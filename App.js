@@ -37,8 +37,9 @@ const styles = StyleSheet.create({
   constructor(props) {
     super(props)
 
-    this.user = ""
+    this.username = ""
     this.pass = ""
+    this.user = null
   }
 
   componentDidMount() {
@@ -51,18 +52,24 @@ const styles = StyleSheet.create({
     messagingSenderId: "680139677816"
   }
   firebase.initializeApp(config)
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    this.user = user
+    // User is signed in.
+  } else {
+    // No user is signed in.
+  }
+});
 }
 
   render () {
     return (
     <Container style={styles.container}>
-      <Text style={styles.welcome}>
-        Welcome to React Native Navigation Sample!
-      </Text>
       <Item rounded style={styles.inputGrp}>
         <Input
         placeholder="Username"
-        onChangeText={u => this.user = u}
+        onChangeText={u => this.username = u}
         placeholderTextColor="#FFF"
         style={styles.input}
         autoCapitalize={'none'}
@@ -82,7 +89,7 @@ const styles = StyleSheet.create({
         </Item>
         <View style={{flexDirection: 'row'}}>
       <Button primary rounded
-        onPress={() => this.login(this.user, this.pass)}
+        onPress={() => this.login(this.username, this.pass)}
         style={{alignSelf: 'center'}}
         >
         <Text>Login</Text>
@@ -98,33 +105,22 @@ const styles = StyleSheet.create({
   )
   }
 
-    async signup(email, pass) {
-      try {
-        await firebase.auth()
-        .createUserWithEmailAndPassword(email, pass)
 
-        console.log("Account created")
-        Alert.alert("account created")
-      } catch (error) {
-        console.log(error.toString())
-      }
-}
-
-//   async login(email, pass) {
+  async login(email, pass) {
     
-//     try {
-//         await firebase.auth()
-//             .signInWithEmailAndPassword(email, pass);
+    try {
+        await firebase.auth()
+            .signInWithEmailAndPassword(email, pass);
 
-//         console.log("Logged In!")
-//         Alert.alert("logged in")
+        console.log("Logged In!")
+        Alert.alert("logged in")
 
-//         // Navigate to the Home page
+        // Navigate to the Home page
 
-//     } catch (error) {
-//         Alert.alert(error.toString())
-//     }
+    } catch (error) {
+        Alert.alert(error.toString())
+    }
 
-// }
+}
 
 } 

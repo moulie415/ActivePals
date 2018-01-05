@@ -11,7 +11,8 @@ import {
   Icon,
   Body,
   Title,
-  Right
+  Right,
+  Content
 } from 'native-base'
 import * as firebase from "firebase"
 
@@ -59,22 +60,6 @@ const styles = StyleSheet.create({
   render () {
     return (
     <Container style={styles.container}>
-    <Header>
-          <Left>
-            <Button
-            transparent
-            onPress={() => this.props.navigation.goBack()}>
-              <Icon name="arrow-round-back" />
-            </Button>
-          </Left>
-          <Body>
-            <Title adjustsFontSizeToFit>Sign up</Title>
-          </Body>
-          <Right />
-        </Header>
-      <Text style={styles.welcome}>
-        Welcome to React Native Navigation Sample!
-      </Text>
       <Item rounded style={styles.inputGrp}>
         <Input
         placeholder="Username"
@@ -100,7 +85,7 @@ const styles = StyleSheet.create({
         onPress={() => this.signup(this.user, this.pass)}
         style={{alignSelf: 'center'}}
         >
-        <Text>Go to second screen</Text>
+        <Text>Sign up</Text>
         </Button>
     </Container>
   )
@@ -114,11 +99,6 @@ const styles = StyleSheet.create({
 
         console.log("Account created");
         Alert.alert("account created")
-       //this.props.navigation.navigate("SecondScreen")
-
-
-        // Navigate to the Home page, the user is auto logged in
-
       } catch (error) {
         console.log(error.toString())
       }
