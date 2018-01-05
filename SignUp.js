@@ -1,6 +1,18 @@
 import React, { Component } from "react"
-import { StyleSheet, Alert, View } from "react-native"
-import { Button, Text, Input, Container, Content,  Item } from 'native-base'
+import { StyleSheet, Alert } from "react-native"
+import {
+  Button,
+  Text,
+  Input,
+  Container,
+  Item,
+  Header,
+  Left,
+  Icon,
+  Body,
+  Title,
+  Right
+} from 'native-base'
 import * as firebase from "firebase"
 
 const styles = StyleSheet.create({
@@ -32,7 +44,7 @@ const styles = StyleSheet.create({
   },
 })
 
- export default class App extends Component {
+ export default class SignUp extends Component {
 
   constructor(props) {
     super(props)
@@ -42,20 +54,24 @@ const styles = StyleSheet.create({
   }
 
   componentDidMount() {
-   let config = {
-    apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
-    authDomain: "anyone-80c08.firebaseapp.com",
-    databaseURL: "https://anyone-80c08.firebaseio.com",
-    projectId: "anyone-80c08",
-    storageBucket: "anyone-80c08.appspot.com",
-    messagingSenderId: "680139677816"
   }
-  firebase.initializeApp(config)
-}
 
   render () {
     return (
     <Container style={styles.container}>
+    <Header>
+          <Left>
+            <Button
+            transparent
+            onPress={() => this.props.navigation.goBack()}>
+              <Icon name="arrow-round-back" />
+            </Button>
+          </Left>
+          <Body>
+            <Title adjustsFontSizeToFit>Sign up</Title>
+          </Body>
+          <Right />
+        </Header>
       <Text style={styles.welcome}>
         Welcome to React Native Navigation Sample!
       </Text>
@@ -80,51 +96,33 @@ const styles = StyleSheet.create({
         style={styles.input}
         />
         </Item>
-        <View style={{flexDirection: 'row'}}>
       <Button primary rounded
-        onPress={() => this.login(this.user, this.pass)}
+        onPress={() => this.signup(this.user, this.pass)}
         style={{alignSelf: 'center'}}
         >
-        <Text>Login</Text>
+        <Text>Go to second screen</Text>
         </Button>
-      <Button primary rounded
-        onPress={() => this.props.navigation.navigate("SignUp")}
-        style={{alignSelf: 'center'}}
-        >
-        <Text>Sign Up</Text>
-        </Button>
-        </View>
     </Container>
   )
   }
 
     async signup(email, pass) {
+
       try {
         await firebase.auth()
-        .createUserWithEmailAndPassword(email, pass)
+        .createUserWithEmailAndPassword(email, pass);
 
-        console.log("Account created")
+        console.log("Account created");
         Alert.alert("account created")
+       //this.props.navigation.navigate("SecondScreen")
+
+
+        // Navigate to the Home page, the user is auto logged in
+
       } catch (error) {
         console.log(error.toString())
       }
-}
 
-//   async login(email, pass) {
-    
-//     try {
-//         await firebase.auth()
-//             .signInWithEmailAndPassword(email, pass);
-
-//         console.log("Logged In!")
-//         Alert.alert("logged in")
-
-//         // Navigate to the Home page
-
-//     } catch (error) {
-//         Alert.alert(error.toString())
-//     }
-
-// }
+} 
 
 } 

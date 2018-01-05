@@ -1,9 +1,10 @@
 
 import React from "react"
-import { AppRegistry } from 'react-native';
-import App from './App';
-import { StackNavigator } from "react-navigation";
-import SecondScreen from "Anyone/SecondScreen";
+import { AppRegistry } from 'react-native'
+import { StackNavigator } from "react-navigation"
+import App from './App'
+import SignUp from './SignUp'
+import SecondScreen from "./SecondScreen"
 
 
 const reactNavigationSample = props => {
@@ -16,6 +17,7 @@ reactNavigationSample.navigationOptions = {
 
 const SimpleApp = StackNavigator({
   Home: { screen: reactNavigationSample },
+  SignUp: { screen: SignUp},
   SecondScreen: { screen: SecondScreen, title: "Second Screen" }
 });
 
