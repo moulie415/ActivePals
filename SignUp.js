@@ -50,11 +50,20 @@ const styles = StyleSheet.create({
   constructor(props) {
     super(props)
 
-    this.user = ""
+    this.username = ""
     this.pass = ""
   }
 
   componentDidMount() {
+    
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        this.user = user
+    // User is signed in.
+  } else {
+    // No user is signed in.
+  }
+})
   }
 
   render () {
@@ -63,7 +72,7 @@ const styles = StyleSheet.create({
       <Item rounded style={styles.inputGrp}>
         <Input
         placeholder="Username"
-        onChangeText={u => this.user = u}
+        onChangeText={u => this.username = u}
         placeholderTextColor="#FFF"
         style={styles.input}
         autoCapitalize={'none'}
@@ -82,7 +91,7 @@ const styles = StyleSheet.create({
         />
         </Item>
       <Button primary rounded
-        onPress={() => this.signup(this.user, this.pass)}
+        onPress={() => this.signup(this.username, this.pass)}
         style={{alignSelf: 'center'}}
         >
         <Text>Sign up</Text>

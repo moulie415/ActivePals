@@ -2,7 +2,7 @@
 import React from "react"
 import { AppRegistry } from 'react-native'
 import { StackNavigator } from "react-navigation"
-import App from './App'
+import App from './login'
 import SignUp from './SignUp'
 import SecondScreen from "./SecondScreen"
 
@@ -12,7 +12,7 @@ const reactNavigationSample = props => {
 };
 
 reactNavigationSample.navigationOptions = {
-  title: "Home Screen"
+  title: "Login"
 };
 
 const SimpleApp = StackNavigator({
