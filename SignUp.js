@@ -15,35 +15,7 @@ import {
   Content
 } from 'native-base'
 import * as firebase from "firebase"
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#002b31"
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: "center",
-    margin: 10
-  },
-  instructions: {
-    textAlign: "center",
-    color: "#333333",
-    marginBottom: 5
-  },
-  input: {
-    color: '#fff'
-  },
-  inputGrp: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    marginBottom: 20,
-    borderWidth: 0,
-    borderColor: 'transparent',
-  },
-})
+import  styles  from './styles/signUpStyles'
 
  export default class SignUp extends Component {
 
@@ -52,10 +24,11 @@ const styles = StyleSheet.create({
 
     this.username = ""
     this.pass = ""
+    this.confirm = ""
   }
 
   componentDidMount() {
-    
+
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
         this.user = user
@@ -90,8 +63,24 @@ const styles = StyleSheet.create({
         style={styles.input}
         />
         </Item>
-      <Button primary rounded
-        onPress={() => this.signup(this.username, this.pass)}
+      <Item rounded style={styles.inputGrp}>
+      <Input
+        placeholder="Confirm Password"
+        secureTextEntry={true}
+        placeholderTextColor="#FFF"
+        onChangeText={p => this.confirm = p}
+        style={styles.input}
+        />
+        </Item>
+        <Button primary rounded
+        onPress={() => {
+          if (this.pass == this.confirm) {
+            this.signup(this.username, this.pass)
+          }
+          else {
+            Alert.alert("Please try again", "Passwords do not match")
+          }
+        }}
         style={{alignSelf: 'center'}}
         >
         <Text>Sign up</Text>

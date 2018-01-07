@@ -3,6 +3,7 @@ import { StyleSheet, Alert, View } from "react-native"
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import * as firebase from "firebase"
 import  styles  from './styles/loginStyles'
+import {GoogleSignin } from 'react-native-google-signin'
 const FBSDK = require('react-native-fbsdk')
 const { LoginManager, AccessToken } = FBSDK
 
@@ -85,6 +86,7 @@ const { LoginManager, AccessToken } = FBSDK
         <Text style={{marginLeft: -20}}>Login with Facebook</Text>
         </Button>
         <Button rounded
+        onPress={()=> this.gLogin()}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
         <Icon name="logo-google"/>
         <Text style={{marginLeft: -20}}>Login with Google</Text>
@@ -168,4 +170,45 @@ fbLogin() {
    
   }
 
-} 
+  gLogin() {
+    GoogleSignin.configure({}).then(() => {
+      GoogleSignin.hasPlayServices({ autoResolve: true })
+        .then(() => {
+          GoogleSignin.signIn()
+            .then(user => {
+              console.log(user);
+
+              const credential = firebase.auth.GoogleAuthProvider.credential(
+                user.idToken,
+                user.accessToken
+              );
+
+              firebase
+                .auth()
+                .signInWithCredential(credential)
+                .then(user => {
+                  console.log("user firebase ", user);
+                  if (user._authObj.authenticated) {
+                    // do you login action here
+                    // dispatch({
+                    //  type: LOGIN_SUCCESS,
+                    //  payload: { ...user._user, loggedIn: true }
+                    //});
+                  }
+                });
+            })
+            .catch(err => {
+              console.log("WRONG SIGNIN", err.message)
+              Alert.alert("Wrong sign in", err.message)
+            })
+            .done();
+        })
+        .catch(err => {
+          console.log("Play services error", err.code, err.message)
+          Alert.alert("Play services error", err.code, err.message)
+        });
+   });
+
+  }
+
+}
