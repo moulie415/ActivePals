@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { StyleSheet, Alert, View } from "react-native"
-import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
+import { Button, Text, Input, Container, Content,  Item, Icon, Spinner } from 'native-base'
 import * as firebase from "firebase"
 import  styles  from './styles/loginStyles'
 import {GoogleSignin } from 'react-native-google-signin'
@@ -8,14 +8,20 @@ const FBSDK = require('react-native-fbsdk')
 const { LoginManager, AccessToken } = FBSDK
 
 
- export default class App extends Component {
+ export default class Login extends Component {
 
   constructor(props) {
     super(props)
 
     this.username = ""
     this.pass = ""
-    this.user = null
+    this.state = {
+      user: null,
+      spinner: false,
+      loggedIn: false
+
+    }
+    const navigation = props.navigation
   }
 
   componentDidMount() {
@@ -29,19 +35,26 @@ const { LoginManager, AccessToken } = FBSDK
   }
   firebase.initializeApp(config)
 
-  firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    this.user = user
-    // User is signed in.
-  } else {
-    // No user is signed in.
-  }
-})
+  this.isLoggedIn = firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+      this.navigate('MainNav');
+    }
+  });  
 }
+
+componentWillUnMount() {
+  this.isLoggedIn()
+}
+
+navigate(routeName) {
+    this.props.navigation.navigate(routeName)
+  }
+
 
   render () {
     return (
     <Container style={styles.container}>
+      {this.state.spinner && <Spinner />}
       <Item rounded style={styles.inputGrp}>
       <Icon name="mail" style={{color: "#fff"}} />
         <Input
@@ -67,7 +80,10 @@ const { LoginManager, AccessToken } = FBSDK
         </Item>
         <View style={{flexDirection: 'row', marginVertical: 10}}>
       <Button primary rounded
-        onPress={() => this.login(this.username, this.pass)}
+        onPress={() => {
+          this.setState({spinner: true})
+          this.login(this.username, this.pass)
+        }}
         style={{marginRight: 10, width: 100, justifyContent: 'center'}}
         >
         <Text>Login</Text>
@@ -80,13 +96,17 @@ const { LoginManager, AccessToken } = FBSDK
         </Button>
         </View>
         <Button rounded
-        onPress={()=> this.fbLogin()}
+        onPress={()=> {
+          this.fbLogin()
+        }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
         <Icon name="logo-facebook"/>
         <Text style={{marginLeft: -20}}>Login with Facebook</Text>
         </Button>
         <Button rounded
-        onPress={()=> this.gLogin()}
+        onPress={()=> {
+          this.gLogin()
+        }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
         <Icon name="logo-google"/>
         <Text style={{marginLeft: -20}}>Login with Google</Text>
@@ -95,22 +115,26 @@ const { LoginManager, AccessToken } = FBSDK
   )
   }
 
+  
+
 
   async login(email, pass) {
+
     
     try {
         await firebase.auth()
             .signInWithEmailAndPassword(email, pass);
 
+        this.setState({spinner: false, loggedIn: true})
         console.log("Logged In!")
         Alert.alert("logged in")
 
         // Navigate to the Home page
 
     } catch (error) {
+        this.setState({spinner: false})
         Alert.alert(error.toString())
     }
-
 }
 
 fbLogin() {
@@ -120,6 +144,7 @@ fbLogin() {
             alert('Login fail with error: ' + error);
           }
         )
+
 }
 
  _handleCallBack(result){
@@ -176,7 +201,7 @@ fbLogin() {
         .then(() => {
           GoogleSignin.signIn()
             .then(user => {
-              console.log(user);
+              console.log(user)
 
               const credential = firebase.auth.GoogleAuthProvider.credential(
                 user.idToken,
@@ -187,7 +212,7 @@ fbLogin() {
                 .auth()
                 .signInWithCredential(credential)
                 .then(user => {
-                  console.log("user firebase ", user);
+                  console.log("user firebase ", user)
                   if (user._authObj.authenticated) {
                     // do you login action here
                     // dispatch({
@@ -201,14 +226,13 @@ fbLogin() {
               console.log("WRONG SIGNIN", err.message)
               Alert.alert("Wrong sign in", err.message)
             })
-            .done();
+            .done()
         })
         .catch(err => {
           console.log("Play services error", err.code, err.message)
           Alert.alert("Play services error", err.code, err.message)
-        });
-   });
-
+        })
+   })
   }
 
 }

@@ -12,7 +12,8 @@ import {
   Body,
   Title,
   Right,
-  Content
+  Content,
+  Spinner
 } from 'native-base'
 import * as firebase from "firebase"
 import  styles  from './styles/signUpStyles'
@@ -25,6 +26,9 @@ import  styles  from './styles/signUpStyles'
     this.username = ""
     this.pass = ""
     this.confirm = ""
+    this.state = {
+      spinner: false
+    }
   }
 
   componentDidMount() {
@@ -42,9 +46,10 @@ import  styles  from './styles/signUpStyles'
   render () {
     return (
     <Container style={styles.container}>
+      {this.state.spinner && <Spinner />}
       <Item rounded style={styles.inputGrp}>
         <Input
-        placeholder="Username"
+        placeholder="Email"
         onChangeText={u => this.username = u}
         placeholderTextColor="#FFF"
         style={styles.input}
@@ -75,6 +80,7 @@ import  styles  from './styles/signUpStyles'
         <Button primary rounded
         onPress={() => {
           if (this.pass == this.confirm) {
+            this.setState({spinner: true})
             this.signup(this.username, this.pass)
           }
           else {
@@ -95,10 +101,14 @@ import  styles  from './styles/signUpStyles'
         await firebase.auth()
         .createUserWithEmailAndPassword(email, pass);
 
+        this.setState({spinner: false})
         console.log("Account created");
         Alert.alert("account created")
+
       } catch (error) {
         console.log(error.toString())
+        this.setState({spinner: false})
+        Alert.alert(error.toString())
       }
 
 } 
