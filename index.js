@@ -10,7 +10,18 @@ import Friends from './Friends'
 import Profile from './Profile'
 import Settings from './Settings'
 import SecondScreen from "./SecondScreen"
+import * as firebase from "firebase"
 
+let config = {
+	apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
+	authDomain: "anyone-80c08.firebaseapp.com",
+	databaseURL: "https://anyone-80c08.firebaseio.com",
+	projectId: "anyone-80c08",
+	storageBucket: "anyone-80c08.appspot.com",
+	messagingSenderId: "680139677816"
+}
+firebase.initializeApp(config)
+export default firebase
 
 const App = props => {
   return <Login navigation={props.navigation} />;

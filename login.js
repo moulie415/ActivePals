@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { StyleSheet, Alert, View } from "react-native"
 import { Button, Text, Input, Container, Content,  Item, Icon, Spinner } from 'native-base'
-import * as firebase from "firebase"
+import firebase from "./index"
 import  styles  from './styles/loginStyles'
 import {GoogleSignin } from 'react-native-google-signin'
 const FBSDK = require('react-native-fbsdk')
@@ -25,21 +25,13 @@ const { LoginManager, AccessToken } = FBSDK
   }
 
   componentDidMount() {
-   let config = {
-    apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
-    authDomain: "anyone-80c08.firebaseapp.com",
-    databaseURL: "https://anyone-80c08.firebaseio.com",
-    projectId: "anyone-80c08",
-    storageBucket: "anyone-80c08.appspot.com",
-    messagingSenderId: "680139677816"
-  }
-  firebase.initializeApp(config)
+   
 
   this.isLoggedIn = firebase.auth().onAuthStateChanged(user => {
     if (user) {
       this.navigate('MainNav');
     }
-  });  
+  })  
 }
 
 componentWillUnMount() {
@@ -213,13 +205,14 @@ fbLogin() {
                 .signInWithCredential(credential)
                 .then(user => {
                   console.log("user firebase ", user)
-                  if (user._authObj.authenticated) {
+
+                  //if (user._authObj.authenticated) { THIS LINE DOES NOT WORK 
                     // do you login action here
                     // dispatch({
                     //  type: LOGIN_SUCCESS,
                     //  payload: { ...user._user, loggedIn: true }
                     //});
-                  }
+                  //}
                 });
             })
             .catch(err => {

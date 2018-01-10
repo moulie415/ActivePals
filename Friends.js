@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { StyleSheet, Alert, View } from "react-native"
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
-import * as firebase from "firebase"
+import firebase from "./index"
 
 
  export default class Friends extends Component {
