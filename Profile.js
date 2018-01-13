@@ -5,6 +5,7 @@ import firebase from './index'
 
  export default class Profile extends Component {
   static navigationOptions = {
+    header: null,
     tabBarLabel: 'Profile',
     tabBarIcon: ({ tintColor }) => (
       <Icon

@@ -24,6 +24,7 @@ import  styles  from './styles/signUpStyles'
     super(props)
 
     this.username = ""
+    this.email = ""
     this.pass = ""
     this.confirm = ""
     this.state = {
@@ -33,7 +34,7 @@ import  styles  from './styles/signUpStyles'
 
   componentDidMount() {
 
-    firebase.auth().onAuthStateChanged(function(user) {
+    firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.user = user
     // User is signed in.
@@ -48,18 +49,31 @@ import  styles  from './styles/signUpStyles'
     <Container style={styles.container}>
       {this.state.spinner && <Spinner />}
       <Item rounded style={styles.inputGrp}>
+      <Icon name="person" style={{color: "#fff"}} />
         <Input
-        placeholder="Email"
+        placeholder="Username (optional)"
         onChangeText={u => this.username = u}
         placeholderTextColor="#FFF"
         style={styles.input}
         autoCapitalize={'none'}
         autoCorrect={false}
-        //value={this.state.username}
         keyboardType={'email-address'}
         />
         </Item>
       <Item rounded style={styles.inputGrp}>
+      <Icon name="mail" style={{color: "#fff"}} />
+        <Input
+        placeholder="Email"
+        onChangeText={e => this.email = e}
+        placeholderTextColor="#FFF"
+        style={styles.input}
+        autoCapitalize={'none'}
+        autoCorrect={false}
+        keyboardType={'email-address'}
+        />
+        </Item>
+      <Item rounded style={styles.inputGrp}>
+      <Icon name="mail" style={{color: "#fff"}} />
       <Input
         placeholder="Password"
         secureTextEntry={true}
@@ -69,6 +83,7 @@ import  styles  from './styles/signUpStyles'
         />
         </Item>
       <Item rounded style={styles.inputGrp}>
+      <Icon name="unlock" style={{color: "#fff"}} />
       <Input
         placeholder="Confirm Password"
         secureTextEntry={true}
@@ -81,7 +96,7 @@ import  styles  from './styles/signUpStyles'
         onPress={() => {
           if (this.pass == this.confirm) {
             this.setState({spinner: true})
-            this.signup(this.username, this.pass)
+            this.signup(this.email, this.pass)
           }
           else {
             Alert.alert("Please try again", "Passwords do not match")
@@ -99,7 +114,11 @@ import  styles  from './styles/signUpStyles'
 
       try {
         await firebase.auth()
-        .createUserWithEmailAndPassword(email, pass);
+        .createUserWithEmailAndPassword(email, pass).then(user => {
+         user.updateProfile({displayName: this.username})
+       }).catch(function(error) {
+        console.log(error)
+      })
 
         this.setState({spinner: false})
         console.log("Account created");

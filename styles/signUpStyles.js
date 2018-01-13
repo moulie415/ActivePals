@@ -26,5 +26,7 @@ export default styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 0,
     borderColor: 'transparent',
+    marginLeft: 20,
+    marginRight: 20
   },
 })

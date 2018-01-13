@@ -7,6 +7,7 @@ import firebase from "./index"
  export default class Home extends Component {
 
  static navigationOptions = {
+    header: null,
     tabBarLabel: 'Home',
     tabBarIcon: ({ tintColor }) => (
       <Icon
@@ -19,23 +20,33 @@ import firebase from "./index"
     super(props)
 
     this.user = null
+    this.state = {
+      username: 'no username'
+    }
   }
 
   componentDidMount() {
 
-  firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    this.user = user
-    // User is signed in.
-  } else {
-    // No user is signed in.
-  }
-})
+
+  firebase.auth().onAuthStateChanged( user => {
+    if (user.email) {
+      this.setState({email: user.email})
+    }
+    if (user.displayName) {
+      this.setState({username: user.displayName})
+    }
+    })
+}
+
+componentDidUnMount() {
+
 }
 
   render () {
     return (
     <Container>
+    <Text>{this.state.email}</Text>
+    <Text>{this.state.username}</Text>
       <Button>
 
       </Button>

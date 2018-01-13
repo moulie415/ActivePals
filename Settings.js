@@ -6,6 +6,7 @@ import firebase from "./index"
 
  export default class Settings extends Component {
   static navigationOptions = {
+    header: null,
     tabBarLabel: 'Settings',
     tabBarIcon: ({ tintColor }) => (
       <Icon

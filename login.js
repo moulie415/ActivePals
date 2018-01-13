@@ -3,7 +3,7 @@ import { StyleSheet, Alert, View } from "react-native"
 import { Button, Text, Input, Container, Content,  Item, Icon, Spinner } from 'native-base'
 import firebase from "./index"
 import  styles  from './styles/loginStyles'
-import {GoogleSignin } from 'react-native-google-signin'
+import { GoogleSignin } from 'react-native-google-signin'
 const FBSDK = require('react-native-fbsdk')
 const { LoginManager, AccessToken } = FBSDK
 
@@ -27,16 +27,16 @@ const { LoginManager, AccessToken } = FBSDK
   componentDidMount() {
    
 
-  this.isLoggedIn = firebase.auth().onAuthStateChanged(user => {
+  firebase.auth().onAuthStateChanged(user => {
     if (user) {
-      this.navigate('MainNav');
+      this.navigate('Home');
     }
   })  
 }
 
-componentWillUnMount() {
-  this.isLoggedIn()
-}
+// componentWillUnMount() {
+//   this.isLoggedIn()
+// }
 
 navigate(routeName) {
     this.props.navigation.navigate(routeName)
@@ -74,6 +74,9 @@ navigate(routeName) {
       <Button primary rounded
         onPress={() => {
           this.setState({spinner: true})
+          if (this.user) {
+            this.logout()
+          }
           this.login(this.username, this.pass)
         }}
         style={{marginRight: 10, width: 100, justifyContent: 'center'}}
@@ -89,6 +92,9 @@ navigate(routeName) {
         </View>
         <Button rounded
         onPress={()=> {
+          if (this.user) {
+            this.logout()
+          }
           this.fbLogin()
         }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
@@ -97,6 +103,9 @@ navigate(routeName) {
         </Button>
         <Button rounded
         onPress={()=> {
+          if (this.user) {
+            this.logout()
+          }
           this.gLogin()
         }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
@@ -111,33 +120,31 @@ navigate(routeName) {
 
 
   async login(email, pass) {
-
-    
     try {
-        await firebase.auth()
-            .signInWithEmailAndPassword(email, pass);
+      await firebase.auth()
+      .signInWithEmailAndPassword(email, pass);
 
-        this.setState({spinner: false, loggedIn: true})
-        console.log("Logged In!")
-        Alert.alert("logged in")
+      this.setState({spinner: false, loggedIn: true})
+      console.log("Logged In!")
+      Alert.alert("logged in")
 
         // Navigate to the Home page
 
-    } catch (error) {
+      } catch (error) {
         this.setState({spinner: false})
         Alert.alert(error.toString())
+      }
     }
-}
 
-fbLogin() {
-   LoginManager.logInWithReadPermissions(['public_profile', 'email'])
-        .then((result) => this._handleCallBack(result),
-          function(error) {
-            alert('Login fail with error: ' + error);
-          }
+    fbLogin() {
+      LoginManager.logInWithReadPermissions(['public_profile', 'email'])
+      .then((result) => this._handleCallBack(result),
+        function(error) {
+          alert('Login fail with error: ' + error);
+        }
         )
+    }
 
-}
 
  _handleCallBack(result){
     let _this = this
@@ -226,6 +233,13 @@ fbLogin() {
           Alert.alert("Play services error", err.code, err.message)
         })
    })
+  }
+
+   logout() {
+    firebase.auth().signOut().then(function() {
+    }, function(error) {
+      Alert.alert(error.toString())
+    })
   }
 
 }

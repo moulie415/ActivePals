@@ -6,6 +6,7 @@ import firebase from "./index"
 
  export default class Friends extends Component {
   static navigationOptions = {
+    header: null,
     tabBarLabel: 'Friends',
     tabBarIcon: ({ tintColor }) => (
       <Icon
