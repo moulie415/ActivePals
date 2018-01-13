@@ -149,7 +149,7 @@ navigate(routeName) {
  _handleCallBack(result){
     let _this = this
     if (result.isCancelled) {
-      alert('Login cancelled');
+      Alert.alert("Facbook login", "cancelled")
     } else {   
   AccessToken.getCurrentAccessToken().then(
           (data) => {
@@ -195,7 +195,9 @@ navigate(routeName) {
   }
 
   gLogin() {
-    GoogleSignin.configure({}).then(() => {
+    GoogleSignin.configure({
+      iosClientId: '680139677816-3eoc0cs830fbns898khlh01e6f685k1u.apps.googleusercontent.com'
+    }).then(() => {
       GoogleSignin.hasPlayServices({ autoResolve: true })
         .then(() => {
           GoogleSignin.signIn()
