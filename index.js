@@ -50,11 +50,15 @@ const tabs = TabNavigator({
 })
 
 const SimpleApp = StackNavigator({
-  Login : { screen: App },
+  Login : { screen: App, navigationOptions: {header: null} },
   SignUp: { screen: SignUp},
   MainNav: { screen: tabs},
   SecondScreen: { screen: SecondScreen, title: "Second Screen" }
 })
+
+// const sessionNav = StackNavigator({
+
+// })
 
 
 

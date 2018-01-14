@@ -13,6 +13,7 @@
 #import <React/RCTRootView.h>
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <RNGoogleSignin/RNGoogleSignin.h>
+@import GoogleMaps;
 
 
 
@@ -37,6 +38,8 @@
   [self.window makeKeyAndVisible];
   
   //[FIRApp configure];
+  
+  [GMSServices provideAPIKey:@"AIzaSyC_lZXdWz3no4k9MhIKbyIG5789TVir48Y"];
   
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
