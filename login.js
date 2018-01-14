@@ -1,6 +1,15 @@
 import React, { Component } from "react"
 import { StyleSheet, Alert, View } from "react-native"
-import { Button, Text, Input, Container, Content,  Item, Icon, Spinner } from 'native-base'
+import { 
+  Button,
+  Text,
+  Input,
+  Container,
+  Content,
+  Item,
+  Icon,
+  Spinner,
+} from 'native-base'
 import firebase from "./index"
 import  styles  from './styles/loginStyles'
 import { GoogleSignin } from 'react-native-google-signin'
@@ -18,8 +27,6 @@ const { LoginManager, AccessToken } = FBSDK
     this.state = {
       user: null,
       spinner: false,
-      loggedIn: false
-
     }
     const navigation = props.navigation
   }
@@ -29,18 +36,12 @@ const { LoginManager, AccessToken } = FBSDK
 
   firebase.auth().onAuthStateChanged(user => {
     if (user) {
-      this.navigate('Home');
+      this.props.navigation.navigate('Home')
+
     }
   })  
 }
 
-// componentWillUnMount() {
-//   this.isLoggedIn()
-// }
-
-navigate(routeName) {
-    this.props.navigation.navigate(routeName)
-  }
 
 
   render () {
@@ -122,11 +123,15 @@ navigate(routeName) {
   async login(email, pass) {
     try {
       await firebase.auth()
-      .signInWithEmailAndPassword(email, pass);
-
-      this.setState({spinner: false, loggedIn: true})
+      .signInWithEmailAndPassword(email, pass).then(user => {
       console.log("Logged In!")
-      Alert.alert("logged in")
+      let text = user.displayName? user.displayName : user.email 
+      Alert.alert("Success", "Logged in as: " + text)
+
+      })
+
+      this.setState({spinner: false})
+
 
         // Navigate to the Home page
 
@@ -155,7 +160,7 @@ navigate(routeName) {
           (data) => {
           
             const token = data.accessToken
-            fetch('https://graph.facebook.com/v2.8/me?fields=id,first_name,last_name,gender,birthday&access_token=' + token)
+            fetch('https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,gender,birthday&access_token=' + token)
             .then((response) => response.json())
             .then((json) => {
           
@@ -190,6 +195,7 @@ navigate(routeName) {
       uid,
       token
     }
+    Alert.alert("Success", "Logged in as: " + userData.email)
     firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
    
   }
@@ -214,6 +220,8 @@ navigate(routeName) {
                 .signInWithCredential(credential)
                 .then(user => {
                   console.log("user firebase ", user)
+                  let text = user.displayName? user.displayName : user.email 
+                  Alert.alert("Success", "Logged in as: " + text)
 
                   //if (user._authObj.authenticated) { THIS LINE DOES NOT WORK 
                     // do you login action here

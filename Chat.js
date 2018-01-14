@@ -1,0 +1,50 @@
+import React, { Component } from "react"
+import { StyleSheet, Alert, View } from "react-native"
+import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
+import firebase from './index'
+import  styles  from './styles/loginStyles'
+
+ export default class Chat extends Component {
+  static navigationOptions = {
+    header: null,
+    tabBarLabel: 'Chat',
+    tabBarIcon: ({ tintColor }) => (
+      <Icon
+        name='chatboxes'
+        style={{ color: tintColor }}
+      />
+    ),
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.user = null
+    this.state = {
+      email: "",
+      username: ""
+    }
+  }
+
+  //have dms and session chat tabs at top
+
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        this.props.navigation.navigate('Login');
+      }
+      else {
+        this.setState({email: user.email, username: user.displayName })
+      }
+    })  
+  }
+
+
+  render () {
+    return (
+    <Container>
+    </Container>
+  )
+  }
+
+}

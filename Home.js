@@ -28,29 +28,28 @@ import firebase from "./index"
   componentDidMount() {
 
 
-  firebase.auth().onAuthStateChanged( user => {
-    if (user.email) {
-      this.setState({email: user.email})
-    }
-    if (user.displayName) {
-      this.setState({username: user.displayName})
-    }
+    firebase.auth().onAuthStateChanged( user => {
+      if (user) {
+        this.user = user
+      }
     })
-}
+  }
 
-componentDidUnMount() {
-
-}
 
   render () {
+    //switch for list view and map view
+    //action sheet when pressing 
     return (
-    <Container>
-    <Text>{this.state.email}</Text>
-    <Text>{this.state.username}</Text>
-      <Button>
-
-      </Button>
-    </Container>
-  )
+      <Container>
+        <Button
+        onPress={()=> this.logout()}>
+          <Text>Create Session</Text>
+        </Button>
+        <Button
+        onPress={()=> this.logout()}>
+          <Text>Create Private Session</Text>
+        </Button>
+      </Container>
+      )
   }
 }

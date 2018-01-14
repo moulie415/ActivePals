@@ -9,8 +9,10 @@ import Home from './Home'
 import Friends from './Friends'
 import Profile from './Profile'
 import Settings from './Settings'
+import Chat from './Chat'
 import SecondScreen from "./SecondScreen"
 import * as firebase from "firebase"
+import { Root } from 'native-base'
 
 let config = {
 	apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
@@ -25,7 +27,7 @@ export default firebase
 
 const App = props => {
   return <Login navigation={props.navigation} />;
-};
+}
 
 App.navigationOptions = {
   title: "Login"
@@ -33,15 +35,17 @@ App.navigationOptions = {
 
 const tabs = TabNavigator({
 	Home : {screen: Home},
+  Friends: {screen: Friends},
+  Chat: {screen: Chat},
 	Profile: {screen: Profile},
-	Friends: {screen: Friends},
 	Settings: {screen: Settings}
 }, {
   tabBarPosition: 'bottom',
   animationEnabled: true,
   tabBarOptions: {
     activeTintColor: '#e91e63',
-    showIcon: true
+    showIcon: true,
+    showLabel: false
   },
 })
 
