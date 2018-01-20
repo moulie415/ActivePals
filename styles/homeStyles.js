@@ -10,4 +10,10 @@ export default styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  map: {
+    flex: 1
+  },
+  container: {
+
+  }
 })

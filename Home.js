@@ -3,6 +3,8 @@ import {
   StyleSheet,
   Alert,
   View,
+  FlatList,
+  TouchableOpacity
 } from "react-native"
 import {
   Button,
@@ -12,11 +14,16 @@ import {
   Content,
   Item,
   Icon,
-  Spinner
+  Spinner,
+  Switch,
+  Header,
+  Card
 } from 'native-base'
 import firebase from "./index"
 import Permissions from 'react-native-permissions'
 import styles from './styles/homeStyles'
+import colors from './constants/colors'
+import MapView from 'react-native-maps'
 
 
  export default class Home extends Component {
@@ -38,7 +45,9 @@ import styles from './styles/homeStyles'
     this.state = {
       username: 'no username',
       spinner: false,
-      showMap: true
+      showMap: true,
+      switch: false,
+      data: ['1', '2', '3', '4', '5', '6', '7']
     }
   }
 
@@ -69,16 +78,62 @@ import styles from './styles/homeStyles'
     //switch for list view and map view
     //action sheet when pressing 
     return (
-      <Container>
+      <Container style={styles.container}>
+      <Header />
       {this.state.spinner && <Spinner style={styles.spinner} />}
-        <Button
-        onPress={()=> this.logout()}>
-          <Text>Create Session</Text>
-        </Button>
-        <Button
-        onPress={()=> this.logout()}>
-          <Text>Create Private Session</Text>
-        </Button>
+        <View style={{flexDirection: 'row', marginVertical: 10, justifyContent: 'flex-end'}}>
+          <View style={{flexDirection: 'row'}}> 
+            <Text>Map view:</Text>
+            <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
+          </View>
+        </View>
+
+        {!this.state.switch && <FlatList
+          style={{marginHorizontal: 10}}
+          data={this.state.data}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <Card style={{padding: 10}}>
+              <Text>{'Session ' + item}</Text>
+              <Text>Placeholder text</Text>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text>{"Location: Gym " + item}</Text>
+                <TouchableOpacity>
+                  <Text style={{color: 'blue'}}>View on map</Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          )}
+      />}
+
+        {this.state.switch && this.state.showMap && <MapView
+          style={styles.map}
+          showsUserLocation={true}
+          initialRegion={{
+            latitude: this.state.latitude,
+            longitude: this.state.longitude,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.0121,
+          }}
+          region={{
+            latitude: this.state.latitude,
+            longitude: this.state.longitude,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.0121,
+          }}
+        >
+        </MapView>}
+
+        <View style={{flexDirection: 'row'}}>
+          <Button style={{flex: 1,}}
+          onPress={()=> this.logout()}>
+            <Text style={{flex: 1, textAlign: 'center'}} >Create Session</Text>
+          </Button>
+          <Button style={{flex: 1}}
+          onPress={()=> this.logout()}>
+            <Text style={{flex: 1, textAlign: 'center'}}>Create Private Session</Text>
+          </Button>
+        </View>
       </Container>
       )
   }
@@ -130,7 +185,7 @@ import styles from './styles/homeStyles'
         this.setState({ spinner: false })
         Alert.alert('Error', error.message)
       },
-      { enableHighAccuracy: true, timeout: 20000/*, maximumAge: 1000*/ },
+      { enableHighAccuracy: true, timeout: 20000, /*maximumAge: 1000*/ },
     )
   }
 }

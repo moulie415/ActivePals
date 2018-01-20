@@ -14,6 +14,7 @@ import {
   Left
 } from 'native-base'
 import firebase from "./index"
+import colors from './constants/colors'
 
 
  export default class Friends extends Component {
@@ -49,9 +50,9 @@ import firebase from "./index"
   render () {
     return (
     <Container>
-      <Header>  
+      <Header style={{backgroundColor: colors.primary}}>  
         <Left style={{flex: 1}}/>
-        <Title style={{alignSelf: 'center', flex: 1 }}>Friends</Title>
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff' }}>Friends</Title>
         <Right style={{flex: 1}}>
           <TouchableOpacity>
             <Icon name='add' style={{color: '#fff'}} />
