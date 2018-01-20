@@ -116,13 +116,16 @@ import  styles  from './styles/signUpStyles'
         await firebase.auth()
         .createUserWithEmailAndPassword(email, pass).then(user => {
          user.updateProfile({displayName: this.username})
-       }).catch(function(error) {
+         let userData = {uid: user.uid, email: user.email, username: this.username}
+         this.createUser(user.uid, userData, "")
+        Alert.alert("account created")
+       }).catch(error => {
         console.log(error)
+        Alert.alert('Error', error.message)
       })
 
         this.setState({spinner: false})
-        console.log("Account created");
-        Alert.alert("account created")
+        
 
       } catch (error) {
         console.log(error.toString())
@@ -131,5 +134,15 @@ import  styles  from './styles/signUpStyles'
       }
 
 } 
+
+createUser = (uid,userData,token) => {
+    const defaults = {
+      uid,
+      token
+    }
+    //Alert.alert("Success", "Logged in as: " + userData.email)
+    firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
+   
+  }
 
 } 

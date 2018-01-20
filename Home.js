@@ -125,13 +125,15 @@ import MapView from 'react-native-maps'
         </MapView>}
 
         <View style={{flexDirection: 'row'}}>
-          <Button style={{flex: 1,}}
+          <Button style={{width: '50%'}}
           onPress={()=> this.logout()}>
-            <Text style={{flex: 1, textAlign: 'center'}} >Create Session</Text>
+            <Text adjustsFontSizeToFit={true} 
+            style={{flex: 1, textAlign: 'center'}}>Create Session</Text>
           </Button>
-          <Button style={{flex: 1}}
+          <Button style={{width: '50%'}}
           onPress={()=> this.logout()}>
-            <Text style={{flex: 1, textAlign: 'center'}}>Create Private Session</Text>
+            <Text adjustsFontSizeToFit={true} 
+            style={{flex: 1, textAlign: 'center'}}>Create Private Session</Text>
           </Button>
         </View>
       </Container>

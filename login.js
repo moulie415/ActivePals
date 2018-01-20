@@ -126,6 +126,7 @@ const { LoginManager, AccessToken } = FBSDK
       await firebase.auth()
       .signInWithEmailAndPassword(email, pass).then(user => {
       console.log("Logged In!")
+
       let text = user.displayName? user.displayName : user.email 
       Alert.alert("Success", "Logged in as: " + text)
 
@@ -173,12 +174,15 @@ const { LoginManager, AccessToken } = FBSDK
                 const { uid } = result               
                 _this.createUser(uid,json,token)
               })
+              .catch(error => {
+                Alert.alert('Error', error.message)
+              })
  
  
             })
-            .catch(function(err) {
-                console.log(err);
-            });
+            .catch(error => {
+              Alert.alert('Error', error.message)
+            })
           }
         )
  
@@ -222,6 +226,9 @@ const { LoginManager, AccessToken } = FBSDK
                 .then(user => {
                   console.log("user firebase ", user)
                   let text = user.displayName? user.displayName : user.email 
+                  let userData = {uid: user.uid, email: user.email, username: user.displayName, token: user.refreshToken}
+                  //let token 
+                  this.createUser(user.uid, userData, user.refreshToken)
                   Alert.alert("Success", "Logged in as: " + text)
 
                   //if (user._authObj.authenticated) { THIS LINE DOES NOT WORK 
