@@ -40,6 +40,7 @@ import MapView from 'react-native-maps'
   }
   constructor(props) {
     super(props)
+    this.nav = this.props.navigation
 
     this.user = null
     this.state = {
@@ -126,12 +127,12 @@ import MapView from 'react-native-maps'
 
         <View style={{flexDirection: 'row'}}>
           <Button style={{width: '50%'}}
-          onPress={()=> this.logout()}>
+          onPress={()=> this.nav.navigate('SessionType')}>
             <Text adjustsFontSizeToFit={true} 
             style={{flex: 1, textAlign: 'center'}}>Create Session</Text>
           </Button>
           <Button style={{width: '50%'}}
-          onPress={()=> this.logout()}>
+          onPress={()=> this.nav.navigate('SessionType')}>
             <Text adjustsFontSizeToFit={true} 
             style={{flex: 1, textAlign: 'center'}}>Create Private Session</Text>
           </Button>
@@ -168,6 +169,12 @@ import MapView from 'react-native-maps'
       // Returns once the user has chosen to 'allow' or to 'not allow' access
       // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
       this.setState({ locationPermission: response })
+      if (response == 'authorized') {
+        this.getPosition()
+      }
+      else {
+        Alert.alert('Sorry', 'The app does not have access to your location some functionality may not work as a result')
+      }
     })
   }
 

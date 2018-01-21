@@ -227,7 +227,6 @@ const { LoginManager, AccessToken } = FBSDK
                   console.log("user firebase ", user)
                   let text = user.displayName? user.displayName : user.email 
                   let userData = {uid: user.uid, email: user.email, username: user.displayName, token: user.refreshToken}
-                  //let token 
                   this.createUser(user.uid, userData, user.refreshToken)
                   Alert.alert("Success", "Logged in as: " + text)
 

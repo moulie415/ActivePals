@@ -11,6 +11,7 @@ import Profile from './Profile'
 import Settings from './Settings'
 import Chat from './Chat'
 import SecondScreen from "./SecondScreen"
+import SessionType from './sessions/SessionType'
 import * as firebase from "firebase"
 import { Root } from 'native-base'
 
@@ -30,11 +31,18 @@ const App = props => {
 }
 
 App.navigationOptions = {
-  title: "Login"
+  title: ""
 }
+const sessions = StackNavigator({
+  Home : {screen: Home},
+  SessionType: { screen: SessionType, navigationOptions: {tabBarVisible: false} }
+},{
+  mode: 'modal',
+  headerMode: 'none'
+})
 
 const tabs = TabNavigator({
-	Home : {screen: Home},
+	Home : {screen: sessions},
   Friends: {screen: Friends},
   Chat: {screen: Chat},
 	Profile: {screen: Profile},
@@ -55,6 +63,7 @@ const SimpleApp = StackNavigator({
   MainNav: { screen: tabs},
   SecondScreen: { screen: SecondScreen, title: "Second Screen" }
 })
+
 
 // const sessionNav = StackNavigator({
 
