@@ -30,6 +30,7 @@ import Permissions from 'react-native-permissions'
 import styles from './styles/homeStyles'
 import colors from './constants/colors'
 import MapView from 'react-native-maps'
+import Modal from 'react-native-modalbox'
 
 
  export default class Home extends Component {
@@ -54,7 +55,8 @@ import MapView from 'react-native-maps'
       spinner: false,
       showMap: true,
       switch: false,
-      data: ['1', '2', '3', '4', '5', '6', '7']
+      data: ['1', '2', '3', '4', '5', '6', '7'],
+      //isDisabled: true
     }
   }
 
@@ -106,7 +108,10 @@ import MapView from 'react-native-maps'
           data={this.state.data}
           keyExtractor={(item) => item}
           renderItem={({ item }) => (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              this.setState({selectedSession: item})
+              this.refs.modal.open()
+            }}>
               <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
                 <View style={{flexDirection: 'row'}} >
 
@@ -162,6 +167,9 @@ import MapView from 'react-native-maps'
             style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Private Session</Text>
           </Button>
         </View>
+        <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
+          <Text style={styles.modalText}>Modal centered</Text>
+        </Modal>
       </Container>
       )
   }

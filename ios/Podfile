@@ -23,6 +23,8 @@ target 'Anyone' do
 
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
+  pod 'react-native-geocoder', :path => '../node_modules/react-native-geocoder'
+
 end
 post_install do |installer|
   installer.pods_project.targets.each do |target|

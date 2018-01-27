@@ -193,7 +193,7 @@ const { LoginManager, AccessToken } = FBSDK
     const provider = firebase.auth.FacebookAuthProvider
     const credential = provider.credential(token)
     let ret = firebase.auth().signInWithCredential(credential)
-    return ret;
+    return ret
   }
   createUser = (uid,userData,token) => {
     const defaults = {
