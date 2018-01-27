@@ -18,6 +18,11 @@
     "react-navigation": "^1.0.0-beta.22"
   },
   "jest": {
-    "preset": "react-native"
+	  "preset": "react-native"
+  },
+  "rnpm": {
+	  "assets": [
+		  "./assets/fonts/"
+	  ]
   }
 }

@@ -16,6 +16,7 @@ import SessionDetail from './sessions/SessionDetail'
 import * as firebase from "firebase"
 import { Root } from 'native-base'
 import colors from 'Anyone/constants/colors'
+import color from 'color'
 
 let config = {
 	apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
@@ -37,8 +38,8 @@ App.navigationOptions = {
 }
 const sessions = StackNavigator({
   Home : {screen: Home},
-  SessionType: { screen: SessionType, navigationOptions: {tabBarVisible: false} },
-  SessionDetail: { screen: SessionDetail, navigationOptions: {tabBarVisible: false} },
+  SessionType: { screen: SessionType, navigationOptions: {/*tabBarVisible: false*/} },
+  SessionDetail: { screen: SessionDetail, navigationOptions: {/*tabBarVisible: false*/} },
 },{
   mode: 'modal',
   headerMode: 'none'
@@ -55,7 +56,7 @@ const tabs = TabNavigator({
   animationEnabled: true,
   tabBarOptions: {
     activeTintColor: colors.primary,
-    inactiveTintColor: colors.secondary,
+    inactiveTintColor: color(colors.secondary).lighten(0.3).hex(),
     style: { backgroundColor: '#fff' },
     indicatorStyle: { backgroundColor: colors.primary },
     showIcon: true,

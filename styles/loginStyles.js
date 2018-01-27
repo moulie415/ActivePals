@@ -19,7 +19,8 @@ export default styles = StyleSheet.create({
     marginBottom: 5
   },
   input: {
-    color: '#fff'
+    color: '#fff',
+    fontFamily: 'Avenir'
   },
   inputGrp: {
     flexDirection: 'row',

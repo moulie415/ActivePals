@@ -93,7 +93,7 @@ import MapView from 'react-native-maps'
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Sessions</Title>
         <Right>
            <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}> 
-            <Text style={{color: '#fff'}}>Map view:</Text>
+            <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Map: </Text>
             <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
           </View>
         </Right>
@@ -111,14 +111,14 @@ import MapView from 'react-native-maps'
                 <View style={{flexDirection: 'row'}} >
 
                   <Image style={{height: 40, width: 40, marginRight: 10, alignSelf: 'center'}} 
-                  source={require('Anyone/images/dumbbell.png')}/>
+                  source={require('./assets/images/dumbbell.png')}/>
                   <View style={{flex: 1}}>
-                    <Text>{'Session ' + item}</Text>
+                    <Text style={{fontFamily: 'Avenir'}}>{'Session ' + item}</Text>
                     <Text>Placeholder text</Text>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                      <Text >{"Location: Gym " + item}</Text>
+                      <Text style={{fontFamily: 'Avenir'}} >{"Location: Gym " + item}</Text>
                       <TouchableOpacity>
-                        <Text style={{color: colors.secondary}}>View on map</Text>
+                        <Text style={{color: colors.secondary, fontFamily: 'Avenir'}}>View on map</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -153,13 +153,13 @@ import MapView from 'react-native-maps'
           <Button style={[styles.button]}
           onPress={()=> this.nav.navigate('SessionType')}>
             <Text adjustsFontSizeToFit={true} 
-            style={{flex: 1, textAlign: 'center'}}>Create Session</Text>
+            style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Session</Text>
           </Button>
           <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/> 
           <Button style={styles.button}
           onPress={()=> this.nav.navigate('SessionType')}>
             <Text adjustsFontSizeToFit={true} 
-            style={{flex: 1, textAlign: 'center'}}>Create Private Session</Text>
+            style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Private Session</Text>
           </Button>
         </View>
       </Container>
@@ -231,7 +231,7 @@ import MapView from 'react-native-maps'
           error: null,
           showMap: true
         })
-        Alert.alert("lat: " + position.coords.latitude, "lon: " + position.coords.longitude)
+        //Alert.alert("lat: " + position.coords.latitude, "lon: " + position.coords.longitude)
         this.setState({spinner: false})
       },
       (error) => {

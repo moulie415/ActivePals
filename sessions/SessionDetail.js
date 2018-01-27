@@ -6,6 +6,7 @@ import {
 	Input,
 	Picker,
 	ActionSheet,
+	Icon
 } from 'native-base'
 import {
 	Text,
@@ -15,7 +16,14 @@ import {
 
 
 export default class SessionDetail extends Component {
-
+	static navigationOptions = {
+    tabBarIcon: ({ tintColor }) => (
+      <Icon
+        name='md-home'
+        style={{ color: tintColor }}
+      />
+    ),
+  }
 
 	constructor(props) {
 		super(props)

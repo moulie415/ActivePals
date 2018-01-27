@@ -83,13 +83,13 @@ const { LoginManager, AccessToken } = FBSDK
         }}
         style={[{marginRight: 10}, styles.button]}
         >
-        <Text>Login</Text>
+        <Text style={{fontFamily: 'Avenir'}}>Login</Text>
         </Button>
       <Button primary
         onPress={() => this.props.navigation.navigate("SignUp")}
         style={styles.button}
         >
-        <Text>Sign Up</Text>
+        <Text style={{fontFamily: 'Avenir'}}>Sign Up</Text>
         </Button>
         </View>
         <Button 
@@ -101,7 +101,7 @@ const { LoginManager, AccessToken } = FBSDK
         }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
         <Icon name="logo-facebook"/>
-        <Text style={{marginLeft: -20}}>Login with Facebook</Text>
+        <Text style={{marginLeft: -20, fontFamily: 'Avenir'}}>Login with Facebook</Text>
         </Button>
         <Button 
         onPress={()=> {
@@ -112,7 +112,7 @@ const { LoginManager, AccessToken } = FBSDK
         }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
         <Icon name="logo-google"/>
-        <Text style={{marginLeft: -20}}>Login with Google</Text>
+        <Text style={{marginLeft: -20, fontFamily: 'Avenir'}}>Login with Google</Text>
         </Button>
     </Container>
   )
