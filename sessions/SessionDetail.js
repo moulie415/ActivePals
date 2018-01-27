@@ -99,18 +99,30 @@ export default class SessionDetail extends Component {
 					</View>
 					<Button style={styles.createButton}
 					onPress={()=> {
-						Geocoder.geocodeAddress(this.location).then(res => {
-							Alert.alert(res[0].country + " " + res[0].streetName)
-							let session = {
-								location: {...res[0]}, 
-								title: this.title, 
-								details: this.details, 
-								gender: this.state.gender,
-								type: this.type
+						if (this.validatePostcode(this.location)) {
+							try {
+								Geocoder.geocodeAddress(this.location).then(res => {
+									let session = {
+										location: {...res[0]}, 
+										title: this.title, 
+										details: this.details, 
+										gender: this.state.gender,
+										type: this.type
+									}
+									firebase.database().ref('sessions').push(session).then(()=> {
+										Alert.alert('Success','Session created')
+									})
+									.catch(err => Alert.alert('Error', err.message))
+								})
+								.catch(err => Alert.alert('Error', err.message))
 							}
-							firebase.database().ref('sessions').push(session)
-						.catch(err => Alert.alert(err.message))
-						})
+							catch(err) {
+								Alert.alert("Error", err.message)
+							}
+						}
+						else {
+							Alert.alert("Error", "Postcode is invalid")
+						}
 					}}>
 						<Text style={{color: '#fff', fontSize: 20}}>Create Session</Text>
 					</Button>
@@ -119,6 +131,12 @@ export default class SessionDetail extends Component {
 
 			</Container>
 			)
+	}
+
+	validatePostcode(code) {
+		postcode = code.replace(/\s/g, "")
+		let regex = /^[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}$/i
+		return regex.test(postcode)
 	}
 
 }
