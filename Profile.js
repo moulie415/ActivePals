@@ -10,7 +10,7 @@ import  styles  from './styles/loginStyles'
     tabBarLabel: 'Profile',
     tabBarIcon: ({ tintColor }) => (
       <Icon
-        name='person'
+        name='md-person'
         style={{ color: tintColor }}
       />
     ),

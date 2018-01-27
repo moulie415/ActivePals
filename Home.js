@@ -4,7 +4,9 @@ import {
   Alert,
   View,
   FlatList,
-  TouchableOpacity
+  Image,
+  TouchableOpacity,
+  StatusBar
 } from "react-native"
 import {
   Button,
@@ -17,7 +19,11 @@ import {
   Spinner,
   Switch,
   Header,
-  Card
+  Card,
+  ActionSheet,
+  Left,
+  Right,
+  Title,
 } from 'native-base'
 import firebase from "./index"
 import Permissions from 'react-native-permissions'
@@ -33,7 +39,7 @@ import MapView from 'react-native-maps'
     tabBarLabel: 'Home',
     tabBarIcon: ({ tintColor }) => (
       <Icon
-        name='home'
+        name='md-home'
         style={{ color: tintColor }}
       />
     ),
@@ -80,35 +86,51 @@ import MapView from 'react-native-maps'
     //action sheet when pressing 
     return (
       <Container style={styles.container}>
-      <Header />
+
       {this.state.spinner && <Spinner style={styles.spinner} />}
-        <View style={{flexDirection: 'row', marginVertical: 10, justifyContent: 'flex-end'}}>
-          <View style={{flexDirection: 'row'}}> 
-            <Text>Map view:</Text>
+        <Header style={{backgroundColor: colors.primary}}>
+        <Left style={{flex: 1}} />
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Sessions</Title>
+        <Right>
+           <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}> 
+            <Text style={{color: '#fff'}}>Map view:</Text>
             <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
           </View>
-        </View>
+        </Right>
+
+        </Header>
+       
 
         {!this.state.switch && <FlatList
-          style={{marginHorizontal: 10}}
+          //style={}
           data={this.state.data}
           keyExtractor={(item) => item}
           renderItem={({ item }) => (
-            <Card style={{padding: 10}}>
-              <Text>{'Session ' + item}</Text>
-              <Text>Placeholder text</Text>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text>{"Location: Gym " + item}</Text>
-                <TouchableOpacity>
-                  <Text style={{color: 'blue'}}>View on map</Text>
-                </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+                <View style={{flexDirection: 'row'}} >
+
+                  <Image style={{height: 40, width: 40, marginRight: 10, alignSelf: 'center'}} 
+                  source={require('Anyone/images/dumbbell.png')}/>
+                  <View style={{flex: 1}}>
+                    <Text>{'Session ' + item}</Text>
+                    <Text>Placeholder text</Text>
+                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                      <Text >{"Location: Gym " + item}</Text>
+                      <TouchableOpacity>
+                        <Text style={{color: colors.secondary}}>View on map</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
               </View>
-            </Card>
+            </TouchableOpacity>
           )}
       />}
 
         {this.state.switch && this.state.showMap && <MapView
           style={styles.map}
+          onPress={(event)=> this.handlePress(event)}
           showsUserLocation={true}
           initialRegion={{
             latitude: this.state.latitude,
@@ -122,16 +144,19 @@ import MapView from 'react-native-maps'
             latitudeDelta: 0.015,
             longitudeDelta: 0.0121,
           }}
+
         >
+        {this.markers()}
         </MapView>}
 
         <View style={{flexDirection: 'row'}}>
-          <Button style={{width: '50%'}}
+          <Button style={[styles.button]}
           onPress={()=> this.nav.navigate('SessionType')}>
             <Text adjustsFontSizeToFit={true} 
             style={{flex: 1, textAlign: 'center'}}>Create Session</Text>
           </Button>
-          <Button style={{width: '50%'}}
+          <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/> 
+          <Button style={styles.button}
           onPress={()=> this.nav.navigate('SessionType')}>
             <Text adjustsFontSizeToFit={true} 
             style={{flex: 1, textAlign: 'center'}}>Create Private Session</Text>
@@ -139,6 +164,25 @@ import MapView from 'react-native-maps'
         </View>
       </Container>
       )
+  }
+
+  handlePress(event) {
+    //Alert.alert(event.nativeEvent.coordinate.longitude.toString(), event.nativeEvent.coordinate.latitude.toString())
+    ActionSheet.show(
+              {
+                options: ['Create session', 'Create private session', 'Cancel'],
+                cancelButtonIndex: 2,
+                //destructiveButtonIndex: DESTRUCTIVE_INDEX,
+                title: "Create session at location?"
+              },
+              buttonIndex => {
+                //this.setState({ clicked: BUTTONS[buttonIndex] });
+              }
+            )
+  }
+
+  markers() {
+    
   }
 
   // This is a common pattern when asking for permissions.

@@ -23,7 +23,7 @@ import colors from './constants/colors'
     tabBarLabel: 'Friends',
     tabBarIcon: ({ tintColor }) => (
       <Icon
-        name='people'
+        name='md-people'
         style={{ color: tintColor }}
       />
     ),

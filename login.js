@@ -49,7 +49,7 @@ const { LoginManager, AccessToken } = FBSDK
     return (
     <Container style={styles.container}>
       {this.state.spinner && <Spinner />}
-      <Item rounded style={styles.inputGrp}>
+      <Item style={styles.inputGrp}>
       <Icon name="mail" style={{color: "#fff"}} />
         <Input
         placeholder="Email"
@@ -62,7 +62,7 @@ const { LoginManager, AccessToken } = FBSDK
         keyboardType={'email-address'}
         />
         </Item>
-      <Item rounded style={styles.inputGrp}>
+      <Item style={styles.inputGrp}>
       <Icon name="unlock" style={{color: "#fff"}}/>
       <Input
         placeholder="Password"
@@ -73,7 +73,7 @@ const { LoginManager, AccessToken } = FBSDK
         />
         </Item>
         <View style={{flexDirection: 'row', marginVertical: 10}}>
-      <Button primary rounded
+      <Button primary
         onPress={() => {
           this.setState({spinner: true})
           if (this.user) {
@@ -81,18 +81,18 @@ const { LoginManager, AccessToken } = FBSDK
           }
           this.login(this.username, this.pass)
         }}
-        style={{marginRight: 10, width: 100, justifyContent: 'center'}}
+        style={[{marginRight: 10}, styles.button]}
         >
         <Text>Login</Text>
         </Button>
-      <Button primary rounded
+      <Button primary
         onPress={() => this.props.navigation.navigate("SignUp")}
-        style={{width: 100, justifyContent: 'center'}}
+        style={styles.button}
         >
         <Text>Sign Up</Text>
         </Button>
         </View>
-        <Button rounded
+        <Button 
         onPress={()=> {
           if (this.user) {
             this.logout()
@@ -103,7 +103,7 @@ const { LoginManager, AccessToken } = FBSDK
         <Icon name="logo-facebook"/>
         <Text style={{marginLeft: -20}}>Login with Facebook</Text>
         </Button>
-        <Button rounded
+        <Button 
         onPress={()=> {
           if (this.user) {
             this.logout()

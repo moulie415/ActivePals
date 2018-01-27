@@ -23,12 +23,18 @@ export default styles = StyleSheet.create({
   },
   inputGrp: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: '#fff7',
     marginBottom: 20,
     borderWidth: 0,
     borderColor: 'transparent',
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
+    paddingLeft: 10,
+    borderRadius: 3
 
   },
+  button: {
+    backgroundColor: colors.secondary,
+    width: 100, justifyContent: 'center'
+  }
 })

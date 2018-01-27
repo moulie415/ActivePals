@@ -12,8 +12,10 @@ import Settings from './Settings'
 import Chat from './Chat'
 import SecondScreen from "./SecondScreen"
 import SessionType from './sessions/SessionType'
+import SessionDetail from './sessions/SessionDetail'
 import * as firebase from "firebase"
 import { Root } from 'native-base'
+import colors from 'Anyone/constants/colors'
 
 let config = {
 	apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
@@ -27,7 +29,7 @@ firebase.initializeApp(config)
 export default firebase
 
 const App = props => {
-  return <Login navigation={props.navigation} />;
+  return <Root><Login navigation={props.navigation} /></Root>
 }
 
 App.navigationOptions = {
@@ -35,7 +37,8 @@ App.navigationOptions = {
 }
 const sessions = StackNavigator({
   Home : {screen: Home},
-  SessionType: { screen: SessionType, navigationOptions: {tabBarVisible: false} }
+  SessionType: { screen: SessionType, navigationOptions: {tabBarVisible: false} },
+  SessionDetail: { screen: SessionDetail, navigationOptions: {tabBarVisible: false} },
 },{
   mode: 'modal',
   headerMode: 'none'
@@ -51,7 +54,10 @@ const tabs = TabNavigator({
   tabBarPosition: 'bottom',
   animationEnabled: true,
   tabBarOptions: {
-    activeTintColor: '#e91e63',
+    activeTintColor: colors.primary,
+    inactiveTintColor: colors.secondary,
+    style: { backgroundColor: '#fff' },
+    indicatorStyle: { backgroundColor: colors.primary },
     showIcon: true,
     showLabel: false
   },

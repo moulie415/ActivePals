@@ -10,7 +10,7 @@ import  styles  from './styles/loginStyles'
     tabBarLabel: 'Chat',
     tabBarIcon: ({ tintColor }) => (
       <Icon
-        name='chatboxes'
+        name='md-chatboxes'
         style={{ color: tintColor }}
       />
     ),

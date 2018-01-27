@@ -10,7 +10,7 @@ import firebase from "./index"
     tabBarLabel: 'Settings',
     tabBarIcon: ({ tintColor }) => (
       <Icon
-        name='settings'
+        name='md-settings'
         style={{ color: tintColor }}
       />
     ),
