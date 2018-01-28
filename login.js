@@ -88,7 +88,7 @@ const { LoginManager, AccessToken } = FBSDK
         </View>
         <Button 
         onPress={()=> {
-          this.fbLogin()
+          this.fbLogin(this.props.navigation)
         }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
         <Icon name="logo-facebook"/>
@@ -137,9 +137,9 @@ const { LoginManager, AccessToken } = FBSDK
       }
     }
 
-    fbLogin() {
+    fbLogin(navigation) {
       LoginManager.logInWithReadPermissions(['public_profile', 'email'])
-      .then((result) => this._handleCallBack(result),
+      .then((result) => this._handleCallBack(result, navigation),
         function(error) {
           alert('Login fail with error: ' + error);
         }
@@ -147,7 +147,7 @@ const { LoginManager, AccessToken } = FBSDK
     }
 
 
- _handleCallBack(result){
+ _handleCallBack(result, navigation){
     let _this = this
     if (result.isCancelled) {
       Alert.alert("Facbook login", "cancelled")
@@ -165,11 +165,10 @@ const { LoginManager, AccessToken } = FBSDK
               // const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`
              this.authenticate(data.accessToken)
              .then(function(result){
-
               if (result.emailVerified) {
-                
-             }
-             else {
+                navigation.navigate('Home')
+              }
+              else {
                result.sendEmailVerification().then(()=> {
                  Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
                }).catch(error => {
