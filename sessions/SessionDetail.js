@@ -3,7 +3,6 @@ import React, { Component } from "react"
 import {
 	Container,
 	Card,
-	Input,
 	Picker,
 	ActionSheet,
 	Icon,
@@ -14,7 +13,8 @@ import {
 	Text,
 	View,
 	TouchableOpacity,
-	Alert
+	Alert,
+	TextInput
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
@@ -45,12 +45,12 @@ export default class SessionDetail extends Component {
 		return (
 			<Container style={{marginHorizontal: 10, flex: 1}}>
 				<Content>
-					<Input 
+					<TextInput 
 					style={{padding: 5, borderWidth: 1, borderColor: '#000', flex: 1, margin: 10}}
 					textAlignVertical={'top'}
 					onChangeText={title => this.title = title}
 					placeholder='Title'/>
-					<Input
+					<TextInput
 					style={{padding: 5, borderWidth: 1, borderColor: '#000', flex: 3, margin: 10}}
 					placeholder='Details...'
 					multiline={true}
@@ -59,7 +59,7 @@ export default class SessionDetail extends Component {
 					<View style={{flex: 2}}>
 						<Text style={{fontSize: 30, margin: 10}}>Location</Text>
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-							<Input 
+							<TextInput 
 							onChangeText={location => this.location = location}
 							style={{padding: 5, borderWidth: 1, borderColor: '#000', margin: 10}}
 							placeholder='Enter postcode'/>
@@ -100,25 +100,7 @@ export default class SessionDetail extends Component {
 					<Button style={styles.createButton}
 					onPress={()=> {
 						if (this.validatePostcode(this.location)) {
-							try {
-								Geocoder.geocodeAddress(this.location).then(res => {
-									let session = {
-										location: {...res[0]}, 
-										title: this.title, 
-										details: this.details, 
-										gender: this.state.gender,
-										type: this.type
-									}
-									firebase.database().ref('sessions').push(session).then(()=> {
-										Alert.alert('Success','Session created')
-									})
-									.catch(err => Alert.alert('Error', err.message))
-								})
-								.catch(err => Alert.alert('Error', err.message))
-							}
-							catch(err) {
-								Alert.alert("Error", err.message)
-							}
+							this.createSession(this.location)
 						}
 						else {
 							Alert.alert("Error", "Postcode is invalid")
@@ -131,6 +113,29 @@ export default class SessionDetail extends Component {
 
 			</Container>
 			)
+	}
+
+	async createSession(location) {
+		try {
+			await Geocoder.geocodeAddress(location).then(res => {
+				let session = {
+					location: {...res[0]}, 
+					title: this.title, 
+					details: this.details, 
+					gender: this.state.gender,
+					type: this.type
+				}
+				firebase.database().ref('sessions').push(session).then(()=> {
+					Alert.alert('Success','Session created')
+				})
+				.catch(err => Alert.alert('Error', err.message))
+			})
+			.catch(err => Alert.alert('Error', err.message))
+
+		}
+		catch(err) {
+			Alert.alert("Error", err.message)
+		}
 	}
 
 	validatePostcode(code) {
