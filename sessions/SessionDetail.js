@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-
 import {
 	Container,
 	Card,
@@ -36,7 +35,8 @@ export default class SessionDetail extends Component {
 		this.params = this.props.navigation.state.params
 		this.type = this.params.type
 		this.state = {
-			gender: 'All'
+			gender: 'All',
+			formattedAddress: 'none'
 		}
 
 	}
@@ -48,25 +48,45 @@ export default class SessionDetail extends Component {
 					<TextInput 
 					style={{padding: 5, borderWidth: 1, borderColor: '#000', flex: 1, margin: 10}}
 					textAlignVertical={'top'}
+					underlineColorAndroid='transparent'
 					onChangeText={title => this.title = title}
 					placeholder='Title'/>
 					<TextInput
-					style={{padding: 5, borderWidth: 1, borderColor: '#000', flex: 3, margin: 10}}
+					style={{padding: 5, borderWidth: 1, borderColor: '#000', height: 150, margin: 10}}
 					placeholder='Details...'
+					textAlignVertical={'top'}
 					multiline={true}
-					onChangeText={details => this.details = details}
-					numberOfLines={7}/>
-					<View style={{flex: 2}}>
-						<Text style={{fontSize: 30, margin: 10}}>Location</Text>
+					underlineColorAndroid='transparent'
+					onChangeText={details => this.details = details}/>
+					<View style={{flex: 2, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#999'}}>
+						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Location</Text>
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
 							<TextInput 
-							onChangeText={location => this.location = location}
-							style={{padding: 5, borderWidth: 1, borderColor: '#000', margin: 10}}
+							onChangeText={postcode => this.postcode = postcode}
+							style={{padding: 5, borderWidth: 1, borderColor: '#000', margin: 10, flex: 1}}
+							underlineColorAndroid='transparent'
 							placeholder='Enter postcode'/>
+							<TouchableOpacity onPress={()=> {
+								if (this.validatePostcode(this.postcode)) {
+									this.setLocation(this.postcode)
+								}
+								else {
+									Alert.alert("Error", "Postcode is invalid")
+								}
+							}}
+							style={{flex: 1}}>
+							<Text style={{color: 'blue', fontSize: 20, margin: 10, textAlign: 'center'}}>Submit</Text>
+							</TouchableOpacity>
+						</View>
+						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+							<TouchableOpacity onPress={()=> this.setLocationAsPosition()}>
+								<Text style={{color: 'blue', fontSize: 20, margin: 10}}>Use my location</Text>
+							</TouchableOpacity>
 							<TouchableOpacity>
 								<Text style={{color: 'blue', fontSize: 20, margin: 10}}>Select on map</Text>
 							</TouchableOpacity>
 						</View>
+						<Text style={{alignSelf: 'center', marginVertical: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
 					</View>
 					<View style={{flexDirection: 'row'}}>
 					<TouchableOpacity 
@@ -98,14 +118,7 @@ export default class SessionDetail extends Component {
 					<Text style={styles.typeText}>{'Type: ' + this.type}</Text>
 					</View>
 					<Button style={styles.createButton}
-					onPress={()=> {
-						if (this.validatePostcode(this.location)) {
-							this.createSession(this.location)
-						}
-						else {
-							Alert.alert("Error", "Postcode is invalid")
-						}
-					}}>
+					onPress={()=> this.createSession()}>
 						<Text style={{color: '#fff', fontSize: 20}}>Create Session</Text>
 					</Button>
 				</Content>
@@ -115,27 +128,56 @@ export default class SessionDetail extends Component {
 			)
 	}
 
-	async createSession(location) {
+	async setLocation(location, usingPosition = false) {
 		try {
-			await Geocoder.geocodeAddress(location).then(res => {
-				let session = {
-					location: {...res[0]}, 
-					title: this.title, 
-					details: this.details, 
-					gender: this.state.gender,
-					type: this.type
-				}
-				firebase.database().ref('sessions').push(session).then(()=> {
-					Alert.alert('Success','Session created')
+			if (usingPosition) {
+				await Geocoder.geocodePosition(location).then(res => {
+					this.location = {...res[0]}
+					this.setState({formattedAddress: res[0].formattedAddress})
+
 				})
 				.catch(err => Alert.alert('Error', err.message))
-			})
-			.catch(err => Alert.alert('Error', err.message))
+			}
+			else {
+				await Geocoder.geocodeAddress(location).then(res => {
+					this.location = {...res[0]}
+					this.setState({formattedAddress: res[0].formattedAddress})
 
+				})
+				.catch(err => Alert.alert('Error', err.message))
+			}
 		}
 		catch(err) {
 			Alert.alert("Error", err.message)
 		}
+	}
+
+	setLocationAsPosition() {
+		navigator.geolocation.getCurrentPosition(
+			(position) => {
+				let coords = {lat: position.coords.latitude, lng: position.coords.longitude }
+				this.setLocation(coords, true)
+			},
+			(error) => {
+				Alert.alert('Error', error.message)
+			},
+		{ enableHighAccuracy: true, timeout: 20000, /*maximumAge: 1000*/ },
+		)
+	}
+
+	createSession() {
+		let session = {
+			location: this.location, 
+			title: this.title, 
+			details: this.details, 
+			gender: this.state.gender,
+			type: this.type
+		}
+		firebase.database().ref('sessions').push(session).then(()=> {
+			Alert.alert('Success','Session created')
+		})
+		.catch(err => Alert.alert('Error', err.message))
+
 	}
 
 	validatePostcode(code) {
