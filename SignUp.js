@@ -118,7 +118,11 @@ import  styles  from './styles/signUpStyles'
          user.updateProfile({displayName: this.username})
          let userData = {uid: user.uid, email: user.email, username: this.username}
          this.createUser(user.uid, userData, "")
-        Alert.alert("account created")
+         user.sendEmailVerification().then(()=> {
+           Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
+         }).catch(error => {
+          Alert.alert('Error', error.message)
+        })
        }).catch(error => {
         console.log(error)
         Alert.alert('Error', error.message)

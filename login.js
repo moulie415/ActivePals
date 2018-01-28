@@ -33,15 +33,12 @@ const { LoginManager, AccessToken } = FBSDK
   }
 
   componentDidMount() {
-   
-
-  firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-      this.props.navigation.navigate('Home')
-
-    }
-  })  
-}
+    firebase.auth().onAuthStateChanged(user => {
+      if (user && user.emailVerified) {
+          this.props.navigation.navigate('Home')
+      }
+    })  
+  }
 
 
 
@@ -76,9 +73,6 @@ const { LoginManager, AccessToken } = FBSDK
       <Button primary
         onPress={() => {
           this.setState({spinner: true})
-          if (this.user) {
-            this.logout()
-          }
           this.login(this.username, this.pass)
         }}
         style={[{marginRight: 10}, styles.button]}
@@ -94,9 +88,6 @@ const { LoginManager, AccessToken } = FBSDK
         </View>
         <Button 
         onPress={()=> {
-          if (this.user) {
-            this.logout()
-          }
           this.fbLogin()
         }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
@@ -105,9 +96,6 @@ const { LoginManager, AccessToken } = FBSDK
         </Button>
         <Button 
         onPress={()=> {
-          if (this.user) {
-            this.logout()
-          }
           this.gLogin()
         }}
         style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
@@ -125,10 +113,16 @@ const { LoginManager, AccessToken } = FBSDK
     try {
       await firebase.auth()
       .signInWithEmailAndPassword(email, pass).then(user => {
-      console.log("Logged In!")
+        if (user.emailVerified) {
+          let text = user.displayName? user.displayName : user.email 
+         Alert.alert("Success", "Logged in as: " + text)
+         this.props.navigation.navigate('Home')
+       }
+       else {
+        Alert.alert('Sorry', 'You must first verify your email using the link we sent you before logging in')
+       }
+       console.log("Logged In!")
 
-      let text = user.displayName? user.displayName : user.email 
-      Alert.alert("Success", "Logged in as: " + text)
 
       })
 
@@ -170,8 +164,19 @@ const { LoginManager, AccessToken } = FBSDK
               // const facebookID = json.id
               // const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`
              this.authenticate(data.accessToken)
-              .then(function(result){
-                const { uid } = result               
+             .then(function(result){
+
+              if (result.emailVerified) {
+                
+             }
+             else {
+               result.sendEmailVerification().then(()=> {
+                 Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
+               }).catch(error => {
+                Alert.alert('Error', error.message)
+              })
+             }
+             const { uid } = result  
                 _this.createUser(uid,json,token)
               })
               .catch(error => {
@@ -200,7 +205,6 @@ const { LoginManager, AccessToken } = FBSDK
       uid,
       token
     }
-    Alert.alert("Success", "Logged in as: " + userData.email)
     firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
    
   }
@@ -228,7 +232,17 @@ const { LoginManager, AccessToken } = FBSDK
                   let text = user.displayName? user.displayName : user.email 
                   let userData = {uid: user.uid, email: user.email, username: user.displayName, token: user.refreshToken}
                   this.createUser(user.uid, userData, user.refreshToken)
-                  Alert.alert("Success", "Logged in as: " + text)
+
+                  if (user.emailVerified) {
+                   Alert.alert("Success", "Logged in as: " + text)
+                 }
+                 else {
+                   user.sendEmailVerification().then(()=> {
+                     Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
+                   }).catch(error => {
+                    Alert.alert('Error', error.message)
+                  })
+                 }
 
                   //if (user._authObj.authenticated) { THIS LINE DOES NOT WORK 
                     // do you login action here

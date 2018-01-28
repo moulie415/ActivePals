@@ -18,6 +18,7 @@ import {
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
 import firebase from "Anyone/index"
+import DatePicker from 'react-native-datepicker'
 
 
 export default class SessionDetail extends Component {
