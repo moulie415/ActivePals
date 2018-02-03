@@ -130,7 +130,7 @@ export default class SessionDetail extends Component {
 					<Text style={styles.typeText}>{'Type: ' + this.type}</Text>
 					</View>
 					<Button style={styles.createButton}
-					onPress={()=> this.createSession()}>
+					onPress={()=> this.createSession(this.props.navigation)}>
 						<Text style={{color: '#fff', fontSize: 20}}>Create Session</Text>
 					</Button>
 				</Content>
@@ -177,7 +177,7 @@ export default class SessionDetail extends Component {
 		)
 	}
 
-	createSession() {
+	createSession(navigation) {
 		let session = {
 			location: this.location, 
 			title: this.title, 
@@ -188,8 +188,11 @@ export default class SessionDetail extends Component {
 		}
 		firebase.database().ref('sessions').push(session).then(()=> {
 			Alert.alert('Success','Session created')
+			navigation.navigate("Home")
 		})
-		.catch(err => Alert.alert('Error', err.message))
+		.catch(err => {
+			Alert.alert('Error', err.message)
+		})
 
 	}
 

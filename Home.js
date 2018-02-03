@@ -31,7 +31,7 @@ import styles from './styles/homeStyles'
 import colors from './constants/colors'
 import MapView from 'react-native-maps'
 import Modal from 'react-native-modalbox'
-
+import { getType } from './constants/utils'
 
  export default class Home extends Component {
 
@@ -134,8 +134,7 @@ import Modal from 'react-native-modalbox'
               <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
                 <View style={{flexDirection: 'row'}} >
 
-                  <Image style={{height: 40, width: 40, marginRight: 10, alignSelf: 'center'}} 
-                  source={require('./assets/images/dumbbell.png')}/>
+                  <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
                   <View style={{flex: 1}}>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                       <Text style={styles.title}>{item.title}</Text>
@@ -195,6 +194,7 @@ import Modal from 'react-native-modalbox'
       </Container>
       )
   }
+
 
   handlePress(event) {
     //Alert.alert(event.nativeEvent.coordinate.longitude.toString(), event.nativeEvent.coordinate.latitude.toString())
