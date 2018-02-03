@@ -50,12 +50,13 @@ import Modal from 'react-native-modalbox'
     this.nav = this.props.navigation
 
     this.user = null
+    this.sessionsRef = firebase.database().ref('sessions')
     this.state = {
       username: 'no username',
       spinner: false,
       showMap: true,
       switch: false,
-      data: ['1', '2', '3', '4', '5', '6', '7'],
+      sessions: []
       //isDisabled: true
     }
   }
@@ -80,7 +81,25 @@ import Modal from 'react-native-modalbox'
         this.getPosition()
       }
     })
+
+    this.listenForSessions(this.sessionsRef)
+
+
+
   }
+
+  listenForSessions(ref) {
+    ref.on('value', snapshot => {
+      let sessions = []
+      let index = 1
+      snapshot.forEach(child => {
+        sessions.push({...child.val(), key: index})
+        index++
+      })
+      this.setState({sessions})
+    })
+  }
+
 
 
   render () {
@@ -105,8 +124,8 @@ import Modal from 'react-native-modalbox'
 
         {!this.state.switch && <FlatList
           //style={}
-          data={this.state.data}
-          keyExtractor={(item) => item}
+          data={this.state.sessions}
+          keyExtractor={(item) => item.key}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => {
               this.setState({selectedSession: item})
@@ -118,12 +137,15 @@ import Modal from 'react-native-modalbox'
                   <Image style={{height: 40, width: 40, marginRight: 10, alignSelf: 'center'}} 
                   source={require('./assets/images/dumbbell.png')}/>
                   <View style={{flex: 1}}>
-                    <Text style={{fontFamily: 'Avenir'}}>{'Session ' + item}</Text>
-                    <Text>Placeholder text</Text>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                      <Text style={{fontFamily: 'Avenir'}} >{"Location: Gym " + item}</Text>
-                      <TouchableOpacity>
-                        <Text style={{color: colors.secondary, fontFamily: 'Avenir'}}>View on map</Text>
+                      <Text style={styles.title}>{item.title}</Text>
+                      <Text style={{fontFamily: 'Avenir'}}>{"gender: " + item.gender}</Text>
+                    </View>
+                    <Text style={styles.details} numberOfLines={1}>{item.details}</Text>
+                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                      <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
+                      <TouchableOpacity style={{flex: 1}}>
+                        <Text style={{color: colors.secondary, fontFamily: 'Avenir', textAlign: 'right'}}>View on map</Text>
                       </TouchableOpacity>
                     </View>
                   </View>

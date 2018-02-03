@@ -42,6 +42,17 @@ export default class SessionDetail extends Component {
 
 	}
 
+	componentDidMount() {
+
+
+		firebase.auth().onAuthStateChanged( user => {
+			if (user) {
+				this.user = user
+			}
+		})
+
+	}
+
 	render() {
 		return (
 			<Container style={{marginHorizontal: 10, flex: 1}}>
@@ -172,7 +183,8 @@ export default class SessionDetail extends Component {
 			title: this.title, 
 			details: this.details, 
 			gender: this.state.gender,
-			type: this.type
+			type: this.type,
+			host: this.user.uid
 		}
 		firebase.database().ref('sessions').push(session).then(()=> {
 			Alert.alert('Success','Session created')

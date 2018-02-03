@@ -30,7 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
-            new RNGeocoderPackage(),
+              new RNGeocoderPackage(),
               new RNGoogleSigninPackage(),
               new MapsPackage(),
               new FBSDKPackage(mCallbackManager)

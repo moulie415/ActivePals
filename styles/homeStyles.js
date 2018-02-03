@@ -40,5 +40,12 @@ export default styles = StyleSheet.create({
     color: "white",
     padding: 10
   },
+  title: {
+    fontFamily: 'Avenir',
+    fontWeight: 'bold'
+  },
+  details: {
+    fontFamily: 'Avenir',
+  }
 
 })
