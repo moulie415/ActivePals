@@ -29,7 +29,7 @@ import firebase from "./index"
 import Permissions from 'react-native-permissions'
 import styles from './styles/homeStyles'
 import colors from './constants/colors'
-import MapView from 'react-native-maps'
+import MapView  from 'react-native-maps'
 import Modal from 'react-native-modalbox'
 import { getType } from './constants/utils'
 
@@ -172,7 +172,7 @@ import { getType } from './constants/utils'
           }}
 
         >
-        {this.markers()}
+        {this.markers(this.state.sessions)}
         </MapView>}
 
         <View style={{flexDirection: 'row'}}>
@@ -211,8 +211,23 @@ import { getType } from './constants/utils'
             )
   }
 
-  markers() {
-    
+  markers(sessions) {
+    let markers = []
+    let index = 1
+    sessions.forEach(session => {
+      markers.push(
+        <MapView.Marker 
+          key={index}
+          coordinate={{
+            latitude: session.location.position.lat, 
+            longitude: session.location.position.lng
+          }}
+          title={session.title}
+        />
+        )
+      index++
+    })
+    return markers
   }
 
   // This is a common pattern when asking for permissions.
