@@ -140,7 +140,7 @@ import { getType } from './constants/utils'
                       <Text style={styles.title}>{item.title}</Text>
                       <Text style={{fontFamily: 'Avenir'}}>{"gender: " + item.gender}</Text>
                     </View>
-                    <Text style={styles.details} numberOfLines={1}>{item.details}</Text>
+                    <Text style={styles.date} >{this.formatDateTime(item.dateTime)}</Text>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                       <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                       <TouchableOpacity style={{flex: 1}}>
@@ -229,6 +229,33 @@ import { getType } from './constants/utils'
     })
     return markers
   }
+
+  formatDateTime(dateTime) {
+    let date = new Date(dateTime)
+    let hours = date.getHours()
+    let minutes = date.getMinutes()
+    let ampm = hours >= 12 ? 'pm' : 'am'
+    hours = hours % 12
+    hours = hours ? hours : 12 
+    minutes = minutes < 10 ? '0'+minutes : minutes
+    let strTime = hours + ':' + minutes + ampm
+
+    let days =['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]  
+    let day = date.getDate()
+    return `${days[date.getDay()]} ${day + this.nth(day)} ${months[date.getMonth()]} ${strTime}`
+  }
+
+  nth(d) {
+  if (d>3 && d<21) return 'th'
+  switch (d % 10) {
+        case 1:  return "st"
+        case 2:  return "nd"
+        case 3:  return "rd"
+        default: return "th"
+    }
+} 
 
   // This is a common pattern when asking for permissions.
   // iOS only gives you once chance to show the permission dialog,

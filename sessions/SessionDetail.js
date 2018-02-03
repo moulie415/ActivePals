@@ -37,7 +37,8 @@ export default class SessionDetail extends Component {
 		this.type = this.params.type
 		this.state = {
 			gender: 'All',
-			formattedAddress: 'none'
+			formattedAddress: 'none',
+			date: null
 		}
 
 	}
@@ -70,6 +71,14 @@ export default class SessionDetail extends Component {
 					multiline={true}
 					underlineColorAndroid='transparent'
 					onChangeText={details => this.details = details}/>
+					<DatePicker
+					date={this.state.date}
+					placeholder={"Select date and time"}
+					mode={'datetime'}
+					onDateChange={(date) => {this.setState({date})}}
+					minDate={(new Date()).toISOString()}/>
+
+
 					<View style={{flex: 2, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#999'}}>
 						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Location</Text>
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -184,7 +193,8 @@ export default class SessionDetail extends Component {
 			details: this.details, 
 			gender: this.state.gender,
 			type: this.type,
-			host: this.user.uid
+			host: this.user.uid,
+			dateTime: this.state.date
 		}
 		firebase.database().ref('sessions').push(session).then(()=> {
 			Alert.alert('Success','Session created')
