@@ -203,7 +203,11 @@ import { getType } from './constants/utils'
                     <Text style={styles.date} >{this.formatDateTime(item.dateTime)}</Text>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                       <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
-                      <TouchableOpacity style={{flex: 1}}>
+                      <TouchableOpacity onPress={()=>{
+                        this.setState({switch: true})
+                        this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat})
+                      }}
+                      style={{flex: 1}}>
                         <Text style={{color: colors.secondary, fontFamily: 'Avenir', textAlign: 'right'}}>View on map</Text>
                       </TouchableOpacity>
                     </View>
