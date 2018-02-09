@@ -122,37 +122,7 @@ import { getType } from './constants/utils'
         </Header>
        
 
-        {!this.state.switch && <FlatList
-          //style={}
-          data={this.state.sessions}
-          keyExtractor={(item) => item.key}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => {
-              this.setState({selectedSession: item})
-              this.refs.modal.open()
-            }}>
-              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-                <View style={{flexDirection: 'row'}} >
-
-                  <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
-                  <View style={{flex: 1}}>
-                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                      <Text style={styles.title}>{item.title}</Text>
-                      <Text style={{fontFamily: 'Avenir'}}>{"gender: " + item.gender}</Text>
-                    </View>
-                    <Text style={styles.date} >{this.formatDateTime(item.dateTime)}</Text>
-                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                      <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
-                      <TouchableOpacity style={{flex: 1}}>
-                        <Text style={{color: colors.secondary, fontFamily: 'Avenir', textAlign: 'right'}}>View on map</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
-      />}
+        {!this.state.switch && this.getSessions(this.state.sessions)}
 
         {this.state.switch && this.state.showMap && <MapView
           style={styles.map}
@@ -211,6 +181,45 @@ import { getType } from './constants/utils'
             )
   }
 
+  getSessions(sessions) {
+    if (sessions.length > 0) {
+          return <FlatList
+          data={sessions}
+          keyExtractor={(item) => item.key}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => {
+              this.setState({selectedSession: item})
+              this.refs.modal.open()
+            }}>
+              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+                <View style={{flexDirection: 'row'}} >
+
+                  <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
+                  <View style={{flex: 1}}>
+                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                      <Text style={styles.title}>{item.title}</Text>
+                      <Text style={{fontFamily: 'Avenir'}}>{"gender: " + item.gender}</Text>
+                    </View>
+                    <Text style={styles.date} >{this.formatDateTime(item.dateTime)}</Text>
+                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                      <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
+                      <TouchableOpacity style={{flex: 1}}>
+                        <Text style={{color: colors.secondary, fontFamily: 'Avenir', textAlign: 'right'}}>View on map</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+      />
+          }
+          else return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
+            <Text style={{color: '#fff', textAlign: 'center'}}>
+            No sessions have been created yet, also please make sure you are connected to the internet
+          </Text></View>
+  }
+
   markers(sessions) {
     let markers = []
     let index = 1
@@ -231,6 +240,7 @@ import { getType } from './constants/utils'
   }
 
   formatDateTime(dateTime) {
+    dateTime = dateTime.replace(/-/g, "/")
     let date = new Date(dateTime)
     let hours = date.getHours()
     let minutes = date.getMinutes()
@@ -244,7 +254,7 @@ import { getType } from './constants/utils'
     let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]  
     let day = date.getDate()
-    return `${days[date.getDay()]} ${day + this.nth(day)} ${months[date.getMonth()]} ${strTime}`
+    return `${days[date.getDay()].toString()} ${day.toString() + this.nth(day)} ${months[date.getMonth()].toString()} ${strTime}`
   }
 
   nth(d) {
