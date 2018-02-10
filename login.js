@@ -114,8 +114,7 @@ const { LoginManager, AccessToken } = FBSDK
       await firebase.auth()
       .signInWithEmailAndPassword(email, pass).then(user => {
         if (user.emailVerified) {
-          let text = user.displayName? user.displayName : user.email 
-         Alert.alert("Success", "Logged in as: " + text)
+         Alert.alert("Success", "Logged in as: " + user.email)
          this.props.navigation.navigate('Home')
        }
        else {
@@ -229,7 +228,7 @@ const { LoginManager, AccessToken } = FBSDK
                 .then(user => {
                   console.log("user firebase ", user)
                   let text = user.displayName? user.displayName : user.email 
-                  let userData = {uid: user.uid, email: user.email, username: user.displayName, token: user.refreshToken}
+                  let userData = {uid: user.uid, email: user.email, token: user.refreshToken}
                   this.createUser(user.uid, userData, user.refreshToken)
 
                   if (user.emailVerified) {

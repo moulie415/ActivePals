@@ -73,7 +73,7 @@ import  styles  from './styles/signUpStyles'
         />
         </Item>
       <Item rounded style={styles.inputGrp}>
-      <Icon name="mail" style={{color: "#fff"}} />
+      <Icon name="unlock" style={{color: "#fff"}} />
       <Input
         placeholder="Password"
         secureTextEntry={true}
@@ -115,7 +115,6 @@ import  styles  from './styles/signUpStyles'
       try {
         await firebase.auth()
         .createUserWithEmailAndPassword(email, pass).then(user => {
-         user.updateProfile({displayName: this.username})
          let userData = {uid: user.uid, email: user.email, username: this.username}
          this.createUser(user.uid, userData, "")
          user.sendEmailVerification().then(()=> {
