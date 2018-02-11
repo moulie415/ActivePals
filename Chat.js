@@ -30,11 +30,8 @@ import  styles  from './styles/loginStyles'
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-        this.props.navigation.navigate('Login');
-      }
-      else {
-        this.setState({email: user.email, username: user.displayName })
+      if (user) {
+        this.setState({email: user.email })
       }
     })  
   }

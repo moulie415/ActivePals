@@ -76,6 +76,8 @@ export default class SessionDetail extends Component {
 					placeholder={"Select date and time"}
 					mode={'datetime'}
 					onDateChange={(date) => {this.setState({date})}}
+					confirmBtnText={'Confirm'}
+					cancelBtnText={'Cancel'}
 					minDate={(new Date()).toISOString()}/>
 
 

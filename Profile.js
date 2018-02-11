@@ -53,6 +53,7 @@ import DatePicker from 'react-native-datepicker'
         this.props.navigation.navigate('Login')
       }
       else {
+        this.user = user
         this.setState({email: user.email })
         this.listenForUserChanges(firebase.database().ref('users/' + user.uid))
 
@@ -77,7 +78,8 @@ import DatePicker from 'react-native-datepicker'
         <Left style={{flex: 1}} />
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Profile</Title>
         <Right>
-          <Button style={{backgroundColor: 'transparent', elevation: 0}}>
+          <Button onPress={()=> this.updateUser(this.initialProfile, this.state.profile)}
+          style={{backgroundColor: 'transparent', elevation: 0}}>
             <Text>Save</Text>
           </Button>
         </Right>
@@ -91,7 +93,7 @@ import DatePicker from 'react-native-datepicker'
         <Text style={{alignSelf: 'center'}}>Username: </Text>
             <Input
             value={this.state.profile.username}
-            onChangeText={u => this.lastName = u}
+            onChangeText={username => this.setState({profile: {...this.state.profile, username}})}
             placeholderTextColor="#fff"
             style={styles.input}
             autoCapitalize={'none'}
@@ -102,7 +104,7 @@ import DatePicker from 'react-native-datepicker'
             <Text style={{alignSelf: 'center'}}>First name: </Text>
             <Input
             value={this.state.profile.first_name}
-            onChangeText={u => this.lastName = u}
+            onChangeText={name => this.setState({profile: {...this.state.profile, first_name: name}})}
             placeholderTextColor="#fff"
             style={styles.input}
             autoCapitalize={'none'}
@@ -113,7 +115,7 @@ import DatePicker from 'react-native-datepicker'
             <Text style={{alignSelf: 'center'}}>Last name: </Text>
             <Input
             value={this.state.profile.last_name}
-            onChangeText={u => this.lastName = u}
+            onChangeText={name => this.setState({profile: {...this.state.profile, last_name: name}})}
             placeholderTextColor="#fff"
             style={styles.input}
             autoCapitalize={'none'}
@@ -124,11 +126,16 @@ import DatePicker from 'react-native-datepicker'
             <Text style={{alignSelf: 'center'}}>Birthday: </Text>
           <DatePicker
           date={this.getDate(this.state.profile.birthday)}
-          placeholder={this.state.profile.birthday}
+          placeholder={this.state.profile.birthday || 'None'}
           maxDate={new Date()}
+          confirmBtnText={'Confirm'}
+          cancelBtnText={'Cancel'}
           customStyles={{
             dateText: {
               color: '#fff',
+            },
+            placeholderText: {
+              color: '#fff'
             },
             dateInput: {
               borderWidth: 0
@@ -152,7 +159,30 @@ import DatePicker from 'react-native-datepicker'
     }
     else return null
   }
+  
+updateUser(initial, profile) {
+  if (JSON.stringify(initial) === JSON.stringify(profile)) {
+    Alert.alert("No changes")
+  }  
+  else {
+      if (profile.username.length < 5) {
+        Alert.alert('Sorry', 'Username must be at least 5 characters long')
+      }
+      else {
+      firebase.database().ref('users/' + this.user.uid).set({...profile})
+      .then(()=> {
+        initial.username && firebase.database().ref('usernames').child(initial.username).remove()
+        firebase.database().ref('usernames').child(profile.username).set(profile.uid)
+        .then(() => Alert.alert("Success", 'Profile saved'))
+        .catch(e => Alert.alert("Error", e.message))
+      })
+      .catch(e => Alert.alert('Error', e.message + "\nthat username may have already been taken"))
+      }
+    }
 
+}
+
+ 
 
   logout() {
     firebase.auth().signOut().then(function() {
