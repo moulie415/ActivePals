@@ -57,7 +57,6 @@ import { getType } from './constants/utils'
       showMap: true,
       switch: false,
       sessions: []
-      //isDisabled: true
     }
   }
 
