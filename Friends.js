@@ -5,7 +5,7 @@ import {
   View,
   TouchableOpacity,
   TextInput,
-  FlatList
+  ScrollView
 } from "react-native"
 import {
   Button,
@@ -70,10 +70,17 @@ import styles from './styles/friendsStyles'
       let friends = []
       let index = 1
       snapshot.forEach(child => {
-        friends.push({uid: child.key, key: index})
-        index++
+        firebase.database().ref('users/' + child.key).once('value')
+          .then(snapshot => {
+            let user = snapshot.val()
+            let pending = user.friends && user.friends[this.user.uid] ? false : true
+            friends.push({...user, pending, key: index})
+            index++
+            this.setState({friends})
+
+          })
+          .catch(e => Alert.alert('Error', e.message))
       })
-      this.setState({friends})
     })
   }
 
@@ -104,7 +111,15 @@ import styles from './styles/friendsStyles'
           </TouchableOpacity>
         </Right>
       </Header>
+      <ScrollView>
       {this.getRequests(this.state.requests)}
+      {this.getFriends(this.state.friends)}
+      </ScrollView>
+      {this.state.friends.length == 0 && this.state.requests.length == 0 &&
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
+            <Text style={{color: '#fff', textAlign: 'center'}}>
+            No don't have any friends yet, also please make sure you are connected to the internet
+          </Text></View>}
 
       <Modal style={styles.modal} position={"center"} ref={"modal"} >
           <Text style={styles.modalText}>Send friend request</Text>
@@ -124,34 +139,53 @@ import styles from './styles/friendsStyles'
   }
 
   getRequests(requests) {
-    if (requests.length > 0) {
-          return <FlatList
-          data={requests}
-          keyExtractor={(item) => item.key}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => {
-              console.log('Pressed')
-            }}>
-              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-                <View style={{flexDirection: 'row'}} >
-                  <Icon name='ios-contact' />
-                  <Text>{item.username + ' has sent you a friend request'}</Text>
-                  <TouchableOpacity>
-                    <Icon name='checkmark' style={{color: 'green'}}/>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Icon name='close' style={{color: 'red'}}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
-      />
-          }
-          else return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
-            <Text style={{color: '#fff', textAlign: 'center'}}>
-            No don't have any friends yet, also please make sure you are connected to the internet
-          </Text></View>
+    let list = []
+    let index = 1
+    requests.forEach(item => {
+      list.push(
+          <View key={index}
+          style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+            <View style={{flexDirection: 'row'}} >
+              <Icon name='ios-contact' />
+              <Text>{item.username + ' has sent you a friend request'}</Text>
+              <TouchableOpacity>
+               <Icon name='checkmark' style={{color: 'green'}}/>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Icon name='close' style={{color: 'red'}}/>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )
+      index++
+    })
+    return list
+
+  }
+  getFriends(friends) {
+    let list = []
+    let index = 1
+    friends.forEach(item => {
+      if (item.pending) {
+        list.push(
+          <View key={index}
+          style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+            <View style={{flexDirection: 'row'}} >
+              <Text>{item.username + ' request sent'}</Text>
+            </View>
+          </View>
+          )
+      }
+      else {
+        list.push(
+          <TouchableOpacity key={index}>
+          </TouchableOpacity>
+          )
+      }
+      index++
+    })
+    return list
+
   }
 
   sendRequest(username) {
