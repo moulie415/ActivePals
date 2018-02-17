@@ -13,7 +13,8 @@
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
 		00E356F31AD99517003FC87E /* AnyoneTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* AnyoneTests.m */; };
-		0A88FFEA201D6E22004A17CD /* libRNGeocoder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A88FFE8201D6E19004A17CD /* libRNGeocoder.a */; };
+		0A19E29D20376EB60036DFF2 /* libreact-native-fcm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A19E24820376D230036DFF2 /* libreact-native-fcm.a */; };
+		0A19E30B203771B50036DFF2 /* libreact-native-geocoder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A19E24A20376D230036DFF2 /* libreact-native-geocoder.a */; };
 		0AB3810F20098C9700BCD283 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB380DD20098C9700BCD283 /* Bolts.framework */; };
 		0AB3811320098CC000BCD283 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811020098CBC00BCD283 /* FBSDKLoginKit.framework */; };
 		0AB3811420098CC000BCD283 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811120098CBD00BCD283 /* FBSDKShareKit.framework */; };
@@ -22,11 +23,8 @@
 		0AB3811720098E4A00BCD283 /* FBSDKCoreKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811220098CC000BCD283 /* FBSDKCoreKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0AB381282009960200BCD283 /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB380CE20098A3C00BCD283 /* libRNGoogleSignin.a */; };
 		0AB3814F2009993300BCD283 /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB380CB20098A3C00BCD283 /* libRCTFBSDK.a */; };
-		0AB3818320099B2300BCD283 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 54CC344D7C254B2999C9E743 /* libz.tbd */; };
 		0AB3818520099C6400BCD283 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0AB3818420099C6300BCD283 /* GoogleService-Info.plist */; };
 		0AB381CA20099FB700BCD283 /* libGoogleToolboxForMac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3819E20099F9900BCD283 /* libGoogleToolboxForMac.a */; };
-		0AB381CB20099FEC00BCD283 /* libGTMOAuth2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB381A020099F9900BCD283 /* libGTMOAuth2.a */; };
-		0AB381CC20099FEC00BCD283 /* libGTMSessionFetcher.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB381A220099F9900BCD283 /* libGTMSessionFetcher.a */; };
 		0DEC0B3B247E40D1953C8594 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 112BFEAFFE274186B850223D /* SafariServices.framework */; };
 		133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
 		139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139105C11AF99BAD00B5F7CC /* libRCTSettings.a */; };
@@ -113,6 +111,34 @@
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = Anyone;
+		};
+		0A19E24520376D230036DFF2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5A1F2426ABFFA974B8DE554B5AEB6BF7;
+			remoteInfo = Protobuf;
+		};
+		0A19E24720376D230036DFF2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 06AEEAE257CB46186763683CAC3D050D;
+			remoteInfo = "react-native-fcm";
+		};
+		0A19E24920376D230036DFF2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 65AC38A37A1DC4C7A1CC472E41192FC0;
+			remoteInfo = "react-native-geocoder";
+		};
+		0A19E2C820376ED50036DFF2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A19E2C420376ED50036DFF2 /* RNFIRMessaging.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNFIRMessaging;
 		};
 		0A88FFBA201D6E19004A17CD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -232,20 +258,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = EA63CD9169BF9983B8838AC3C0A19067;
 			remoteInfo = GoogleToolboxForMac;
-		};
-		0AB3819F20099F9900BCD283 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 60E9B1951D7A1BE04DE38CED4909018F;
-			remoteInfo = GTMOAuth2;
-		};
-		0AB381A120099F9900BCD283 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 40DFA8C08080C774B82FE56416062FA0;
-			remoteInfo = GTMSessionFetcher;
 		};
 		0AB381A320099F9900BCD283 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -434,6 +446,8 @@
 		00E356EE1AD99517003FC87E /* AnyoneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnyoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* AnyoneTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnyoneTests.m; sourceTree = "<group>"; };
+		0A19E27120376D310036DFF2 /* Anyone.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Anyone.entitlements; path = Anyone/Anyone.entitlements; sourceTree = "<group>"; };
+		0A19E2C420376ED50036DFF2 /* RNFIRMessaging.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFIRMessaging.xcodeproj; path = "../node_modules/react-native-fcm/ios/RNFIRMessaging.xcodeproj"; sourceTree = "<group>"; };
 		0A88FFAF201D6E18004A17CD /* RNGeocoder.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNGeocoder.xcodeproj; path = "../node_modules/react-native-geocoder/ios/RNGeocoder.xcodeproj"; sourceTree = "<group>"; };
 		0AB380DD20098C9700BCD283 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		0AB3811020098CBC00BCD283 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
@@ -496,11 +510,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A88FFEA201D6E22004A17CD /* libRNGeocoder.a in Frameworks */,
-				0AB381CB20099FEC00BCD283 /* libGTMOAuth2.a in Frameworks */,
-				0AB381CC20099FEC00BCD283 /* libGTMSessionFetcher.a in Frameworks */,
+				0A19E30B203771B50036DFF2 /* libreact-native-geocoder.a in Frameworks */,
+				0A19E29D20376EB60036DFF2 /* libreact-native-fcm.a in Frameworks */,
 				0AB381CA20099FB700BCD283 /* libGoogleToolboxForMac.a in Frameworks */,
-				0AB3818320099B2300BCD283 /* libz.tbd in Frameworks */,
 				0DEC0B3B247E40D1953C8594 /* SafariServices.framework in Frameworks */,
 				26C2C41C33114C5B9B6D278D /* AddressBook.framework in Frameworks */,
 				0AB3814F2009993300BCD283 /* libRCTFBSDK.a in Frameworks */,
@@ -612,6 +624,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		0A19E2C520376ED50036DFF2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A19E2C920376ED50036DFF2 /* libRNFIRMessaging.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		0A88FFB0201D6E18004A17CD /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -647,9 +667,10 @@
 			isa = PBXGroup;
 			children = (
 				0AB3819E20099F9900BCD283 /* libGoogleToolboxForMac.a */,
-				0AB381A020099F9900BCD283 /* libGTMOAuth2.a */,
-				0AB381A220099F9900BCD283 /* libGTMSessionFetcher.a */,
 				0AB381A420099F9900BCD283 /* libPods-Anyone.a */,
+				0A19E24620376D230036DFF2 /* libProtobuf.a */,
+				0A19E24820376D230036DFF2 /* libreact-native-fcm.a */,
+				0A19E24A20376D230036DFF2 /* libreact-native-geocoder.a */,
 				0A88FFBB201D6E19004A17CD /* libreact-native-google-maps.a */,
 				0A88FFBD201D6E19004A17CD /* libreact-native-maps.a */,
 				0A88FFBF201D6E19004A17CD /* libReactNativePermissions.a */,
@@ -681,6 +702,7 @@
 		13B07FAE1A68108700A75B9A /* Anyone */ = {
 			isa = PBXGroup;
 			children = (
+				0A19E27120376D310036DFF2 /* Anyone.entitlements */,
 				0AB3818420099C6300BCD283 /* GoogleService-Info.plist */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -744,6 +766,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				0A19E2C420376ED50036DFF2 /* RNFIRMessaging.xcodeproj */,
 				0A88FFAF201D6E18004A17CD /* RNGeocoder.xcodeproj */,
 				0AB3819620099F9900BCD283 /* Pods.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
@@ -942,6 +965,14 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = J88YLCF8ZH;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+							com.apple.Push = {
+								enabled = 0;
+							};
+						};
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -1023,6 +1054,10 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
+					ProductGroup = 0A19E2C520376ED50036DFF2 /* Products */;
+					ProjectRef = 0A19E2C420376ED50036DFF2 /* RNFIRMessaging.xcodeproj */;
+				},
+				{
 					ProductGroup = 0A88FFB0201D6E18004A17CD /* Products */;
 					ProjectRef = 0A88FFAF201D6E18004A17CD /* RNGeocoder.xcodeproj */;
 				},
@@ -1075,6 +1110,34 @@
 			fileType = archive.ar;
 			path = libRCTVibration.a;
 			remoteRef = 00C302E31ABCB9EE00DB3ED1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A19E24620376D230036DFF2 /* libProtobuf.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libProtobuf.a;
+			remoteRef = 0A19E24520376D230036DFF2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A19E24820376D230036DFF2 /* libreact-native-fcm.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libreact-native-fcm.a";
+			remoteRef = 0A19E24720376D230036DFF2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A19E24A20376D230036DFF2 /* libreact-native-geocoder.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libreact-native-geocoder.a";
+			remoteRef = 0A19E24920376D230036DFF2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A19E2C920376ED50036DFF2 /* libRNFIRMessaging.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFIRMessaging.a;
+			remoteRef = 0A19E2C820376ED50036DFF2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A88FFBB201D6E19004A17CD /* libreact-native-google-maps.a */ = {
@@ -1194,20 +1257,6 @@
 			fileType = archive.ar;
 			path = libGoogleToolboxForMac.a;
 			remoteRef = 0AB3819D20099F9900BCD283 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		0AB381A020099F9900BCD283 /* libGTMOAuth2.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libGTMOAuth2.a;
-			remoteRef = 0AB3819F20099F9900BCD283 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		0AB381A220099F9900BCD283 /* libGTMSessionFetcher.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libGTMSessionFetcher.a;
-			remoteRef = 0AB381A120099F9900BCD283 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0AB381A420099F9900BCD283 /* libPods-Anyone.a */ = {
@@ -1437,7 +1486,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Anyone/Pods-Anyone-resources.sh",
-				"${PODS_ROOT}/GTMOAuth2/Source/Touch/GTMOAuth2ViewTouch.xib",
+				"${PODS_ROOT}/GoogleAuthUtilities/Frameworks/frameworks/GoogleAuthUtilities.framework/Resources/GTMOAuth2ViewTouch.xib",
 				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
 				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 			);

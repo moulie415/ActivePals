@@ -44,7 +44,6 @@ import styles from './styles/friendsStyles'
     this.user = null
     this.state = {
       friends: [],
-      requests: []
     }
   }
 
@@ -53,10 +52,8 @@ import styles from './styles/friendsStyles'
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.user = user
-        this.friendsRef = firebase.database().ref('users/' + this.user.uid + '/friends')
-        this.requestsRef = firebase.database().ref('users/' + this.user.uid + '/requests' )
-        this.listenForFriends(this.friendsRef)
-        this.listenForRequests(this.requestsRef)
+        let friendsRef = firebase.database().ref('users/' + this.user.uid + '/friends')
+        this.listenForFriends(friendsRef)
     // User is signed in.
   } else {
     // No user is signed in.
@@ -70,34 +67,15 @@ import styles from './styles/friendsStyles'
       let friends = []
       let index = 1
       snapshot.forEach(child => {
-        firebase.database().ref('users/' + child.key).once('value')
-          .then(snapshot => {
-            let user = snapshot.val()
-            let pending = user.friends && user.friends[this.user.uid] ? false : true
-            friends.push({...user, pending, key: index})
+        firebase.database().ref('users/' + child.key).on('value', snapshot => {
+            friends.push({...snapshot.val(), status: child.val(), key: index})
             index++
             this.setState({friends})
-
           })
-          .catch(e => Alert.alert('Error', e.message))
       })
     })
   }
 
-  listenForRequests(ref) {
-    ref.on('value', snapshot => {
-      let requests = []
-      let index = 1
-      snapshot.forEach(child => {
-        firebase.database().ref('users/' + child.key + '/username').once('value').then(snapshot => {
-          requests.push({username: snapshot.val(), key: index})
-          index++
-          this.setState({requests})
-        })
-        .catch(e => Alert.alert("Error", e.message))
-      })
-    })
-  }
 
   render () {
     return (
@@ -112,10 +90,9 @@ import styles from './styles/friendsStyles'
         </Right>
       </Header>
       <ScrollView>
-      {this.getRequests(this.state.requests)}
       {this.getFriends(this.state.friends)}
       </ScrollView>
-      {this.state.friends.length == 0 && this.state.requests.length == 0 &&
+      {this.state.friends.length == 0  &&
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: '#fff', textAlign: 'center'}}>
             No don't have any friends yet, also please make sure you are connected to the internet
@@ -138,35 +115,12 @@ import styles from './styles/friendsStyles'
   )
   }
 
-  getRequests(requests) {
-    let list = []
-    let index = 1
-    requests.forEach(item => {
-      list.push(
-          <View key={index}
-          style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-            <View style={{flexDirection: 'row'}} >
-              <Icon name='ios-contact' />
-              <Text>{item.username + ' has sent you a friend request'}</Text>
-              <TouchableOpacity>
-               <Icon name='checkmark' style={{color: 'green'}}/>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Icon name='close' style={{color: 'red'}}/>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )
-      index++
-    })
-    return list
 
-  }
   getFriends(friends) {
     let list = []
     let index = 1
     friends.forEach(item => {
-      if (item.pending) {
+      if (item.status == 'outgoing') {
         list.push(
           <View key={index}
           style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
@@ -176,9 +130,33 @@ import styles from './styles/friendsStyles'
           </View>
           )
       }
+      else if (item.status == 'incoming') {
+        list.push(
+          <View key={index}
+          style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+            <View style={{flexDirection: 'row'}} >
+              <Icon name='ios-contact' />
+              <Text>{item.username + ' has sent you a friend request'}</Text>
+              <TouchableOpacity onPress={()=> this.accept(item)}>
+               <Icon name='checkmark' style={{color: 'green'}}/>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Icon name='close' style={{color: 'red'}}/>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )
+      }
       else {
         list.push(
-          <TouchableOpacity key={index}>
+          <TouchableOpacity key={index}
+          style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+            <View style={{flexDirection: 'row'}} >
+              <Text>{item.username}</Text>
+              <TouchableOpacity>
+                <Icon name='md-chatboxes' style={{color: colors.primary}}/>
+              </TouchableOpacity>
+            </View>
           </TouchableOpacity>
           )
       }
@@ -188,20 +166,38 @@ import styles from './styles/friendsStyles'
 
   }
 
+  accept(item) {
+    // let friend = {}
+    // friend[item.uid] = true
+    firebase.database().ref('users/' + this.user.uid + '/friends').child(item.uid).set("connected").then(()=> {
+      firebase.database().ref('users/' + item.uid + '/friends').child(this.user.uid).set("connected").then(() => {
+        //refresh friends to avoid duplicates, this could potentially be improved as its a bit hacky
+        this.setState({friends: []})
+        let friendsRef = firebase.database().ref('users/' + this.user.uid + '/friends')
+        this.listenForFriends(friendsRef)
+      })
+    })
+    .catch(e => Alert.alert("Error", e.message))
+
+  }
+
+  reject(item) {
+    let test = item
+
+  }
+
   sendRequest(username) {
     firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
       let friend = {}
-      friend[snapshot.val()] = true
+      friend[snapshot.val()] = 'outgoing'
       firebase.database().ref('users/' + this.user.uid + '/friends').set(friend).then(()=> {
         let request = {}
-        request[this.user.uid] = true
-        firebase.database().ref('users/' + snapshot.val() + '/requests').set(request)
-          .then(() => {
-            Alert.alert("Success", "Request sent")
-          })
-          .catch(e => Alert.alert('Error', e.message))
+        request[this.user.uid] = 'incoming'
+        firebase.database().ref('users/' + snapshot.val() + '/friends').set(request)
+        .then(() => {
+          Alert.alert("Success", "Request sent")
+        })
       })
-      .catch(e => Alert.alert('Error', e.message))
     })
     .catch(e => Alert.alert("Error", e.message))
   }

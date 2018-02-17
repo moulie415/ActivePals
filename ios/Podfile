@@ -20,10 +20,14 @@ target 'Anyone' do
 	]
 
 	pod 'react-native-maps', path: rn_maps_path
+	pod 'Firebase/Core', '4.0.0'
+	pod 'Firebase/Messaging'
 
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
   pod 'react-native-geocoder', :path => '../node_modules/react-native-geocoder'
+
+  pod 'react-native-fcm', :path => '../node_modules/react-native-fcm'
 
 end
 post_install do |installer|
