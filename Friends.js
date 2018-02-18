@@ -44,7 +44,7 @@ import styles from './styles/friendsStyles'
     this.user = null
     this.state = {
       friends: [],
-      usernames: []
+      users: []
     }
   }
 
@@ -72,17 +72,17 @@ import styles from './styles/friendsStyles'
         this.setState({friends})
         i++
       })
-      this.fetchUsernames()
+      this.fetchUsers()
     })
   }
 
-  fetchUsernames() {
-    let usernames = []
+  fetchUsers() {
+    let users = []
     this.state.friends.forEach(friend => {
-      firebase.database().ref('users/' + friend.uid).child('username').once('value')
+      firebase.database().ref('users/' + friend.uid).once('value')
       .then(snapshot => {
-        usernames.push({username: snapshot.val(), uid: friend.uid, status: friend.status})
-        this.setState({usernames})
+        users.push({...snapshot.val(), status: friend.status})
+        this.setState({users})
       })
     })
 
@@ -95,13 +95,13 @@ import styles from './styles/friendsStyles'
       <Header style={{backgroundColor: colors.primary}}>  
         <Left style={{flex: 1}}>
           <TouchableOpacity onPress={() => this.refreshFriends() }>
-            <Icon name='refresh' style={{color: '#fff'}} />
+            <Icon name='md-refresh' style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>
           </Left>
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff' }}>Friends</Title>
         <Right style={{flex: 1}}>
           <TouchableOpacity onPress={() => this.refs.modal.open() }>
-            <Icon name='add' style={{color: '#fff'}} />
+            <Icon name='md-add' style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>
         </Right>
       </Header>
@@ -135,7 +135,7 @@ import styles from './styles/friendsStyles'
   getFriends() {
     let list = []
     let index = 1
-    this.state.usernames.forEach(friend => {
+    this.state.users.forEach(friend => {
         if (friend.status == 'outgoing') {
         list.push(
           <View key={index}
@@ -164,15 +164,20 @@ import styles from './styles/friendsStyles'
       }
       else {
         list.push(
-          <TouchableOpacity key={index}
+          <View key={index}
           style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-            <View style={{flexDirection: 'row', alignItems: 'center', height: 40}} >
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
               <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
-              <TouchableOpacity>
+              <View style={{flexDirection: 'row'}}>
+              <TouchableOpacity style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-chatboxes' style={{color: colors.primary}}/>
               </TouchableOpacity>
+              <TouchableOpacity style={{padding: 5, marginHorizontal: 5}}>
+                <Icon name='md-person' style={{color: colors.primary}}/>
+              </TouchableOpacity>
+              </View>
             </View>
-          </TouchableOpacity>
+          </View>
           )
       }
       index++
@@ -210,6 +215,7 @@ import styles from './styles/friendsStyles'
       .then(()=> {
         firebase.database().ref('users/' + snapshot.val() + '/friends').child(this.user.uid).set("incoming")
         .then(() => {
+          this.refs.modal.close()
           Alert.alert("Success", "Request sent")
         })
       })
