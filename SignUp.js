@@ -96,7 +96,20 @@ import  styles  from './styles/signUpStyles'
         onPress={() => {
           if (this.pass == this.confirm) {
             this.setState({spinner: true})
-            this.signup(this.email, this.pass)
+            if (this.username) {
+              firebase.database().ref('/usernames/' + this.username).once('value')
+              .then(snapshot => {
+                if (snapshot.val()) {
+                  Alert.alert('Sorry', 'That username is already in use')
+                }
+                else {
+                  this.signup(this.email, this.pass)
+                }
+              }) 
+            }
+            else {
+              this.signup(this.email, this.pass)
+            }
           }
           else {
             Alert.alert("Please try again", "Passwords do not match")
@@ -145,7 +158,9 @@ createUser = (uid,userData,token) => {
     }
     //Alert.alert("Success", "Logged in as: " + userData.email)
     firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
-   
+    if (this.username) {
+      firebase.database().ref('usernames').child(this.username).set(uid)
+    } 
   }
 
 } 

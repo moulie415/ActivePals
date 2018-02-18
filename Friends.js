@@ -44,6 +44,7 @@ import styles from './styles/friendsStyles'
     this.user = null
     this.state = {
       friends: [],
+      usernames: []
     }
   }
 
@@ -65,15 +66,26 @@ import styles from './styles/friendsStyles'
   listenForFriends(ref) {
     ref.on('value', snapshot => {
       let friends = []
-      let index = 1
+      let i = 1
       snapshot.forEach(child => {
-        firebase.database().ref('users/' + child.key).on('value', snapshot => {
-            friends.push({...snapshot.val(), status: child.val(), key: index})
-            index++
-            this.setState({friends})
-          })
+        friends.push({uid: child.key, status: child.val(), key: i})
+        this.setState({friends})
+        i++
+      })
+      this.fetchUsernames()
+    })
+  }
+
+  fetchUsernames() {
+    let usernames = []
+    this.state.friends.forEach(friend => {
+      firebase.database().ref('users/' + friend.uid).child('username').once('value')
+      .then(snapshot => {
+        usernames.push({username: snapshot.val(), uid: friend.uid, status: friend.status})
+        this.setState({usernames})
       })
     })
+
   }
 
 
@@ -81,7 +93,11 @@ import styles from './styles/friendsStyles'
     return (
     <Container>
       <Header style={{backgroundColor: colors.primary}}>  
-        <Left style={{flex: 1}}/>
+        <Left style={{flex: 1}}>
+          <TouchableOpacity onPress={() => this.refreshFriends() }>
+            <Icon name='refresh' style={{color: '#fff'}} />
+          </TouchableOpacity>
+          </Left>
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff' }}>Friends</Title>
         <Right style={{flex: 1}}>
           <TouchableOpacity onPress={() => this.refs.modal.open() }>
@@ -90,7 +106,7 @@ import styles from './styles/friendsStyles'
         </Right>
       </Header>
       <ScrollView>
-      {this.getFriends(this.state.friends)}
+      {this.getFriends()}
       </ScrollView>
       {this.state.friends.length == 0  &&
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
@@ -116,32 +132,31 @@ import styles from './styles/friendsStyles'
   }
 
 
-  getFriends(friends) {
+  getFriends() {
     let list = []
     let index = 1
-    friends.forEach(item => {
-      if (item.status == 'outgoing') {
+    this.state.usernames.forEach(friend => {
+        if (friend.status == 'outgoing') {
         list.push(
           <View key={index}
           style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-            <View style={{flexDirection: 'row'}} >
-              <Text>{item.username + ' request sent'}</Text>
+            <View style={{flexDirection: 'row', height: 40, alignItems: 'center'}} >
+              <Text style={{marginHorizontal: 10}}>{friend.username + ' request sent'}</Text>
             </View>
           </View>
           )
       }
-      else if (item.status == 'incoming') {
+      else if (friend.status == 'incoming') {
         list.push(
           <View key={index}
           style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-            <View style={{flexDirection: 'row'}} >
-              <Icon name='ios-contact' />
-              <Text>{item.username + ' has sent you a friend request'}</Text>
-              <TouchableOpacity onPress={()=> this.accept(item)}>
-               <Icon name='checkmark' style={{color: 'green'}}/>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 40}} >
+              <Text style={{marginHorizontal: 10}}>{friend.username + ' has sent you a friend request'}</Text>
+              <TouchableOpacity onPress={()=> this.accept(friend)}>
+               <Icon name='checkmark' style={{color: 'green', fontSize: 40, padding: 5}}/>
               </TouchableOpacity>
               <TouchableOpacity>
-                <Icon name='close' style={{color: 'red'}}/>
+                <Icon name='close' style={{color: 'red', fontSize: 40, padding: 5}}/>
               </TouchableOpacity>
             </View>
           </View>
@@ -151,8 +166,8 @@ import styles from './styles/friendsStyles'
         list.push(
           <TouchableOpacity key={index}
           style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-            <View style={{flexDirection: 'row'}} >
-              <Text>{item.username}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 40}} >
+              <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
               <TouchableOpacity>
                 <Icon name='md-chatboxes' style={{color: colors.primary}}/>
               </TouchableOpacity>
@@ -163,18 +178,14 @@ import styles from './styles/friendsStyles'
       index++
     })
     return list
-
   }
 
-  accept(item) {
-    // let friend = {}
-    // friend[item.uid] = true
-    firebase.database().ref('users/' + this.user.uid + '/friends').child(item.uid).set("connected").then(()=> {
-      firebase.database().ref('users/' + item.uid + '/friends').child(this.user.uid).set("connected").then(() => {
-        //refresh friends to avoid duplicates, this could potentially be improved as its a bit hacky
-        this.setState({friends: []})
-        let friendsRef = firebase.database().ref('users/' + this.user.uid + '/friends')
-        this.listenForFriends(friendsRef)
+  accept(friend) {
+    firebase.database().ref('users/' + this.user.uid + '/friends').child(friend.uid).set("connected")
+    .then(()=> {
+      firebase.database().ref('users/' + friend.uid + '/friends').child(this.user.uid).set("connected")
+      .then(() => {
+        this.refreshFriends()
       })
     })
     .catch(e => Alert.alert("Error", e.message))
@@ -186,14 +197,18 @@ import styles from './styles/friendsStyles'
 
   }
 
+  refreshFriends() {
+        //refresh friends to display correctly, this could potentially be improved as its a bit hacky
+        this.setState({friends: []})
+        let friendsRef = firebase.database().ref('users/' + this.user.uid + '/friends')
+        this.listenForFriends(friendsRef)
+      }
+
   sendRequest(username) {
     firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
-      let friend = {}
-      friend[snapshot.val()] = 'outgoing'
-      firebase.database().ref('users/' + this.user.uid + '/friends').set(friend).then(()=> {
-        let request = {}
-        request[this.user.uid] = 'incoming'
-        firebase.database().ref('users/' + snapshot.val() + '/friends').set(request)
+      firebase.database().ref('users/' + this.user.uid + '/friends').child(snapshot.val()).set("outgoing")
+      .then(()=> {
+        firebase.database().ref('users/' + snapshot.val() + '/friends').child(this.user.uid).set("incoming")
         .then(() => {
           Alert.alert("Success", "Request sent")
         })
