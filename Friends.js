@@ -40,7 +40,7 @@ import styles from './styles/friendsStyles'
 
   constructor(props) {
     super(props)
-
+    this.nav = this.props.navigation
     this.user = null
     this.state = {
       friends: [],
@@ -169,7 +169,9 @@ import styles from './styles/friendsStyles'
             <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
               <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
               <View style={{flexDirection: 'row'}}>
-              <TouchableOpacity style={{padding: 5, marginHorizontal: 5}}>
+              <TouchableOpacity 
+                onPress={()=> this.openChat(friend.uid, friend.username)}
+                style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-chatboxes' style={{color: colors.primary}}/>
               </TouchableOpacity>
               <TouchableOpacity style={{padding: 5, marginHorizontal: 5}}>
@@ -221,5 +223,35 @@ import styles from './styles/friendsStyles'
       })
     })
     .catch(e => Alert.alert("Error", e.message))
+  }
+
+  openChat(uid, username) {
+    firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).once('value')
+      .then(snapshot => {
+        if (snapshot.val()) {
+          this.nav.navigate('Messaging', {uid: this.user.uid, friendUid: uid})
+        }
+        else {
+          Alert.alert(
+            'Start a new chat with ' + username + '?',
+            'This will be the beggining of your chat with ' + username,
+            [
+            {text: 'Cancel', style: 'cancel'},
+            {text: 'OK', onPress: () => {
+              let timestamp = (new Date()).toString()
+              firebase.database().ref('chats').push({createdAt: timestamp}).then(snapshot => {
+                let chatId = snapshot.key
+                firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).set(chatId)
+                firebase.database().ref('users/' + uid + '/chats').child(this.user.uid).set(chatId)
+                this.nav.navigate('Messaging', {uid: this.user.uid, friendUid: uid})
+              })
+
+            }
+              , style: 'positive'},
+            ]
+            )
+        }
+      })
+      .catch(e => Alert.alert('Error', e.message))
   }
 }

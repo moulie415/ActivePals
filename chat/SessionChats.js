@@ -1,13 +1,13 @@
 import React, { Component } from "react"
 import { StyleSheet, Alert, View } from "react-native"
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
-import firebase from './index'
-import  styles  from './styles/loginStyles'
+import firebase from '../index'
+//import  styles  from './styles/loginStyles'
 
- export default class Chat extends Component {
+ export default class SessionChats extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Chat',
+    tabBarLabel: 'Session Chats',
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-chatboxes'

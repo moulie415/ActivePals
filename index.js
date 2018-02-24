@@ -1,6 +1,6 @@
 
 import React from "react"
-import { AppRegistry } from 'react-native'
+import { AppRegistry, Platform } from 'react-native'
 import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
 import Login from './login'
@@ -9,14 +9,17 @@ import Home from './Home'
 import Friends from './Friends'
 import Profile from './Profile'
 import Settings from './Settings'
-import Chat from './Chat'
+import Messaging from './chat/Messaging'
+import DirectMessages from './chat/DirectMessages'
+import SessionChats from './chat/SessionChats'
 import SecondScreen from "./SecondScreen"
 import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
 import * as firebase from "firebase"
-import { Root } from 'native-base'
+import { Root, Header } from 'native-base'
 import colors from 'Anyone/constants/colors'
 import color from 'color'
+import { isIphoneX } from 'react-native-iphone-x-helper'
 
 let config = {
 	apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
@@ -45,10 +48,42 @@ const sessions = StackNavigator({
   headerMode: 'none'
 })
 
+
+const chats = TabNavigator({
+  DirectMessages: {screen: DirectMessages},
+  SessionChats: {screen: SessionChats}
+}, {
+  tabBarPosition: 'top',
+  swipeEnabled: false,
+  lazyLoad: true,
+  animationEnabled: false,
+  tabBarOptions: {
+    showIcon: false,
+    showLabel: true,
+    labelStyle: {
+      fontSize: 15
+    },
+    activeTintColor: '#fff',
+    inactiveTintColor: colors.secondary,
+    tabStyle: {
+      justifyContent: isIphoneX()? 'flex-end' :'center',
+      marginBottom: Platform.select({ios: isIphoneX()? -20: -10})
+    },
+    style: {
+      backgroundColor: colors.primary,
+      height: Platform.select({ios: isIphoneX()? 50 : 70}),
+      justifyContent: isIphoneX()? 'center' : null,
+    },
+    indicatorStyle: {
+      backgroundColor: '#fff'
+    },
+  }
+})
+
 const tabs = TabNavigator({
 	Home : {screen: sessions},
   Friends: {screen: Friends},
-  Chat: {screen: Chat},
+  Chat: {screen: chats},
 	Profile: {screen: Profile},
 	Settings: {screen: Settings}
 }, {
@@ -68,6 +103,7 @@ const SimpleApp = StackNavigator({
   Login : { screen: App, navigationOptions: {header: null} },
   SignUp: { screen: SignUp},
   MainNav: { screen: tabs},
+  Messaging: {screen: Messaging},
   SecondScreen: { screen: SecondScreen, title: "Second Screen" }
 })
 
