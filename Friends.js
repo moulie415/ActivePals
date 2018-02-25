@@ -24,6 +24,7 @@ import firebase from "./index"
 import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'
+import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
 
  export default class Friends extends Component {
@@ -229,7 +230,7 @@ import styles from './styles/friendsStyles'
     firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).once('value')
       .then(snapshot => {
         if (snapshot.val()) {
-          this.nav.navigate('Messaging', {chatId: snapshot.val(), uid: this.user.uid, friendUid: uid})
+          this.nav.navigate('Messaging', {chatId: snapshot.val(), uid: this.user.uid, friendUid: uid, friendUsername: username})
         }
         else {
           Alert.alert(
@@ -241,9 +242,10 @@ import styles from './styles/friendsStyles'
               let timestamp = (new Date()).toString()
               firebase.database().ref('chats').push({createdAt: timestamp}).then(snapshot => {
                 let chatId = snapshot.key
+                FCM.subscribeToTopic('/topics/' + chatId)
                 firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).set(chatId)
                 firebase.database().ref('users/' + uid + '/chats').child(this.user.uid).set(chatId)
-                this.nav.navigate('Messaging', {chatId, uid: this.user.uid, friendUid: uid})
+                this.nav.navigate('Messaging', {chatId, uid: this.user.uid, friendUid: uid, friendUsername: username})
               })
 
             }

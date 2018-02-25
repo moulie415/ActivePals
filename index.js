@@ -1,6 +1,6 @@
 
 import React from "react"
-import { AppRegistry, Platform } from 'react-native'
+import { AppRegistry, Platform, Alert } from 'react-native'
 import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
 import Login from './login'
@@ -20,20 +20,93 @@ import { Root, Header } from 'native-base'
 import colors from 'Anyone/constants/colors'
 import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'
+import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
 let config = {
-	apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
-	authDomain: "anyone-80c08.firebaseapp.com",
-	databaseURL: "https://anyone-80c08.firebaseio.com",
-	projectId: "anyone-80c08",
-	storageBucket: "anyone-80c08.appspot.com",
-	messagingSenderId: "680139677816"
+  apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
+  authDomain: "anyone-80c08.firebaseapp.com",
+  databaseURL: "https://anyone-80c08.firebaseio.com",
+  projectId: "anyone-80c08",
+  storageBucket: "anyone-80c08.appspot.com",
+  messagingSenderId: "680139677816"
 }
 firebase.initializeApp(config)
 export default firebase
 
-const App = props => {
-  return <Root><Login navigation={props.navigation} /></Root>
+FCM.on(FCMEvent.Notification, async (notif) => {
+    // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
+    if(notif.local_notification){
+      //this is a local notification
+    }
+    if(notif.opened_from_tray){
+      //iOS: app is open/resumed because user clicked banner
+      //Android: app is open/resumed because user clicked banner or tapped app icon
+    }
+    // await someAsyncCall();
+
+    if(Platform.OS ==='ios'){
+      if (notif._actionIdentifier === 'com.myapp.MyCategory.Confirm') {
+        // handle notification action here
+        // the text from user is in notif._userText if type of the action is NotificationActionType.TextInput
+      }
+      //optional
+      //iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623013-application.
+      //This library handles it for you automatically with default behavior (for remote notification, finish with NoData; for WillPresent, finish depend on "show_in_foreground"). However if you want to return different result, follow the following code to override
+      //notif._notificationType is available for iOS platfrom
+      switch(notif._notificationType){
+        case NotificationType.Remote:
+          notif.finish(RemoteNotificationResult.NewData) //other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+          break
+        case NotificationType.NotificationResponse:
+          notif.finish()
+          break
+        case NotificationType.WillPresent:
+          notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
+          break
+      }
+    }
+    showLocalNotification(notif)
+})
+
+FCM.on(FCMEvent.RefreshToken, (token) => {
+    console.log(token)
+    // fcm token may not be available on first load, catch it here
+})
+
+const showLocalNotification = (notif) => {
+    FCM.presentLocalNotification({
+      title: "test",
+      body: "test",
+      priority: "high",
+      sound: "default",
+      //click_action: notif.click_action,
+      show_in_foreground: true,
+      "lights": true,
+      local: true,
+      vibrate: 300,
+    })
+  }
+
+
+class App extends React.Component {
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        firebase.database().ref('users/' + user.uid).child('chats').on('value', snapshot => {
+          snapshot.forEach(child => {
+            //FCM.subscribeToTopic('/topics/' + child.val())
+          })
+        })
+    // User is signed in.
+  } else {
+    // No user is signed in.
+  }
+})
+  }
+  render () {
+  const { navigation } = this.props
+    return <Root><Login navigation={navigation} /></Root>
+  }
 }
 
 App.navigationOptions = {
