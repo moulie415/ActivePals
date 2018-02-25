@@ -229,7 +229,7 @@ import styles from './styles/friendsStyles'
     firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).once('value')
       .then(snapshot => {
         if (snapshot.val()) {
-          this.nav.navigate('Messaging', {uid: this.user.uid, friendUid: uid})
+          this.nav.navigate('Messaging', {chatId: snapshot.val(), uid: this.user.uid, friendUid: uid})
         }
         else {
           Alert.alert(
@@ -243,7 +243,7 @@ import styles from './styles/friendsStyles'
                 let chatId = snapshot.key
                 firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).set(chatId)
                 firebase.database().ref('users/' + uid + '/chats').child(this.user.uid).set(chatId)
-                this.nav.navigate('Messaging', {uid: this.user.uid, friendUid: uid})
+                this.nav.navigate('Messaging', {chatId, uid: this.user.uid, friendUid: uid})
               })
 
             }
