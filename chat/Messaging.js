@@ -27,6 +27,7 @@ export default class Messaging extends React.Component {
     this.chatId = this.params.chatId
     this.uid = this.params.uid
     this.friendUsername = this.params.friendUsername
+    this.friendUid = this.params.friendUid
     this.state = {
       messageObjects: [],
       messages: [],
@@ -41,18 +42,51 @@ export default class Messaging extends React.Component {
     firebase.database().ref('users/' + this.uid).once('value', snapshot => {
       this.setState({user: snapshot.val()})
     })
-    // iOS: show permission prompt for the first call. later just check permission in user settings
-        // Android: check permission in user settings
-        FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
+
+    firebase.database().ref('users/' + this.friendUid).child('FCMToken').once('value', snapshot => {
+      this.friendToken = snapshot.val()
+    })
+    
         
-        FCM.getFCMToken().then(token => {
-          console.log(token)
-            // store fcm token in your server
-          })
+        
         
         this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
-            // optional, do some component related stuff
-          })
+  //handle stuff
+  
+  FCM.cancelAllLocalNotifications()
+    // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
+    if(notif.local_notification){
+      //this is a local notification
+    }
+    if(notif.opened_from_tray){
+      //iOS: app is open/resumed because user clicked banner
+      //Android: app is open/resumed because user clicked banner or tapped app icon
+    }
+    // await someAsyncCall();
+
+    if(Platform.OS ==='ios'){
+      if (notif._actionIdentifier === 'com.myapp.MyCategory.Confirm') {
+        // handle notification action here
+        // the text from user is in notif._userText if type of the action is NotificationActionType.TextInput
+      }
+      //optional
+      //iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623013-application.
+      //This library handles it for you automatically with default behavior (for remote notification, finish with NoData; for WillPresent, finish depend on "show_in_foreground"). However if you want to return different result, follow the following code to override
+      //notif._notificationType is available for iOS platfrom
+      switch(notif._notificationType){
+        case NotificationType.Remote:
+          notif.finish(RemoteNotificationResult.NewData) //other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+          break
+        case NotificationType.NotificationResponse:
+          notif.finish()
+          break
+        case NotificationType.WillPresent:
+          notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
+          break
+      }
+    }
+})
+
         
         // initial notification contains the notification that launchs the app. If user launchs app by clicking banner, the banner notification info will be here rather than through FCM.on event
         // sometimes Android kills activity when app goes to background, and when resume it broadcasts notification before JS is run. You can use FCM.getInitialNotification() to capture those missed events.
@@ -102,13 +136,19 @@ export default class Messaging extends React.Component {
     //make messages database friendly
     let converted = []
     messages.forEach(message => {
-      converted.push({...message, createdAt: message.createdAt.toString()})
+      converted.push({...message, createdAt: message.createdAt.toString(), FCMToken: this.friendToken})
     })
 
+    firebase.database().ref()
     firebase.database().ref('chats/' + this.chatId).child('messages').push(...converted)
-    this.setState(previousState => ({
-      messageObjects: GiftedChat.append(previousState.messageObjects, messages),
-    }))
+    .then(() => {
+      this.setState(previousState => ({
+        messageObjects: GiftedChat.append(previousState.messageObjects, messages),
+      }))
+
+    })
+    .catch(e => Alert.alert("Error sending message", e.message))
+
   }
 
   render() {
