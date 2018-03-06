@@ -20,18 +20,37 @@ exports.sendNewMessageNotification = functions.database.ref('/chats').onWrite(ev
         console.log(message)
         const { user, text, FCMToken, createdAt, _id } = message
 
+        // const payload = {
+        //     notification: {
+                
+        //         body: text,
+        //     },
+        //     data: {
+
+        //         username: user.name,
+        //         uid: user._id,
+        //         createdAt,
+        //         _id,
+        //     },
+        //     token: FCMToken,
+
+        // }
+
         const payload = {
-            notification: {
-                title: user.name + ' sent you a message',
-                body: text,
-            },
             data: {
+                custom_notification: JSON.stringify({
+                    body: text,
+                    title: user.name + ' sent you a message',
+                    priority: 'high'
+                }),
                 username: user.name,
                 uid: user._id,
                 createdAt,
                 _id,
+
             },
             token: FCMToken,
+
         }
 
         return admin.messaging()

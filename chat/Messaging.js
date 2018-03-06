@@ -49,11 +49,10 @@ export default class Messaging extends React.Component {
     
         
         
-        
         this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
   //handle stuff
   
-  FCM.cancelAllLocalNotifications()
+  
     // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
     if(notif.local_notification){
       //this is a local notification
@@ -75,13 +74,13 @@ export default class Messaging extends React.Component {
       //notif._notificationType is available for iOS platfrom
       switch(notif._notificationType){
         case NotificationType.Remote:
-          notif.finish(RemoteNotificationResult.NewData) //other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+          //notif.finish(RemoteNotificationResult.NewData) //other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
           break
         case NotificationType.NotificationResponse:
-          notif.finish()
+          //notif.finish()
           break
         case NotificationType.WillPresent:
-          notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
+          //notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
           break
       }
     }

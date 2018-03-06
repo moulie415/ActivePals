@@ -1,6 +1,6 @@
 
 import React from "react"
-import { AppRegistry, Platform, Alert } from 'react-native'
+import { AppRegistry, Platform, Alert, AppState } from 'react-native'
 import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
 import Login from './login'
@@ -35,8 +35,11 @@ export default firebase
 
 FCM.on(FCMEvent.Notification, async (notif) => {
     // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
+    let state = AppState.currentState
+
     if(notif.local_notification){
       //this is a local notification
+
     }
     if(notif.opened_from_tray){
       //iOS: app is open/resumed because user clicked banner
