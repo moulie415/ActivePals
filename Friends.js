@@ -240,12 +240,14 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
               let timestamp = (new Date()).toString()
-              firebase.database().ref('chats').push({createdAt: timestamp}).then(snapshot => {
+              firebase.database().ref('chats').push({_id: 'initial'}).then(snapshot => {
                 let chatId = snapshot.key
-                FCM.subscribeToTopic('/topics/' + chatId)
+                firebase.database().ref('chats').child(chatId).push({_id: 'initial'}).then(snapshot => {
+                firebase.database().ref('chats').child(chatId).child('_id').remove()
                 firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).set(chatId)
                 firebase.database().ref('users/' + uid + '/chats').child(this.user.uid).set(chatId)
                 this.nav.navigate('Messaging', {chatId, uid: this.user.uid, friendUid: uid, friendUsername: username})
+                })
               })
 
             }

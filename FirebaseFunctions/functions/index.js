@@ -4,23 +4,22 @@ const _ = require('lodash')
 
 admin.initializeApp(functions.config().firebase)
 
-exports.sendNewMessageNotification = functions.database.ref('/chats').onWrite(event => {
+exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWrite(event => {
     console.log(event)
+
     const getValuePromise = admin.database()
                                  .ref('chats')
+                                 .child(event.params.id)
                                  .orderByKey()
                                  .limitToLast(1)
                                  .once('value')
 
     return getValuePromise.then(snapshot => {
-        const { messages } = _.values(snapshot.val())[0]
-        console.log(_.values(snapshot.val())[0])
-        let message = messages[Object.keys(messages)[Object.keys(messages).length - 1]]
-        console.log(messages)
-        console.log(message)
-        const { user, text, FCMToken, createdAt, _id } = message
+        console.log(snapshot.val())
+        console.log(snapshot.val()[Object.keys(snapshot.val())[0]])
+        const { user, text, FCMToken, createdAt, _id } = snapshot.val()[Object.keys(snapshot.val())[0]]
 
-        // const payload = {
+        // const payload = {l
         //     notification: {
                 
         //         body: text,

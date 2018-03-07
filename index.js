@@ -68,26 +68,43 @@ FCM.on(FCMEvent.Notification, async (notif) => {
           break
       }
     }
-    showLocalNotification(notif)
-})
+    if (!notif.opened_from_tray) {
+      showLocalNotification(notif)
+    }
+  })
 
 FCM.on(FCMEvent.RefreshToken, (token) => {
-    console.log(token)
-    // fcm token may not be available on first load, catch it here
+  
+    
 })
 
 const showLocalNotification = (notif) => {
+  if (Platform.OS == 'android') {
+    let custom = JSON.parse(notif.custom_notification)
     FCM.presentLocalNotification({
-      title: "test",
-      body: "test",
+      title: custom.title,
+      body: custom.body,
+      priority: custom.priority,
+      sound: "default",
+      //click_action: notif.click_action,
+      show_in_foreground: true,
+      lights: true,
+      vibrate: 300,
+    })
+  }
+  else {
+    FCM.presentLocalNotification({
+      title: notif.title,
+      body: notif.body,
       priority: "high",
       sound: "default",
       //click_action: notif.click_action,
       show_in_foreground: true,
-      "lights": true,
-      local: true,
+      lights: true,
       vibrate: 300,
     })
+  }
+
   }
 
 

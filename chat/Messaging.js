@@ -37,7 +37,7 @@ export default class Messaging extends React.Component {
 
 
   componentDidMount() {
-    let ref = firebase.database().ref('chats/'+ this.chatId).child('messages').orderByKey().limitToLast(30)
+    let ref = firebase.database().ref('chats/'+ this.chatId).orderByKey().limitToLast(30)
     this.fetchMessages(ref)
     firebase.database().ref('users/' + this.uid).once('value', snapshot => {
       this.setState({user: snapshot.val()})
@@ -46,54 +46,31 @@ export default class Messaging extends React.Component {
     firebase.database().ref('users/' + this.friendUid).child('FCMToken').once('value', snapshot => {
       this.friendToken = snapshot.val()
     })
-    
-        
-        
-        this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
-  //handle stuff
-  
-  
-    // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
-    if(notif.local_notification){
-      //this is a local notification
-    }
-    if(notif.opened_from_tray){
-      //iOS: app is open/resumed because user clicked banner
-      //Android: app is open/resumed because user clicked banner or tapped app icon
-    }
-    // await someAsyncCall();
 
-    if(Platform.OS ==='ios'){
-      if (notif._actionIdentifier === 'com.myapp.MyCategory.Confirm') {
-        // handle notification action here
-        // the text from user is in notif._userText if type of the action is NotificationActionType.TextInput
-      }
-      //optional
-      //iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623013-application.
-      //This library handles it for you automatically with default behavior (for remote notification, finish with NoData; for WillPresent, finish depend on "show_in_foreground"). However if you want to return different result, follow the following code to override
-      //notif._notificationType is available for iOS platfrom
-      switch(notif._notificationType){
-        case NotificationType.Remote:
-          //notif.finish(RemoteNotificationResult.NewData) //other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
-          break
-        case NotificationType.NotificationResponse:
-          //notif.finish()
-          break
-        case NotificationType.WillPresent:
-          //notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
-          break
-      }
-    }
-})
+    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'));
 
-        
-        // initial notification contains the notification that launchs the app. If user launchs app by clicking banner, the banner notification info will be here rather than through FCM.on event
-        // sometimes Android kills activity when app goes to background, and when resume it broadcasts notification before JS is run. You can use FCM.getInitialNotification() to capture those missed events.
-        // initial notification will be triggered all the time even when open app by icon so send some action identifier when you send notification
-        FCM.getInitialNotification().then(notif => {
-         console.log(notif)
-       })
+    FCM.getFCMToken().then(token => {
+      firebase.database().ref('users/' + this.uid).child('FCMToken').set(token)
+    })
+
+    this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
+      const { createdAt, uid, username, _id, body, title } = notif
+      let message
+      if (notif.custom_notification) {
+        let custom = JSON.parse(notif.custom_notification) 
+        message = {createdAt, _id, text: custom.body, user: {_id: uid, name: username}}
       }
+      else {
+        message = {createdAt, _id, text: body, user: {_id: uid, name: username}}
+      }
+      this.setState(previousState => ({
+        messageObjects: GiftedChat.append(previousState.messageObjects, message),
+      }))
+    })
+    FCM.getInitialNotification().then(notif => {
+     console.log(notif)
+   })
+  }
 
 
 
@@ -101,7 +78,9 @@ export default class Messaging extends React.Component {
     ref.once('value', snapshot => {
       let messageObjects = []
       snapshot.forEach(child => {
+        if (child.val()._id != 'initial') {
         messageObjects.push({...child.val()})
+      }
       })
       messageObjects = messageObjects.reverse()
         this.setState({messageObjects})
@@ -138,8 +117,7 @@ export default class Messaging extends React.Component {
       converted.push({...message, createdAt: message.createdAt.toString(), FCMToken: this.friendToken})
     })
 
-    firebase.database().ref()
-    firebase.database().ref('chats/' + this.chatId).child('messages').push(...converted)
+    firebase.database().ref('chats/' + this.chatId).push(...converted)
     .then(() => {
       this.setState(previousState => ({
         messageObjects: GiftedChat.append(previousState.messageObjects, messages),
