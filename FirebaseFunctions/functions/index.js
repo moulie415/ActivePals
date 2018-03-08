@@ -40,7 +40,8 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                 custom_notification: JSON.stringify({
                     body: text,
                     title: user.name + ' sent you a message',
-                    priority: 'high'
+                    priority: 'high',
+                    sound: 'default'
                 }),
                 username: user.name,
                 uid: user._id,
@@ -56,3 +57,14 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                     .send(payload)
     })
 })
+
+// exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/friends/{friend}').onWrite(event => {
+//     console.log(event.val())
+//     console.log(event.params.id)
+//     console.log(event.params.friend)
+
+//     const getValuePromise = admin.database().ref('/users').child(event.params.friend).once('value')
+//     return getValuePromise.then(snapshot => {
+
+//     })
+// })

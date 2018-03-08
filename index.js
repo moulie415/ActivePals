@@ -69,7 +69,9 @@ FCM.on(FCMEvent.Notification, async (notif) => {
       }
     }
     if (!notif.opened_from_tray) {
-      showLocalNotification(notif)
+      if (Platform.OS == 'ios' || state != 'background') {
+        showLocalNotification(notif)
+      }
     }
   })
 
