@@ -119,7 +119,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           <Text style={styles.modalText}>Send friend request</Text>
           <TextInput 
           underlineColorAndroid='transparent'
-          style={{borderColor: '#000'}}
+          style={styles.usernameInput}
           autoCapitalize={'none'}
           placeholder={'Enter username'}
           onChangeText={username => this.username = username}
@@ -168,7 +168,10 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           <View key={index}
           style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
-              <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary}}/>
+                <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
+              </View>
               <View style={{flexDirection: 'row'}}>
               <TouchableOpacity 
                 onPress={()=> this.openChat(friend.uid, friend.username)}

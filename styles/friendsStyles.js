@@ -12,5 +12,14 @@ export default styles = StyleSheet.create({
     color: "black",
     fontSize: 22
   },
+  usernameInput: {
+    borderColor: '#999',
+    borderWidth: 1,
+    width: 200,
+    textAlign: 'center',
+    marginVertical: 5,
+    padding: -5,
+    fontSize: 15 
+  }
 
 })
