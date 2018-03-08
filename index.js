@@ -74,7 +74,7 @@ FCM.on(FCMEvent.Notification, async (notif) => {
   })
 
 FCM.on(FCMEvent.RefreshToken, (token) => {
-  
+
     
 })
 
@@ -112,10 +112,8 @@ class App extends React.Component {
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        firebase.database().ref('users/' + user.uid).child('chats').on('value', snapshot => {
-          snapshot.forEach(child => {
-            //FCM.subscribeToTopic('/topics/' + child.val())
-          })
+        FCM.getFCMToken().then(token => {
+          firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
         })
     // User is signed in.
   } else {

@@ -49,10 +49,6 @@ export default class Messaging extends React.Component {
 
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'));
 
-    FCM.getFCMToken().then(token => {
-      firebase.database().ref('users/' + this.uid).child('FCMToken').set(token)
-    })
-
     this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
       const { createdAt, uid, username, _id, body, title } = notif
       let message
@@ -63,9 +59,11 @@ export default class Messaging extends React.Component {
       else {
         message = {createdAt, _id, text: body, user: {_id: uid, name: username}}
       }
-      this.setState(previousState => ({
-        messageObjects: GiftedChat.append(previousState.messageObjects, message),
-      }))
+      if (this.friendUid == uid) {
+        this.setState(previousState => ({
+          messageObjects: GiftedChat.append(previousState.messageObjects, message),
+        }))
+      }
     })
     FCM.getInitialNotification().then(notif => {
      console.log(notif)
