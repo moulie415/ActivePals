@@ -19,21 +19,22 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
         console.log(snapshot.val()[Object.keys(snapshot.val())[0]])
         const { user, text, FCMToken, createdAt, _id } = snapshot.val()[Object.keys(snapshot.val())[0]]
 
-        // const payload = {l
-        //     notification: {
-                
-        //         body: text,
-        //     },
-        //     data: {
 
-        //         username: user.name,
-        //         uid: user._id,
-        //         createdAt,
-        //         _id,
-        //     },
-        //     token: FCMToken,
-
-        // }
+        // const iosPayload = {
+        //    token: FCMToken,
+        //    notification: {
+        //        title: user.name + ' sent you a message',
+        //        body: text,
+        //            //"click_action": "fcm.ACTION.HELLO"
+        //        },
+        //        data: {
+        //            username : user.name,
+        //            uid: user._id,
+        //            createdAt,
+        //            _id,
+        //            ios: true
+        //        }
+        //    }
 
         const payload = {
             data: {

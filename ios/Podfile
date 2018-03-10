@@ -25,6 +25,8 @@ target 'Anyone' do
 
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
+	pod 'Fabric'
+	pod 'Crashlytics'
   pod 'react-native-geocoder', :path => '../node_modules/react-native-geocoder'
 
   pod 'react-native-fcm', :path => '../node_modules/react-native-fcm'

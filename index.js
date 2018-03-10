@@ -34,8 +34,8 @@ firebase.initializeApp(config)
 export default firebase
 
 FCM.on(FCMEvent.Notification, async (notif) => {
-    // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
     let state = AppState.currentState
+    // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
 
     if(notif.local_notification){
       //this is a local notification
@@ -67,11 +67,17 @@ FCM.on(FCMEvent.Notification, async (notif) => {
           notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
           break
       }
+
     }
+    try {
     if (!notif.opened_from_tray) {
       if (Platform.OS == 'ios' || state != 'background') {
         showLocalNotification(notif)
       }
+    }
+  }
+    catch(e) {
+      Alert.alert(e.message)
     }
   })
 
@@ -81,7 +87,7 @@ FCM.on(FCMEvent.RefreshToken, (token) => {
 })
 
 const showLocalNotification = (notif) => {
-  if (Platform.OS == 'android') {
+  if (notif.custom_notification) {
     let custom = JSON.parse(notif.custom_notification)
     FCM.presentLocalNotification({
       title: custom.title,
@@ -94,20 +100,8 @@ const showLocalNotification = (notif) => {
       vibrate: 300,
     })
   }
-  else {
-    FCM.presentLocalNotification({
-      title: notif.title,
-      body: notif.body,
-      priority: "high",
-      sound: "default",
-      //click_action: notif.click_action,
-      show_in_foreground: true,
-      lights: true,
-      vibrate: 300,
-    })
-  }
 
-  }
+}
 
 
 class App extends React.Component {
