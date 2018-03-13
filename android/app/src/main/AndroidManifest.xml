@@ -27,7 +27,7 @@
                       <category android:name="android.intent.category.DEFAULT" />
                   </intent-filter>
               </receiver>
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/app_id"/>
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/maps_key"/>

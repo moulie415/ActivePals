@@ -48,6 +48,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                 uid: user._id,
                 createdAt,
                 _id,
+                type: 'message'
 
             },
             token: FCMToken,

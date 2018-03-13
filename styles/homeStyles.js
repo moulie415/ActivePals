@@ -25,10 +25,8 @@ export default styles = StyleSheet.create({
     borderColor: '#fff'
   },
   modal: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 300,
-    width: 300
+    height: 400,
+    width: '90%'
   },
   modalText: {
     color: "black",

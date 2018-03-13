@@ -32,6 +32,7 @@ import colors from './constants/colors'
 import MapView  from 'react-native-maps'
 import Modal from 'react-native-modalbox'
 import { getType } from './constants/utils'
+import Hyperlink from 'react-native-hyperlink'
 
  export default class Home extends Component {
 
@@ -95,9 +96,15 @@ import { getType } from './constants/utils'
         sessions.push({...child.val(), key: index})
         index++
       })
-      this.setState({sessions})
+      let sorted = sessions.sort(function(a, b) {
+        let aDate = a.dateTime.replace(/-/g, "/")
+        let bDate = b.dateTime.replace(/-/g, "/")
+        return new Date(bDate) - new Date(aDate)
+      })
+      this.setState({sessions: sorted})
     })
   }
+
 
 
 
@@ -152,17 +159,31 @@ import { getType } from './constants/utils'
           </Button>
           <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/> 
           <Button style={styles.button}
-          onPress={()=> this.nav.navigate('SessionType')}>
+          onPress={()=> Alert.alert("Feature coming soon")}>
             <Text adjustsFontSizeToFit={true} 
             style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Private Session</Text>
           </Button>
         </View>
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
-          <Text style={styles.modalText}>Modal centered</Text>
+        {this.state.selectedSession && <View style={{margin: 10}}>
+          <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedSession.title}</Text>
+          <Hyperlink 
+          linkStyle={{color: colors.secondary}}
+          linkDefault={ true }>
+            <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedSession.details}</Text>
+          </Hyperlink>
+          <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{(this.formatDateTime(this.state.selectedSession.dateTime))
+            + " for " + (this.state.selectedSession.duration) + " " +
+            (this.state.selectedSession.duration > 1? 'hours' : 'hour') }</Text>
+            <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedSession.location.formattedAddress}</Text>
+            </View>}
+
         </Modal>
       </Container>
       )
   }
+
+
 
 
   handlePress(event) {
@@ -187,8 +208,7 @@ import { getType } from './constants/utils'
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => {
-              this.setState({selectedSession: item})
-              this.refs.modal.open()
+              this.setState({selectedSession: item}, ()=> this.refs.modal.open())
             }}>
               <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
                 <View style={{flexDirection: 'row'}} >

@@ -50,25 +50,27 @@ export default class Messaging extends React.Component {
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'));
 
     this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
-      try {
-      let message
-      const { createdAt, uid, username, _id, body, title, aps } = notif
-        if (notif.custom_notification) {
-          let custom = JSON.parse(notif.custom_notification) 
-          message = {createdAt, _id, text: custom.body, user: {_id: uid, name: username}}
+      if (notif.type == 'message') {
+        try {
+          let message
+          const { createdAt, uid, username, _id, body, title, aps} = notif
+          if (notif.custom_notification) {
+            let custom = JSON.parse(notif.custom_notification) 
+            message = {createdAt, _id, text: custom.body, user: {_id: uid, name: username}}
+          }
+          else {
+            message = {createdAt, _id, text: body, user: {_id: uid, name: username}}
+          }
+          if (this.friendUid == uid) {
+            this.setState(previousState => ({
+              messageObjects: GiftedChat.append(previousState.messageObjects, message),
+            }))
+          }
         }
-        else {
-          message = {createdAt, _id, text: body, user: {_id: uid, name: username}}
+        catch(e) {
+          Alert.alert(e)
         }
-      if (this.friendUid == uid) {
-        this.setState(previousState => ({
-          messageObjects: GiftedChat.append(previousState.messageObjects, message),
-        }))
       }
-    }
-    catch(e) {
-      Alert.alert(e)
-    }
     })
     FCM.getInitialNotification().then(notif => {
      console.log(notif)

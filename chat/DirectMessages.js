@@ -9,6 +9,7 @@ import {
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import firebase from '../index'
 import colors from 'Anyone/constants/colors'
+import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 //import  styles  from './styles/loginStyles'
 
  export default class DirectMessages extends Component {
@@ -43,6 +44,12 @@ import colors from 'Anyone/constants/colors'
         this.listenForChats(chatRef)
       }
     })  
+    FCM.on(FCMEvent.Notification, async (notif) => {
+      //update last message on notification
+      if (notif.type == 'message') {
+        this.fetchUsers()
+      }
+    })
   }
 
   listenForChats(ref) {
@@ -80,9 +87,14 @@ import colors from 'Anyone/constants/colors'
   render () {
     return (
     <Container>
+    {this.state.chats.length > 0?
       <ScrollView>
         {this.getChats()}
-      </ScrollView>
+      </ScrollView> :
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
+            <Text style={{color: colors.primary, textAlign: 'center'}}>
+            You haven't started any chats yet, also please make sure you are connected to the internet
+          </Text></View>}
     </Container>
   )
   }

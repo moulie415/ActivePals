@@ -5,7 +5,8 @@ import {
   View,
   TouchableOpacity,
   TextInput,
-  ScrollView
+  ScrollView,
+  RefreshControl
 } from "react-native"
 import {
   Button,
@@ -30,7 +31,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
  export default class Friends extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Friends',
+    tabBarLabel: 'Buddies',
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-people'
@@ -45,7 +46,8 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
     this.user = null
     this.state = {
       friends: [],
-      users: []
+      users: [],
+      refreshing: false
     }
   }
 
@@ -79,14 +81,24 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
 
   fetchUsers() {
     let users = []
-    this.state.friends.forEach(friend => {
-      firebase.database().ref('users/' + friend.uid).once('value')
-      .then(snapshot => {
-        users.push({...snapshot.val(), status: friend.status})
-        this.setState({users})
+    if (this.state.friends.length > 0) {
+      this.state.friends.forEach(friend => {
+        firebase.database().ref('users/' + friend.uid).once('value')
+        .then(snapshot => {
+          users.push({...snapshot.val(), status: friend.status})
+          this.setState({users})
+        })
+        this.setState({refreshing: false})
       })
-    })
+    }
+    else {
+      this.setState({refreshing: false})
+    }
+  }
 
+  _onRefresh() {
+    this.setState({refreshing: true});
+    this.refreshFriends()
   }
 
 
@@ -95,24 +107,33 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
     <Container>
       <Header style={{backgroundColor: colors.primary}}>  
         <Left style={{flex: 1}}>
-          <TouchableOpacity onPress={() => this.refreshFriends() }>
-            <Icon name='md-refresh' style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>
           </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff' }}>Friends</Title>
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff' }}>Buddies</Title>
         <Right style={{flex: 1}}>
-          <TouchableOpacity onPress={() => this.refs.modal.open() }>
+          <TouchableOpacity onPress={() => {
+        firebase.database().ref('users/' + this.user.uid).child('username')
+          .once('value', snapshot => {
+            snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a buddy")
+          })
+          }}>
             <Icon name='md-add' style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>
         </Right>
       </Header>
+      <Content contentContainerStyle={{flex: 1}}
+      refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={this._onRefresh.bind(this)}
+          />
+        }>
+      {this.state.friends.length > 0 ?
       <ScrollView>
       {this.getFriends()}
-      </ScrollView>
-      {this.state.friends.length == 0  &&
+      </ScrollView> :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
-            <Text style={{color: '#fff', textAlign: 'center'}}>
-            No don't have any friends yet, also please make sure you are connected to the internet
+            <Text style={{color: colors.primary, textAlign: 'center'}}>
+            You don't have any friends yet, also please make sure you are connected to the internet
           </Text></View>}
 
       <Modal style={styles.modal} position={"center"} ref={"modal"} >
@@ -128,6 +149,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
             <Text>Submit</Text>
           </TouchableOpacity>
         </Modal>
+        </Content>
     </Container>
   )
   }

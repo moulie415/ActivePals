@@ -19,6 +19,7 @@ import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
 import firebase from "Anyone/index"
 import DatePicker from 'react-native-datepicker'
+import colors from 'Anyone/constants/colors'
 
 
 export default class SessionDetail extends Component {
@@ -38,7 +39,8 @@ export default class SessionDetail extends Component {
 		this.state = {
 			gender: 'All',
 			formattedAddress: 'none',
-			date: null
+			date: null,
+			duration: 1
 		}
 
 	}
@@ -71,14 +73,29 @@ export default class SessionDetail extends Component {
 					multiline={true}
 					underlineColorAndroid='transparent'
 					onChangeText={details => this.details = details}/>
+					<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginBottom: 10}}>
 					<DatePicker
-					date={this.state.date}
-					placeholder={"Select date and time"}
-					mode={'datetime'}
-					onDateChange={(date) => {this.setState({date})}}
-					confirmBtnText={'Confirm'}
-					cancelBtnText={'Cancel'}
-					minDate={(new Date()).toISOString()}/>
+						date={this.state.date}
+						placeholder={"Select date and time"}
+						mode={'datetime'}
+						onDateChange={(date) => {this.setState({date})}}
+						confirmBtnText={'Confirm'}
+						cancelBtnText={'Cancel'}
+						minDate={(new Date()).toISOString()}/>
+						<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+							<TouchableOpacity onPress={()=> {
+								this.state.duration > 1 && this.setState({duration: this.state.duration-=1})
+							}}>
+								<Icon name='arrow-dropdown-circle' style={{color: colors.primary, marginRight: 5, fontSize: 40}}/>
+							</TouchableOpacity>
+							<Text style={{marginRight: 5, width: 50, textAlign: 'center'}}>{this.state.duration + (this.state.duration > 1? ' hrs' :' hr')}</Text>
+							<TouchableOpacity onPress={()=> {
+								this.state.duration < 24 && this.setState({duration: this.state.duration+=1})
+							}}>
+								<Icon name='arrow-dropup-circle' style={{color: colors.primary, fontSize: 40}}/>
+							</TouchableOpacity>
+						</View>
+					</View>
 
 
 					<View style={{flex: 2, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#999'}}>
@@ -189,22 +206,28 @@ export default class SessionDetail extends Component {
 	}
 
 	createSession(navigation) {
-		let session = {
-			location: this.location, 
-			title: this.title, 
-			details: this.details, 
-			gender: this.state.gender,
-			type: this.type,
-			host: this.user.uid,
-			dateTime: this.state.date
+		if (this.location && this.title && this.details && this.state.date) {
+			let session = {
+				location: this.location, 
+				title: this.title, 
+				details: this.details, 
+				gender: this.state.gender,
+				type: this.type,
+				host: this.user.uid,
+				dateTime: this.state.date,
+				duration: this.state.duration
+			}
+			firebase.database().ref('sessions').push(session).then(()=> {
+				Alert.alert('Success','Session created')
+				navigation.navigate("Home")
+			})
+			.catch(err => {
+				Alert.alert('Error', err.message)
+			})
 		}
-		firebase.database().ref('sessions').push(session).then(()=> {
-			Alert.alert('Success','Session created')
-			navigation.navigate("Home")
-		})
-		.catch(err => {
-			Alert.alert('Error', err.message)
-		})
+		else {
+			Alert.alert('Error', 'Please enter all the necessary fields')
+		}
 
 	}
 

@@ -81,10 +81,6 @@ FCM.on(FCMEvent.Notification, async (notif) => {
     }
   })
 
-FCM.on(FCMEvent.RefreshToken, (token) => {
-
-    
-})
 
 const showLocalNotification = (notif) => {
   if (notif.custom_notification) {
@@ -108,14 +104,19 @@ class App extends React.Component {
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
+        this.user = user
         FCM.getFCMToken().then(token => {
           firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
         })
-    // User is signed in.
-  } else {
-    // No user is signed in.
-  }
-})
+      } else {
+      }
+    })
+    this.tokenListener = FCM.on(FCMEvent.RefreshToken, (token) => {
+      if (this.user) {
+          firebase.database().ref('users/' + this.user.uid).child('FCMToken').set(token)
+        }
+    })    
+
   }
   render () {
   const { navigation } = this.props
@@ -128,8 +129,8 @@ App.navigationOptions = {
 }
 const sessions = StackNavigator({
   Home : {screen: Home},
-  SessionType: { screen: SessionType, navigationOptions: {/*tabBarVisible: false*/} },
-  SessionDetail: { screen: SessionDetail, navigationOptions: {/*tabBarVisible: false*/} },
+  SessionType: { screen: SessionType, navigationOptions: {tabBarVisible: false} },
+  SessionDetail: { screen: SessionDetail, navigationOptions: {tabBarVisible: false} },
 },{
   mode: 'modal',
   headerMode: 'none'

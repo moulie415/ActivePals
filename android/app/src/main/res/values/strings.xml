@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Anyone</string>
+    <string name="app_name">Fit Link</string>
     <string name="app_id">1959322104333437</string>
     <string name='maps_key'>AIzaSyC_lZXdWz3no4k9MhIKbyIG5789TVir48Y</string>
+    <string name="facebook_app_id">1959322104333437</string>
 </resources>
