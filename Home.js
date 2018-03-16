@@ -6,7 +6,8 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  StatusBar
+  StatusBar,
+  RefreshControl
 } from "react-native"
 import {
   Button,
@@ -57,7 +58,8 @@ import Hyperlink from 'react-native-hyperlink'
       spinner: false,
       showMap: true,
       switch: false,
-      sessions: []
+      sessions: [],
+      refreshing: false,
     }
   }
 
@@ -93,15 +95,32 @@ import Hyperlink from 'react-native-hyperlink'
       let sessions = []
       let index = 1
       snapshot.forEach(child => {
-        sessions.push({...child.val(), key: index})
-        index++
+        let duration = child.val().duration*60*60*1000
+        let time = new Date(child.val().dateTime.replace(/-/g, "/")).getTime()
+        let current = new Date().getTime()
+        if (time + duration > current) {
+          let inProgress = time < current
+          sessions.push({...child.val(), key: index, inProgress})
+          index++
+        }
+        else {
+          //validate time serverside before deleting session in case clients time is wrong
+          firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
+          .then(()=> {
+            firebase.database().ref('timestamp').once('value', snapshot => {
+              if (snapshot.val() > time + duration) {
+                firebase.database().ref('sessions').child(child.key).remove()
+              }
+            })
+          })
+        }
       })
       let sorted = sessions.sort(function(a, b) {
         let aDate = a.dateTime.replace(/-/g, "/")
         let bDate = b.dateTime.replace(/-/g, "/")
-        return new Date(bDate) - new Date(aDate)
+        return new Date(aDate) - new Date(bDate)
       })
-      this.setState({sessions: sorted})
+      this.setState({sessions: sorted, refreshing: false})
     })
   }
 
@@ -204,6 +223,11 @@ import Hyperlink from 'react-native-hyperlink'
   getSessions(sessions) {
     if (sessions.length > 0) {
           return <FlatList
+          refreshing={this.state.refreshing}
+          onRefresh={()=> {
+            this.setState({refreshing: true})
+            this.listenForSessions(this.sessionsRef)
+          }}
           data={sessions}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => (
@@ -219,7 +243,8 @@ import Hyperlink from 'react-native-hyperlink'
                       <Text style={styles.title}>{item.title}</Text>
                       <Text style={{fontFamily: 'Avenir'}}>{"gender: " + item.gender}</Text>
                     </View>
-                    <Text style={styles.date} >{this.formatDateTime(item.dateTime)}</Text>
+                    <Text style={[styles.date], {color: item.inProgress? colors.secondary : null}} >
+                    {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                       <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                       <TouchableOpacity onPress={()=>{

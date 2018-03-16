@@ -217,9 +217,10 @@ export default class SessionDetail extends Component {
 				dateTime: this.state.date,
 				duration: this.state.duration
 			}
-			firebase.database().ref('sessions').push(session).then(()=> {
+			firebase.database().ref('sessions').push(session).then((snapshot)=> {
 				Alert.alert('Success','Session created')
 				navigation.navigate("Home")
+				firebase.database().ref('users/' + this.user.uid).child('sessions').push(snapshot.key)
 			})
 			.catch(err => {
 				Alert.alert('Error', err.message)

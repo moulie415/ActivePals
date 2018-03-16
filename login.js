@@ -200,7 +200,8 @@ const { LoginManager, AccessToken } = FBSDK
   createUser = (uid,userData,token) => {
     const defaults = {
       uid,
-      token
+      token,
+      accountType: 'standard',
     }
     firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
    

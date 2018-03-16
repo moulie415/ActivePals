@@ -154,7 +154,8 @@ import  styles  from './styles/signUpStyles'
 createUser = (uid,userData,token) => {
     const defaults = {
       uid,
-      token
+      token,
+      accountType: 'standard'
     }
     //Alert.alert("Success", "Logged in as: " + userData.email)
     firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
