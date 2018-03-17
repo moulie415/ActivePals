@@ -11,6 +11,7 @@ import firebase from '../index'
 import { getType } from 'Anyone/constants/utils'
 import colors from 'Anyone/constants/colors'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
+import { EventRegister } from 'react-native-event-listeners'
 
 //import  styles  from './styles/loginStyles'
 
@@ -51,6 +52,14 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         this.fetchDetail()
       }
     })
+    this.listener = EventRegister.addEventListener('sessionJoined', (id) => {
+      this.fetchDetail()
+    })
+    this.listener = EventRegister.addEventListener('sessionLeft', (id) => {
+      let sessions = this.state.sessions.filter(s => s != id )
+      this.setState({sessions})
+    })
+
   }
 
   listenForSessionChats(ref) {

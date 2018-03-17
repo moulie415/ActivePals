@@ -36,6 +36,7 @@ import Modal from 'react-native-modalbox'
 import { getType } from './constants/utils'
 import Hyperlink from 'react-native-hyperlink'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
+import { EventRegister } from 'react-native-event-listeners'
 
  export default class Home extends Component {
 
@@ -249,6 +250,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           <TouchableOpacity
           onPress={()=> {
             firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+             .then(() => EventRegister.emit('sessionLeft', session.key))
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).remove()
             FCM.unsubscribeFromTopic(session.key)
             this.refs.modal.close()
@@ -271,6 +273,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           <TouchableOpacity
           onPress={()=> {
             firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
+              .then(() => EventRegister.emit('sessionJoined', session.key))
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
             this.refs.modal.close()
             FCM.subscribeToTopic(session.key)
