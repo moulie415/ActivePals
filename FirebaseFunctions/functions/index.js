@@ -16,25 +16,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
 
     return getValuePromise.then(snapshot => {
         console.log(snapshot.val())
-        console.log(snapshot.val()[Object.keys(snapshot.val())[0]])
         const { user, text, FCMToken, createdAt, _id } = snapshot.val()[Object.keys(snapshot.val())[0]]
-
-
-        // const iosPayload = {
-        //    token: FCMToken,
-        //    notification: {
-        //        title: user.name + ' sent you a message',
-        //        body: text,
-        //            //"click_action": "fcm.ACTION.HELLO"
-        //        },
-        //        data: {
-        //            username : user.name,
-        //            uid: user._id,
-        //            createdAt,
-        //            _id,
-        //            ios: true
-        //        }
-        //    }
 
         const payload = {
             data: {
@@ -59,6 +41,45 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                     .send(payload)
     })
 })
+
+exports.sendNewSessionMessageNotification = functions.database.ref('/sessions/{id}/chat').onWrite(event => {
+    console.log(event)
+
+    const getValuePromise = admin.database()
+                                 .ref('sessions/' + event.params.id)
+                                 .child('chat')
+                                 .orderByKey()
+                                 .limitToLast(1)
+                                 .once('value')
+
+    return getValuePromise.then(snapshot => {
+        console.log(snapshot.val())
+        const { user, text, sessionId, createdAt, _id, sessionTitle } = snapshot.val()[Object.keys(snapshot.val())[0]] 
+        const payload = {
+            data: {
+                custom_notification: JSON.stringify({
+                    body: text,
+                    title: user.name + ' sent a message to ' + sessionTitle,
+                    priority: 'high',
+                    sound: 'default'
+                }),
+                username: user.name,
+                uid: user._id,
+                createdAt,
+                _id,
+                type: 'sessionMessage',
+                sessionId
+
+            },
+            topic: sessionId,
+
+        }
+
+        return admin.messaging()
+                    .send(payload)
+    })
+})
+
 
 // exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/friends/{friend}').onWrite(event => {
 //     console.log(event.val())

@@ -84,17 +84,21 @@ FCM.on(FCMEvent.Notification, async (notif) => {
 
 const showLocalNotification = (notif) => {
   if (notif.custom_notification) {
-    let custom = JSON.parse(notif.custom_notification)
-    FCM.presentLocalNotification({
-      title: custom.title,
-      body: custom.body,
-      priority: custom.priority,
-      sound: "default",
+    let user = firebase.auth().currentUser
+    if (!notif.type == 'sessionMessage' || 
+      (notif.type == 'sessionMessage' && notif.uid != user.uid)) {
+      let custom = JSON.parse(notif.custom_notification)
+      FCM.presentLocalNotification({
+        title: custom.title,
+        body: custom.body,
+        priority: custom.priority,
+        sound: "default",
       //click_action: notif.click_action,
       show_in_foreground: true,
       lights: true,
       vibrate: 300,
     })
+    }
   }
 
 }
@@ -138,8 +142,8 @@ const sessions = StackNavigator({
 
 
 const chats = TabNavigator({
+  SessionChats: {screen: SessionChats},
   DirectMessages: {screen: DirectMessages},
-  SessionChats: {screen: SessionChats}
 }, {
   tabBarPosition: 'top',
   swipeEnabled: false,

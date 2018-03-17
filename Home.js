@@ -7,7 +7,8 @@ import {
   Image,
   TouchableOpacity,
   StatusBar,
-  RefreshControl
+  RefreshControl,
+  ScrollView
 } from "react-native"
 import {
   Button,
@@ -34,6 +35,7 @@ import MapView  from 'react-native-maps'
 import Modal from 'react-native-modalbox'
 import { getType } from './constants/utils'
 import Hyperlink from 'react-native-hyperlink'
+import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
  export default class Home extends Component {
 
@@ -100,7 +102,7 @@ import Hyperlink from 'react-native-hyperlink'
         let current = new Date().getTime()
         if (time + duration > current) {
           let inProgress = time < current
-          sessions.push({...child.val(), key: index, inProgress})
+          sessions.push({...child.val(), key: child.key, inProgress})
           index++
         }
         else {
@@ -184,7 +186,8 @@ import Hyperlink from 'react-native-hyperlink'
           </Button>
         </View>
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
-        {this.state.selectedSession && <View style={{margin: 10}}>
+        {this.state.selectedSession && <View style={{margin: 10, flex: 1}}>
+          <ScrollView>
           <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedSession.title}</Text>
           <Hyperlink 
           linkStyle={{color: colors.secondary}}
@@ -195,11 +198,90 @@ import Hyperlink from 'react-native-hyperlink'
             + " for " + (this.state.selectedSession.duration) + " " +
             (this.state.selectedSession.duration > 1? 'hours' : 'hour') }</Text>
             <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedSession.location.formattedAddress}</Text>
+            </ScrollView>
+             {<View style={{justifyContent: 'flex-end', flex: 1}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>} 
             </View>}
 
         </Modal>
       </Container>
       )
+  }
+
+  fetchButtons(session, uid) {
+    if (session.users[uid]){
+      if (session.host == uid) {
+        return (
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <TouchableOpacity
+          onPress={()=> {
+            Alert.alert(
+              "Delete session",
+              "Are you sure?",
+              [
+              {text: 'cancel', style: 'cancel'},
+              {text: 'Yes', onPress: ()=> {
+                firebase.database().ref('sessions/' + session.key).remove()
+                firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+                FCM.unsubscribeFromTopic(session.key)
+                this.refs.modal.close()
+              },
+              style: 'destructive'}
+              ],
+
+              )
+            
+          }}
+          style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
+            <Text style={{color: '#fff', textAlign: 'center'}}>Delete session</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+          onPress={()=> {
+            this.nav.navigate('Messaging', {sessionId: session.key, uid, session: {...session}})
+          }}
+          style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
+            <Text style={{color: '#fff', textAlign: 'center'}}>Open chat</Text>
+          </TouchableOpacity>
+          </View>
+          )
+      }
+      else return (
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <TouchableOpacity
+          onPress={()=> {
+            firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+            firebase.database().ref('sessions/' + session.key + '/users').child(uid).remove()
+            FCM.unsubscribeFromTopic(session.key)
+            this.refs.modal.close()
+          }}
+          style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
+            <Text style={{color: '#fff', textAlign: 'center'}}>Leave session</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+          onPress={()=> {
+            this.nav.navigate('Messaging', {sessionId: session.key, uid, session: {...session}})
+          }}
+          style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
+            <Text style={{color: '#fff', textAlign: 'center'}}>Open chat</Text>
+          </TouchableOpacity>
+          </View>
+        )
+    }
+    else {
+      return (
+          <TouchableOpacity
+          onPress={()=> {
+            firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
+            firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
+            this.refs.modal.close()
+            FCM.subscribeToTopic(session.key)
+            Alert.alert("Session joined", "You should now see this session in your session chats")
+          }}
+          style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
+            <Text style={{color: '#fff', textAlign: 'center'}}>Join session</Text>
+          </TouchableOpacity>
+        )
+
+    }
   }
 
 
@@ -243,7 +325,7 @@ import Hyperlink from 'react-native-hyperlink'
                       <Text style={styles.title}>{item.title}</Text>
                       <Text style={{fontFamily: 'Avenir'}}>{"gender: " + item.gender}</Text>
                     </View>
-                    <Text style={[styles.date], {color: item.inProgress? colors.secondary : null}} >
+                    <Text style={[styles.date], {color: item.inProgress? colors.secondary : "#999"}} >
                     {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                       <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>

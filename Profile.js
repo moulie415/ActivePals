@@ -89,6 +89,9 @@ import DatePicker from 'react-native-datepicker'
       <View style={{flexDirection: 'row', marginLeft: 20, marginVertical: 20}}>
         <Text style={{color: '#fff'}}>Email: {this.state.email}</Text>
       </View>
+      <View style={{flexDirection: 'row', marginLeft: 20, marginBottom: 20}}>
+        <Text style={{color: '#fff'}}>Account type: {this.state.profile.accountType}</Text>
+      </View>
       <View style={styles.inputGrp}>
         <Text style={{alignSelf: 'center'}}>Username: </Text>
             <Input
@@ -144,10 +147,11 @@ import DatePicker from 'react-native-datepicker'
           onDateChange={(date) => this.setState({profile: {...this.state.profile, birthday: date}})}
           />
           </View>
-      <Button
+      <TouchableOpacity
+        style={{backgroundColor: colors.secondary, marginLeft: 20, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20}}
         onPress={()=> this.logout()}>
-        <Text>Log out</Text>
-      </Button>
+        <Text style={{color: '#fff', fontFamily: 'Avenir'}} >Log out</Text>
+      </TouchableOpacity>
     </Container>
   )
   }

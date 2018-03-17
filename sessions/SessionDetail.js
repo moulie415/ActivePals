@@ -20,6 +20,7 @@ import Geocoder from 'react-native-geocoder'
 import firebase from "Anyone/index"
 import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/constants/colors'
+import FCM from 'react-native-fcm'
 
 
 export default class SessionDetail extends Component {
@@ -220,7 +221,9 @@ export default class SessionDetail extends Component {
 			firebase.database().ref('sessions').push(session).then((snapshot)=> {
 				Alert.alert('Success','Session created')
 				navigation.navigate("Home")
-				firebase.database().ref('users/' + this.user.uid).child('sessions').push(snapshot.key)
+				firebase.database().ref('users/' + this.user.uid + '/sessions').child(snapshot.key).set(true)
+				firebase.database().ref('sessions/' + snapshot.key + '/users').child(this.user.uid).set(true)
+				FCM.subscribeToTopic(snapshot.key)
 			})
 			.catch(err => {
 				Alert.alert('Error', err.message)

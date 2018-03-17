@@ -73,7 +73,10 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
       .then(snapshot => {
         firebase.database().ref('chats').child(id).orderByKey().limitToLast(1)
         .once('value', lastMessage => {
-          let message = lastMessage.val()[Object.keys(lastMessage.val())[0]]
+          let message = {text: "new chat created"}
+          if (lastMessage.val()) {
+            message = Object.values(lastMessage.val())[0]
+          }
           users.push({...snapshot.val(), chatId: id, lastMessage: message.text})
           this.setState({users})
           console.log(users)
