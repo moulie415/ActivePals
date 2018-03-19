@@ -52,12 +52,17 @@ import { EventRegister } from 'react-native-event-listeners'
         this.fetchDetail()
       }
     })
-    this.listener = EventRegister.addEventListener('sessionJoined', (id) => {
+    this.joinListener = EventRegister.addEventListener('sessionJoined', (id) => {
       this.fetchDetail()
     })
-    this.listener = EventRegister.addEventListener('sessionLeft', (id) => {
+
+    this.leaveListener = EventRegister.addEventListener('sessionLeft', (id) => {
       let sessions = this.state.sessions.filter(s => s != id )
       this.setState({sessions})
+    })
+
+    this.messageListener = EventRegister.addEventListener('newSessionMessage', () => {
+      this.fetchDetail()
     })
 
   }
@@ -87,7 +92,7 @@ import { EventRegister } from 'react-native-event-listeners'
             if (lastMessage.val()) {
               message = Object.values(lastMessage.val())[0]
             }
-            details.push({...snapshot.val(), id: session, lastMessage: message.text})
+            details.push({...snapshot.val(), id: session, lastMessage: message})
             this.setState({details})
           })
         }
@@ -131,8 +136,10 @@ import { EventRegister } from 'react-native-event-listeners'
             <View>{getType(detail.type, 40)}</View>
             <View style={{marginHorizontal: 10, flex: 1}}>
               <Text>{detail.title}</Text>
-              <Text numberOfLines={1} style={{color: '#999'}}>{detail.lastMessage}</Text>
+              <Text numberOfLines={1} style={{color: '#999'}}>{detail.lastMessage.text}</Text>
             </View>
+            {detail.lastMessage.createdAt && <View style={{alignSelf: 'flex-end', marginHorizontal: 10}}>
+              <Text style={{color: '#999'}}>{getSimplified(detail.lastMessage.createdAt)}</Text></View>}
           </View>
         </TouchableOpacity>
         )
@@ -141,5 +148,32 @@ import { EventRegister } from 'react-native-event-listeners'
     return list
   }
 
-
 }
+
+export function getSimplified(createdAt) {
+  let timeStamp = new Date(createdAt)
+  let today = new Date()
+  let yesterday = new Date(today.setHours(0,0,0,0))
+  yesterday.setDate(today.getDate() -1)
+  let dateString = ''
+
+  if (timeStamp < yesterday) dateString = timeStamp.toDateString()
+    else if (timeStamp < today) dateString = 'Yesterday'
+      else {
+        let minsBeforeNow = Math.floor((today.getTime() - timeStamp.getTime())/(1000*60))
+        let hoursBeforeNow = Math.floor(minsBeforeNow/60)
+        if (hoursBeforeNow > 0) {
+          dateString = hoursBeforeNow+' '+
+          (hoursBeforeNow == 1? 'hour' : 'hours')
+          +' ago'
+        }
+        else if (minsBeforeNow > 0) {
+          dateString = minsBeforeNow+' '+
+          (minsBeforeNow == 1? 'min' : 'mins')
+          +' ago'
+        } else {
+          dateString = 'Just Now'
+        }
+      }
+      return dateString
+    }

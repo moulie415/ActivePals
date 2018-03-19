@@ -10,6 +10,8 @@ import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-bas
 import firebase from '../index'
 import colors from 'Anyone/constants/colors'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
+import {getSimplified } from './SessionChats'
+import { EventRegister } from 'react-native-event-listeners'
 //import  styles  from './styles/loginStyles'
 
  export default class DirectMessages extends Component {
@@ -50,6 +52,9 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         this.fetchUsers()
       }
     })
+    this.messageListener = EventRegister.addEventListener('newMessage', () => {
+      this.fetchUsers()
+    })
   }
 
   listenForChats(ref) {
@@ -77,7 +82,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           if (lastMessage.val()) {
             message = Object.values(lastMessage.val())[0]
           }
-          users.push({...snapshot.val(), chatId: id, lastMessage: message.text})
+          users.push({...snapshot.val(), chatId: id, lastMessage: message})
           this.setState({users})
           console.log(users)
         })
@@ -117,8 +122,10 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary}}/>
             <View style={{marginHorizontal: 10, flex: 1}}>
               <Text>{user.username}</Text>
-              <Text numberOfLines={1} style={{color: '#999'}}>{user.lastMessage}</Text>
+              <Text numberOfLines={1} style={{color: '#999'}}>{user.lastMessage.text}</Text>
             </View>
+             {user.lastMessage.createdAt && <View style={{alignSelf: 'flex-end', marginHorizontal: 10}}>
+              <Text style={{color: '#999'}}>{getSimplified(user.lastMessage.createdAt)}</Text></View>}
           </View>
         </TouchableOpacity>
         )

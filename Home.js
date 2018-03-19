@@ -113,6 +113,7 @@ import { EventRegister } from 'react-native-event-listeners'
             firebase.database().ref('timestamp').once('value', snapshot => {
               if (snapshot.val() > time + duration) {
                 firebase.database().ref('sessions').child(child.key).remove()
+                .then(() => EventRegister.emit('sessionLeft', child.key))
               }
             })
           })
@@ -223,6 +224,7 @@ import { EventRegister } from 'react-native-event-listeners'
               {text: 'Yes', onPress: ()=> {
                 firebase.database().ref('sessions/' + session.key).remove()
                 firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+                .then(() => EventRegister.emit('sessionLeft', session.key))
                 FCM.unsubscribeFromTopic(session.key)
                 this.refs.modal.close()
               },

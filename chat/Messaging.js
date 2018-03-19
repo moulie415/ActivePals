@@ -2,7 +2,8 @@ import React, { Component } from "react"
 import { 
   Alert,
   Platform,
-  TouchableOpacity
+  TouchableOpacity,
+  View,
 } from "react-native"
 import {
   Header,
@@ -10,12 +11,16 @@ import {
   Title,
   Left,
   Right,
-  Icon
+  Icon,
+  Text
 } from 'native-base'
 import firebase from "Anyone/index"
 import { GiftedChat } from 'react-native-gifted-chat'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import colors from 'Anyone/constants/colors'
+import Modal from 'react-native-modalbox'
+import hStyles from 'Anyone/styles/homeStyles'
+import { EventRegister } from 'react-native-event-listeners'
 
 export default class Messaging extends React.Component {
   static navigationOptions = {
@@ -26,6 +31,7 @@ export default class Messaging extends React.Component {
     this.params = this.props.navigation.state.params
     this.session = this.params.session
     this.uid = this.params.uid
+    this.nav = this.props.navigation
 
     if (this.session) {
       this.sessionId = this.params.sessionId
@@ -150,7 +156,7 @@ export default class Messaging extends React.Component {
       this.setState(previousState => ({
         messageObjects: GiftedChat.append(previousState.messageObjects, messages),
       }))
-
+      this.session? EventRegister.emit('newSessionMessage') : EventRegister.emit('newMessage')
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 
@@ -172,13 +178,135 @@ export default class Messaging extends React.Component {
         <GiftedChat
           messages={this.state.messageObjects}
           onSend={messages => this.onSend(messages)}
+          onPressAvatar={user => this.fetchUser(user)}
           user={{
             _id: this.uid,
             name: this.state.user.username
           }}
         />
+        <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
+        {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
+          <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
+            <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', color: '#fff'}}>{this.state.selectedUser.username}</Text>
+          </View>
+          {(this.state.selectedUser.first_name || this.state.selectedUser.last_name) && 
+            <View style={{flexDirection: 'row', backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
+            {this.state.selectedUser.first_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
+            {this.state.selectedUser.first_name + ' '}</Text>}
+            {this.state.selectedUser.last_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
+            {this.state.selectedUser.last_name}</Text>}
+          </View>}
+
+          {this.state.selectedUser.birthday && <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
+            <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{'Birthday: ' + this.state.selectedUser.birthday}</Text></View>}
+
+          <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
+          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{"Account type: " + 
+          this.state.selectedUser.accountType}</Text></View>
+
+            <View style={{flex: 1, justifyContent: 'flex-end'}}>
+            {this.fetchFriendButton(this.state.selectedUser)}
+              </View>
+            </View>}
+
+        </Modal>
       </Container>
     )
+  }
+
+  fetchFriendButton(user) {
+    if (user.status == 'connected' && this.session) {
+      return <TouchableOpacity
+      onPress={()=> {
+        this.openChat(user)
+        this.refs.modal.close()
+      }}
+      style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
+      <Text style={{color: '#fff', textAlign: 'center'}}>Send direct message</Text>
+      </TouchableOpacity>
+    }
+    else if (user.status == 'incoming') {
+      return <TouchableOpacity
+      onPress={()=> {
+        firebase.database().ref('users/' + this.uid + '/friends').child(user.uid).set("connected")
+        .then(()=> {
+          firebase.database().ref('users/' + user.uid + '/friends').child(this.uid).set("connected")
+          .then(() => {
+            this.refs.modal.close()
+          })
+        })
+        .catch(e => Alert.alert("Error", e.message))
+      }}
+      style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
+      <Text style={{color: '#fff', textAlign: 'center'}}>Accept friend request</Text>
+      </TouchableOpacity>
+    }
+    else if (user.status == 'outgoing') {
+      return <Text>Friend request sent</Text>
+    } 
+    else if (this.session) {
+      return <TouchableOpacity
+      onPress={()=> {
+        firebase.database().ref('users/' + this.uid + '/friends').child(user.uid).set("outgoing")
+        .then(()=> {
+          firebase.database().ref('users/' + user.uid + '/friends').child(this.uid).set("incoming")
+          .then(() => {
+            this.refs.modal.close()
+            Alert.alert("Success", "Request sent")
+          })
+        })
+        .catch(e => Alert.alert("Error", e.message))
+      }}
+      style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
+      <Text style={{color: '#fff', textAlign: 'center'}}>Send friend request</Text>
+      </TouchableOpacity>
+    }
+    else return null
+
+  }
+
+  fetchUser(user) {
+    firebase.database().ref('users/' + user._id).once('value', snapshot => {
+      firebase.database().ref('users/' + this.uid + '/friends').child(user._id)
+        .once('value', status => {
+          this.setState({selectedUser: {...snapshot.val(), status: status.val()}}, ()=> this.refs.modal.open())
+        })
+    })
+  }
+
+  openChat(user) {
+    firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).once('value')
+      .then(snapshot => {
+        if (snapshot.val()) {
+          this.nav.navigate('Messaging', 
+            {chatId: snapshot.val(), uid: this.uid, friendUid: user.uid, friendUsername: user.username})
+        }
+        else {
+          Alert.alert(
+            'Start a new chat with ' + user.username + '?',
+            'This will be the beggining of your chat with ' + user.username,
+            [
+            {text: 'Cancel', style: 'cancel'},
+            {text: 'OK', onPress: () => {
+              let timestamp = (new Date()).toString()
+              firebase.database().ref('chats').push({_id: 'initial'}).then(snapshot => {
+                let chatId = snapshot.key
+                firebase.database().ref('chats').child(chatId).push({_id: 'initial'}).then(snapshot => {
+                firebase.database().ref('chats').child(chatId).child('_id').remove()
+                firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).set(chatId)
+                firebase.database().ref('users/' + user.uid + '/chats').child(this.uid).set(chatId)
+                this.nav.navigate('Messaging', 
+                  {chatId, uid: this.uid, friendUid: user.uid, friendUsername: user.username})
+                })
+              })
+
+            }
+              , style: 'positive'},
+            ]
+            )
+        }
+      })
+      .catch(e => Alert.alert('Error', e.message))
   }
   componentWillUnmount() {
         // stop listening for events

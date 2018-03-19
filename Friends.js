@@ -26,6 +26,7 @@ import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
+import hStyles from 'Anyone/styles/homeStyles'
 
 
  export default class Friends extends Component {
@@ -149,6 +150,30 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
             <Text>Submit</Text>
           </TouchableOpacity>
         </Modal>
+
+        <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"profileModal"} isDisabled={this.state.isDisabled}>
+        {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
+          <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
+            <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', color: '#fff'}}>{this.state.selectedUser.username}</Text>
+          </View>
+          {(this.state.selectedUser.first_name || this.state.selectedUser.last_name) && 
+            <View style={{flexDirection: 'row', backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
+            {this.state.selectedUser.first_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
+            {this.state.selectedUser.first_name + ' '}</Text>}
+            {this.state.selectedUser.last_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
+            {this.state.selectedUser.last_name}</Text>}
+          </View>}
+
+          {this.state.selectedUser.birthday && <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
+            <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{'Birthday: ' + this.state.selectedUser.birthday}</Text></View>}
+
+          <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
+          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{"Account type: " + 
+          this.state.selectedUser.accountType}</Text></View>
+
+            </View>}
+
+        </Modal>
         </Content>
     </Container>
   )
@@ -200,7 +225,9 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
                 style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-chatboxes' style={{color: colors.primary}}/>
               </TouchableOpacity>
-              <TouchableOpacity style={{padding: 5, marginHorizontal: 5}}>
+              <TouchableOpacity 
+              onPress={()=> this.setState({selectedUser: friend}, ()=> this.refs.profileModal.open())}
+              style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-person' style={{color: colors.primary}}/>
               </TouchableOpacity>
               </View>

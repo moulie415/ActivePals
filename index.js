@@ -85,7 +85,7 @@ FCM.on(FCMEvent.Notification, async (notif) => {
 const showLocalNotification = (notif) => {
   if (notif.custom_notification) {
     let user = firebase.auth().currentUser
-    if (!notif.type == 'sessionMessage' || 
+    if (notif.type != 'sessionMessage' || 
       (notif.type == 'sessionMessage' && notif.uid != user.uid)) {
       let custom = JSON.parse(notif.custom_notification)
       FCM.presentLocalNotification({
@@ -116,9 +116,8 @@ class App extends React.Component {
       }
     })
     this.tokenListener = FCM.on(FCMEvent.RefreshToken, (token) => {
-      if (this.user) {
-          firebase.database().ref('users/' + this.user.uid).child('FCMToken').set(token)
-        }
+      let user = firebase.auth().currentUser
+      firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
     })    
 
   }
