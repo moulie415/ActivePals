@@ -8,6 +8,9 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import fr.bamlab.rnimageresizer.ImageResizerPackage;
+import com.imagepicker.ImagePickerPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
 import com.devfd.RNGeocoder.RNGeocoderPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
@@ -33,6 +36,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
+            new RNFetchBlobPackage(),
+            new ImageResizerPackage(),
+            new ImagePickerPackage(),
             new FIRMessagingPackage(),
               new RNGeocoderPackage(),
               new RNGoogleSigninPackage(),

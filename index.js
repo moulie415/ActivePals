@@ -33,6 +33,12 @@ let config = {
 firebase.initializeApp(config)
 export default firebase
 
+FCM.on(FCMEvent.RefreshToken, token => {
+  let user = firebase.auth().currentUser
+  firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
+  console.log("TOKEN (refreshUnsubscribe)", token);
+})
+
 FCM.on(FCMEvent.Notification, async (notif) => {
     let state = AppState.currentState
     // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
@@ -115,10 +121,6 @@ class App extends React.Component {
       } else {
       }
     })
-    this.tokenListener = FCM.on(FCMEvent.RefreshToken, (token) => {
-      let user = firebase.auth().currentUser
-      firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
-    })    
 
   }
   render () {

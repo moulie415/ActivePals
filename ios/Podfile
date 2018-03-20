@@ -26,10 +26,16 @@ target 'Anyone' do
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
 	pod 'Fabric'
-	pod 'Crashlytics'
+	pod 'Crashlytics', '~> 3.10'
   pod 'react-native-geocoder', :path => '../node_modules/react-native-geocoder'
 
   pod 'react-native-fcm', :path => '../node_modules/react-native-fcm'
+
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
+  pod 'react-native-image-resizer', :path => '../node_modules/react-native-image-resizer'
+
+  pod 'react-native-fetch-blob', :path => '../node_modules/react-native-fetch-blob'
 
 end
 post_install do |installer|

@@ -4,6 +4,7 @@ import {
   Platform,
   TouchableOpacity,
   View,
+  Image
 } from "react-native"
 import {
   Header,
@@ -44,7 +45,8 @@ export default class Messaging extends React.Component {
     this.state = {
       messageObjects: [],
       messages: [],
-      user: {}
+      user: {},
+      avatar: ''
     }
   }
 
@@ -66,20 +68,31 @@ export default class Messaging extends React.Component {
         this.friendToken = snapshot.val()
       })
     }
+    firebase.storage().ref('images/' + this.uid).getDownloadURL()
+    .then(image => {
+      this.setState({avatar: image})
+    })
+    .catch(e => {
+      this.setState({avatar: ''})
+    })
 
-    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'));
+    FCM.getFCMToken().then(token => {
+      firebase.database().ref('users/' + this.uid).child('FCMToken').set(token)
+    })
+
+    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
     this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
       if (notif.type == 'message' || notif.type == 'sessionMessage') {
         try {
           let message
-          const { createdAt, uid, username, _id, body, title, sessionId, aps} = notif
+          const { createdAt, uid, username, _id, body, title, sessionId, aps, avatar} = notif
           if (notif.custom_notification) {
             let custom = JSON.parse(notif.custom_notification) 
-            message = {createdAt, _id, text: custom.body, user: {_id: uid, name: username}}
+            message = {createdAt, _id, text: custom.body, user: {_id: uid, name: username, avatar}}
           }
           else {
-            message = {createdAt, _id, text: body, user: {_id: uid, name: username}}
+            message = {createdAt, _id, text: body, user: {_id: uid, name: username, avatar}}
           }
           if ((notif.type == 'message' && this.friendUid == uid) ||
             (notif.type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid)) {
@@ -114,27 +127,6 @@ export default class Messaging extends React.Component {
 
     })
   }
-
-
-
-  // convertMessageObjects(){
-  //   let messages = []
-  //   this.state.messageObjects.forEach(item => {
-  //     firebase.database().ref('users/' + item.user._id).once('value', snapshot => {
-
-  //       let message = {
-  //         ...item,
-  //         user: {
-  //           _id: snapshot.val().uid,
-  //           name: snapshot.val().username
-  //         },
-  //         createdAt: new Date(item.createdAt),
-  //       }
-  //       messages.push(message)
-  //       this.setState({messages})
-  //     })
-  //   })
-  // }
 
   onSend(messages = []) {
     //make messages database friendly
@@ -181,7 +173,8 @@ export default class Messaging extends React.Component {
           onPressAvatar={user => this.fetchUser(user)}
           user={{
             _id: this.uid,
-            name: this.state.user.username
+            name: this.state.user.username,
+            avatar: this.state.avatar
           }}
         />
         <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
@@ -238,7 +231,7 @@ export default class Messaging extends React.Component {
         .catch(e => Alert.alert("Error", e.message))
       }}
       style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
-      <Text style={{color: '#fff', textAlign: 'center'}}>Accept friend request</Text>
+      <Text style={{color: '#fff', textAlign: 'center'}}>Accept buddy request</Text>
       </TouchableOpacity>
     }
     else if (user.status == 'outgoing') {
@@ -258,7 +251,7 @@ export default class Messaging extends React.Component {
         .catch(e => Alert.alert("Error", e.message))
       }}
       style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
-      <Text style={{color: '#fff', textAlign: 'center'}}>Send friend request</Text>
+      <Text style={{color: '#fff', textAlign: 'center'}}>Send buddy request</Text>
       </TouchableOpacity>
     }
     else return null

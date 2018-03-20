@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  RefreshControl
+  RefreshControl,
+  Image
 } from "react-native"
 import {
   Button,
@@ -53,17 +54,15 @@ import hStyles from 'Anyone/styles/homeStyles'
   }
 
   componentDidMount() {
-
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.user = user
         let friendsRef = firebase.database().ref('users/' + this.user.uid + '/friends')
         this.listenForFriends(friendsRef)
-    // User is signed in.
-  } else {
-    // No user is signed in.
-  }
-})
+      } else {
+      }
+    })
+    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
   }
 
@@ -86,8 +85,15 @@ import hStyles from 'Anyone/styles/homeStyles'
       this.state.friends.forEach(friend => {
         firebase.database().ref('users/' + friend.uid).once('value')
         .then(snapshot => {
-          users.push({...snapshot.val(), status: friend.status})
-          this.setState({users})
+          firebase.storage().ref('images/' + friend.uid).getDownloadURL()
+          .then(image => {
+            users.push({...snapshot.val(), status: friend.status, avatar: image})
+            this.setState({users})
+          })
+          .catch(e => {
+            users.push({...snapshot.val(), status: friend.status})
+            this.setState({users})
+          })
         })
         this.setState({refreshing: false})
       })
@@ -134,11 +140,11 @@ import hStyles from 'Anyone/styles/homeStyles'
       </ScrollView> :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
-            You don't have any friends yet, also please make sure you are connected to the internet
+            You don't have any buddies yet, also please make sure you are connected to the internet
           </Text></View>}
 
       <Modal style={styles.modal} position={"center"} ref={"modal"} >
-          <Text style={styles.modalText}>Send friend request</Text>
+          <Text style={styles.modalText}>Send buddy request</Text>
           <TextInput 
           underlineColorAndroid='transparent'
           style={styles.usernameInput}
@@ -197,14 +203,14 @@ import hStyles from 'Anyone/styles/homeStyles'
       else if (friend.status == 'incoming') {
         list.push(
           <View key={index}
-          style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+          style={{paddingVertical: 20, paddingHorizontal: 10, backgroundColor: '#fff', marginBottom: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 40}} >
-              <Text style={{marginHorizontal: 10}}>{friend.username + ' has sent you a friend request'}</Text>
+              <Text style={{marginHorizontal: 10}}>{friend.username + ' has sent you a buddy request'}</Text>
               <TouchableOpacity onPress={()=> this.accept(friend)}>
-               <Icon name='checkmark' style={{color: 'green', fontSize: 40, padding: 5}}/>
+               <Icon name='checkmark' style={{color: 'green', fontSize: 30, padding: 5}}/>
               </TouchableOpacity>
               <TouchableOpacity>
-                <Icon name='close' style={{color: 'red', fontSize: 40, padding: 5}}/>
+                <Icon name='close' style={{color: 'red', fontSize: 30, padding: 5}}/>
               </TouchableOpacity>
             </View>
           </View>
@@ -216,19 +222,20 @@ import hStyles from 'Anyone/styles/homeStyles'
           style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary}}/>
+              {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
+                <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
                 <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
               </View>
               <View style={{flexDirection: 'row'}}>
               <TouchableOpacity 
                 onPress={()=> this.openChat(friend.uid, friend.username)}
                 style={{padding: 5, marginHorizontal: 5}}>
-                <Icon name='md-chatboxes' style={{color: colors.primary}}/>
+                <Icon name='md-chatboxes' style={{color: colors.primary, fontSize: 30}}/>
               </TouchableOpacity>
               <TouchableOpacity 
               onPress={()=> this.setState({selectedUser: friend}, ()=> this.refs.profileModal.open())}
               style={{padding: 5, marginHorizontal: 5}}>
-                <Icon name='md-person' style={{color: colors.primary}}/>
+                <Icon name='md-person' style={{color: colors.primary, fontSize: 30}}/>
               </TouchableOpacity>
               </View>
             </View>

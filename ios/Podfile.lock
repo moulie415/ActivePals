@@ -109,7 +109,7 @@ PODS:
   - yoga (0.51.0.React)
 
 DEPENDENCIES:
-  - Crashlytics
+  - Crashlytics (~> 3.10)
   - Fabric
   - Firebase/Core (= 4.0.0)
   - Firebase/Messaging
@@ -177,6 +177,6 @@ SPEC CHECKSUMS:
   ReactNativePermissions: a25615ebfd785b7a081dff3dec88bf191a7d7c42
   yoga: b5d96400ca8b2936965a7a6516da7c1177f432a3
 
-PODFILE CHECKSUM: 8675ba68aba5490be7d95e8cd74411cfd951d88b
+PODFILE CHECKSUM: d19755c2a520fbdb9b2d1f3012c0f733c2d2445e
 
 COCOAPODS: 1.3.1

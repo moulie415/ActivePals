@@ -3,7 +3,9 @@ import {
   StyleSheet,
   Alert,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  Image,
+  Platform
 } from "react-native"
 import {
   Button,
@@ -16,12 +18,24 @@ import {
   Header,
   Left,
   Title,
-  Right
+  Right,
+  ActionSheet,
+  Spinner
 } from 'native-base'
 import firebase from './index'
 import  styles  from './styles/loginStyles'
 import colors from './constants/colors'
 import DatePicker from 'react-native-datepicker'
+var ImagePicker = require('react-native-image-picker')
+import ImageResizer from 'react-native-image-resizer'
+import RNFetchBlob from 'react-native-fetch-blob'
+
+
+// Prepare Blob support
+const Blob = RNFetchBlob.polyfill.Blob
+const fs = RNFetchBlob.fs
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+window.Blob = Blob
 
  export default class Profile extends Component {
   static navigationOptions = {
@@ -43,6 +57,8 @@ import DatePicker from 'react-native-datepicker'
     this.state = {
       email: "",
       profile: {},
+      initialProfile: {},
+      spinner: false
     }
   }
 
@@ -56,6 +72,13 @@ import DatePicker from 'react-native-datepicker'
         this.user = user
         this.setState({email: user.email })
         this.listenForUserChanges(firebase.database().ref('users/' + user.uid))
+        firebase.storage().ref('images/' + user.uid).getDownloadURL() 
+          .then(url => {
+            this.setState({initialAvatar: url, avatar: url})
+          })
+          .catch(e => {
+            this.setState({initialAvatar: '', avatar: ''})
+          })
 
       }
     })  
@@ -64,7 +87,7 @@ import DatePicker from 'react-native-datepicker'
   listenForUserChanges(ref) {
     ref.on("value", snapshot => {
       profile = snapshot.val()
-      this.initialProfile = profile
+      this.setState({initialProfile: profile})
       this.setState({profile})
     })
 
@@ -78,7 +101,7 @@ import DatePicker from 'react-native-datepicker'
         <Left style={{flex: 1}} />
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Profile</Title>
         <Right>
-          <Button onPress={()=> this.updateUser(this.initialProfile, this.state.profile)}
+          <Button onPress={()=> this.updateUser(this.state.initialProfile, this.state.profile)}
           style={{backgroundColor: 'transparent', elevation: 0}}>
             <Text>Save</Text>
           </Button>
@@ -86,12 +109,35 @@ import DatePicker from 'react-native-datepicker'
 
         </Header>
         
-      <View style={{flexDirection: 'row', marginLeft: 20, marginVertical: 20}}>
-        <Text style={{color: '#fff'}}>Email: {this.state.email}</Text>
+      <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 10}}>
+        {this.state.avatar? 
+          <TouchableOpacity 
+          style={{marginHorizontal: 20}}
+          onPress={()=> this.selectAvatar()}>
+            <Image style={{height: 90, width: 90, borderRadius: 5}}
+            source={{uri: this.state.avatar}} />
+          </TouchableOpacity>
+         : <TouchableOpacity
+        onPress={()=> this.selectAvatar()}
+        style={{marginHorizontal: 20, backgroundColor: '#fff7', borderRadius: 5, width: 90, height: 90, justifyContent: 'center'}}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <Icon name='md-contact'  
+          style={{fontSize: 80, color: colors.primary, textAlign: 'center', 
+          marginBottom: Platform.OS == 'ios'? -5 : null}}/>
+          </View>
+          </TouchableOpacity>}
+        <View>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{color: '#fff'}}>Email: {this.state.email}</Text>
+          </View>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{color: '#fff'}}>Account type: {this.state.profile.accountType}</Text>
+          </View>
+        </View>
+
       </View>
-      <View style={{flexDirection: 'row', marginLeft: 20, marginBottom: 20}}>
-        <Text style={{color: '#fff'}}>Account type: {this.state.profile.accountType}</Text>
-      </View>
+
+
       <View style={styles.inputGrp}>
         <Text style={{alignSelf: 'center'}}>Username: </Text>
             <Input
@@ -152,6 +198,8 @@ import DatePicker from 'react-native-datepicker'
         onPress={()=> this.logout()}>
         <Text style={{color: '#fff', fontFamily: 'Avenir'}} >Log out</Text>
       </TouchableOpacity>
+        {this.state.spinner && <Spinner color={colors.secondary}/>}
+
     </Container>
   )
   }
@@ -165,26 +213,118 @@ import DatePicker from 'react-native-datepicker'
   }
   
 updateUser(initial, profile) {
-  if (JSON.stringify(initial) === JSON.stringify(profile)) {
+  if (JSON.stringify(initial) === JSON.stringify(profile && this.state.initialAvatar == this.state.avatar)) {
     Alert.alert("No changes")
   }  
   else {
-      if (profile.username.length < 5) {
-        Alert.alert('Sorry', 'Username must be at least 5 characters long')
+    if (profile.username.length < 5) {
+      Alert.alert('Sorry', 'Username must be at least 5 characters long')
+    }
+    else {
+      this.setState({spinner: true})
+      if (this.state.initialAvatar != this.state.avatar) {
+        this.uploadImage(this.state.avatar).then((url)=> {
+          this.checkUsername(initial, profile)
+          this.setState({initalAvatar: url})
+        })
+        .catch(e => {
+          this.setState({spinner: false})
+          Alert.alert('Error', e.message)
+        })
       }
       else {
-      firebase.database().ref('users/' + this.user.uid).set({...profile})
-      .then(()=> {
-        initial.username && firebase.database().ref('usernames').child(initial.username).remove()
-        firebase.database().ref('usernames').child(profile.username).set(profile.uid)
-        .then(() => Alert.alert("Success", 'Profile saved'))
-        .catch(e => Alert.alert("Error", e.message))
-      })
-      .catch(e => Alert.alert('Error', e.message + "\nthat username may have already been taken"))
+        this.checkUsername(initial, profile)
       }
     }
-
+  }
 }
+
+checkUsername(initial, profile){
+  delete profile.avatar
+  firebase.database().ref('users/' + this.user.uid).set({...profile})
+  .then(()=> {
+    initial.username && firebase.database().ref('usernames').child(initial.username).remove()
+    firebase.database().ref('usernames').child(profile.username).set(profile.uid)
+    .then(() => {
+      Alert.alert("Success", 'Profile saved')
+      this.setState({spinner: false})
+    })
+  })
+  .catch(e => {
+    Alert.alert('Error', e.message + "\nthat username may have already been taken")
+    this.setState({spinner: false})
+  })
+}
+
+selectAvatar() {
+  var options = {
+    title: 'Select Avatar',
+    mediaType: 'photo',
+    storageOptions: {
+      skipBackup: true,
+      path: 'images'
+    }
+  }
+  ImagePicker.showImagePicker(options, (response) => {
+    console.log('Response = ', response);
+
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    }
+    else if (response.error) {
+      console.log('ImagePicker Error: ', response.error);
+    }
+    else if (response.customButton) {
+      console.log('User tapped custom button: ', response.customButton);
+    }
+    else {
+      let source = { uri: response.uri };
+
+    // You can also display the image using data:
+    // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+    ImageResizer.createResizedImage(response.uri, 200, 200, 'PNG', 100).then((resized) => {
+      // response.uri is the URI of the new image that can now be displayed, uploaded...
+      // response.path is the path of the new image
+      // response.name is the name of the new image with the extension
+      // response.size is the size of the new image
+      this.setState({avatar: resized.uri})
+
+    }).catch((err) => {
+      Alert.alert(err.message)
+    })
+
+  }
+})
+}
+
+
+  uploadImage(uri, mime = 'application/octet-stream') {
+    return new Promise((resolve, reject) => {
+      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+      let uploadBlob = null
+
+      const imageRef = firebase.storage().ref('images').child(this.user.uid)
+
+      fs.readFile(uploadUri, 'base64')
+        .then((data) => {
+          return Blob.build(data, { type: `${mime};BASE64` })
+        })
+        .then((blob) => {
+          uploadBlob = blob
+          return imageRef.put(blob, { contentType: mime })
+        })
+        .then(() => {
+          uploadBlob.close()
+          return imageRef.getDownloadURL()
+        })
+        .then((url) => {
+          resolve(url)
+        })
+        .catch((error) => {
+          reject(error)
+      })
+    })
+  }
 
  
 

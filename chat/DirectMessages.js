@@ -4,7 +4,8 @@ import {
   Alert,
   View,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Image
 } from "react-native"
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import firebase from '../index'
@@ -82,9 +83,15 @@ import { EventRegister } from 'react-native-event-listeners'
           if (lastMessage.val()) {
             message = Object.values(lastMessage.val())[0]
           }
-          users.push({...snapshot.val(), chatId: id, lastMessage: message})
-          this.setState({users})
-          console.log(users)
+          firebase.storage().ref('images/' + chat.uid).getDownloadURL()
+          .then(image => {
+            users.push({...snapshot.val(), chatId: id, lastMessage: message, avatar: image})
+            this.setState({users})
+          })
+          .catch(e => {
+            users.push({...snapshot.val(), chatId: id, lastMessage: message})
+            this.setState({users})
+          })
         })
       })
     })
@@ -119,12 +126,13 @@ import { EventRegister } from 'react-native-event-listeners'
             {chatId: user.chatId, uid: this.user.uid, friendUid: user.uid, friendUsername: user.username})
         }}>
           <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary}}/>
-            <View style={{marginHorizontal: 10, flex: 1}}>
+          {user.avatar? <Image source={{uri: user.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
+                <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
+            <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
               <Text>{user.username}</Text>
               <Text numberOfLines={1} style={{color: '#999'}}>{user.lastMessage.text}</Text>
             </View>
-             {user.lastMessage.createdAt && <View style={{alignSelf: 'flex-end', marginHorizontal: 10}}>
+             {user.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
               <Text style={{color: '#999'}}>{getSimplified(user.lastMessage.createdAt)}</Text></View>}
           </View>
         </TouchableOpacity>

@@ -65,6 +65,8 @@ import { EventRegister } from 'react-native-event-listeners'
       this.fetchDetail()
     })
 
+    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
+
   }
 
   listenForSessionChats(ref) {
@@ -152,15 +154,17 @@ import { EventRegister } from 'react-native-event-listeners'
 
 export function getSimplified(createdAt) {
   let timeStamp = new Date(createdAt)
-  let today = new Date()
-  let yesterday = new Date(today.setHours(0,0,0,0))
-  yesterday.setDate(today.getDate() -1)
-  let dateString = ''
 
-  if (timeStamp < yesterday) dateString = timeStamp.toDateString()
-    else if (timeStamp < today) dateString = 'Yesterday'
+  let now = new Date()
+  let today0 = new Date()
+  let yesterday0 = new Date(today0.setHours(0,0,0,0))
+  yesterday0.setDate(today0.getDate() -1)
+
+
+  if (timeStamp < yesterday0) dateString = timeStamp.toDateString()
+    else if (timeStamp < today0) dateString = 'Yesterday'
       else {
-        let minsBeforeNow = Math.floor((today.getTime() - timeStamp.getTime())/(1000*60))
+        let minsBeforeNow = Math.floor((now.getTime() - timeStamp.getTime())/(1000*60))
         let hoursBeforeNow = Math.floor(minsBeforeNow/60)
         if (hoursBeforeNow > 0) {
           dateString = hoursBeforeNow+' '+

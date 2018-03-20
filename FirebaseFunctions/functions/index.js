@@ -30,6 +30,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                 uid: user._id,
                 createdAt,
                 _id,
+                avatar: user.avatar ,
                 type: 'message'
 
             },
@@ -67,6 +68,7 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessions/{i
                 uid: user._id,
                 createdAt,
                 _id,
+                avatar: user.avatar,
                 type: 'sessionMessage',
                 sessionId
 
