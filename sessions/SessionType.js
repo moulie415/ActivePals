@@ -36,24 +36,24 @@ export default class SessionType extends Component {
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} onPress={()=> this.nav.navigate('SessionDetail', {type: 'Gym'})}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
 						<Image style={{height: 50, width: 50}} source={require('../assets/images/dumbbell.png')}/>
-						<Text style={styles.typeText}>Gym?</Text>
+						<Text style={styles.typeText}>Gym</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} onPress={()=> this.nav.navigate('SessionDetail', {type: 'Running'})}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
 						<Image style={{height: 50, width: 50}} source={require('../assets/images/running.png')}/>
-						<Text style={{fontSize: 30, marginLeft: 10}}>Running?</Text>
+						<Text style={{fontSize: 30, marginLeft: 10}}>Running</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} onPress={()=> this.nav.navigate('SessionDetail', {type: 'Cycling'})}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
 						<Icon name='bicycle' style={{fontSize: 50}}/>
-						<Text style={styles.typeText}>Cycling?</Text>
+						<Text style={styles.typeText}>Cycling</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} onPress={()=> this.nav.navigate('SessionDetail', {type: 'Custom'})}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-						<Text style={styles.typeText}>Custom?</Text>
+						<Text style={styles.typeText}>Custom</Text>
 					</Card>
 				</TouchableOpacity>
 

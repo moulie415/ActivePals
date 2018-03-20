@@ -40,7 +40,8 @@ export default styles = StyleSheet.create({
   },
   title: {
     fontFamily: 'Avenir',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    flex: 2
   },
   date: {
     fontFamily: 'Avenir',

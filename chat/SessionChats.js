@@ -135,12 +135,12 @@ import { EventRegister } from 'react-native-event-listeners'
             {sessionId: detail.id, uid: this.user.uid, session: {...detail}})
         }}>
           <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
-            <View>{getType(detail.type, 40)}</View>
+            <View>{getType(detail.type, 50)}</View>
             <View style={{marginHorizontal: 10, flex: 1}}>
-              <Text>{detail.title}</Text>
+              <Text numberOfLines={1} style={{flex: 2}}>{detail.title}</Text>
               <Text numberOfLines={1} style={{color: '#999'}}>{detail.lastMessage.text}</Text>
             </View>
-            {detail.lastMessage.createdAt && <View style={{alignSelf: 'flex-end', marginHorizontal: 10}}>
+            {detail.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
               <Text style={{color: '#999'}}>{getSimplified(detail.lastMessage.createdAt)}</Text></View>}
           </View>
         </TouchableOpacity>

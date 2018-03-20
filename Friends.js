@@ -219,7 +219,7 @@ import hStyles from 'Anyone/styles/homeStyles'
       else {
         list.push(
           <View key={index}
-          style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+          style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :

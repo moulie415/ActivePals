@@ -164,7 +164,8 @@ export default class Messaging extends React.Component {
             <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>
           </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff' }}>{this.friendUsername || this.session.title}</Title>
+        <Text numberOfLines={1}
+        style={{alignSelf: 'center', flex: 1, color: '#fff', textAlign: 'center' }}>{this.friendUsername || this.session.title}</Text>
         <Right style={{flex: 1}}/>
       </Header>
         <GiftedChat

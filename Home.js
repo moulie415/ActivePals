@@ -327,7 +327,7 @@ import { EventRegister } from 'react-native-event-listeners'
                   <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
                   <View style={{flex: 1}}>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                      <Text style={styles.title}>{item.title}</Text>
+                      <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
                       <Text style={{fontFamily: 'Avenir'}}>{"gender: " + item.gender}</Text>
                     </View>
                     <Text style={[styles.date], {color: item.inProgress? colors.secondary : "#999"}} >
