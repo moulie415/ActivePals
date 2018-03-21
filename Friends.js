@@ -115,7 +115,7 @@ import hStyles from 'Anyone/styles/homeStyles'
       <Header style={{backgroundColor: colors.primary}}>  
         <Left style={{flex: 1}}>
           </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff' }}>Buddies</Title>
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Buddies</Title>
         <Right style={{flex: 1}}>
           <TouchableOpacity onPress={() => {
         firebase.database().ref('users/' + this.user.uid).child('username')

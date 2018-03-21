@@ -13,6 +13,7 @@ import {
 import firebase from "./index"
 import  styles  from './styles/loginStyles'
 import { GoogleSignin } from 'react-native-google-signin'
+import VersionNumber from 'react-native-version-number'
 const FBSDK = require('react-native-fbsdk')
 const { LoginManager, AccessToken } = FBSDK
 
@@ -86,22 +87,26 @@ const { LoginManager, AccessToken } = FBSDK
         <Text style={{fontFamily: 'Avenir'}}>Sign Up</Text>
         </Button>
         </View>
-        <Button 
-        onPress={()=> {
-          this.fbLogin(this.props.navigation)
-        }}
-        style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
-        <Icon name="logo-facebook"/>
-        <Text style={{marginLeft: -20, fontFamily: 'Avenir'}}>Login with Facebook</Text>
-        </Button>
-        <Button 
-        onPress={()=> {
-          this.gLogin()
-        }}
-        style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
-        <Icon name="logo-google"/>
-        <Text style={{marginLeft: -20, fontFamily: 'Avenir'}}>Login with Google</Text>
-        </Button>
+        <View>
+          <Button 
+          onPress={()=> {
+            this.fbLogin(this.props.navigation)
+          }}
+          style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
+            <Icon name="logo-facebook"/>
+            <Text style={{marginLeft: -20, fontFamily: 'Avenir'}}>Login with Facebook</Text>
+          </Button>
+          <Button 
+          onPress={()=> {
+            this.gLogin()
+          }}
+          style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
+            <Icon name="logo-google"/>
+            <Text style={{marginLeft: -20, fontFamily: 'Avenir'}}>Login with Google</Text>
+          </Button>
+        </View>
+          <Text style={{color: '#fff', fontFamily: 'Avenir', textAlign: 'center', position: 'absolute', bottom: 10}}>
+          {"v"+VersionNumber.appVersion}</Text>
     </Container>
   )
   }

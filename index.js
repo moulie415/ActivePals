@@ -35,7 +35,9 @@ export default firebase
 
 FCM.on(FCMEvent.RefreshToken, token => {
   let user = firebase.auth().currentUser
-  firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
+  if (user) {
+    firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
+  }
   console.log("TOKEN (refreshUnsubscribe)", token);
 })
 
@@ -154,7 +156,8 @@ const chats = TabNavigator({
     showIcon: false,
     showLabel: true,
     labelStyle: {
-      fontSize: 15
+      fontSize: 15,
+      fontFamily: 'Avenir'
     },
     activeTintColor: '#fff',
     inactiveTintColor: colors.secondary,
@@ -188,7 +191,7 @@ const tabs = TabNavigator({
     style: { backgroundColor: '#fff' },
     indicatorStyle: { backgroundColor: colors.primary },
     showIcon: true,
-    showLabel: false
+    showLabel: false,
   },
 })
 

@@ -140,7 +140,7 @@ import { EventRegister } from 'react-native-event-listeners'
       {this.state.spinner && <Spinner style={styles.spinner} />}
         <Header style={{backgroundColor: colors.primary}}>
         <Left style={{flex: 1}} />
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Sessions</Title>
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Sessions</Title>
         <Right>
            <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}> 
             <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Map: </Text>

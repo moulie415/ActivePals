@@ -165,7 +165,8 @@ export default class Messaging extends React.Component {
           </TouchableOpacity>
           </Left>
         <Text numberOfLines={1}
-        style={{alignSelf: 'center', flex: 1, color: '#fff', textAlign: 'center' }}>{this.friendUsername || this.session.title}</Text>
+        style={{alignSelf: 'center', flex: 1, color: '#fff', textAlign: 'center', fontFamily: 'Avenir'}}>
+        {this.friendUsername || this.session.title}</Text>
         <Right style={{flex: 1}}/>
       </Header>
         <GiftedChat

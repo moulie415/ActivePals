@@ -99,7 +99,7 @@ window.Blob = Blob
     <Container style={{backgroundColor: colors.primary}}>
     <Header style={{backgroundColor: colors.primary}}>
         <Left style={{flex: 1}} />
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Profile</Title>
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Profile</Title>
         <Right>
           <Button onPress={()=> this.updateUser(this.state.initialProfile, this.state.profile)}
           style={{backgroundColor: 'transparent', elevation: 0}}>
@@ -128,10 +128,10 @@ window.Blob = Blob
           </TouchableOpacity>}
         <View>
           <View style={{flexDirection: 'row'}}>
-            <Text style={{color: '#fff'}}>Email: {this.state.email}</Text>
+            <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Email: {this.state.email}</Text>
           </View>
           <View style={{flexDirection: 'row'}}>
-            <Text style={{color: '#fff'}}>Account type: {this.state.profile.accountType}</Text>
+            <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Account type: {this.state.profile.accountType}</Text>
           </View>
         </View>
 
@@ -139,7 +139,7 @@ window.Blob = Blob
 
 
       <View style={styles.inputGrp}>
-        <Text style={{alignSelf: 'center'}}>Username: </Text>
+        <Text style={{alignSelf: 'center', fontFamily: 'Avenir'}}>Username: </Text>
             <Input
             value={this.state.profile.username}
             onChangeText={username => this.setState({profile: {...this.state.profile, username}})}
@@ -150,7 +150,7 @@ window.Blob = Blob
         />
           </View>
           <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>First name: </Text>
+            <Text style={{alignSelf: 'center', fontFamily: 'Avenir'}}>First name: </Text>
             <Input
             value={this.state.profile.first_name}
             onChangeText={name => this.setState({profile: {...this.state.profile, first_name: name}})}
@@ -161,7 +161,7 @@ window.Blob = Blob
         />
           </View>
           <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>Last name: </Text>
+            <Text style={{alignSelf: 'center', fontFamily: 'Avenir'}}>Last name: </Text>
             <Input
             value={this.state.profile.last_name}
             onChangeText={name => this.setState({profile: {...this.state.profile, last_name: name}})}
@@ -172,7 +172,7 @@ window.Blob = Blob
         />
           </View>
           <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>Birthday: </Text>
+            <Text style={{alignSelf: 'center', fontFamily: 'Avenir'}}>Birthday: </Text>
           <DatePicker
           date={this.getDate(this.state.profile.birthday)}
           placeholder={this.state.profile.birthday || 'None'}

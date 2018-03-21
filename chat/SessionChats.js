@@ -136,8 +136,8 @@ import { EventRegister } from 'react-native-event-listeners'
         }}>
           <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
             <View>{getType(detail.type, 50)}</View>
-            <View style={{marginHorizontal: 10, flex: 1}}>
-              <Text numberOfLines={1} style={{flex: 2}}>{detail.title}</Text>
+            <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
+              <Text numberOfLines={1} >{detail.title}</Text>
               <Text numberOfLines={1} style={{color: '#999'}}>{detail.lastMessage.text}</Text>
             </View>
             {detail.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>

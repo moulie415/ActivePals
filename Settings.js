@@ -1,7 +1,25 @@
 import React, { Component } from "react"
-import { StyleSheet, Alert, View } from "react-native"
-import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
+import { 
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert
+} from "react-native"
+import { 
+  Button,
+  Text,
+  Input,
+  Container,
+  Content,
+  Item,
+  Icon,
+  Header,
+  Title,
+} from 'native-base'
 import firebase from "./index"
+import VersionNumber from 'react-native-version-number'
+import colors from './constants/colors'
+import  styles  from './styles/settingsStyles'
 
 
  export default class Settings extends Component {
@@ -36,7 +54,23 @@ import firebase from "./index"
 
   render () {
     return (
-    <Container>
+    <Container style={styles.container}>
+      <Header style={{backgroundColor: colors.primary}}>
+        <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir'}}>Settings</Title>
+      </Header>
+      <Content>
+        <TouchableOpacity 
+        onPress={()=> Alert.alert('coming soon')}
+        style={{backgroundColor: '#fff', padding: 10, borderBottomWidth: 0.5, borderColor: "#999"}}>
+          <Text>Support</Text>
+        </TouchableOpacity>
+        <View>
+          <View style={{padding: 10, backgroundColor: '#fff', flexDirection: 'row'}}>
+              <Text style={{fontFamily: 'Avenir'}}>Version no: </Text>
+              <Text style={{color: colors.primary, fontFamily: 'Avenir', fontWeight: 'bold'}}>{VersionNumber.appVersion}</Text>
+          </View>
+        </View>
+      </Content>
     </Container>
   )
   }
