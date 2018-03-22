@@ -79,6 +79,7 @@ export default class SessionDetail extends Component {
 						date={this.state.date}
 						placeholder={"Select date and time"}
 						mode={'datetime'}
+						androidMode={'spinner'}
 						onDateChange={(date) => {this.setState({date})}}
 						confirmBtnText={'Confirm'}
 						cancelBtnText={'Cancel'}

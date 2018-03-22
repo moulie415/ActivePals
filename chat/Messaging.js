@@ -13,7 +13,7 @@ import {
   Left,
   Right,
   Icon,
-  Text
+  Text,
 } from 'native-base'
 import firebase from "Anyone/index"
 import { GiftedChat } from 'react-native-gifted-chat'
@@ -157,7 +157,7 @@ export default class Messaging extends React.Component {
   render() {
     const { navigation } = this.props
     return (
-      <Container>
+      <Container style={{flex: 1}}>
       <Header style={{backgroundColor: colors.primary}}>  
         <Left style={{flex: 1}}>
           <TouchableOpacity onPress={() => navigation.goBack() }>
@@ -181,6 +181,11 @@ export default class Messaging extends React.Component {
         />
         <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
+
+        <View style={{flexDirection: 'row'}}>      
+        {this.state.selectedUser.avatar? <Image source={{uri: this.state.selectedUser.avatar}} 
+         style={{height: 90, width: 90, marginRight: 10, borderRadius: 5}} /> : null}
+        <View style={{flex: 1}}>
           <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
             <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', color: '#fff'}}>{this.state.selectedUser.username}</Text>
           </View>
@@ -191,6 +196,9 @@ export default class Messaging extends React.Component {
             {this.state.selectedUser.last_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
             {this.state.selectedUser.last_name}</Text>}
           </View>}
+          </View>
+
+          </View>
 
           {this.state.selectedUser.birthday && <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
             <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{'Birthday: ' + this.state.selectedUser.birthday}</Text></View>}
@@ -264,7 +272,7 @@ export default class Messaging extends React.Component {
     firebase.database().ref('users/' + user._id).once('value', snapshot => {
       firebase.database().ref('users/' + this.uid + '/friends').child(user._id)
         .once('value', status => {
-          this.setState({selectedUser: {...snapshot.val(), status: status.val()}}, ()=> this.refs.modal.open())
+          this.setState({selectedUser: {...snapshot.val(), status: status.val(), avatar: user.avatar}}, ()=> this.refs.modal.open())
         })
     })
   }

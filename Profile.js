@@ -178,6 +178,7 @@ window.Blob = Blob
           placeholder={this.state.profile.birthday || 'None'}
           maxDate={new Date()}
           confirmBtnText={'Confirm'}
+          androidMode={'spinner'}
           cancelBtnText={'Cancel'}
           customStyles={{
             dateText: {

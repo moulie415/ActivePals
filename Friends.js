@@ -159,6 +159,12 @@ import hStyles from 'Anyone/styles/homeStyles'
 
         <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"profileModal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
+
+         <View style={{flexDirection: 'row'}}>       
+
+         {this.state.selectedUser.avatar? <Image source={{uri: this.state.selectedUser.avatar}} 
+         style={{height: 90, width: 90, marginRight: 10, borderRadius: 5}} /> : null}
+         <View style={{flex: 1}}>
           <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
             <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', color: '#fff'}}>{this.state.selectedUser.username}</Text>
           </View>
@@ -169,6 +175,9 @@ import hStyles from 'Anyone/styles/homeStyles'
             {this.state.selectedUser.last_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
             {this.state.selectedUser.last_name}</Text>}
           </View>}
+          </View>
+
+          </View>
 
           {this.state.selectedUser.birthday && <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
             <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{'Birthday: ' + this.state.selectedUser.birthday}</Text></View>}
