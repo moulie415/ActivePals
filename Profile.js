@@ -29,6 +29,7 @@ import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')
 import ImageResizer from 'react-native-image-resizer'
 import RNFetchBlob from 'react-native-fetch-blob'
+import { NavigationActions } from "react-navigation"
 
 
 // Prepare Blob support
@@ -37,7 +38,7 @@ const fs = RNFetchBlob.fs
 window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
 window.Blob = Blob
 
- export default class Profile extends Component {
+ class Profile extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Profile',
@@ -66,7 +67,7 @@ window.Blob = Blob
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
-        this.props.navigation.navigate('Login')
+        this.props.onLogoutPress()
       }
       else {
         this.user = user
@@ -336,3 +337,16 @@ selectAvatar() {
     })
   }
 }
+
+
+import { connect } from 'react-redux'
+import { navigateLogin } from 'Anyone/actions/navigation'
+
+// const mapStateToProps = ({ home, settings }) => ({
+// })
+
+const mapDispatchToProps = dispatch => ({
+  onLogoutPress: ()=> { dispatch(navigateLogin())}
+})
+
+export default connect(null, mapDispatchToProps)(Profile)

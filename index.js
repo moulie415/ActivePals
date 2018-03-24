@@ -3,24 +3,21 @@ import React from "react"
 import { AppRegistry, Platform, Alert, AppState } from 'react-native'
 import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
-import Login from './login'
-import SignUp from './SignUp'
-import Home from './Home'
-import Friends from './Friends'
-import Profile from './Profile'
-import Settings from './Settings'
-import Messaging from './chat/Messaging'
-import DirectMessages from './chat/DirectMessages'
-import SessionChats from './chat/SessionChats'
-import SecondScreen from "./SecondScreen"
-import SessionType from './sessions/SessionType'
-import SessionDetail from './sessions/SessionDetail'
 import * as firebase from "firebase"
-import { Root, Header } from 'native-base'
+import { Root } from 'native-base'
 import colors from 'Anyone/constants/colors'
 import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'
+import { Provider } from 'react-redux'
+import { createStore, applyMiddleware, compose } from 'redux'
+import reducer from './reducers/'
+import thunk from 'redux-thunk'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
+import App from './App'
+import {
+  createReactNavigationReduxMiddleware,
+  createReduxBoundAddListener,
+} from 'react-navigation-redux-helpers'
 
 let config = {
   apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
@@ -111,8 +108,23 @@ const showLocalNotification = (notif) => {
 
 }
 
+const middleware = createReactNavigationReduxMiddleware(
+  "root",
+  state => state.nav,
+)
+  
+export const addListener = createReduxBoundAddListener("root")
+  
 
-class App extends React.Component {
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
+export const store = createStore(
+  reducer,
+  composeEnhancers(applyMiddleware(middleware, thunk))
+)
+
+
+class FitLink extends React.Component {
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -126,82 +138,13 @@ class App extends React.Component {
 
   }
   render () {
-  const { navigation } = this.props
-    return <Root><Login navigation={navigation} /></Root>
+    return <Root>
+        <Provider store={store}>
+          <App/>
+        </Provider>
+      </Root>
   }
 }
-
-App.navigationOptions = {
-  title: ""
-}
-const sessions = StackNavigator({
-  Home : {screen: Home},
-  SessionType: { screen: SessionType, navigationOptions: {tabBarVisible: false} },
-  SessionDetail: { screen: SessionDetail, navigationOptions: {tabBarVisible: false} },
-},{
-  mode: 'modal',
-  headerMode: 'none'
-})
-
-
-const chats = TabNavigator({
-  SessionChats: {screen: SessionChats},
-  DirectMessages: {screen: DirectMessages},
-}, {
-  tabBarPosition: 'top',
-  swipeEnabled: false,
-  lazyLoad: true,
-  animationEnabled: false,
-  tabBarOptions: {
-    showIcon: false,
-    showLabel: true,
-    labelStyle: {
-      fontSize: 15,
-      fontFamily: 'Avenir'
-    },
-    activeTintColor: '#fff',
-    inactiveTintColor: colors.secondary,
-    tabStyle: {
-      justifyContent: isIphoneX()? 'flex-end' :'center',
-      marginBottom: Platform.select({ios: isIphoneX()? -20: -10})
-    },
-    style: {
-      backgroundColor: colors.primary,
-      height: Platform.select({ios: isIphoneX()? 50 : 70}),
-      justifyContent: isIphoneX()? 'center' : null,
-    },
-    indicatorStyle: {
-      backgroundColor: '#fff'
-    },
-  }
-})
-
-const tabs = TabNavigator({
-	Home : {screen: sessions},
-  Friends: {screen: Friends},
-  Chat: {screen: chats},
-	Profile: {screen: Profile},
-	Settings: {screen: Settings}
-}, {
-  tabBarPosition: 'bottom',
-  animationEnabled: true,
-  tabBarOptions: {
-    activeTintColor: colors.primary,
-    inactiveTintColor: color(colors.secondary).lighten(0.3).hex(),
-    style: { backgroundColor: '#fff' },
-    indicatorStyle: { backgroundColor: colors.primary },
-    showIcon: true,
-    showLabel: false,
-  },
-})
-
-const SimpleApp = StackNavigator({
-  Login : { screen: App, navigationOptions: {header: null} },
-  SignUp: { screen: SignUp},
-  MainNav: { screen: tabs},
-  Messaging: {screen: Messaging},
-  SecondScreen: { screen: SecondScreen, title: "Second Screen" }
-})
 
 
 // const sessionNav = StackNavigator({
@@ -210,4 +153,4 @@ const SimpleApp = StackNavigator({
 
 
 
-AppRegistry.registerComponent('Anyone', () => SimpleApp);
+AppRegistry.registerComponent('Anyone', () => FitLink)

@@ -60,7 +60,10 @@ import  styles  from './styles/settingsStyles'
       </Header>
       <Content>
         <TouchableOpacity 
-        onPress={()=> Alert.alert('coming soon')}
+        onPress={()=> {
+          Alert.alert('coming soon')
+          //Linking.openURL('mailto:fitlink-support@gmail.com')
+        }}
         style={{backgroundColor: '#fff', padding: 10, borderBottomWidth: 0.5, borderColor: "#999"}}>
           <Text>Support</Text>
         </TouchableOpacity>

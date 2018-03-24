@@ -27,7 +27,11 @@
     "react-native-modalbox": "^1.4.2",
     "react-native-permissions": "^1.0.6",
     "react-native-version-number": "^0.3.2",
-    "react-navigation": "^1.5.8"
+    "react-navigation": "^1.5.8",
+    "react-navigation-redux-helpers": "^1.0.3",
+    "react-redux": "^5.0.7",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0"
   },
   "jest": {
     "preset": "react-native"

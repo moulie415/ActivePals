@@ -10,10 +10,10 @@ import {
 
 export function getType(type, size) {
 	if (type == 'Cycling') {
-		return <Icon name='bicycle' style={{fontSize: size}} />
+		return <Icon name='bicycle' style={{fontSize: size+10}} />
 	}
 	else if (type == 'Custom') {
-		return <Icon name='help' style={{fontSize: size}} />
+		return <Icon name='help' style={{fontSize: size+10}} />
 	}
 	else if (type == 'Gym') {
 		return <Image style={{width: size, height: size}} 
@@ -22,6 +22,10 @@ export function getType(type, size) {
 	else if (type == 'Running') {
 		return <Image style={{width: size, height: size}} 
 		source={require('../assets/images/running.png')} />
+	}
+	else if (type == 'Swimming') {
+		return <Image style={{width: size, height: size}} 
+		source={require('../assets/images/swim.png')} />
 	}
 
 }

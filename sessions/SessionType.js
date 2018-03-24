@@ -42,13 +42,19 @@ export default class SessionType extends Component {
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} onPress={()=> this.nav.navigate('SessionDetail', {type: 'Running'})}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
 						<Image style={{height: 50, width: 50}} source={require('../assets/images/running.png')}/>
-						<Text style={{fontSize: 30, marginLeft: 10}}>Running</Text>
+						<Text style={styles.typeText}>Running</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} onPress={()=> this.nav.navigate('SessionDetail', {type: 'Cycling'})}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-						<Icon name='bicycle' style={{fontSize: 50}}/>
+						<Icon name='bicycle' style={{fontSize: 60}}/>
 						<Text style={styles.typeText}>Cycling</Text>
+					</Card>
+				</TouchableOpacity>
+				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} onPress={()=> this.nav.navigate('SessionDetail', {type: 'Swimming'})}>
+					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+						<Image style={{height: 50, width: 50}} source={require('../assets/images/swim.png')}/>
+						<Text style={styles.typeText}>Swimming</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} onPress={()=> this.nav.navigate('SessionDetail', {type: 'Custom'})}>
