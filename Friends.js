@@ -152,8 +152,9 @@ import hStyles from 'Anyone/styles/homeStyles'
           placeholder={'Enter username'}
           onChangeText={username => this.username = username}
           />
-          <TouchableOpacity onPress={()=> this.sendRequest(this.username)}>
-            <Text>Submit</Text>
+          <TouchableOpacity onPress={()=> this.sendRequest(this.username)}
+          style={{padding: 10, backgroundColor: colors.primary, marginTop: 10}}>
+            <Text style={{fontFamily: "Avenir", color: '#fff'}}>Submit</Text>
           </TouchableOpacity>
         </Modal>
 

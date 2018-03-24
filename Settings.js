@@ -64,8 +64,9 @@ import  styles  from './styles/settingsStyles'
           Alert.alert('coming soon')
           //Linking.openURL('mailto:fitlink-support@gmail.com')
         }}
-        style={{backgroundColor: '#fff', padding: 10, borderBottomWidth: 0.5, borderColor: "#999"}}>
-          <Text>Support</Text>
+        style={styles.contact}>
+          <Text style={{fontFamily: 'Avenir'}}>Contact Support</Text>
+          <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
         </TouchableOpacity>
         <View>
           <View style={{padding: 10, backgroundColor: '#fff', flexDirection: 'row'}}>
