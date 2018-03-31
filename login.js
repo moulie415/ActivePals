@@ -18,7 +18,7 @@ const FBSDK = require('react-native-fbsdk')
 const { LoginManager, AccessToken } = FBSDK
 
 
- export default class Login extends Component {
+ class Login extends Component {
 
 
   constructor(props) {
@@ -36,7 +36,8 @@ const { LoginManager, AccessToken } = FBSDK
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user && user.emailVerified) {
-          this.props.navigation.navigate('Home')
+        this.setState({spinner: true})
+        this.props.onLogin()
       }
     })  
   }
@@ -46,7 +47,7 @@ const { LoginManager, AccessToken } = FBSDK
   render () {
     return (
     <Container style={styles.container}>
-      {this.state.spinner && <Spinner />}
+      {this.state.spinner && <Spinner color='#fff'/>}
       <Item style={styles.inputGrp}>
       <Icon name="mail" style={{color: "#fff"}} />
         <Input
@@ -119,7 +120,7 @@ const { LoginManager, AccessToken } = FBSDK
       await firebase.auth()
       .signInWithEmailAndPassword(email, pass).then(user => {
         if (user.emailVerified) {
-         this.props.navigation.navigate('Home')
+          this.props.onLogin()
        }
        else {
         Alert.alert('Sorry', 'You must first verify your email using the link we sent you before logging in')
@@ -169,7 +170,6 @@ const { LoginManager, AccessToken } = FBSDK
              this.authenticate(data.accessToken)
              .then(function(result){
               if (result.emailVerified) {
-                navigation.navigate('Home')
               }
               else {
                result.sendEmailVerification().then(()=> {
@@ -275,3 +275,19 @@ const { LoginManager, AccessToken } = FBSDK
   }
 
 }
+
+import { connect } from 'react-redux'
+import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { doSetup } from 'Anyone/actions/profile'
+
+// const mapStateToProps = ({ home, settings }) => ({
+// })
+
+const mapDispatchToProps = dispatch => ({
+  onLogoutPress: ()=> { dispatch(navigateLogin())},
+  onLogin: ()=> {dispatch(doSetup()).then(()=> {
+    dispatch(navigateHome())
+  })}
+})
+
+export default connect(null, mapDispatchToProps)(Login)

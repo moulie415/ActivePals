@@ -40,5 +40,8 @@
     "assets": [
       "./assets/fonts/"
     ]
+  },
+  "devDependencies": {
+    "babel-preset-react-native": "^4.0.0"
   }
 }

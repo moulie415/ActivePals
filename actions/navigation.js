@@ -15,3 +15,5 @@ export const navigateLogin = () => {
 		dispatch(resetAction)
 	}
 }
+
+export const navigateHome = () => nav('Home')

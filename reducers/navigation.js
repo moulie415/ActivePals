@@ -1,7 +1,7 @@
 import { NavigationActions } from 'react-navigation'
 import { Stack } from 'Anyone/App'
 
-const initialState = Stack.router.getStateForAction(
+export const initialState = Stack.router.getStateForAction(
   NavigationActions.init()
 )
 

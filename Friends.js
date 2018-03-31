@@ -30,7 +30,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
 import hStyles from 'Anyone/styles/homeStyles'
 
 
- export default class Friends extends Component {
+ class Friends extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Buddies',
@@ -45,10 +45,10 @@ import hStyles from 'Anyone/styles/homeStyles'
   constructor(props) {
     super(props)
     this.nav = this.props.navigation
+    this.uid = this.props.profile.uid
     this.user = null
     this.state = {
-      friends: [],
-      users: [],
+      friends: this.props.friends,
       refreshing: false
     }
   }
@@ -57,11 +57,11 @@ import hStyles from 'Anyone/styles/homeStyles'
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.user = user
-        let friendsRef = firebase.database().ref('users/' + this.user.uid + '/friends')
-        this.listenForFriends(friendsRef)
       } else {
       }
     })
+    let friendsRef = firebase.database().ref('users/' + this.uid + '/friends')
+    this.listenForFriends(friendsRef)
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
   }
@@ -71,41 +71,18 @@ import hStyles from 'Anyone/styles/homeStyles'
       let friends = []
       let i = 1
       snapshot.forEach(child => {
-        friends.push({uid: child.key, status: child.val(), key: i})
-        this.setState({friends})
         i++
       })
-      this.fetchUsers()
     })
   }
 
-  fetchUsers() {
-    let users = []
-    if (this.state.friends.length > 0) {
-      this.state.friends.forEach(friend => {
-        firebase.database().ref('users/' + friend.uid).once('value')
-        .then(snapshot => {
-          firebase.storage().ref('images/' + friend.uid).getDownloadURL()
-          .then(image => {
-            users.push({...snapshot.val(), status: friend.status, avatar: image})
-            this.setState({users})
-          })
-          .catch(e => {
-            users.push({...snapshot.val(), status: friend.status})
-            this.setState({users})
-          })
-        })
-        this.setState({refreshing: false})
-      })
-    }
-    else {
-      this.setState({refreshing: false})
-    }
-  }
 
   _onRefresh() {
-    this.setState({refreshing: true});
-    this.refreshFriends()
+    this.setState({refreshing: true})
+    this.props.onRefresh(friends => {
+      this.setState({refreshing: false})
+      this.setState({friends})
+    })
   }
 
 
@@ -118,7 +95,7 @@ import hStyles from 'Anyone/styles/homeStyles'
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Buddies</Title>
         <Right style={{flex: 1}}>
           <TouchableOpacity onPress={() => {
-        firebase.database().ref('users/' + this.user.uid).child('username')
+        firebase.database().ref('users/' + this.uid).child('username')
           .once('value', snapshot => {
             snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a buddy")
           })
@@ -199,7 +176,7 @@ import hStyles from 'Anyone/styles/homeStyles'
   getFriends() {
     let list = []
     let index = 1
-    this.state.users.forEach(friend => {
+    this.state.friends.forEach(friend => {
         if (friend.status == 'outgoing') {
         list.push(
           <View key={index}
@@ -258,9 +235,9 @@ import hStyles from 'Anyone/styles/homeStyles'
   }
 
   accept(friend) {
-    firebase.database().ref('users/' + this.user.uid + '/friends').child(friend.uid).set("connected")
+    firebase.database().ref('users/' + this.uid + '/friends').child(friend.uid).set("connected")
     .then(()=> {
-      firebase.database().ref('users/' + friend.uid + '/friends').child(this.user.uid).set("connected")
+      firebase.database().ref('users/' + friend.uid + '/friends').child(this.uid).set("connected")
       .then(() => {
         this.refreshFriends()
       })
@@ -274,18 +251,11 @@ import hStyles from 'Anyone/styles/homeStyles'
 
   }
 
-  refreshFriends() {
-        //refresh friends to display correctly, this could potentially be improved as its a bit hacky
-        this.setState({friends: []})
-        let friendsRef = firebase.database().ref('users/' + this.user.uid + '/friends')
-        this.listenForFriends(friendsRef)
-      }
-
   sendRequest(username) {
     firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
-      firebase.database().ref('users/' + this.user.uid + '/friends').child(snapshot.val()).set("outgoing")
+      firebase.database().ref('users/' + this.uid + '/friends').child(snapshot.val()).set("outgoing")
       .then(()=> {
-        firebase.database().ref('users/' + snapshot.val() + '/friends').child(this.user.uid).set("incoming")
+        firebase.database().ref('users/' + snapshot.val() + '/friends').child(this.uid).set("incoming")
         .then(() => {
           this.refs.modal.close()
           Alert.alert("Success", "Request sent")
@@ -296,10 +266,10 @@ import hStyles from 'Anyone/styles/homeStyles'
   }
 
   openChat(uid, username) {
-    firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).once('value')
+    firebase.database().ref('users/' + this.uid + '/chats').child(uid).once('value')
       .then(snapshot => {
         if (snapshot.val()) {
-          this.nav.navigate('Messaging', {chatId: snapshot.val(), uid: this.user.uid, friendUid: uid, friendUsername: username})
+          this.nav.navigate('Messaging', {chatId: snapshot.val(), uid: this.uid, friendUid: uid, friendUsername: username})
         }
         else {
           Alert.alert(
@@ -313,9 +283,9 @@ import hStyles from 'Anyone/styles/homeStyles'
                 let chatId = snapshot.key
                 firebase.database().ref('chats').child(chatId).push({_id: 'initial'}).then(snapshot => {
                 firebase.database().ref('chats').child(chatId).child('_id').remove()
-                firebase.database().ref('users/' + this.user.uid + '/chats').child(uid).set(chatId)
-                firebase.database().ref('users/' + uid + '/chats').child(this.user.uid).set(chatId)
-                this.nav.navigate('Messaging', {chatId, uid: this.user.uid, friendUid: uid, friendUsername: username})
+                firebase.database().ref('users/' + this.uid + '/chats').child(uid).set(chatId)
+                firebase.database().ref('users/' + uid + '/chats').child(this.uid).set(chatId)
+                this.nav.navigate('Messaging', {chatId, uid: this.uid, friendUid: uid, friendUsername: username})
                 })
               })
 
@@ -328,3 +298,18 @@ import hStyles from 'Anyone/styles/homeStyles'
       .catch(e => Alert.alert('Error', e.message))
   }
 }
+
+import { connect } from 'react-redux'
+//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { fetchFriends } from 'Anyone/actions/friends'
+
+const mapStateToProps = ({ friends, profile }) => ({
+  friends: friends.friends,
+  profile: profile.profile
+})
+
+const mapDispatchToProps = dispatch => ({
+  onRefresh: ()=> {return dispatch(fetchFriends())}
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Friends)

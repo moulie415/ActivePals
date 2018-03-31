@@ -38,7 +38,7 @@ export default class SessionDetail extends Component {
 		this.params = this.props.navigation.state.params
 		this.type = this.params.type
 		this.state = {
-			gender: 'All',
+			gender: 'Unspecified',
 			formattedAddress: 'none',
 			date: null,
 			duration: 1
@@ -136,14 +136,14 @@ export default class SessionDetail extends Component {
 					onPress={()=> {
 						ActionSheet.show(
 						{
-							options: ['All', 'Male', 'Female', 'Cancel'],
+							options: ['Unspecified', 'Male', 'Female', 'Cancel'],
 							cancelButtonIndex: 3,
 							title: "Gender?"
 						},
 						buttonIndex => {
 							switch(buttonIndex) {
 								case 0:
-									this.setState({gender: 'All'})
+									this.setState({gender: 'Unspecified'})
 									break
 								case 1:
 									this.setState({gender: 'Male'})

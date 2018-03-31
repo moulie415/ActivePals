@@ -1,6 +1,8 @@
 
 import { combineReducers } from 'redux'
 import nav from './navigation'
+import friends from './friends'
+import profile from './profile'
  
 //import { DATA_AVAILABLE } from "../actions/" //Import the actions types constant we defined in our actions
  
@@ -19,7 +21,9 @@ const dataReducer = (state = dataState, action) => {
 // Combine all the reducers
 const rootReducer = combineReducers({
     dataReducer,
-    nav
+    nav,
+    profile,
+    friends,
 
     // ,[ANOTHER REDUCER], [ANOTHER REDUCER] ....
 })

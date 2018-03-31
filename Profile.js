@@ -52,14 +52,17 @@ window.Blob = Blob
 
   constructor(props) {
     super(props)
+    this.profile = this.props.profile
 
     this.database = firebase.database().ref('users')
     this.user = null
     this.state = {
-      email: "",
-      profile: {},
-      initialProfile: {},
-      spinner: false
+      email: this.profile.email,
+      profile: this.profile,
+      initialProfile: this.profile,
+      spinner: false,
+      initialAvatar: this.profile.avatar,
+      avatar: this.profile.avatar
     }
   }
 
@@ -69,20 +72,8 @@ window.Blob = Blob
       if (!user) {
         this.props.onLogoutPress()
       }
-      else {
-        this.user = user
-        this.setState({email: user.email })
-        this.listenForUserChanges(firebase.database().ref('users/' + user.uid))
-        firebase.storage().ref('images/' + user.uid).getDownloadURL() 
-          .then(url => {
-            this.setState({initialAvatar: url, avatar: url})
-          })
-          .catch(e => {
-            this.setState({initialAvatar: '', avatar: ''})
-          })
-
-      }
     })  
+    this.listenForUserChanges(firebase.database().ref('users/' + this.profile.uid))
   }
 
   listenForUserChanges(ref) {
@@ -243,7 +234,7 @@ updateUser(initial, profile) {
 
 checkUsername(initial, profile){
   delete profile.avatar
-  firebase.database().ref('users/' + this.user.uid).set({...profile})
+  firebase.database().ref('users/' + this.profile.uid).set({...profile})
   .then(()=> {
     initial.username && firebase.database().ref('usernames').child(initial.username).remove()
     firebase.database().ref('usernames').child(profile.username).set(profile.uid)
@@ -305,7 +296,7 @@ selectAvatar() {
       const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       let uploadBlob = null
 
-      const imageRef = firebase.storage().ref('images').child(this.user.uid)
+      const imageRef = firebase.storage().ref('images/' + this.profile.uid).child('avatar')
 
       fs.readFile(uploadUri, 'base64')
         .then((data) => {
@@ -342,11 +333,12 @@ selectAvatar() {
 import { connect } from 'react-redux'
 import { navigateLogin } from 'Anyone/actions/navigation'
 
-// const mapStateToProps = ({ home, settings }) => ({
-// })
+const mapStateToProps = ({ profile }) => ({
+  profile: profile.profile
+})
 
 const mapDispatchToProps = dispatch => ({
   onLogoutPress: ()=> { dispatch(navigateLogin())}
 })
 
-export default connect(null, mapDispatchToProps)(Profile)
+export default connect(mapStateToProps, mapDispatchToProps)(Profile)
