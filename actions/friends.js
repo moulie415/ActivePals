@@ -40,4 +40,30 @@ export const fetchFriends = () => {
 	}
 }
 
+export const sendRequest = (uid, friendUid) => {
+	return (dispatch) => {
+		let promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("outgoing")
+		let promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("incoming")
+		return Promise.all([promise1, promise2])
+	}
+}
+
+export const acceptRequest = (uid, friendUid) => {
+	return (dispatch) => {
+		let promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("connected")
+		let promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("connected")
+		return Promise.all([promise1, promise2])
+	}
+}
+
+export const deleteFriend = (uid, friendUid) => {
+	return (dispatch) => {
+		let promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).remove()
+		let promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).remove()
+		return Promise.all([promise1, promise2])
+
+	}
+
+}
+
 

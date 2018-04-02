@@ -185,6 +185,20 @@ import hStyles from 'Anyone/styles/homeStyles'
           this.state.selectedUser.accountType}</Text></View>
 
             </View>}
+          <TouchableOpacity 
+          style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 10}}
+          onPress={()=> {
+            Alert.alert(
+              "Delete friend",
+              "Are you sure?",
+              [
+              {text: "Cancel", style: 'cancel'},
+              {text: "Yes", onPress: ()=> this.remove(this.state.selectedUser.uid), style: 'destructive'}
+              ]
+              )
+          }}>
+          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Delete friend</Text>
+          </TouchableOpacity>
 
         </Modal>
         </Content>
@@ -213,11 +227,11 @@ import hStyles from 'Anyone/styles/homeStyles'
           style={{paddingVertical: 20, paddingHorizontal: 10, backgroundColor: '#fff', marginBottom: 1}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 40}} >
               <Text style={{marginHorizontal: 10}}>{friend.username + ' has sent you a buddy request'}</Text>
-              <TouchableOpacity onPress={()=> this.accept(friend)}>
-               <Icon name='checkmark' style={{color: 'green', fontSize: 30, padding: 5}}/>
+              <TouchableOpacity onPress={()=> this.accept(friend.uid)}>
+               <Icon name='checkmark' style={{color: 'green', fontSize: 40, padding: 5}}/>
               </TouchableOpacity>
-              <TouchableOpacity>
-                <Icon name='close' style={{color: 'red', fontSize: 30, padding: 5}}/>
+              <TouchableOpacity onPress={()=> this.remove(friend.uid)}>
+                <Icon name='close' style={{color: 'red', fontSize: 40, padding: 5}}/>
               </TouchableOpacity>
             </View>
           </View>
@@ -255,33 +269,24 @@ import hStyles from 'Anyone/styles/homeStyles'
   }
 
   accept(friend) {
-    firebase.database().ref('users/' + this.uid + '/friends').child(friend.uid).set("connected")
-    .then(()=> {
-      firebase.database().ref('users/' + friend.uid + '/friends').child(this.uid).set("connected")
-      .then(() => {
-        this.refreshFriends()
-      })
-    })
+    this.props.onAccept(this.uid, friend)
     .catch(e => Alert.alert("Error", e.message))
 
   }
 
-  reject(item) {
-    let test = item
-
+  remove(friend) {
+    this.props.onRemove(this.uid, friend)
+    .then(()=> this.refs.profileModal.close())
+    .catch(e => Alert.alert("Error", e.message))
   }
 
   sendRequest(username) {
     if (username != this.props.profile.username) {
       firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
-        firebase.database().ref('users/' + this.uid + '/friends').child(snapshot.val()).set("outgoing")
-        .then(()=> {
-          firebase.database().ref('users/' + snapshot.val() + '/friends').child(this.uid).set("incoming")
-          .then(() => {
-            this.refs.modal.close()
-            Alert.alert("Success", "Request sent")
-          })
+        this.props.onRequest(this.uid, snapshot.val()).then(() => {
+          Alert.alert("Success", "Request sent")
         })
+        .catch(e => Alert.alert("Error", e.message))
       })
       .catch(e => Alert.alert("Error", e.message))
     }
@@ -326,7 +331,7 @@ import hStyles from 'Anyone/styles/homeStyles'
 
 import { connect } from 'react-redux'
 //import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
-import { fetchFriends } from 'Anyone/actions/friends'
+import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
 
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,
@@ -334,7 +339,10 @@ const mapStateToProps = ({ friends, profile }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getFriends: ()=> { return dispatch(fetchFriends())}
+  getFriends: ()=> { return dispatch(fetchFriends())},
+  onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
+  onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
+  onRemove: (uid, friendUid)=> {return dispatch(deleteFriend(uid, friendUid))}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)
