@@ -69,25 +69,40 @@ import hStyles from 'Anyone/styles/homeStyles'
   listenForFriends(ref) {
     ref.on('value', snapshot => {
       let friends = []
-      let i = 1
       snapshot.forEach(child => {
-        i++
+        let exists = false
+        this.state.friends.forEach(friend => {
+          if (child.key == friend.uid) {
+            if (child.val() == friend.status) {
+              exists = true
+            }
+          }
+        })
+        if (!exists) {
+          friends.push(child.key)
+        }
       })
+      if (friends.length > 0) {
+        this.props.getFriends()
+      }
+      else if (Object.keys(snapshot.val()).length 
+        != this.state.friends.length) {
+        this.props.getFriends()
+      }
     })
   }
 
 
   _onRefresh() {
     this.setState({refreshing: true})
-    this.props.onRefresh().then(() => {
-      this.setState({refreshing: false})
-      Alert.alert('test')
-    })
+    this.props.getFriends()
   }
 
   componentWillReceiveProps(nextProps) {
-    let props = nextProps
-    Alert.alert('new friends')
+    if (nextProps.friends) {
+      this.setState({refreshing: false, friends: nextProps.friends})
+
+    }
   }
 
 
@@ -257,17 +272,22 @@ import hStyles from 'Anyone/styles/homeStyles'
   }
 
   sendRequest(username) {
-    firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
-      firebase.database().ref('users/' + this.uid + '/friends').child(snapshot.val()).set("outgoing")
-      .then(()=> {
-        firebase.database().ref('users/' + snapshot.val() + '/friends').child(this.uid).set("incoming")
-        .then(() => {
-          this.refs.modal.close()
-          Alert.alert("Success", "Request sent")
+    if (username != this.props.profile.username) {
+      firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
+        firebase.database().ref('users/' + this.uid + '/friends').child(snapshot.val()).set("outgoing")
+        .then(()=> {
+          firebase.database().ref('users/' + snapshot.val() + '/friends').child(this.uid).set("incoming")
+          .then(() => {
+            this.refs.modal.close()
+            Alert.alert("Success", "Request sent")
+          })
         })
       })
-    })
-    .catch(e => Alert.alert("Error", e.message))
+      .catch(e => Alert.alert("Error", e.message))
+    }
+    else {
+      Alert.alert("Error", "You cannot add yourself as a friend")
+    }
   }
 
   openChat(uid, username) {
@@ -311,11 +331,10 @@ import { fetchFriends } from 'Anyone/actions/friends'
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,
   profile: profile.profile,
-  refreshing: friends.refreshing
 })
 
 const mapDispatchToProps = dispatch => ({
-  onRefresh: ()=> { return dispatch(fetchFriends())}
+  getFriends: ()=> { return dispatch(fetchFriends())}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)
