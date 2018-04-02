@@ -3,7 +3,8 @@ import {
 } from 'Anyone/actions/friends'
 
 const initialState = {
-	friends: []
+	friends: [],
+	refreshing: false
 }
 
 export default function(state = initialState, action) {

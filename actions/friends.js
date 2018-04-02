@@ -1,18 +1,19 @@
 import * as firebase from "firebase"
 export const SET_FRIENDS = 'SET_FRIENDS'
+export const REFRESHING_FRIENDS = 'REFRESHING_FRIENDS'
 
 
 const setFriends = (friends) => ({
 	type: SET_FRIENDS,
 	friends
-
 })
+
 
 export const fetchFriends = () => {
 	return (dispatch) => {
 		let user = firebase.auth().currentUser
-		firebase.database().ref('users/' + user.uid + '/friends').once('value', snapshot => {
-			let friends = []
+		let friends = []
+		return firebase.database().ref('users/' + user.uid + '/friends').once('value', snapshot => {
 
 			Object.keys(snapshot.val()).forEach(friend => {
 				let promise = new Promise(function(resolve, reject) {
@@ -31,7 +32,8 @@ export const fetchFriends = () => {
 
 				friends.push(promise)
 			})
-			return Promise.all(friends).then(items => {
+		}).then(() => {
+			Promise.all(friends).then(items => {
 				dispatch(setFriends(items))
 			})
 		})

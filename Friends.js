@@ -79,10 +79,15 @@ import hStyles from 'Anyone/styles/homeStyles'
 
   _onRefresh() {
     this.setState({refreshing: true})
-    this.props.onRefresh(friends => {
+    this.props.onRefresh().then(() => {
       this.setState({refreshing: false})
-      this.setState({friends})
+      Alert.alert('test')
     })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    let props = nextProps
+    Alert.alert('new friends')
   }
 
 
@@ -305,11 +310,12 @@ import { fetchFriends } from 'Anyone/actions/friends'
 
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,
-  profile: profile.profile
+  profile: profile.profile,
+  refreshing: friends.refreshing
 })
 
 const mapDispatchToProps = dispatch => ({
-  onRefresh: ()=> {return dispatch(fetchFriends())}
+  onRefresh: ()=> { return dispatch(fetchFriends())}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)
