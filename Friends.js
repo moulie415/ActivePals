@@ -133,7 +133,7 @@ import hStyles from 'Anyone/styles/homeStyles'
         }>
       {this.state.friends.length > 0 ?
       <ScrollView>
-      {this.getFriends()}
+      {this.renderFriends()}
       </ScrollView> :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
@@ -207,7 +207,7 @@ import hStyles from 'Anyone/styles/homeStyles'
   }
 
 
-  getFriends() {
+  renderFriends() {
     let list = []
     let index = 1
     this.state.friends.forEach(friend => {

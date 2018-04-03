@@ -43,12 +43,12 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
     })
 })
 
-exports.sendNewSessionMessageNotification = functions.database.ref('/sessions/{id}/chat').onWrite(event => {
+exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChats/{id}').onWrite(event => {
     console.log(event)
 
     const getValuePromise = admin.database()
-                                 .ref('sessions/' + event.params.id)
-                                 .child('chat')
+                                 .ref('sessionChats')
+                                 .child(event.params.id)
                                  .orderByKey()
                                  .limitToLast(1)
                                  .once('value')

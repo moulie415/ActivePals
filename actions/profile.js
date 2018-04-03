@@ -1,6 +1,7 @@
 import * as firebase from "firebase"
 export const SET_PROFILE = 'SET_PROFILE'
 import { fetchFriends } from './friends'
+import { fetchSessionChats } from './chats'
 
 
 const setProfile = (profile) => ({
@@ -24,10 +25,12 @@ export const fetchProfile = () => {
 	}
 }
 
-export const doSetup = () => {
-	return (dispatch) => Promise.all([
-		dispatch(fetchProfile()),
-		dispatch(fetchFriends())
-		])
+export const doSetup = (profile) => {
+	return (dispatch) => {
+		return Promise.all([
+			profile.val().friends && dispatch(fetchFriends(profile.val().friends)),
+			profile.val().sessions && dispatch(fetchSessionChats(profile.val().sessions, profile.val().uid))
+			])
+	}
 }
 

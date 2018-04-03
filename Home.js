@@ -36,9 +36,8 @@ import Modal from 'react-native-modalbox'
 import { getType } from './constants/utils'
 import Hyperlink from 'react-native-hyperlink'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
-import { EventRegister } from 'react-native-event-listeners'
 
- export default class Home extends Component {
+ class Home extends Component {
 
  static navigationOptions = {
     header: null,
@@ -112,8 +111,10 @@ import { EventRegister } from 'react-native-event-listeners'
           .then(()=> {
             firebase.database().ref('timestamp').once('value', snapshot => {
               if (snapshot.val() > time + duration) {
-                firebase.database().ref('sessions').child(child.key).remove()
-                .then(() => EventRegister.emit('sessionLeft', child.key))
+                firebase.database().ref('users/' + uid + '/sessions').once('value', snapshot => {
+                  firebase.database().ref('sessions').child(child.key).remove()
+                  .then(() => this.props.getChats(Object.keys(snapshot.val()), uid)
+                })
               }
             })
           })
@@ -223,8 +224,10 @@ import { EventRegister } from 'react-native-event-listeners'
               {text: 'cancel', style: 'cancel'},
               {text: 'Yes', onPress: ()=> {
                 firebase.database().ref('sessions/' + session.key).remove()
-                firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
-                .then(() => EventRegister.emit('sessionLeft', session.key))
+                firebase.database().ref('users/' + uid + '/sessions').once('value', snapshot => {
+                  firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+                    .then(()=> this.props.getChats(Object.keys(snapshot.val()), uid))
+                })
                 FCM.unsubscribeFromTopic(session.key)
                 this.refs.modal.close()
               },
@@ -251,8 +254,10 @@ import { EventRegister } from 'react-native-event-listeners'
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableOpacity
           onPress={()=> {
-            firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
-             .then(() => EventRegister.emit('sessionLeft', session.key))
+            firebase.database().ref('users/' + uid + '/sessions').once('value', snapshot => {
+              firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+              .then(() => this.props.getChats(Object.keys(snapshot.val()), uid))
+            })
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).remove()
             FCM.unsubscribeFromTopic(session.key)
             this.refs.modal.close()
@@ -274,8 +279,11 @@ import { EventRegister } from 'react-native-event-listeners'
       return (
           <TouchableOpacity
           onPress={()=> {
-            firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
-              .then(() => EventRegister.emit('sessionJoined', session.key))
+
+            firebase.database().ref('users/' + uid + '/sessions').once('value', snapshot => {
+              firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
+              .then(() => this.props.getChats(Object.keys(snapshot.val()), uid))
+            })
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
             this.refs.modal.close()
             FCM.subscribeToTopic(session.key)
@@ -325,23 +333,23 @@ import { EventRegister } from 'react-native-event-listeners'
                 <View style={{flexDirection: 'row'}} >
 
                   <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
-                  <View style={{flex: 1}}>
-                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                      <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
-                      <Text style={{fontFamily: 'Avenir'}}>{"gender: " + item.gender}</Text>
-                    </View>
-                    <Text style={[styles.date], {color: item.inProgress? colors.secondary : "#999"}} >
-                    {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
-                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                      <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
-                      <TouchableOpacity onPress={()=>{
-                        this.setState({switch: true})
-                        this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat})
-                      }}
-                      style={{flex: 1}}>
-                        <Text style={{color: colors.secondary, fontFamily: 'Avenir', textAlign: 'right'}}>View on map</Text>
-                      </TouchableOpacity>
-                    </View>
+                    <View style={{flex: 1}}>
+                      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                        <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
+                        <Text style={{fontFamily: 'Avenir', fontSize: 13 }}>{"gender: " + item.gender}</Text>
+                      </View>
+                      <Text style={[styles.date], {color: item.inProgress? colors.secondary : "#999"}} >
+                      {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
+                      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                        <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
+                        <TouchableOpacity onPress={()=>{
+                          this.setState({switch: true})
+                          this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat})
+                        }}
+                        style={{flex: 1}}>
+                          <Text style={{color: colors.secondary, fontFamily: 'Avenir', textAlign: 'right'}}>View on map</Text>
+                        </TouchableOpacity>
+                      </View>
                   </View>
                 </View>
               </View>
@@ -459,3 +467,19 @@ import { EventRegister } from 'react-native-event-listeners'
     )
   }
 }
+
+import { connect } from 'react-redux'
+//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { fetchSessionChats } from 'Anyone/actions/chats'
+
+const mapStateToProps = ({ friends, profile, chats }) => ({
+  friends: friends.friends,
+  profile: profile.profile,
+  chats: chats.sessionChats
+})
+
+const mapDispatchToProps = dispatch => ({
+  getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))}
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

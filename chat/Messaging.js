@@ -23,7 +23,7 @@ import Modal from 'react-native-modalbox'
 import hStyles from 'Anyone/styles/homeStyles'
 import { EventRegister } from 'react-native-event-listeners'
 
-export default class Messaging extends React.Component {
+class Messaging extends React.Component {
   static navigationOptions = {
     header: null,
   }
@@ -54,7 +54,7 @@ export default class Messaging extends React.Component {
   componentDidMount() {
     let ref 
     if (this.session) {
-      ref = firebase.database().ref('sessions/'+ this.sessionId).child('chat').orderByKey().limitToLast(30) 
+      ref = firebase.database().ref('sessionChats/'+ this.sessionId).orderByKey().limitToLast(30) 
     }
     else {
       ref = firebase.database().ref('chats/'+ this.chatId).orderByKey().limitToLast(30)
@@ -68,13 +68,8 @@ export default class Messaging extends React.Component {
         this.friendToken = snapshot.val()
       })
     }
-    firebase.storage().ref('images/' + this.uid).getDownloadURL()
-    .then(image => {
-      this.setState({avatar: image})
-    })
-    .catch(e => {
-      this.setState({avatar: ''})
-    })
+
+    this.props.profile.avatar? this.setState({avatar: this.props.profile.avatar}) : this.setState({avatar: ''})
 
     FCM.getFCMToken().then(token => {
       firebase.database().ref('users/' + this.uid).child('FCMToken').set(token)
@@ -118,7 +113,9 @@ export default class Messaging extends React.Component {
       let messageObjects = []
       snapshot.forEach(child => {
         if (child.val()._id != 'initial') {
-        messageObjects.push({...child.val()})
+          messageObjects.push({...child.val()})
+          //let friend = this.isFriend(child.val().user._id)
+          //friend? messageObjects.push({...child.val(), avatar: friend.avatar}) : messageObjects.push({...child.val()})
       }
       })
       messageObjects = messageObjects.reverse()
@@ -126,6 +123,17 @@ export default class Messaging extends React.Component {
       //this.convertMessageObjects()
 
     })
+  }
+
+  isFriend(uid) {
+    let isFriend = false
+    this.props.friends.forEach(friend => {
+      if (friend.uid = uid) {
+        isFriend = friend
+      }
+    })
+    return friend
+
   }
 
   onSend(messages = []) {
@@ -140,7 +148,7 @@ export default class Messaging extends React.Component {
       }
     })
 
-    let ref = this.session? firebase.database().ref('sessions/' + this.sessionId).child('chat') :
+    let ref = this.session? firebase.database().ref('sessionChats/' + this.sessionId) :
     firebase.database().ref('chats/' + this.chatId)
 
     ref.push(...converted)
@@ -316,3 +324,17 @@ export default class Messaging extends React.Component {
         this.notificationListener.remove();
     }
 }
+
+import { connect } from 'react-redux'
+//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
+
+const mapStateToProps = ({ friends, profile }) => ({
+  friends: friends.friends,
+  profile: profile.profile,
+})
+
+// const mapDispatchToProps = dispatch => ({
+// })
+
+export default connect(mapStateToProps, null)(Messaging)

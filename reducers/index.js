@@ -3,6 +3,7 @@ import { combineReducers } from 'redux'
 import nav from './navigation'
 import friends from './friends'
 import profile from './profile'
+import chats from './chats'
  
 //import { DATA_AVAILABLE } from "../actions/" //Import the actions types constant we defined in our actions
  
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
     nav,
     profile,
     friends,
+    chats
 
     // ,[ANOTHER REDUCER], [ANOTHER REDUCER] ....
 })

@@ -278,15 +278,17 @@ const { LoginManager, AccessToken } = FBSDK
 
 import { connect } from 'react-redux'
 import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
-import { doSetup } from 'Anyone/actions/profile'
+import { doSetup, fetchProfile } from 'Anyone/actions/profile'
 
 // const mapStateToProps = ({ home, settings }) => ({
 // })
 
 const mapDispatchToProps = dispatch => ({
   onLogoutPress: ()=> { dispatch(navigateLogin())},
-  onLogin: ()=> {dispatch(doSetup()).then(()=> {
-    dispatch(navigateHome())
+  onLogin: ()=> {dispatch(fetchProfile()).then(profile => {
+    dispatch(doSetup(profile)).then(()=> {
+      dispatch(navigateHome())
+    })
   })}
 })
 

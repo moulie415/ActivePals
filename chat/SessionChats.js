@@ -11,11 +11,10 @@ import firebase from '../index'
 import { getType } from 'Anyone/constants/utils'
 import colors from 'Anyone/constants/colors'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
-import { EventRegister } from 'react-native-event-listeners'
 
 //import  styles  from './styles/loginStyles'
 
- export default class SessionChats extends Component {
+ class SessionChats extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Session Chats',
@@ -34,86 +33,41 @@ import { EventRegister } from 'react-native-event-listeners'
     this.state = {
       email: "",
       username: "",
-      sessions: [],
-      details: []
+      chats: this.props.chats
     }
   }
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.user = user
-        let sessionsRef = firebase.database().ref('users/' + this.user.uid).child('sessions')
-        this.listenForSessionChats(sessionsRef)
+        //let sessionsRef = firebase.database().ref('users/' + this.user.uid).child('sessions')
       }
     })  
     FCM.on(FCMEvent.Notification, async (notif) => {
       //update last message on notification
       if (notif.type == 'sessionMessage') {
-        this.fetchDetail()
+        this.props.fetchSessionChats()
       }
-    })
-    this.joinListener = EventRegister.addEventListener('sessionJoined', (id) => {
-      this.fetchDetail()
-    })
-
-    this.leaveListener = EventRegister.addEventListener('sessionLeft', (id) => {
-      let sessions = this.state.sessions.filter(s => s != id )
-      this.setState({sessions})
-    })
-
-    this.messageListener = EventRegister.addEventListener('newSessionMessage', () => {
-      this.fetchDetail()
     })
 
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
   }
 
-  listenForSessionChats(ref) {
-    ref.on('value', snapshot => {
-      let sessions = []
-      let i = 1
-      snapshot.forEach(child => {
-        sessions.push(child.key)
-        this.setState({sessions})
-        i++
-      })
-      this.fetchDetail()
-    })
-  }
 
-  fetchDetail() {
-    let details = []
-    this.state.sessions.forEach(session => {
-      firebase.database().ref('sessions/' + session).once('value')
-      .then(snapshot => {
-        if (snapshot.val()) {
-          firebase.database().ref('sessions/'+ session).child('chat').orderByKey().limitToLast(1)
-          .once('value', lastMessage => {
-            let message = {text: "new group created"}
-            if (lastMessage.val()) {
-              message = Object.values(lastMessage.val())[0]
-            }
-            details.push({...snapshot.val(), id: session, lastMessage: message})
-            this.setState({details})
-          })
-        }
-        else {
-          firebase.database().ref('users/' + this.user.uid + '/sessions').child(session).remove()
-          FCM.unsubscribeFromTopic(session)
-        }
-      })
-      })
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.chats) {
+      this.setState({chats: nextProps.chats})
+    }
   }
-
 
 
   render () {
     return (
     <Container>
-    {this.state.sessions.length > 0?
+    {this.state.chats.length > 0?
       <ScrollView>
-        {this.getChats()}
+        {this.renderChats()}
       </ScrollView> :
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
@@ -123,10 +77,10 @@ import { EventRegister } from 'react-native-event-listeners'
   )
   }
 
-  getChats() {
+  renderChats() {
     let list = []
     let index = 1
-    this.state.details.forEach(detail => {
+    this.state.chats.forEach(detail => {
       list.push(
         <TouchableOpacity 
         key={index}
@@ -181,3 +135,20 @@ export function getSimplified(createdAt) {
       }
       return dateString
     }
+
+
+import { connect } from 'react-redux'
+//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { fetchSessionChats } from 'Anyone/actions/chats'
+
+const mapStateToProps = ({ friends, profile, chats }) => ({
+  friends: friends.friends,
+  profile: profile.profile,
+  chats: chats.sessionChats
+})
+
+const mapDispatchToProps = dispatch => ({
+  getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))}
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(SessionChats)
