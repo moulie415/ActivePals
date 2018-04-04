@@ -111,10 +111,8 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           .then(()=> {
             firebase.database().ref('timestamp').once('value', snapshot => {
               if (snapshot.val() > time + duration) {
-                firebase.database().ref('users/' + uid + '/sessions').once('value', snapshot => {
-                  firebase.database().ref('sessions').child(child.key).remove()
-                  .then(() => this.props.getChats(Object.keys(snapshot.val()), uid)
-                })
+                firebase.database().ref('sessions').child(child.key).remove()
+                .then(() => this.props.onLeave(child.key, this.props.chats))
               }
             })
           })
@@ -224,10 +222,8 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
               {text: 'cancel', style: 'cancel'},
               {text: 'Yes', onPress: ()=> {
                 firebase.database().ref('sessions/' + session.key).remove()
-                firebase.database().ref('users/' + uid + '/sessions').once('value', snapshot => {
-                  firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
-                    .then(()=> this.props.getChats(Object.keys(snapshot.val()), uid))
-                })
+                firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+                .then(()=> this.props.onLeave(session.key, this.props.chats))
                 FCM.unsubscribeFromTopic(session.key)
                 this.refs.modal.close()
               },
@@ -254,10 +250,8 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableOpacity
           onPress={()=> {
-            firebase.database().ref('users/' + uid + '/sessions').once('value', snapshot => {
-              firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
-              .then(() => this.props.getChats(Object.keys(snapshot.val()), uid))
-            })
+            firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+            .then(() => this.props.onLeave(session.key, this.props.chats))
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).remove()
             FCM.unsubscribeFromTopic(session.key)
             this.refs.modal.close()
@@ -279,11 +273,8 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
       return (
           <TouchableOpacity
           onPress={()=> {
-
-            firebase.database().ref('users/' + uid + '/sessions').once('value', snapshot => {
-              firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
-              .then(() => this.props.getChats(Object.keys(snapshot.val()), uid))
-            })
+            firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
+            .then(() => this.props.onJoin(session.key))
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
             this.refs.modal.close()
             FCM.subscribeToTopic(session.key)
@@ -470,7 +461,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
 
 import { connect } from 'react-redux'
 //import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
-import { fetchSessionChats } from 'Anyone/actions/chats'
+import { fetchSessionChats, addSessionChat, removeSessionChat } from 'Anyone/actions/chats'
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
   friends: friends.friends,
@@ -479,7 +470,9 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))}
+  getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
+  onJoin: (session) => {return dispatch(addSessionChat(session))},
+  onLeave: (session, sessions) => {return dispatch(removeSessionChat(session, sessions))}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

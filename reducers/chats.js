@@ -1,5 +1,7 @@
 import {
 	SET_SESSION_CHATS,
+	ADD_SESSION_CHAT,
+	REMOVE_SESSION_CHAT,
 } from 'Anyone/actions/chats'
 
 const initialState = {
@@ -13,6 +15,12 @@ export default function(state = initialState, action) {
 				...state,
 				sessionChats: action.sessionChats
 			}
+		case ADD_SESSION_CHAT:
+			return {
+				...state,
+				sessionChats: [...state.sessionChats, action.session]
+			}
+
 		default:
 			return state
 	}
