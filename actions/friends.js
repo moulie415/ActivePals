@@ -7,6 +7,12 @@ const setFriends = (friends) => ({
 	friends
 })
 
+const addToFriends = (friend) => ({
+	type: ADD_FRIEND,
+	friend
+})
+
+
 
 export const fetchFriends = (uids) => {
 	return (dispatch) => {

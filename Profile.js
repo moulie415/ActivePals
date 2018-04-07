@@ -23,7 +23,7 @@ import {
   Spinner
 } from 'native-base'
 import firebase from './index'
-import  styles  from './styles/loginStyles'
+import  styles  from './styles/profileStyles'
 import colors from './constants/colors'
 import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')

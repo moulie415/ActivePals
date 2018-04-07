@@ -112,6 +112,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
             firebase.database().ref('timestamp').once('value', snapshot => {
               if (snapshot.val() > time + duration) {
                 firebase.database().ref('sessions').child(child.key).remove()
+                firebase.database().ref('sessionChats').child(child.key).remove()
                 .then(() => this.props.onLeave(child.key, this.props.chats))
               }
             })
@@ -223,6 +224,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
               {text: 'Yes', onPress: ()=> {
                 firebase.database().ref('sessions/' + session.key).remove()
                 firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+                firebase.database().ref('sessionChats').child(child.key).remove()
                 .then(()=> this.props.onLeave(session.key, this.props.chats))
                 FCM.unsubscribeFromTopic(session.key)
                 this.refs.modal.close()

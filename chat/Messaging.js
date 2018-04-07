@@ -21,7 +21,6 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
 import colors from 'Anyone/constants/colors'
 import Modal from 'react-native-modalbox'
 import hStyles from 'Anyone/styles/homeStyles'
-import { EventRegister } from 'react-native-event-listeners'
 
 class Messaging extends React.Component {
   static navigationOptions = {
@@ -156,7 +155,8 @@ class Messaging extends React.Component {
       this.setState(previousState => ({
         messageObjects: GiftedChat.append(previousState.messageObjects, messages),
       }))
-      this.session? EventRegister.emit('newSessionMessage') : EventRegister.emit('newMessage')
+      this.session? this.props.getSessionChats(this.props.profile.sessionChats, this.uid) : 
+      this.props.getChats(this.props.profile.chats)
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 
@@ -239,13 +239,8 @@ class Messaging extends React.Component {
     else if (user.status == 'incoming') {
       return <TouchableOpacity
       onPress={()=> {
-        firebase.database().ref('users/' + this.uid + '/friends').child(user.uid).set("connected")
-        .then(()=> {
-          firebase.database().ref('users/' + user.uid + '/friends').child(this.uid).set("connected")
-          .then(() => {
-            this.refs.modal.close()
-          })
-        })
+        this.props.onAccept(this.uid, user.uid)
+        .then(()=> this.refs.modal.close())
         .catch(e => Alert.alert("Error", e.message))
       }}
       style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
@@ -258,13 +253,10 @@ class Messaging extends React.Component {
     else if (this.session) {
       return <TouchableOpacity
       onPress={()=> {
-        firebase.database().ref('users/' + this.uid + '/friends').child(user.uid).set("outgoing")
+        this.props.onRequest(this.uid, user.uid)
         .then(()=> {
-          firebase.database().ref('users/' + user.uid + '/friends').child(this.uid).set("incoming")
-          .then(() => {
-            this.refs.modal.close()
-            Alert.alert("Success", "Request sent")
-          })
+          this.refs.modal.close()
+          Alert.alert("Success", "Request sent")
         })
         .catch(e => Alert.alert("Error", e.message))
       }}
@@ -321,20 +313,27 @@ class Messaging extends React.Component {
   }
   componentWillUnmount() {
         // stop listening for events
-        this.notificationListener.remove();
+        this.notificationListener.remove()
     }
 }
 
 import { connect } from 'react-redux'
 //import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
+import { fetchChats, fetchSessionChats } from 'Anyone/actions/chats'
 
-const mapStateToProps = ({ friends, profile }) => ({
+const mapStateToProps = ({ friends, profile, chats }) => ({
   friends: friends.friends,
   profile: profile.profile,
+  sessionChats: chats.sessionChats,
+  chats: chats.chats
 })
 
-// const mapDispatchToProps = dispatch => ({
-// })
+const mapDispatchToProps = dispatch => ({
+  getChats: (chats) => {return dispatch(fetchChats(chats))},
+  getSessionChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
+  onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
+  onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
+})
 
-export default connect(mapStateToProps, null)(Messaging)
+export default connect(mapStateToProps, mapDispatchToProps)(Messaging)

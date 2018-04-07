@@ -2,6 +2,7 @@ import * as firebase from "firebase"
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS'
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT'
+export const SET_CHATS = 'SET_CHATS'
 
 
 const setSessionChats = (sessionChats) => ({
@@ -14,34 +15,62 @@ const addToSessionChats = (session) => ({
 	session,
 })
 
+const setChats = (chats) => ({
+	type: SET_CHATS,
+	chats
+})
+
+export const fetchChats = (chats) => {
+	return (dispatch) => {
+		let chatList = []
+		Object.keys(chats).forEach(chat => {
+			let val = chats[chat]
+			let promise = new Promise(function(resolve, reject) {
+				firebase.database().ref('chats').child(val).orderByKey().limitToLast(1)
+				.once('value', lastMessage => {
+					let message = {text: "new chat created"}
+					if (lastMessage.val()) {
+						message = Object.values(lastMessage.val())[0]
+					}
+					resolve({uid: chat, chatId: val, lastMessage: message})
+				})
+			})
+			chatList.push(promise)
+		})
+		return Promise.all(chatList).then(chats => {
+			dispatch(setChats(chats))
+		})
+	}
+}
+
 export const fetchSessionChats = (sessions, uid) => {
 	return (dispatch) => {
 		let chatList = []
-			Object.keys(sessions).forEach(session => {
-				let promise = new Promise(function(resolve, reject) {
-					firebase.database().ref('sessions/' + session).once('value', snapshot => {
-						if (snapshot.val()) {
-							firebase.database().ref('sessionChats/'+ session).orderByKey().limitToLast(1)
-							.once('value', lastMessage => {
-								let message = {text: "new group created"}
-								if (lastMessage.val()) {
-									message = Object.values(lastMessage.val())[0]
-								}
-								resolve({...snapshot.val(), id: session, lastMessage: message})
-							})
-						}
-						else {
-							reject()
-							firebase.database().ref('users/' + uid + '/sessions').child(session).remove()
-							FCM.unsubscribeFromTopic(session)
-						}
-					})
+		Object.keys(sessions).forEach(session => {
+			let promise = new Promise(function(resolve, reject) {
+				firebase.database().ref('sessions/' + session).once('value', snapshot => {
+					if (snapshot.val()) {
+						firebase.database().ref('sessionChats/'+ session).orderByKey().limitToLast(1)
+						.once('value', lastMessage => {
+							let message = {text: "new group created"}
+							if (lastMessage.val()) {
+								message = Object.values(lastMessage.val())[0]
+							}
+							resolve({...snapshot.val(), id: session, lastMessage: message})
+						})
+					}
+					else {
+						reject()
+						firebase.database().ref('users/' + uid + '/sessions').child(session).remove()
+						FCM.unsubscribeFromTopic(session)
+					}
 				})
-				chatList.push(promise)
 			})
-			return Promise.all(chatList).then((sessionChats) => {
-				dispatch(setSessionChats(sessionChats))
-			})
+			chatList.push(promise)
+		})
+		return Promise.all(chatList).then(sessionChats => {
+			dispatch(setSessionChats(sessionChats))
+		})
 	}
 }
 

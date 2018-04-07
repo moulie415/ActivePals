@@ -30,14 +30,6 @@ let config = {
 firebase.initializeApp(config)
 export default firebase
 
-FCM.on(FCMEvent.RefreshToken, token => {
-  let user = firebase.auth().currentUser
-  if (user) {
-    firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
-  }
-  console.log("TOKEN (refreshUnsubscribe)", token);
-})
-
 FCM.on(FCMEvent.Notification, async (notif) => {
     let state = AppState.currentState
     // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
@@ -108,6 +100,18 @@ const showLocalNotification = (notif) => {
 
 }
 
+const reactNavigationMiddleware = store => dispatch => action => {
+  switch (action.type) {
+    case 'Navigation/NAVIGATE':
+      const { routeName } = action
+      // if (routeName == 'Notifications') {
+      //     dispatch(markInboxAsRead())
+      // }
+    default:
+     return dispatch(action)
+  }
+}
+
 const middleware = createReactNavigationReduxMiddleware(
   "root",
   state => state.nav,
@@ -120,13 +124,20 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export const store = createStore(
   reducer,
-  composeEnhancers(applyMiddleware(middleware, thunk))
+  composeEnhancers(applyMiddleware(middleware, reactNavigationMiddleware, thunk))
   //applyMiddleware(middleware, thunk)
 )
 
 
 class FitLink extends React.Component {
   componentDidMount() {
+    this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, token => {
+      let user = firebase.auth().currentUser
+      if (user) {
+        firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
+      }
+      console.log("TOKEN (refreshUnsubscribe)", token);
+    })
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.user = user

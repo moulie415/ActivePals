@@ -46,7 +46,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
     FCM.on(FCMEvent.Notification, async (notif) => {
       //update last message on notification
       if (notif.type == 'sessionMessage') {
-        this.props.fetchSessionChats()
+        this.props.getChats(this.props.profile.chats, this.user.uid)
       }
     })
 

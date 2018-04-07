@@ -83,11 +83,11 @@ import hStyles from 'Anyone/styles/homeStyles'
         }
       })
       if (friends.length > 0) {
-        this.props.getFriends()
+        this.props.getProfile()
       }
       else if (Object.keys(snapshot.val()).length 
         != this.state.friends.length) {
-        this.props.getFriends()
+        this.props.getProfile()
       }
     })
   }
@@ -95,13 +95,15 @@ import hStyles from 'Anyone/styles/homeStyles'
 
   _onRefresh() {
     this.setState({refreshing: true})
-    this.props.getFriends()
+    this.props.getProfile()
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.friends) {
       this.setState({refreshing: false, friends: nextProps.friends})
-
+    }
+    if (nextProps.profile) {
+      this.props.getFriends(nextProps.profile.friends)
     }
   }
 
@@ -332,6 +334,7 @@ import hStyles from 'Anyone/styles/homeStyles'
 import { connect } from 'react-redux'
 //import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
+import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,
@@ -339,10 +342,11 @@ const mapStateToProps = ({ friends, profile }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getFriends: ()=> { return dispatch(fetchFriends())},
+  getFriends: (uids)=> { return dispatch(fetchFriends(uids))},
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
-  onRemove: (uid, friendUid)=> {return dispatch(deleteFriend(uid, friendUid))}
+  onRemove: (uid, friendUid)=> {return dispatch(deleteFriend(uid, friendUid))},
+  getProfile: ()=> {return dispatch(fetchProfile())}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)

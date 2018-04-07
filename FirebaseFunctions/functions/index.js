@@ -83,13 +83,41 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
 })
 
 
-// exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/friends/{friend}').onWrite(event => {
-//     console.log(event.val())
-//     console.log(event.params.id)
-//     console.log(event.params.friend)
+exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/friends/{friend}').onWrite(event => {
+    console.log(event.params.id)
+    console.log(event.params.friend)
 
-//     const getValuePromise = admin.database().ref('/users').child(event.params.friend).once('value')
-//     return getValuePromise.then(snapshot => {
+    const getValuePromise = admin.database()
+    .ref('/users')
+    .child(event.params.id)
+    .once('value')
 
-//     })
-// })
+    return getValuePromise.then(snapshot => {
+        return new Promise(function(resolve, reject) {
+            let user = snapshot.val()
+            if (user.friends[event.params.friend] === 'incoming') {
+                admin.database().ref('/users').child(event.params.friend).once('value', friend => {
+                    const username = friend.val().username
+                    const { FCMToken } = user
+                    const payload = {
+                        data: {
+                            custom_notification: JSON.stringify({
+                                body: 'sent you a buddy request',
+                                title: username,
+                                priority: 'high',
+                                sound: 'default'
+                            }),
+                            type: 'buddyRequest'
+
+                        },
+                        token: FCMToken,
+                    }
+                    resolve(admin.messaging().send(payload))
+                })
+            }
+            else {
+                resolve(null)
+            }
+        })
+    })
+})
