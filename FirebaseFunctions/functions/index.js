@@ -70,7 +70,8 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                 _id,
                 avatar: user.avatar,
                 type: 'sessionMessage',
-                sessionId
+                sessionId,
+                sessionTitle
 
             },
             topic: sessionId,

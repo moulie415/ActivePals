@@ -30,7 +30,7 @@ class Messaging extends React.Component {
     super(props)
     this.params = this.props.navigation.state.params
     this.session = this.params.session
-    this.uid = this.params.uid
+    this.uid = this.props.profile.uid
     this.nav = this.props.navigation
 
     if (this.session) {
@@ -155,7 +155,7 @@ class Messaging extends React.Component {
       this.setState(previousState => ({
         messageObjects: GiftedChat.append(previousState.messageObjects, messages),
       }))
-      this.session? this.props.getSessionChats(this.props.profile.sessionChats, this.uid) : 
+      this.session? this.props.getSessionChats(this.props.profile.sessions, this.uid) : 
       this.props.getChats(this.props.profile.chats)
     })
     .catch(e => Alert.alert("Error sending message", e.message))

@@ -17,3 +17,5 @@ export const navigateLogin = () => {
 }
 
 export const navigateHome = () => nav('Home')
+export const navigateMessaging = (sessionId, session, chatId, friendUsername, friendUid, ) => {
+	nav('Messaging', {sessionId, session, chatId, friendUsername, friendUid})}
