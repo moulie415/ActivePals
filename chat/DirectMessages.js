@@ -55,7 +55,7 @@ import {getSimplified } from './SessionChats'
     if (nextProps.chats) {
       this.setState({chats: nextProps.chats})
     }
-    if (nextProps.profile) {
+    if (nextProps.profile.chats) {
       this.props.getChats(nextProps.profile.chats)
     }
   }

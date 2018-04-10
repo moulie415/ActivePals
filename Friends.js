@@ -102,7 +102,7 @@ import hStyles from 'Anyone/styles/homeStyles'
     if (nextProps.friends) {
       this.setState({refreshing: false, friends: nextProps.friends})
     }
-    if (nextProps.profile) {
+    if (nextProps.profile.friends) {
       this.props.getFriends(nextProps.profile.friends)
     }
   }
