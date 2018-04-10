@@ -292,19 +292,13 @@ class Messaging extends React.Component {
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
               let timestamp = (new Date()).toString()
-              firebase.database().ref('chats').push({_id: 'initial'}).then(snapshot => {
-                let chatId = snapshot.key
-                firebase.database().ref('chats').child(chatId).push({_id: 'initial'}).then(snapshot => {
-                firebase.database().ref('chats').child(chatId).child('_id').remove()
-                firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).set(chatId)
-                firebase.database().ref('users/' + user.uid + '/chats').child(this.uid).set(chatId)
-                this.nav.navigate('Messaging', 
-                  {chatId, uid: this.uid, friendUid: user.uid, friendUsername: user.username})
-                })
-              })
+              let chatId = firebase.database().ref('chats').push().key
+              firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).set(chatId)
+              firebase.database().ref('users/' + user.uid + '/chats').child(this.uid).set(chatId)
+              this.props.onOpenChat(null, null, chatId, user.username, user,uid)
 
             }
-              , style: 'positive'},
+            , style: 'positive'},
             ]
             )
         }
@@ -318,7 +312,7 @@ class Messaging extends React.Component {
 }
 
 import { connect } from 'react-redux'
-//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { navigateMessaging } from 'Anyone/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
 import { fetchChats, fetchSessionChats } from 'Anyone/actions/chats'
 
@@ -334,6 +328,10 @@ const mapDispatchToProps = dispatch => ({
   getSessionChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
+  onOpenChat: (sessionId, session, chatId, friendUsername, friendUid)=> {
+    return dispatch(navigateMessaging(sessionId, session, chatId, friendUsername, friendUid))
+  }
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messaging)

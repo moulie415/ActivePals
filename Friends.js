@@ -85,7 +85,7 @@ import hStyles from 'Anyone/styles/homeStyles'
       if (friends.length > 0) {
         this.props.getProfile()
       }
-      else if (Object.keys(snapshot.val()).length 
+      else if (snapshot.val() && Object.keys(snapshot.val()).length 
         != this.state.friends.length) {
         this.props.getProfile()
       }
@@ -277,7 +277,7 @@ import hStyles from 'Anyone/styles/homeStyles'
   }
 
   remove(friend) {
-    this.props.onRemove(this.uid, friend)
+    this.props.onRemove(this.uid, friend, this.props.profile)
     .then(()=> this.refs.profileModal.close())
     .catch(e => Alert.alert("Error", e.message))
   }
@@ -311,15 +311,10 @@ import hStyles from 'Anyone/styles/homeStyles'
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
               let timestamp = (new Date()).toString()
-              firebase.database().ref('chats').push({_id: 'initial'}).then(snapshot => {
-                let chatId = snapshot.key
-                firebase.database().ref('chats').child(chatId).push({_id: 'initial'}).then(snapshot => {
-                firebase.database().ref('chats').child(chatId).child('_id').remove()
-                firebase.database().ref('users/' + this.uid + '/chats').child(uid).set(chatId)
-                firebase.database().ref('users/' + uid + '/chats').child(this.uid).set(chatId)
-                this.nav.navigate('Messaging', {chatId, uid: this.uid, friendUid: uid, friendUsername: username})
-                })
-              })
+              let chatId = firebase.database().ref('chats').push().key
+              firebase.database().ref('users/' + this.uid + '/chats').child(uid).set(chatId)
+              firebase.database().ref('users/' + uid + '/chats').child(this.uid).set(chatId)
+              this.nav.navigate('Messaging', {chatId, uid: this.uid, friendUid: uid, friendUsername: username})
 
             }
               , style: 'positive'},
@@ -345,7 +340,7 @@ const mapDispatchToProps = dispatch => ({
   getFriends: (uids)=> { return dispatch(fetchFriends(uids))},
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
-  onRemove: (uid, friendUid)=> {return dispatch(deleteFriend(uid, friendUid))},
+  onRemove: (uid, friendUid, profile)=> {return dispatch(deleteFriend(uid, friendUid, profile))},
   getProfile: ()=> {return dispatch(fetchProfile())}
 })
 

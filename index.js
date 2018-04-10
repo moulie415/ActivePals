@@ -1,6 +1,6 @@
 
 import React from "react"
-import { AppRegistry, Platform, Alert, AppState } from 'react-native'
+import { AppRegistry, Platform, Alert, AppState, YellowBox } from 'react-native'
 import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
 import * as firebase from "firebase"
@@ -133,6 +133,9 @@ FCM.on(FCMEvent.Notification, async (notif) => {
 
 class FitLink extends React.Component {
   componentDidMount() {
+    //ignore setting a timer warnings
+    YellowBox.ignoreWarnings(['Setting a timer'])
+
     this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, token => {
       let user = firebase.auth().currentUser
       if (user) {

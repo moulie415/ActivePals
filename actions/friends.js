@@ -56,11 +56,16 @@ export const acceptRequest = (uid, friendUid) => {
 	}
 }
 
-export const deleteFriend = (uid, friendUid) => {
+export const deleteFriend = (uid, friendUid, profile) => {
 	return (dispatch) => {
-		let promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).remove()
-		let promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).remove()
-		return Promise.all([promise1, promise2])
+		let chatId = profile.chats[friendUid]
+		let promises = []
+		promises.push(firebase.database().ref('users/' + uid + '/friends').child(friendUid).remove())
+		promises.push(firebase.database().ref('users/' + friendUid + '/friends').child(uid).remove())
+		chatId && promises.push(firebase.database().ref('users/' + uid + '/chats').child(friendUid).remove())
+		chatId && promises.push(firebase.database().ref('users/' + friendUid + '/chats').child(uid).remove())
+		chatId &&  promises.push(firebase.database().ref('chats').child(chatId).remove())
+		return Promise.all(promises)
 
 	}
 
