@@ -16,7 +16,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
 
     return getValuePromise.then(snapshot => {
         console.log(snapshot.val())
-        const { user, text, FCMToken, createdAt, _id } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        const { user, text, FCMToken, createdAt, _id, chatId } = snapshot.val()[Object.keys(snapshot.val())[0]]
 
         const payload = {
             data: {
@@ -31,7 +31,8 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                 createdAt,
                 _id,
                 avatar: user.avatar ,
-                type: 'message'
+                type: 'message',
+                chatId
 
             },
             token: FCMToken,

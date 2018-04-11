@@ -14,6 +14,7 @@ import reducer from './reducers/'
 import thunk from 'redux-thunk'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import App from './App'
+import { navigateMessaging, navigateMessagingSession, navigateFriends } from "./actions/navigation"
 import {
   createReactNavigationReduxMiddleware,
   createReduxBoundAddListener,
@@ -47,6 +48,7 @@ const showLocalNotification = (notif) => {
       show_in_foreground: true,
       lights: true,
       vibrate: 300,
+      notif
     })
     }
   }
@@ -91,6 +93,8 @@ FCM.on(FCMEvent.Notification, async (notif) => {
 
     }
     if(notif.opened_from_tray){
+
+      //}
       //iOS: app is open/resumed because user clicked banner
       //Android: app is open/resumed because user clicked banner or tapped app icon
     }
@@ -119,16 +123,37 @@ FCM.on(FCMEvent.Notification, async (notif) => {
 
       }
       try {
-        if (!notif.opened_from_tray) {
-          if (Platform.OS == 'ios' || state != 'background') {
-            showLocalNotification(notif)
+          if (!notif.opened_from_tray) {
+            if (Platform.OS == 'ios' || state != 'background') {
+              if (notif.type) {
+                showLocalNotification(notif)
+              }
+            }
+          }
+          else {
+            if (notif.notif) {
+              const {  type, sessionId, sessionTitle, chatId, uid, username } = notif.notif
+              
+              switch(type) {
+                case 'message':
+                  store.dispatch(navigateMessaging(chatId, username, uid))
+                  break
+                case 'sessionMessage':
+                  store.dispatch(navigateMessagingSession(true, sessionId, sessionTitle))
+                  break
+                case 'buddyRequest':
+                  store.dispatch(navigateFriends())
+                  break
+
+              }
+
           }
         }
       }
-      catch(e) {
-        Alert.alert(e.message)
-      }
-    })
+    catch(e) {
+      Alert.alert(e.message)
+    }
+  })
 
 
 class FitLink extends React.Component {

@@ -85,8 +85,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         <TouchableOpacity 
         key={index}
         onPress={()=> {
-          this.nav.navigate('Messaging', 
-            {sessionId: detail.id, uid: this.user.uid, session: {...detail}})
+            this.props.onOpenChat(true, detail.id, detail.title)
         }}>
           <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
             <View>{getType(detail.type, 50)}</View>
@@ -138,7 +137,7 @@ export function getSimplified(createdAt) {
 
 
 import { connect } from 'react-redux'
-//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { navigateMessagingSession } from 'Anyone/actions/navigation'
 import { fetchSessionChats } from 'Anyone/actions/chats'
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
@@ -148,7 +147,8 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))}
+  getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
+  onOpenChat: (session, sessionId, sessionTitle) => {return dispatch(navigateMessagingSession(session, sessionId, sessionTitle))}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionChats)

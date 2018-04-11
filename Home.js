@@ -240,7 +240,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           </TouchableOpacity>
           <TouchableOpacity
           onPress={()=> {
-            this.nav.navigate('Messaging', {sessionId: session.key, uid, session: {...session}})
+            this.props.onOpenChat(true, session.key, session.title)
           }}
           style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
             <Text style={{color: '#fff', textAlign: 'center'}}>Open chat</Text>
@@ -263,7 +263,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           </TouchableOpacity>
           <TouchableOpacity
           onPress={()=> {
-            this.nav.navigate('Messaging', {sessionId: session.key, uid, session: {...session}})
+            this.props.onOpenChat(true, session.key, session.title)
           }}
           style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
             <Text style={{color: '#fff', textAlign: 'center'}}>Open chat</Text>
@@ -462,7 +462,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
 }
 
 import { connect } from 'react-redux'
-//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { navigateMessagingSession } from 'Anyone/actions/navigation'
 import { fetchSessionChats, addSessionChat, removeSessionChat } from 'Anyone/actions/chats'
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
@@ -474,7 +474,8 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 const mapDispatchToProps = dispatch => ({
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onJoin: (session) => {return dispatch(addSessionChat(session))},
-  onLeave: (session, sessions) => {return dispatch(removeSessionChat(session, sessions))}
+  onLeave: (session, sessions) => {return dispatch(removeSessionChat(session, sessions))},
+  onOpenChat: (session, sessionId, sessionTitle) => {return dispatch(navigateMessagingSession(session, sessionId, sessionTitle))}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

@@ -15,7 +15,8 @@ export const navigateLogin = () => {
 		dispatch(resetAction)
 	}
 }
+ export const navigateFriends = () => nav('Friends')
 
 export const navigateHome = () => nav('Home')
-export const navigateMessaging = (sessionId, session, chatId, friendUsername, friendUid ) => {
-	nav('Messaging', {sessionId, session, chatId, friendUsername, friendUid})}
+export const navigateMessaging = (chatId, friendUsername, friendUid ) => nav('Messaging', {chatId, friendUsername, friendUid})
+export const navigateMessagingSession = (session, sessionId, sessionTitle) => nav("Messaging", {session, sessionId, sessionTitle})

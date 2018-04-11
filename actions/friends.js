@@ -58,7 +58,10 @@ export const acceptRequest = (uid, friendUid) => {
 
 export const deleteFriend = (uid, friendUid, profile) => {
 	return (dispatch) => {
-		let chatId = profile.chats[friendUid]
+		let chatId
+		if (profile.chats) {
+			chatId = profile.chats[friendUid]
+		}
 		let promises = []
 		promises.push(firebase.database().ref('users/' + uid + '/friends').child(friendUid).remove())
 		promises.push(firebase.database().ref('users/' + friendUid + '/friends').child(uid).remove())

@@ -33,8 +33,10 @@ class Messaging extends React.Component {
     this.uid = this.props.profile.uid
     this.nav = this.props.navigation
 
+
     if (this.session) {
       this.sessionId = this.params.sessionId
+      this.sessionTitle = this.params.sessionTitle
     }
     else {
       this.chatId = this.params.chatId
@@ -140,10 +142,10 @@ class Messaging extends React.Component {
     let converted = []
     messages.forEach(message => {
       if (this.session) {
-        converted.push({...message, createdAt: message.createdAt.toString(), sessionId: this.sessionId, sessionTitle: this.session.title})
+        converted.push({...message, createdAt: message.createdAt.toString(), sessionId: this.sessionId, sessionTitle: this.sessionTitle})
       }
       else {
-        converted.push({...message, createdAt: message.createdAt.toString(), FCMToken: this.friendToken})
+        converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, FCMToken: this.friendToken})
       }
     })
 
@@ -174,7 +176,7 @@ class Messaging extends React.Component {
           </Left>
         <Text numberOfLines={1}
         style={{alignSelf: 'center', flex: 1, color: '#fff', textAlign: 'center', fontFamily: 'Avenir'}}>
-        {this.friendUsername || this.session.title}</Text>
+        {this.friendUsername || this.sessionTitle}</Text>
         <Right style={{flex: 1}}/>
       </Header>
         <GiftedChat

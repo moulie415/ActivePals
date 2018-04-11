@@ -226,15 +226,17 @@ import hStyles from 'Anyone/styles/homeStyles'
       else if (friend.status == 'incoming') {
         list.push(
           <View key={index}
-          style={{paddingVertical: 20, paddingHorizontal: 10, backgroundColor: '#fff', marginBottom: 1}}>
-            <View style={{flexDirection: 'row', alignItems: 'center', height: 40}} >
-              <Text style={{marginHorizontal: 10}}>{friend.username + ' has sent you a buddy request'}</Text>
-              <TouchableOpacity onPress={()=> this.accept(friend.uid)}>
-               <Icon name='checkmark' style={{color: 'green', fontSize: 40, padding: 5}}/>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={()=> this.remove(friend.uid)}>
-                <Icon name='close' style={{color: 'red', fontSize: 40, padding: 5}}/>
-              </TouchableOpacity>
+          style={{paddingVertical: 20, paddingHorizontal: 15, backgroundColor: '#fff'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
+              <Text style={{marginRight: 5, flex: 4}}>{friend.username + ' has sent you a buddy request'}</Text>
+              <View style={{flexDirection: 'row', flex: 1}}>
+                <TouchableOpacity onPress={()=> this.accept(friend.uid)}>
+                 <Icon name='ios-checkmark' style={{color: 'green', fontSize: 50, padding: 10}}/>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=> this.remove(friend.uid)}>
+                  <Icon name='ios-close' style={{color: 'red', fontSize: 50, padding: 10}}/>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         )
@@ -301,7 +303,7 @@ import hStyles from 'Anyone/styles/homeStyles'
     firebase.database().ref('users/' + this.uid + '/chats').child(uid).once('value')
       .then(snapshot => {
         if (snapshot.val()) {
-          this.nav.navigate('Messaging', {chatId: snapshot.val(), uid: this.uid, friendUid: uid, friendUsername: username})
+          this.props.onOpenChat(snapshot.val(), username, uid)
         }
         else {
           Alert.alert(
@@ -314,7 +316,7 @@ import hStyles from 'Anyone/styles/homeStyles'
               let chatId = firebase.database().ref('chats').push().key
               firebase.database().ref('users/' + this.uid + '/chats').child(uid).set(chatId)
               firebase.database().ref('users/' + uid + '/chats').child(this.uid).set(chatId)
-              this.nav.navigate('Messaging', {chatId, uid: this.uid, friendUid: uid, friendUsername: username})
+              this.props.onOpenChat(snapshot.val(), username, uid)
 
             }
               , style: 'positive'},
@@ -327,7 +329,7 @@ import hStyles from 'Anyone/styles/homeStyles'
 }
 
 import { connect } from 'react-redux'
-//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { navigateMessaging } from 'Anyone/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
 import { fetchProfile } from 'Anyone/actions/profile'
 
@@ -341,7 +343,8 @@ const mapDispatchToProps = dispatch => ({
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onRemove: (uid, friendUid, profile)=> {return dispatch(deleteFriend(uid, friendUid, profile))},
-  getProfile: ()=> {return dispatch(fetchProfile())}
+  getProfile: ()=> {return dispatch(fetchProfile())},
+  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)

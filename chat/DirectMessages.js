@@ -107,26 +107,27 @@ import {getSimplified } from './SessionChats'
     let index = 1
     this.state.chats.forEach(chat => {
       let friend = this.props.friends.filter(friend => friend.uid == chat.uid)[0]
-      list.push(
-        <TouchableOpacity 
-        key={index}
-        onPress={()=> {
-          this.nav.navigate('Messaging', 
-            {chatId: chat.chatId, uid: this.user.uid, friendUid: chat.uid, friendUsername: friend.username})
-        }}>
-          <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
-          {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
-                <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
-            <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
-              <Text>{friend.username}</Text>
-              <Text numberOfLines={1} style={{color: '#999'}}>{chat.lastMessage.text}</Text>
+      if (friend) {
+        list.push(
+          <TouchableOpacity 
+          key={index}
+          onPress={()=> {
+            this.props.onOpenChat(chat.chatId, friend.username, chat.uid)
+          }}>
+            <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
+            {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
+                  <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
+              <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
+                <Text>{friend.username}</Text>
+                <Text numberOfLines={1} style={{color: '#999'}}>{chat.lastMessage.text}</Text>
+              </View>
+               {chat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
+                <Text style={{color: '#999'}}>{getSimplified(chat.lastMessage.createdAt)}</Text></View>}
             </View>
-             {chat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
-              <Text style={{color: '#999'}}>{getSimplified(chat.lastMessage.createdAt)}</Text></View>}
-          </View>
-        </TouchableOpacity>
-        )
+          </TouchableOpacity>
+          )
       index++
+    }
     })
     return list
   }
@@ -134,7 +135,7 @@ import {getSimplified } from './SessionChats'
 }
 
 import { connect } from 'react-redux'
-//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { navigateMessaging } from 'Anyone/actions/navigation'
 import { fetchChats } from 'Anyone/actions/chats'
 import { fetchProfile } from 'Anyone/actions/profile'
 
@@ -146,7 +147,8 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 
 const mapDispatchToProps = dispatch => ({
   getChats: (chats) => {return dispatch(fetchChats(chats))},
-  getProfile: () => {return dispatch(fetchProfile())}
+  getProfile: () => {return dispatch(fetchProfile())},
+  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DirectMessages)
