@@ -224,7 +224,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
               {text: 'Yes', onPress: ()=> {
                 firebase.database().ref('sessions/' + session.key).remove()
                 firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
-                firebase.database().ref('sessionChats').child(child.key).remove()
+                firebase.database().ref('sessionChats').child(session.key).remove()
                 .then(()=> this.props.onLeave(session.key, this.props.chats))
                 FCM.unsubscribeFromTopic(session.key)
                 this.refs.modal.close()
