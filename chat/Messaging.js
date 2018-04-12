@@ -61,9 +61,7 @@ class Messaging extends React.Component {
       ref = firebase.database().ref('chats/'+ this.chatId).orderByKey().limitToLast(30)
     }
     this.fetchMessages(ref)
-    firebase.database().ref('users/' + this.uid).once('value', snapshot => {
-      this.setState({user: snapshot.val()})
-    })
+
     if (!this.session) {
       firebase.database().ref('users/' + this.friendUid).child('FCMToken').once('value', snapshot => {
         this.friendToken = snapshot.val()
@@ -185,7 +183,7 @@ class Messaging extends React.Component {
           onPressAvatar={user => this.fetchUser(user)}
           user={{
             _id: this.uid,
-            name: this.state.user.username,
+            name: this.props.profile.username,
             avatar: this.state.avatar
           }}
         />
@@ -250,7 +248,7 @@ class Messaging extends React.Component {
       </TouchableOpacity>
     }
     else if (user.status == 'outgoing') {
-      return <Text>Friend request sent</Text>
+      return <Text style={{color: '#fff', padding: 5}}>Friend request sent</Text>
     } 
     else if (this.session) {
       return <TouchableOpacity
@@ -283,8 +281,7 @@ class Messaging extends React.Component {
     firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).once('value')
       .then(snapshot => {
         if (snapshot.val()) {
-          this.nav.navigate('Messaging', 
-            {chatId: snapshot.val(), uid: this.uid, friendUid: user.uid, friendUsername: user.username})
+              this.props.onOpenChat(snapshot.val(), user.username, user.uid)
         }
         else {
           Alert.alert(
@@ -293,11 +290,10 @@ class Messaging extends React.Component {
             [
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
-              let timestamp = (new Date()).toString()
               let chatId = firebase.database().ref('chats').push().key
               firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).set(chatId)
               firebase.database().ref('users/' + user.uid + '/chats').child(this.uid).set(chatId)
-              this.props.onOpenChat(null, null, chatId, user.username, user,uid)
+              this.props.onOpenChat(chatId, user.username, user.uid)
 
             }
             , style: 'positive'},
@@ -330,9 +326,7 @@ const mapDispatchToProps = dispatch => ({
   getSessionChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
-  onOpenChat: (sessionId, session, chatId, friendUsername, friendUid)=> {
-    return dispatch(navigateMessaging(sessionId, session, chatId, friendUsername, friendUid))
-  }
+  onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))}
 
 })
 
