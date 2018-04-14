@@ -84,6 +84,7 @@ import hStyles from 'Anyone/styles/homeStyles'
       })
       if (friends.length > 0) {
         this.props.getProfile()
+        
       }
       else if (snapshot.val() && Object.keys(snapshot.val()).length 
         != this.state.friends.length) {

@@ -181,6 +181,7 @@ class Messaging extends React.Component {
           messages={this.state.messageObjects}
           onSend={messages => this.onSend(messages)}
           onPressAvatar={user => this.fetchUser(user)}
+          alwaysShowSend={true}
           user={{
             _id: this.uid,
             name: this.props.profile.username,

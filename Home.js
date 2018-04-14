@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  ScrollView
+  ScrollView,
+  Linking
 } from "react-native"
 import {
   Button,
@@ -200,6 +201,10 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
             + " for " + (this.state.selectedSession.duration) + " " +
             (this.state.selectedSession.duration > 1? 'hours' : 'hour') }</Text>
             <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedSession.location.formattedAddress}</Text>
+            <TouchableOpacity onPress={()=> this.getDirections()}
+            style={{marginVertical: 5}}>
+              <Text style={{color: colors.secondary, fontFamily: 'Avenir'}}>Get directions</Text>
+            </TouchableOpacity>
             </ScrollView>
              {<View style={{justifyContent: 'flex-end', flex: 1}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>} 
             </View>}
@@ -446,6 +451,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         this.setState({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
+          yourLocation: position.coords,
           error: null,
           showMap: true
         })
@@ -458,6 +464,21 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
       },
       { enableHighAccuracy: true, timeout: 20000, /*maximumAge: 1000*/ },
     )
+  }
+
+  getDirections() {
+    if (this.state.yourLocation) {
+      let lat1 = this.state.yourLocation.latitude
+      let lng1 = this.state.yourLocation.longitude
+      let lat2 = this.state.selectedSession.location.position.lat
+      let lng2 = this.state.selectedSession.location.position.lng
+      let url = `https://www.google.com/maps/dir/?api=1&origin=${lat1},${lng1}&destination=${lat2},${lng2}`
+      Linking.openURL(url).catch(err => console.error('An error occurred', err))
+    }
+    else {
+      Alert.alert('No location found', 
+        'You may need to change your settings to allow Fit Link to access your location')
+    }
   }
 }
 
