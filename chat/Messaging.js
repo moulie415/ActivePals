@@ -179,7 +179,7 @@ class Messaging extends React.Component {
             this.fetched = false
             this.setState({amount: this.state.amount+=15, spinner: true} ,()=> this.loadMessages())
           }}
-          loadEarlier={!this.state.spinner}
+          loadEarlier={!this.state.spinner && this.state.messages.length > 29}
           user={{
             _id: this.uid,
             name: this.props.profile.username,
