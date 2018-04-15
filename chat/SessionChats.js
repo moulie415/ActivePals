@@ -43,12 +43,6 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         //let sessionsRef = firebase.database().ref('users/' + this.user.uid).child('sessions')
       }
     })  
-    FCM.on(FCMEvent.Notification, async (notif) => {
-      //update last message on notification
-      if (notif.type == 'sessionMessage') {
-        this.props.getChats(this.props.profile.chats, this.user.uid)
-      }
-    })
 
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
@@ -65,7 +59,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
   render () {
     return (
     <Container>
-    {this.state.chats.length > 0?
+    {this.state.chats.length > 0 && this.state.chats[0].id?
       <ScrollView>
         {this.renderChats()}
       </ScrollView> :

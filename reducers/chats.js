@@ -1,6 +1,7 @@
 import {
 	SET_SESSION_CHATS,
 	ADD_SESSION_CHAT,
+	REMOVE_SESSION_CHAT,
 	SET_CHATS,
 	UPDATE_CHATS,
 	ADD_CHAT,
@@ -26,6 +27,11 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				sessionChats: [...state.sessionChats, action.session]
+			}
+		case REMOVE_SESSION_CHAT:
+			return {
+				...state,
+				sessionChats: state.sessionChats.filter(chat => chat.id != action.session)
 			}
 		case SET_CHATS:
 			return {

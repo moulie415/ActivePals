@@ -300,10 +300,20 @@ class Messaging extends React.Component {
             [
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
-              let chatId = firebase.database().ref('chats').push().key
-              firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).set(chatId)
-              firebase.database().ref('users/' + user.uid + '/chats').child(this.uid).set(chatId)
-              this.props.onOpenChat(chatId, user.username, user.uid)
+
+              let systemMessage = {
+                _id: 1,
+                text: 'Beggining of chat',
+                createdAt: new Date().toString(),
+                system: true,
+              }
+              firebase.database().ref('chats').push().then(newChat => {
+                firebase.database().ref('chats/' + newChat.key).push(systemMessage)
+                firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).set(newChat.key)
+                firebase.database().ref('users/' + user.uid + '/chats').child(this.uid).set(newChat.key)
+                this.props.onOpenChat(newChat.key, user.username, user.uid)
+              })
+
 
             }
             , style: 'positive'},

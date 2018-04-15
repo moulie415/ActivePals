@@ -23,7 +23,7 @@ import colors from 'Anyone/constants/colors'
 import FCM from 'react-native-fcm'
 
 
-export default class SessionDetail extends Component {
+class SessionDetail extends Component {
 	static navigationOptions = {
     tabBarIcon: ({ tintColor }) => (
       <Icon
@@ -224,7 +224,15 @@ export default class SessionDetail extends Component {
 				navigation.navigate("Home")
 				firebase.database().ref('users/' + this.user.uid + '/sessions').child(snapshot.key).set(true)
 				firebase.database().ref('sessions/' + snapshot.key + '/users').child(this.user.uid).set(true)
+				let systemMessage = {
+					_id: 1,
+					text: 'Beggining of chat',
+					createdAt: new Date().toString(),
+					system: true,
+				}
+				firebase.database().ref('sessionChats/' + snapshot.key).push(systemMessage)
 				FCM.subscribeToTopic(snapshot.key)
+				this.props.onCreate(snapshot.key)
 			})
 			.catch(err => {
 				Alert.alert('Error', err.message)
@@ -243,3 +251,16 @@ export default class SessionDetail extends Component {
 	}
 
 }
+
+import { connect } from 'react-redux'
+//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import { addSessionChat } from 'Anyone/actions/chats'
+
+// const mapStateToProps = ({ home, settings }) => ({
+// })
+
+const mapDispatchToProps = dispatch => ({
+	onCreate: (session) => dispatch(addSessionChat(session))
+})
+
+export default connect(null, mapDispatchToProps)(SessionDetail)

@@ -2,6 +2,7 @@ import * as firebase from "firebase"
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS'
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT'
+export const REMOVE_SESSION_CHAT = 'REMOVE_SESSION_CHAT'
 export const SET_CHATS = 'SET_CHATS'
 export const UPDATE_CHATS = 'UPDATE_CHATS'
 export const ADD_CHAT = 'ADD_CHAT'
@@ -18,6 +19,11 @@ const setSessionChats = (sessionChats) => ({
 const addToSessionChats = (session) => ({
 	type: ADD_SESSION_CHAT,
 	session,
+})
+
+export const removeSessionChat = (session) => ({
+	type: REMOVE_SESSION_CHAT,
+	session
 })
 
 const setChats = (chats) => ({
@@ -108,7 +114,8 @@ export const fetchSessionChats = (sessions, uid) => {
 						})
 					}
 					else {
-						reject()
+						resolve()
+						dispatch(removeSessionChat(session))
 						firebase.database().ref('users/' + uid + '/sessions').child(session).remove()
 						FCM.unsubscribeFromTopic(session)
 					}
@@ -137,13 +144,6 @@ export const addSessionChat = (session) => {
 				})
 			})
 		})
-	}
-}
-
-export const removeSessionChat = (session, sessions) => {
-	return (dispatch) => {
-		let sessionChats = sessions.filter(i => i.id != session)
-		dispatch(setSessionChats(sessionChats))
 	}
 }
 

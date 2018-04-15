@@ -307,10 +307,18 @@ import hStyles from 'Anyone/styles/homeStyles'
             [
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
-              let chatId = firebase.database().ref('chats').push().key
-              firebase.database().ref('users/' + this.uid + '/chats').child(uid).set(chatId)
-              firebase.database().ref('users/' + uid + '/chats').child(this.uid).set(chatId)
-              this.props.onOpenChat(snapshot.val(), username, uid)
+              let systemMessage = {
+                _id: 1,
+                text: 'Beggining of chat',
+                createdAt: new Date().toString(),
+                system: true,
+              }
+              firebase.database().ref('chats').push().then(newChat => {
+                firebase.database().ref('chats/' + newChat.key).push(systemMessage)
+                firebase.database().ref('users/' + this.uid + '/chats').child(uid).set(newChat.key)
+                firebase.database().ref('users/' + uid + '/chats').child(this.uid).set(newChat.key)
+                this.props.onOpenChat(newChat.key, username, uid)
+              })
 
             }
               , style: 'positive'},
