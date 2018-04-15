@@ -17,7 +17,7 @@ import {
   Spinner,
 } from 'native-base'
 import firebase from "Anyone/index"
-import { GiftedChat } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble } from 'react-native-gifted-chat'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import colors from 'Anyone/constants/colors'
 import Modal from 'react-native-modalbox'
@@ -185,7 +185,15 @@ class Messaging extends React.Component {
             name: this.props.profile.username,
             avatar: this.state.avatar
           }}
-        />
+          renderBubble={(props) => { return ( 
+            <Bubble {...props} 
+            wrapperStyle={{
+              right: {
+                backgroundColor: colors.secondary
+              }
+            }}/>
+            )}}
+          />
         <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
 
