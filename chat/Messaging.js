@@ -48,18 +48,14 @@ class Messaging extends React.Component {
       messages: [],
       user: {},
       avatar: '',
-      spinner: true
+      spinner: true,
+      amount: 30
     }
   }
 
 
   componentDidMount() {
-    if (this.session) {
-      this.props.getSessionMessages(this.sessionId, 30)
-    }
-    else {
-      this.props.getMessages(this.chatId, 30)
-    }
+    this.loadMessages()
 
     if (!this.session) {
       firebase.database().ref('users/' + this.friendUid).child('FCMToken').once('value', snapshot => {
@@ -78,6 +74,15 @@ class Messaging extends React.Component {
     FCM.getInitialNotification().then(notif => {
      console.log(notif)
    })
+  }
+
+  loadMessages() {
+    if (this.session) {
+      this.props.getSessionMessages(this.sessionId, this.state.amount)
+    }
+    else {
+      this.props.getMessages(this.chatId, this.state.amount)
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -170,6 +175,11 @@ class Messaging extends React.Component {
           onSend={messages => this.onSend(messages)}
           onPressAvatar={user => this.fetchUser(user)}
           alwaysShowSend={true}
+          onLoadEarlier={()=> {
+            this.fetched = false
+            this.setState({amount: this.state.amount+=15, spinner: true} ,()=> this.loadMessages())
+          }}
+          loadEarlier={!this.state.spinner}
           user={{
             _id: this.uid,
             name: this.props.profile.username,
@@ -210,9 +220,9 @@ class Messaging extends React.Component {
             </View>}
 
         </Modal>
-        <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
-          {this.state.spinner && <Spinner color={colors.secondary}/>}
-        </View>
+        {this.state.spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
+          <Spinner color={colors.secondary}/>
+        </View>}
       </Container>
     )
   }
