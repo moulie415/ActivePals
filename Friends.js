@@ -68,7 +68,6 @@ import hStyles from 'Anyone/styles/homeStyles'
 
   listenForFriends(ref) {
     ref.on('value', snapshot => {
-      let friends = []
       snapshot.forEach(child => {
         let exists = false
         this.state.friends.forEach(friend => {
@@ -79,16 +78,13 @@ import hStyles from 'Anyone/styles/homeStyles'
           }
         })
         if (!exists) {
-          friends.push(child.key)
+          this.props.add(child)
         }
       })
-      if (friends.length > 0) {
-        this.props.getProfile()
-        
-      }
-      else if (snapshot.val() && Object.keys(snapshot.val()).length 
+      if (snapshot.val() && Object.keys(snapshot.val()).length 
         != this.state.friends.length) {
-        this.props.getProfile()
+        this.props.update(Object.keys(snapshot.val()))
+        this.props.updateDms(Object.keys(snapshot.val()))
       }
     })
   }
@@ -96,15 +92,12 @@ import hStyles from 'Anyone/styles/homeStyles'
 
   _onRefresh() {
     this.setState({refreshing: true})
-    this.props.getProfile()
+    this.props.getFriends(this.props.profile.friends)
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.friends) {
       this.setState({refreshing: false, friends: nextProps.friends})
-    }
-    if (nextProps.profile.friends) {
-      this.props.getFriends(nextProps.profile.friends)
     }
   }
 
@@ -283,6 +276,7 @@ import hStyles from 'Anyone/styles/homeStyles'
     this.props.onRemove(this.uid, friend, this.props.profile)
     .then(()=> this.refs.profileModal.close())
     .catch(e => Alert.alert("Error", e.message))
+
   }
 
   sendRequest(username) {
@@ -313,7 +307,6 @@ import hStyles from 'Anyone/styles/homeStyles'
             [
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
-              let timestamp = (new Date()).toString()
               let chatId = firebase.database().ref('chats').push().key
               firebase.database().ref('users/' + this.uid + '/chats').child(uid).set(chatId)
               firebase.database().ref('users/' + uid + '/chats').child(this.uid).set(chatId)
@@ -331,7 +324,8 @@ import hStyles from 'Anyone/styles/homeStyles'
 
 import { connect } from 'react-redux'
 import { navigateMessaging } from 'Anyone/actions/navigation'
-import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
+import { fetchFriends, sendRequest, acceptRequest, deleteFriend, updateFriends, addFriend } from 'Anyone/actions/friends'
+import { updateChats } from 'Anyone/actions/chats'
 import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ friends, profile }) => ({
@@ -345,7 +339,10 @@ const mapDispatchToProps = dispatch => ({
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onRemove: (uid, friendUid, profile)=> {return dispatch(deleteFriend(uid, friendUid, profile))},
   getProfile: ()=> {return dispatch(fetchProfile())},
-  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid))
+  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
+  update: (uids) => dispatch(updateFriends(uids)),
+  updateDms: (uids) => dispatch(updateChats(uids)),
+  add: (friend) => dispatch(addFriend(friend))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)

@@ -44,7 +44,6 @@ class Messaging extends React.Component {
       this.friendUid = this.params.friendUid
     }
     this.state = {
-      messageObjects: [],
       messages: [],
       user: {},
       avatar: ''
@@ -53,14 +52,12 @@ class Messaging extends React.Component {
 
 
   componentDidMount() {
-    let ref 
     if (this.session) {
-      ref = firebase.database().ref('sessionChats/'+ this.sessionId).orderByKey().limitToLast(30) 
+      this.props.getSessionMessages(this.sessionId, 30)
     }
     else {
-      ref = firebase.database().ref('chats/'+ this.chatId).orderByKey().limitToLast(30)
+      this.props.getMessages(this.chatId, 30)
     }
-    this.fetchMessages(ref)
 
     if (!this.session) {
       firebase.database().ref('users/' + this.friendUid).child('FCMToken').once('value', snapshot => {
@@ -77,21 +74,22 @@ class Messaging extends React.Component {
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
     this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
-      if (notif.type == 'message' || notif.type == 'sessionMessage') {
+      if (notif.notif.type == 'message' || notif.notif.type == 'sessionMessage') {
         try {
           let message
-          const { createdAt, uid, username, _id, body, title, sessionId, aps, avatar} = notif
-          if (notif.custom_notification) {
-            let custom = JSON.parse(notif.custom_notification) 
+          const {  uid, username, _id, body, title, sessionId, aps, avatar} = notif.notif
+          let createdAt = new Date(notif.notif.createdAt)
+          if (notif.notif.custom_notification) {
+            let custom = JSON.parse(notif.notif.custom_notification) 
             message = {createdAt, _id, text: custom.body, user: {_id: uid, name: username, avatar}}
           }
           else {
             message = {createdAt, _id, text: body, user: {_id: uid, name: username, avatar}}
           }
-          if ((notif.type == 'message' && this.friendUid == uid) ||
-            (notif.type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid)) {
+          if ((notif.notif.type == 'message' && this.friendUid == uid) ||
+            (notif.notif.type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid)) {
             this.setState(previousState => ({
-              messageObjects: GiftedChat.append(previousState.messageObjects, message),
+              messages: GiftedChat.append(previousState.messages, message),
             }))
           }
         }
@@ -105,35 +103,23 @@ class Messaging extends React.Component {
    })
   }
 
-
-
-  fetchMessages(ref) {
-    ref.once('value', snapshot => {
-      let messageObjects = []
-      snapshot.forEach(child => {
-        if (child.val()._id != 'initial') {
-          messageObjects.push({...child.val()})
-          //let friend = this.isFriend(child.val().user._id)
-          //friend? messageObjects.push({...child.val(), avatar: friend.avatar}) : messageObjects.push({...child.val()})
-      }
-      })
-      messageObjects = messageObjects.reverse()
-        this.setState({messageObjects})
-      //this.convertMessageObjects()
-
-    })
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.messageSession) {
+      this.setState({messages: nextProps.messageSession.reverse()})
+    }
   }
 
-  isFriend(uid) {
-    let isFriend = false
-    this.props.friends.forEach(friend => {
-      if (friend.uid = uid) {
-        isFriend = friend
-      }
-    })
-    return friend
 
-  }
+  // isFriend(uid) {
+  //   let isFriend = false
+  //   this.props.friends.forEach(friend => {
+  //     if (friend.uid = uid) {
+  //       isFriend = friend
+  //     }
+  //   })
+  //   return friend
+
+  // }
 
   onSend(messages = []) {
     //make messages database friendly
@@ -153,10 +139,10 @@ class Messaging extends React.Component {
     ref.push(...converted)
     .then(() => {
       this.setState(previousState => ({
-        messageObjects: GiftedChat.append(previousState.messageObjects, messages),
+      messages: GiftedChat.append(previousState.messages, messages),
       }))
-      this.session? this.props.getSessionChats(this.props.profile.sessions, this.uid) : 
-      this.props.getChats(this.props.profile.chats)
+      //this.session? this.props.getSessionChats(this.props.profile.sessions, this.uid) : 
+      //this.props.getChats(this.props.profile.chats)
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 
@@ -178,7 +164,7 @@ class Messaging extends React.Component {
         <Right style={{flex: 1}}/>
       </Header>
         <GiftedChat
-          messages={this.state.messageObjects}
+          messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           onPressAvatar={user => this.fetchUser(user)}
           alwaysShowSend={true}
@@ -313,13 +299,21 @@ class Messaging extends React.Component {
 import { connect } from 'react-redux'
 import { navigateMessaging } from 'Anyone/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
-import { fetchChats, fetchSessionChats } from 'Anyone/actions/chats'
+import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages } from 'Anyone/actions/chats'
 
-const mapStateToProps = ({ friends, profile, chats }) => ({
+const fetchId = (params) => {
+  if (params.session) {
+    return params.sessionId
+  }
+  else return params.chatId
+}
+
+const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
   friends: friends.friends,
   profile: profile.profile,
   sessionChats: chats.sessionChats,
-  chats: chats.chats
+  chats: chats.chats,
+  messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)]
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -327,7 +321,9 @@ const mapDispatchToProps = dispatch => ({
   getSessionChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
-  onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))}
+  onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
+  getMessages: (id, amount) => dispatch(fetchMessages(id, amount)),
+  getSessionMessages: (id, amount) => dispatch(fetchSessionMessages(id, amount)),
 
 })
 

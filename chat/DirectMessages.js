@@ -55,14 +55,10 @@ import {getSimplified } from './SessionChats'
     if (nextProps.chats) {
       this.setState({chats: nextProps.chats})
     }
-    if (nextProps.profile.chats) {
-      this.props.getChats(nextProps.profile.chats)
-    }
   }
 
   listenForChats(ref) {
     ref.on('value', snapshot => {
-      let chats = []
       snapshot.forEach(child => {
         let exists = false
         this.state.chats.forEach(chat => {
@@ -71,18 +67,15 @@ import {getSimplified } from './SessionChats'
           }
         })
         if (!exists) {
-          chats.push(child.val())
+          this.props.add(child)
         }
       })
-      if (chats.length > 0) {
-        this.props.getProfile()
-      }
-      else if (snapshot.val() && Object.keys(snapshot.val()).length 
+      if (snapshot.val() && Object.keys(snapshot.val()).length 
         != this.state.chats.length) {
-        this.props.getProfile()
-      }
+        this.props.update(Object.keys(snapshot.val()))
+    }
 
-    })
+  })
   }
 
 
@@ -136,7 +129,7 @@ import {getSimplified } from './SessionChats'
 
 import { connect } from 'react-redux'
 import { navigateMessaging } from 'Anyone/actions/navigation'
-import { fetchChats } from 'Anyone/actions/chats'
+import { fetchChats, addChat, updateChats } from 'Anyone/actions/chats'
 import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
@@ -148,7 +141,9 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 const mapDispatchToProps = dispatch => ({
   getChats: (chats) => {return dispatch(fetchChats(chats))},
   getProfile: () => {return dispatch(fetchProfile())},
-  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid))
+  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
+  add: (chat) => dispatch(addChat(chat)),
+  update: (chats) => dispatch(updateChats(chats))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DirectMessages)

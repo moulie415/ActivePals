@@ -93,6 +93,23 @@ FCM.on(FCMEvent.Notification, async (notif) => {
 
     }
     if(notif.opened_from_tray){
+       if (notif.notif) {
+              const {  type, sessionId, sessionTitle, chatId, uid, username } = notif.notif
+              
+              switch(type) {
+                case 'message':
+                  store.dispatch(navigateMessaging(chatId, username, uid))
+                  break
+                case 'sessionMessage':
+                  store.dispatch(navigateMessagingSession(true, sessionId, sessionTitle))
+                  break
+                case 'buddyRequest':
+                  store.dispatch(navigateFriends())
+                  break
+
+              }
+
+          }
 
       //}
       //iOS: app is open/resumed because user clicked banner
@@ -130,25 +147,6 @@ FCM.on(FCMEvent.Notification, async (notif) => {
               }
             }
           }
-          else {
-            if (notif.notif) {
-              const {  type, sessionId, sessionTitle, chatId, uid, username } = notif.notif
-              
-              switch(type) {
-                case 'message':
-                  store.dispatch(navigateMessaging(chatId, username, uid))
-                  break
-                case 'sessionMessage':
-                  store.dispatch(navigateMessagingSession(true, sessionId, sessionTitle))
-                  break
-                case 'buddyRequest':
-                  store.dispatch(navigateFriends())
-                  break
-
-              }
-
-          }
-        }
       }
     catch(e) {
       Alert.alert(e.message)

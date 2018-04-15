@@ -1,13 +1,16 @@
 import {
 	SET_SESSION_CHATS,
 	ADD_SESSION_CHAT,
-	REMOVE_SESSION_CHAT,
-	SET_CHATS
+	SET_CHATS,
+	UPDATE_CHATS,
+	ADD_CHAT,
+	SET_MESSAGE_SESSION,
 } from 'Anyone/actions/chats'
 
 const initialState = {
 	sessionChats: [],
-	chats: []
+	chats: [],
+	messageSessions: {}
 }
 
 export default function(state = initialState, action) {
@@ -26,6 +29,21 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				chats: action.chats
+			}
+		case UPDATE_CHATS:
+			return {
+				...state,
+				chats: state.chats.filter(chat => action.chats.includes(chat.uid))
+			}
+		case ADD_CHAT:
+			return {
+				...state,
+				chats: [...state.chats, action.chat]
+			}
+		case SET_MESSAGE_SESSION:
+			return {
+				...state,
+				messageSessions: {...state.messageSessions, [action.id]: action.messages}
 			}
 		default:
 			return state

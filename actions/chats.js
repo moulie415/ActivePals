@@ -3,6 +3,9 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS'
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT'
 export const SET_CHATS = 'SET_CHATS'
+export const UPDATE_CHATS = 'UPDATE_CHATS'
+export const ADD_CHAT = 'ADD_CHAT'
+export const SET_MESSAGE_SESSION = 'SET_MESSAGE_SESSION'
 
 
 const setSessionChats = (sessionChats) => ({
@@ -17,6 +20,22 @@ const addToSessionChats = (session) => ({
 
 const setChats = (chats) => ({
 	type: SET_CHATS,
+	chats
+})
+
+const addToChats = (chat) => ({
+	type: ADD_CHAT,
+	chat
+})
+
+const setMessageSession = (id, messages) => ({
+	type: SET_MESSAGE_SESSION,
+	id,
+	messages,
+})
+
+export const updateChats = (chats) => ({
+	type: UPDATE_CHATS,
 	chats
 })
 
@@ -43,6 +62,24 @@ export const fetchChats = (chats) => {
 	}
 }
 
+export const addChat = (chat) => {
+	return (dispatch) => {
+		uid = chat.key
+		chatId = chat.val()
+		return new Promise(resolve => {
+			firebase.database().ref('chats/'+ chatId).orderByKey().limitToLast(1)
+			.once('value', lastMessage => {
+				let message = {text: "new chat created"}
+				if (lastMessage.val()) {
+					message = Object.values(lastMessage.val())[0]
+				}
+				resolve({uid, chatId, lastMessage: message})
+				dispatch(addToChats({uid, chatId, lastMessage: message}))
+			})
+		})
+	}
+}
+
 export const fetchSessionChats = (sessions, uid) => {
 	return (dispatch) => {
 		let chatList = []
@@ -52,7 +89,7 @@ export const fetchSessionChats = (sessions, uid) => {
 					if (snapshot.val()) {
 						firebase.database().ref('sessionChats/'+ session).orderByKey().limitToLast(1)
 						.once('value', lastMessage => {
-							let message = {text: "new group created"}
+							let message = {text: "new session chat created"}
 							if (lastMessage.val()) {
 								message = Object.values(lastMessage.val())[0]
 							}
@@ -76,19 +113,19 @@ export const fetchSessionChats = (sessions, uid) => {
 
 export const addSessionChat = (session) => {
 	return (dispatch) => {
-		let promise = new Promise(function(resolve, reject) {
+		return new Promise(resolve => {
 			firebase.database().ref('sessions/' + session).once('value', snapshot => {
 				firebase.database().ref('sessionChats/'+ session).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
-					let message = {text: "new group created"}
+					let message = {text: "new session chat created"}
 					if (lastMessage.val()) {
 						message = Object.values(lastMessage.val())[0]
 					}
 					resolve({...snapshot.val(), id: session, lastMessage: message})
+					dispatch(addToSessionChats({...snapshot.val(), id: session, lastMessage: message}))
 				})
 			})
 		})
-		return promise.then((sessionChat) => dispatch(addToSessionChats(sessionChat)))
 	}
 }
 
@@ -96,5 +133,32 @@ export const removeSessionChat = (session, sessions) => {
 	return (dispatch) => {
 		let sessionChats = sessions.filter(i => i.id != session)
 		dispatch(setSessionChats(sessionChats))
+	}
+}
+
+
+export const fetchMessages = (id, amount) => {
+	return (dispatch) => {
+		return firebase.database().ref('chats/'+ id).orderByKey().limitToLast(amount)
+		.once('value', snapshot => {
+			let messages = []
+			snapshot.forEach(child => {
+				messages.push({...child.val(), createdAt: new Date(child.val().createdAt)})
+			})
+			dispatch(setMessageSession(id, messages))
+		})
+	}
+}
+
+export const fetchSessionMessages = (id, amount) => {
+	return (dispatch) => {
+		return firebase.database().ref('sessionChats/'+ id).orderByKey().limitToLast(amount)
+		.once('value', snapshot => {
+			let messages = []
+			snapshot.forEach(child => {
+				messages.push({...child.val(), createdAt: new Date(child.val().createdAt)})
+			})
+			dispatch(setMessageSession(id, messages))
+		})
 	}
 }

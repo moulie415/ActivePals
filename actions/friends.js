@@ -1,5 +1,7 @@
 import * as firebase from "firebase"
 export const SET_FRIENDS = 'SET_FRIENDS'
+export const UPDATE_FRIENDS = 'UPDATE_FRIENDS'
+export const ADD_FRIEND = 'ADD_FRIEND'
 
 
 const setFriends = (friends) => ({
@@ -10,6 +12,11 @@ const setFriends = (friends) => ({
 const addToFriends = (friend) => ({
 	type: ADD_FRIEND,
 	friend
+})
+
+export const updateFriends = (friends) => ({
+	type: UPDATE_FRIENDS,
+	friends
 })
 
 
@@ -36,6 +43,25 @@ export const fetchFriends = (uids) => {
 		})
 		return Promise.all(friends).then(items => {
 			dispatch(setFriends(items))
+		})
+	}
+}
+
+export const addFriend = (uid) => {
+	return (dispatch) => {
+		let status = uid.val()
+		return new Promise(resolve => {
+			firebase.database().ref('users/' + uid.key).once('value', profile => {
+				firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL() 
+					.then(url => {
+						resolve()
+						dispatch(addToFriends({...profile.val(), status, avatar: url}))
+					})
+					.catch(e => {
+						resolve()
+						dispatch(addToFriends({...profile.val(), status}))
+					})
+			})
 		})
 	}
 }
