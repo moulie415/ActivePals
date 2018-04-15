@@ -15,6 +15,7 @@ import thunk from 'redux-thunk'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import App from './App'
 import { navigateMessaging, navigateMessagingSession, navigateFriends } from "./actions/navigation"
+import { newNotification } from './actions/chats'
 import {
   createReactNavigationReduxMiddleware,
   createReduxBoundAddListener,
@@ -48,7 +49,7 @@ const showLocalNotification = (notif) => {
       show_in_foreground: true,
       lights: true,
       vibrate: 300,
-      notif
+      data: notif
     })
     }
   }
@@ -87,24 +88,29 @@ FCM.on(FCMEvent.Notification, async (notif) => {
   console.log(store)
   let state = AppState.currentState
     // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
+    const { dispatch } = store
+
+    if (!notif.opened_from_tray) {
+      dispatch(newNotification(notif))
+    }
 
     if(notif.local_notification){
       //this is a local notification
 
     }
     if(notif.opened_from_tray){
-       if (notif.notif) {
-              const {  type, sessionId, sessionTitle, chatId, uid, username } = notif.notif
+       if (notif.data) {
+              const {  type, sessionId, sessionTitle, chatId, uid, username } = notif.data
               
               switch(type) {
                 case 'message':
-                  store.dispatch(navigateMessaging(chatId, username, uid))
+                  dispatch(navigateMessaging(chatId, username, uid))
                   break
                 case 'sessionMessage':
-                  store.dispatch(navigateMessagingSession(true, sessionId, sessionTitle))
+                  dispatch(navigateMessagingSession(true, sessionId, sessionTitle))
                   break
                 case 'buddyRequest':
-                  store.dispatch(navigateFriends())
+                  dispatch(navigateFriends())
                   break
 
               }

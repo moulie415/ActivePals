@@ -6,6 +6,8 @@ export const SET_CHATS = 'SET_CHATS'
 export const UPDATE_CHATS = 'UPDATE_CHATS'
 export const ADD_CHAT = 'ADD_CHAT'
 export const SET_MESSAGE_SESSION = 'SET_MESSAGE_SESSION'
+export const NEW_NOTIF = 'NEW_NOTIF'
+export const RESET_NOTIFICATION = 'RESET_NOTIFICATION'
 
 
 const setSessionChats = (sessionChats) => ({
@@ -37,6 +39,15 @@ const setMessageSession = (id, messages) => ({
 export const updateChats = (chats) => ({
 	type: UPDATE_CHATS,
 	chats
+})
+
+export const newNotification = (notif) => ({
+	type: NEW_NOTIF,
+	notif
+})
+
+export const resetNotification = () => ({
+	type: RESET_NOTIFICATION,
 })
 
 export const fetchChats = (chats) => {
@@ -162,3 +173,4 @@ export const fetchSessionMessages = (id, amount) => {
 		})
 	}
 }
+

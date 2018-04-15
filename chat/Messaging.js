@@ -14,6 +14,7 @@ import {
   Right,
   Icon,
   Text,
+  Spinner,
 } from 'native-base'
 import firebase from "Anyone/index"
 import { GiftedChat } from 'react-native-gifted-chat'
@@ -46,7 +47,8 @@ class Messaging extends React.Component {
     this.state = {
       messages: [],
       user: {},
-      avatar: ''
+      avatar: '',
+      spinner: true
     }
   }
 
@@ -73,41 +75,39 @@ class Messaging extends React.Component {
 
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
-    this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
-      if (notif.notif.type == 'message' || notif.notif.type == 'sessionMessage') {
-        try {
-          let message
-          const {  uid, username, _id, body, title, sessionId, aps, avatar} = notif.notif
-          let createdAt = new Date(notif.notif.createdAt)
-          if (notif.notif.custom_notification) {
-            let custom = JSON.parse(notif.notif.custom_notification) 
-            message = {createdAt, _id, text: custom.body, user: {_id: uid, name: username, avatar}}
-          }
-          else {
-            message = {createdAt, _id, text: body, user: {_id: uid, name: username, avatar}}
-          }
-          if ((notif.notif.type == 'message' && this.friendUid == uid) ||
-            (notif.notif.type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid)) {
-            this.setState(previousState => ({
-              messages: GiftedChat.append(previousState.messages, message),
-            }))
-          }
-        }
-        catch(e) {
-          Alert.alert(e)
-        }
-      }
-    })
     FCM.getInitialNotification().then(notif => {
      console.log(notif)
    })
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.messageSession) {
-      this.setState({messages: nextProps.messageSession.reverse()})
+    if (nextProps.messageSession && !this.fetched) {
+      this.fetched = true
+      this.setState({messages: nextProps.messageSession.reverse(), spinner: false})
+
+    }
+    if (nextProps.notif) {
+      this.props.resetNotif()
+      const { type, uid, username, _id, body, title, sessionId, avatar, createdAt, custom_notification } = nextProps.notif
+      if (type == 'message' || type == 'sessionMessage') {
+        let message
+        let date = new Date(createdAt)
+        if (custom_notification) {
+          let custom = JSON.parse(custom_notification) 
+          message = {createdAt: date, _id, text: custom.body, user: {_id: uid, name: username, avatar}}
+        }
+        else {
+          message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}}
+        }
+        if ((type == 'message' && this.friendUid == uid) ||
+          (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid)) {
+          this.setState(previousState => ({
+            messages: GiftedChat.append(previousState.messages, message),
+          }))
+      }
     }
   }
+}
 
 
   // isFriend(uid) {
@@ -154,7 +154,9 @@ class Messaging extends React.Component {
       <Container style={{flex: 1}}>
       <Header style={{backgroundColor: colors.primary}}>  
         <Left style={{flex: 1}}>
-          <TouchableOpacity onPress={() => navigation.goBack() }>
+          <TouchableOpacity onPress={() => {
+            navigation.goBack()
+          } }>
             <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>
           </Left>
@@ -208,6 +210,9 @@ class Messaging extends React.Component {
             </View>}
 
         </Modal>
+        <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
+          {this.state.spinner && <Spinner color={colors.secondary}/>}
+        </View>
       </Container>
     )
   }
@@ -290,16 +295,16 @@ class Messaging extends React.Component {
       })
       .catch(e => Alert.alert('Error', e.message))
   }
-  componentWillUnmount() {
-        // stop listening for events
-        this.notificationListener.remove()
-    }
+
+  // componentWillUnmount() {
+
+  //   }
 }
 
 import { connect } from 'react-redux'
 import { navigateMessaging } from 'Anyone/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
-import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages } from 'Anyone/actions/chats'
+import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, addMessage, resetNotification } from 'Anyone/actions/chats'
 
 const fetchId = (params) => {
   if (params.session) {
@@ -313,7 +318,8 @@ const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
   profile: profile.profile,
   sessionChats: chats.sessionChats,
   chats: chats.chats,
-  messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)]
+  messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)],
+  notif: chats.notif
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -324,6 +330,7 @@ const mapDispatchToProps = dispatch => ({
   onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
   getMessages: (id, amount) => dispatch(fetchMessages(id, amount)),
   getSessionMessages: (id, amount) => dispatch(fetchSessionMessages(id, amount)),
+  resetNotif: () => dispatch(resetNotification())
 
 })
 
