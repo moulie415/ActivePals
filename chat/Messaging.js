@@ -146,8 +146,7 @@ class Messaging extends React.Component {
       this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
       }))
-      //this.session? this.props.getSessionChats(this.props.profile.sessions, this.uid) : 
-      //this.props.getChats(this.props.profile.chats)
+      !this.session && this.props.getChats(this.props.profile.chats)
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 

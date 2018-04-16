@@ -15,7 +15,7 @@ import thunk from 'redux-thunk'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import App from './App'
 import { navigateMessaging, navigateMessagingSession, navigateFriends } from "./actions/navigation"
-import { newNotification } from './actions/chats'
+import { newNotification, updateLastMessage } from './actions/chats'
 import {
   createReactNavigationReduxMiddleware,
   createReduxBoundAddListener,
@@ -91,8 +91,11 @@ FCM.on(FCMEvent.Notification, async (notif) => {
     const { dispatch } = store
 
     if (!notif.opened_from_tray) {
+     if (notif.type == 'message' || notif.type == 'sessionMessage') {
       dispatch(newNotification(notif))
+      dispatch(updateLastMessage(notif))
     }
+  }
 
     if(notif.local_notification){
       //this is a local notification

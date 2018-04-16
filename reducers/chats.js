@@ -7,7 +7,7 @@ import {
 	ADD_CHAT,
 	SET_MESSAGE_SESSION,
 	NEW_NOTIF,
-	RESET_NOTIFICATION
+	RESET_NOTIFICATION,
 } from 'Anyone/actions/chats'
 
 const initialState = {

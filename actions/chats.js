@@ -42,6 +42,7 @@ const setMessageSession = (id, messages) => ({
 	messages,
 })
 
+
 export const updateChats = (chats) => ({
 	type: UPDATE_CHATS,
 	chats
@@ -55,6 +56,32 @@ export const newNotification = (notif) => ({
 export const resetNotification = () => ({
 	type: RESET_NOTIFICATION,
 })
+
+export const updateLastMessage = (notif) => {
+	return (dispatch, getState) => {
+		if (notif.type == 'message') {
+			return firebase.database().ref('chats').child(notif.chatId).orderByKey().limitToLast(1)
+				.once('value', lastMessage => {
+					if (lastMessage.val()) {
+						let chats = getState().chats.chats.filter(chat => chat.chatId != notif.chatId)
+						dispatch(setChats([...chats, {uid: notif.uid, chatID: notif.chatId, lastMessage: Object.values(lastMessage.val())[0]}]))
+					}
+				})
+		}
+		else if (notif.type == 'sessionMessage') {
+			return firebase.database().ref('sessionChats').child(notif.sessionId).orderByKey().limitToLast(1)
+				.once('value', lastMessage => {
+					if (lastMessage.val()) {
+						let chats = getState().chats.sessionChats.filter(chat => chat.id != notif.sessionId)
+						let chat = getState().chats.sessionChats.filter(chat => chat.id == notif.sessionId)[0]
+						dispatch(setSessionChats([...chats, {...chat, lastMessage: Object.values(lastMessage.val())[0]}]))
+					}
+				})
+
+		}
+	}
+}
+
 
 export const fetchChats = (chats) => {
 	return (dispatch) => {
