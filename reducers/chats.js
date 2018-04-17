@@ -6,8 +6,8 @@ import {
 	UPDATE_CHATS,
 	ADD_CHAT,
 	SET_MESSAGE_SESSION,
-	NEW_NOTIF,
 	RESET_NOTIFICATION,
+	NEW_NOTIF,
 } from 'Anyone/actions/chats'
 
 const initialState = {
@@ -59,10 +59,10 @@ export default function(state = initialState, action) {
 				notif: action.notif
 			}
 		case RESET_NOTIFICATION:
-			return {
-				...state,
-				notif: null
-			}
+             return {
+                ...state,
+                notif: null
+            }
 		default:
 			return state
 	}

@@ -24,13 +24,13 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                     body: text,
                     title: user.name + ' sent you a message',
                     priority: 'high',
-                    sound: 'default'
+                    sound: 'default',
+                    group: 'CHAT',
                 }),
                 username: user.name,
                 uid: user._id,
                 createdAt,
                 _id,
-                group: 'CHAT',
                 avatar: user.avatar ,
                 type: 'message',
                 chatId
@@ -49,40 +49,51 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
     console.log(event)
 
     const getValuePromise = admin.database()
-                                 .ref('sessionChats')
-                                 .child(event.params.id)
-                                 .orderByKey()
-                                 .limitToLast(1)
-                                 .once('value')
+    .ref('sessionChats')
+    .child(event.params.id)
+    .orderByKey()
+    .limitToLast(1)
+    .once('value')
 
     return getValuePromise.then(snapshot => {
         console.log(snapshot.val())
         const { user, text, sessionId, createdAt, _id, sessionTitle } = snapshot.val()[Object.keys(snapshot.val())[0]] 
-        const payload = {
-            data: {
-                custom_notification: JSON.stringify({
-                    body: text,
-                    title: user.name + ' sent a message to ' + sessionTitle,
-                    priority: 'high',
-                    sound: 'default',
-                    group: 'SESSION_CHAT',
-                }),
-                username: user.name,
-                uid: user._id,
-                createdAt,
-                _id,
-                avatar: user.avatar,
-                type: 'sessionMessage',
-                sessionId,
-                sessionTitle
+        return admin.database().ref('/sessions/' + sessionId).child('users').once('value', users => {
+            let tokens = []
+            users.forEach(child => {
+                if (child.key !== user._id) {
+                    tokens.push(admin.database().ref('/users/' + child.key).child("FCMToken").once('value'))
+                }
+            })
+            return Promise.all(tokens).then(tokens => {
+                let promises = []
+                tokens.forEach(token => {
+                    const payload = {
+                        data: {
+                            custom_notification: JSON.stringify({
+                                body: text,
+                                title: user.name + ' sent a message to ' + sessionTitle,
+                                priority: 'high',
+                                sound: 'default',
+                                group: 'SESSION',
+                            }),
+                            username: user.name,
+                            uid: user._id,
+                            createdAt,
+                            _id,
+                            avatar: user.avatar,
+                            type: 'sessionMessage',
+                            sessionId,
+                            sessionTitle
 
-            },
-            topic: sessionId,
-
-        }
-
-        return admin.messaging()
-                    .send(payload)
+                        },
+                        token: token.val(),
+                    }
+                    promises.push(admin.messaging().send(payload))
+                })
+                return Promise.all(promises)
+            })
+        })
     })
 })
 
@@ -110,7 +121,7 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
                                 title: username,
                                 priority: 'high',
                                 sound: 'default',
-                                GROUP: 'FRIEND_REQUEST',
+                                group: 'REQUEST',
                             }),
                             type: 'buddyRequest'
 

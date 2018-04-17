@@ -1,5 +1,6 @@
 import * as firebase from "firebase"
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
+import { fetchProfile } from './profile'
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS'
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT'
 export const REMOVE_SESSION_CHAT = 'REMOVE_SESSION_CHAT'
@@ -42,7 +43,6 @@ const setMessageSession = (id, messages) => ({
 	messages,
 })
 
-
 export const updateChats = (chats) => ({
 	type: UPDATE_CHATS,
 	chats
@@ -54,8 +54,9 @@ export const newNotification = (notif) => ({
 })
 
 export const resetNotification = () => ({
-	type: RESET_NOTIFICATION,
+       type: RESET_NOTIFICATION,
 })
+
 
 export const updateLastMessage = (notif) => {
 	return (dispatch, getState) => {
@@ -64,7 +65,7 @@ export const updateLastMessage = (notif) => {
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
 						let chats = getState().chats.chats.filter(chat => chat.chatId != notif.chatId)
-						dispatch(setChats([...chats, {uid: notif.uid, chatID: notif.chatId, lastMessage: Object.values(lastMessage.val())[0]}]))
+						dispatch(setChats([...chats, {uid: notif.uid, chatId: notif.chatId, lastMessage: Object.values(lastMessage.val())[0]}]))
 					}
 				})
 		}
@@ -81,6 +82,7 @@ export const updateLastMessage = (notif) => {
 		}
 	}
 }
+
 
 
 export const fetchChats = (chats) => {
@@ -168,6 +170,7 @@ export const addSessionChat = (session) => {
 					}
 					resolve({...snapshot.val(), id: session, lastMessage: message})
 					dispatch(addToSessionChats({...snapshot.val(), id: session, lastMessage: message}))
+					dispatch(fetchProfile())
 				})
 			})
 		})

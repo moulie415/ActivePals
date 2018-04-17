@@ -49,6 +49,7 @@ const showLocalNotification = (notif) => {
       show_in_foreground: true,
       lights: true,
       vibrate: 300,
+      group: custom.group,
       data: notif
     })
     }

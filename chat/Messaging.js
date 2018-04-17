@@ -89,28 +89,31 @@ class Messaging extends React.Component {
     if (nextProps.messageSession && !this.fetched) {
       this.fetched = true
       this.setState({messages: nextProps.messageSession.reverse(), spinner: false})
-
     }
     if (nextProps.notif) {
       this.props.resetNotif()
-      const { type, uid, username, _id, body, title, sessionId, avatar, createdAt, custom_notification } = nextProps.notif
-      if (type == 'message' || type == 'sessionMessage') {
-        let message
-        let date = new Date(createdAt)
-        if (custom_notification) {
-          let custom = JSON.parse(custom_notification) 
-          message = {createdAt: date, _id, text: custom.body, user: {_id: uid, name: username, avatar}}
+      //ignore inital fetch when component mounts
+      if (this.listenForNotif) {
+        const { type, uid, username, _id, body, title, sessionId, avatar, createdAt, custom_notification } = nextProps.notif
+        if (type == 'message' || type == 'sessionMessage') {
+          let message
+          let date = new Date(createdAt)
+          if (custom_notification) {
+            let custom = JSON.parse(custom_notification) 
+            message = {createdAt: date, _id, text: custom.body, user: {_id: uid, name: username, avatar}}
+          }
+          else {
+            message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}}
+          }
+          if ((type == 'message' && this.friendUid == uid) ||
+            (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid)) {
+            this.setState(previousState => ({
+              messages: GiftedChat.append(previousState.messages, message),
+            }))
         }
-        else {
-          message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}}
-        }
-        if ((type == 'message' && this.friendUid == uid) ||
-          (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid)) {
-          this.setState(previousState => ({
-            messages: GiftedChat.append(previousState.messages, message),
-          }))
       }
     }
+    this.listenForNotif = true
   }
 }
 
@@ -146,7 +149,8 @@ class Messaging extends React.Component {
       this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
       }))
-      this.session? this.props.getSessionChats(this.props.profile.sessionChats) : this.props.getChats(this.props.profile.chats)
+      this.session? this.props.getSessionChats(this.props.profile.sessions, this.sessionId) : 
+      this.props.getChats(this.props.profile.chats)
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 
