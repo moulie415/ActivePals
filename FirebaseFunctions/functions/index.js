@@ -30,6 +30,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                 uid: user._id,
                 createdAt,
                 _id,
+                group: 'CHAT',
                 avatar: user.avatar ,
                 type: 'message',
                 chatId
@@ -63,7 +64,8 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                     body: text,
                     title: user.name + ' sent a message to ' + sessionTitle,
                     priority: 'high',
-                    sound: 'default'
+                    sound: 'default',
+                    group: 'SESSION_CHAT',
                 }),
                 username: user.name,
                 uid: user._id,
@@ -107,7 +109,8 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
                                 body: 'sent you a buddy request',
                                 title: username,
                                 priority: 'high',
-                                sound: 'default'
+                                sound: 'default',
+                                GROUP: 'FRIEND_REQUEST',
                             }),
                             type: 'buddyRequest'
 

@@ -303,13 +303,13 @@ import hStyles from 'Anyone/styles/homeStyles'
         else {
           Alert.alert(
             'Start a new chat with ' + username + '?',
-            'This will be the beggining of your chat with ' + username,
+            'This will be the beginning of your chat with ' + username,
             [
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
               let systemMessage = {
                 _id: 1,
-                text: 'Beggining of chat',
+                text: 'Beginning of chat',
                 createdAt: new Date().toString(),
                 system: true,
               }

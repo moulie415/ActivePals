@@ -201,7 +201,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
             + " for " + (this.state.selectedSession.duration) + " " +
             (this.state.selectedSession.duration > 1? 'hours' : 'hour') }</Text>
             <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedSession.location.formattedAddress}</Text>
-            <TouchableOpacity onPress={()=> this.getDirections()}
+            <TouchableOpacity onPress={()=> this.getPosition(true)}
             style={{marginVertical: 5}}>
               <Text style={{color: colors.secondary, fontFamily: 'Avenir'}}>Get directions</Text>
             </TouchableOpacity>
@@ -445,7 +445,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
     })
   }
 
-  getPosition() {
+  getPosition(getDirections = false) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.setState({
@@ -453,10 +453,8 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
           longitude: position.coords.longitude,
           yourLocation: position.coords,
           error: null,
-          showMap: true
-        })
-        //Alert.alert("lat: " + position.coords.latitude, "lon: " + position.coords.longitude)
-        this.setState({spinner: false})
+          showMap: true,
+          spinner: false}, ()=> getDirections && this.getDirections())
       },
       (error) => {
         this.setState({ spinner: false })

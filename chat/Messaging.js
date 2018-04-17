@@ -146,7 +146,7 @@ class Messaging extends React.Component {
       this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
       }))
-      !this.session && this.props.getChats(this.props.profile.chats)
+      this.session? this.props.getSessionChats(this.props.profile.sessionChats) : this.props.getChats(this.props.profile.chats)
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 
@@ -295,14 +295,14 @@ class Messaging extends React.Component {
         else {
           Alert.alert(
             'Start a new chat with ' + user.username + '?',
-            'This will be the beggining of your chat with ' + user.username,
+            'This will be the beginning of your chat with ' + user.username,
             [
             {text: 'Cancel', style: 'cancel'},
             {text: 'OK', onPress: () => {
 
               let systemMessage = {
                 _id: 1,
-                text: 'Beggining of chat',
+                text: 'Beginning of chat',
                 createdAt: new Date().toString(),
                 system: true,
               }

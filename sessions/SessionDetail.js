@@ -62,13 +62,13 @@ class SessionDetail extends Component {
 			<Container style={{marginHorizontal: 10, flex: 1}}>
 				<Content>
 					<TextInput 
-					style={{padding: 5, borderWidth: 1, borderColor: '#000', flex: 1, margin: 10}}
+					style={{padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10}}
 					textAlignVertical={'top'}
 					underlineColorAndroid='transparent'
 					onChangeText={title => this.title = title}
 					placeholder='Title'/>
 					<TextInput
-					style={{padding: 5, borderWidth: 1, borderColor: '#000', height: 150, margin: 10}}
+					style={{padding: 5, borderWidth: 0.5, borderColor: '#999', height: 100, margin: 10}}
 					placeholder='Details...'
 					textAlignVertical={'top'}
 					multiline={true}
@@ -105,7 +105,7 @@ class SessionDetail extends Component {
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
 							<TextInput 
 							onChangeText={postcode => this.postcode = postcode}
-							style={{padding: 5, borderWidth: 1, borderColor: '#000', margin: 10, flex: 1}}
+							style={{padding: 5, borderWidth: 0.5, borderColor: '#999', margin: 10, flex: 1}}
 							underlineColorAndroid='transparent'
 							placeholder='Enter postcode'/>
 							<TouchableOpacity onPress={()=> {
@@ -117,15 +117,15 @@ class SessionDetail extends Component {
 								}
 							}}
 							style={{flex: 1}}>
-							<Text style={{color: 'blue', fontSize: 20, margin: 10, textAlign: 'center'}}>Submit</Text>
+							<Text style={{color: colors.secondary, fontSize: 20, margin: 10, textAlign: 'center'}}>Submit</Text>
 							</TouchableOpacity>
 						</View>
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
 							<TouchableOpacity onPress={()=> this.setLocationAsPosition()}>
-								<Text style={{color: 'blue', fontSize: 20, margin: 10}}>Use my location</Text>
+								<Text style={{color: colors.secondary, fontSize: 20, margin: 10}}>Use my location</Text>
 							</TouchableOpacity>
 							<TouchableOpacity>
-								<Text style={{color: 'blue', fontSize: 20, margin: 10}}>Select on map</Text>
+								<Text style={{color: colors.secondary, fontSize: 20, margin: 10}}>Select on map</Text>
 							</TouchableOpacity>
 						</View>
 						<Text style={{alignSelf: 'center', marginVertical: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
@@ -226,7 +226,7 @@ class SessionDetail extends Component {
 				firebase.database().ref('sessions/' + snapshot.key + '/users').child(this.user.uid).set(true)
 				let systemMessage = {
 					_id: 1,
-					text: 'Beggining of chat',
+					text: 'Beginning of chat',
 					createdAt: new Date().toString(),
 					system: true,
 				}
