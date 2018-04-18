@@ -177,15 +177,30 @@ export const addSessionChat = (session) => {
 }
 
 
-export const fetchMessages = (id, amount) => {
+export const fetchMessages = (id, amount, uid) => {
 	return (dispatch) => {
 		return firebase.database().ref('chats/'+ id).orderByKey().limitToLast(amount)
 		.once('value', snapshot => {
 			let messages = []
-			snapshot.forEach(child => {
-				messages.push({...child.val(), createdAt: new Date(child.val().createdAt)})
+			firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
+			.then (url => {
+				snapshot.forEach(child => {
+					if (child.val().user && child.val().user._id == uid) {
+						messages.push({...child.val(), createdAt: new Date(child.val().createdAt), 
+							user: {...child.val().user, avatar: url}})
+					}
+					else {
+						messages.push({...child.val(), createdAt: new Date(child.val().createdAt)})
+					}
+				})
+				dispatch(setMessageSession(id, messages))
 			})
-			dispatch(setMessageSession(id, messages))
+			.catch(e => {
+				snapshot.forEach(child => {
+					messages.push({...child.val(), createdAt: new Date(child.val().createdAt)})
+				})
+				dispatch(setMessageSession(id, messages))
+			})
 		})
 	}
 }

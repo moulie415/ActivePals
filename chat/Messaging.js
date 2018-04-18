@@ -83,7 +83,7 @@ class Messaging extends React.Component {
       this.props.getSessionMessages(this.sessionId, this.state.amount)
     }
     else {
-      this.props.getMessages(this.chatId, this.state.amount)
+      this.props.getMessages(this.chatId, this.state.amount, this.friendUid)
     }
   }
 
@@ -373,7 +373,7 @@ const mapDispatchToProps = dispatch => ({
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
-  getMessages: (id, amount) => dispatch(fetchMessages(id, amount)),
+  getMessages: (id, amount, uid) => dispatch(fetchMessages(id, amount, uid)),
   getSessionMessages: (id, amount) => dispatch(fetchSessionMessages(id, amount)),
   resetNotif: () => dispatch(resetNotification())
 
