@@ -17,7 +17,7 @@ import {
   Spinner,
 } from 'native-base'
 import firebase from "Anyone/index"
-import { GiftedChat, Bubble } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import colors from 'Anyone/constants/colors'
 import Modal from 'react-native-modalbox'
@@ -45,11 +45,12 @@ class Messaging extends React.Component {
       this.friendUid = this.params.friendUid
     }
     this.state = {
-      messages: [],
+      messages: this.props.messageSession,
       user: {},
       avatar: '',
-      spinner: true,
-      amount: 30
+      spinner: false,
+      amount: 30,
+      showLoadEarlier: true
     }
   }
 
@@ -77,6 +78,7 @@ class Messaging extends React.Component {
   }
 
   loadMessages() {
+    this.setState({spinner: true})
     if (this.session) {
       this.props.getSessionMessages(this.sessionId, this.state.amount)
     }
@@ -89,6 +91,9 @@ class Messaging extends React.Component {
     if (nextProps.messageSession && !this.fetched) {
       this.fetched = true
       this.setState({messages: nextProps.messageSession.reverse(), spinner: false})
+      if (nextProps.messageSession.some(message => message._id == 1)) {
+        this.setState({showLoadEarlier: false})
+      }
     }
     if (nextProps.notif) {
       this.props.resetNotif()
@@ -113,8 +118,8 @@ class Messaging extends React.Component {
         }
       }
     }
-    this.listenForNotif = true
   }
+  this.listenForNotif = true
 }
 
 
@@ -182,7 +187,7 @@ class Messaging extends React.Component {
             this.fetched = false
             this.setState({amount: this.state.amount+=15, spinner: true} ,()=> this.loadMessages())
           }}
-          loadEarlier={!this.state.spinner && this.state.messages.length > 29}
+          loadEarlier={this.state.messages && this.state.messages.length > 29 && this.state.showLoadEarlier}
           user={{
             _id: this.uid,
             name: this.props.profile.username,
@@ -195,6 +200,15 @@ class Messaging extends React.Component {
                 backgroundColor: colors.secondary
               }
             }}/>
+            )}}
+          renderMessageText={(props)=> { return (
+            <View>
+              {((props.previousMessage.user && props.position == 'left' && props.previousMessage.user._id != props.currentMessage.user._id) ||
+              (!props.previousMessage.user && props.currentMessage.user && props.position == 'left')) &&
+              <Text style={{color: '#999', fontSize: 10, fontFamily: 'Avenir', paddingLeft: 10, marginBottom: -5}}>
+              {props.currentMessage.user.name}</Text>}
+              <MessageText {...props} />
+            </View>
             )}}
           />
         <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>

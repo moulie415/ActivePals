@@ -36,7 +36,6 @@ import MapView  from 'react-native-maps'
 import Modal from 'react-native-modalbox'
 import { getType } from './constants/utils'
 import Hyperlink from 'react-native-hyperlink'
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
  class Home extends Component {
 
@@ -231,7 +230,6 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
                 firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
                 firebase.database().ref('sessionChats').child(session.key).remove()
                 .then(()=> this.props.onLeave(session.key, this.props.chats))
-                FCM.unsubscribeFromTopic(session.key)
                 this.refs.modal.close()
               },
               style: 'destructive'}
@@ -260,7 +258,6 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
             firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
             .then(() => this.props.onLeave(session.key, this.props.chats))
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).remove()
-            FCM.unsubscribeFromTopic(session.key)
             this.refs.modal.close()
           }}
           style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
@@ -284,7 +281,6 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
             .then(() => this.props.onJoin(session.key))
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
             this.refs.modal.close()
-            FCM.subscribeToTopic(session.key)
             Alert.alert("Session joined", "You should now see this session in your session chats")
           }}
           style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>

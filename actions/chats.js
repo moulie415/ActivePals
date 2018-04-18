@@ -1,5 +1,4 @@
 import * as firebase from "firebase"
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import { fetchProfile } from './profile'
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS'
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT'
@@ -121,6 +120,7 @@ export const addChat = (chat) => {
 				}
 				resolve({uid, chatId, lastMessage: message})
 				dispatch(addToChats({uid, chatId, lastMessage: message}))
+				dispatch(fetchProfile())
 			})
 		})
 	}
@@ -146,7 +146,6 @@ export const fetchSessionChats = (sessions, uid) => {
 						resolve()
 						dispatch(removeSessionChat(session))
 						firebase.database().ref('users/' + uid + '/sessions').child(session).remove()
-						FCM.unsubscribeFromTopic(session)
 					}
 				})
 			})
@@ -196,10 +195,31 @@ export const fetchSessionMessages = (id, amount) => {
 		return firebase.database().ref('sessionChats/'+ id).orderByKey().limitToLast(amount)
 		.once('value', snapshot => {
 			let messages = []
-			snapshot.forEach(child => {
-				messages.push({...child.val(), createdAt: new Date(child.val().createdAt)})
+			let promises = []
+			firebase.database().ref('sessions/' + id).child('users').once('value', users => {
+				users.forEach(child => {
+					promises.push(new Promise(resolve => {
+						firebase.storage().ref('images/' + child.key ).child('avatar').getDownloadURL()
+						.then(url => resolve({[child.key]: url}))
+						.catch(e => resolve({[child.key]: null}))
+					}))
+				})
+				Promise.all(promises).then(array => {
+					let avatars = {}
+					array.forEach((avatar, index) => {
+						let key = Object.keys(avatar)[0]
+						if (key) {
+							avatars[key] = avatar[key]
+						}
+					})
+					snapshot.forEach(child => {
+						let avatar = child.val().user? avatars[child.val().user._id] : null
+						messages.push({...child.val(), createdAt: new Date(child.val().createdAt), 
+							user: {...child.val().user, avatar}})
+					})
+					dispatch(setMessageSession(id, messages))
+				})
 			})
-			dispatch(setMessageSession(id, messages))
 		})
 	}
 }

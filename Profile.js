@@ -85,6 +85,13 @@ window.Blob = Blob
 
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.profile) {
+      let profile = nextProps.profile
+      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar})
+    }
+  }
+
 
   render () {
     return (
@@ -230,6 +237,7 @@ updateUser(initial, profile) {
       }
     }
   }
+  this.props.onSave()
 }
 
 checkUsername(initial, profile){
@@ -332,13 +340,15 @@ selectAvatar() {
 
 import { connect } from 'react-redux'
 import { navigateLogin } from 'Anyone/actions/navigation'
+import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile
 })
 
 const mapDispatchToProps = dispatch => ({
-  onLogoutPress: ()=> { dispatch(navigateLogin())}
+  onLogoutPress: ()=> { dispatch(navigateLogin())},
+  onSave: ()=> dispatch(fetchProfile())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile)

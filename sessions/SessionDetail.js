@@ -20,7 +20,6 @@ import Geocoder from 'react-native-geocoder'
 import firebase from "Anyone/index"
 import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/constants/colors'
-import FCM from 'react-native-fcm'
 
 
 class SessionDetail extends Component {
@@ -231,7 +230,6 @@ class SessionDetail extends Component {
 					system: true,
 				}
 				firebase.database().ref('sessionChats/' + snapshot.key).push(systemMessage)
-				FCM.subscribeToTopic(snapshot.key)
 				this.props.onCreate(snapshot.key)
 			})
 			.catch(err => {
