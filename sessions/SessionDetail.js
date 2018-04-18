@@ -35,6 +35,7 @@ class SessionDetail extends Component {
 	constructor(props) {
 		super(props)
 		this.params = this.props.navigation.state.params
+		this.buddies = this.params.buddies
 		this.type = this.params.type
 		this.state = {
 			gender: 'Unspecified',
@@ -216,13 +217,26 @@ class SessionDetail extends Component {
 				type: this.type,
 				host: this.user.uid,
 				dateTime: this.state.date,
-				duration: this.state.duration
+				duration: this.state.duration,
+				users: {}
 			}
+			if (this.buddies) {
+				session.private = true
+				this.buddies.forEach(uid => {
+					session.users[uid] = true
+				})
+			}
+			session.users[this.user.uid] = true
 			firebase.database().ref('sessions').push(session).then((snapshot)=> {
 				Alert.alert('Success','Session created')
 				navigation.navigate("Home")
-				firebase.database().ref('users/' + this.user.uid + '/sessions').child(snapshot.key).set(true)
+				if (this.buddies) {
+					this.buddies.forEach(buddy => {
+						firebase.database().ref('users/' + buddy + '/sessions').child(snapshot.key).set(true)
+					})
+				}
 				firebase.database().ref('sessions/' + snapshot.key + '/users').child(this.user.uid).set(true)
+				firebase.database().ref('users/' + this.user.uid + '/sessions').child(snapshot.key).set(true)
 				let systemMessage = {
 					_id: 1,
 					text: 'Beginning of chat',

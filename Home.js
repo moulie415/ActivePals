@@ -62,6 +62,7 @@ import Hyperlink from 'react-native-hyperlink'
       switch: false,
       sessions: [],
       refreshing: false,
+      selectedFriends: []
     }
   }
 
@@ -102,8 +103,11 @@ import Hyperlink from 'react-native-hyperlink'
         let current = new Date().getTime()
         if (time + duration > current) {
           let inProgress = time < current
-          sessions.push({...child.val(), key: child.key, inProgress})
-          index++
+          let users = Object.keys(child.val().users)
+          if (!child.val().private || users.some(user => user == this.props.profile.uid) ) {
+            sessions.push({...child.val(), key: child.key, inProgress})
+            index++
+          }
         }
         else {
           //validate time serverside before deleting session in case clients time is wrong
@@ -176,13 +180,20 @@ import Hyperlink from 'react-native-hyperlink'
 
         <View style={{flexDirection: 'row'}}>
           <Button style={[styles.button]}
-          onPress={()=> this.nav.navigate('SessionType')}>
+          onPress={()=> this.props.onContinue(null)}>
             <Text adjustsFontSizeToFit={true} 
             style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Session</Text>
           </Button>
           <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/> 
           <Button style={styles.button}
-          onPress={()=> Alert.alert("Feature coming soon")}>
+          onPress={()=> {
+            if (this.props.friends.length > 0) {
+              this.refs.friendsModal.open()
+            }
+            else {
+              Alert.alert("Sorry", "You must have at least one buddy to create a private session")
+            }
+          }}>
             <Text adjustsFontSizeToFit={true} 
             style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Private Session</Text>
           </Button>
@@ -209,8 +220,61 @@ import Hyperlink from 'react-native-hyperlink'
             </View>}
 
         </Modal>
+        <Modal style={styles.modal} position={"center"} ref={"friendsModal"} >
+          <Text style={{fontSize: 20, textAlign: 'center', fontFamily: 'Avenir', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          Select buddies</Text>
+          <ScrollView style={{backgroundColor: '#d6d6d6'}}>
+          {this.renderFriendsSelection()}
+          </ScrollView>
+          <View style={{backgroundColor: colors.primary}}>
+            <TouchableOpacity onPress={()=> {
+              if (this.state.selectedFriends.length > 0) {
+                this.props.onContinue(this.state.selectedFriends)
+              }
+              else {
+                Alert.alert("Sorry", "Please select at least one buddy")
+              }
+            }}
+            style={{padding: 5}}>
+              <Text style={{color: '#fff', backgroundColor: colors.secondary, alignSelf: 'center', padding: 5, paddingHorizontal: 10}}>Continue</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
       </Container>
       )
+  }
+
+  renderFriendsSelection() {
+    let friends = []
+    this.props.friends.forEach((friend, index) => {
+      let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
+      friends.push(
+          <TouchableOpacity key={index} onPress={()=> this.onFriendPress(friend.uid)}>
+          <View style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
+                <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary}}/>}
+                <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
+                {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
+              </View>
+            </View>
+          </View>
+          </TouchableOpacity>
+          )
+
+    })
+    return friends
+  }
+
+  onFriendPress(uid) {
+    if (this.state.selectedFriends.some(friend => friend == uid)) {
+      let friends = this.state.selectedFriends.filter(friend => friend != uid)
+      this.setState({selectedFriends: friends})
+    }
+    else {
+      this.setState({selectedFriends: [...this.state.selectedFriends, uid]})
+    }
   }
 
   fetchButtons(session, uid) {
@@ -227,7 +291,7 @@ import Hyperlink from 'react-native-hyperlink'
               {text: 'cancel', style: 'cancel'},
               {text: 'Yes', onPress: ()=> {
                 firebase.database().ref('sessions/' + session.key).remove()
-                firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
+                Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(session.key).remove())
                 firebase.database().ref('sessionChats').child(session.key).remove()
                 .then(()=> this.props.onLeave(session.key, this.props.chats))
                 this.refs.modal.close()
@@ -332,8 +396,11 @@ import Hyperlink from 'react-native-hyperlink'
                         <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
                         <Text style={{fontFamily: 'Avenir', fontSize: 13 }}>{"gender: " + item.gender}</Text>
                       </View>
+                      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text style={[styles.date], {color: item.inProgress? colors.secondary : "#999"}} >
                       {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
+                      {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 15, paddingHorizontal: 5}}/>
+                      <Text style={{fontFamily: 'Avenir', fontSize: 12}}>PRIVATE</Text></View>}</View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                         <TouchableOpacity onPress={()=>{
@@ -477,7 +544,7 @@ import Hyperlink from 'react-native-hyperlink'
 }
 
 import { connect } from 'react-redux'
-import { navigateMessagingSession } from 'Anyone/actions/navigation'
+import { navigateMessagingSession, navigateSessionType } from 'Anyone/actions/navigation'
 import { fetchSessionChats, addSessionChat, removeSessionChat } from 'Anyone/actions/chats'
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
@@ -490,7 +557,8 @@ const mapDispatchToProps = dispatch => ({
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onJoin: (session) => {return dispatch(addSessionChat(session))},
   onLeave: (session, sessions) => {return dispatch(removeSessionChat(session, sessions))},
-  onOpenChat: (session, sessionId, sessionTitle) => {return dispatch(navigateMessagingSession(session, sessionId, sessionTitle))}
+  onOpenChat: (session, sessionId, sessionTitle) => {return dispatch(navigateMessagingSession(session, sessionId, sessionTitle))},
+  onContinue: (buddies) => dispatch(navigateSessionType(buddies))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)
