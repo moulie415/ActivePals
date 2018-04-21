@@ -164,7 +164,7 @@ class Messaging extends React.Component {
   render() {
     const { navigation } = this.props
     return (
-      <Container style={{flex: 1}}>
+      <Container style={{flex: 1, backgroundColor: '#9993'}}>
       <Header style={{backgroundColor: colors.primary}}>  
         <Left style={{flex: 1}}>
           <TouchableOpacity onPress={() => {
@@ -205,7 +205,7 @@ class Messaging extends React.Component {
             <View>
               {((props.previousMessage.user && props.position == 'left' && props.previousMessage.user._id != props.currentMessage.user._id) ||
               (!props.previousMessage.user && props.currentMessage.user && props.position == 'left')) &&
-              <Text style={{color: '#999', fontSize: 12, fontFamily: 'Avenir', paddingLeft: 10, marginBottom: -5}}>
+              <Text style={{color: colors.secondary, fontSize: 12, fontFamily: 'Avenir', padding: 10, paddingBottom: 0}}>
               {props.currentMessage.user.name}</Text>}
               <MessageText {...props} />
             </View>

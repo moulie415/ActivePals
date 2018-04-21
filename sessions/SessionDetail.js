@@ -36,6 +36,11 @@ class SessionDetail extends Component {
 		super(props)
 		this.params = this.props.navigation.state.params
 		this.buddies = this.params.buddies
+		this.location = this.params.location
+		if (this.location) {
+			let coords = {lat: this.location.geometry.location.lat, lng: this.location.geometry.location.lng}
+			this.setLocation(coords, true)
+		}
 		this.type = this.params.type
 		this.state = {
 			gender: 'Unspecified',
@@ -178,7 +183,7 @@ class SessionDetail extends Component {
 					this.setState({formattedAddress: res[0].formattedAddress})
 
 				})
-				.catch(err => Alert.alert('Error', err.message))
+				.catch(err => Alert.alert('Error', "Invalid location"))
 			}
 			else {
 				await Geocoder.geocodeAddress(location).then(res => {
@@ -186,11 +191,11 @@ class SessionDetail extends Component {
 					this.setState({formattedAddress: res[0].formattedAddress})
 
 				})
-				.catch(err => Alert.alert('Error', err.message))
+				.catch(err => Alert.alert('Error', "Invalid location"))
 			}
 		}
 		catch(err) {
-			Alert.alert("Error", err.message)
+			Alert.alert("Error", "Fetching location failed")
 		}
 	}
 

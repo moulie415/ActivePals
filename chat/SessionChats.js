@@ -59,7 +59,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
   render () {
     return (
     <Container>
-    {this.state.chats.length > 0 && this.state.chats[0].id?
+    {this.state.chats.length > 0 && this.state.chats[0].type?
       <ScrollView>
         {this.renderChats()}
       </ScrollView> :

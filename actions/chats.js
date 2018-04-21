@@ -228,9 +228,14 @@ export const fetchSessionMessages = (id, amount) => {
 						}
 					})
 					snapshot.forEach(child => {
-						let avatar = child.val().user? avatars[child.val().user._id] : null
-						messages.push({...child.val(), createdAt: new Date(child.val().createdAt), 
-							user: {...child.val().user, avatar}})
+						let avatar = child.val().user? avatars[child.val().user._id] : ""
+						if (avatar) {
+							messages.push({...child.val(), createdAt: new Date(child.val().createdAt), 
+								user: {...child.val().user, avatar}})
+						}
+						else {
+							messages.push({...child.val(), createdAt: new Date(child.val().createdAt)})
+							}
 					})
 					dispatch(setMessageSession(id, messages))
 				})

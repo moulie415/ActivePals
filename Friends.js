@@ -91,8 +91,10 @@ import hStyles from 'Anyone/styles/homeStyles'
 
 
   _onRefresh() {
-    this.setState({refreshing: true})
-    this.props.getFriends(this.props.profile.friends)
+    if (this.props.profile.friends) {
+      this.setState({refreshing: true})
+      this.props.getFriends(this.props.profile.friends)
+    }
   }
 
   componentWillReceiveProps(nextProps) {

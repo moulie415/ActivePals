@@ -34,7 +34,8 @@ import styles from './styles/homeStyles'
 import colors from './constants/colors'
 import MapView  from 'react-native-maps'
 import Modal from 'react-native-modalbox'
-import { getType } from './constants/utils'
+import { getType, getResource } from './constants/utils'
+import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
 
  class Home extends Component {
@@ -62,7 +63,8 @@ import Hyperlink from 'react-native-hyperlink'
       switch: false,
       sessions: [],
       refreshing: false,
-      selectedFriends: []
+      selectedFriends: [],
+      markers: []
     }
   }
 
@@ -106,6 +108,9 @@ import Hyperlink from 'react-native-hyperlink'
           let users = Object.keys(child.val().users)
           if (!child.val().private || users.some(user => user == this.props.profile.uid) ) {
             sessions.push({...child.val(), key: child.key, inProgress})
+            if (child.val().private && !this.props.chats.some(chat => chat.id == child.key)) {
+              this.props.onJoin(child.key)
+            }
             index++
           }
         }
@@ -128,7 +133,7 @@ import Hyperlink from 'react-native-hyperlink'
         let bDate = b.dateTime.replace(/-/g, "/")
         return new Date(aDate) - new Date(bDate)
       })
-      this.setState({sessions: sorted, refreshing: false})
+      this.setState({sessions: sorted, refreshing: false}, ()=> this.setState({markers: this.markers(this.state.sessions)}))
     })
   }
 
@@ -175,12 +180,15 @@ import Hyperlink from 'react-native-hyperlink'
           }}
 
         >
-        {this.markers(this.state.sessions)}
+        {this.state.markers}
         </MapView>}
 
         <View style={{flexDirection: 'row'}}>
           <Button style={[styles.button]}
-          onPress={()=> this.props.onContinue(null)}>
+          onPress={()=> {
+            this.setState({selectedLocation: null})
+            this.props.onContinue()
+          }}>
             <Text adjustsFontSizeToFit={true} 
             style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Session</Text>
           </Button>
@@ -188,6 +196,7 @@ import Hyperlink from 'react-native-hyperlink'
           <Button style={styles.button}
           onPress={()=> {
             if (this.props.friends.length > 0) {
+              this.setState({selectedLocation: null})
               this.refs.friendsModal.open()
             }
             else {
@@ -229,7 +238,7 @@ import Hyperlink from 'react-native-hyperlink'
           <View style={{backgroundColor: colors.primary}}>
             <TouchableOpacity onPress={()=> {
               if (this.state.selectedFriends.length > 0) {
-                this.props.onContinue(this.state.selectedFriends)
+                this.props.onContinue(this.state.selectedFriends, this.state.selectedLocation)
               }
               else {
                 Alert.alert("Sorry", "Please select at least one buddy")
@@ -239,6 +248,34 @@ import Hyperlink from 'react-native-hyperlink'
               <Text style={{color: '#fff', backgroundColor: colors.secondary, alignSelf: 'center', padding: 5, paddingHorizontal: 10}}>Continue</Text>
             </TouchableOpacity>
           </View>
+        </Modal>
+        <Modal style={styles.modal} position={'center'} ref={"locationModal"} >
+          {this.state.selectedLocation && <View style={{margin: 10, flex: 1}}>
+          <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedLocation.name}</Text>
+
+            <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedLocation.vicinity}</Text>
+            {this.state.selectedLocation.rating && <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>
+            {"Rating " + this.state.selectedLocation.rating + "/5 stars"}</Text>}
+            <View style={{flex: 1, justifyContent: 'flex-end'}}>
+            <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
+              <TouchableOpacity 
+              onPress={()=> {
+                this.props.onContinue(null, this.state.selectedLocation)
+              }}
+              style={{backgroundColor: colors.secondary, padding: 10, flex: 1, marginRight: 10}}>
+                <Text style={{fontFamily: 'Avenir', color: '#fff', textAlign: 'center'}}>Create session at location</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+              onPress={()=> {
+                this.refs.locationModal.close()
+                this.refs.friendsModal.open()
+              }}
+              style={{backgroundColor: colors.secondary, padding: 10, flex: 1}}>
+                <Text style={{fontFamily: 'Avenir', color: '#fff', textAlign: 'center'}}>Create private session at location</Text>
+              </TouchableOpacity>
+            </View>
+            </View>
+            </View>}
         </Modal>
       </Container>
       )
@@ -359,7 +396,10 @@ import Hyperlink from 'react-native-hyperlink'
 
 
   handlePress(event) {
-    //Alert.alert(event.nativeEvent.coordinate.longitude.toString(), event.nativeEvent.coordinate.latitude.toString())
+    let lat = event.nativeEvent.coordinate.latitude
+    let lng = event.nativeEvent.coordinate.longitude
+    let location = {geometry: {location: {lat, lng}}}
+    this.setState({selectedLocation: location, latitude: lat, longitude: lng})
     ActionSheet.show(
               {
                 options: ['Create session', 'Create private session', 'Cancel'],
@@ -369,6 +409,17 @@ import Hyperlink from 'react-native-hyperlink'
               },
               buttonIndex => {
                 //this.setState({ clicked: BUTTONS[buttonIndex] });
+                if (buttonIndex == 0) {
+                  this.props.onContinue(null, this.state.selectedLocation)
+                }
+                else if (buttonIndex == 1) {
+                  if (this.props.friends.length > 0) {
+                    this.refs.friendsModal.open()
+                  }
+                  else {
+                    Alert.alert("Sorry", "You must have at least one buddy to create a private session")
+                  }
+                }
               }
             )
   }
@@ -380,6 +431,7 @@ import Hyperlink from 'react-native-hyperlink'
           onRefresh={()=> {
             this.setState({refreshing: true})
             this.listenForSessions(this.sessionsRef)
+            this.getPosition()
           }}
           data={sessions}
           keyExtractor={(item) => item.key}
@@ -426,19 +478,22 @@ import Hyperlink from 'react-native-hyperlink'
 
   markers(sessions) {
     let markers = []
-    let index = 1
-    sessions.forEach(session => {
+    sessions.forEach((session, index) => {
+      let lng = session.location.position.lng
+      let lat = session.location.position.lat
       markers.push(
         <MapView.Marker 
-          key={index}
+          key={"s" + index.toString()}
           coordinate={{
-            latitude: session.location.position.lat, 
-            longitude: session.location.position.lng
+            latitude: lat, 
+            longitude: lng
           }}
-          title={session.title}
-        />
+          onPress={() => this.setState({selectedSession: session}, ()=> this.refs.modal.open())}
+        >
+        {getType(session.type, 40, 40)}
+        </MapView.Marker>
+
         )
-      index++
     })
     return markers
   }
@@ -509,15 +564,46 @@ import Hyperlink from 'react-native-hyperlink'
   }
 
   getPosition(getDirections = false) {
+    //to watch position:
+    //this.watchID = navigator.geolocation.watchPosition((position) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        lat = position.coords.latitude
+        lon = position.coords.longitude
         this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude: lat,
+          longitude: lon,
           yourLocation: position.coords,
           error: null,
           showMap: true,
           spinner: false}, ()=> getDirections && this.getDirections())
+
+        let url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+        fetch(`${url}location=${lat},${lon}&radius=15000&types=gym&key=${str.googleApiKey}`)
+          .then(response => response.json())
+          .then(json => {
+            let results = json.results
+            console.log(results[0])
+            let markers = []
+            results.forEach((result, index) => {
+              let lat = result.geometry.location.lat
+              let lng = result.geometry.location.lng
+              markers.push(
+                <MapView.Marker 
+                key={index}
+                coordinate={{
+                  latitude: lat, 
+                  longitude: lng
+                }}
+                pinColor={colors.secondary}
+                onPress={() => this.setState({selectedLocation: result, latitude: lat, longitude: lng}, ()=> this.refs.locationModal.open())}
+                />
+                )
+            })
+            this.setState({markers: [...this.state.markers, ...markers]})
+
+          })
+
       },
       (error) => {
         this.setState({ spinner: false })
@@ -558,7 +644,7 @@ const mapDispatchToProps = dispatch => ({
   onJoin: (session) => {return dispatch(addSessionChat(session))},
   onLeave: (session, sessions) => {return dispatch(removeSessionChat(session, sessions))},
   onOpenChat: (session, sessionId, sessionTitle) => {return dispatch(navigateMessagingSession(session, sessionId, sessionTitle))},
-  onContinue: (buddies) => dispatch(navigateSessionType(buddies))
+  onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

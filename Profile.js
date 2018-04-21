@@ -125,13 +125,9 @@ window.Blob = Blob
           marginBottom: Platform.OS == 'ios'? -5 : null}}/>
           </View>
           </TouchableOpacity>}
-        <View>
-          <View style={{flexDirection: 'row'}}>
+        <View style={{flex: 1, marginRight: 10}}>
             <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Email: {this.state.email}</Text>
-          </View>
-          <View style={{flexDirection: 'row'}}>
             <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Account type: {this.state.profile.accountType}</Text>
-          </View>
         </View>
 
       </View>
