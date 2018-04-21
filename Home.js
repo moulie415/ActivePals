@@ -37,6 +37,7 @@ import Modal from 'react-native-modalbox'
 import { getType, getResource } from './constants/utils'
 import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
+import StarRating from 'react-native-star-rating'
 
  class Home extends Component {
 
@@ -254,8 +255,18 @@ import Hyperlink from 'react-native-hyperlink'
           <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedLocation.name}</Text>
 
             <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedLocation.vicinity}</Text>
-            {this.state.selectedLocation.rating && <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>
-            {"Rating " + this.state.selectedLocation.rating + "/5 stars"}</Text>}
+            {this.state.selectedLocation.rating && <View style={{flexDirection: 'row'}}>
+              <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>Google rating: </Text>
+            <StarRating
+            disabled={true}
+            style={{marginLeft: 10}}
+            fullStarColor={colors.secondary}
+            maxStars={5}
+            starSize={30}
+            halfStarEnabled={true}
+            rating={this.state.selectedLocation.rating}
+            /></View>}
+            {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999'}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
             <View style={{flex: 1, justifyContent: 'flex-end'}}>
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
               <TouchableOpacity 
@@ -279,6 +290,17 @@ import Hyperlink from 'react-native-hyperlink'
         </Modal>
       </Container>
       )
+  }
+
+  renderTags(tags) {
+    let string = ""
+    tags.forEach((tag, index, array) => {
+      if (index === array.length - 1){ 
+        string += tag
+      }
+      else string += tag + ", "
+    })
+    return string
   }
 
   renderFriendsSelection() {
@@ -488,7 +510,10 @@ import Hyperlink from 'react-native-hyperlink'
             latitude: lat, 
             longitude: lng
           }}
-          onPress={() => this.setState({selectedSession: session}, ()=> this.refs.modal.open())}
+          onPress={(event) => {
+            event.stopPropagation()
+            this.setState({selectedSession: session}, ()=> this.refs.modal.open())
+          }}
         >
         {getType(session.type, 40, 40)}
         </MapView.Marker>
@@ -596,7 +621,10 @@ import Hyperlink from 'react-native-hyperlink'
                   longitude: lng
                 }}
                 pinColor={colors.secondary}
-                onPress={() => this.setState({selectedLocation: result, latitude: lat, longitude: lng}, ()=> this.refs.locationModal.open())}
+                onPress={(event) => {
+                  event.stopPropagation()
+                  this.setState({selectedLocation: result, latitude: lat, longitude: lng}, ()=> this.refs.locationModal.open())
+                }}
                 />
                 )
             })
