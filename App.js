@@ -10,6 +10,7 @@ import {
 import Login from './login'
 import SignUp from './SignUp'
 import Home from './Home'
+import Sessions from './Sessions'
 import Friends from './Friends'
 import Profile from './Profile'
 import Settings from './Settings'
@@ -75,10 +76,10 @@ const chats = TabNavigator({
 
 const tabs = TabNavigator({
 	Home : {screen: Home},
+  Sessions: {screen: Sessions},
   Friends: {screen: Friends},
   Chat: {screen: chats},
 	Profile: {screen: Profile},
-	Settings: {screen: Settings}
 }, {
   tabBarPosition: 'bottom',
   animationEnabled: true,
@@ -102,6 +103,7 @@ export const Stack = StackNavigator({
   SignUp: { screen: SignUp},
   MainNav: { screen: tabs},
   Messaging: {screen: Messaging},
+  Settings: { screen: Settings },
   SecondScreen: { screen: SecondScreen, title: "Second Screen" }
 })
 

@@ -27,7 +27,7 @@ import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
-import hStyles from 'Anyone/styles/homeStyles'
+import sStyles from 'Anyone/styles/sessionStyles'
 
 
  class Friends extends Component {
@@ -153,7 +153,7 @@ import hStyles from 'Anyone/styles/homeStyles'
           </TouchableOpacity>
         </Modal>
 
-        <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"profileModal"} isDisabled={this.state.isDisabled}>
+        <Modal style={[sStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"profileModal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
 
          <View style={{flexDirection: 'row'}}>       
@@ -237,7 +237,7 @@ import hStyles from 'Anyone/styles/homeStyles'
           </View>
         )
       }
-      else {
+      else if (friend.status == 'connected') {
         list.push(
           <View key={index}
           style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10}}>

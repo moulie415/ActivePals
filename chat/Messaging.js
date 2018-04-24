@@ -21,7 +21,7 @@ import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-cha
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import colors from 'Anyone/constants/colors'
 import Modal from 'react-native-modalbox'
-import hStyles from 'Anyone/styles/homeStyles'
+import sStyles from 'Anyone/styles/sessionStyles'
 
 class Messaging extends React.Component {
   static navigationOptions = {
@@ -36,8 +36,8 @@ class Messaging extends React.Component {
 
 
     if (this.session) {
-      this.sessionId = this.params.sessionId
-      this.sessionTitle = this.params.sessionTitle
+      this.sessionId = this.session.key || this.session.id
+      this.sessionTitle = this.session.title
     }
     else {
       this.chatId = this.params.chatId
@@ -80,7 +80,7 @@ class Messaging extends React.Component {
   loadMessages() {
     this.setState({spinner: true})
     if (this.session) {
-      this.props.getSessionMessages(this.sessionId, this.state.amount)
+      this.props.getSessionMessages(this.sessionId, this.state.amount, this.session.private)
     }
     else {
       this.props.getMessages(this.chatId, this.state.amount, this.friendUid)
@@ -139,7 +139,8 @@ class Messaging extends React.Component {
     let converted = []
     messages.forEach(message => {
       if (this.session) {
-        converted.push({...message, createdAt: message.createdAt.toString(), sessionId: this.sessionId, sessionTitle: this.sessionTitle})
+        let type = this.session.private? "privateSessions" : 'sessions'
+        converted.push({...message, createdAt: message.createdAt.toString(), sessionId: this.sessionId, sessionTitle: this.sessionTitle, type})
       }
       else {
         converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, FCMToken: this.friendToken})
@@ -182,7 +183,6 @@ class Messaging extends React.Component {
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           onPressAvatar={user => this.fetchUser(user)}
-          alwaysShowSend={true}
           onLoadEarlier={()=> {
             this.fetched = false
             this.setState({amount: this.state.amount+=15, spinner: true} ,()=> this.loadMessages())
@@ -211,7 +211,7 @@ class Messaging extends React.Component {
             </View>
             )}}
           />
-        <Modal style={[hStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
+        <Modal style={[sStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
 
         <View style={{flexDirection: 'row'}}>      
@@ -353,7 +353,7 @@ import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, add
 
 const fetchId = (params) => {
   if (params.session) {
-    return params.sessionId
+    return params.session.key || params.session.id
   }
   else return params.chatId
 }
@@ -374,7 +374,7 @@ const mapDispatchToProps = dispatch => ({
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
   getMessages: (id, amount, uid) => dispatch(fetchMessages(id, amount, uid)),
-  getSessionMessages: (id, amount) => dispatch(fetchSessionMessages(id, amount)),
+  getSessionMessages: (id, amount, isPrivate) => dispatch(fetchSessionMessages(id, amount, isPrivate)),
   resetNotif: () => dispatch(resetNotification())
 
 })

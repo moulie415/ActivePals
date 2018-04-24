@@ -15,6 +15,8 @@ import {
   Icon,
   Header,
   Title,
+  Left,
+  Right
 } from 'native-base'
 import firebase from "./index"
 import VersionNumber from 'react-native-version-number'
@@ -22,16 +24,10 @@ import colors from './constants/colors'
 import  styles  from './styles/settingsStyles'
 
 
- export default class Settings extends Component {
+ class Settings extends Component {
+
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Settings',
-    tabBarIcon: ({ tintColor }) => (
-      <Icon
-        name='md-settings'
-        style={{ color: tintColor }}
-      />
-    ),
   }
 
   constructor(props) {
@@ -56,7 +52,15 @@ import  styles  from './styles/settingsStyles'
     return (
     <Container style={styles.container}>
       <Header style={{backgroundColor: colors.primary}}>
+      <Left style={{flex: 1}}>
+          <TouchableOpacity onPress={() => {
+            this.props.goBack()
+          } }>
+            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
+          </TouchableOpacity>
+          </Left>
         <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir'}}>Settings</Title>
+        <Right style={{flex: 1}} />
       </Header>
       <Content>
         <TouchableOpacity 
@@ -79,3 +83,17 @@ import  styles  from './styles/settingsStyles'
   )
   }
 }
+
+
+import { connect } from 'react-redux'
+import { navigateBack } from 'Anyone/actions/navigation'
+//import {  } from 'Anyone/actions/chats'
+
+// const mapStateToProps = ({ friends, profile, chats }) => ({
+// })
+
+const mapDispatchToProps = dispatch => ({
+  goBack: ()=> dispatch(navigateBack())
+})
+
+export default connect(null, mapDispatchToProps)(Settings)

@@ -97,7 +97,14 @@ window.Blob = Blob
     return (
     <Container style={{backgroundColor: colors.primary}}>
     <Header style={{backgroundColor: colors.primary}}>
-        <Left style={{flex: 1}} />
+        <Left style={{flex: 1}} >
+        <TouchableOpacity style={{marginLeft: 10}} onPress={()=> this.props.goToSettings()}>
+          <Icon
+          name='md-settings'
+          style={{ color: '#fff' }}
+          />
+        </TouchableOpacity>
+        </Left>
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Profile</Title>
         <Right>
           <Button onPress={()=> this.updateUser(this.state.initialProfile, this.state.profile)}
@@ -209,7 +216,7 @@ window.Blob = Blob
   }
   
 updateUser(initial, profile) {
-  if (JSON.stringify(initial) === JSON.stringify(profile && this.state.initialAvatar == this.state.avatar)) {
+  if (JSON.stringify(initial) === JSON.stringify(profile) && (this.state.initialAvatar == this.state.avatar)) {
     Alert.alert("No changes")
   }  
   else {
@@ -335,7 +342,7 @@ selectAvatar() {
 
 
 import { connect } from 'react-redux'
-import { navigateLogin } from 'Anyone/actions/navigation'
+import { navigateLogin, navigateSettings } from 'Anyone/actions/navigation'
 import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ profile }) => ({
@@ -344,7 +351,8 @@ const mapStateToProps = ({ profile }) => ({
 
 const mapDispatchToProps = dispatch => ({
   onLogoutPress: ()=> { dispatch(navigateLogin())},
-  onSave: ()=> dispatch(fetchProfile())
+  onSave: ()=> dispatch(fetchProfile()),
+  goToSettings: ()=> dispatch(navigateSettings())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile)

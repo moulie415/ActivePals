@@ -79,7 +79,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         <TouchableOpacity 
         key={index}
         onPress={()=> {
-            this.props.onOpenChat(true, detail.id, detail.title)
+            this.props.onOpenChat(detail)
         }}>
           <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
             <View>{getType(detail.type, 50)}</View>
@@ -142,7 +142,7 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 
 const mapDispatchToProps = dispatch => ({
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
-  onOpenChat: (session, sessionId, sessionTitle) => {return dispatch(navigateMessagingSession(session, sessionId, sessionTitle))}
+  onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionChats)

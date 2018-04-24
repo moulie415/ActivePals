@@ -37,10 +37,7 @@ class SessionDetail extends Component {
 		this.params = this.props.navigation.state.params
 		this.buddies = this.params.buddies
 		this.location = this.params.location
-		if (this.location) {
-			let coords = {lat: this.location.geometry.location.lat, lng: this.location.geometry.location.lng}
-			this.setLocation(coords, true)
-		}
+
 		this.type = this.params.type
 		this.state = {
 			gender: 'Unspecified',
@@ -52,8 +49,10 @@ class SessionDetail extends Component {
 	}
 
 	componentDidMount() {
-
-
+		if (this.location) {
+			let coords = {lat: this.location.geometry.location.lat, lng: this.location.geometry.location.lng}
+			this.setLocation(coords, true)
+		}
 		firebase.auth().onAuthStateChanged( user => {
 			if (user) {
 				this.user = user
@@ -129,9 +128,6 @@ class SessionDetail extends Component {
 							<TouchableOpacity onPress={()=> this.setLocationAsPosition()}>
 								<Text style={{color: colors.secondary, fontSize: 20, margin: 10}}>Use my location</Text>
 							</TouchableOpacity>
-							<TouchableOpacity>
-								<Text style={{color: colors.secondary, fontSize: 20, margin: 10}}>Select on map</Text>
-							</TouchableOpacity>
 						</View>
 						<Text style={{alignSelf: 'center', marginVertical: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
 					</View>
@@ -165,7 +161,7 @@ class SessionDetail extends Component {
 					<Text style={styles.typeText}>{'Type: ' + this.type}</Text>
 					</View>
 					<Button style={styles.createButton}
-					onPress={()=> this.createSession(this.props.navigation)}>
+					onPress={()=> this.createSession()}>
 						<Text style={{color: '#fff', fontSize: 20}}>Create Session</Text>
 					</Button>
 				</Content>
@@ -212,7 +208,7 @@ class SessionDetail extends Component {
 		)
 	}
 
-	createSession(navigation) {
+	createSession() {
 		if (this.location && this.title && this.details && this.state.date) {
 			let session = {
 				location: this.location, 
@@ -232,16 +228,19 @@ class SessionDetail extends Component {
 				})
 			}
 			session.users[this.user.uid] = true
-			firebase.database().ref('sessions').push(session).then((snapshot)=> {
+
+			let type = session.private? "privateSessions" : "sessions"
+			let val = session.private? "private" : true
+			firebase.database().ref(type).push(session).then((snapshot)=> {
 				Alert.alert('Success','Session created')
-				navigation.navigate("Home")
+				this.props.goSessions()
 				if (this.buddies) {
 					this.buddies.forEach(buddy => {
-						firebase.database().ref('users/' + buddy + '/sessions').child(snapshot.key).set(true)
+						firebase.database().ref('users/' + buddy + '/sessions').child(snapshot.key).set(val)
 					})
 				}
-				firebase.database().ref('sessions/' + snapshot.key + '/users').child(this.user.uid).set(true)
-				firebase.database().ref('users/' + this.user.uid + '/sessions').child(snapshot.key).set(true)
+				firebase.database().ref(type + '/' + snapshot.key + '/users').child(this.user.uid).set(true)
+				firebase.database().ref('users/' + this.user.uid + '/sessions').child(snapshot.key).set(val)
 				let systemMessage = {
 					_id: 1,
 					text: 'Beginning of chat',
@@ -249,7 +248,7 @@ class SessionDetail extends Component {
 					system: true,
 				}
 				firebase.database().ref('sessionChats/' + snapshot.key).push(systemMessage)
-				this.props.onCreate(snapshot.key)
+				this.props.onCreate(snapshot.key, session.private)
 			})
 			.catch(err => {
 				Alert.alert('Error', err.message)
@@ -270,14 +269,15 @@ class SessionDetail extends Component {
 }
 
 import { connect } from 'react-redux'
-//import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
+import {  navigateSessions } from 'Anyone/actions/navigation'
 import { addSessionChat } from 'Anyone/actions/chats'
 
 // const mapStateToProps = ({ home, settings }) => ({
 // })
 
 const mapDispatchToProps = dispatch => ({
-	onCreate: (session) => dispatch(addSessionChat(session))
+	onCreate: (session, isPrivate) => dispatch(addSessionChat(session, isPrivate)),
+	goSessions: ()=> dispatch(navigateSessions())
 })
 
 export default connect(null, mapDispatchToProps)(SessionDetail)
