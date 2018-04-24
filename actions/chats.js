@@ -130,8 +130,9 @@ export const fetchSessionChats = (sessions, uid) => {
 	return (dispatch) => {
 		let chatList = []
 		Object.keys(sessions).forEach(session => {
+			let type = sessions[session] == 'private'? "privateSessions" : 'sessions'
 			let promise = new Promise(function(resolve, reject) {
-				firebase.database().ref('sessions/' + session).once('value', snapshot => {
+				firebase.database().ref(type + '/' + session).once('value', snapshot => {
 					if (snapshot.val()) {
 						firebase.database().ref('sessionChats/'+ session).orderByKey().limitToLast(1)
 						.once('value', lastMessage => {
@@ -157,10 +158,11 @@ export const fetchSessionChats = (sessions, uid) => {
 	}
 }
 
-export const addSessionChat = (session) => {
+export const addSessionChat = (session, isPrivate = false) => {
 	return (dispatch) => {
+		let type = isPrivate? "privateSessions" : "sessions"
 		return new Promise(resolve => {
-			firebase.database().ref('sessions/' + session).once('value', snapshot => {
+			firebase.database().ref(type + '/' + session).once('value', snapshot => {
 				firebase.database().ref('sessionChats/'+ session).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					let message = {text: "new session chat created"}
@@ -205,13 +207,14 @@ export const fetchMessages = (id, amount, uid) => {
 	}
 }
 
-export const fetchSessionMessages = (id, amount) => {
+export const fetchSessionMessages = (id, amount, isPrivate = false) => {
 	return (dispatch) => {
+		let type = isPrivate? 'privateSessions' : 'sessions'
 		return firebase.database().ref('sessionChats/'+ id).orderByKey().limitToLast(amount)
 		.once('value', snapshot => {
 			let messages = []
 			let promises = []
-			firebase.database().ref('sessions/' + id).child('users').once('value', users => {
+			firebase.database().ref(type + '/' + id).child('users').once('value', users => {
 				users.forEach(child => {
 					promises.push(new Promise(resolve => {
 						firebase.storage().ref('images/' + child.key ).child('avatar').getDownloadURL()

@@ -18,7 +18,11 @@ export const navigateLogin = () => {
  export const navigateFriends = () => nav('Friends')
 
 export const navigateHome = () => nav('Home')
+export const navigateSessions = () => nav('Sessions') 
 export const navigateMessaging = (chatId, friendUsername, friendUid ) => nav('Messaging', {chatId, friendUsername, friendUid})
-export const navigateMessagingSession = (session, sessionId, sessionTitle) => nav("Messaging", {session, sessionId, sessionTitle})
+export const navigateMessagingSession = (session) => nav("Messaging", {session})
 export const navigateSessionType = (buddies, location) => nav("SessionType", {buddies, location})
 export const navigateSessionDetail = (type, buddies, location) => nav("SessionDetail", {type, buddies, location})
+export const navigateSettings = () => nav('Settings')
+export const navigateProfile = () => nav('Profile')
+export const navigateBack = () => NavigationActions.back()
