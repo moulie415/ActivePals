@@ -111,7 +111,8 @@ FCM.on(FCMEvent.Notification, async (notif) => {
                   dispatch(navigateMessaging(chatId, username, uid))
                   break
                 case 'sessionMessage':
-                  dispatch(navigateMessagingSession(true, sessionId, sessionTitle))
+                  let session = {key: sessionId, title: sessionTitle}
+                  dispatch(navigateMessagingSession(session))
                   break
                 case 'buddyRequest':
                   dispatch(navigateFriends())

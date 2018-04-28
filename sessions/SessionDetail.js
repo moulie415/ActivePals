@@ -271,13 +271,15 @@ class SessionDetail extends Component {
 import { connect } from 'react-redux'
 import {  navigateSessions } from 'Anyone/actions/navigation'
 import { addSessionChat } from 'Anyone/actions/chats'
+import { addPost } from 'Anyone/actions/home'
 
 // const mapStateToProps = ({ home, settings }) => ({
 // })
 
 const mapDispatchToProps = dispatch => ({
 	onCreate: (session, isPrivate) => dispatch(addSessionChat(session, isPrivate)),
-	goSessions: ()=> dispatch(navigateSessions())
+	goSessions: ()=> dispatch(navigateSessions()),
+	createPost: (post)=> dispatch(addPost(post))
 })
 
 export default connect(null, mapDispatchToProps)(SessionDetail)

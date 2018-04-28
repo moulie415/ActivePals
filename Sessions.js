@@ -120,9 +120,7 @@ import StarRating from 'react-native-star-rating'
           .then(()=> {
             firebase.database().ref('timestamp').once('value', snapshot => {
               if (snapshot.val() > time + duration) {
-                firebase.database().ref('sessions').child(child.key).remove()
-                firebase.database().ref('sessionChats').child(child.key).remove()
-                .then(() => this.props.onLeave(child.key, this.props.chats))
+                this.props.onRemove(child.val(), child.key)
               }
             })
           })
@@ -155,6 +153,7 @@ import StarRating from 'react-native-star-rating'
         if (time + duration > current) {
           let inProgress = time < current
             privateSessions.push({...session.val(), key: session.key, inProgress})
+            //this.props.onJoin(session.key, true)
         }
         else {
           //validate time serverside before deleting session in case clients time is wrong
@@ -162,9 +161,7 @@ import StarRating from 'react-native-star-rating'
           .then(()=> {
             firebase.database().ref('timestamp').once('value', snapshot => {
               if (snapshot.val() > time + duration) {
-                firebase.database().ref('privateSessions').child(session.key).remove()
-                firebase.database().ref('sessionChats').child(session.key).remove()
-                .then(() => this.props.onLeave(session.key, this.props.chats))
+                this.props.onRemove(session.val(), session.key)
               }
             })
           })
@@ -397,10 +394,7 @@ import StarRating from 'react-native-star-rating'
               [
               {text: 'cancel', style: 'cancel'},
               {text: 'Yes', onPress: ()=> {
-                firebase.database().ref('sessions/' + session.key).remove()
-                Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(session.key).remove())
-                firebase.database().ref('sessionChats').child(session.key).remove()
-                .then(()=> this.props.onLeave(session.key, this.props.chats))
+                this.props.onRemove(session, session.key)
                 this.refs.modal.close()
               },
               style: 'destructive'}
@@ -426,9 +420,7 @@ import StarRating from 'react-native-star-rating'
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableOpacity
           onPress={()=> {
-            firebase.database().ref('users/' + uid + '/sessions').child(session.key).remove()
-            .then(() => this.props.onLeave(session.key, this.props.chats))
-            firebase.database().ref('sessions/' + session.key + '/users').child(uid).remove()
+            this.props.onRemove(session, session.key)
             this.refs.modal.close()
           }}
           style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
@@ -707,7 +699,7 @@ import StarRating from 'react-native-star-rating'
 
 import { connect } from 'react-redux'
 import { navigateMessagingSession, navigateSessionType } from 'Anyone/actions/navigation'
-import { fetchSessionChats, addSessionChat, removeSessionChat } from 'Anyone/actions/chats'
+import { fetchSessionChats, addSessionChat, removeSessionChat, leaveSessionChat } from 'Anyone/actions/chats'
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
   friends: friends.friends,
@@ -718,7 +710,8 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 const mapDispatchToProps = dispatch => ({
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onJoin: (session, isPrivate) => {return dispatch(addSessionChat(session, isPrivate))},
-  onLeave: (session, sessions) => {return dispatch(removeSessionChat(session, sessions))},
+  onRemove: (session, key) => {return dispatch(removeSessionChat(session, key))},
+  onLeave: (session) => {return dispatch(leaveSessionChat(session))},
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
 })

@@ -31,7 +31,7 @@ export default function(state = initialState, action) {
 		case REMOVE_SESSION_CHAT:
 			return {
 				...state,
-				sessionChats: state.sessionChats.filter(chat => chat.id != action.session)
+				sessionChats: state.sessionChats.filter(chat => chat.key != action.session)
 			}
 		case SET_CHATS:
 			return {

@@ -36,7 +36,7 @@ class Messaging extends React.Component {
 
 
     if (this.session) {
-      this.sessionId = this.session.key || this.session.id
+      this.sessionId = this.session.key
       this.sessionTitle = this.session.title
     }
     else {
@@ -99,7 +99,7 @@ class Messaging extends React.Component {
       this.props.resetNotif()
       //ignore inital fetch when component mounts
       if (this.listenForNotif) {
-        const { type, uid, username, _id, body, title, sessionId, avatar, createdAt, custom_notification } = nextProps.notif
+        const { type, uid, username, _id, body, title, sessionId, sessionTitle, avatar, createdAt, custom_notification } = nextProps.notif
         if (type == 'message' || type == 'sessionMessage') {
           let message
           let date = new Date(createdAt)
@@ -140,7 +140,7 @@ class Messaging extends React.Component {
     messages.forEach(message => {
       if (this.session) {
         let type = this.session.private? "privateSessions" : 'sessions'
-        converted.push({...message, createdAt: message.createdAt.toString(), sessionId: this.sessionId, sessionTitle: this.sessionTitle, type})
+        converted.push({...message, createdAt: message.createdAt.toString(), sessionTitle: this.sessionTitle, sessionId: this.sessionId, type})
       }
       else {
         converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, FCMToken: this.friendToken})
@@ -353,7 +353,7 @@ import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, add
 
 const fetchId = (params) => {
   if (params.session) {
-    return params.session.key || params.session.id
+    return params.session.key
   }
   else return params.chatId
 }

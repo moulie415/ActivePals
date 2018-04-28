@@ -21,7 +21,7 @@ const addToSessionChats = (session) => ({
 	session,
 })
 
-export const removeSessionChat = (session) => ({
+const removeFromSessionChats = (session) => ({
 	type: REMOVE_SESSION_CHAT,
 	session
 })
@@ -72,8 +72,8 @@ export const updateLastMessage = (notif) => {
 			return firebase.database().ref('sessionChats').child(notif.sessionId).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
-						let chats = getState().chats.sessionChats.filter(chat => chat.id != notif.sessionId)
-						let chat = getState().chats.sessionChats.filter(chat => chat.id == notif.sessionId)[0]
+						let chats = getState().chats.sessionChats.filter(chat => chat.key != notif.sessionId)
+						let chat = getState().chats.sessionChats.filter(chat => chat.key == notif.sessionId)[0]
 						dispatch(setSessionChats([...chats, {...chat, lastMessage: Object.values(lastMessage.val())[0]}]))
 					}
 				})
@@ -140,7 +140,7 @@ export const fetchSessionChats = (sessions, uid) => {
 							if (lastMessage.val()) {
 								message = Object.values(lastMessage.val())[0]
 							}
-							resolve({...snapshot.val(), id: session, lastMessage: message})
+							resolve({...snapshot.val(), key: session, lastMessage: message})
 						})
 					}
 					else {
@@ -169,8 +169,8 @@ export const addSessionChat = (session, isPrivate = false) => {
 					if (lastMessage.val()) {
 						message = Object.values(lastMessage.val())[0]
 					}
-					resolve({...snapshot.val(), id: session, lastMessage: message})
-					dispatch(addToSessionChats({...snapshot.val(), id: session, lastMessage: message}))
+					resolve({...snapshot.val(), key: session, lastMessage: message})
+					dispatch(addToSessionChats({...snapshot.val(), key: session, lastMessage: message}))
 					dispatch(fetchProfile())
 				})
 			})
@@ -178,6 +178,22 @@ export const addSessionChat = (session, isPrivate = false) => {
 	}
 }
 
+export const removeSessionChat = (session, key) => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		let type = session.private? "privateSessions" : "sessions"
+		if (session.host == uid) {
+			firebase.database().ref(type + '/' + key).remove()
+			Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(key).remove())
+			firebase.database().ref('sessionChats').child(key).remove()
+		}
+		else {
+			firebase.database().ref('users/' + uid + '/sessions').child(key).remove()
+			firebase.database().ref(type + '/' + key + '/users').child(uid).remove()
+		}
+		dispatch(removeFromSessionChats(key))
+	}
+}
 
 export const fetchMessages = (id, amount, uid) => {
 	return (dispatch) => {

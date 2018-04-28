@@ -4,6 +4,7 @@ import nav from './navigation'
 import friends from './friends'
 import profile from './profile'
 import chats from './chats'
+import home from './home'
  
 //import { DATA_AVAILABLE } from "../actions/" //Import the actions types constant we defined in our actions
  
@@ -25,7 +26,8 @@ const rootReducer = combineReducers({
     nav,
     profile,
     friends,
-    chats
+    chats,
+    home
 
     // ,[ANOTHER REDUCER], [ANOTHER REDUCER] ....
 })
