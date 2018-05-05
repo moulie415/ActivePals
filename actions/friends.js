@@ -9,15 +9,24 @@ const setFriends = (friends) => ({
 	friends
 })
 
-const addToFriends = (friend) => ({
+const addToFriends = (uid,friend) => ({
 	type: ADD_FRIEND,
+	uid,
 	friend
 })
 
-export const updateFriends = (friends) => ({
-	type: UPDATE_FRIENDS,
-	friends
-})
+
+export const removeFriend = (uid) => {
+	return (dispatch, getState) => {
+		let friends = getState().friends.friends
+		let friendArr = Object.values(friends).filter(friend => friend.uid != uid)
+		let obj = friendArr.reduce(function(acc, cur, i) {
+				acc[cur.uid] = cur
+				return acc
+			}, {})
+		dispatch(setFriends(obj))
+	}
+}
 
 
 
@@ -42,7 +51,11 @@ export const fetchFriends = (uids) => {
 			friends.push(promise)
 		})
 		return Promise.all(friends).then(items => {
-			dispatch(setFriends(items))
+			let obj = items.reduce(function(acc, cur, i) {
+				acc[cur.uid] = cur
+				return acc
+			}, {})
+			dispatch(setFriends(obj))
 		})
 	}
 }
@@ -55,11 +68,11 @@ export const addFriend = (uid) => {
 				firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL() 
 					.then(url => {
 						resolve()
-						dispatch(addToFriends({...profile.val(), status, avatar: url}))
+						dispatch(addToFriends(uid.key, {...profile.val(), status, avatar: url}))
 					})
 					.catch(e => {
 						resolve()
-						dispatch(addToFriends({...profile.val(), status}))
+						dispatch(addToFriends(uid.key, {...profile.val(), status}))
 					})
 			})
 		})

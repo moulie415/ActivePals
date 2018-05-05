@@ -99,7 +99,7 @@ import {getSimplified } from './SessionChats'
     let list = []
     let index = 1
     this.state.chats.forEach(chat => {
-      let friend = this.props.friends.filter(friend => friend.uid == chat.uid)[0]
+      let friend = this.props.friends[chat.uid]
       if (friend) {
         list.push(
           <TouchableOpacity 

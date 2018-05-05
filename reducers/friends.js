@@ -5,7 +5,7 @@ import {
 } from 'Anyone/actions/friends'
 
 const initialState = {
-	friends: [],
+	friends: {},
 	refreshing: false,
 }
 
@@ -24,7 +24,7 @@ export default function(state = initialState, action) {
 		case ADD_FRIEND:
 			return {
 				...state,
-				friends: [...state.friends.filter(friend => friend.uid != action.friend.uid), action.friend]
+				friends: {...state.friends, [action.uid]: action.friend}
 			}
 		default:
 			return state

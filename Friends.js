@@ -48,7 +48,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
     this.uid = this.props.profile.uid
     this.user = null
     this.state = {
-      friends: this.props.friends,
+      friends: Object.values(this.props.friends),
       refreshing: false
     }
   }
@@ -67,25 +67,14 @@ import sStyles from 'Anyone/styles/sessionStyles'
   }
 
   listenForFriends(ref) {
-    ref.on('value', snapshot => {
-      snapshot.forEach(child => {
-        let exists = false
-        this.state.friends.forEach(friend => {
-          if (child.key == friend.uid) {
-            if (child.val() == friend.status) {
-              exists = true
-            }
-          }
-        })
-        if (!exists) {
-          this.props.add(child)
-        }
-      })
-      if (snapshot.val() && Object.keys(snapshot.val()).length 
-        != this.state.friends.length) {
-        this.props.update(Object.keys(snapshot.val()))
-        this.props.updateDms(Object.keys(snapshot.val()))
-      }
+    ref.on('child_added', snapshot => {
+        this.props.add(snapshot)
+    })
+    ref.on('child_changed', snapshot => {
+        this.props.add(snapshot)
+    })
+    ref.on('child_removed', snapshot => {
+        this.props.removeLocal(snapshot.key) 
     })
   }
 
@@ -99,7 +88,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.friends) {
-      this.setState({refreshing: false, friends: nextProps.friends})
+      this.setState({refreshing: false, friends: Object.values(nextProps.friends)})
     }
   }
 
@@ -334,7 +323,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
 
 import { connect } from 'react-redux'
 import { navigateMessaging } from 'Anyone/actions/navigation'
-import { fetchFriends, sendRequest, acceptRequest, deleteFriend, updateFriends, addFriend } from 'Anyone/actions/friends'
+import { fetchFriends, sendRequest, acceptRequest, deleteFriend, removeFriend, addFriend } from 'Anyone/actions/friends'
 import { updateChats } from 'Anyone/actions/chats'
 import { fetchProfile } from 'Anyone/actions/profile'
 
@@ -348,9 +337,9 @@ const mapDispatchToProps = dispatch => ({
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onRemove: (uid, friendUid, profile)=> {return dispatch(deleteFriend(uid, friendUid, profile))},
+  removeLocal: (uid) => dispatch(removeFriend(uid)),
   getProfile: ()=> {return dispatch(fetchProfile())},
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
-  update: (uids) => dispatch(updateFriends(uids)),
   updateDms: (uids) => dispatch(updateChats(uids)),
   add: (friend) => dispatch(addFriend(friend))
 })

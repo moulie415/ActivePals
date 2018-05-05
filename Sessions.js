@@ -350,7 +350,7 @@ import StarRating from 'react-native-star-rating'
 
   renderFriendsSelection() {
     let friends = []
-    this.props.friends.forEach((friend, index) => {
+    Object.values(this.props.friends).forEach((friend, index) => {
       let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
       friends.push(
           <TouchableOpacity key={index} onPress={()=> this.onFriendPress(friend.uid)}>
@@ -475,7 +475,7 @@ import StarRating from 'react-native-star-rating'
                   this.props.onContinue(null, this.state.selectedLocation)
                 }
                 else if (buttonIndex == 1) {
-                  if (this.props.friends.length > 0) {
+                  if (Object.values(this.props.friends).length > 0) {
                     this.refs.friendsModal.open()
                   }
                   else {
@@ -518,8 +518,7 @@ import StarRating from 'react-native-star-rating'
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                         <TouchableOpacity onPress={()=>{
-                          this.setState({switch: true})
-                          this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat})
+                          this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat, switch: true})
                         }}
                         style={{flex: 1}}>
                           <Text style={{color: colors.secondary, fontFamily: 'Avenir', textAlign: 'right'}}>View on map</Text>
