@@ -16,7 +16,7 @@ const setFeed = (feed) => ({
 export const addPost = (item) => {
 	return (dispatch, getState) => {
 		uid = getState().profile.profile.uid
-		let uids = getState().friends.friends.map(friend => friend.uid)
+		let uids = Object.keys(getState().friends.friends)
 		return firebase.database().ref('posts').push(item).then(snapshot => {
 			uids.forEach(friend => {
 				firebase.database().ref('userPosts/' + friend).child(snapshot.key).set(true)
@@ -32,7 +32,7 @@ export const fetchPosts = (uid, amount) => {
 	return (dispatch, getState) => {
 		let promises = []
 		return new Promise(resolve => {
-			firebase.database().ref('userPosts/' + uid).orderByKey().limitToLast(amount).once('value', snapshot => {
+			firebase.database().ref('userPosts/' + uid).orderByKey().limitToLast(amount).on('value', snapshot => {
 				if (snapshot.val()) {
 					Object.keys(snapshot.val()).forEach(post => {
 						promises.push(firebase.database().ref('posts/' + post).once('value'))

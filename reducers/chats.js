@@ -3,7 +3,6 @@ import {
 	ADD_SESSION_CHAT,
 	REMOVE_SESSION_CHAT,
 	SET_CHATS,
-	UPDATE_CHATS,
 	ADD_CHAT,
 	SET_MESSAGE_SESSION,
 	RESET_NOTIFICATION,
@@ -12,7 +11,7 @@ import {
 
 const initialState = {
 	sessionChats: [],
-	chats: [],
+	chats: {},
 	messageSessions: {},
 }
 
@@ -37,11 +36,6 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				chats: action.chats
-			}
-		case UPDATE_CHATS:
-			return {
-				...state,
-				chats: state.chats.filter(chat => action.chats.includes(chat.uid))
 			}
 		case ADD_CHAT:
 			return {

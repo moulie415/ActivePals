@@ -324,7 +324,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
 import { connect } from 'react-redux'
 import { navigateMessaging } from 'Anyone/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend, removeFriend, addFriend } from 'Anyone/actions/friends'
-import { updateChats } from 'Anyone/actions/chats'
+import { removeChat } from 'Anyone/actions/chats'
 import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ friends, profile }) => ({
@@ -340,7 +340,6 @@ const mapDispatchToProps = dispatch => ({
   removeLocal: (uid) => dispatch(removeFriend(uid)),
   getProfile: ()=> {return dispatch(fetchProfile())},
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
-  updateDms: (uids) => dispatch(updateChats(uids)),
   add: (friend) => dispatch(addFriend(friend))
 })
 

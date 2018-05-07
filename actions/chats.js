@@ -4,7 +4,6 @@ export const SET_SESSION_CHATS = 'SET_SESSION_CHATS'
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT'
 export const REMOVE_SESSION_CHAT = 'REMOVE_SESSION_CHAT'
 export const SET_CHATS = 'SET_CHATS'
-export const UPDATE_CHATS = 'UPDATE_CHATS'
 export const ADD_CHAT = 'ADD_CHAT'
 export const SET_MESSAGE_SESSION = 'SET_MESSAGE_SESSION'
 export const NEW_NOTIF = 'NEW_NOTIF'
@@ -31,8 +30,9 @@ const setChats = (chats) => ({
 	chats
 })
 
-const addToChats = (chat) => ({
+const addToChats = (uid, chat) => ({
 	type: ADD_CHAT,
+	uid,
 	chat
 })
 
@@ -42,10 +42,6 @@ const setMessageSession = (id, messages) => ({
 	messages,
 })
 
-export const updateChats = (chats) => ({
-	type: UPDATE_CHATS,
-	chats
-})
 
 export const newNotification = (notif) => ({
 	type: NEW_NOTIF,
@@ -102,7 +98,11 @@ export const fetchChats = (chats) => {
 			chatList.push(promise)
 		})
 		return Promise.all(chatList).then(chats => {
-			dispatch(setChats(chats))
+			let obj = chats.reduce(function(acc, cur, i) {
+				acc[cur.uid] = cur
+				return acc
+			}, {})
+			dispatch(setChats(obj))
 		})
 	}
 }
@@ -111,18 +111,27 @@ export const addChat = (chat) => {
 	return (dispatch) => {
 		uid = chat.key
 		chatId = chat.val()
-		return new Promise(resolve => {
-			firebase.database().ref('chats/'+ chatId).orderByKey().limitToLast(1)
-			.once('value', lastMessage => {
-				let message = {text: "new chat created"}
-				if (lastMessage.val()) {
-					message = Object.values(lastMessage.val())[0]
-				}
-				resolve({uid, chatId, lastMessage: message})
-				dispatch(addToChats({uid, chatId, lastMessage: message}))
-				dispatch(fetchProfile())
-			})
+		return firebase.database().ref('chats/'+ chatId).orderByKey().limitToLast(1)
+		.once('value', lastMessage => {
+			let message = {text: "new chat created"}
+			if (lastMessage.val()) {
+				message = Object.values(lastMessage.val())[0]
+			}
+			dispatch(addToChats(uid, {uid, chatId, lastMessage: message}))
+			dispatch(fetchProfile())
 		})
+	}
+}
+
+export const removeChat = (uid) => {
+	return (dispatch, getState) => {
+		let chats = getState().chats.chats
+		let chatArr = Object.values(chats).filter(chat => chat.uid != uid)
+		let obj = chatArr.reduce(function(acc, cur, i) {
+			acc[cur.uid] = cur
+			return acc
+		}, {})
+		dispatch(setChats(obj))
 	}
 }
 

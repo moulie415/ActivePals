@@ -23,6 +23,7 @@ import firebase from "./index"
 import colors from './constants/colors'
 import  styles  from './styles/homeStyles'
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
+import { getSimplified } from 'Anyone/chat/SessionChats'
 
 
 class Home extends Component {
@@ -64,8 +65,8 @@ componentWillReceiveProps(nextProps) {
   if (nextProps.profile) {
     this.setState({profile: nextProps.profile})
   }
-  if (nextProps.home) {
-    this.setState({feed: nextProps.home.feed})
+  if (nextProps.feed) {
+    this.setState({feed: nextProps.feed})
   }
 }
 
@@ -79,7 +80,7 @@ componentWillReceiveProps(nextProps) {
       <Content>
         <View style={{flexDirection: 'row', backgroundColor: '#fff', padding: 10, alignItems: 'center'}}>
         <TouchableOpacity onPress={()=> this.props.goToProfile()}>
-          {this.state.profile.avatar? 
+          {this.state.profile && this.state.profile.avatar? 
             <Image source={{uri: this.props.profile.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/>
             : <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
             </TouchableOpacity> 
@@ -93,7 +94,7 @@ componentWillReceiveProps(nextProps) {
             <TouchableOpacity onPress={() => {
               if (this.state.status) {
                 if (username) {
-                  this.props.postStatus({type: 'status', text: this.state.status, uid, username, createAt: (new Date()).toString()})
+                  this.props.postStatus({type: 'status', text: this.state.status, uid, username, createdAt: (new Date()).toString()})
                     .then(() => this.setState({status: ""}))
                     .catch(e => Alert.alert('Error', e.message))
                 }
@@ -108,7 +109,7 @@ componentWillReceiveProps(nextProps) {
               <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 40}}/>
             </TouchableOpacity>
         </View>
-        {this.renderFeed()}
+        {this.props.friends && this.renderFeed()}
       </Content>
     </Container>
   )
@@ -117,7 +118,7 @@ componentWillReceiveProps(nextProps) {
   renderFeed() {
     if (Object.values(this.state.feed).length > 0) {
       return <FlatList 
-        data={Object.values(this.state.feed)}
+        data={Object.values(this.state.feed).reverse()}
         keyExtractor={(item) => item.key}
         renderItem = {({ item }) => (
             <Card style={{padding: 10, margin: 5}}>
@@ -126,20 +127,38 @@ componentWillReceiveProps(nextProps) {
           )}
       />
     }
-    else return <Text>No feed items yet</Text>
+    else return <Text style={{fontSize: 20, alignSelf: 'center', marginTop: 20, color: '#999'}}>No feed items yet</Text>
   }
   
   renderFeedItem(item) {
     switch(item.type) {
       case 'status':
         return (
-          <View>
-            <Text style={{fontWeight: 'bold'}}>{item.uid == this.props.profile.uid? 'You' : item.username}</Text>
-            <Text>{item.text}</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {this.fetchAvatar(item.uid)}
+            <View style={{flex: 1}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text style={{fontWeight: 'bold', color: '#000', flex: 1}}>{item.uid == this.props.profile.uid? 'You' : item.username}</Text>
+                <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
+              </View>
+              <Text style={{color: '#000'}}>{item.text}</Text>
+            </View>
           </View>
           )
     }
   }
+
+  fetchAvatar(uid) {
+    if (uid == this.props.profile.uid && this.state.profile.avatar) {
+      return <Image source={{uri: this.props.profile.avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
+    }
+    else if (uid != this.props.profile.uid && this.props.friends[uid].avatar) {
+      return <Image source={{uri: this.props.friends[uid].avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/> 
+    }
+    else return <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary, marginRight: 10}}/> 
+  }
+
+
 }
 
 
@@ -147,9 +166,10 @@ import { connect } from 'react-redux'
 import { navigateProfile } from 'Anyone/actions/navigation'
 import { addPost } from 'Anyone/actions/home'
 
-const mapStateToProps = ({ profile, home }) => ({
+const mapStateToProps = ({ profile, home, friends }) => ({
   profile: profile.profile,
-  feed: home.feed
+  feed: home.feed,
+  friends: friends.friends
 })
 
 const mapDispatchToProps = dispatch => ({

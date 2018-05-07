@@ -1,7 +1,9 @@
 import * as firebase from "firebase"
+import { removeChat } from './chats'
 export const SET_FRIENDS = 'SET_FRIENDS'
 export const UPDATE_FRIENDS = 'UPDATE_FRIENDS'
 export const ADD_FRIEND = 'ADD_FRIEND'
+
 
 
 const setFriends = (friends) => ({
@@ -25,6 +27,7 @@ export const removeFriend = (uid) => {
 				return acc
 			}, {})
 		dispatch(setFriends(obj))
+		dispatch(removeChat(uid))
 	}
 }
 

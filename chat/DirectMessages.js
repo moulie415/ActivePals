@@ -31,7 +31,7 @@ import {getSimplified } from './SessionChats'
     this.nav = this.props.navigation
     this.user = null
     this.state = {
-      chats: this.props.chats,
+      chats: Object.values(this.props.chats),
     }
   }
 
@@ -53,29 +53,20 @@ import {getSimplified } from './SessionChats'
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.chats) {
-      this.setState({chats: nextProps.chats})
+      this.setState({chats: Object.values(nextProps.chats)})
     }
   }
 
   listenForChats(ref) {
-    ref.on('value', snapshot => {
-      snapshot.forEach(child => {
-        let exists = false
-        this.state.chats.forEach(chat => {
-          if (child.val() == chat.chatId) {
-            exists = true
-          }
-        })
-        if (!exists) {
-          this.props.add(child)
-        }
-      })
-      if (snapshot.val() && Object.keys(snapshot.val()).length 
-        != this.state.chats.length) {
-        this.props.update(Object.keys(snapshot.val()))
-    }
-
-  })
+    ref.on('child_added', snapshot => {
+        this.props.add(snapshot)
+    })
+    ref.on('child_changed', snapshot => {
+        this.props.add(snapshot)
+    })
+    ref.on('child_removed', snapshot => {
+        this.props.remove(snapshot.key) 
+    })
   }
 
 
@@ -129,7 +120,7 @@ import {getSimplified } from './SessionChats'
 
 import { connect } from 'react-redux'
 import { navigateMessaging } from 'Anyone/actions/navigation'
-import { fetchChats, addChat, updateChats } from 'Anyone/actions/chats'
+import { fetchChats, addChat, removeChat } from 'Anyone/actions/chats'
 import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
@@ -143,7 +134,7 @@ const mapDispatchToProps = dispatch => ({
   getProfile: () => {return dispatch(fetchProfile())},
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   add: (chat) => dispatch(addChat(chat)),
-  update: (chats) => dispatch(updateChats(chats))
+  remove: (chat) => dispatch(removeChat(chat))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DirectMessages)
