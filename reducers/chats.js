@@ -40,7 +40,7 @@ export default function(state = initialState, action) {
 		case ADD_CHAT:
 			return {
 				...state,
-				chats: [...state.chats, action.chat]
+				chats: {...state.chats, [action.uid]: action.chat}
 			}
 		case SET_MESSAGE_SESSION:
 			return {

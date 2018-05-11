@@ -39,8 +39,8 @@ export default styles = StyleSheet.create({
     padding: 10
   },
   title: {
-    fontFamily: 'Avenir',
     fontWeight: 'bold',
+    color: '#000',
     flex: 2
   },
   date: {

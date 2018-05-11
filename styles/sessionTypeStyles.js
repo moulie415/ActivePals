@@ -3,7 +3,6 @@ import colors from 'Anyone/constants/colors'
 
 export default styles = StyleSheet.create({
   typeText: {
-    fontFamily: 'Avenir',
     fontSize: 30, 
     marginLeft: 10
   },

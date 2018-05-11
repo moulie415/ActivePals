@@ -94,9 +94,18 @@ componentWillReceiveProps(nextProps) {
             <TouchableOpacity onPress={() => {
               if (this.state.status) {
                 if (username) {
-                  this.props.postStatus({type: 'status', text: this.state.status, uid, username, createdAt: (new Date()).toString()})
-                    .then(() => this.setState({status: ""}))
-                    .catch(e => Alert.alert('Error', e.message))
+                  Alert.alert(
+                    "Confirm",
+                    "Submit post?",
+                    [
+                    {text: 'Cancel', style: 'cancel'},
+                    {text: 'Yes', style: 'positive', onPress: ()=> {
+                      this.props.postStatus({type: 'status', text: this.state.status, uid, username, createdAt: (new Date()).toString()})
+                      .then(() => this.setState({status: ""}))
+                      .catch(e => Alert.alert('Error', e.message))
+                    }}
+                    ]
+                    )
                 }
                 else {
                   //alert username not set

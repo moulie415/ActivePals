@@ -8,10 +8,10 @@ import {
 import {
 	Image,
 	TouchableOpacity,
-	Text,
 	Alert
 } from 'react-native'
 import styles from '../styles/sessionTypeStyles'
+import Text, { globalTextStyle } from 'Anyone/constants/Text'
 
 
 class SessionType extends Component {

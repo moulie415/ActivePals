@@ -111,7 +111,7 @@ export const addChat = (chat) => {
 	return (dispatch) => {
 		uid = chat.key
 		chatId = chat.val()
-		return firebase.database().ref('chats/'+ chatId).orderByKey().limitToLast(1)
+		return firebase.database().ref('chats').child(chatId).orderByKey().limitToLast(1)
 		.once('value', lastMessage => {
 			let message = {text: "new chat created"}
 			if (lastMessage.val()) {

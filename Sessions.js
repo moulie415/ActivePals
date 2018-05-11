@@ -13,7 +13,6 @@ import {
 } from "react-native"
 import {
   Button,
-  Text,
   Input,
   Container,
   Content,
@@ -29,6 +28,7 @@ import {
   Title,
 } from 'native-base'
 import firebase from "./index"
+import Text, { globalTextStyle } from 'Anyone/constants/Text'
 import Permissions from 'react-native-permissions'
 import styles from './styles/sessionStyles'
 import colors from './constants/colors'
@@ -195,10 +195,10 @@ import StarRating from 'react-native-star-rating'
       {this.state.spinner && <Spinner style={styles.spinner} />}
         <Header style={{backgroundColor: colors.primary}}>
         <Left style={{flex: 1}} />
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Sessions</Title>
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Sessions</Title>
         <Right>
            <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}> 
-            <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Map: </Text>
+            <Text style={{color: '#fff'}}>Map: </Text>
             <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
           </View>
         </Right>
@@ -236,12 +236,12 @@ import StarRating from 'react-native-star-rating'
             this.props.onContinue()
           }}>
             <Text adjustsFontSizeToFit={true} 
-            style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Session</Text>
+            style={{flex: 1, textAlign: 'center', color: '#fff'}}>Create Session</Text>
           </Button>
           <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/> 
           <Button style={styles.button}
           onPress={()=> {
-            if (this.props.friends.length > 0) {
+            if (Object.keys(this.props.friends).length > 0) {
               this.setState({selectedLocation: null})
               this.refs.friendsModal.open()
             }
@@ -250,33 +250,34 @@ import StarRating from 'react-native-star-rating'
             }
           }}>
             <Text adjustsFontSizeToFit={true} 
-            style={{flex: 1, textAlign: 'center', fontFamily: 'Avenir'}}>Create Private Session</Text>
+            style={{flex: 1, textAlign: 'center', color: '#fff'}}>Create Private Session</Text>
           </Button>
         </View>
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
-        {this.state.selectedSession && <View style={{margin: 10, flex: 1}}>
-          <ScrollView>
-          <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedSession.title}</Text>
+        {this.state.selectedSession && <View style={{flex: 1}}>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          {this.state.selectedSession.title}</Text>
+          <ScrollView style={{margin: 10}}>
           <Hyperlink 
           linkStyle={{color: colors.secondary}}
           linkDefault={ true }>
-            <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedSession.details}</Text>
+            <Text style={{marginVertical: 5}}>{this.state.selectedSession.details}</Text>
           </Hyperlink>
-          <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{(this.formatDateTime(this.state.selectedSession.dateTime))
+          <Text style={{marginVertical: 5}}>{(this.formatDateTime(this.state.selectedSession.dateTime))
             + " for " + (this.state.selectedSession.duration) + " " +
             (this.state.selectedSession.duration > 1? 'hours' : 'hour') }</Text>
-            <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedSession.location.formattedAddress}</Text>
+            <Text style={{marginVertical: 5}}>{this.state.selectedSession.location.formattedAddress}</Text>
             <TouchableOpacity onPress={()=> this.getPosition(true)}
             style={{marginVertical: 5}}>
-              <Text style={{color: colors.secondary, fontFamily: 'Avenir'}}>Get directions</Text>
+              <Text style={{color: colors.secondary}}>Get directions</Text>
             </TouchableOpacity>
             </ScrollView>
-             {<View style={{justifyContent: 'flex-end', flex: 1}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>} 
+             {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>} 
             </View>}
 
         </Modal>
         <Modal style={styles.modal} position={"center"} ref={"friendsModal"} >
-          <Text style={{fontSize: 20, textAlign: 'center', fontFamily: 'Avenir', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
           Select buddies</Text>
           <ScrollView style={{backgroundColor: '#d6d6d6'}}>
           {this.renderFriendsSelection()}
@@ -297,11 +298,11 @@ import StarRating from 'react-native-star-rating'
         </Modal>
         <Modal style={styles.modal} position={'center'} ref={"locationModal"} >
           {this.state.selectedLocation && <View style={{margin: 10, flex: 1}}>
-          <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedLocation.name}</Text>
+          <Text style={{fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedLocation.name}</Text>
 
-            <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>{this.state.selectedLocation.vicinity}</Text>
+            <Text style={{marginVertical: 5}}>{this.state.selectedLocation.vicinity}</Text>
             {this.state.selectedLocation.rating && <View style={{flexDirection: 'row'}}>
-              <Text style={{fontFamily: 'Avenir', marginVertical: 5}}>Google rating: </Text>
+              <Text style={{marginVertical: 5}}>Google rating: </Text>
             <StarRating
             disabled={true}
             style={{marginLeft: 10}}
@@ -319,7 +320,7 @@ import StarRating from 'react-native-star-rating'
                 this.props.onContinue(null, this.state.selectedLocation)
               }}
               style={{backgroundColor: colors.secondary, padding: 10, flex: 1, marginRight: 10}}>
-                <Text style={{fontFamily: 'Avenir', color: '#fff', textAlign: 'center'}}>Create session at location</Text>
+                <Text style={{color: '#fff', textAlign: 'center'}}>Create session at location</Text>
               </TouchableOpacity>
               <TouchableOpacity 
               onPress={()=> {
@@ -327,7 +328,7 @@ import StarRating from 'react-native-star-rating'
                 this.refs.friendsModal.open()
               }}
               style={{backgroundColor: colors.secondary, padding: 10, flex: 1}}>
-                <Text style={{fontFamily: 'Avenir', color: '#fff', textAlign: 'center'}}>Create private session at location</Text>
+                <Text style={{color: '#fff', textAlign: 'center'}}>Create private session at location</Text>
               </TouchableOpacity>
             </View>
             </View>
@@ -508,20 +509,20 @@ import StarRating from 'react-native-star-rating'
                     <View style={{flex: 1}}>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
-                        <Text style={{fontFamily: 'Avenir', fontSize: 13 }}>{"gender: " + item.gender}</Text>
+                        <Text style={{fontSize: 13, color: '#000'}}>{"gender: " + item.gender}</Text>
                       </View>
                       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text style={[styles.date], {color: item.inProgress? colors.secondary : "#999"}} >
                       {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
                       {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 15, paddingHorizontal: 5}}/>
-                      <Text style={{fontFamily: 'Avenir', fontSize: 12}}>PRIVATE</Text></View>}</View>
+                      <Text style={{fontSize: 12, color: '#000'}}>PRIVATE</Text></View>}</View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <Text style={{fontFamily: 'Avenir', flex: 2}} numberOfLines={1} >{item.location.formattedAddress}</Text>
+                        <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                         <TouchableOpacity onPress={()=>{
                           this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat, switch: true})
                         }}
                         style={{flex: 1}}>
-                          <Text style={{color: colors.secondary, fontFamily: 'Avenir', textAlign: 'right'}}>View on map</Text>
+                          <Text style={{color: colors.secondary, textAlign: 'right'}}>View on map</Text>
                         </TouchableOpacity>
                       </View>
                   </View>
