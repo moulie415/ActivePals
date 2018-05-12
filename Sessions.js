@@ -9,7 +9,7 @@ import {
   StatusBar,
   RefreshControl,
   ScrollView,
-  Linking
+  Linking,
 } from "react-native"
 import {
   Button,
@@ -59,11 +59,10 @@ import StarRating from 'react-native-star-rating'
       spinner: false,
       showMap: true,
       switch: false,
-      sessions: [],
-      privateSessions: [],
+      sessions: this.sortByDateTime(Object.values(this.props.sessions)),
       refreshing: false,
       selectedFriends: [],
-      markers: [],
+      markers: this.markers(Object.values(this.props.sessions)),
       amount: 30
     }
   }
@@ -88,90 +87,15 @@ import StarRating from 'react-native-star-rating'
         this.getPosition()
       }
     })
-    this.fetchSessions()
-
   }
 
-  fetchSessions() {
-    let sessionsRef = firebase.database().ref('sessions').orderByKey().limitToLast(this.state.amount)
-    this.listenForSessions(sessionsRef)
-
-    let privateRef = firebase.database().ref('users/' + this.props.profile.uid).child('sessions')
-    this.listenForPrivateSessions(privateRef)
-
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sessions) {
+      let sessions = Object.values(nextProps.sessions)
+      this.setState({markers: this.markers(sessions), sessions: this.sortByDateTime(sessions)})
+    }
   }
 
-  listenForSessions(ref) {
-    ref.on('value', snapshot => {
-      let sessions = []
-      let index = 1
-      snapshot.forEach(child => {
-        let duration = child.val().duration*60*60*1000
-        let time = new Date(child.val().dateTime.replace(/-/g, "/")).getTime()
-        let current = new Date().getTime()
-        if (time + duration > current) {
-          let inProgress = time < current
-            sessions.push({...child.val(), key: child.key, inProgress})
-            index++
-        }
-        else {
-          //validate time serverside before deleting session in case clients time is wrong
-          firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
-          .then(()=> {
-            firebase.database().ref('timestamp').once('value', snapshot => {
-              if (snapshot.val() > time + duration) {
-                this.props.onRemove(child.val(), child.key)
-              }
-            })
-          })
-        }
-      })
-      this.setState({sessions: this.sortByDateTime(sessions), refreshing: false}, 
-        ()=> this.setState({markers: this.markers(this.state.sessions)}))
-    })
-  }
-
-  listenForPrivateSessions(ref) {
-    ref.on('value', snapshot => {
-      let privateSessions = []
-      let uids = []
-      snapshot.forEach(child => {
-        if (child.val() == 'private') {
-          uids.push(child.key)
-        }
-      })
-      let promises = []
-      uids.forEach(uid => {
-        promises.push(firebase.database().ref("privateSessions").child(uid).once('value'))
-      })
-
-      Promise.all(promises).then(sessions => {
-        sessions.forEach(session => {
-          let duration = session.val().duration*60*60*1000
-          let time = new Date(session.val().dateTime.replace(/-/g, "/")).getTime()
-          let current = new Date().getTime()
-        if (time + duration > current) {
-          let inProgress = time < current
-            privateSessions.push({...session.val(), key: session.key, inProgress})
-            //this.props.onJoin(session.key, true)
-        }
-        else {
-          //validate time serverside before deleting session in case clients time is wrong
-          firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
-          .then(()=> {
-            firebase.database().ref('timestamp').once('value', snapshot => {
-              if (snapshot.val() > time + duration) {
-                this.props.onRemove(session.val(), session.key)
-              }
-            })
-          })
-        }
-        })
-      this.setState({privateSessions: this.sortByDateTime(privateSessions), refreshing: false}, 
-        ()=> this.setState({privateMarkers: this.markers(this.state.privateSessions)}))
-      })
-    })
-  }
 
 
   sortByDateTime(sessions) {
@@ -206,7 +130,7 @@ import StarRating from 'react-native-star-rating'
         </Header>
        
 
-        {!this.state.switch && this.getSessions([...this.state.privateSessions,...this.state.sessions])}
+        {!this.state.switch && this.renderSessions(this.state.sessions)}
 
         {this.state.switch && this.state.showMap && <MapView
           style={styles.map}
@@ -226,20 +150,20 @@ import StarRating from 'react-native-star-rating'
           }}
 
         >
-        {[...this.state.privateMarkers, ...this.state.markers]}
+        {this.state.markers}
         </MapView>}
 
-        <View style={{flexDirection: 'row'}}>
-          <Button style={[styles.button]}
+        <View style={{flexDirection: 'row', height: 50}}>
+          <TouchableOpacity style={styles.button}
           onPress={()=> {
             this.setState({selectedLocation: null})
             this.props.onContinue()
           }}>
             <Text adjustsFontSizeToFit={true} 
-            style={{flex: 1, textAlign: 'center', color: '#fff'}}>Create Session</Text>
-          </Button>
+            style={{flex: 1, textAlign: 'center', color: '#fff', fontSize: 15, height: 50, textAlignVertical: 'center'}}>Create Session</Text>
+          </TouchableOpacity>
           <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/> 
-          <Button style={styles.button}
+          <TouchableOpacity style={styles.button}
           onPress={()=> {
             if (Object.keys(this.props.friends).length > 0) {
               this.setState({selectedLocation: null})
@@ -250,14 +174,18 @@ import StarRating from 'react-native-star-rating'
             }
           }}>
             <Text adjustsFontSizeToFit={true} 
-            style={{flex: 1, textAlign: 'center', color: '#fff'}}>Create Private Session</Text>
-          </Button>
+            style={{flex: 1, textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Private Session</Text>
+          </TouchableOpacity>
         </View>
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedSession && <View style={{flex: 1}}>
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
           {this.state.selectedSession.title}</Text>
           <ScrollView style={{margin: 10}}>
+          <View style={{flexDirection: 'row'}}>
+            <Text>Host: </Text>
+            {this.fetchHost(this.state.selectedSession.host)}
+          </View>
           <Hyperlink 
           linkStyle={{color: colors.secondary}}
           linkDefault={ true }>
@@ -384,7 +312,7 @@ import StarRating from 'react-native-star-rating'
 
   fetchButtons(session, uid) {
     if (session.users[uid]){
-      if (session.host == uid) {
+      if (session.host.uid == uid) {
         return (
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableOpacity
@@ -487,20 +415,20 @@ import StarRating from 'react-native-star-rating'
             )
   }
 
-  getSessions(sessions) {
+  renderSessions(sessions) {
     if (sessions.length > 0) {
           return <FlatList
           refreshing={this.state.refreshing}
           onRefresh={()=> {
             this.setState({refreshing: true})
-            this.fetchSessions()
+            this.props.fetch(30).then(()=> this.setState({refreshing: false}))
             this.getPosition()
           }}
           data={sessions}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => {
-              this.setState({selectedSession: item}, ()=> this.refs.modal.open())
+                this.setState({selectedSession: item}, ()=> this.refs.modal.open())
             }}>
               <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
                 <View style={{flexDirection: 'row'}} >
@@ -695,16 +623,30 @@ import StarRating from 'react-native-star-rating'
         'You may need to change your settings to allow Fit Link to access your location')
     }
   }
+
+  fetchHost(host) {
+    if (host.uid == this.props.profile.uid) {
+      return <Text style={{fontWeight: 'bold'}}>You</Text>
+    }
+    else if (host.username) {
+      return <TouchableOpacity>
+              <Text style={{color: colors.secondary}}>{host.username}</Text>
+            </TouchableOpacity>
+    }
+    else return <Text>N/A</Text>
+  }
 }
 
 import { connect } from 'react-redux'
 import { navigateMessagingSession, navigateSessionType } from 'Anyone/actions/navigation'
 import { fetchSessionChats, addSessionChat, removeSessionChat, leaveSessionChat } from 'Anyone/actions/chats'
+import { fetchSessions, fetchPrivateSessions } from 'Anyone/actions/sessions'
 
-const mapStateToProps = ({ friends, profile, chats }) => ({
+const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
   friends: friends.friends,
   profile: profile.profile,
-  chats: chats.sessionChats
+  chats: chats.sessionChats,
+  sessions: sessions.sessions
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -714,6 +656,7 @@ const mapDispatchToProps = dispatch => ({
   onLeave: (session) => {return dispatch(leaveSessionChat(session))},
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
+  fetch: (amount) => {return Promise.all([dispatch(fetchSessions(amount)), dispatch(fetchPrivateSessions())])}
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)

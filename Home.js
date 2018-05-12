@@ -118,7 +118,7 @@ componentWillReceiveProps(nextProps) {
               <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 40}}/>
             </TouchableOpacity>
         </View>
-        {this.props.friends && this.renderFeed()}
+        {this.props.friends && this.state.profile && this.renderFeed()}
       </Content>
     </Container>
   )

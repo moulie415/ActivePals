@@ -22,7 +22,7 @@ export default styles = StyleSheet.create({
     borderRadius: 0,
     backgroundColor: colors.secondary,
     flex: 1,
-    borderColor: '#fff'
+    borderColor: '#fff',
   },
   modal: {
     height: 400,

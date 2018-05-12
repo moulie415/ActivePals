@@ -1,5 +1,6 @@
 import * as firebase from "firebase"
 import { removeChat } from './chats'
+import { fetchPrivateSessions } from './sessions'
 export const SET_FRIENDS = 'SET_FRIENDS'
 export const UPDATE_FRIENDS = 'UPDATE_FRIENDS'
 export const ADD_FRIEND = 'ADD_FRIEND'
@@ -59,6 +60,7 @@ export const fetchFriends = (uids) => {
 				return acc
 			}, {})
 			dispatch(setFriends(obj))
+			dispatch(fetchPrivateSessions())
 		})
 	}
 }
