@@ -9,13 +9,13 @@ export const ADD_FRIEND = 'ADD_FRIEND'
 
 const setFriends = (friends) => ({
 	type: SET_FRIENDS,
-	friends
+	friends,
 })
 
 const addToFriends = (uid,friend) => ({
 	type: ADD_FRIEND,
 	uid,
-	friend
+	friend,
 })
 
 

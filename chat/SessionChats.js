@@ -1,11 +1,9 @@
 import React, { Component } from "react"
-import { 
-  StyleSheet,
-  Alert,
+import {
   View,
   ScrollView,
-  TouchableOpacity 
-} from "react-native"
+  TouchableOpacity,
+} from 'react-native'
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import firebase from '../index'
 import { getType } from 'Anyone/constants/utils'
@@ -33,7 +31,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
     this.state = {
       email: "",
       username: "",
-      chats: this.props.chats
+      chats: Object.values(this.props.chats),
     }
   }
   componentDidMount() {
@@ -42,7 +40,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         this.user = user
         //let sessionsRef = firebase.database().ref('users/' + this.user.uid).child('sessions')
       }
-    })  
+    })
 
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
@@ -51,7 +49,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.chats) {
-      this.setState({chats: nextProps.chats})
+      this.setState({chats: Object.values(nextProps.chats)})
     }
   }
 
@@ -59,7 +57,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
   render () {
     return (
     <Container>
-    {this.state.chats.length > 0 && this.state.chats[0].type?
+    {this.state.chats.length > 0 && this.state.chats[0].type ?
       <ScrollView>
         {this.renderChats()}
       </ScrollView> :
@@ -76,7 +74,7 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
     let index = 1
     this.state.chats.forEach(detail => {
       list.push(
-        <TouchableOpacity 
+        <TouchableOpacity
         key={index}
         onPress={()=> {
             this.props.onOpenChat(detail)

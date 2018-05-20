@@ -74,7 +74,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
         this.props.add(snapshot)
     })
     ref.on('child_removed', snapshot => {
-        this.props.removeLocal(snapshot.key) 
+        this.props.removeLocal(snapshot.key)
     })
   }
 

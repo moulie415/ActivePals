@@ -2,38 +2,35 @@ import * as firebase from "firebase"
 import { fetchProfile } from './profile'
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS'
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT'
-export const REMOVE_SESSION_CHAT = 'REMOVE_SESSION_CHAT'
 export const SET_CHATS = 'SET_CHATS'
 export const ADD_CHAT = 'ADD_CHAT'
 export const SET_MESSAGE_SESSION = 'SET_MESSAGE_SESSION'
 export const NEW_NOTIF = 'NEW_NOTIF'
 export const RESET_NOTIFICATION = 'RESET_NOTIFICATION'
+export const UPDATE_CHAT = 'UPDATE_CHAT'
+export const UPDATE_SESSION_CHAT = 'UPDATE_SESSION_CHAT'
 
 
 const setSessionChats = (sessionChats) => ({
 	type: SET_SESSION_CHATS,
-	sessionChats
+	sessionChats,
 })
 
-const addToSessionChats = (session) => ({
+const addToSessionChats = (key, session) => ({
 	type: ADD_SESSION_CHAT,
+	key,
 	session,
-})
-
-const removeFromSessionChats = (session) => ({
-	type: REMOVE_SESSION_CHAT,
-	session
 })
 
 const setChats = (chats) => ({
 	type: SET_CHATS,
-	chats
+	chats,
 })
 
 const addToChats = (uid, chat) => ({
 	type: ADD_CHAT,
 	uid,
-	chat
+	chat,
 })
 
 const setMessageSession = (id, messages) => ({
@@ -42,10 +39,22 @@ const setMessageSession = (id, messages) => ({
 	messages,
 })
 
+const updateChat = (id, lastMessage) => ({
+	type: UPDATE_CHAT,
+	id,
+	lastMessage,
+})
+
+const updateSessionChat = (key, lastMessage) => ({
+	type: UPDATE_SESSION_CHAT,
+	key,
+	lastMessage,
+})
+
 
 export const newNotification = (notif) => ({
 	type: NEW_NOTIF,
-	notif
+	notif,
 })
 
 export const resetNotification = () => ({
@@ -59,8 +68,7 @@ export const updateLastMessage = (notif) => {
 			return firebase.database().ref('chats').child(notif.chatId).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
-						let chats = getState().chats.chats.filter(chat => chat.chatId != notif.chatId)
-						dispatch(setChats([...chats, {uid: notif.uid, chatId: notif.chatId, lastMessage: Object.values(lastMessage.val())[0]}]))
+						dispatch(updateChat(notif.chatId, Object.values(lastMessage.val())[0]))
 					}
 				})
 		}
@@ -68,9 +76,7 @@ export const updateLastMessage = (notif) => {
 			return firebase.database().ref('sessionChats').child(notif.sessionId).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
-						let chats = getState().chats.sessionChats.filter(chat => chat.key != notif.sessionId)
-						let chat = getState().chats.sessionChats.filter(chat => chat.key == notif.sessionId)[0]
-						dispatch(setSessionChats([...chats, {...chat, lastMessage: Object.values(lastMessage.val())[0]}]))
+						dispatch(updateSessionChat(notif.sessionId, Object.values(lastMessage.val())[0]))
 					}
 				})
 
@@ -88,7 +94,7 @@ export const fetchChats = (chats) => {
 			let promise = new Promise(function(resolve, reject) {
 				firebase.database().ref('chats').child(val).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
-					let message = {text: "new chat created"}
+					let message = {text: 'new chat created'}
 					if (lastMessage.val()) {
 						message = Object.values(lastMessage.val())[0]
 					}
@@ -109,11 +115,11 @@ export const fetchChats = (chats) => {
 
 export const addChat = (chat) => {
 	return (dispatch) => {
-		uid = chat.key
-		chatId = chat.val()
+		let uid = chat.key
+		let chatId = chat.val()
 		return firebase.database().ref('chats').child(chatId).orderByKey().limitToLast(1)
 		.once('value', lastMessage => {
-			let message = {text: "new chat created"}
+			let message = {text: 'new chat created'}
 			if (lastMessage.val()) {
 				message = Object.values(lastMessage.val())[0]
 			}
@@ -139,11 +145,11 @@ export const fetchSessionChats = (sessions, uid) => {
 	return (dispatch) => {
 		let chatList = []
 		Object.keys(sessions).forEach(session => {
-			let type = sessions[session] == 'private'? "privateSessions" : 'sessions'
+			let type = sessions[session] == 'private' ? 'privateSessions' : 'sessions'
 			let promise = new Promise(function(resolve, reject) {
 				firebase.database().ref(type + '/' + session).once('value', snapshot => {
 					if (snapshot.val()) {
-						firebase.database().ref('sessionChats/'+ session).orderByKey().limitToLast(1)
+						firebase.database().ref('sessionChats/' + session).orderByKey().limitToLast(1)
 						.once('value', lastMessage => {
 							let message = {text: "new session chat created"}
 							if (lastMessage.val()) {
@@ -162,24 +168,28 @@ export const fetchSessionChats = (sessions, uid) => {
 			chatList.push(promise)
 		})
 		return Promise.all(chatList).then(sessionChats => {
-			dispatch(setSessionChats(sessionChats))
+			let obj = sessionChats.reduce(function(acc, cur, i) {
+				acc[cur.key] = cur
+				return acc
+			}, {})
+			dispatch(setSessionChats(obj))
 		})
 	}
 }
 
 export const addSessionChat = (session, isPrivate = false) => {
 	return (dispatch) => {
-		let type = isPrivate? "privateSessions" : "sessions"
+		let type = isPrivate ? 'privateSessions' : 'sessions'
 		return new Promise(resolve => {
 			firebase.database().ref(type + '/' + session).once('value', snapshot => {
-				firebase.database().ref('sessionChats/'+ session).orderByKey().limitToLast(1)
+				firebase.database().ref('sessionChats/' + session).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
-					let message = {text: "new session chat created"}
+					let message = {text: 'new session chat created'}
 					if (lastMessage.val()) {
 						message = Object.values(lastMessage.val())[0]
 					}
 					resolve({...snapshot.val(), key: session, lastMessage: message})
-					dispatch(addToSessionChats({...snapshot.val(), key: session, lastMessage: message}))
+					dispatch(addToSessionChats(session, {...snapshot.val(), key: session, lastMessage: message}))
 					dispatch(fetchProfile())
 				})
 			})
@@ -187,33 +197,28 @@ export const addSessionChat = (session, isPrivate = false) => {
 	}
 }
 
-export const removeSessionChat = (session, key) => {
+export const removeSessionChat = (key) => {
 	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
-		let type = session.private? "privateSessions" : "sessions"
-		if (session.host == uid) {
-			firebase.database().ref(type + '/' + key).remove()
-			Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(key).remove())
-			firebase.database().ref('sessionChats').child(key).remove()
-		}
-		else {
-			firebase.database().ref('users/' + uid + '/sessions').child(key).remove()
-			firebase.database().ref(type + '/' + key + '/users').child(uid).remove()
-		}
-		dispatch(removeFromSessionChats(key))
+		let sessionChats = getState().chats.sessionChats
+		let chatArr = Object.values(sessionChats).filter(chat => chat.key != key)
+		let obj = chatArr.reduce(function(acc, cur, i) {
+			acc[cur.key] = cur
+			return acc
+		}, {})
+		dispatch(setSessionChats(obj))
 	}
 }
 
 export const fetchMessages = (id, amount, uid) => {
 	return (dispatch) => {
-		return firebase.database().ref('chats/'+ id).orderByKey().limitToLast(amount)
+		return firebase.database().ref('chats/' + id).orderByKey().limitToLast(amount)
 		.once('value', snapshot => {
 			let messages = []
 			firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
 			.then (url => {
 				snapshot.forEach(child => {
 					if (child.val().user && child.val().user._id == uid) {
-						messages.push({...child.val(), createdAt: new Date(child.val().createdAt), 
+						messages.push({...child.val(), createdAt: new Date(child.val().createdAt),
 							user: {...child.val().user, avatar: url}})
 					}
 					else {
@@ -234,8 +239,8 @@ export const fetchMessages = (id, amount, uid) => {
 
 export const fetchSessionMessages = (id, amount, isPrivate = false) => {
 	return (dispatch) => {
-		let type = isPrivate? 'privateSessions' : 'sessions'
-		return firebase.database().ref('sessionChats/'+ id).orderByKey().limitToLast(amount)
+		let type = isPrivate ? 'privateSessions' : 'sessions'
+		return firebase.database().ref('sessionChats/' + id).orderByKey().limitToLast(amount)
 		.once('value', snapshot => {
 			let messages = []
 			let promises = []
@@ -256,9 +261,9 @@ export const fetchSessionMessages = (id, amount, isPrivate = false) => {
 						}
 					})
 					snapshot.forEach(child => {
-						let avatar = child.val().user? avatars[child.val().user._id] : ""
+						let avatar = child.val().user ? avatars[child.val().user._id] : ""
 						if (avatar) {
-							messages.push({...child.val(), createdAt: new Date(child.val().createdAt), 
+							messages.push({...child.val(), createdAt: new Date(child.val().createdAt),
 								user: {...child.val().user, avatar}})
 						}
 						else {

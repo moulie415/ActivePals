@@ -1,10 +1,10 @@
-import * as firebase from "firebase"
+import * as firebase from 'firebase'
 import { removeSessionChat } from 'Anyone/actions/chats'
 export const SET_SESSIONS = 'SET_SESSIONS'
 
 const setSessions = (sessions) => ({
 	type: SET_SESSIONS,
-	sessions
+	sessions,
 })
 
 export const fetchSessions = (amount) => {
@@ -13,7 +13,7 @@ export const fetchSessions = (amount) => {
 			let sessions = []
 			let index = 1
 			snapshot.forEach(child => {
-				let duration = child.val().duration*60*60*1000
+				let duration = child.val().duration * 60 * 60*1000
 				let time = new Date(child.val().dateTime.replace(/-/g, "/")).getTime()
 				let current = new Date().getTime()
 				if (time + duration > current) {
@@ -65,12 +65,12 @@ export const fetchPrivateSessions = () =>  {
 			})
 			let promises = []
 			uids.forEach(uid => {
-				promises.push(firebase.database().ref("privateSessions").child(uid).once('value'))
+				promises.push(firebase.database().ref('privateSessions').child(uid).once('value'))
 			})
 
 			return Promise.all(promises).then(sessions => {
 				sessions.forEach(session => {
-					let duration = session.val().duration*60*60*1000
+					let duration = session.val().duration * 60 * 60 * 1000
 					let time = new Date(session.val().dateTime.replace(/-/g, "/")).getTime()
 					let current = new Date().getTime()
 					if (time + duration > current) {
@@ -105,5 +105,30 @@ export const fetchPrivateSessions = () =>  {
 				dispatch(setSessions(obj))
 			})
 		})
+	}
+}
+
+export const removeSession = (key) => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		let sessions = getState().sessions.sessions
+		let session = sessions[key]
+		let type = session.private ? 'privateSessions' : 'sessions'
+		if (session.host == uid) {
+			firebase.database().ref(type + '/' + key).remove()
+			Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(key).remove())
+			firebase.database().ref('sessionChats').child(key).remove()
+		}
+		else {
+			firebase.database().ref('users/' + uid + '/sessions').child(key).remove()
+			firebase.database().ref(type + '/' + key + '/users').child(uid).remove()
+		}
+		// let sessionsArr = Object.values(sessions).filter(session => session.key != key)
+		// let obj = sessionsArr.reduce(function(acc, cur, i) {
+		// 		acc[cur.key] = cur
+		// 		return acc
+		// 	}, {})
+		// dispatch(setSessions(obj))
+		dispatch(removeSessionChat(key))
 	}
 }

@@ -63,7 +63,7 @@ import StarRating from 'react-native-star-rating'
       refreshing: false,
       selectedFriends: [],
       markers: this.markers(Object.values(this.props.sessions)),
-      amount: 30
+      amount: 30,
     }
   }
 
@@ -80,11 +80,20 @@ import StarRating from 'react-native-star-rating'
       this.setState({spinner: true})
       // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
       this.setState({ locationPermission: response })
-      if (response != "authorized") {
+      if (response != 'authorized') {
         this.alertForLocationPermission()
       }
       else {
         this.getPosition()
+      }
+    })
+
+    firebase.database().ref('sessions').orderByKey().limitToLast(this.state.amount).on('child_removed', snapshot => {
+        this.props.remove(snapshot.key)
+    })
+    firebase.database().ref('users/' + this.props.profile.uid).child('sessions').on('child_removed', snapshot => {
+      if (snapshot.val() == 'private') {
+        this.props.remove(snapshot.key)
       }
     })
   }
@@ -159,10 +168,10 @@ import StarRating from 'react-native-star-rating'
             this.setState({selectedLocation: null})
             this.props.onContinue()
           }}>
-            <Text adjustsFontSizeToFit={true} 
+            <Text adjustsFontSizeToFit={true}
             style={{flex: 1, textAlign: 'center', color: '#fff', fontSize: 15, height: 50, textAlignVertical: 'center'}}>Create Session</Text>
           </TouchableOpacity>
-          <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/> 
+          <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/>
           <TouchableOpacity style={styles.button}
           onPress={()=> {
             if (Object.keys(this.props.friends).length > 0) {
@@ -186,7 +195,7 @@ import StarRating from 'react-native-star-rating'
             <Text>Host: </Text>
             {this.fetchHost(this.state.selectedSession.host)}
           </View>
-          <Hyperlink 
+          <Hyperlink
           linkStyle={{color: colors.secondary}}
           linkDefault={ true }>
             <Text style={{marginVertical: 5}}>{this.state.selectedSession.details}</Text>
@@ -250,7 +259,7 @@ import StarRating from 'react-native-star-rating'
               style={{backgroundColor: colors.secondary, padding: 10, flex: 1, marginRight: 10}}>
                 <Text style={{color: '#fff', textAlign: 'center'}}>Create session at location</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
               onPress={()=> {
                 this.refs.locationModal.close()
                 this.refs.friendsModal.open()
@@ -323,7 +332,7 @@ import StarRating from 'react-native-star-rating'
               [
               {text: 'cancel', style: 'cancel'},
               {text: 'Yes', onPress: ()=> {
-                this.props.onRemove(session, session.key)
+                this.props.remove(session.key)
                 this.refs.modal.close()
               },
               style: 'destructive'}
@@ -349,7 +358,7 @@ import StarRating from 'react-native-star-rating'
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableOpacity
           onPress={()=> {
-            this.props.onRemove(session, session.key)
+            this.props.remove(session.key)
             this.refs.modal.close()
           }}
           style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
@@ -502,7 +511,7 @@ import StarRating from 'react-native-star-rating'
     minutes = minutes < 10 ? '0'+minutes : minutes
     let strTime = hours + ':' + minutes + ampm
 
-    let days =['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]  
     let day = date.getDate()
@@ -510,7 +519,7 @@ import StarRating from 'react-native-star-rating'
   }
 
   nth(d) {
-  if (d>3 && d<21) return 'th'
+  if (d > 3 && d < 21) return 'th'
   switch (d % 10) {
         case 1:  return "st"
         case 2:  return "nd"
@@ -561,8 +570,8 @@ import StarRating from 'react-native-star-rating'
     //this.watchID = navigator.geolocation.watchPosition((position) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        lat = position.coords.latitude
-        lon = position.coords.longitude
+        let lat = position.coords.latitude
+        let lon = position.coords.longitude
         this.setState({
           latitude: lat,
           longitude: lon,
@@ -571,7 +580,7 @@ import StarRating from 'react-native-star-rating'
           showMap: true,
           spinner: false}, ()=> getDirections && this.getDirections())
 
-        let url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+        let url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
         fetch(`${url}location=${lat},${lon}&radius=15000&types=gym&key=${str.googleApiKey}`)
           .then(response => response.json())
           .then(json => {
@@ -582,11 +591,11 @@ import StarRating from 'react-native-star-rating'
               let lat = result.geometry.location.lat
               let lng = result.geometry.location.lng
               markers.push(
-                <MapView.Marker 
+                <MapView.Marker
                 key={index}
                 coordinate={{
-                  latitude: lat, 
-                  longitude: lng
+                  latitude: lat,
+                  longitude: lng,
                 }}
                 pinColor={colors.secondary}
                 onPress={(event) => {
@@ -605,7 +614,7 @@ import StarRating from 'react-native-star-rating'
         this.setState({ spinner: false })
         Alert.alert('Error', error.message)
       },
-      { enableHighAccuracy: true, timeout: 20000, /*maximumAge: 1000*/ },
+      { enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
     )
   }
 
@@ -639,24 +648,23 @@ import StarRating from 'react-native-star-rating'
 
 import { connect } from 'react-redux'
 import { navigateMessagingSession, navigateSessionType } from 'Anyone/actions/navigation'
-import { fetchSessionChats, addSessionChat, removeSessionChat, leaveSessionChat } from 'Anyone/actions/chats'
-import { fetchSessions, fetchPrivateSessions } from 'Anyone/actions/sessions'
+import { fetchSessionChats, addSessionChat } from 'Anyone/actions/chats'
+import { fetchSessions, fetchPrivateSessions, removeSession } from 'Anyone/actions/sessions'
 
 const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
   friends: friends.friends,
   profile: profile.profile,
   chats: chats.sessionChats,
-  sessions: sessions.sessions
+  sessions: sessions.sessions,
 })
 
 const mapDispatchToProps = dispatch => ({
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onJoin: (session, isPrivate) => {return dispatch(addSessionChat(session, isPrivate))},
-  onRemove: (session, key) => {return dispatch(removeSessionChat(session, key))},
-  onLeave: (session) => {return dispatch(leaveSessionChat(session))},
+  remove: (key) => dispatch(removeSession(key)),
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
-  fetch: (amount) => {return Promise.all([dispatch(fetchSessions(amount)), dispatch(fetchPrivateSessions())])}
+  fetch: (amount) => {return Promise.all([dispatch(fetchSessions(amount)), dispatch(fetchPrivateSessions())])},
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)

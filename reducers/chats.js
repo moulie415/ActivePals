@@ -1,16 +1,17 @@
 import {
 	SET_SESSION_CHATS,
 	ADD_SESSION_CHAT,
-	REMOVE_SESSION_CHAT,
 	SET_CHATS,
 	ADD_CHAT,
 	SET_MESSAGE_SESSION,
 	RESET_NOTIFICATION,
 	NEW_NOTIF,
+	UPDATE_CHAT,
+	UPDATE_SESSION_CHAT,
 } from 'Anyone/actions/chats'
 
 const initialState = {
-	sessionChats: [],
+	sessionChats: {},
 	chats: {},
 	messageSessions: {},
 }
@@ -25,37 +26,42 @@ export default function(state = initialState, action) {
 		case ADD_SESSION_CHAT:
 			return {
 				...state,
-				sessionChats: [...state.sessionChats, action.session]
-			}
-		case REMOVE_SESSION_CHAT:
-			return {
-				...state,
-				sessionChats: state.sessionChats.filter(chat => chat.key != action.session)
+				sessionChats: {...state.sessionChats, [action.key]: action.session},
 			}
 		case SET_CHATS:
 			return {
 				...state,
-				chats: action.chats
+				chats: action.chats,
 			}
 		case ADD_CHAT:
 			return {
 				...state,
-				chats: {...state.chats, [action.uid]: action.chat}
+				chats: {...state.chats, [action.uid]: action.chat},
+			}
+		case UPDATE_CHAT:
+			return {
+				...state,
+				chats: {...state.chats, [action.id]: {...state.chats[action.id], lastMessage: action.lastMessage}}
+			}
+		case UPDATE_SESSION_CHAT:
+			return {
+				...state,
+				sessionChats: {...state.sessionChats, [action.key]: {...state.sessionChats[action.key], lastMessage: action.lastMessage}}
 			}
 		case SET_MESSAGE_SESSION:
 			return {
 				...state,
-				messageSessions: {...state.messageSessions, [action.id]: action.messages}
+				messageSessions: {...state.messageSessions, [action.id]: action.messages},
 			}
 		case NEW_NOTIF:
 			return {
 				...state,
-				notif: action.notif
+				notif: action.notif,
 			}
 		case RESET_NOTIFICATION:
              return {
                 ...state,
-                notif: null
+                notif: null,
             }
 		default:
 			return state

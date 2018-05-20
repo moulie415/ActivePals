@@ -1,9 +1,9 @@
 import {
-	SET_SESSIONS
+	SET_SESSIONS,
 } from 'Anyone/actions/sessions'
 
 const initialState = {
-	sessions: {}
+	sessions: {},
 }
 
 export default function(state = initialState, action) {
