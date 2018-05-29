@@ -86,7 +86,6 @@ export const store = createStore(
 )
 
 FCM.on(FCMEvent.Notification, async (notif) => {
-  console.log(store)
   let state = AppState.currentState
     // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
     const { dispatch } = store

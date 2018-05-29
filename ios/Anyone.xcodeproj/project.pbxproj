@@ -15,7 +15,7 @@
 		00E356F31AD99517003FC87E /* AnyoneTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* AnyoneTests.m */; };
 		0A19E29D20376EB60036DFF2 /* libreact-native-fcm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A19E24820376D230036DFF2 /* libreact-native-fcm.a */; };
 		0A19E30B203771B50036DFF2 /* libreact-native-geocoder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A19E24A20376D230036DFF2 /* libreact-native-geocoder.a */; };
-		0A95540120531CB90013CC3C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A95540020531CB90013CC3C /* GoogleService-Info.plist */; };
+		0A36828A20BC802B0003EEF6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A36824F20BC802A0003EEF6 /* GoogleService-Info.plist */; };
 		0AB3810F20098C9700BCD283 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB380DD20098C9700BCD283 /* Bolts.framework */; };
 		0AB3811320098CC000BCD283 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811020098CBC00BCD283 /* FBSDKLoginKit.framework */; };
 		0AB3811420098CC000BCD283 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811120098CBD00BCD283 /* FBSDKShareKit.framework */; };
@@ -518,8 +518,8 @@
 		00E356F21AD99517003FC87E /* AnyoneTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnyoneTests.m; sourceTree = "<group>"; };
 		0A19E27120376D310036DFF2 /* Anyone.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Anyone.entitlements; path = Anyone/Anyone.entitlements; sourceTree = "<group>"; };
 		0A19E2C420376ED50036DFF2 /* RNFIRMessaging.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFIRMessaging.xcodeproj; path = "../node_modules/react-native-fcm/ios/RNFIRMessaging.xcodeproj"; sourceTree = "<group>"; };
+		0A36824F20BC802A0003EEF6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0A88FFAF201D6E18004A17CD /* RNGeocoder.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNGeocoder.xcodeproj; path = "../node_modules/react-native-geocoder/ios/RNGeocoder.xcodeproj"; sourceTree = "<group>"; };
-		0A95540020531CB90013CC3C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0AB380DD20098C9700BCD283 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		0AB3811020098CBC00BCD283 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		0AB3811120098CBD00BCD283 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKShareKit.framework; sourceTree = "<group>"; };
@@ -814,7 +814,7 @@
 		13B07FAE1A68108700A75B9A /* Anyone */ = {
 			isa = PBXGroup;
 			children = (
-				0A95540020531CB90013CC3C /* GoogleService-Info.plist */,
+				0A36824F20BC802A0003EEF6 /* GoogleService-Info.plist */,
 				0A19E27120376D310036DFF2 /* Anyone.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -1650,8 +1650,8 @@
 				D6B88B12417F4557AA5810EF /* Octicons.ttf in Resources */,
 				D990CE85731348A89DC6852B /* Roboto_medium.ttf in Resources */,
 				409141D1217B4C3A92BC0D8F /* Roboto.ttf in Resources */,
+				0A36828A20BC802B0003EEF6 /* GoogleService-Info.plist in Resources */,
 				C4C400ECE06A40F1A341CCDF /* rubicon-icon-font.ttf in Resources */,
-				0A95540120531CB90013CC3C /* GoogleService-Info.plist in Resources */,
 				BB6F0F22EF534635A8E9F6B8 /* SimpleLineIcons.ttf in Resources */,
 				146D8830EC084AC180E3D821 /* Zocial.ttf in Resources */,
 				8BCE8FA7CE7A4CB2A49EFB78 /* avenir.ttf in Resources */,

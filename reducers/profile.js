@@ -3,7 +3,8 @@ import {
 } from 'Anyone/actions/profile'
 
 const initialState = {
-	profile: {}
+	profile: {},
+	loggedIn: false
 }
 
 export default function(state = initialState, action) {
@@ -13,6 +14,11 @@ export default function(state = initialState, action) {
 				...state,
 				profile: action.profile
 			}
+		// case SET_LOGGED_IN:
+		// 	return {
+		// 		...state,
+		// 		profile: action.loggedIn
+		// 	}
 		default:
 			return state
 	}

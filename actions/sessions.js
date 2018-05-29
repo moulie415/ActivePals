@@ -9,12 +9,12 @@ const setSessions = (sessions) => ({
 
 export const fetchSessions = (amount) => {
 	return (dispatch) => {
-		return firebase.database().ref('sessions').orderByKey().limitToLast(amount).once('value', snapshot => {
+		return firebase.database().ref('sessions').orderByKey().limitToLast(amount).on('value', snapshot => {
 			let sessions = []
 			let index = 1
 			snapshot.forEach(child => {
-				let duration = child.val().duration * 60 * 60*1000
-				let time = new Date(child.val().dateTime.replace(/-/g, "/")).getTime()
+				let duration = child.val().duration * 60 * 60 * 1000
+				let time = new Date(child.val().dateTime.replace(/-/g, '/')).getTime()
 				let current = new Date().getTime()
 				if (time + duration > current) {
 					let inProgress = time < current

@@ -68,7 +68,7 @@ export const updateLastMessage = (notif) => {
 			return firebase.database().ref('chats').child(notif.chatId).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
-						dispatch(updateChat(notif.chatId, Object.values(lastMessage.val())[0]))
+						dispatch(updateChat(notif.uid, Object.values(lastMessage.val())[0]))
 					}
 				})
 		}

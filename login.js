@@ -1,6 +1,6 @@
 import React, { Component } from "react"
-import { StyleSheet, Alert, View } from "react-native"
-import { 
+import { Alert, View, ImageBackground } from "react-native"
+import {
   Button,
   Text,
   Input,
@@ -16,6 +16,8 @@ import { GoogleSignin } from 'react-native-google-signin'
 import VersionNumber from 'react-native-version-number'
 const FBSDK = require('react-native-fbsdk')
 const { LoginManager, AccessToken } = FBSDK
+const background = require('Anyone/assets/images/Running-background.jpg')
+import colors from 'Anyone/constants/colors'
 
 
  class Login extends Component {
@@ -46,14 +48,14 @@ const { LoginManager, AccessToken } = FBSDK
 
   render () {
     return (
-    <Container style={styles.container}>
-      {this.state.spinner && <Spinner color='#fff'/>}
+    <ImageBackground style={styles.container} source={background}>
+      {this.state.spinner && <Spinner color={colors.secondary}/>}
       <Item style={styles.inputGrp}>
-      <Icon name="mail" style={{color: "#fff"}} />
+      <Icon name="mail" style={{color: '#fff'}} />
         <Input
         placeholder="Email"
         onChangeText={u => this.username = u}
-        placeholderTextColor="#fff"
+        placeholderTextColor={'#fff'}
         style={styles.input}
         autoCapitalize={'none'}
         autoCorrect={false}
@@ -62,11 +64,11 @@ const { LoginManager, AccessToken } = FBSDK
         />
         </Item>
       <Item style={styles.inputGrp}>
-      <Icon name="unlock" style={{color: "#fff"}}/>
+      <Icon name="unlock" style={{color: '#fff'}}/>
       <Input
         placeholder="Password"
         secureTextEntry={true}
-        placeholderTextColor="#FFF"
+        placeholderTextColor={'#fff'}
         onChangeText={p => this.pass = p}
         style={styles.input}
         />
@@ -108,7 +110,7 @@ const { LoginManager, AccessToken } = FBSDK
         </View>
           <Text style={{color: '#fff', fontFamily: 'Avenir', textAlign: 'center', position: 'absolute', bottom: 10}}>
           {"v"+VersionNumber.appVersion}</Text>
-    </Container>
+    </ImageBackground>
   )
   }
 
@@ -125,7 +127,7 @@ const { LoginManager, AccessToken } = FBSDK
        else {
         Alert.alert('Sorry', 'You must first verify your email using the link we sent you before logging in')
        }
-       console.log("Logged In!")
+       console.log('Logged In!')
 
 
       })
@@ -154,8 +156,8 @@ const { LoginManager, AccessToken } = FBSDK
  _handleCallBack(result, navigation){
     let _this = this
     if (result.isCancelled) {
-      Alert.alert("Facbook login", "cancelled")
-    } else {   
+      Alert.alert('Facbook login', 'cancelled')
+    } else {
   AccessToken.getCurrentAccessToken().then(
           (data) => {
           
@@ -178,21 +180,18 @@ const { LoginManager, AccessToken } = FBSDK
                 Alert.alert('Error', error.message)
               })
              }
-             const { uid } = result  
+             const { uid } = result
                 _this.createUser(uid,json,token)
               })
               .catch(error => {
                 Alert.alert('Error', error.message)
               })
- 
- 
             })
             .catch(error => {
               Alert.alert('Error', error.message)
             })
           }
         )
- 
     }
   }
 
@@ -209,7 +208,6 @@ const { LoginManager, AccessToken } = FBSDK
       accountType: 'standard',
     }
     firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
-   
   }
 
   gLogin() {
