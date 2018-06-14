@@ -64,7 +64,7 @@ class Messaging extends React.Component {
       })
     }
 
-    this.props.profile.avatar? this.setState({avatar: this.props.profile.avatar}) : this.setState({avatar: ''})
+    this.props.profile.avatar ? this.setState({avatar: this.props.profile.avatar}) : this.setState({avatar: ''})
 
     FCM.getFCMToken().then(token => {
       firebase.database().ref('users/' + this.uid).child('FCMToken').set(token)
@@ -139,7 +139,7 @@ class Messaging extends React.Component {
     let converted = []
     messages.forEach(message => {
       if (this.session) {
-        let type = this.session.private? "privateSessions" : 'sessions'
+        let type = this.session.private ? "privateSessions" : 'sessions'
         converted.push({...message, createdAt: message.createdAt.toString(), sessionTitle: this.sessionTitle, sessionId: this.sessionId, type})
       }
       else {
@@ -147,7 +147,7 @@ class Messaging extends React.Component {
       }
     })
 
-    let ref = this.session? firebase.database().ref('sessionChats/' + this.sessionId) :
+    let ref = this.session ? firebase.database().ref('sessionChats/' + this.sessionId) :
     firebase.database().ref('chats/' + this.chatId)
 
     ref.push(...converted)
@@ -185,7 +185,7 @@ class Messaging extends React.Component {
           onPressAvatar={user => this.fetchUser(user)}
           onLoadEarlier={()=> {
             this.fetched = false
-            this.setState({amount: this.state.amount+=15, spinner: true} ,()=> this.loadMessages())
+            this.setState({amount: this.state.amount += 15, spinner: true} ,()=> this.loadMessages())
           }}
           loadEarlier={this.state.messages && this.state.messages.length > 29 && this.state.showLoadEarlier}
           user={{

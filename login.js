@@ -2,7 +2,6 @@ import React, { Component } from "react"
 import { Alert, View, ImageBackground } from "react-native"
 import {
   Button,
-  Text,
   Input,
   Container,
   Content,
@@ -18,6 +17,7 @@ const FBSDK = require('react-native-fbsdk')
 const { LoginManager, AccessToken } = FBSDK
 const background = require('Anyone/assets/images/Running-background.jpg')
 import colors from 'Anyone/constants/colors'
+import Text, { globalTextStyle } from 'Anyone/constants/Text'
 
 
  class Login extends Component {
@@ -50,6 +50,10 @@ import colors from 'Anyone/constants/colors'
     return (
     <ImageBackground style={styles.container} source={background}>
       {this.state.spinner && <Spinner color={colors.secondary}/>}
+      <View style={{marginBottom: 40}}>
+        <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>F I T</Text>
+        <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>L I N K</Text>
+      </View>
       <Item style={styles.inputGrp}>
       <Icon name="mail" style={{color: '#fff'}} />
         <Input
@@ -81,13 +85,13 @@ import colors from 'Anyone/constants/colors'
         }}
         style={[{marginRight: 10}, styles.button]}
         >
-        <Text style={{fontFamily: 'Avenir'}}>Login</Text>
+        <Text style={{color: '#fff'}}>Login</Text>
         </Button>
       <Button primary
         onPress={() => this.props.navigation.navigate("SignUp")}
         style={styles.button}
         >
-        <Text style={{fontFamily: 'Avenir'}}>Sign Up</Text>
+        <Text style={{color: '#fff'}}>Sign Up</Text>
         </Button>
         </View>
         <View>
@@ -97,18 +101,18 @@ import colors from 'Anyone/constants/colors'
           }}
           style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
             <Icon name="logo-facebook"/>
-            <Text style={{marginLeft: -20, fontFamily: 'Avenir'}}>Login with Facebook</Text>
+            <Text style={{color: '#fff'}}>Login with Facebook</Text>
           </Button>
           <Button 
           onPress={()=> {
             this.gLogin()
           }}
           style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
-            <Icon name="logo-google"/>
-            <Text style={{marginLeft: -20, fontFamily: 'Avenir'}}>Login with Google</Text>
+            <Icon style={{marginLeft: 0}} name="logo-google"/>
+            <Text style={{ color: '#fff'}}>Login with Google</Text>
           </Button>
         </View>
-          <Text style={{color: '#fff', fontFamily: 'Avenir', textAlign: 'center', position: 'absolute', bottom: 10}}>
+          <Text style={{color: '#fff', textAlign: 'center', position: 'absolute', bottom: 10}}>
           {"v"+VersionNumber.appVersion}</Text>
     </ImageBackground>
   )

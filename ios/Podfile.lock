@@ -1,7 +1,7 @@
 PODS:
-  - Crashlytics (3.10.1):
-    - Fabric (~> 1.7.5)
-  - Fabric (1.7.5)
+  - Crashlytics (3.10.2):
+    - Fabric (~> 1.7.7)
+  - Fabric (1.7.7)
   - Firebase/Core (4.0.0):
     - FirebaseAnalytics (= 4.0.0)
     - FirebaseCore (= 4.0.0)
@@ -11,9 +11,9 @@ PODS:
   - FirebaseAnalytics (4.0.0):
     - FirebaseCore (~> 4.0)
     - FirebaseInstanceID (~> 2.0)
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
   - FirebaseCore (4.0.0):
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
   - FirebaseInstanceID (2.0.10):
     - FirebaseCore (~> 4.0)
   - FirebaseMessaging (2.0.0):
@@ -50,17 +50,17 @@ PODS:
     - GoogleNetworkingUtilities (~> 1.0)
     - GoogleUtilities (~> 1.0)
   - GoogleSymbolUtilities (1.1.2)
-  - GoogleToolboxForMac/Defines (2.1.3)
-  - GoogleToolboxForMac/Logger (2.1.3):
-    - GoogleToolboxForMac/Defines (= 2.1.3)
-  - GoogleToolboxForMac/NSData+zlib (2.1.3):
-    - GoogleToolboxForMac/Defines (= 2.1.3)
+  - GoogleToolboxForMac/Defines (2.1.4)
+  - GoogleToolboxForMac/Logger (2.1.4):
+    - GoogleToolboxForMac/Defines (= 2.1.4)
+  - "GoogleToolboxForMac/NSData+zlib (2.1.4)":
+    - GoogleToolboxForMac/Defines (= 2.1.4)
   - GoogleUtilities (1.3.2):
     - GoogleSymbolUtilities (~> 1.1)
   - Protobuf (3.5.0)
   - React (0.53.3):
     - React/Core (= 0.53.3)
-  - react-native-fcm (14.1.3):
+  - react-native-fcm (14.2.0):
     - Firebase/Messaging
     - React
   - react-native-fetch-blob (0.10.6):
@@ -145,31 +145,52 @@ DEPENDENCIES:
   - ReactNativePermissions (from `../node_modules/react-native-permissions`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga/yoga.podspec`)
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Crashlytics
+    - Fabric
+    - Firebase
+    - FirebaseAnalytics
+    - FirebaseCore
+    - FirebaseInstanceID
+    - FirebaseMessaging
+    - Google
+    - GoogleAppUtilities
+    - GoogleAuthUtilities
+    - GoogleInterchangeUtilities
+    - GoogleMaps
+    - GoogleNetworkingUtilities
+    - GoogleSignIn
+    - GoogleSymbolUtilities
+    - GoogleToolboxForMac
+    - GoogleUtilities
+    - Protobuf
+
 EXTERNAL SOURCES:
   React:
-    :path: ../node_modules/react-native
+    :path: "../node_modules/react-native"
   react-native-fcm:
-    :path: ../node_modules/react-native-fcm
+    :path: "../node_modules/react-native-fcm"
   react-native-fetch-blob:
-    :path: ../node_modules/react-native-fetch-blob
+    :path: "../node_modules/react-native-fetch-blob"
   react-native-geocoder:
-    :path: ../node_modules/react-native-geocoder
+    :path: "../node_modules/react-native-geocoder"
   react-native-google-maps:
-    :path: ../node_modules/react-native-maps
+    :path: "../node_modules/react-native-maps"
   react-native-image-picker:
-    :path: ../node_modules/react-native-image-picker
+    :path: "../node_modules/react-native-image-picker"
   react-native-image-resizer:
-    :path: ../node_modules/react-native-image-resizer
+    :path: "../node_modules/react-native-image-resizer"
   react-native-maps:
-    :path: ../node_modules/react-native-maps
+    :path: "../node_modules/react-native-maps"
   ReactNativePermissions:
-    :path: ../node_modules/react-native-permissions
+    :path: "../node_modules/react-native-permissions"
   yoga:
-    :path: ../node_modules/react-native/ReactCommon/yoga/yoga.podspec
+    :path: "../node_modules/react-native/ReactCommon/yoga/yoga.podspec"
 
 SPEC CHECKSUMS:
-  Crashlytics: aee1a064cbbf99b32efa3f056a5f458d846bc8ff
-  Fabric: ae7146a5f505ea370a1e44820b4b1dc8890e2890
+  Crashlytics: 0360624eea1c978a743feddb2fb1ef8b37fb7a0d
+  Fabric: bda89e242bce1b7b8ab264248cf3407774ce0095
   Firebase: 284eea779b73fdff309791817da7c68bff8dd572
   FirebaseAnalytics: 6f08e746f7d66f5452931bc2e822b5df9c66b64a
   FirebaseCore: 85ad466044c2f013cdb167f85d426d15b128114a
@@ -183,20 +204,20 @@ SPEC CHECKSUMS:
   GoogleNetworkingUtilities: 3edd3a8161347494f2da60ea0deddc8a472d94cb
   GoogleSignIn: 3d571172b8603be39dcb1705d8217146bb76fe62
   GoogleSymbolUtilities: 631ee17048aa5e9ab133470d768ea997a5ef9b96
-  GoogleToolboxForMac: 2501e2ad72a52eb3dfe7bd9aee7dad11b858bd20
+  GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
   GoogleUtilities: 8bbc733218aad26306f9d4a253823986110e3358
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
-  React: fd20e9486c9d994fb6e40d6e67dbd29c7709889c
-  react-native-fcm: 6471f37deaa69ebda22e515750416ac16aee7948
-  react-native-fetch-blob: 2bef9be702de8726f4d7bf58d2345579aaaee60d
-  react-native-geocoder: 757427682892bb256f3b3745858cc90eba148a8e
-  react-native-google-maps: dc6d7644b0517e6e232644d2b66004714b91e152
-  react-native-image-picker: 3693786b3d5958c8f71deed66ec068b323565e0d
-  react-native-image-resizer: aa1600566fd336a044daf9273dcec5033c1d41ca
-  react-native-maps: d3b689927722398a12a4b3007fd9a0c60e1c48cd
-  ReactNativePermissions: a25615ebfd785b7a081dff3dec88bf191a7d7c42
-  yoga: c7c8e64dbc2552b1ceac0b491ff03f5e5128b501
+  React: af66244a7d630be2aef03b4ddfe3570e4eff39fc
+  react-native-fcm: 7de3ba1108aba709c3d2b4237594554eb5f6f026
+  react-native-fetch-blob: 63394b1d7b0781547b3e4463b3195790177b1222
+  react-native-geocoder: 33b16a5929aa868fef37acb4f7ee10a428cd5fff
+  react-native-google-maps: 963fc78a5ac32dad3a726e4fa08b5307faa5cab2
+  react-native-image-picker: 42cfe2c8435d893414f8714a81e480313cb1412b
+  react-native-image-resizer: 04a3409e7d4ad646c4468671c69dec490def139c
+  react-native-maps: 066c2afcc89e18726377bcc685315f989ca22449
+  ReactNativePermissions: 9f2d9c45c98800795e6c2ed330e25d11a66a8169
+  yoga: 55da126afc384965b96bff46652464373b330add
 
 PODFILE CHECKSUM: f45be59ec7d4420031244b9ddb1022e36412638a
 
-COCOAPODS: 1.3.1
+COCOAPODS: 1.5.0

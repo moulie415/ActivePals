@@ -37,7 +37,7 @@ export default firebase
 const showLocalNotification = (notif) => {
   if (notif.custom_notification) {
     let user = firebase.auth().currentUser
-    if (notif.type != 'sessionMessage' || 
+    if (notif.type != 'sessionMessage' ||
       (notif.type == 'sessionMessage' && notif.uid != user.uid)) {
       let custom = JSON.parse(notif.custom_notification)
       FCM.presentLocalNotification({
@@ -50,7 +50,7 @@ const showLocalNotification = (notif) => {
       lights: true,
       vibrate: 300,
       group: custom.group,
-      data: notif
+      data: notif,
     })
     }
   }

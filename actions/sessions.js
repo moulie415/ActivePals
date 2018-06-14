@@ -1,9 +1,15 @@
 import * as firebase from 'firebase'
 import { removeSessionChat } from 'Anyone/actions/chats'
 export const SET_SESSIONS = 'SET_SESSIONS'
+export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
 
 const setSessions = (sessions) => ({
 	type: SET_SESSIONS,
+	sessions,
+})
+
+const updateSessions = (sessions) => ({
+	type: UPDATE_SESSIONS,
 	sessions,
 })
 
@@ -114,7 +120,7 @@ export const removeSession = (key) => {
 		let sessions = getState().sessions.sessions
 		let session = sessions[key]
 		let type = session.private ? 'privateSessions' : 'sessions'
-		if (session.host == uid) {
+		if (session.host.uid == uid) {
 			firebase.database().ref(type + '/' + key).remove()
 			Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(key).remove())
 			firebase.database().ref('sessionChats').child(key).remove()
@@ -123,12 +129,12 @@ export const removeSession = (key) => {
 			firebase.database().ref('users/' + uid + '/sessions').child(key).remove()
 			firebase.database().ref(type + '/' + key + '/users').child(uid).remove()
 		}
-		// let sessionsArr = Object.values(sessions).filter(session => session.key != key)
-		// let obj = sessionsArr.reduce(function(acc, cur, i) {
-		// 		acc[cur.key] = cur
-		// 		return acc
-		// 	}, {})
-		// dispatch(setSessions(obj))
+		let sessionsArr = Object.values(sessions).filter(session => session.key != key)
+			let obj = sessionsArr.reduce(function(acc, cur, i) {
+				acc[cur.key] = cur
+				return acc
+			}, {})
+			dispatch(updateSessions(obj))
 		dispatch(removeSessionChat(key))
 	}
 }
