@@ -9,7 +9,6 @@ import {
 } from "react-native"
 import {
   Button,
-  Text,
   Input,
   Container,
   Content, 
@@ -23,6 +22,7 @@ import {
   Spinner
 } from 'native-base'
 import firebase from './index'
+import Text, { globalTextStyle } from 'Anyone/constants/Text'
 import  styles  from './styles/profileStyles'
 import colors from './constants/colors'
 import DatePicker from 'react-native-datepicker'
@@ -78,7 +78,7 @@ window.Blob = Blob
 
   listenForUserChanges(ref) {
     ref.on("value", snapshot => {
-      profile = snapshot.val()
+      let profile = snapshot.val()
       this.setState({initialProfile: profile})
       this.setState({profile})
     })
@@ -95,28 +95,28 @@ window.Blob = Blob
 
   render () {
     return (
-    <Container style={{backgroundColor: colors.primary}}>
+    <Container>
     <Header style={{backgroundColor: colors.primary}}>
         <Left style={{flex: 1}} >
-        <TouchableOpacity style={{marginLeft: 10}} onPress={()=> this.props.goToSettings()}>
-          <Icon
-          name='md-settings'
-          style={{ color: '#fff' }}
-          />
-        </TouchableOpacity>
+        {this.hasChanged() && <TouchableOpacity
+            onPress={() => {
+              this.setState({profile: this.state.initialProfile, avatar: this.state.initialAvatar})
+          }}>
+            <Text style={{color: '#fff'}}>UNDO</Text>
+          </TouchableOpacity>}
         </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Profile</Title>
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Profile</Title>
         <Right>
           <Button onPress={()=> this.updateUser(this.state.initialProfile, this.state.profile)}
           style={{backgroundColor: 'transparent', elevation: 0}}>
-            <Text>Save</Text>
+            <Text style={{color: '#fff'}}>SAVE</Text>
           </Button>
         </Right>
 
         </Header>
         
       <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 10}}>
-        {this.state.avatar? 
+        {this.state.avatar ? 
           <TouchableOpacity 
           style={{marginHorizontal: 20}}
           onPress={()=> this.selectAvatar()}>
@@ -129,19 +129,19 @@ window.Blob = Blob
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <Icon name='md-contact'  
           style={{fontSize: 80, color: colors.primary, textAlign: 'center', 
-          marginBottom: Platform.OS == 'ios'? -5 : null}}/>
+          marginBottom: Platform.OS == 'ios' ? -5 : null}}/>
           </View>
           </TouchableOpacity>}
         <View style={{flex: 1, marginRight: 10}}>
-            <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Email: {this.state.email}</Text>
-            <Text style={{color: '#fff', fontFamily: 'Avenir'}}>Account type: {this.state.profile.accountType}</Text>
+            <Text style={{color: '#999'}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
+            <Text style={{color: '#999'}}>Account type: <Text style={{color: colors.secondary}}>{this.state.profile.accountType}</Text></Text>
         </View>
 
       </View>
 
 
       <View style={styles.inputGrp}>
-        <Text style={{alignSelf: 'center', fontFamily: 'Avenir'}}>Username: </Text>
+        <Text style={{alignSelf: 'center'}}>Username: </Text>
             <Input
             value={this.state.profile.username}
             onChangeText={username => this.setState({profile: {...this.state.profile, username}})}
@@ -152,7 +152,7 @@ window.Blob = Blob
         />
           </View>
           <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center', fontFamily: 'Avenir'}}>First name: </Text>
+            <Text style={{alignSelf: 'center'}}>First name: </Text>
             <Input
             value={this.state.profile.first_name}
             onChangeText={name => this.setState({profile: {...this.state.profile, first_name: name}})}
@@ -163,7 +163,7 @@ window.Blob = Blob
         />
           </View>
           <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center', fontFamily: 'Avenir'}}>Last name: </Text>
+            <Text style={{alignSelf: 'center'}}>Last name: </Text>
             <Input
             value={this.state.profile.last_name}
             onChangeText={name => this.setState({profile: {...this.state.profile, last_name: name}})}
@@ -174,7 +174,7 @@ window.Blob = Blob
         />
           </View>
           <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center', fontFamily: 'Avenir'}}>Birthday: </Text>
+            <Text style={{alignSelf: 'center'}}>Birthday: </Text>
           <DatePicker
           date={this.getDate(this.state.profile.birthday)}
           placeholder={this.state.profile.birthday || 'None'}
@@ -187,19 +187,29 @@ window.Blob = Blob
               color: '#fff',
             },
             placeholderText: {
-              color: '#fff'
+              color: '#fff',
             },
             dateInput: {
-              borderWidth: 0
+              borderWidth: 0,
             }
           }}
           onDateChange={(date) => this.setState({profile: {...this.state.profile, birthday: date}})}
           />
           </View>
+          <TouchableOpacity 
+          style={{flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: colors.secondary, paddingVertical: 10}} 
+          onPress={()=> this.props.goToSettings()}>
+            <Icon
+            name='md-settings'
+            style={{ color: colors.secondary, marginLeft: 20}}
+            />
+            <Text style={{color: colors.secondary, alignSelf: 'center', marginLeft: 20}}>Settings</Text>
+          </TouchableOpacity>
+
       <TouchableOpacity
-        style={{backgroundColor: colors.secondary, marginLeft: 20, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20}}
+        style={{backgroundColor: colors.secondary, marginTop: 20, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20}}
         onPress={()=> this.logout()}>
-        <Text style={{color: '#fff', fontFamily: 'Avenir'}} >Log out</Text>
+        <Text style={{color: '#fff'}} >Log out</Text>
       </TouchableOpacity>
         {this.state.spinner && <Spinner color={colors.secondary}/>}
 
@@ -214,11 +224,11 @@ window.Blob = Blob
     }
     else return null
   }
-  
+
 updateUser(initial, profile) {
-  if (JSON.stringify(initial) === JSON.stringify(profile) && (this.state.initialAvatar == this.state.avatar)) {
+  if (!this.hasChanged()) {
     Alert.alert("No changes")
-  }  
+  }
   else {
     if (profile.username.length < 5) {
       Alert.alert('Sorry', 'Username must be at least 5 characters long')
@@ -260,14 +270,19 @@ checkUsername(initial, profile){
   })
 }
 
+hasChanged() {
+  return !((JSON.stringify(this.state.initialProfile) === JSON.stringify(this.state.profile)
+    && (this.state.initialAvatar == this.state.avatar)))
+}
+
 selectAvatar() {
   var options = {
     title: 'Select Avatar',
     mediaType: 'photo',
     storageOptions: {
       skipBackup: true,
-      path: 'images'
-    }
+      path: 'images',
+    },
   }
   ImagePicker.showImagePicker(options, (response) => {
     console.log('Response = ', response);
@@ -346,13 +361,13 @@ import { navigateLogin, navigateSettings } from 'Anyone/actions/navigation'
 import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ profile }) => ({
-  profile: profile.profile
+  profile: profile.profile,
 })
 
 const mapDispatchToProps = dispatch => ({
   onLogoutPress: ()=> { dispatch(navigateLogin())},
   onSave: ()=> dispatch(fetchProfile()),
-  goToSettings: ()=> dispatch(navigateSettings())
+  goToSettings: ()=> dispatch(navigateSettings()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile)

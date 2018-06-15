@@ -147,7 +147,7 @@ componentWillReceiveProps(nextProps) {
             {this.fetchAvatar(item.uid)}
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{fontWeight: 'bold', color: '#000', flex: 1}}>{item.uid == this.props.profile.uid? 'You' : item.username}</Text>
+                <Text style={{fontWeight: 'bold', color: '#000', flex: 1}}>{item.uid == this.props.profile.uid ? 'You' : item.username}</Text>
                 <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
               </View>
               <Text style={{color: '#000'}}>{item.text}</Text>
@@ -178,7 +178,7 @@ import { addPost } from 'Anyone/actions/home'
 const mapStateToProps = ({ profile, home, friends }) => ({
   profile: profile.profile,
   feed: home.feed,
-  friends: friends.friends
+  friends: friends.friends,
 })
 
 const mapDispatchToProps = dispatch => ({

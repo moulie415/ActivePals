@@ -8,7 +8,8 @@ export default styles = StyleSheet.create({
   },
   inputGrp: {
     flexDirection: 'row',
-    backgroundColor: '#fff7',
+    //backgroundColor: '#fff7',
+    backgroundColor: colors.primaryLighter,
     marginBottom: 20,
     borderWidth: 0,
     borderColor: 'transparent',
