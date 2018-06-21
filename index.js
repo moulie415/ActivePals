@@ -16,6 +16,8 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
 import App from './App'
 import { navigateMessaging, navigateMessagingSession, navigateFriends } from "./actions/navigation"
 import { newNotification, updateLastMessage } from './actions/chats'
+import GeoFire from 'geofire'
+
 import {
   createReactNavigationReduxMiddleware,
   createReduxBoundAddListener,
@@ -30,6 +32,9 @@ let config = {
   messagingSenderId: "680139677816"
 }
 firebase.initializeApp(config)
+let firebaseRef = firebase.database().ref('locations')
+export const geofire = new GeoFire(firebaseRef)
+
 export default firebase
 
 

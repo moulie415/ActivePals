@@ -89,11 +89,11 @@ import StarRating from 'react-native-star-rating'
     })
 
     firebase.database().ref('sessions').orderByKey().limitToLast(this.state.amount).on('child_removed', snapshot => {
-        this.props.remove(snapshot.key)
+        this.props.remove(snapshot.key, snapshot.val().private)
     })
     firebase.database().ref('users/' + this.props.profile.uid).child('sessions').on('child_removed', snapshot => {
       if (snapshot.val() == 'private') {
-        this.props.remove(snapshot.key)
+        this.props.remove(snapshot.key, snapshot.val().private)
       }
     })
   }
@@ -332,7 +332,7 @@ import StarRating from 'react-native-star-rating'
               [
               {text: 'cancel', style: 'cancel'},
               {text: 'Yes', onPress: ()=> {
-                this.props.remove(session.key)
+                this.props.remove(session.key, session.private)
                 this.refs.modal.close()
               },
               style: 'destructive'}
@@ -358,7 +358,7 @@ import StarRating from 'react-native-star-rating'
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableOpacity
           onPress={()=> {
-            this.props.remove(session.key)
+            this.props.remove(session.key, session.private)
             this.refs.modal.close()
           }}
           style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
@@ -661,7 +661,7 @@ const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
 const mapDispatchToProps = dispatch => ({
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onJoin: (session, isPrivate) => {return dispatch(addSessionChat(session, isPrivate))},
-  remove: (key) => dispatch(removeSession(key)),
+  remove: (key, type) => dispatch(removeSession(key, type)),
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
   fetch: (amount) => {return Promise.all([dispatch(fetchSessions(amount)), dispatch(fetchPrivateSessions())])},

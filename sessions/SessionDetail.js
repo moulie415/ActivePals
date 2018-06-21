@@ -6,18 +6,19 @@ import {
 	ActionSheet,
 	Icon,
 	Button,
-	Content
+	Content,
 } from 'native-base'
 import {
 	Text,
 	View,
 	TouchableOpacity,
 	Alert,
-	TextInput
+	TextInput,
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
-import firebase from "Anyone/index"
+import firebase from 'Anyone/index'
+import { geofire }  from 'Anyone/index'
 import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/constants/colors'
 
@@ -132,7 +133,7 @@ class SessionDetail extends Component {
 						<Text style={{alignSelf: 'center', marginVertical: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
 					</View>
 					<View style={{flexDirection: 'row'}}>
-					<TouchableOpacity 
+					<TouchableOpacity
 					style={styles.gender}
 					onPress={()=> {
 						ActionSheet.show(
@@ -211,15 +212,15 @@ class SessionDetail extends Component {
 	createSession() {
 		if (this.location && this.title && this.details && this.state.date) {
 			let session = {
-				location: this.location, 
-				title: this.title, 
-				details: this.details, 
+				location: this.location,
+				title: this.title,
+				details: this.details,
 				gender: this.state.gender,
 				type: this.type,
 				host: this.user.uid,
 				dateTime: this.state.date,
 				duration: this.state.duration,
-				users: {}
+				users: {},
 			}
 			if (this.buddies) {
 				session.private = true
@@ -229,8 +230,8 @@ class SessionDetail extends Component {
 			}
 			session.users[this.user.uid] = true
 
-			let type = session.private? "privateSessions" : "sessions"
-			let val = session.private? "private" : true
+			let type = session.private ? "privateSessions" : "sessions"
+			let val = session.private ? "private" : true
 			firebase.database().ref(type).push(session).then((snapshot)=> {
 				Alert.alert('Success','Session created')
 				this.props.goSessions()
@@ -241,6 +242,10 @@ class SessionDetail extends Component {
 				}
 				firebase.database().ref(type + '/' + snapshot.key + '/users').child(this.user.uid).set(true)
 				firebase.database().ref('users/' + this.user.uid + '/sessions').child(snapshot.key).set(val)
+				let coords = this.location.position
+				if (type == 'sessions') {
+					geofire.set(snapshot.key , [coords.lat, coords.lng])
+				}
 				let systemMessage = {
 					_id: 1,
 					text: 'Beginning of chat',

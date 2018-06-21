@@ -44,7 +44,7 @@ class Home extends Component {
 
     this.state = {
       profile: this.props.profile,
-      feed: this.props.feed
+      feed: this.props.feed,
     }
   }
 
@@ -57,6 +57,8 @@ class Home extends Component {
   } else {
     // No user is signed in.
   }
+
+
 
 })
 }
@@ -80,7 +82,7 @@ componentWillReceiveProps(nextProps) {
       <Content>
         <View style={{flexDirection: 'row', backgroundColor: '#fff', padding: 10, alignItems: 'center'}}>
         <TouchableOpacity onPress={()=> this.props.goToProfile()}>
-          {this.state.profile && this.state.profile.avatar? 
+          {this.state.profile && this.state.profile.avatar ?
             <Image source={{uri: this.props.profile.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/>
             : <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
             </TouchableOpacity> 

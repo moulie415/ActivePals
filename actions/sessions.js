@@ -1,5 +1,6 @@
 import * as firebase from 'firebase'
 import { removeSessionChat } from 'Anyone/actions/chats'
+import { geofire }  from 'Anyone/index'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
 
@@ -33,7 +34,11 @@ export const fetchSessions = (amount) => {
 					.then(()=> {
 						firebase.database().ref('timestamp').once('value', snapshot => {
 							if (snapshot.val() > time + duration) {
-								dispatch(removeSessionChat(child.val(), child.key))
+								dispatch(removeSession(child.key, child.val().private))
+								firebase.database().ref('sessions' + '/' + child.key).remove()
+								firebase.database().ref('sessionChats').child(child.key).remove()
+								dispatch(removeSessionChat(child.key))
+								geofire.remove(child.key)
 							}
 						})
 					})
@@ -98,7 +103,9 @@ export const fetchPrivateSessions = () =>  {
 						.then(()=> {
 							firebase.database().ref('timestamp').once('value', snapshot => {
 								if (snapshot.val() > time + duration) {
-									dispatch(removeSessionChat(session.val(), session.key))
+									dispatch(removeSession(session.key, snapshot.val().private))
+									firebase.database().ref('privateSessions' + '/' + session.key).remove()
+									firebase.database().ref('sessionChats').child(session.key).remove()
 								}
 							})
 						})
@@ -114,27 +121,30 @@ export const fetchPrivateSessions = () =>  {
 	}
 }
 
-export const removeSession = (key) => {
+export const removeSession = (key, isPrivate) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
 		let sessions = getState().sessions.sessions
 		let session = sessions[key]
-		let type = session.private ? 'privateSessions' : 'sessions'
-		if (session.host.uid == uid) {
+		let type = isPrivate ? 'privateSessions' : 'sessions'
+		if (session && session.host.uid == uid) {
 			firebase.database().ref(type + '/' + key).remove()
 			Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(key).remove())
 			firebase.database().ref('sessionChats').child(key).remove()
+			geofire.remove(key)
 		}
 		else {
 			firebase.database().ref('users/' + uid + '/sessions').child(key).remove()
 			firebase.database().ref(type + '/' + key + '/users').child(uid).remove()
 		}
-		let sessionsArr = Object.values(sessions).filter(session => session.key != key)
+		if (session) {
+			let sessionsArr = Object.values(sessions).filter(session => session.key != key)
 			let obj = sessionsArr.reduce(function(acc, cur, i) {
 				acc[cur.key] = cur
 				return acc
 			}, {})
 			dispatch(updateSessions(obj))
-		dispatch(removeSessionChat(key))
+			dispatch(removeSessionChat(key))
+		}
 	}
 }
