@@ -38,6 +38,7 @@ import { getType, getResource } from './constants/utils'
 import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
 import StarRating from 'react-native-star-rating'
+import { geofire }  from 'Anyone/index'
 
  class Sessions extends Component {
 
@@ -59,11 +60,13 @@ import StarRating from 'react-native-star-rating'
       spinner: false,
       showMap: true,
       switch: false,
-      sessions: this.sortByDateTime(Object.values(this.props.sessions)),
+      radius: 10,
+      //sessions: this.sortByDateTime(Object.values(this.props.sessions)),
+      sessions: this.sortByDistance(Object.values(this.props.sessions)),
       refreshing: false,
       selectedFriends: [],
       markers: this.markers(Object.values(this.props.sessions)),
-      amount: 30,
+      sessionKeys: [],
     }
   }
 
@@ -76,6 +79,7 @@ import StarRating from 'react-native-star-rating'
       }
     })
 
+
     Permissions.check('location').then(response => {
       this.setState({spinner: true})
       // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
@@ -87,10 +91,9 @@ import StarRating from 'react-native-star-rating'
         this.getPosition()
       }
     })
-
-    firebase.database().ref('sessions').orderByKey().limitToLast(this.state.amount).on('child_removed', snapshot => {
-        this.props.remove(snapshot.key, snapshot.val().private)
-    })
+    // firebase.database().ref('sessions').orderByKey().limitToLast(this.state.amount).on('child_removed', snapshot => {
+    //     this.props.remove(snapshot.key, snapshot.val().private)
+    // })
     firebase.database().ref('users/' + this.props.profile.uid).child('sessions').on('child_removed', snapshot => {
       if (snapshot.val() == 'private') {
         this.props.remove(snapshot.key, snapshot.val().private)
@@ -113,6 +116,18 @@ import StarRating from 'react-native-star-rating'
         let bDate = b.dateTime.replace(/-/g, "/")
         return new Date(aDate) - new Date(bDate)
       })
+    return sessions
+  }
+
+  sortByDistance(sessions) {
+    sessions.sort(function(a, b) {
+      if (a.distance && b.distance) {
+        let aDistance = a.distance
+        let bDistance = b.distance
+        return aDistance - bDistance
+      }
+      else return -100
+    })
     return sessions
   }
 
@@ -430,7 +445,7 @@ import StarRating from 'react-native-star-rating'
           refreshing={this.state.refreshing}
           onRefresh={()=> {
             this.setState({refreshing: true})
-            this.props.fetch(30).then(()=> this.setState({refreshing: false}))
+            this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
             this.getPosition()
           }}
           data={sessions}
@@ -445,11 +460,12 @@ import StarRating from 'react-native-star-rating'
                   <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
                     <View style={{flex: 1}}>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
-                        <Text style={{fontSize: 13, color: '#000'}}>{"gender: " + item.gender}</Text>
+                        <Text style={{flex: 3}} numberOfLines={1}><Text  style={styles.title}>{item.title}</Text>
+                        <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : this.getDistance(item)) + ' km away)'}</Text></Text>
+                        <Text numberOfLines={1} style={{fontSize: 13, color: '#000', flex: 2}}>{"gender: " + item.gender}</Text>
                       </View>
                       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                      <Text style={[styles.date], {color: item.inProgress? colors.secondary : "#999"}} >
+                      <Text style={[styles.date], {color: item.inProgress ? colors.secondary : "#999"}} >
                       {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
                       {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 15, paddingHorizontal: 5}}/>
                       <Text style={{fontSize: 12, color: '#000'}}>PRIVATE</Text></View>}</View>
@@ -644,6 +660,31 @@ import StarRating from 'react-native-star-rating'
     }
     else return <Text>N/A</Text>
   }
+
+getDistance(item) {
+  if (this.state.latitude) {
+    let lat1 = this.state.latitude
+    let lon1 = this.state.longitude
+    let lat2 = item.location.position.lat
+    let lon2 = item.location.position.lng
+    let R = 6371
+    let dLat = deg2rad(lat2 - lat1)
+    let dLon = deg2rad(lon2 - lon1)
+    let a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2)
+
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    let d = R * c
+    return d.toFixed(2)
+  }
+  else return 'unknown'
+}
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI / 180)
 }
 
 import { connect } from 'react-redux'
@@ -664,7 +705,7 @@ const mapDispatchToProps = dispatch => ({
   remove: (key, type) => dispatch(removeSession(key, type)),
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
-  fetch: (amount) => {return Promise.all([dispatch(fetchSessions(amount)), dispatch(fetchPrivateSessions())])},
+  fetch: (radius) => {return Promise.all([dispatch(fetchSessions(radius)), dispatch(fetchPrivateSessions())])},
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)

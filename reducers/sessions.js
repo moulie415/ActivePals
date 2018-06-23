@@ -1,6 +1,7 @@
 import {
 	SET_SESSIONS,
 	UPDATE_SESSIONS,
+	ADD_SESSION,
 } from 'Anyone/actions/sessions'
 
 const initialState = {
@@ -19,6 +20,12 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				sessions: {...action.sessions},
+			}
+		}
+		case ADD_SESSION: {
+			return {
+				...state,
+				sessions: {...state.sessions, [action.session.key]: action.session}
 			}
 		}
 		default:

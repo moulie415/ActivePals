@@ -364,7 +364,7 @@ const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
   sessionChats: chats.sessionChats,
   chats: chats.chats,
   messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)],
-  notif: chats.notif
+  notif: chats.notif,
 })
 
 const mapDispatchToProps = dispatch => ({

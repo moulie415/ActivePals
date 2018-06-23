@@ -3,6 +3,7 @@ import { removeSessionChat } from 'Anyone/actions/chats'
 import { geofire }  from 'Anyone/index'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
+export const ADD_SESSION = 'ADD_SESSION'
 
 const setSessions = (sessions) => ({
 	type: SET_SESSIONS,
@@ -14,54 +15,120 @@ const updateSessions = (sessions) => ({
 	sessions,
 })
 
-export const fetchSessions = (amount) => {
+const addSession = (session) => ({
+	type: ADD_SESSION,
+	session,
+})
+
+export const fetchSessions = (radius = 30) => {
 	return (dispatch) => {
-		return firebase.database().ref('sessions').orderByKey().limitToLast(amount).on('value', snapshot => {
-			let sessions = []
-			let index = 1
-			snapshot.forEach(child => {
-				let duration = child.val().duration * 60 * 60 * 1000
-				let time = new Date(child.val().dateTime.replace(/-/g, '/')).getTime()
-				let current = new Date().getTime()
-				if (time + duration > current) {
-					let inProgress = time < current
-						sessions.push({...child.val(), key: child.key, inProgress})
-						index++
-				}
-				else {
-					//validate time serverside before deleting session in case clients time is wrong
-					firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
-					.then(()=> {
-						firebase.database().ref('timestamp').once('value', snapshot => {
-							if (snapshot.val() > time + duration) {
-								dispatch(removeSession(child.key, child.val().private))
-								firebase.database().ref('sessions' + '/' + child.key).remove()
-								firebase.database().ref('sessionChats').child(child.key).remove()
-								dispatch(removeSessionChat(child.key))
-								geofire.remove(child.key)
+		return new Promise((resolve, reject) => {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					let lat = position.coords.latitude
+					let lon = position.coords.longitude
+					let geoQuery = geofire.query({
+						center: [lat, lon],
+						radius: 10,
+					})
+
+					let onReadyRegistration = geoQuery.on("ready",() => {
+						console.log("GeoQuery has loaded and fired all other events for initial data")
+						resolve()
+					})
+
+					let onKeyEnteredRegistration = geoQuery.on("key_entered", (key, location, distance) => {
+						console.log(key + " entered query at " + location + " (" + distance + " km from center)")
+						firebase.database().ref('sessions/' + key).once('value', snapshot => {
+							let duration = snapshot.val().duration * 60 * 60 * 1000
+							let time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
+							let current = new Date().getTime()
+							if (time + duration > current) {
+								let inProgress = time < current
+								firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
+									dispatch(addSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
+								})
+							}
+							else {
+							//validate time serverside before deleting session in case clients time is wrong
+								firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
+								.then(()=> {
+									firebase.database().ref('timestamp').once('value', timestamp => {
+										if (timestamp.val() > time + duration) {
+											dispatch(removeSession(key, snapshot.val().private))
+											firebase.database().ref('sessions/' + key).remove()
+											firebase.database().ref('sessionChats').child(key).remove()
+											dispatch(removeSessionChat(key))
+											geofire.remove(key)
+										}
+									})
+								})
 							}
 						})
 					})
-				}
-			})
-			let promises = []
-			sessions.forEach(session => {
-				promises.push(new Promise(resolve => {
-					firebase.database().ref('users/' + session.host).once('value', snapshot => {
-						resolve({...session, host: snapshot.val()})
+
+					let onKeyExitedRegistration = geoQuery.on("key_exited", (key, location, distance) => {
+						console.log(key + " exited query to " + location + " (" + distance + " km from center)")
 					})
-				}))
-			})
-			return Promise.all(promises).then(sessions => {
-				let obj = sessions.reduce(function(acc, cur, i) {
-					acc[cur.key] = cur
-					return acc
-				}, {})
-				dispatch(setSessions(obj))
-			})
+
+					let onKeyMovedRegistration = geoQuery.on("key_moved", (key, location, distance) => {
+						console.log(key + " moved within query to " + location + " (" + distance + " km from center)")
+					})
+
+				},
+				(error) => {
+
+				},
+			{ enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
+			)
 		})
 	}
 }
+
+		//  firebase.database().ref('sessions/' + key).orderByKey().once('value', snapshot => {
+		// 	let sessions = []
+		// 	let index = 1
+		// 	snapshot.forEach(child => {
+		// 		let duration = child.val().duration * 60 * 60 * 1000
+		// 		let time = new Date(child.val().dateTime.replace(/-/g, '/')).getTime()
+		// 		let current = new Date().getTime()
+		// 		if (time + duration > current) {
+		// 			let inProgress = time < current
+		// 				sessions.push({...child.val(), key: child.key, inProgress})
+		// 				index++
+		// 		}
+		// 		else {
+		// 			//validate time serverside before deleting session in case clients time is wrong
+		// 			firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
+		// 			.then(()=> {
+		// 				firebase.database().ref('timestamp').once('value', snapshot => {
+		// 					if (snapshot.val() > time + duration) {
+		// 						dispatch(removeSession(child.key, child.val().private))
+		// 						firebase.database().ref('sessions/' + child.key).remove()
+		// 						firebase.database().ref('sessionChats').child(child.key).remove()
+		// 						dispatch(removeSessionChat(child.key))
+		// 						geofire.remove(child.key)
+		// 					}
+		// 				})
+		// 			})
+		// 		}
+		// 	})
+		// 	let promises = []
+		// 	sessions.forEach(session => {
+		// 		promises.push(new Promise(resolve => {
+		// 			firebase.database().ref('users/' + session.host).once('value', snapshot => {
+		// 				resolve({...session, host: snapshot.val()})
+		// 			})
+		// 		}))
+		// 	})
+		// 	return Promise.all(promises).then(sessions => {
+		// 		let obj = sessions.reduce(function(acc, cur, i) {
+		// 			acc[cur.key] = cur
+		// 			return acc
+		// 		}, {})
+		// 		dispatch(setSessions(obj))
+		// 	})
+		// })
 
 export const fetchPrivateSessions = () =>  {
 	return (dispatch, getState) => {
