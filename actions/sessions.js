@@ -85,51 +85,6 @@ export const fetchSessions = (radius = 30) => {
 	}
 }
 
-		//  firebase.database().ref('sessions/' + key).orderByKey().once('value', snapshot => {
-		// 	let sessions = []
-		// 	let index = 1
-		// 	snapshot.forEach(child => {
-		// 		let duration = child.val().duration * 60 * 60 * 1000
-		// 		let time = new Date(child.val().dateTime.replace(/-/g, '/')).getTime()
-		// 		let current = new Date().getTime()
-		// 		if (time + duration > current) {
-		// 			let inProgress = time < current
-		// 				sessions.push({...child.val(), key: child.key, inProgress})
-		// 				index++
-		// 		}
-		// 		else {
-		// 			//validate time serverside before deleting session in case clients time is wrong
-		// 			firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
-		// 			.then(()=> {
-		// 				firebase.database().ref('timestamp').once('value', snapshot => {
-		// 					if (snapshot.val() > time + duration) {
-		// 						dispatch(removeSession(child.key, child.val().private))
-		// 						firebase.database().ref('sessions/' + child.key).remove()
-		// 						firebase.database().ref('sessionChats').child(child.key).remove()
-		// 						dispatch(removeSessionChat(child.key))
-		// 						geofire.remove(child.key)
-		// 					}
-		// 				})
-		// 			})
-		// 		}
-		// 	})
-		// 	let promises = []
-		// 	sessions.forEach(session => {
-		// 		promises.push(new Promise(resolve => {
-		// 			firebase.database().ref('users/' + session.host).once('value', snapshot => {
-		// 				resolve({...session, host: snapshot.val()})
-		// 			})
-		// 		}))
-		// 	})
-		// 	return Promise.all(promises).then(sessions => {
-		// 		let obj = sessions.reduce(function(acc, cur, i) {
-		// 			acc[cur.key] = cur
-		// 			return acc
-		// 		}, {})
-		// 		dispatch(setSessions(obj))
-		// 	})
-		// })
-
 export const fetchPrivateSessions = () =>  {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid

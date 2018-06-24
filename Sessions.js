@@ -66,6 +66,7 @@ import { geofire }  from 'Anyone/index'
       refreshing: false,
       selectedFriends: [],
       markers: this.markers(Object.values(this.props.sessions)),
+      pointsOfInterest: [],
       sessionKeys: [],
     }
   }
@@ -104,7 +105,7 @@ import { geofire }  from 'Anyone/index'
   componentWillReceiveProps(nextProps) {
     if (nextProps.sessions) {
       let sessions = Object.values(nextProps.sessions)
-      this.setState({markers: this.markers(sessions), sessions: this.sortByDateTime(sessions)})
+      this.setState({markers: this.markers(sessions), sessions: this.sortByDistance(sessions)})
     }
   }
 
@@ -175,6 +176,7 @@ import { geofire }  from 'Anyone/index'
 
         >
         {this.state.markers}
+        {this.state.pointsOfInterest}
         </MapView>}
 
         <View style={{flexDirection: 'row', height: 50}}>
@@ -207,18 +209,22 @@ import { geofire }  from 'Anyone/index'
           {this.state.selectedSession.title}</Text>
           <ScrollView style={{margin: 10}}>
           <View style={{flexDirection: 'row'}}>
-            <Text>Host: </Text>
+            <Text style={{color: '#000'}}>Host: </Text>
             {this.fetchHost(this.state.selectedSession.host)}
           </View>
           <Hyperlink
           linkStyle={{color: colors.secondary}}
           linkDefault={ true }>
-            <Text style={{marginVertical: 5}}>{this.state.selectedSession.details}</Text>
+            <Text style={{marginVertical: 5, color: '#000'}}>{this.state.selectedSession.details}</Text>
           </Hyperlink>
-          <Text style={{marginVertical: 5}}>{(this.formatDateTime(this.state.selectedSession.dateTime))
+          <Text style={{marginVertical: 5, color: '#000'}}>{(this.formatDateTime(this.state.selectedSession.dateTime))
             + " for " + (this.state.selectedSession.duration) + " " +
-            (this.state.selectedSession.duration > 1? 'hours' : 'hour') }</Text>
-            <Text style={{marginVertical: 5}}>{this.state.selectedSession.location.formattedAddress}</Text>
+            (this.state.selectedSession.duration > 1 ? 'hours' : 'hour') }</Text>
+            <Text style={{marginVertical: 5}}>
+              <Text style={{color: '#000'}}>{this.state.selectedSession.location.formattedAddress}</Text>
+              <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
+                this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
+            </Text>
             <TouchableOpacity onPress={()=> this.getPosition(true)}
             style={{marginVertical: 5}}>
               <Text style={{color: colors.secondary}}>Get directions</Text>
@@ -310,7 +316,7 @@ import { geofire }  from 'Anyone/index'
           <View style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
+              {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
                 <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary}}/>}
                 <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
                 {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
@@ -621,7 +627,7 @@ import { geofire }  from 'Anyone/index'
                 />
                 )
             })
-            this.setState({markers: [...this.state.markers, ...markers]})
+            this.setState({pointsOfInterest: markers})
 
           })
 
