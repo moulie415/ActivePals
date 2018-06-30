@@ -1,21 +1,27 @@
 import * as firebase from "firebase"
 export const ADD_POST = 'ADD_POST'
 export const SET_FEED = 'SET_FEED'
+export const SET_POST = 'SET_POST'
 
 const addToFeed = (post, id) => ({
 	type: ADD_POST,
 	post,
-	id
+	id,
 })
 
 const setFeed = (feed) => ({
 	type: SET_FEED,
-	feed
+	feed,
+})
+
+const setPost = (post) => ({
+	type: SET_POST,
+	post,
 })
 
 export const addPost = (item) => {
 	return (dispatch, getState) => {
-		uid = getState().profile.profile.uid
+		let uid = getState().profile.profile.uid
 		let uids = Object.keys(getState().friends.friends)
 		return firebase.database().ref('posts').push(item).then(snapshot => {
 			uids.forEach(friend => {
@@ -39,16 +45,82 @@ export const fetchPosts = (uid, amount) => {
 					})
 					Promise.all(promises).then(posts => {
 						let feed = {}
+						let reps = []
 						posts.forEach(post => {
 							feed[post.key] = post.val()
 							feed[post.key].key = post.key
+							reps.push(firebase.database().ref('userReps/' + uid).child(post.key).once('value'))
 						})
-						dispatch(setFeed(feed))
-						resolve()
+						Promise.all(reps).then(reps => {
+							reps.forEach(rep => {
+								if (rep.val()) {
+									feed[rep.key].rep = true
+								}
+							})
+							dispatch(setFeed(feed))
+							resolve()
+						})
 					})
 				}
 				else resolve()
 			})
+		})
+	}
+}
+
+export const repPost = (item) => {
+	return (dispatch, getState) => {
+		let post = item.key
+		let uid = getState().profile.profile.uid
+		let obj = getState().home.feed[post]
+		let rep = obj.rep ? false : true
+		if (obj.rep) {
+			obj.rep = false
+			obj.repCount -= 1
+		}
+		else {
+			obj.rep = true
+			if (obj.repCount) {
+				obj.repCount += 1
+			}
+			else obj.repCount = 1
+		}
+		dispatch(setPost(obj))
+		return new Promise(resolve => {
+			if (rep) {
+			firebase.database().ref('reps/' + post).child(uid).set({date: new Date().toString(), uid, post, type: 'post'}).then(() => {
+				firebase.database().ref('posts/' + post).child('repCount').once('value', snapshot => {
+					let count
+					if (snapshot.val()) {
+						count = snapshot.val()
+						count += 1
+					}
+					else count = 1
+					firebase.database().ref('posts/' + post).child('repCount').set(count).then(() => {
+						firebase.database().ref('userReps/' + uid).child(post).set(rep).then(() => {
+							resolve()
+						})
+					})
+				})
+			})
+		}
+		else {
+			firebase.database().ref('reps/' + post).child(uid).remove().then(() => {
+				firebase.database().ref('posts/' + post).child('repCount').once('value', snapshot => {
+					let count
+					if (snapshot.val()) {
+						count = snapshot.val()
+						count -= 1
+					}
+					else count = 0
+					firebase.database().ref('posts/' + post).child('repCount').set(count).then(() => {
+						firebase.database().ref('userReps/' + uid).child(post).set(rep).then(() => {
+							resolve()
+						})
+					})
+				})
+			})
+		}
 		})
 	}
 }

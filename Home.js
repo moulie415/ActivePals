@@ -17,13 +17,18 @@ import {
   Icon,
   Header,
   Title,
-  Card
+  Card,
+  Left,
+  Right,
 } from 'native-base'
 import firebase from "./index"
 import colors from './constants/colors'
 import  styles  from './styles/homeStyles'
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
 import { getSimplified } from 'Anyone/chat/SessionChats'
+
+const weightUp = require('Anyone/assets/images/weightlifting_up.png')
+const weightDown = require('Anyone/assets/images/weightlifting_down.png')
 
 
 class Home extends Component {
@@ -77,7 +82,15 @@ componentWillReceiveProps(nextProps) {
     return (
     <Container >
       <Header style={{backgroundColor: colors.primary}}>
-        <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir'}}>Feed</Title>
+        <Left style={{flex: 1}}/>
+        <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir', flex: 1}}>Feed</Title>
+        <Right>
+          <TouchableOpacity onPress={()=> {
+            Alert.alert("coming soon")
+          }}>
+            <Icon name='ios-notifications' style={{color: '#fff', marginRight: 10}}/>
+          </TouchableOpacity>
+        </Right>
       </Header>
       <Content>
         <View style={{flexDirection: 'row', backgroundColor: '#fff', padding: 10, alignItems: 'center'}}>
@@ -93,6 +106,9 @@ componentWillReceiveProps(nextProps) {
             onChangeText={(status) => this.setState({status})}
             placeholder="Post a status for your buddies..."
             style={{flex: 1, borderColor: '#999', borderWidth: 0.5, marginHorizontal: 10, height: 40, padding: 5}}/>
+            <TouchableOpacity onPress={()=> Alert.alert("coming soon")}>
+              <Icon name="ios-camera" style={{color: colors.secondary, fontSize: 40, marginRight: 10}} />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => {
               if (this.state.status) {
                 if (username) {
@@ -145,18 +161,53 @@ componentWillReceiveProps(nextProps) {
     switch(item.type) {
       case 'status':
         return (
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View>
+          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+          <TouchableOpacity onPress={()=> {
+            console.log("navigate to profile")
+          }}>
             {this.fetchAvatar(item.uid)}
+          </TouchableOpacity>
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{fontWeight: 'bold', color: '#000', flex: 1}}>{item.uid == this.props.profile.uid ? 'You' : item.username}</Text>
+                <TouchableOpacity onPress={()=> {
+                  console.log("navigate to profile")
+                }}>
+                  <Text style={{fontWeight: 'bold', color: colors.secondary, flex: 1}}>
+                  {item.uid == this.props.profile.uid ? 'You' : item.username}</Text>
+                </TouchableOpacity>
                 <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
               </View>
               <Text style={{color: '#000'}}>{item.text}</Text>
             </View>
+            </View>
+            <View style={{marginHorizontal: 10, borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
+            {this.repsAndComments(item)}
           </View>
           )
     }
+  }
+
+  repsAndComments(item) {
+   return(<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+    <TouchableOpacity 
+      onPress={() => {
+        this.props.onRepPost(item)
+      }}
+      style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
+      <Image source={item.rep ? weightUp : weightDown} 
+      style={{width: 25, height: 25, marginRight: 10, tintColor: item.rep ? colors.secondary : '#616770'}}/>
+      <Text style={{color: item.rep ? colors.secondary : '#616770'}}>Rep</Text>
+    </TouchableOpacity>
+    <TouchableOpacity 
+    onPress={() => {
+      Alert.alert('coming soon')
+    }}
+    style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
+      <Icon name='md-chatboxes' style={{marginRight: 10, color: '#616770'}}/>
+      <Text style={{color: '#616770'}}>Comment</Text>
+    </TouchableOpacity>
+   </View>)
   }
 
   fetchAvatar(uid) {
@@ -175,7 +226,7 @@ componentWillReceiveProps(nextProps) {
 
 import { connect } from 'react-redux'
 import { navigateProfile } from 'Anyone/actions/navigation'
-import { addPost } from 'Anyone/actions/home'
+import { addPost, repPost } from 'Anyone/actions/home'
 
 const mapStateToProps = ({ profile, home, friends }) => ({
   profile: profile.profile,
@@ -185,7 +236,8 @@ const mapStateToProps = ({ profile, home, friends }) => ({
 
 const mapDispatchToProps = dispatch => ({
   goToProfile: () => dispatch(navigateProfile()),
-  postStatus: (status) => {return dispatch(addPost(status))}
+  postStatus: (status) => {return dispatch(addPost(status))},
+  onRepPost: (item) => dispatch(repPost(item)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

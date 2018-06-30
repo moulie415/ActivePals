@@ -1,6 +1,7 @@
 import {
 	ADD_POST,
 	SET_FEED,
+	SET_POST,
 } from 'Anyone/actions/home'
 
 const initialState = {
@@ -19,6 +20,11 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				feed: {...state.feed, [action.id]: action.post}
+			}
+		case SET_POST:
+			return {
+				...state,
+				feed: {...state.feed, [action.post.key]: action.post },
 			}
 		default:
 			return state
