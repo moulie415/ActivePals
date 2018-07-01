@@ -34,6 +34,7 @@ export const addPost = (item) => {
 	}
 }
 
+
 export const fetchPosts = (uid, amount) => {
 	return (dispatch, getState) => {
 		let promises = []
@@ -42,6 +43,13 @@ export const fetchPosts = (uid, amount) => {
 				if (snapshot.val()) {
 					Object.keys(snapshot.val()).forEach(post => {
 						promises.push(firebase.database().ref('posts/' + post).once('value'))
+						firebase.database().ref('posts/' + post).on('child_changed', child => {
+								if (child.key == 'repCount') {
+									let obj = getState().home.feed[post]
+									obj.repCount = child.val()
+									dispatch(setPost(obj))
+								}
+						})
 					})
 					Promise.all(promises).then(posts => {
 						let feed = {}

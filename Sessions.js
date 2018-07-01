@@ -10,6 +10,7 @@ import {
   RefreshControl,
   ScrollView,
   Linking,
+  Slider,
 } from "react-native"
 import {
   Button,
@@ -22,10 +23,10 @@ import {
   Switch,
   Header,
   Card,
+  Title,
   ActionSheet,
   Left,
   Right,
-  Title,
 } from 'native-base'
 import firebase from "./index"
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
@@ -53,6 +54,9 @@ import { geofire }  from 'Anyone/index'
   constructor(props) {
     super(props)
     this.nav = this.props.navigation
+    let sessions = Object.values(this.props.sessions)
+    let privateSessions = Object.values(this.props.privateSessions)
+    let combined = [...sessions, ...privateSessions]
 
     this.user = null
     this.state = {
@@ -62,10 +66,10 @@ import { geofire }  from 'Anyone/index'
       switch: false,
       radius: 10,
       //sessions: this.sortByDateTime(Object.values(this.props.sessions)),
-      sessions: this.sortByDistance(Object.values(this.props.sessions)),
+      sessions: this.sortByDistance(combined),
       refreshing: false,
       selectedFriends: [],
-      markers: this.markers(Object.values(this.props.sessions)),
+      markers: this.markers(combined),
       pointsOfInterest: [],
       sessionKeys: [],
     }
@@ -97,15 +101,17 @@ import { geofire }  from 'Anyone/index'
     // })
     firebase.database().ref('users/' + this.props.profile.uid).child('sessions').on('child_removed', snapshot => {
       if (snapshot.val() == 'private') {
-        this.props.remove(snapshot.key, snapshot.val().private)
+        this.props.remove(snapshot.key, true)
       }
     })
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.sessions) {
+    if (nextProps.sessions || nextProps.privateSessions) {
       let sessions = Object.values(nextProps.sessions)
-      this.setState({markers: this.markers(sessions), sessions: this.sortByDistance(sessions)})
+      let privateSessions = Object.values(nextProps.privateSessions)
+      let combined = [...sessions, ...privateSessions]
+      this.setState({markers: this.markers(combined), sessions: this.sortByDistance(combined)})
     }
   }
 
@@ -143,7 +149,15 @@ import { geofire }  from 'Anyone/index'
 
       {this.state.spinner && <Spinner style={styles.spinner} />}
         <Header style={{backgroundColor: colors.primary}}>
-        <Left style={{flex: 1}} />
+        <Left style={{flex: 1}} >
+          <TouchableOpacity
+            style={{paddingHorizontal: 10}}
+            onPress={()=> {
+              this.refs.filterModal.open()
+            }}>
+            <Text style={{color: '#fff'}}>Filters</Text>
+          </TouchableOpacity>
+        </Left>
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Sessions</Title>
         <Right>
            <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}> 
@@ -292,6 +306,39 @@ import { geofire }  from 'Anyone/index'
             </View>
             </View>}
         </Modal>
+        <Modal style={styles.modal} position={'center'} ref={"filterModal"} >
+            <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          Filters</Text>
+          <View style={{margin: 10, flex: 1}}>
+            <View style={{ flex: 1}}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={{marginRight: 5, fontSize: 12}}>{"Search radius* " + this.state.radius + " km"}</Text>
+                <Slider
+                  maximumValue={50}
+                  minimumValue={5}
+                  minimumTrackTintColor={colors.secondary}
+                  thumbTintColor={colors.secondary}
+                  step={5}
+                  style={{flex: 1}}
+                  value={this.state.radius}
+                  onValueChange={(val)=> this.setState({radius: val})}
+                />
+              </View>
+            </View>
+              <Text style={{fontSize: 12, textAlign: 'right'}}>*Public only</Text>
+          </View>
+            <View style={{backgroundColor: colors.primary}}>
+              <TouchableOpacity 
+              onPress={()=> {
+                this.setState({refreshing: true})
+                this.props.fetch(this.state.radius, true).then(() => this.setState({refreshing: false}))
+                this.refs.filterModal.close()
+              }}
+              style={{padding: 5}}>
+                <Text style={{color: '#fff', backgroundColor: colors.secondary, alignSelf: 'center', padding: 5, paddingHorizontal: 10}}>Apply</Text>
+              </TouchableOpacity>
+            </View>
+        </Modal>
       </Container>
       )
   }
@@ -313,7 +360,7 @@ import { geofire }  from 'Anyone/index'
       let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
       friends.push(
           <TouchableOpacity key={index} onPress={()=> this.onFriendPress(friend.uid)}>
-          <View style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
+          <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
@@ -603,7 +650,7 @@ import { geofire }  from 'Anyone/index'
           spinner: false}, ()=> getDirections && this.getDirections())
 
         let url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
-        fetch(`${url}location=${lat},${lon}&radius=15000&types=gym&key=${str.googleApiKey}`)
+        fetch(`${url}location=${lat},${lon}&radius=10000&types=gym&key=${str.googleApiKey}`)
           .then(response => response.json())
           .then(json => {
             let results = json.results
@@ -703,6 +750,7 @@ const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
   profile: profile.profile,
   chats: chats.sessionChats,
   sessions: sessions.sessions,
+  privateSessions: sessions.privateSessions,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -711,7 +759,7 @@ const mapDispatchToProps = dispatch => ({
   remove: (key, type) => dispatch(removeSession(key, type)),
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
-  fetch: (radius) => {return Promise.all([dispatch(fetchSessions(radius)), dispatch(fetchPrivateSessions())])},
+  fetch: (radius, update = false) => {return Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())])},
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)

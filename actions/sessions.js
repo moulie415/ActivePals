@@ -3,10 +3,17 @@ import { removeSessionChat } from 'Anyone/actions/chats'
 import { geofire }  from 'Anyone/index'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
+export const UPDATE_PRIVATE_SESSIONS = 'UPDATE_PRIVATE_SESSIONS'
 export const ADD_SESSION = 'ADD_SESSION'
+export const SET_PRIVATE_SESSIONS = 'SET_PRIVATE_SESSIONS'
 
 const setSessions = (sessions) => ({
 	type: SET_SESSIONS,
+	sessions,
+})
+
+const setPrivateSessions = (sessions) => ({
+	type: SET_PRIVATE_SESSIONS,
 	sessions,
 })
 
@@ -15,12 +22,17 @@ const updateSessions = (sessions) => ({
 	sessions,
 })
 
+const updatePrivateSessions = (sessions) => ({
+	type: UPDATE_PRIVATE_SESSIONS,
+	sessions,
+})
+
 const addSession = (session) => ({
 	type: ADD_SESSION,
 	session,
 })
 
-export const fetchSessions = (radius = 30) => {
+export const fetchSessions = (radius = 10, update = false) => {
 	return (dispatch) => {
 		return new Promise((resolve, reject) => {
 			navigator.geolocation.getCurrentPosition(
@@ -29,8 +41,16 @@ export const fetchSessions = (radius = 30) => {
 					let lon = position.coords.longitude
 					let geoQuery = geofire.query({
 						center: [lat, lon],
-						radius: 10,
+						radius: radius,
 					})
+
+					if (update) {
+						dispatch(updateSessions([]))
+						// geoQuery.updateCriteria({
+						// 	center: [lat, lon],
+						// 	radius: radius,
+						// })
+					}
 
 					let onReadyRegistration = geoQuery.on("ready",() => {
 						console.log("GeoQuery has loaded and fired all other events for initial data")
@@ -40,29 +60,31 @@ export const fetchSessions = (radius = 30) => {
 					let onKeyEnteredRegistration = geoQuery.on("key_entered", (key, location, distance) => {
 						console.log(key + " entered query at " + location + " (" + distance + " km from center)")
 						firebase.database().ref('sessions/' + key).once('value', snapshot => {
-							let duration = snapshot.val().duration * 60 * 60 * 1000
-							let time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
-							let current = new Date().getTime()
-							if (time + duration > current) {
-								let inProgress = time < current
-								firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
-									dispatch(addSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
-								})
-							}
-							else {
-							//validate time serverside before deleting session in case clients time is wrong
-								firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
-								.then(()=> {
-									firebase.database().ref('timestamp').once('value', timestamp => {
-										if (timestamp.val() > time + duration) {
-											dispatch(removeSession(key, snapshot.val().private))
-											firebase.database().ref('sessions/' + key).remove()
-											firebase.database().ref('sessionChats').child(key).remove()
-											dispatch(removeSessionChat(key))
-											geofire.remove(key)
-										}
+							if (snapshot.val()) {
+								let duration = snapshot.val().duration * 60 * 60 * 1000
+								let time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
+								let current = new Date().getTime()
+								if (time + duration > current) {
+									let inProgress = time < current
+									firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
+										dispatch(addSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
 									})
-								})
+								}
+								else {
+									//validate time serverside before deleting session in case clients time is wrong
+									firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
+									.then(()=> {
+										firebase.database().ref('timestamp').once('value', timestamp => {
+											if (timestamp.val() > time + duration) {
+												dispatch(removeSession(key, snapshot.val().private))
+												firebase.database().ref('sessions/' + key).remove()
+												firebase.database().ref('sessionChats').child(key).remove()
+												dispatch(removeSessionChat(key))
+												geofire.remove(key)
+											}
+										})
+									})
+								}
 							}
 						})
 					})
@@ -137,7 +159,7 @@ export const fetchPrivateSessions = () =>  {
 					acc[cur.key] = cur
 					return acc
 				}, {})
-				dispatch(setSessions(obj))
+				dispatch(setPrivateSessions(obj))
 			})
 		})
 	}
@@ -146,7 +168,7 @@ export const fetchPrivateSessions = () =>  {
 export const removeSession = (key, isPrivate) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
-		let sessions = getState().sessions.sessions
+		let sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions
 		let session = sessions[key]
 		let type = isPrivate ? 'privateSessions' : 'sessions'
 		if (session && session.host.uid == uid) {
@@ -165,7 +187,7 @@ export const removeSession = (key, isPrivate) => {
 				acc[cur.key] = cur
 				return acc
 			}, {})
-			dispatch(updateSessions(obj))
+			isPrivate ? dispatch(updatePrivateSessions(obj)) :  dispatch(updateSessions(obj))
 			dispatch(removeSessionChat(key))
 		}
 	}

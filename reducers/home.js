@@ -2,6 +2,7 @@ import {
 	ADD_POST,
 	SET_FEED,
 	SET_POST,
+	SET_REP_COUNT,
 } from 'Anyone/actions/home'
 
 const initialState = {

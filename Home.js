@@ -144,7 +144,7 @@ componentWillReceiveProps(nextProps) {
 
   renderFeed() {
     if (Object.values(this.state.feed).length > 0) {
-      return <FlatList 
+      return <FlatList
         data={Object.values(this.state.feed).reverse()}
         keyExtractor={(item) => item.key}
         renderItem = {({ item }) => (
@@ -156,7 +156,7 @@ componentWillReceiveProps(nextProps) {
     }
     else return <Text style={{fontSize: 20, alignSelf: 'center', marginTop: 20, color: '#999'}}>No feed items yet</Text>
   }
-  
+ 
   renderFeedItem(item) {
     switch(item.type) {
       case 'status':
@@ -181,7 +181,12 @@ componentWillReceiveProps(nextProps) {
               <Text style={{color: '#000'}}>{item.text}</Text>
             </View>
             </View>
-            <View style={{marginHorizontal: 10, borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
+            {!!item.repCount && item.repCount > 0 &&
+              <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>}
+              {!!item.repCount && item.repCount > 0 && <View style={{marginHorizontal: 10}}>
+                  <Text style={{color: '#999'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>
+                </View>}
+            <View style={{borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
             {this.repsAndComments(item)}
           </View>
           )
@@ -190,16 +195,16 @@ componentWillReceiveProps(nextProps) {
 
   repsAndComments(item) {
    return(<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-    <TouchableOpacity 
+    <TouchableOpacity
       onPress={() => {
         this.props.onRepPost(item)
       }}
       style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
-      <Image source={item.rep ? weightUp : weightDown} 
+      <Image source={item.rep ? weightUp : weightDown}
       style={{width: 25, height: 25, marginRight: 10, tintColor: item.rep ? colors.secondary : '#616770'}}/>
       <Text style={{color: item.rep ? colors.secondary : '#616770'}}>Rep</Text>
     </TouchableOpacity>
-    <TouchableOpacity 
+    <TouchableOpacity
     onPress={() => {
       Alert.alert('coming soon')
     }}
@@ -215,9 +220,9 @@ componentWillReceiveProps(nextProps) {
       return <Image source={{uri: this.props.profile.avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
     }
     else if (uid != this.props.profile.uid && this.props.friends[uid].avatar) {
-      return <Image source={{uri: this.props.friends[uid].avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/> 
+      return <Image source={{uri: this.props.friends[uid].avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
     }
-    else return <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary, marginRight: 10}}/> 
+    else return <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary, marginRight: 10}}/>
   }
 
 
