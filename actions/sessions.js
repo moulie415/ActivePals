@@ -4,8 +4,9 @@ import { geofire }  from 'Anyone/index'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
 export const UPDATE_PRIVATE_SESSIONS = 'UPDATE_PRIVATE_SESSIONS'
-export const ADD_SESSION = 'ADD_SESSION'
 export const SET_PRIVATE_SESSIONS = 'SET_PRIVATE_SESSIONS'
+export const SET_PRIVATE_SESSION = 'SET_PRIVATE_SESSION'
+export const SET_SESSION = 'SET_SESSION'
 
 const setSessions = (sessions) => ({
 	type: SET_SESSIONS,
@@ -27,8 +28,13 @@ const updatePrivateSessions = (sessions) => ({
 	sessions,
 })
 
-const addSession = (session) => ({
-	type: ADD_SESSION,
+const setSession = (session) => ({
+	type: SET_SESSION,
+	session,
+})
+
+const setPrivateSession = (session) => ({
+	type: SET_PRIVATE_SESSION,
 	session,
 })
 
@@ -67,7 +73,7 @@ export const fetchSessions = (radius = 10, update = false) => {
 								if (time + duration > current) {
 									let inProgress = time < current
 									firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
-										dispatch(addSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
+										dispatch(setSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
 									})
 								}
 								else {
@@ -91,6 +97,7 @@ export const fetchSessions = (radius = 10, update = false) => {
 
 					let onKeyExitedRegistration = geoQuery.on("key_exited", (key, location, distance) => {
 						console.log(key + " exited query to " + location + " (" + distance + " km from center)")
+						dispatch(removeSession(key, false, true))
 					})
 
 					let onKeyMovedRegistration = geoQuery.on("key_moved", (key, location, distance) => {
@@ -147,7 +154,7 @@ export const fetchPrivateSessions = () =>  {
 						.then(()=> {
 							firebase.database().ref('timestamp').once('value', snapshot => {
 								if (snapshot.val() > time + duration) {
-									dispatch(removeSession(session.key, snapshot.val().private))
+									dispatch(removeSession(session.key, true))
 									firebase.database().ref('privateSessions' + '/' + session.key).remove()
 									firebase.database().ref('sessionChats').child(session.key).remove()
 								}
@@ -156,7 +163,9 @@ export const fetchPrivateSessions = () =>  {
 					}
 				})
 				let obj = privateSessions.reduce(function(acc, cur, i) {
-					acc[cur.key] = cur
+					if (cur) {
+						acc[cur.key] = cur
+					}
 					return acc
 				}, {})
 				dispatch(setPrivateSessions(obj))
@@ -165,7 +174,7 @@ export const fetchPrivateSessions = () =>  {
 	}
 }
 
-export const removeSession = (key, isPrivate) => {
+export const removeSession = (key, isPrivate, force = false) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
 		let sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions
@@ -181,14 +190,33 @@ export const removeSession = (key, isPrivate) => {
 			firebase.database().ref('users/' + uid + '/sessions').child(key).remove()
 			firebase.database().ref(type + '/' + key + '/users').child(uid).remove()
 		}
-		if (session) {
+		let obj
+		if (session && (isPrivate || session.host.uid == uid || force)) {
 			let sessionsArr = Object.values(sessions).filter(session => session.key != key)
-			let obj = sessionsArr.reduce(function(acc, cur, i) {
-				acc[cur.key] = cur
+			obj = sessionsArr.reduce(function(acc, cur, i) {
+				if (cur) {
+					acc[cur.key] = cur
+				}
 				return acc
 			}, {})
-			isPrivate ? dispatch(updatePrivateSessions(obj)) :  dispatch(updateSessions(obj))
+			}
+			else {
+				obj = sessions
+				if (obj[key] && obj[key].users) {
+					obj[key].users[uid] = false
+				}
+			}
+			isPrivate ? dispatch(updatePrivateSessions(obj)) : dispatch(updateSessions(obj))
 			dispatch(removeSessionChat(key))
 		}
+	}
+
+export const addUser = (key, isPrivate) => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		let sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions
+		let session = sessions[key]
+		session.users = {...session.users, [uid]: true}
+		isPrivate ? dispatch(setPrivateSession(session)) : dispatch(setSession(session))
 	}
 }

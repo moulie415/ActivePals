@@ -447,7 +447,9 @@ import { geofire }  from 'Anyone/index'
           <TouchableOpacity
           onPress={()=> {
             firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
-            .then(() => this.props.onJoin(session.key, session.private))
+            .then(() => {
+              this.props.onJoin(session.key, session.private)
+            })
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
             this.refs.modal.close()
             Alert.alert("Session joined", "You should now see this session in your session chats")
@@ -743,7 +745,7 @@ function deg2rad(deg) {
 import { connect } from 'react-redux'
 import { navigateMessagingSession, navigateSessionType } from 'Anyone/actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/actions/chats'
-import { fetchSessions, fetchPrivateSessions, removeSession } from 'Anyone/actions/sessions'
+import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/actions/sessions'
 
 const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
   friends: friends.friends,
@@ -755,7 +757,10 @@ const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
 
 const mapDispatchToProps = dispatch => ({
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
-  onJoin: (session, isPrivate) => {return dispatch(addSessionChat(session, isPrivate))},
+  onJoin: (session, isPrivate) => {
+    dispatch(addUser(session, isPrivate))
+    return dispatch(addSessionChat(session, isPrivate))
+  },
   remove: (key, type) => dispatch(removeSession(key, type)),
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),

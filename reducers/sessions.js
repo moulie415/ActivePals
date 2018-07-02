@@ -3,7 +3,8 @@ import {
 	SET_PRIVATE_SESSIONS,
 	UPDATE_SESSIONS,
 	UPDATE_PRIVATE_SESSIONS,
-	ADD_SESSION,
+	SET_SESSION,
+	SET_PRIVATE_SESSION,
 } from 'Anyone/actions/sessions'
 
 const initialState = {
@@ -37,10 +38,16 @@ export default function(state = initialState, action) {
 				privateSessions: {...action.sessions},
 			}
 		}
-		case ADD_SESSION: {
+		case SET_SESSION: {
 			return {
 				...state,
 				sessions: {...state.sessions, [action.session.key]: action.session},
+			}
+		}
+		case SET_PRIVATE_SESSION: {
+			return {
+				...state,
+				privateSessions: {...state.privateSessions, [action.session.key]: action.session},
 			}
 		}
 		default:

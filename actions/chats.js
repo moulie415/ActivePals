@@ -169,7 +169,9 @@ export const fetchSessionChats = (sessions, uid) => {
 		})
 		return Promise.all(chatList).then(sessionChats => {
 			let obj = sessionChats.reduce(function(acc, cur, i) {
-				acc[cur.key] = cur
+				if (cur) {
+					acc[cur.key] = cur
+				}
 				return acc
 			}, {})
 			dispatch(setSessionChats(obj))
@@ -202,7 +204,9 @@ export const removeSessionChat = (key) => {
 		let sessionChats = getState().chats.sessionChats
 		let chatArr = Object.values(sessionChats).filter(chat => chat.key != key)
 		let obj = chatArr.reduce(function(acc, cur, i) {
-			acc[cur.key] = cur
+			if (cur) {
+				acc[cur.key] = cur
+			}
 			return acc
 		}, {})
 		dispatch(setSessionChats(obj))
