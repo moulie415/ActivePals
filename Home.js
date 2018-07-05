@@ -147,11 +147,14 @@ componentWillReceiveProps(nextProps) {
       return <FlatList
         data={Object.values(this.state.feed).reverse()}
         keyExtractor={(item) => item.key}
-        renderItem = {({ item }) => (
-            <Card style={{padding: 10, margin: 5}}>
+        renderItem = {({ item }) => {
+          if (item.uid == this.props.profile.uid || this.props.friends[item.uid]) {
+            return (<Card style={{padding: 10, margin: 5}}>
               {this.renderFeedItem(item)}
-            </Card>
-          )}
+              </Card>
+              )}
+          }
+        }
       />
     }
     else return <Text style={{fontSize: 20, alignSelf: 'center', marginTop: 20, color: '#999'}}>No feed items yet</Text>

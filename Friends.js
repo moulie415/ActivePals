@@ -340,7 +340,7 @@ const mapDispatchToProps = dispatch => ({
   removeLocal: (uid) => dispatch(removeFriend(uid)),
   getProfile: ()=> {return dispatch(fetchProfile())},
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
-  add: (friend) => dispatch(addFriend(friend))
+  add: (friend) => dispatch(addFriend(friend)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)
