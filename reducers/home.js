@@ -6,7 +6,7 @@ import {
 } from 'Anyone/actions/home'
 
 const initialState = {
-	feed: {}
+	feed: {},
 }
 
 export default function(state = initialState, action) {

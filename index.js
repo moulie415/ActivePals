@@ -9,6 +9,8 @@ import colors from 'Anyone/constants/colors'
 import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'
 import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/lib/integration/react'
+import { persistStore } from 'redux-persist'
 import { createStore, applyMiddleware, compose } from 'redux'
 import reducer from './reducers/'
 import thunk from 'redux-thunk'
@@ -89,6 +91,8 @@ export const store = createStore(
   composeEnhancers(applyMiddleware(middleware, reactNavigationMiddleware, thunk))
   //applyMiddleware(middleware, thunk)
 )
+
+export const persistor = persistStore(store)
 
 FCM.on(FCMEvent.Notification, async (notif) => {
   let state = AppState.currentState
@@ -193,11 +197,13 @@ class FitLink extends React.Component {
 
   }
   render () {
-    return <Root>
+    return <PersistGate persistor={persistor}> 
+      <Root>
         <Provider store={store}>
           <App/>
         </Provider>
       </Root>
+      </PersistGate>
   }
 }
 

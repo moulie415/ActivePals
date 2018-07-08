@@ -1,5 +1,7 @@
 
-import { combineReducers } from 'redux'
+import { persistCombineReducers } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+import { createFilter } from 'redux-persist-transform-filter'
 import nav from './navigation'
 import friends from './friends'
 import profile from './profile'
@@ -7,31 +9,24 @@ import chats from './chats'
 import home from './home'
 import sessions from './sessions'
  
-//import { DATA_AVAILABLE } from "../actions/" //Import the actions types constant we defined in our actions
- 
-let dataState = { data: [], loading:true }
- 
-const dataReducer = (state = dataState, action) => {
-    switch (action.type) {
-        // case DATA_AVAILABLE
-        //     state = Object.assign({}, state, { data: action.data, loading:false });
-        //     return state
-        default:
-            return state
-    }
-};
- 
+const config = {
+    key: 'root',
+    storage,
+    //whitelist: ['profile'],
+    // transforms: [
+    //     createFilter('login', ['hasViewedWelcomeWizard']),
+    //     createFilter('settings', ['unreadCount', 'profile', 'loggedOut']),
+    // ],
+}
+
 // Combine all the reducers
-const rootReducer = combineReducers({
-    dataReducer,
+export default persistCombineReducers(config, {
     nav,
     profile,
     friends,
     chats,
     home,
-    sessions
+    sessions,
 
-    // ,[ANOTHER REDUCER], [ANOTHER REDUCER] ....
 })
- 
-export default rootReducer
+

@@ -41,7 +41,10 @@ import Text, { globalTextStyle } from 'Anyone/constants/Text'
         this.setState({spinner: true})
         this.props.onLogin()
       }
-    })  
+    })
+    if (this.props.loggedIn) {
+      this.props.goHome()
+    }
   }
 
 
@@ -222,6 +225,7 @@ import Text, { globalTextStyle } from 'Anyone/constants/Text'
         .then(() => {
           GoogleSignin.signIn()
             .then(user => {
+              this.setState({spinner: true})
               console.log(user)
 
               const credential = firebase.auth.GoogleAuthProvider.credential(
@@ -280,18 +284,21 @@ import Text, { globalTextStyle } from 'Anyone/constants/Text'
 
 import { connect } from 'react-redux'
 import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
-import { doSetup, fetchProfile } from 'Anyone/actions/profile'
+import { doSetup, fetchProfile, setHasLoggedIn } from 'Anyone/actions/profile'
 
-// const mapStateToProps = ({ home, settings }) => ({
-// })
+const mapStateToProps = ({ home, settings, profile }) => ({
+  loggedIn: profile.loggedIn,
+})
 
 const mapDispatchToProps = dispatch => ({
   onLogoutPress: ()=> { dispatch(navigateLogin())},
   onLogin: ()=> {dispatch(fetchProfile()).then(profile => {
     dispatch(doSetup(profile)).then(()=> {
-      dispatch(navigateHome())
+      dispatch(navigateHome()),
+      dispatch(setHasLoggedIn(true))
     })
-  })}
+  })},
+  goHome: ()=> dispatch(navigateHome())
 })
 
-export default connect(null, mapDispatchToProps)(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

@@ -84,7 +84,7 @@ const tabs = TabNavigator({
   tabBarPosition: 'bottom',
   animationEnabled: true,
   navigationOptions: {
-      gesturesEnabled: false
+      gesturesEnabled: false,
     },
   tabBarOptions: {
     activeTintColor: colors.primary,

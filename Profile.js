@@ -62,7 +62,7 @@ window.Blob = Blob
       initialProfile: this.profile,
       spinner: false,
       initialAvatar: this.profile.avatar,
-      avatar: this.profile.avatar
+      avatar: this.profile.avatar,
     }
   }
 
@@ -70,7 +70,7 @@ window.Blob = Blob
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
-        this.props.onLogoutPress()
+        this.props.goLogin()
       }
     })  
     this.listenForUserChanges(firebase.database().ref('users/' + this.profile.uid))
@@ -348,24 +348,39 @@ selectAvatar() {
  
 
   logout() {
-    firebase.auth().signOut().then(function() {
-    }, function(error) {
-      Alert.alert(error.toString())
-    })
+    Alert.alert(
+      'Log out',
+      'Are you sure?',
+      [
+      {text: 'Cancel', onPress: () => console.log('Cancel logout'), style: 'cancel'},
+      {text: 'OK', onPress: () => {
+        this.props.onLogoutPress()
+        firebase.auth().signOut().then(function() {
+        }, function(error) {
+          Alert.alert(error.toString())
+        })
+
+      }},
+      ])
   }
 }
 
 
 import { connect } from 'react-redux'
 import { navigateLogin, navigateSettings } from 'Anyone/actions/navigation'
-import { fetchProfile } from 'Anyone/actions/profile'
+import { fetchProfile, setLoggedOut } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile,
 })
 
 const mapDispatchToProps = dispatch => ({
-  onLogoutPress: ()=> { dispatch(navigateLogin())},
+  onLogoutPress: ()=> {
+    dispatch(setLoggedOut())
+  },
+  goLogin: ()=> {
+    dispatch(navigateLogin())
+  },
   onSave: ()=> dispatch(fetchProfile()),
   goToSettings: ()=> dispatch(navigateSettings()),
 })

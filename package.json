@@ -34,6 +34,8 @@
     "react-navigation-redux-helpers": "^1.0.3",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
+    "redux-persist": "^5.10.0",
+    "redux-persist-transform-filter": "0.0.18",
     "redux-thunk": "^2.2.0"
   },
   "jest": {

@@ -1,5 +1,7 @@
 import * as firebase from "firebase"
 export const SET_PROFILE = 'SET_PROFILE'
+export const SET_LOGGED_IN = 'SET_LOGGED_IN'
+export const SET_LOGGED_OUT = 'SET_LOGGED_OUT'
 import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats } from './chats'
 import { fetchPosts } from './home'
@@ -8,7 +10,16 @@ import { fetchSessions, fetchPrivateSessions } from './sessions'
 
 const setProfile = (profile) => ({
 	type: SET_PROFILE,
-	profile
+	profile,
+})
+
+export const setHasLoggedIn = (loggedIn) => ({
+	type: SET_LOGGED_IN,
+	loggedIn,
+})
+
+export const setLoggedOut = () => ({
+	type: SET_LOGGED_OUT,
 })
 
 export const fetchProfile = () => {
