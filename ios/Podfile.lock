@@ -1,7 +1,7 @@
 PODS:
-  - Crashlytics (3.10.2):
-    - Fabric (~> 1.7.7)
-  - Fabric (1.7.7)
+  - Crashlytics (3.10.5):
+    - Fabric (~> 1.7.9)
+  - Fabric (1.7.9)
   - Firebase/Core (4.0.0):
     - FirebaseAnalytics (= 4.0.0)
     - FirebaseCore (= 4.0.0)
@@ -76,6 +76,8 @@ PODS:
     - React
   - react-native-maps (0.19.0):
     - React
+  - react-native-splash-screen (3.0.9):
+    - React
   - React/BatchedBridge (0.53.3):
     - React/Core
     - React/cxxreact_legacy
@@ -130,6 +132,7 @@ DEPENDENCIES:
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-image-resizer (from `../node_modules/react-native-image-resizer`)
   - react-native-maps (from `../node_modules/react-native-maps`)
+  - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - React/BatchedBridge (from `../node_modules/react-native`)
   - React/Core (from `../node_modules/react-native`)
   - React/RCTActionSheet (from `../node_modules/react-native`)
@@ -183,14 +186,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-resizer"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
+  react-native-splash-screen:
+    :path: "../node_modules/react-native-splash-screen"
   ReactNativePermissions:
     :path: "../node_modules/react-native-permissions"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga/yoga.podspec"
 
 SPEC CHECKSUMS:
-  Crashlytics: 0360624eea1c978a743feddb2fb1ef8b37fb7a0d
-  Fabric: bda89e242bce1b7b8ab264248cf3407774ce0095
+  Crashlytics: 7f2e38d302d9da96475b3d64d86fb29e31a542b7
+  Fabric: a2917d3895e4c1569b9c3170de7320ea1b1e6661
   Firebase: 284eea779b73fdff309791817da7c68bff8dd572
   FirebaseAnalytics: 6f08e746f7d66f5452931bc2e822b5df9c66b64a
   FirebaseCore: 85ad466044c2f013cdb167f85d426d15b128114a
@@ -215,9 +220,10 @@ SPEC CHECKSUMS:
   react-native-image-picker: 42cfe2c8435d893414f8714a81e480313cb1412b
   react-native-image-resizer: 04a3409e7d4ad646c4468671c69dec490def139c
   react-native-maps: 066c2afcc89e18726377bcc685315f989ca22449
+  react-native-splash-screen: 8e3f866dc79bfe533baeffd0a38c33f7a7eae7f8
   ReactNativePermissions: 9f2d9c45c98800795e6c2ed330e25d11a66a8169
   yoga: 55da126afc384965b96bff46652464373b330add
 
-PODFILE CHECKSUM: f45be59ec7d4420031244b9ddb1022e36412638a
+PODFILE CHECKSUM: 4ae68d5d85610f5208e76ba7b69fedf8586cbb71
 
 COCOAPODS: 1.5.3
