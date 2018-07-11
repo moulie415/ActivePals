@@ -1,10 +1,10 @@
 
 import React from "react"
-import { AppRegistry, Platform, Alert, AppState, YellowBox } from 'react-native'
+import { AppRegistry, Platform, Alert, AppState, YellowBox, ImageBackground, View } from 'react-native'
 import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
 import * as firebase from "firebase"
-import { Root } from 'native-base'
+import { Root, Spinner } from 'native-base'
 import colors from 'Anyone/constants/colors'
 import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'
@@ -19,6 +19,7 @@ import App from './App'
 import { navigateMessaging, navigateMessagingSession, navigateFriends } from "./actions/navigation"
 import { newNotification, updateLastMessage } from './actions/chats'
 import GeoFire from 'geofire'
+import styles from 'Anyone/styles/loginStyles'
 
 import {
   createReactNavigationReduxMiddleware,
@@ -197,7 +198,7 @@ class FitLink extends React.Component {
 
   }
   render () {
-    return <PersistGate persistor={persistor}> 
+    return <PersistGate persistor={persistor} > 
       <Root>
         <Provider store={store}>
           <App/>
@@ -211,6 +212,7 @@ class FitLink extends React.Component {
 // const sessionNav = StackNavigator({
 
 // })
+
 
 
 

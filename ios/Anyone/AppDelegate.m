@@ -16,6 +16,7 @@
 #import "RNFIRMessaging.h"
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
+#import "SplashScreen.h"
 @import GoogleMaps;
 
 
@@ -26,6 +27,7 @@
 {
   [Fabric with:@[[Crashlytics class]]];
   NSURL *jsCodeLocation;
+  
 
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
 
@@ -48,6 +50,7 @@
   
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
+  [SplashScreen show];
   return YES;
 }
 

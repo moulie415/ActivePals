@@ -18,6 +18,7 @@ const { LoginManager, AccessToken } = FBSDK
 const background = require('Anyone/assets/images/Running-background.jpg')
 import colors from 'Anyone/constants/colors'
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
+import SplashScreen from 'react-native-splash-screen'
 
 
  class Login extends Component {
@@ -36,6 +37,7 @@ import Text, { globalTextStyle } from 'Anyone/constants/Text'
   }
 
   componentDidMount() {
+    SplashScreen.hide()
     firebase.auth().onAuthStateChanged(user => {
       if (user && user.emailVerified) {
         this.setState({spinner: true})
