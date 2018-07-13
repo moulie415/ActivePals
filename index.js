@@ -190,7 +190,9 @@ class FitLink extends React.Component {
       if (user) {
         this.user = user
         FCM.getFCMToken().then(token => {
-          firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
+          if (user) {
+            firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
+          }
         })
       } else {
       }

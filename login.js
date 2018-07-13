@@ -165,7 +165,7 @@ import SplashScreen from 'react-native-splash-screen'
  _handleCallBack(result, navigation){
     let _this = this
     if (result.isCancelled) {
-      Alert.alert('Facbook login', 'cancelled')
+      //Alert.alert('Facbook login', 'cancelled')
     } else {
   AccessToken.getCurrentAccessToken().then(
           (data) => {

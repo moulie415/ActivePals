@@ -4,6 +4,10 @@ import {
 	ADD_FRIEND
 } from 'Anyone/actions/friends'
 
+import {
+	SET_LOGGED_OUT,
+} from 'Anyone/actions/profile'
+
 const initialState = {
 	friends: {},
 	refreshing: false,
@@ -26,6 +30,9 @@ export default function(state = initialState, action) {
 				...state,
 				friends: {...state.friends, [action.uid]: action.friend}
 			}
+		case SET_LOGGED_OUT: {
+			return initialState
+		}
 		default:
 			return state
 	}

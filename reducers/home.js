@@ -5,6 +5,10 @@ import {
 	SET_REP_COUNT,
 } from 'Anyone/actions/home'
 
+import {
+	SET_LOGGED_OUT,
+} from 'Anyone/actions/profile'
+
 const initialState = {
 	feed: {},
 }
@@ -27,6 +31,9 @@ export default function(state = initialState, action) {
 				...state,
 				feed: {...state.feed, [action.post.key]: action.post },
 			}
+		case SET_LOGGED_OUT: {
+			return initialState
+		}
 		default:
 			return state
 	}

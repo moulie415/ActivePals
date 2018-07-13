@@ -1,27 +1,25 @@
 import React, { Component } from "react"
-import { 
+import {
   StyleSheet,
   View,
   TouchableOpacity,
-  Alert
+  Alert,
 } from "react-native"
-import { 
-  Button,
-  Text,
-  Input,
+import {
   Container,
   Content,
-  Item,
   Icon,
   Header,
   Title,
   Left,
-  Right
+  Right,
+  Spinner,
 } from 'native-base'
 import firebase from "./index"
 import VersionNumber from 'react-native-version-number'
 import colors from './constants/colors'
 import  styles  from './styles/settingsStyles'
+import Text, { globalTextStyle } from 'Anyone/constants/Text'
 
 
  class Settings extends Component {
@@ -34,6 +32,9 @@ import  styles  from './styles/settingsStyles'
     super(props)
 
     this.user = null
+    this.state = {
+      spinner: false,
+    }
   }
 
   componentDidMount() {
@@ -59,26 +60,52 @@ import  styles  from './styles/settingsStyles'
             <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>
           </Left>
-        <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir'}}>Settings</Title>
+        <Title style={{alignSelf: 'center', color: '#fff'}}>Settings</Title>
         <Right style={{flex: 1}} />
       </Header>
       <Content>
-        <TouchableOpacity 
+        <TouchableOpacity
         onPress={()=> {
           Alert.alert('coming soon')
           //Linking.openURL('mailto:fitlink-support@gmail.com')
         }}
         style={styles.contact}>
-          <Text style={{fontFamily: 'Avenir'}}>Contact Support</Text>
+          <Text>Contact Support</Text>
           <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
         </TouchableOpacity>
-        <View>
-          <View style={{padding: 10, backgroundColor: '#fff', flexDirection: 'row'}}>
-              <Text style={{fontFamily: 'Avenir'}}>Version no: </Text>
-              <Text style={{color: colors.primary, fontFamily: 'Avenir', fontWeight: 'bold'}}>{VersionNumber.appVersion}</Text>
+          <View style={styles.contact}>
+              <Text >Version no: </Text>
+              <Text style={{color: colors.primary, fontWeight: 'bold'}}>{VersionNumber.appVersion}</Text>
           </View>
-        </View>
+          <TouchableOpacity
+          style={{padding: 10, backgroundColor: '#fff'}}
+          onPress={()=> {
+            Alert.alert(
+              'Are you sure?',
+              'All profile data will be deleted.',
+              [
+              {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+              {text: 'OK', onPress: () => {
+                this.setState({spinner: true})
+                this.props.removeUser()
+                .then(() => {
+                  Alert.alert('Success', 'Account deleted')
+                this.setState({spinner: false})
+                })
+                .catch(e => {
+                  Alert.alert('Error', e.message)
+                  this.setState({spinner: false})
+                })
+              }},
+              ]
+              )
+          }}>
+              <Text style={{color: 'red'}}>Delete account</Text>
+          </TouchableOpacity>
       </Content>
+     {this.state.spinner && <View style={styles.spinner}>
+      <Spinner color={colors.secondary}/>
+      </View>}
     </Container>
   )
   }
@@ -87,13 +114,15 @@ import  styles  from './styles/settingsStyles'
 
 import { connect } from 'react-redux'
 import { navigateBack } from 'Anyone/actions/navigation'
+import { removeUser } from 'Anyone/actions/profile'
 //import {  } from 'Anyone/actions/chats'
 
 // const mapStateToProps = ({ friends, profile, chats }) => ({
 // })
 
 const mapDispatchToProps = dispatch => ({
-  goBack: ()=> dispatch(navigateBack())
+  goBack: ()=> dispatch(navigateBack()),
+  removeUser: ()=> dispatch(removeUser()),
 })
 
 export default connect(null, mapDispatchToProps)(Settings)

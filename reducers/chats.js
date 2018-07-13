@@ -10,6 +10,10 @@ import {
 	UPDATE_SESSION_CHAT,
 } from 'Anyone/actions/chats'
 
+import {
+	SET_LOGGED_OUT
+} from 'Anyone/actions/profile'
+
 const initialState = {
 	sessionChats: {},
 	chats: {},
@@ -63,6 +67,9 @@ export default function(state = initialState, action) {
                 ...state,
                 notif: null,
             }
+        case SET_LOGGED_OUT: {
+			return initialState
+		}
 		default:
 			return state
 	}

@@ -7,6 +7,10 @@ import {
 	SET_PRIVATE_SESSION,
 } from 'Anyone/actions/sessions'
 
+import {
+	SET_LOGGED_OUT,
+} from 'Anyone/actions/profile'
+
 const initialState = {
 	sessions: {},
 	privateSessions: {},
@@ -49,6 +53,9 @@ export default function(state = initialState, action) {
 				...state,
 				privateSessions: {...state.privateSessions, [action.session.key]: action.session},
 			}
+		}
+		case SET_LOGGED_OUT: {
+			return initialState
 		}
 		default:
 			return state

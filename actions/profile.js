@@ -6,6 +6,7 @@ import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats } from './chats'
 import { fetchPosts } from './home'
 import { fetchSessions, fetchPrivateSessions } from './sessions'
+import { navigateLogin } from './navigation'
 
 
 const setProfile = (profile) => ({
@@ -52,6 +53,23 @@ export const doSetup = (profile) => {
 			dispatch(fetchPosts(uid, 30)),
 			dispatch(fetchSessions()),
 			])
+	}
+}
+
+export const removeUser = () => {
+	return (dispatch, getState) => {
+		return new Promise((resolve, reject) => {
+			let profile = getState().profile.profile
+			firebase.database().ref('users').child(profile.uid).remove()
+			.then(() => {
+				let user = firebase.auth().currentUser
+				user.delete().then(() => {
+					dispatch(setLoggedOut(true))
+					resolve()
+				})
+				.catch(e => reject(e))
+			})
+		})
 	}
 }
 

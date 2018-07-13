@@ -134,7 +134,8 @@ window.Blob = Blob
           </TouchableOpacity>}
         <View style={{flex: 1, marginRight: 10}}>
             <Text style={{color: '#999'}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
-            <Text style={{color: '#999'}}>Account type: <Text style={{color: colors.secondary}}>{this.state.profile.accountType}</Text></Text>
+            <Text style={{color: '#999'}}>Account type: <Text style={{color: colors.secondary}}>
+            {this.state.profile && this.state.profile.accountType}</Text></Text>
         </View>
 
       </View>
@@ -143,7 +144,7 @@ window.Blob = Blob
       <View style={styles.inputGrp}>
         <Text style={{alignSelf: 'center'}}>Username: </Text>
             <Input
-            value={this.state.profile.username}
+            value={this.state.profile && this.state.profile.username}
             onChangeText={username => this.setState({profile: {...this.state.profile, username}})}
             placeholderTextColor="#fff"
             style={styles.input}
@@ -154,7 +155,7 @@ window.Blob = Blob
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>First name: </Text>
             <Input
-            value={this.state.profile.first_name}
+            value={this.state.profile && this.state.profile.first_name}
             onChangeText={name => this.setState({profile: {...this.state.profile, first_name: name}})}
             placeholderTextColor="#fff"
             style={styles.input}
@@ -165,7 +166,7 @@ window.Blob = Blob
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Last name: </Text>
             <Input
-            value={this.state.profile.last_name}
+            value={this.state.profile && this.state.profile.last_name}
             onChangeText={name => this.setState({profile: {...this.state.profile, last_name: name}})}
             placeholderTextColor="#fff"
             style={styles.input}
@@ -176,8 +177,8 @@ window.Blob = Blob
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Birthday: </Text>
           <DatePicker
-          date={this.getDate(this.state.profile.birthday)}
-          placeholder={this.state.profile.birthday || 'None'}
+          date={this.getDate(this.state.profile && this.state.profile.birthday)}
+          placeholder={this.state.profile && this.state.profile.birthday || 'None'}
           maxDate={new Date()}
           confirmBtnText={'Confirm'}
           androidMode={'spinner'}

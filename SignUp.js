@@ -2,7 +2,6 @@ import React, { Component } from "react"
 import { StyleSheet, Alert } from "react-native"
 import {
   Button,
-  Text,
   Input,
   Container,
   Item,
@@ -17,8 +16,9 @@ import {
 } from 'native-base'
 import * as firebase from "firebase"
 import  styles  from './styles/signUpStyles'
+import Text, { globalTextStyle } from 'Anyone/constants/Text'
 
- export default class SignUp extends Component {
+ class SignUp extends Component {
 
   constructor(props) {
     super(props)
@@ -101,6 +101,7 @@ import  styles  from './styles/signUpStyles'
               .then(snapshot => {
                 if (snapshot.val()) {
                   Alert.alert('Sorry', 'That username is already in use')
+                  this.setState({spinner: false})
                 }
                 else {
                   this.signup(this.email, this.pass)
@@ -113,6 +114,7 @@ import  styles  from './styles/signUpStyles'
           }
           else {
             Alert.alert("Please try again", "Passwords do not match")
+            this.setState({spinner: false})
           }
         }}
         style={{alignSelf: 'center'}}
@@ -132,17 +134,16 @@ import  styles  from './styles/signUpStyles'
          this.createUser(user.uid, userData, "")
          user.sendEmailVerification().then(()=> {
            Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
+           this.setState({spinner: false})
          }).catch(error => {
           Alert.alert('Error', error.message)
+        this.setState({spinner: false})
         })
        }).catch(error => {
         console.log(error)
         Alert.alert('Error', error.message)
-      })
-
         this.setState({spinner: false})
-        
-
+      })
       } catch (error) {
         console.log(error.toString())
         this.setState({spinner: false})
@@ -155,13 +156,22 @@ createUser = (uid,userData,token) => {
     const defaults = {
       uid,
       token,
-      accountType: 'standard'
+      accountType: 'standard',
     }
     //Alert.alert("Success", "Logged in as: " + userData.email)
     firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
     if (this.username) {
       firebase.database().ref('usernames').child(this.username).set(uid)
-    } 
+    }
   }
 
-} 
+}
+
+import { connect } from 'react-redux'
+// const mapStateToProps = ({ home, settings, profile }) => ({
+// })
+
+// const mapDispatchToProps = dispatch => ({
+// })
+
+export default connect(null, null)(SignUp)
