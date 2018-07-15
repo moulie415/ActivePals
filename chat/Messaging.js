@@ -147,8 +147,8 @@ class Messaging extends React.Component {
       }
     })
 
-    let ref = this.session ? firebase.database().ref('sessionChats/' + this.sessionId) :
-    firebase.database().ref('chats/' + this.chatId)
+    let ref = this.session ? firebase.database().ref('sessionChats').child(this.sessionId) :
+    firebase.database().ref('chats').child(this.chatId)
 
     ref.push(...converted)
     .then(() => {
@@ -181,7 +181,21 @@ class Messaging extends React.Component {
       </Header>
         <GiftedChat
           messages={this.state.messages}
-          onSend={messages => this.onSend(messages)}
+          onSend={messages => {
+            if (this.props.profile.username) {
+              this.onSend(messages)
+            }
+            else {
+              Alert.alert(
+                'Username not set',
+                'You need a username before sending messages, go to your profile now?',
+                [
+                {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                {text: 'OK', onPress: () => this.props.navigateProfile()},
+                ]
+                )
+            }
+          }}
           onPressAvatar={user => this.fetchUser(user)}
           onLoadEarlier={()=> {
             this.fetched = false
@@ -193,8 +207,8 @@ class Messaging extends React.Component {
             name: this.props.profile.username,
             avatar: this.state.avatar
           }}
-          renderBubble={(props) => { return ( 
-            <Bubble {...props} 
+          renderBubble={(props) => { return (
+            <Bubble {...props}
             wrapperStyle={{
               right: {
                 backgroundColor: colors.secondary
@@ -347,9 +361,9 @@ class Messaging extends React.Component {
 }
 
 import { connect } from 'react-redux'
-import { navigateMessaging } from 'Anyone/actions/navigation'
-import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from 'Anyone/actions/friends'
-import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, addMessage, resetNotification } from 'Anyone/actions/chats'
+import { navigateMessaging, navigateProfile } from 'Anyone/actions/navigation'
+import { sendRequest, acceptRequest } from 'Anyone/actions/friends'
+import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, resetNotification } from 'Anyone/actions/chats'
 
 const fetchId = (params) => {
   if (params.session) {
@@ -375,7 +389,8 @@ const mapDispatchToProps = dispatch => ({
   onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
   getMessages: (id, amount, uid) => dispatch(fetchMessages(id, amount, uid)),
   getSessionMessages: (id, amount, isPrivate) => dispatch(fetchSessionMessages(id, amount, isPrivate)),
-  resetNotif: () => dispatch(resetNotification())
+  resetNotif: () => dispatch(resetNotification()),
+  navigateProfile: () => dispatch(navigateProfile()),
 
 })
 

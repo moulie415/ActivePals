@@ -25,9 +25,9 @@ export const addPost = (item) => {
 		let uids = Object.keys(getState().friends.friends)
 		return firebase.database().ref('posts').push(item).then(snapshot => {
 			uids.forEach(friend => {
-				firebase.database().ref('userPosts/' + friend).child(snapshot.key).set(true)
+				firebase.database().ref('userPosts/' + friend).child(snapshot.key).set(uid)
 			})
-			firebase.database().ref('userPosts/' + uid).child(snapshot.key).set(true)
+			firebase.database().ref('userPosts/' + uid).child(snapshot.key).set(uid)
 			item.key = snapshot.key
 			dispatch(addToFeed(item, snapshot.key))
 		})
