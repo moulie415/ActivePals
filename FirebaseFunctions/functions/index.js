@@ -137,3 +137,29 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
         })
     })
 })
+
+exports.deleteUserData = functions.database.ref('/users/{id}').onDelete(event => {
+    let uid = event.params.id
+    admin.database().ref('userPosts').child(uid).once('value', posts => {
+        Object.keys(posts.val()).forEach(key => {
+            if (posts.val()[key] === uid) {
+                admin.database().ref('posts/' + uid).child(key).remove()
+            }
+        })
+        admin.database().ref('userPosts').child(uid).remove()
+    }) 
+
+    admin.database().ref('userReps').child(uid).once('value', reps => {
+        Object.keys(reps.val()).forEach(rep => {
+            admin.database().ref('reps/' + rep).child('post').once('value', post => {
+                admin.database().ref('posts/' + post.val()).child('repCount').once('value', count => {
+                    let newCount = count.val() - 1
+                    admin.database().ref('posts/' + post.val()).child('repCount').set(newCount)
+                    admin.database().ref('reps/' + rep).remove()
+                })
+            })
+        })
+        admin.database().ref('userReps').child(uid).remove()
+    })
+    admin.storage().ref('images/' + uid).child('avatar').delete()
+})

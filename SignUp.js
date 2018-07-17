@@ -5,13 +5,7 @@ import {
   Input,
   Container,
   Item,
-  Header,
-  Left,
   Icon,
-  Body,
-  Title,
-  Right,
-  Content,
   Spinner
 } from 'native-base'
 import * as firebase from "firebase"
@@ -113,7 +107,7 @@ import Text, { globalTextStyle } from 'Anyone/constants/Text'
             }
           }
           else {
-            Alert.alert("Please try again", "Passwords do not match")
+            Alert.alert('Please try again', 'Passwords do not match')
             this.setState({spinner: false})
           }
         }}
@@ -133,7 +127,7 @@ import Text, { globalTextStyle } from 'Anyone/constants/Text'
          let userData = {uid: user.uid, email: user.email, username: this.username}
          this.createUser(user.uid, userData, "")
          user.sendEmailVerification().then(()=> {
-           Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
+           Alert.alert('Account created', 'You must now verify your email using the link we sent you before you can login')
            this.setState({spinner: false})
          }).catch(error => {
           Alert.alert('Error', error.message)
@@ -150,19 +144,21 @@ import Text, { globalTextStyle } from 'Anyone/constants/Text'
         Alert.alert(error.toString())
       }
 
-} 
+}
 
 createUser = (uid,userData,token) => {
+  firebase.database().ref('admins').child(uid).once('value', snapshot => {
     const defaults = {
       uid,
       token,
-      accountType: 'standard',
+      accountType: snapshot.val() ? 'admin' : 'standard',
     }
     //Alert.alert("Success", "Logged in as: " + userData.email)
     firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
     if (this.username) {
       firebase.database().ref('usernames').child(this.username).set(uid)
     }
+})
   }
 
 }

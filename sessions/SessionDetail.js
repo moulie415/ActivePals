@@ -266,7 +266,7 @@ class SessionDetail extends Component {
 	}
 
 	validatePostcode(code) {
-		postcode = code.replace(/\s/g, "")
+		let postcode = code.replace(/\s/g, "")
 		let regex = /^[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}$/i
 		return regex.test(postcode)
 	}

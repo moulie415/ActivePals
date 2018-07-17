@@ -135,7 +135,7 @@ import { fetchSessionChats } from 'Anyone/actions/chats'
 const mapStateToProps = ({ friends, profile, chats }) => ({
   friends: friends.friends,
   profile: profile.profile,
-  chats: chats.sessionChats
+  chats: chats.sessionChats,
 })
 
 const mapDispatchToProps = dispatch => ({

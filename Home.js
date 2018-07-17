@@ -126,7 +126,14 @@ componentWillReceiveProps(nextProps) {
                     )
                 }
                 else {
-                  //alert username not set
+                  Alert.alert(
+                    'Username not set',
+                    'You need a username before making posts, go to your profile now?',
+                    [
+                    {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                    {text: 'OK', onPress: () => this.props.goToProfile()},
+                    ]
+                    )
                 }
               }
               else {

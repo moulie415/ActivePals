@@ -100,7 +100,7 @@ import SplashScreen from 'react-native-splash-screen'
         </Button>
         </View>
         <View>
-          <Button 
+          <Button
           onPress={()=> {
             this.fbLogin(this.props.navigation)
           }}
@@ -108,7 +108,7 @@ import SplashScreen from 'react-native-splash-screen'
             <Icon name="logo-facebook"/>
             <Text style={{color: '#fff'}}>Login with Facebook</Text>
           </Button>
-          <Button 
+          <Button
           onPress={()=> {
             this.gLogin()
           }}
@@ -118,12 +118,10 @@ import SplashScreen from 'react-native-splash-screen'
           </Button>
         </View>
           <Text style={{color: '#fff', textAlign: 'center', position: 'absolute', bottom: 10}}>
-          {"v"+VersionNumber.appVersion}</Text>
+          {'v' + VersionNumber.appVersion}</Text>
     </ImageBackground>
   )
   }
-
-  
 
 
   async login(email, pass) {
@@ -137,15 +135,9 @@ import SplashScreen from 'react-native-splash-screen'
         Alert.alert('Sorry', 'You must first verify your email using the link we sent you before logging in')
        }
        console.log('Logged In!')
-
-
       })
-
       this.setState({spinner: false})
-
-
-        // Navigate to the Home page
-
+        //Navigate to the Home page
       } catch (error) {
         this.setState({spinner: false})
         Alert.alert(error.toString())
@@ -156,7 +148,7 @@ import SplashScreen from 'react-native-splash-screen'
       LoginManager.logInWithReadPermissions(['public_profile', 'email'])
       .then((result) => this._handleCallBack(result, navigation),
         function(error) {
-          alert('Login fail with error: ' + error);
+          alert('Login fail with error: ' + error)
         }
         )
     }
@@ -169,12 +161,11 @@ import SplashScreen from 'react-native-splash-screen'
     } else {
   AccessToken.getCurrentAccessToken().then(
           (data) => {
-          
             const token = data.accessToken
             fetch('https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,gender,birthday&access_token=' + token)
             .then((response) => response.json())
             .then((json) => {
-          
+
               // const imageSize = 120
               // const facebookID = json.id
               // const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`
@@ -210,13 +201,17 @@ import SplashScreen from 'react-native-splash-screen'
     let ret = firebase.auth().signInWithCredential(credential)
     return ret
   }
+
   createUser = (uid,userData,token) => {
-    const defaults = {
-      uid,
-      token,
-      accountType: 'standard',
-    }
-    firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
+    firebase.database().ref('admins').child(uid).once('value', snapshot => {
+      const defaults = {
+        uid,
+        token,
+        accountType: snapshot.val() ? 'admin' : 'standard',
+      }
+      firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
+
+    })
   }
 
   gLogin() {
@@ -233,7 +228,7 @@ import SplashScreen from 'react-native-splash-screen'
               const credential = firebase.auth.GoogleAuthProvider.credential(
                 user.idToken,
                 user.accessToken
-              );
+              )
 
               firebase
                 .auth()
@@ -247,7 +242,7 @@ import SplashScreen from 'react-native-splash-screen'
                  }
                  else {
                    user.sendEmailVerification().then(()=> {
-                     Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
+                     Alert.alert('Account created', 'You must now verify your email using the link we sent you before you can login')
                    }).catch(error => {
                     Alert.alert('Error', error.message)
                   })
@@ -275,6 +270,7 @@ import SplashScreen from 'react-native-splash-screen'
    })
   }
 
+
    logout() {
     firebase.auth().signOut().then(function() {
     }, function(error) {
@@ -283,6 +279,7 @@ import SplashScreen from 'react-native-splash-screen'
   }
 
 }
+
 
 import { connect } from 'react-redux'
 import { navigateLogin, navigateHome } from 'Anyone/actions/navigation'
@@ -296,7 +293,7 @@ const mapDispatchToProps = dispatch => ({
   onLogoutPress: ()=> { dispatch(navigateLogin())},
   onLogin: ()=> {dispatch(fetchProfile()).then(profile => {
     dispatch(doSetup(profile)).then(()=> {
-      dispatch(navigateHome()),
+      dispatch(navigateHome())
       dispatch(setHasLoggedIn(true))
     })
   })},

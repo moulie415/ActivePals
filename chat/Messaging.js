@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { 
+import {
   Alert,
   Platform,
   TouchableOpacity,
@@ -104,7 +104,7 @@ class Messaging extends React.Component {
           let message
           let date = new Date(createdAt)
           if (custom_notification) {
-            let custom = JSON.parse(custom_notification) 
+            let custom = JSON.parse(custom_notification)
             message = {createdAt: date, _id, text: custom.body, user: {_id: uid, name: username, avatar}}
           }
           else {
@@ -139,7 +139,7 @@ class Messaging extends React.Component {
     let converted = []
     messages.forEach(message => {
       if (this.session) {
-        let type = this.session.private ? "privateSessions" : 'sessions'
+        let type = this.session.private ? 'privateSessions' : 'sessions'
         converted.push({...message, createdAt: message.createdAt.toString(), sessionTitle: this.sessionTitle, sessionId: this.sessionId, type})
       }
       else {
@@ -228,8 +228,8 @@ class Messaging extends React.Component {
         <Modal style={[sStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
 
-        <View style={{flexDirection: 'row'}}>      
-        {this.state.selectedUser.avatar? <Image source={{uri: this.state.selectedUser.avatar}} 
+        <View style={{flexDirection: 'row'}}>
+        {this.state.selectedUser.avatar ? <Image source={{uri: this.state.selectedUser.avatar}}
          style={{height: 90, width: 90, marginRight: 10, borderRadius: 5}} /> : null}
         <View style={{flex: 1}}>
           <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
