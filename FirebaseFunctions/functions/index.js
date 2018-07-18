@@ -166,6 +166,7 @@ exports.deleteUserData = functions.database.ref('/users/{id}').onDelete(event =>
         })
         admin.database().ref('userReps').child(uid).remove()
     })
+    
     let path = 'images/' + uid + '/avatar'
     
     storage.bucket(bucket).file(path).delete().then(() => {

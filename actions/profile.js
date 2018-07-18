@@ -71,7 +71,7 @@ export const removeUser = () => {
 
 			if (profile.friends) {
 				Object.keys(profile.friends).forEach(friend => {
-					firebase.database().ref('users/' + friend + '/friends').child(friend).remove()
+					firebase.database().ref('users/' + friend + '/friends').child(profile.uid).remove()
 				})
 			}
 
