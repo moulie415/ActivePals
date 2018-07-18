@@ -19,6 +19,7 @@ const background = require('Anyone/assets/images/Running-background.jpg')
 import colors from 'Anyone/constants/colors'
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
 import SplashScreen from 'react-native-splash-screen'
+import RNFetchBlob from 'react-native-fetch-blob'
 
 
  class Login extends Component {
@@ -166,16 +167,22 @@ import SplashScreen from 'react-native-splash-screen'
             .then((response) => response.json())
             .then((json) => {
 
-              // const imageSize = 120
-              // const facebookID = json.id
-              // const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`
+              const imageSize = 200
+              const facebookID = json.id
+              const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`
              this.authenticate(data.accessToken)
              .then(function(result){
               if (result.emailVerified) {
+                _this.props.onLogin()
               }
               else {
                result.sendEmailVerification().then(()=> {
                  Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
+                 const imageRef = firebase.storage().ref('images/' + result.uid).child('avatar')
+                 RNFetchBlob.fetch('GET', fbImage).then(image => image.blob())
+                 .then(blob => {
+                  imageRef.put(blob)
+                 })
                }).catch(error => {
                 Alert.alert('Error', error.message)
               })

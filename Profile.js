@@ -24,6 +24,7 @@ import {
 import firebase from './index'
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
 import  styles  from './styles/profileStyles'
+import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
 import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')
@@ -212,7 +213,7 @@ window.Blob = Blob
         onPress={()=> this.logout()}>
         <Text style={{color: '#fff'}} >Log out</Text>
       </TouchableOpacity>
-        {this.state.spinner && <Spinner color={colors.secondary}/>}
+        {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
 
     </Container>
   )
@@ -231,15 +232,15 @@ updateUser(initial, profile) {
     Alert.alert("No changes")
   }
   else {
-    if (profile.username.length < 5) {
+    if (profile.username && profile.username.length < 5) {
       Alert.alert('Sorry', 'Username must be at least 5 characters long')
     }
     else {
       this.setState({spinner: true})
       if (this.state.initialAvatar != this.state.avatar) {
         this.uploadImage(this.state.avatar).then((url)=> {
-          this.checkUsername(initial, profile)
-          this.setState({initalAvatar: url})
+          profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
+          this.setState({initalAvatar: url, spinner: false})
         })
         .catch(e => {
           this.setState({spinner: false})
@@ -285,20 +286,24 @@ selectAvatar() {
       path: 'images',
     },
   }
+  this.setState({spinner: true})
   ImagePicker.showImagePicker(options, (response) => {
-    console.log('Response = ', response);
+    console.log('Response = ', response)
 
     if (response.didCancel) {
       console.log('User cancelled image picker');
+      this.setState({spinner: false})
     }
     else if (response.error) {
       console.log('ImagePicker Error: ', response.error);
+      this.setState({spinner: false})
     }
     else if (response.customButton) {
       console.log('User tapped custom button: ', response.customButton);
+      this.setState({spinner: false})
     }
     else {
-      let source = { uri: response.uri };
+      let source = { uri: response.uri }
 
     // You can also display the image using data:
     // let source = { uri: 'data:image/jpeg;base64,' + response.data };
@@ -307,7 +312,7 @@ selectAvatar() {
       // response.path is the path of the new image
       // response.name is the name of the new image with the extension
       // response.size is the size of the new image
-      this.setState({avatar: resized.uri})
+      this.setState({avatar: resized.uri, spinner: false})
 
     }).catch((err) => {
       Alert.alert(err.message)

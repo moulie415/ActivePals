@@ -1,5 +1,8 @@
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
+const Storage = require('@google-cloud/storage')
+const storage = new Storage()
+const bucket = 'anyone-80c08.appspot.com'
 const _ = require('lodash')
 
 admin.initializeApp(functions.config().firebase)
@@ -154,12 +157,21 @@ exports.deleteUserData = functions.database.ref('/users/{id}').onDelete(event =>
             admin.database().ref('reps/' + rep).child('post').once('value', post => {
                 admin.database().ref('posts/' + post.val()).child('repCount').once('value', count => {
                     let newCount = count.val() - 1
-                    admin.database().ref('posts/' + post.val()).child('repCount').set(newCount)
+                    if (post.val().uid !== uid) {
+                        admin.database().ref('posts/' + post.val()).child('repCount').set(newCount)
+                    }
                     admin.database().ref('reps/' + rep).remove()
                 })
             })
         })
         admin.database().ref('userReps').child(uid).remove()
     })
-    admin.storage().ref('images/' + uid).child('avatar').delete()
+    let path = 'images/' + uid + '/avatar'
+    
+    storage.bucket(bucket).file(path).delete().then(() => {
+        return console.log(uid + ' avatar deleted')
+    })
+    .catch(e => {
+        console.log(e.message)
+    })
 })
