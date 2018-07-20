@@ -141,32 +141,68 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
     })
 })
 
-exports.deleteUserData = functions.database.ref('/users/{id}').onDelete(event => {
-    let uid = event.params.id
+exports.deleteUserData = functions.auth.user().onDelete((deleted) => {
+    //perhaps send goodbye email
+    console.log(deleted)
+    const uid = deleted.data.uid
+
+    admin.database().ref('users').child(uid).once('value', user => {
+        admin.database().ref('users').child(uid).remove()
+        if (user.val().chats) {
+            Object.keys(user.val().chats).forEach(key => {
+                let chat = user.val().chats[key]
+                admin.database().ref('chats').child(chat).remove()
+                admin.database().ref('users/' + key + '/chats').child(uid).remove()
+            })
+        }
+        if (user.val().username) {
+            admin.database().ref('usernames').child(user.val().username).remove()
+        }
+
+        if (user.val().friends) {
+            Object.keys(user.val().friends).forEach(friend => {
+                admin.database().ref('users/' + friend + '/friends').child(uid).remove()
+                admin.database().ref('userPosts').child(friend).once('value', posts => {
+                    if (posts.val()) {
+                        Object.keys(posts.val()).forEach(post => {
+                            if (posts.val()[post] === uid) {
+                                admin.database().ref('userPosts/' + friend).child(post).remove()
+                            }
+                        })
+                    }
+                })
+            })
+        }
+    })
+
     admin.database().ref('userPosts').child(uid).once('value', posts => {
-        Object.keys(posts.val()).forEach(key => {
-            if (posts.val()[key] === uid) {
-                admin.database().ref('posts/' + uid).child(key).remove()
-            }
-        })
-        admin.database().ref('userPosts').child(uid).remove()
+        if (posts.val()) {
+            Object.keys(posts.val()).forEach(key => {
+                if (posts.val()[key] === uid) {
+                    admin.database().ref('posts/' + uid).child(key).remove()
+                }
+            })
+            admin.database().ref('userPosts').child(uid).remove()
+        }
     }) 
 
     admin.database().ref('userReps').child(uid).once('value', reps => {
-        Object.keys(reps.val()).forEach(rep => {
-            admin.database().ref('reps/' + rep).child('post').once('value', post => {
-                admin.database().ref('posts/' + post.val()).child('repCount').once('value', count => {
-                    let newCount = count.val() - 1
-                    if (post.val().uid !== uid) {
-                        admin.database().ref('posts/' + post.val()).child('repCount').set(newCount)
-                    }
-                    admin.database().ref('reps/' + rep).remove()
+        if (reps.val()) {
+            Object.keys(reps.val()).forEach(rep => {
+                admin.database().ref('reps/' + rep).child('post').once('value', post => {
+                    admin.database().ref('posts/' + post.val()).child('repCount').once('value', count => {
+                        let newCount = count.val() - 1
+                        if (post.val().uid !== uid) {
+                            admin.database().ref('posts/' + post.val()).child('repCount').set(newCount)
+                        }
+                        admin.database().ref('reps/' + rep).remove()
+                    })
                 })
             })
-        })
-        admin.database().ref('userReps').child(uid).remove()
+            admin.database().ref('userReps').child(uid).remove()
+        }
     })
-    
+
     let path = 'images/' + uid + '/avatar'
     
     storage.bucket(bucket).file(path).delete().then(() => {

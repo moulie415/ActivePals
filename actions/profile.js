@@ -58,32 +58,11 @@ export const doSetup = (profile) => {
 
 export const removeUser = () => {
 	return (dispatch, getState) => {
-		return new Promise((resolve, reject) => {
-			let profile = getState().profile.profile
-			if (profile.username) {
-				firebase.database().ref('usernames').child(profile.username).remove()
-			}
-			if (profile.chats) {
-				Object.values(profile.chats).forEach(chat => {
-					firebase.database().ref('chats').child(chat).remove()
-				})
-			}
-
-			if (profile.friends) {
-				Object.keys(profile.friends).forEach(friend => {
-					firebase.database().ref('users/' + friend + '/friends').child(profile.uid).remove()
-				})
-			}
-
-			firebase.database().ref('users').child(profile.uid).remove()
-			.then(() => {
-				let user = firebase.auth().currentUser
-				user.delete().then(() => {
-					dispatch(setLoggedOut(true))
-					resolve()
-				})
-				.catch(e => reject(e))
-			})
+		//let cloud function do all the heavy lifting of deleting user data
+		let user = firebase.auth().currentUser
+		dispatch(setLoggedOut())
+		return user.delete().then(() => {
+			dispatch(navigateLogin())
 		})
 	}
 }

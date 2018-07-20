@@ -71,7 +71,6 @@ window.Blob = Blob
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
-        this.props.goLogin()
       }
     })  
     this.listenForUserChanges(firebase.database().ref('users/' + this.profile.uid))
@@ -360,10 +359,14 @@ selectAvatar() {
       [
       {text: 'Cancel', onPress: () => console.log('Cancel logout'), style: 'cancel'},
       {text: 'OK', onPress: () => {
-        this.props.onLogoutPress()
-        firebase.auth().signOut().then(function() {
-        }, function(error) {
-          Alert.alert(error.toString())
+        this.setState({spinner: true})
+        firebase.auth().signOut().then(() => {
+          this.props.onLogoutPress()
+          this.setState({spinner: false})
+        })
+        .catch(e => {
+          Alert.alert(e.toString())
+          this.setState({spinner: false})
         })
 
       }},
@@ -383,8 +386,6 @@ const mapStateToProps = ({ profile }) => ({
 const mapDispatchToProps = dispatch => ({
   onLogoutPress: ()=> {
     dispatch(setLoggedOut())
-  },
-  goLogin: ()=> {
     dispatch(navigateLogin())
   },
   onSave: ()=> dispatch(fetchProfile()),
