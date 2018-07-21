@@ -6,7 +6,8 @@ import {
   Alert,
   Image,
   TextInput,
-  FlatList
+  FlatList,
+  Platform
 } from "react-native"
 import { 
   Button,
@@ -20,15 +21,27 @@ import {
   Card,
   Left,
   Right,
+  Spinner
 } from 'native-base'
 import firebase from "./index"
 import colors from './constants/colors'
 import  styles  from './styles/homeStyles'
+import sStyles from './styles/settingsStyles'
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
 import { getSimplified } from 'Anyone/chat/SessionChats'
+import ImagePicker from 'react-native-image-picker'
+import ImageResizer from 'react-native-image-resizer'
+import RNFetchBlob from 'react-native-fetch-blob'
+import { guid } from './constants/utils'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
+
+// Prepare Blob support
+const Blob = RNFetchBlob.polyfill.Blob
+const fs = RNFetchBlob.fs
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+window.Blob = Blob
 
 
 class Home extends Component {
@@ -50,6 +63,7 @@ class Home extends Component {
     this.state = {
       profile: this.props.profile,
       feed: this.props.feed,
+      spinner: false
     }
   }
 
@@ -92,7 +106,6 @@ componentWillReceiveProps(nextProps) {
           </TouchableOpacity>
         </Right>
       </Header>
-      <Content>
         <View style={{flexDirection: 'row', backgroundColor: '#fff', padding: 10, alignItems: 'center'}}>
         <TouchableOpacity onPress={()=> this.props.goToProfile()}>
           {this.state.profile && this.state.profile.avatar ?
@@ -106,7 +119,21 @@ componentWillReceiveProps(nextProps) {
             onChangeText={(status) => this.setState({status})}
             placeholder="Post a status for your buddies..."
             style={{flex: 1, borderColor: '#999', borderWidth: 0.5, marginHorizontal: 10, height: 40, padding: 5}}/>
-            <TouchableOpacity onPress={()=> Alert.alert("coming soon")}>
+            <TouchableOpacity onPress={()=> {
+              if (username) {
+                this.showPicker()
+              }
+              else {
+                Alert.alert(
+                  'Username not set',
+                  'You need a username before making posts, go to your profile now?',
+                  [
+                  {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                  {text: 'OK', onPress: () => this.props.goToProfile()},
+                  ]
+                  )
+              }
+            }}>
               <Icon name="ios-camera" style={{color: colors.secondary, fontSize: 40, marginRight: 10}} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
@@ -143,8 +170,10 @@ componentWillReceiveProps(nextProps) {
               <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 40}}/>
             </TouchableOpacity>
         </View>
+      <Content>
         {this.props.friends && this.state.profile && this.renderFeed()}
       </Content>
+      {this.state.spinner && <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>}
     </Container>
   )
   }
@@ -156,7 +185,7 @@ componentWillReceiveProps(nextProps) {
         keyExtractor={(item) => item.key}
         renderItem = {({ item }) => {
           if (item.uid == this.props.profile.uid || this.props.friends[item.uid]) {
-            return (<Card style={{padding: 10, margin: 5}}>
+            return (<Card>
               {this.renderFeedItem(item)}
               </Card>
               )}
@@ -171,7 +200,7 @@ componentWillReceiveProps(nextProps) {
     switch(item.type) {
       case 'status':
         return (
-          <View>
+          <View style={{padding: 10, margin: 5}}>
           <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
           <TouchableOpacity onPress={()=> {
             console.log("navigate to profile")
@@ -200,10 +229,50 @@ componentWillReceiveProps(nextProps) {
             {this.repsAndComments(item)}
           </View>
           )
+    case 'photo':
+      return (
+          <View>
+          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
+          <TouchableOpacity
+          onPress={()=> {
+            console.log("navigate to profile")
+          }}>
+            {this.fetchAvatar(item.uid)}
+          </TouchableOpacity>
+            <View style={{flex: 1}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <TouchableOpacity onPress={()=> {
+                  console.log("navigate to profile")
+                }}>
+                  <Text style={{fontWeight: 'bold', color: colors.secondary, flex: 1, marginTop: 5}}>
+                  {item.uid == this.props.profile.uid ? 'You' : item.username}</Text>
+                </TouchableOpacity>
+                <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
+              </View>
+              <Text style={{color: '#000'}}>{item.text}</Text>
+              </View>
+            </View>
+              <Image
+              style={{width: '100%', height: 400, marginTop: 10, marginRight: 10, marginBottom: 10}}
+              resizeMode={'cover'}
+              source={{uri: item.url}}
+              />
+            {!!item.repCount && item.repCount > 0 &&
+              <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5,}}/>}
+              {!!item.repCount && item.repCount > 0 && <View style={{marginHorizontal: 10}}>
+                  <Text style={{color: '#999'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>
+                </View>}
+            <View style={{borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
+            <View style={{padding: 10}}>
+            {this.repsAndComments(item)}
+            </View>
+          </View>
+        )
     }
+
   }
 
-  repsAndComments(item) {
+  repsAndComments(item, addPadding = false) {
    return(<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
     <TouchableOpacity
       onPress={() => {
@@ -233,6 +302,109 @@ componentWillReceiveProps(nextProps) {
       return <Image source={{uri: this.props.friends[uid].avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
     }
     else return <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary, marginRight: 10}}/>
+  }
+
+showPicker() {
+  let videoOptions = {
+    mediaType: 'video',
+    durationLimit: 30,
+
+  }
+  let options = {
+    title: null,
+    mediaType: 'photo',
+    customButtons: [
+    {name: 'video', title: 'Shoot video (coming soon)'},
+    {name: 'uploadVideo', title: 'Choose video from library (coming soon)'},
+    ],
+    noData: true,
+    storageOptions: {
+      skipBackup: true,
+    }
+  }
+  ImagePicker.showImagePicker(options, (response) => {
+    this.setState({spinner: true})
+    console.log('Response = ', response)
+
+    if (response.didCancel) {
+      console.log('User cancelled image picker')
+      this.setState({spinner: false})
+    }
+    else if (response.error) {
+      Alert.alert('Error', response.error)
+      this.setState({spinner: false})
+    }
+    else if (response.customButton) {
+      if (response.customButton == 'uploadVideo') {
+        ImagePicker.launchImageLibrary(videoOptions, (response)  => {
+          if (response.error) {
+            Alert.alert('Error',response.error)
+            this.setState({spinner: false})
+          }
+        })
+      }
+      else if (response.customButton == 'video') {
+        ImagePicker.launchCamera(videoOptions, (response)  => {
+          if (response.error) {
+            Alert.alert('Error', response.error)
+            this.setState({spinner: false})
+          }
+        })
+
+      }
+    }
+    else {
+      ImageResizer.createResizedImage(response.uri, 500, 500, 'PNG', 100).then((resized) => {
+        this.setState({spinner: false})
+        this.uploadImage(resized.uri).then(url => {
+          let profile = this.props.profile
+          this.props.postStatus({
+            type: 'photo',
+            url,
+            text: '', uid: profile.uid,
+            username: profile.username,
+            createdAt: (new Date()).toString()})
+            .then(() => Alert.alert('Success'))
+            .catch(e => Alert.alert('Error', e.message))
+        })
+        .catch(e => Alert.alert("Error", e.message))
+
+
+    }).catch((e) => {
+      Alert.alert('Error', e.message)
+      this.setState({spinner: false})
+    })
+
+
+    }
+  })
+}
+
+uploadImage(uri, mime = 'application/octet-stream') {
+    return new Promise((resolve, reject) => {
+      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+      let uploadBlob = null
+      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos').child(guid())
+
+      fs.readFile(uploadUri, 'base64')
+        .then((data) => {
+          return Blob.build(data, { type: `${mime};BASE64` })
+        })
+        .then((blob) => {
+          uploadBlob = blob
+          return imageRef.put(blob, { contentType: mime })
+        })
+        .then(() => {
+          uploadBlob.close()
+          return imageRef.getDownloadURL()
+        })
+        .then((url) => {
+          resolve(url)
+        })
+        .catch((error) => {
+          reject(error)
+      })
+    })
   }
 
 

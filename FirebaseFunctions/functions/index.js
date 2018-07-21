@@ -141,6 +141,20 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
     })
 })
 
+exports.onFriendConnected = functions.database.ref('/users/{uid}/friends/{friendUid}').onWrite(event => {
+    let uid = event.params.uid
+    let friendUid = event.params.friendUid
+    return admin.database().ref('users/' + uid + '/friends/' + friendUid).once('value', status => {
+        if (status.val() === 'connected') {
+            admin.database().ref('userPosts/' + uid).once('value', posts => {
+                if (posts.val()) {
+                    admin.database().ref('userPosts').child(friendUid).update(posts.val())
+                }
+            })
+        }
+    })
+})
+
 exports.deleteUserData = functions.auth.user().onDelete((deleted) => {
     //perhaps send goodbye email
     console.log(deleted)

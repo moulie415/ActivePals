@@ -280,6 +280,7 @@ selectAvatar() {
   var options = {
     title: 'Select Avatar',
     mediaType: 'photo',
+    noData: true,
     storageOptions: {
       skipBackup: true,
       path: 'images',
@@ -313,8 +314,8 @@ selectAvatar() {
       // response.size is the size of the new image
       this.setState({avatar: resized.uri, spinner: false})
 
-    }).catch((err) => {
-      Alert.alert(err.message)
+    }).catch((e) => {
+      Alert.alert('Error', e.message)
     })
 
   }
