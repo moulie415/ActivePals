@@ -284,6 +284,9 @@ import { geofire }  from 'Anyone/index'
             halfStarEnabled={true}
             rating={this.state.selectedLocation.rating}
             /></View>}
+            {this.state.selectedLocation.opening_hours && 
+              <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
+              {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
             {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999'}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
             <View style={{flex: 1, justifyContent: 'flex-end'}}>
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>

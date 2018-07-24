@@ -252,11 +252,14 @@ componentWillReceiveProps(nextProps) {
               <Text style={{color: '#000'}}>{item.text}</Text>
               </View>
             </View>
+              <TouchableOpacity
+              style={{marginTop: 10, marginBottom: 10}}>
               <Image
-              style={{width: '100%', height: 400, marginTop: 10, marginRight: 10, marginBottom: 10}}
+              style={{width: '100%', height: 400}}
               resizeMode={'cover'}
               source={{uri: item.url}}
               />
+              </TouchableOpacity>
             {!!item.repCount && item.repCount > 0 &&
               <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5,}}/>}
               {!!item.repCount && item.repCount > 0 && <View style={{marginHorizontal: 10}}>
