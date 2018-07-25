@@ -7,7 +7,7 @@ import {
   TextInput,
   ScrollView,
   RefreshControl,
-  Image
+  Image,
 } from "react-native"
 import {
   Button,

@@ -7,7 +7,9 @@ import {
   Image,
   TextInput,
   FlatList,
-  Platform
+  Platform,
+  Modal,
+  SafeAreaView
 } from "react-native"
 import { 
   Button,
@@ -33,6 +35,7 @@ import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
 import RNFetchBlob from 'react-native-fetch-blob'
 import { guid } from './constants/utils'
+import ImageViewer from 'react-native-image-zoom-viewer'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -62,8 +65,10 @@ class Home extends Component {
 
     this.state = {
       profile: this.props.profile,
-      feed: this.props.feed,
-      spinner: false
+      feed: Object.values(this.props.feed),
+      spinner: false,
+      selectedImage: null,
+      showImage: false
     }
   }
 
@@ -82,12 +87,19 @@ class Home extends Component {
 })
 }
 
+sortByDate(array) {
+  array.sort(function(a,b){
+    return new Date(b.createdAt) - new Date(a.createdAt)
+  })
+  return array
+}
+
 componentWillReceiveProps(nextProps) {
   if (nextProps.profile) {
     this.setState({profile: nextProps.profile})
   }
   if (nextProps.feed) {
-    this.setState({feed: nextProps.feed})
+    this.setState({feed: Object.values(nextProps.feed)})
   }
 }
 
@@ -174,14 +186,35 @@ componentWillReceiveProps(nextProps) {
         {this.props.friends && this.state.profile && this.renderFeed()}
       </Content>
       {this.state.spinner && <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>}
+      <Modal onRequestClose={()=> null}
+          visible={this.state.showImage} transparent={true}>
+        <ImageViewer
+          renderIndicator= {(currentIndex, allSize) => null}
+          loadingRender={()=> <SafeAreaView><Text style={{color: '#fff', fontSize: 20}}>Loading...</Text></SafeAreaView>}
+          renderHeader={()=> {
+            return (<TouchableOpacity style={{position: 'absolute', top: 20, left: 10, padding: 10, zIndex: 9999}}
+              onPress={()=> this.setState({selectedImage: null, showImage: false})}>
+                <View style={{
+                  backgroundColor: '#0007',
+                  paddingHorizontal: 15,
+                  paddingVertical: 2,
+                  borderRadius: 10,
+                }}>
+                  <Icon name={'ios-arrow-back'}  style={{color: '#fff', fontSize: 40}}/>
+                </View>
+              </TouchableOpacity>)
+          }}
+          imageUrls={this.state.selectedImage}
+            />
+      </Modal>
     </Container>
   )
   }
 
   renderFeed() {
-    if (Object.values(this.state.feed).length > 0) {
+    if (this.state.feed.length > 0) {
       return <FlatList
-        data={Object.values(this.state.feed).reverse()}
+        data={this.sortByDate(this.state.feed)}
         keyExtractor={(item) => item.key}
         renderItem = {({ item }) => {
           if (item.uid == this.props.profile.uid || this.props.friends[item.uid]) {
@@ -253,6 +286,10 @@ componentWillReceiveProps(nextProps) {
               </View>
             </View>
               <TouchableOpacity
+              activeOpacity={1}
+              onPress={()=> {
+                this.setState({selectedImage: [{url: item.url}], showImage: true})
+              }}
               style={{marginTop: 10, marginBottom: 10}}>
               <Image
               style={{width: '100%', height: 400}}
@@ -261,7 +298,7 @@ componentWillReceiveProps(nextProps) {
               />
               </TouchableOpacity>
             {!!item.repCount && item.repCount > 0 &&
-              <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5,}}/>}
+              <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>}
               {!!item.repCount && item.repCount > 0 && <View style={{marginHorizontal: 10}}>
                   <Text style={{color: '#999'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>
                 </View>}
