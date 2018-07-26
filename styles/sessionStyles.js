@@ -23,6 +23,8 @@ export default styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     flex: 1,
     borderColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   modal: {
     height: 400,

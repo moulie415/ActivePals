@@ -396,14 +396,16 @@ showPicker() {
     else {
       ImageResizer.createResizedImage(response.uri, 500, 500, 'PNG', 100).then((resized) => {
         this.setState({spinner: false})
-        this.uploadImage(resized.uri).then(url => {
+        this.uploadImage(resized.uri).then(image => {
           let profile = this.props.profile
+          let date = new Date().toString()
+          firebase.database().ref('userPhotos/' + profile.uid).child(image.id).set({createdAt: date, url: image.url})
           this.props.postStatus({
             type: 'photo',
-            url,
+            url: image.url,
             text: '', uid: profile.uid,
             username: profile.username,
-            createdAt: (new Date()).toString()})
+            createdAt: date})
             .then(() => Alert.alert('Success'))
             .catch(e => Alert.alert('Error', e.message))
         })
@@ -424,7 +426,9 @@ uploadImage(uri, mime = 'application/octet-stream') {
     return new Promise((resolve, reject) => {
       const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       let uploadBlob = null
-      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos').child(guid())
+      let id = guid()
+      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos').child(id)
+
 
       fs.readFile(uploadUri, 'base64')
         .then((data) => {
@@ -439,7 +443,7 @@ uploadImage(uri, mime = 'application/octet-stream') {
           return imageRef.getDownloadURL()
         })
         .then((url) => {
-          resolve(url)
+          resolve({url, id})
         })
         .catch((error) => {
           reject(error)

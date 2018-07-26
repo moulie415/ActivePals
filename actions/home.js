@@ -70,7 +70,10 @@ export const fetchPosts = (uid, amount) => {
 						})
 					})
 				}
-				else resolve()
+				else {
+					dispatch(setFeed({}))
+					resolve()
+				}
 			})
 		})
 	}
@@ -81,7 +84,7 @@ export const repPost = (item) => {
 		let post = item.key
 		let uid = getState().profile.profile.uid
 		let obj = getState().home.feed[post]
-		let rep = obj.rep ? false : true
+		let rep = obj.rep ? false : obj.uid
 		if (obj.rep) {
 			obj.rep = false
 			obj.repCount -= 1

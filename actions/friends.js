@@ -102,17 +102,8 @@ export const acceptRequest = (uid, friendUid) => {
 
 export const deleteFriend = (uid, friendUid, profile) => {
 	return (dispatch) => {
-		let chatId
-		if (profile.chats) {
-			chatId = profile.chats[friendUid]
-		}
-		let promises = []
-		promises.push(firebase.database().ref('users/' + uid + '/friends').child(friendUid).remove())
-		promises.push(firebase.database().ref('users/' + friendUid + '/friends').child(uid).remove())
-		chatId && promises.push(firebase.database().ref('users/' + uid + '/chats').child(friendUid).remove())
-		chatId && promises.push(firebase.database().ref('users/' + friendUid + '/chats').child(uid).remove())
-		chatId &&  promises.push(firebase.database().ref('chats').child(chatId).remove())
-		return Promise.all(promises)
+		//handle most the deletion server side using cloud function
+		return firebase.database().ref('users/' + uid + '/friends').child(friendUid).remove()
 
 	}
 

@@ -16,7 +16,6 @@ target 'Anyone' do
 		'RCTText',
 		'RCTVibration',
 		'RCTWebSocket',
-		'BatchedBridge'
 	]
 
 	pod 'react-native-maps', path: rn_maps_path

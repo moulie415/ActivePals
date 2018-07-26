@@ -200,7 +200,7 @@ import { geofire }  from 'Anyone/index'
             this.props.onContinue()
           }}>
             <Text adjustsFontSizeToFit={true}
-            style={{flex: 1, textAlign: 'center', color: '#fff', fontSize: 15, height: 50, textAlignVertical: 'center'}}>Create Session</Text>
+            style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</Text>
           </TouchableOpacity>
           <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/>
           <TouchableOpacity style={styles.button}
@@ -214,7 +214,7 @@ import { geofire }  from 'Anyone/index'
             }
           }}>
             <Text adjustsFontSizeToFit={true} 
-            style={{flex: 1, textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Private Session</Text>
+            style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Private Session</Text>
           </TouchableOpacity>
         </View>
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>

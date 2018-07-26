@@ -5,7 +5,7 @@ export const globalTextStyle = StyleSheet.create({
     app: { fontFamily:'Avenir' }
 })
 
-const AppText = ({...props, style}) => {
+const AppText = ({style, ...props}) => {
     return <Text {...props} style={[style, globalTextStyle.app]}/>
 }
 

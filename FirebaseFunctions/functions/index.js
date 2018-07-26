@@ -155,6 +155,47 @@ exports.onFriendConnected = functions.database.ref('/users/{uid}/friends/{friend
     })
 })
 
+exports.onFriendDeleted = functions.database.ref('/users/{uid}/friends/{friendUid}').onDelete(event => {
+    let uid = event.params.uid
+    let friendUid = event.params.friendUid
+
+    admin.database().ref('users/' + uid + '/chats').child(friendUid).once('value', chat => {
+        if (chat.val()) {
+            firebase.database.ref('chats').child(chat.val()).remove()
+            firebase.database().ref('users/' + uid + '/chats').child(friendUid).remove()
+        }
+    })
+
+    admin.database().ref('userPosts').child(uid).once('value', posts => {
+        if (posts.val()) {
+            Object.keys(posts.val()).forEach(post => {
+                if (posts.val()[post] === friendUid) {
+                    admin.database().ref('userPosts/' + uid).child(post).remove()
+                }
+            })
+        }
+    })
+
+    admin.database().ref('userReps').child(uid).once('value', reps => {
+        if (reps.val()) {
+            Object.key(reps.val()).forEach(rep => {
+                if (reps.val()[rep] === friendUid) {
+                    admin.database().ref('posts/' + rep).child('repCount').once('value', count => {
+                        if (count.val()) {
+                            let newCount = count.val() - 1
+                            admin.database().ref('posts/' + rep).child('repCount').set(newCount)
+                        }
+                        admin.database().ref('reps/' + rep).child(uid).remove()
+                    }) 
+                }
+            })
+        }
+    })
+
+    admin.database().ref('users/' + friendUid + '/friends').child(uid).remove()
+
+})
+
 exports.deleteUserData = functions.auth.user().onDelete((deleted) => {
     //perhaps send goodbye email
     console.log(deleted)
