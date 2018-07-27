@@ -119,7 +119,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
           />
         }>
       {this.state.friends.length > 0 ?
-      <ScrollView>
+      <ScrollView style={{backgroundColor: '#9993'}}>
       {this.renderFriends()}
       </ScrollView> :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>

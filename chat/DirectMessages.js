@@ -75,7 +75,7 @@ import {getSimplified } from './SessionChats'
     return (
     <Container>
     {this.state.chats.length > 0?
-      <ScrollView>
+      <ScrollView style={{backgroundColor: '#9993'}}>
         {this.renderChats()}
       </ScrollView> :
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>

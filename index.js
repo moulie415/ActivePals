@@ -95,6 +95,8 @@ export const store = createStore(
 
 export const persistor = persistStore(store)
 
+
+
 FCM.on(FCMEvent.Notification, async (notif) => {
   let state = AppState.currentState
     // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
