@@ -103,6 +103,14 @@ export const fetchPosts = (uid, amount) => {
 	}
 }
 
+export const resetFeed = () => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		dispatch(setFeed({}))
+		dispatch(fetchPosts(uid, 30))
+	}
+}
+
 export const repPost = (item) => {
 	return (dispatch, getState) => {
 		let post = item.key

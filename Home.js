@@ -217,7 +217,7 @@ componentWillReceiveProps(nextProps) {
         data={this.sortByDate(this.state.feed)}
         keyExtractor={(item) => item.key}
         renderItem = {({ item }) => {
-          if (item.uid == this.props.profile.uid || this.props.friends[item.uid]) {
+          if (item.uid == this.props.profile.uid || this.props.friends[item.uid] && this.props.friends[item.uid].status == 'connected') {
             return (<Card>
               {this.renderFeedItem(item)}
               </Card>
