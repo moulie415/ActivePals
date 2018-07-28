@@ -104,7 +104,7 @@ componentWillReceiveProps(nextProps) {
 }
 
   render () {
-    const { uid, username } = this.props.profile
+    const { uid, username, users } = this.props.profile
     return (
     <Container >
       <Header style={{backgroundColor: colors.primary}}>
@@ -246,7 +246,7 @@ componentWillReceiveProps(nextProps) {
                   console.log("navigate to profile")
                 }}>
                   <Text style={{fontWeight: 'bold', color: colors.secondary, flex: 1}}>
-                  {item.uid == this.props.profile.uid ? 'You' : item.username}</Text>
+                  {item.uid == this.props.profile.uid ? 'You' : this.getUsername(item.uid)}</Text>
                 </TouchableOpacity>
                 <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
               </View>
@@ -278,7 +278,7 @@ componentWillReceiveProps(nextProps) {
                   console.log("navigate to profile")
                 }}>
                   <Text style={{fontWeight: 'bold', color: colors.secondary, flex: 1, marginTop: 5}}>
-                  {item.uid == this.props.profile.uid ? 'You' : item.username}</Text>
+                  {item.uid == this.props.profile.uid ? 'You' : this.getUsername(item.uid)}</Text>
                 </TouchableOpacity>
                 <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
               </View>
@@ -402,7 +402,6 @@ showPicker() {
             type: 'photo',
             url: image.url,
             text: '', uid: profile.uid,
-            username: profile.username,
             createdAt: date})
             .then(() => {
               Alert.alert('Success')
@@ -457,6 +456,15 @@ uploadImage(uri, mime = 'application/octet-stream') {
     })
   }
 
+  getUsername(uid) {
+      if (this.props.friends[uid]) {
+        return this.props.friends[uid].username
+      }
+     else if (this.props.users[uid]) {
+      return this.props.users[uid].username
+     }
+     else return 'N/A'
+   }
 
 }
 
@@ -465,10 +473,11 @@ import { connect } from 'react-redux'
 import { navigateProfile } from 'Anyone/actions/navigation'
 import { addPost, repPost } from 'Anyone/actions/home'
 
-const mapStateToProps = ({ profile, home, friends }) => ({
+const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,
   feed: home.feed,
   friends: friends.friends,
+  users: sharedInfo.users,
 })
 
 const mapDispatchToProps = dispatch => ({

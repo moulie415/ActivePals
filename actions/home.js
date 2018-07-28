@@ -2,6 +2,8 @@ import * as firebase from "firebase"
 export const ADD_POST = 'ADD_POST'
 export const SET_FEED = 'SET_FEED'
 export const SET_POST = 'SET_POST'
+export const SET_USER = 'SET_USER'
+export const UPDATE_USERS = 'UPDATE_USERS'
 
 const addToFeed = (post, id) => ({
 	type: ADD_POST,
@@ -17,6 +19,16 @@ const setFeed = (feed) => ({
 const setPost = (post) => ({
 	type: SET_POST,
 	post,
+})
+
+const setUser = (user) => ({
+	type: SET_USER,
+	user,
+})
+
+const updateUsers = (users) => ({
+	type: UPDATE_USERS,
+	users,
 })
 
 export const addPost = (item) => {
@@ -54,10 +66,13 @@ export const fetchPosts = (uid, amount) => {
 					Promise.all(promises).then(posts => {
 						let feed = {}
 						let reps = []
+						let users = []
 						posts.forEach(post => {
 							feed[post.key] = post.val()
 							feed[post.key].key = post.key
 							reps.push(firebase.database().ref('userReps/' + uid).child(post.key).once('value'))
+							users.push(firebase.database().ref('users/' + post.val().uid).once('value'))
+
 						})
 						Promise.all(reps).then(reps => {
 							reps.forEach(rep => {
@@ -65,8 +80,17 @@ export const fetchPosts = (uid, amount) => {
 									feed[rep.key].rep = true
 								}
 							})
-							dispatch(setFeed(feed))
-							resolve()
+							Promise.all(users).then(users => {
+								let sharedUsers = {}
+								users.forEach(user => {
+									if (user.val()) {
+										sharedUsers[user.key] = user.val()
+									}
+								})
+								dispatch(updateUsers(sharedUsers))
+								dispatch(setFeed(feed))
+								resolve()
+							})
 						})
 					})
 				}
