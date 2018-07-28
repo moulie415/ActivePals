@@ -500,6 +500,7 @@ import { geofire }  from 'Anyone/index'
   renderSessions(sessions) {
     if (sessions.length > 0) {
           return <FlatList
+          style={{backgroundColor: '#9993'}}
           refreshing={this.state.refreshing}
           onRefresh={()=> {
             this.setState({refreshing: true})

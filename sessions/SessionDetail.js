@@ -64,7 +64,7 @@ class SessionDetail extends Component {
 
 	render() {
 		return (
-			<Container style={{marginHorizontal: 10, flex: 1}}>
+			<Container style={{ flex: 1}}>
 				<Content>
 					<TextInput 
 					style={{padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10}}
@@ -105,7 +105,7 @@ class SessionDetail extends Component {
 					</View>
 
 
-					<View style={{flex: 2, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#999'}}>
+					<View style={{flex: 2, borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
 						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Location</Text>
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
 							<TextInput 

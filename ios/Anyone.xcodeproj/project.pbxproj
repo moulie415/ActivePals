@@ -18,6 +18,7 @@
 		0A1F2190210A908F00896D4A /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1F215A210A8E1800896D4A /* libRNGoogleSignin.a */; };
 		0A1F21CF210A909500896D4A /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1F2140210A8E1800896D4A /* libRCTWebSocket.a */; };
 		0A1F225D210BE24200896D4A /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1F2129210A8E1800896D4A /* libRCTFBSDK.a */; };
+		0A1F229B210C9BE600896D4A /* light.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0A1F229A210C9BE600896D4A /* light.mp3 */; };
 		0A36828A20BC802B0003EEF6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A36824F20BC802A0003EEF6 /* GoogleService-Info.plist */; };
 		0A73102420F6780A00CCF377 /* Running-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A730FE820F6780A00CCF377 /* Running-background.jpg */; };
 		0A73113B20F6BF2B00CCF377 /* libreact-native-splash-screen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */; };
@@ -535,6 +536,7 @@
 		00E356F21AD99517003FC87E /* AnyoneTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnyoneTests.m; sourceTree = "<group>"; };
 		0A19E27120376D310036DFF2 /* Anyone.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Anyone.entitlements; path = Anyone/Anyone.entitlements; sourceTree = "<group>"; };
 		0A19E2C420376ED50036DFF2 /* RNFIRMessaging.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFIRMessaging.xcodeproj; path = "../node_modules/react-native-fcm/ios/RNFIRMessaging.xcodeproj"; sourceTree = "<group>"; };
+		0A1F229A210C9BE600896D4A /* light.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = light.mp3; path = ../../../../Downloads/light.mp3; sourceTree = "<group>"; };
 		0A36824F20BC802A0003EEF6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0A730FE820F6780A00CCF377 /* Running-background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "Running-background.jpg"; path = "../assets/images/Running-background.jpg"; sourceTree = "<group>"; };
 		0A88FFAF201D6E18004A17CD /* RNGeocoder.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNGeocoder.xcodeproj; path = "../node_modules/react-native-geocoder/ios/RNGeocoder.xcodeproj"; sourceTree = "<group>"; };
@@ -999,6 +1001,7 @@
 		BD07FBB5C6474DA480F82FB0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				0A1F229A210C9BE600896D4A /* light.mp3 */,
 				9B5F91B7A0D9485B8C284C6C /* Entypo.ttf */,
 				8290EFF7FDC14B51AF0C130F /* EvilIcons.ttf */,
 				38218FF39F6D4C2EB87A2D8A /* FontAwesome.ttf */,
@@ -1692,6 +1695,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				0A1F229B210C9BE600896D4A /* light.mp3 in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				CE1ECCF229E84946BA6D5BA9 /* Entypo.ttf in Resources */,
 				DD042B33BC4643FBBAD9D3D5 /* EvilIcons.ttf in Resources */,

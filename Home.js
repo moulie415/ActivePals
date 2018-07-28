@@ -348,7 +348,6 @@ showPicker() {
   let videoOptions = {
     mediaType: 'video',
     durationLimit: 30,
-
   }
   let options = {
     title: null,
@@ -395,7 +394,6 @@ showPicker() {
     }
     else {
       ImageResizer.createResizedImage(response.uri, 500, 500, 'PNG', 100).then((resized) => {
-        this.setState({spinner: false})
         this.uploadImage(resized.uri).then(image => {
           let profile = this.props.profile
           let date = new Date().toString()
@@ -406,10 +404,19 @@ showPicker() {
             text: '', uid: profile.uid,
             username: profile.username,
             createdAt: date})
-            .then(() => Alert.alert('Success'))
-            .catch(e => Alert.alert('Error', e.message))
+            .then(() => {
+              Alert.alert('Success')
+              this.setState({spinner: false})
+              })
+            .catch(e => {
+              Alert.alert('Error', e.message)
+              this.setState({spinner: false})
+            })
         })
-        .catch(e => Alert.alert("Error", e.message))
+        .catch(e => {
+          Alert.alert('Error', e.message)
+          this.setState({spinner: false})
+        })
 
 
     }).catch((e) => {
@@ -428,7 +435,6 @@ uploadImage(uri, mime = 'application/octet-stream') {
       let uploadBlob = null
       let id = guid()
       const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos').child(id)
-
 
       fs.readFile(uploadUri, 'base64')
         .then((data) => {

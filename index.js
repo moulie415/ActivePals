@@ -52,7 +52,7 @@ const showLocalNotification = (notif) => {
         title: custom.title,
         body: custom.body,
         priority: custom.priority,
-        sound: "default",
+        sound: "light.mp3",
       //click_action: notif.click_action,
       show_in_foreground: true,
       lights: true,
