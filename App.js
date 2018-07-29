@@ -20,6 +20,7 @@ import SessionChats from './chat/SessionChats'
 import SecondScreen from "./SecondScreen"
 import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
+import FilePreview from './FilePreview'
 import * as firebase from "firebase"
 import colors from 'Anyone/constants/colors'
 import color from 'color'
@@ -104,7 +105,8 @@ export const Stack = StackNavigator({
   MainNav: { screen: tabs},
   Messaging: {screen: Messaging},
   Settings: { screen: Settings },
-  SecondScreen: { screen: SecondScreen, title: "Second Screen" }
+  SecondScreen: { screen: SecondScreen, title: "Second Screen" },
+  FilePreview: {screen : FilePreview}
 })
 
 class App extends React.Component {

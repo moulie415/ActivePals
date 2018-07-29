@@ -25,4 +25,5 @@ export const navigateSessionType = (buddies, location) => nav("SessionType", {bu
 export const navigateSessionDetail = (type, buddies, location) => nav("SessionDetail", {type, buddies, location})
 export const navigateSettings = () => nav('Settings')
 export const navigateProfile = () => nav('Profile')
+export const navigateFilePreview = (type, uri) => nav('FilePreview', {type, uri})
 export const navigateBack = () => NavigationActions.back()

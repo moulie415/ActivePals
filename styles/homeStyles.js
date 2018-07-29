@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet, Dimensions } from "react-native"
 import colors from 'Anyone/constants/colors'
 
 export default styles = StyleSheet.create({
@@ -10,5 +10,5 @@ export default styles = StyleSheet.create({
 		bottom: 0,
 		alignItems: 'center',
 		justifyContent: 'center',
-	}
+	},
 })

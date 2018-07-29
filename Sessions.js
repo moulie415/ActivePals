@@ -11,6 +11,7 @@ import {
   ScrollView,
   Linking,
   Slider,
+  Platform
 } from "react-native"
 import {
   Button,
@@ -40,6 +41,7 @@ import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
 import StarRating from 'react-native-star-rating'
 import { geofire }  from 'Anyone/index'
+import RNFetchBlob from 'react-native-fetch-blob'
 
  class Sessions extends Component {
 
@@ -71,6 +73,7 @@ import { geofire }  from 'Anyone/index'
       selectedFriends: [],
       markers: this.markers(combined),
       pointsOfInterest: [],
+      places: [],
       sessionKeys: [],
     }
   }
@@ -268,8 +271,8 @@ import { geofire }  from 'Anyone/index'
             </TouchableOpacity>
           </View>
         </Modal>
-        <Modal style={styles.modal} position={'center'} ref={"locationModal"} >
-          {this.state.selectedLocation && <View style={{margin: 10, flex: 1}}>
+        <Modal style={[styles.modal, {height: null}]} position={'center'} ref={"locationModal"} >
+          {this.state.selectedLocation && <View style={{margin: 10}}>
           <Text style={{fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedLocation.name}</Text>
 
             <Text style={{marginVertical: 5}}>{this.state.selectedLocation.vicinity}</Text>
@@ -287,8 +290,8 @@ import { geofire }  from 'Anyone/index'
             {this.state.selectedLocation.opening_hours && 
               <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
               {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
-            {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999'}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
-            <View style={{flex: 1, justifyContent: 'flex-end'}}>
+            {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
+            {this.state.locationPhoto && <Image style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} resizeMode={'contain'} source={{uri: this.state.locationPhoto}}/>}
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
               <TouchableOpacity 
               onPress={()=> {
@@ -305,7 +308,6 @@ import { geofire }  from 'Anyone/index'
               style={{backgroundColor: colors.secondary, padding: 10, flex: 1}}>
                 <Text style={{color: '#fff', textAlign: 'center'}}>Create private session at location</Text>
               </TouchableOpacity>
-            </View>
             </View>
             </View>}
         </Modal>
@@ -655,12 +657,8 @@ import { geofire }  from 'Anyone/index'
           showMap: true,
           spinner: false}, ()=> getDirections && this.getDirections())
 
-        let url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
-        fetch(`${url}location=${lat},${lon}&radius=10000&types=gym&key=${str.googleApiKey}`)
-          .then(response => response.json())
-          .then(json => {
-            let results = json.results
-            console.log(results[0])
+          this.fetchPlaces(lat, lon)
+          .then((results) => {
             let markers = []
             results.forEach((result, index) => {
               let lat = result.geometry.location.lat
@@ -675,7 +673,21 @@ import { geofire }  from 'Anyone/index'
                 pinColor={colors.secondary}
                 onPress={(event) => {
                   event.stopPropagation()
-                  this.setState({selectedLocation: result, latitude: lat, longitude: lng}, ()=> this.refs.locationModal.open())
+                  this.setState({selectedLocation: result, latitude: lat, longitude: lng}, 
+                    ()=> {
+                      if (result.photos && result.photos[0].photo_reference) {
+                        let url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
+                        let fullUrl = `${url}${result.photos[0].photo_reference}&key=${str.googleApiKey}`
+                          RNFetchBlob.config({fileCache : true, appendExt : 'jpg'})
+                          .fetch('GET', fullUrl).then(image => {
+                            let path = Platform.OS == 'android' ? 'file://' + image.data : image.data
+                            this.setState({locationPhoto: path}, ()=> this.refs.locationModal.open())
+                          })
+                      }
+                      else {
+                        this.setState({ locationPhoto : null}, () => this.refs.locationModal.open())
+                      }
+                    })
                 }}
                 />
                 )
@@ -691,6 +703,37 @@ import { geofire }  from 'Anyone/index'
       },
       { enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
     )
+  }
+
+  fetchPlaces(lat, lon) {
+    return new Promise(resolve => {
+      let url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+      let fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${str.googleApiKey}`
+      fetch(fullUrl).then(response => response.json())
+      .then(json => {
+        let results1 = json.results
+        if (json.next_page_token) {
+          fetch(fullUrl +  `&pagetoken=${json.next_page_token}`)
+          .then(response => response.json())
+          .then(json => {
+            let results2 = json.results
+            if (json.next_page_token) {
+              fetch(fullUrl +  `&pagetoken=${json.next_page_token}`)
+              .then(response => response.json())
+              .then(json => {
+                let results3 = json.results
+                let results = [...results1, ...results2, ...results3]
+                resolve(results)
+              })
+            }
+            else {
+              resolve([...results1, ...results2])
+            }
+          })
+        }
+        else resolve(results1)
+      })
+    })
   }
 
   getDirections() {

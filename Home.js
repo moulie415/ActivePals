@@ -9,7 +9,8 @@ import {
   FlatList,
   Platform,
   Modal,
-  SafeAreaView
+  SafeAreaView,
+  KeyboardAvoidingView,
 } from "react-native"
 import { 
   Button,
@@ -33,19 +34,10 @@ import Text, { globalTextStyle } from 'Anyone/constants/Text'
 import { getSimplified } from 'Anyone/chat/SessionChats'
 import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
-import RNFetchBlob from 'react-native-fetch-blob'
-import { guid } from './constants/utils'
 import ImageViewer from 'react-native-image-zoom-viewer'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
-
-// Prepare Blob support
-const Blob = RNFetchBlob.polyfill.Blob
-const fs = RNFetchBlob.fs
-window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-window.Blob = Blob
-
 
 class Home extends Component {
 
@@ -68,7 +60,7 @@ class Home extends Component {
       feed: Object.values(this.props.feed),
       spinner: false,
       selectedImage: null,
-      showImage: false
+      showImage: false,
     }
   }
 
@@ -182,7 +174,7 @@ componentWillReceiveProps(nextProps) {
               <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 40}}/>
             </TouchableOpacity>
         </View>
-      <Content>
+      <Content contentContainerStyle={{backgroundColor: '#9993', flex: 1}}>
         {this.props.friends && this.state.profile && this.renderFeed()}
       </Content>
       {this.state.spinner && <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>}
@@ -394,29 +386,8 @@ showPicker() {
     }
     else {
       ImageResizer.createResizedImage(response.uri, 500, 500, 'PNG', 100).then((resized) => {
-        this.uploadImage(resized.uri).then(image => {
-          let profile = this.props.profile
-          let date = new Date().toString()
-          firebase.database().ref('userPhotos/' + profile.uid).child(image.id).set({createdAt: date, url: image.url})
-          this.props.postStatus({
-            type: 'photo',
-            url: image.url,
-            text: '', uid: profile.uid,
-            createdAt: date})
-            .then(() => {
-              Alert.alert('Success')
-              this.setState({spinner: false})
-              })
-            .catch(e => {
-              Alert.alert('Error', e.message)
-              this.setState({spinner: false})
-            })
-        })
-        .catch(e => {
-          Alert.alert('Error', e.message)
-          this.setState({spinner: false})
-        })
-
+        this.setState({spinner: false})
+        this.props.previewFile('image', resized.uri)
 
     }).catch((e) => {
       Alert.alert('Error', e.message)
@@ -428,33 +399,6 @@ showPicker() {
   })
 }
 
-uploadImage(uri, mime = 'application/octet-stream') {
-    return new Promise((resolve, reject) => {
-      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
-      let uploadBlob = null
-      let id = guid()
-      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos').child(id)
-
-      fs.readFile(uploadUri, 'base64')
-        .then((data) => {
-          return Blob.build(data, { type: `${mime};BASE64` })
-        })
-        .then((blob) => {
-          uploadBlob = blob
-          return imageRef.put(blob, { contentType: mime })
-        })
-        .then(() => {
-          uploadBlob.close()
-          return imageRef.getDownloadURL()
-        })
-        .then((url) => {
-          resolve({url, id})
-        })
-        .catch((error) => {
-          reject(error)
-      })
-    })
-  }
 
   getUsername(uid) {
       if (this.props.friends[uid]) {
@@ -470,7 +414,7 @@ uploadImage(uri, mime = 'application/octet-stream') {
 
 
 import { connect } from 'react-redux'
-import { navigateProfile } from 'Anyone/actions/navigation'
+import { navigateProfile, navigateFilePreview } from 'Anyone/actions/navigation'
 import { addPost, repPost } from 'Anyone/actions/home'
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -484,6 +428,7 @@ const mapDispatchToProps = dispatch => ({
   goToProfile: () => dispatch(navigateProfile()),
   postStatus: (status) => {return dispatch(addPost(status))},
   onRepPost: (item) => dispatch(repPost(item)),
+  previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)
