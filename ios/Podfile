@@ -19,8 +19,8 @@ target 'Anyone' do
 	]
 
 	pod 'react-native-maps', path: rn_maps_path
-	pod 'Firebase/Core', '4.0.0'
-	pod 'Firebase/Messaging'
+	pod 'Firebase/Core', '4.9.0'
+	pod 'Firebase/Messaging', '4.9.0'
 
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
@@ -34,9 +34,10 @@ target 'Anyone' do
 
   pod 'react-native-image-resizer', :path => '../node_modules/react-native-image-resizer'
 
-  pod 'react-native-fetch-blob', :path => '../node_modules/react-native-fetch-blob'
 
   pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
+
+  pod 'rn-fetch-blob', :path => '../node_modules/rn-fetch-blob'
 
 end
 post_install do |installer|

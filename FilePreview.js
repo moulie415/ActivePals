@@ -19,7 +19,7 @@ import { guid } from './constants/utils'
 import sStyles from './styles/settingsStyles'
 //import Video from 'react-native-video'
 import TouchableOpacity from 'Anyone/constants/TouchableOpacityLockable'
-import RNFetchBlob from 'react-native-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob'
 
 // Prepare Blob support
 const Blob = RNFetchBlob.polyfill.Blob

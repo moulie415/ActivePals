@@ -7,12 +7,12 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+import com.devfd.RNGeocoder.RNGeocoderPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.apsl.versionnumber.RNVersionNumberPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.imagepicker.ImagePickerPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
-import com.devfd.RNGeocoder.RNGeocoderPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
@@ -37,13 +37,13 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
+            new RNGeocoderPackage(),
             new SplashScreenReactPackage(),
             new RNVersionNumberPackage(),
             new MapsPackage(),
             new ImageResizerPackage(),
             new ImagePickerPackage(),
             new RNGoogleSigninPackage(),
-            new RNGeocoderPackage(),
             new RNFetchBlobPackage(),
             new FIRMessagingPackage(),
               new FBSDKPackage(mCallbackManager)

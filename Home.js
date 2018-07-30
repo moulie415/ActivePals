@@ -73,9 +73,6 @@ class Home extends Component {
   } else {
     // No user is signed in.
   }
-
-
-
 })
 }
 

@@ -101,8 +101,8 @@ android {
         applicationId "com.anyone"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 17
-        versionName "2.6"
+        versionCode 18
+        versionName "2.7"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -148,13 +148,13 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-geocoder')
+    compile project(':rn-fetch-blob')
     compile project(':react-native-splash-screen')
     compile project(':react-native-version-number')
     compile project(':react-native-image-resizer')
     compile project(':react-native-image-picker')
     compile project(':react-native-google-signin')
-    compile project(':react-native-geocoder')
-    compile project(':react-native-fetch-blob')
     compile project(':react-native-fcm')
     compile project(':react-native-fbsdk')
 

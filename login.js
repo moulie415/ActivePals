@@ -19,7 +19,7 @@ const background = require('Anyone/assets/images/Running-background.jpg')
 import colors from 'Anyone/constants/colors'
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
 import SplashScreen from 'react-native-splash-screen'
-import RNFetchBlob from 'react-native-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob'
 
 
  class Login extends Component {

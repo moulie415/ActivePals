@@ -41,7 +41,7 @@ import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
 import StarRating from 'react-native-star-rating'
 import { geofire }  from 'Anyone/index'
-import RNFetchBlob from 'react-native-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob'
 
  class Sessions extends Component {
 
