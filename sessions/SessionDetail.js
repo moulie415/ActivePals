@@ -11,7 +11,6 @@ import {
 import {
 	Text,
 	View,
-	TouchableOpacity,
 	Alert,
 	TextInput,
 } from 'react-native'
@@ -21,6 +20,7 @@ import firebase from 'Anyone/index'
 import { geofire }  from 'Anyone/index'
 import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/constants/colors'
+import TouchableOpacity from 'Anyone/constants/TouchableOpacityLockable'
 
 
 class SessionDetail extends Component {
@@ -66,7 +66,7 @@ class SessionDetail extends Component {
 		return (
 			<Container style={{ flex: 1}}>
 				<Content>
-					<TextInput 
+					<TextInput
 					style={{padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10}}
 					textAlignVertical={'top'}
 					underlineColorAndroid='transparent'
@@ -108,17 +108,19 @@ class SessionDetail extends Component {
 					<View style={{flex: 2, borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
 						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Location</Text>
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-							<TextInput 
+							<TextInput
 							onChangeText={postcode => this.postcode = postcode}
 							style={{padding: 5, borderWidth: 0.5, borderColor: '#999', margin: 10, flex: 1}}
 							underlineColorAndroid='transparent'
 							placeholder='Enter postcode'/>
 							<TouchableOpacity onPress={()=> {
-								if (this.validatePostcode(this.postcode)) {
-									this.setLocation(this.postcode)
-								}
-								else {
-									Alert.alert("Error", "Postcode is invalid")
+								if (this.postcode) {
+									if (this.validatePostcode(this.postcode)) {
+										this.setLocation(this.postcode)
+									}
+									else {
+										Alert.alert("Error", "Postcode is invalid")
+									}
 								}
 							}}
 							style={{flex: 1}}>
@@ -161,10 +163,13 @@ class SessionDetail extends Component {
 					</TouchableOpacity>
 					<Text style={styles.typeText}>{'Type: ' + this.type}</Text>
 					</View>
-					<Button style={styles.createButton}
-					onPress={()=> this.createSession()}>
+					<TouchableOpacity style={styles.createButton}
+					onPress={(mutex)=> {
+						mutex.lockFor(1000)
+						this.createSession()
+					}}>
 						<Text style={{color: '#fff', fontSize: 20}}>Create Session</Text>
-					</Button>
+					</TouchableOpacity>
 				</Content>
 
 

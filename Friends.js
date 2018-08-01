@@ -1,13 +1,13 @@
 import React, { Component } from "react"
-import { 
+import {
   StyleSheet,
   Alert,
   View,
-  TouchableOpacity,
   TextInput,
   ScrollView,
   RefreshControl,
   Image,
+  Platform
 } from "react-native"
 import {
   Button,
@@ -22,6 +22,7 @@ import {
   Right,
   Left
 } from 'native-base'
+import TouchableOpacity from './constants/TouchableOpacityLockable'
 import firebase from "./index"
 import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
@@ -61,7 +62,9 @@ import sStyles from 'Anyone/styles/sessionStyles'
       }
     })
     let friendsRef = firebase.database().ref('users/' + this.uid + '/friends')
+    let chatRef = firebase.database().ref('users/' + this.uid).child('chats')
     this.listenForFriends(friendsRef)
+    this.listenForChats(chatRef)
     FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
   }
@@ -71,10 +74,22 @@ import sStyles from 'Anyone/styles/sessionStyles'
         this.props.add(snapshot)
     })
     ref.on('child_changed', snapshot => {
-        this.props.add(snapshot)
+      this.props.add(snapshot)
     })
     ref.on('child_removed', snapshot => {
         this.props.removeLocal(snapshot.key)
+    })
+  }
+
+  listenForChats(ref) {
+    ref.on('child_added', snapshot => {
+        this.props.addChat(snapshot)
+    })
+    ref.on('child_changed', snapshot => {
+        this.props.addChat(snapshot)
+    })
+    ref.on('child_removed', snapshot => {
+        this.props.removeChat(snapshot.key)
     })
   }
 
@@ -96,7 +111,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
   render () {
     return (
     <Container>
-      <Header style={{backgroundColor: colors.primary}}>  
+      <Header style={{backgroundColor: colors.primary}}>
         <Left style={{flex: 1}}>
           </Left>
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Buddies</Title>
@@ -124,19 +139,22 @@ import sStyles from 'Anyone/styles/sessionStyles'
       </ScrollView> :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
-            You don't have any buddies yet, also please make sure you are connected to the internet
+            {"You don't have any buddies yet, also please make sure you are connected to the internet"}
           </Text></View>}
 
       <Modal style={styles.modal} position={"center"} ref={"modal"} >
           <Text style={styles.modalText}>Send buddy request</Text>
-          <TextInput 
+          <TextInput
           underlineColorAndroid='transparent'
           style={styles.usernameInput}
           autoCapitalize={'none'}
           placeholder={'Enter username'}
           onChangeText={username => this.username = username}
           />
-          <TouchableOpacity onPress={()=> this.sendRequest(this.username)}
+          <TouchableOpacity onPress={(mutex)=> {
+            mutex.lockFor(1000)
+            this.sendRequest(this.username)
+          }}
           style={{padding: 10, backgroundColor: colors.primary, marginTop: 10}}>
             <Text style={{fontFamily: "Avenir", color: '#fff'}}>Submit</Text>
           </TouchableOpacity>
@@ -145,15 +163,15 @@ import sStyles from 'Anyone/styles/sessionStyles'
         <Modal style={[sStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"profileModal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
 
-         <View style={{flexDirection: 'row'}}>       
+         <View style={{flexDirection: 'row'}}>
 
-         {this.state.selectedUser.avatar? <Image source={{uri: this.state.selectedUser.avatar}} 
+         {this.state.selectedUser.avatar? <Image source={{uri: this.state.selectedUser.avatar}}
          style={{height: 90, width: 90, marginRight: 10, borderRadius: 5}} /> : null}
          <View style={{flex: 1}}>
           <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
             <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', color: '#fff'}}>{this.state.selectedUser.username}</Text>
           </View>
-          {(this.state.selectedUser.first_name || this.state.selectedUser.last_name) && 
+          {(this.state.selectedUser.first_name || this.state.selectedUser.last_name) &&
             <View style={{flexDirection: 'row', backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
             {this.state.selectedUser.first_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
             {this.state.selectedUser.first_name + ' '}</Text>}
@@ -168,11 +186,11 @@ import sStyles from 'Anyone/styles/sessionStyles'
             <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{'Birthday: ' + this.state.selectedUser.birthday}</Text></View>}
 
           <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{"Account type: " + 
+          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{"Account type: " +
           this.state.selectedUser.accountType}</Text></View>
 
             </View>}
-          <TouchableOpacity 
+          <TouchableOpacity
           style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 10}}
           onPress={()=> {
             Alert.alert(
@@ -216,10 +234,10 @@ import sStyles from 'Anyone/styles/sessionStyles'
               <Text style={{marginRight: 5, flex: 4}}>{friend.username + ' has sent you a buddy request'}</Text>
               <View style={{flexDirection: 'row', flex: 1}}>
                 <TouchableOpacity onPress={()=> this.accept(friend.uid)}>
-                 <Icon name='ios-checkmark' style={{color: 'green', fontSize: 50, padding: 10}}/>
+                 <Icon name='ios-checkmark' style={{color: 'green', fontSize: 50, paddingHorizontal: 10, alignSelf: 'center'}}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=> this.remove(friend.uid)}>
-                  <Icon name='ios-close' style={{color: 'red', fontSize: 50, padding: 10}}/>
+                  <Icon name='ios-close' style={{color: 'red', fontSize: 50, paddingHorizontal: 10, alignSelf: 'center'}}/>
                 </TouchableOpacity>
               </View>
             </View>
@@ -230,19 +248,19 @@ import sStyles from 'Anyone/styles/sessionStyles'
         list.push(
           <View key={index}
           style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10}}>
-            <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
-                <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
+                <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, }}/>}
                 <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
               </View>
               <View style={{flexDirection: 'row'}}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={()=> this.openChat(friend.uid, friend.username)}
                 style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-chatboxes' style={{color: colors.primary, fontSize: 30}}/>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
               onPress={()=> this.setState({selectedUser: friend}, ()=> this.refs.profileModal.open())}
               style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-person' style={{color: colors.primary, fontSize: 30}}/>
@@ -275,6 +293,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
       firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
         this.props.onRequest(this.uid, snapshot.val()).then(() => {
           Alert.alert("Success", "Request sent")
+          this.refs.modal.close()
         })
         .catch(e => Alert.alert("Error", e.message))
       })
@@ -292,29 +311,6 @@ import sStyles from 'Anyone/styles/sessionStyles'
           this.props.onOpenChat(snapshot.val(), username, uid)
         }
         else {
-          Alert.alert(
-            'Start a new chat with ' + username + '?',
-            'This will be the beginning of your chat with ' + username,
-            [
-            {text: 'Cancel', style: 'cancel'},
-            {text: 'OK', onPress: () => {
-              let systemMessage = {
-                _id: 1,
-                text: 'Beginning of chat',
-                createdAt: new Date().toString(),
-                system: true,
-              }
-              firebase.database().ref('chats').push().then(newChat => {
-                firebase.database().ref('chats/' + newChat.key).push(systemMessage)
-                firebase.database().ref('users/' + this.uid + '/chats').child(uid).set(newChat.key)
-                firebase.database().ref('users/' + uid + '/chats').child(this.uid).set(newChat.key)
-                this.props.onOpenChat(newChat.key, username, uid)
-              })
-
-            }
-              , style: 'positive'},
-            ]
-            )
         }
       })
       .catch(e => Alert.alert('Error', e.message))
@@ -324,7 +320,7 @@ import sStyles from 'Anyone/styles/sessionStyles'
 import { connect } from 'react-redux'
 import { navigateMessaging } from 'Anyone/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend, removeFriend, addFriend } from 'Anyone/actions/friends'
-import { removeChat } from 'Anyone/actions/chats'
+import { removeChat, addChat } from 'Anyone/actions/chats'
 import { fetchProfile } from 'Anyone/actions/profile'
 
 const mapStateToProps = ({ friends, profile }) => ({
@@ -341,6 +337,8 @@ const mapDispatchToProps = dispatch => ({
   getProfile: ()=> {return dispatch(fetchProfile())},
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   add: (friend) => dispatch(addFriend(friend)),
+  addChat: (chat) => dispatch(addChat(chat)),
+  removeChat: (chat) => dispatch(removeChat(chat))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)

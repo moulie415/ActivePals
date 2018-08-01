@@ -11,7 +11,8 @@ import {
   ScrollView,
   Linking,
   Slider,
-  Platform
+  Platform,
+  ImageBackground
 } from "react-native"
 import {
   Button,
@@ -42,6 +43,7 @@ import Hyperlink from 'react-native-hyperlink'
 import StarRating from 'react-native-star-rating'
 import { geofire }  from 'Anyone/index'
 import RNFetchBlob from 'rn-fetch-blob'
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
  class Sessions extends Component {
 
@@ -49,7 +51,7 @@ import RNFetchBlob from 'rn-fetch-blob'
     header: null,
     tabBarLabel: 'Sessions',
     tabBarIcon: ({ tintColor }) => (
-      <Image style={{width: 30, height: 30, tintColor}} 
+      <Image style={{width: 30, height: 30, tintColor}}
     source={require('Anyone/assets/images/dumbbell.png')} />
     ),
   }
@@ -146,7 +148,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 
   render () {
     //switch for list view and map view
-    //action sheet when pressing 
+    //action sheet when pressing
     return (
       <Container>
 
@@ -163,16 +165,18 @@ import RNFetchBlob from 'rn-fetch-blob'
         </Left>
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Sessions</Title>
         <Right>
-           <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}> 
+           <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}>
             <Text style={{color: '#fff'}}>Map: </Text>
             <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
           </View>
         </Right>
 
         </Header>
-       
+        {this.state.switch && GooglePlacesInput()}
+
 
         {!this.state.switch && this.renderSessions(this.state.sessions)}
+
 
         {this.state.switch && this.state.showMap && <MapView
           style={styles.map}
@@ -216,7 +220,7 @@ import RNFetchBlob from 'rn-fetch-blob'
               Alert.alert("Sorry", "You must have at least one buddy to create a private session")
             }
           }}>
-            <Text adjustsFontSizeToFit={true} 
+            <Text adjustsFontSizeToFit={true}
             style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Private Session</Text>
           </TouchableOpacity>
         </View>
@@ -247,7 +251,7 @@ import RNFetchBlob from 'rn-fetch-blob'
               <Text style={{color: colors.secondary}}>Get directions</Text>
             </TouchableOpacity>
             </ScrollView>
-             {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>} 
+             {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>}
             </View>}
 
         </Modal>
@@ -287,13 +291,13 @@ import RNFetchBlob from 'rn-fetch-blob'
             halfStarEnabled={true}
             rating={this.state.selectedLocation.rating}
             /></View>}
-            {this.state.selectedLocation.opening_hours && 
+            {this.state.selectedLocation.opening_hours &&
               <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
               {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
             {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
             {this.state.locationPhoto && <Image style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} resizeMode={'contain'} source={{uri: this.state.locationPhoto}}/>}
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
-              <TouchableOpacity 
+              <TouchableOpacity
               onPress={()=> {
                 this.props.onContinue(null, this.state.selectedLocation)
               }}
@@ -333,7 +337,7 @@ import RNFetchBlob from 'rn-fetch-blob'
               <Text style={{fontSize: 12, textAlign: 'right'}}>*Public only</Text>
           </View>
             <View style={{backgroundColor: colors.primary}}>
-              <TouchableOpacity 
+              <TouchableOpacity
               onPress={()=> {
                 this.setState({refreshing: true})
                 this.props.fetch(this.state.radius, true).then(() => this.setState({refreshing: false}))
@@ -351,7 +355,7 @@ import RNFetchBlob from 'rn-fetch-blob'
   renderTags(tags) {
     let string = ""
     tags.forEach((tag, index, array) => {
-      if (index === array.length - 1){ 
+      if (index === array.length - 1){
         string += tag
       }
       else string += tag + ", "
@@ -369,7 +373,7 @@ import RNFetchBlob from 'rn-fetch-blob'
             <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
-                <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary}}/>}
+                <Icon name='md-contact'  style={{fontSize: 30, color: colors.primary}}/>}
                 <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
                 {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
               </View>
@@ -412,7 +416,7 @@ import RNFetchBlob from 'rn-fetch-blob'
               ],
 
               )
-            
+
           }}
           style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
             <Text style={{color: '#fff', textAlign: 'center'}}>Delete session</Text>
@@ -500,15 +504,19 @@ import RNFetchBlob from 'rn-fetch-blob'
   }
 
   renderSessions(sessions) {
-    if (sessions.length > 0) {
           return <FlatList
           style={{backgroundColor: '#9993'}}
+          contentContainerStyle={{flex: 1}}
           refreshing={this.state.refreshing}
           onRefresh={()=> {
             this.setState({refreshing: true})
             this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
             this.getPosition()
           }}
+          ListEmptyComponent={<View style={{flex: 1, justifyContent: 'center', alignSelf: 'center', marginHorizontal: 20}}>
+            <Text style={{color: colors.primary, textAlign: 'center'}}>
+            No sessions have been created yet, also please make sure you are connected to the internet
+          </Text></View>}
           data={sessions}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => (
@@ -545,12 +553,7 @@ import RNFetchBlob from 'rn-fetch-blob'
             </TouchableOpacity>
           )}
       />
-          }
-          else return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
-            <Text style={{color: colors.primary, textAlign: 'center'}}>
-            No sessions have been created yet, also please make sure you are connected to the internet
-          </Text></View>
-  }
+    }
 
   markers(sessions) {
     let markers = []
@@ -558,12 +561,13 @@ import RNFetchBlob from 'rn-fetch-blob'
       let lng = session.location.position.lng
       let lat = session.location.position.lat
       markers.push(
-        <MapView.Marker 
+        <MapView.Marker
           key={"s" + index.toString()}
           coordinate={{
-            latitude: lat, 
-            longitude: lng
+            latitude: lat,
+            longitude: lng,
           }}
+          //image={getResource(session.type)}
           onPress={(event) => {
             event.stopPropagation()
             this.setState({selectedSession: session, latitude: lat, longitude: lng}, ()=> this.refs.modal.open())
@@ -584,13 +588,13 @@ import RNFetchBlob from 'rn-fetch-blob'
     let minutes = date.getMinutes()
     let ampm = hours >= 12 ? 'pm' : 'am'
     hours = hours % 12
-    hours = hours ? hours : 12 
+    hours = hours ? hours : 12
     minutes = minutes < 10 ? '0'+minutes : minutes
     let strTime = hours + ':' + minutes + ampm
 
     let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]  
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     let day = date.getDate()
     return `${days[date.getDay()].toString()} ${day.toString() + this.nth(day)} ${months[date.getMonth()].toString()} ${strTime}`
   }
@@ -603,7 +607,7 @@ import RNFetchBlob from 'rn-fetch-blob'
         case 3:  return "rd"
         default: return "th"
     }
-} 
+}
 
   // This is a common pattern when asking for permissions.
   // iOS only gives you once chance to show the permission dialog,
@@ -673,7 +677,7 @@ import RNFetchBlob from 'rn-fetch-blob'
                 pinColor={colors.secondary}
                 onPress={(event) => {
                   event.stopPropagation()
-                  this.setState({selectedLocation: result, latitude: lat, longitude: lng}, 
+                  this.setState({selectedLocation: result, latitude: lat, longitude: lng},
                     ()=> {
                       if (result.photos && result.photos[0].photo_reference) {
                         let url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
@@ -746,7 +750,7 @@ import RNFetchBlob from 'rn-fetch-blob'
       Linking.openURL(url).catch(err => console.error('An error occurred', err))
     }
     else {
-      Alert.alert('No location found', 
+      Alert.alert('No location found',
         'You may need to change your settings to allow Fit Link to access your location')
     }
   }
@@ -787,6 +791,51 @@ getDistance(item) {
 
 function deg2rad(deg) {
   return deg * (Math.PI / 180)
+}
+
+export const GooglePlacesInput = () => {
+  return (
+    <GooglePlacesAutocomplete
+      renderDescription={row => {
+      row.description
+      }} // custom description render
+      onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+        console.log(data, details);
+      }}
+        styles={{
+          description: {
+            fontWeight: 'bold',
+          },
+          predefinedPlacesDescription: {
+            color: '#1faadb',
+          },
+        }}
+
+         query={{
+        // available options: https://developers.google.com/places/web-service/autocomplete
+        key: 'AIzaSyC_lZXdWz3no4k9MhIKbyIG5789TVir48Y',
+        language: 'en', // language of the results
+        types: 'establishment' // default: 'geocode'
+      }}
+        
+        nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+        GooglePlacesSearchQuery={{
+          // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
+          rankby: 'distance',
+          types: 'gym',
+        }}
+        renderRightButton={() => <Text>Custom text after the input</Text>}
+        placeholder='Search'
+      minLength={2} // minimum length of text to search
+      autoFocus={false}
+      listViewDisplayed='auto'    // true/false/undefined
+      fetchDetails={true}
+
+        
+        
+      />
+    
+    )
 }
 
 import { connect } from 'react-redux'

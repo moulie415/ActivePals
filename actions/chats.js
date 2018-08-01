@@ -9,6 +9,7 @@ export const NEW_NOTIF = 'NEW_NOTIF'
 export const RESET_NOTIFICATION = 'RESET_NOTIFICATION'
 export const UPDATE_CHAT = 'UPDATE_CHAT'
 export const UPDATE_SESSION_CHAT = 'UPDATE_SESSION_CHAT'
+import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
 
 const setSessionChats = (sessionChats) => ({
@@ -86,8 +87,11 @@ export const updateLastMessage = (notif) => {
 
 
 
-export const fetchChats = (chats) => {
-	return (dispatch) => {
+export const fetchChats = (chats = null) => {
+	return (dispatch, getState) => {
+		if (!chats) {
+			chats = getState().chats.chats
+		}
 		let chatList = []
 		Object.keys(chats).forEach(chat => {
 			let val = chats[chat]
@@ -123,6 +127,14 @@ export const addChat = (chat) => {
 			if (lastMessage.val()) {
 				message = Object.values(lastMessage.val())[0]
 			}
+			firebase.database().ref('users/' + uid).child('username').once('value', username => {
+				FCM.createNotificationChannel({
+					id: chatId,
+					name: username.val(),
+					description: 'Notifications from ' + username.val(),
+					priority: 'high',
+				})
+			})
 			dispatch(addToChats(uid, {uid, chatId, lastMessage: message}))
 			dispatch(fetchProfile())
 		})
@@ -138,6 +150,9 @@ export const removeChat = (uid) => {
 			return acc
 		}, {})
 		dispatch(setChats(obj))
+		if (chats[uid]) {
+			FCM.deleteNotificationChannel(chats[uid].chatId)
+		}
 	}
 }
 
@@ -194,6 +209,12 @@ export const addSessionChat = (session, isPrivate = false) => {
 					dispatch(addToSessionChats(session, {...snapshot.val(), key: session, lastMessage: message}))
 					dispatch(fetchProfile())
 				})
+				FCM.createNotificationChannel({
+					id: session,
+					name: snapshot.val().title,
+					description: 'Notifications from ' + snapshot.val().title,
+					priority: 'high',
+				})
 			})
 		})
 	}
@@ -210,6 +231,7 @@ export const removeSessionChat = (key) => {
 			return acc
 		}, {})
 		dispatch(setSessionChats(obj))
+		FCM.deleteNotificationChannel(key)
 	}
 }
 
@@ -280,4 +302,3 @@ export const fetchSessionMessages = (id, amount, isPrivate = false) => {
 		})
 	}
 }
-

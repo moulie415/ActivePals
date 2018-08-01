@@ -155,8 +155,8 @@ class Messaging extends React.Component {
       this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
       }))
-      this.session? this.props.getSessionChats(this.props.profile.sessions, this.sessionId) : 
-      this.props.getChats(this.props.profile.chats)
+      this.session ? this.props.getSessionChats(this.props.profile.sessions, this.sessionId) :
+      this.props.getChats()
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 
@@ -166,7 +166,7 @@ class Messaging extends React.Component {
     const { navigation } = this.props
     return (
       <Container style={{flex: 1, backgroundColor: '#9993'}}>
-      <Header style={{backgroundColor: colors.primary}}>  
+      <Header style={{backgroundColor: colors.primary}}>
         <Left style={{flex: 1}}>
           <TouchableOpacity onPress={() => {
             navigation.goBack()
@@ -235,7 +235,7 @@ class Messaging extends React.Component {
           <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
             <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', color: '#fff'}}>{this.state.selectedUser.username}</Text>
           </View>
-          {(this.state.selectedUser.first_name || this.state.selectedUser.last_name) && 
+          {(this.state.selectedUser.first_name || this.state.selectedUser.last_name) &&
             <View style={{flexDirection: 'row', backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
             {this.state.selectedUser.first_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
             {this.state.selectedUser.first_name + ' '}</Text>}
@@ -250,7 +250,7 @@ class Messaging extends React.Component {
             <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{'Birthday: ' + this.state.selectedUser.birthday}</Text></View>}
 
           <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{"Account type: " + 
+          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{"Account type: " +
           this.state.selectedUser.accountType}</Text></View>
 
             <View style={{flex: 1, justifyContent: 'flex-end'}}>
@@ -290,7 +290,7 @@ class Messaging extends React.Component {
     }
     else if (user.status == 'outgoing') {
       return <Text style={{color: '#fff', padding: 5}}>Friend request sent</Text>
-    } 
+    }
     else if (this.session) {
       return <TouchableOpacity
       onPress={()=> {

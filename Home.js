@@ -2,7 +2,6 @@ import React, { Component } from "react"
 import { 
   StyleSheet,
   View,
-  TouchableOpacity,
   Alert,
   Image,
   TextInput,
@@ -28,6 +27,7 @@ import {
 } from 'native-base'
 import firebase from "./index"
 import colors from './constants/colors'
+import TouchableOpacity from './constants/TouchableOpacityLockable'
 import  styles  from './styles/homeStyles'
 import sStyles from './styles/settingsStyles'
 import Text, { globalTextStyle } from 'Anyone/constants/Text'
@@ -137,7 +137,8 @@ componentWillReceiveProps(nextProps) {
             }}>
               <Icon name="ios-camera" style={{color: colors.secondary, fontSize: 40, marginRight: 10}} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity onPress={(mutex) => {
+              mutex.lockFor(1000)
               if (this.state.status) {
                 if (username) {
                   Alert.alert(

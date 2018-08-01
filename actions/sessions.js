@@ -1,5 +1,5 @@
 import * as firebase from 'firebase'
-import { removeSessionChat } from 'Anyone/actions/chats'
+import { removeSessionChat, addSessionChat } from 'Anyone/actions/chats'
 import { geofire }  from 'Anyone/index'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
@@ -123,6 +123,7 @@ export const fetchPrivateSessions = () =>  {
 			snapshot.forEach(child => {
 				if (child.val() == 'private') {
 					uids.push(child.key)
+					dispatch(addSessionChat(child.key, true))
 				}
 			})
 			let promises = []

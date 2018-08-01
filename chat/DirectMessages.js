@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { 
+import {
   StyleSheet,
   Alert,
   View,
@@ -42,7 +42,7 @@ import {getSimplified } from './SessionChats'
         let chatRef = firebase.database().ref('users/' + this.user.uid).child('chats')
         this.listenForChats(chatRef)
       }
-    })  
+    })
     FCM.on(FCMEvent.Notification, async (notif) => {
       //update last message on notification
       if (notif.type == 'message') {
@@ -65,7 +65,7 @@ import {getSimplified } from './SessionChats'
         this.props.add(snapshot)
     })
     ref.on('child_removed', snapshot => {
-        this.props.remove(snapshot.key) 
+        this.props.remove(snapshot.key)
     })
   }
 
@@ -80,7 +80,7 @@ import {getSimplified } from './SessionChats'
       </ScrollView> :
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
-            You haven't started any chats yet, also please make sure you are connected to the internet
+            {"You haven't started any chats yet, also please make sure you are connected to the internet"}
           </Text></View>}
     </Container>
   )
@@ -93,7 +93,7 @@ import {getSimplified } from './SessionChats'
       let friend = this.props.friends[chat.uid]
       if (friend) {
         list.push(
-          <TouchableOpacity 
+          <TouchableOpacity
           key={index}
           onPress={()=> {
             this.props.onOpenChat(chat.chatId, friend.username, chat.uid)

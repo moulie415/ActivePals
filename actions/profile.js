@@ -6,7 +6,7 @@ import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats } from './chats'
 import { fetchPosts } from './home'
 import { fetchSessions, fetchPrivateSessions } from './sessions'
-import { navigateLogin } from './navigation'
+import { navigateLogin, navigateHome } from './navigation'
 
 
 const setProfile = (profile) => ({
@@ -43,9 +43,13 @@ export const fetchProfile = () => {
 }
 
 export const doSetup = (profile) => {
-	return (dispatch) => {
+	return (dispatch, getState) => {
 		let uid = profile.uid
 		let friends = profile.friends
+		if (getState().nav.index == 0) {
+			dispatch(navigateHome())
+		}
+		dispatch(setHasLoggedIn(true))
 		return Promise.all([
 			friends && dispatch(fetchFriends(friends)),
 			profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),

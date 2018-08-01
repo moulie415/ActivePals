@@ -29,6 +29,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                     priority: 'high',
                     sound: 'light.mp3',
                     id: chatId,
+                    channel: chatId,
                     group: chatId,
                 }),
                 username: user.name,
@@ -61,7 +62,7 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
 
     return getValuePromise.then(snapshot => {
         console.log(snapshot.val())
-        const { user, text, sessionId, createdAt, _id, sessionTitle, type } = snapshot.val()[Object.keys(snapshot.val())[0]] 
+        const { user, text, sessionId, createdAt, _id, sessionTitle, type } = snapshot.val()[Object.keys(snapshot.val())[0]]
         return admin.database().ref('/'+ type +'/' + sessionId).child('users').once('value', users => {
             let tokens = []
             users.forEach(child => {
@@ -80,6 +81,7 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                                 priority: 'high',
                                 sound: 'light.mp3',
                                 id: sessionId,
+                                channel: sessionId,
                                 group: sessionId,
                             }),
                             username: user.name,
@@ -127,6 +129,7 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
                                 priority: 'high',
                                 sound: 'default',
                                 id: 'REQUEST',
+                                channel: 'REQUEST',
                                 group: 'REQUEST',
                             }),
                             type: 'buddyRequest'
@@ -154,6 +157,25 @@ exports.onFriendConnected = functions.database.ref('/users/{uid}/friends/{friend
                     admin.database().ref('userPosts').child(friendUid).update(posts.val())
                 }
             })
+            return admin.database().ref('users/' + uid + '/chats').child(friendUid).once('value', chat1 => {
+                admin.database().ref('users/' + friendUid + '/chats').child(uid).once('value', chat2 => {
+                    if (!chat1.val() && !chat2.val()) {
+                        return admin.database().ref('chats').push().then(chat => {
+                          let systemMessage = {
+                             _id: 1,
+                             text: 'Beginning of chat',
+                             createdAt: new Date().toString(),
+                             system: true,
+                         }
+                         let promises = []
+                         promises.push(admin.database().ref('chats/' + chat.key).push(systemMessage))
+                         promises.push(admin.database().ref('users/' + uid + '/chats').child(friendUid).set(chat.key))
+                         promises.push(admin.database().ref('users/' + friendUid + '/chats').child(uid).set(chat.key))
+                         return Promise.all(promises)
+                     })
+                    }
+                })
+            })
         }
     })
 })
@@ -164,8 +186,8 @@ exports.onFriendDeleted = functions.database.ref('/users/{uid}/friends/{friendUi
 
     admin.database().ref('users/' + uid + '/chats').child(friendUid).once('value', chat => {
         if (chat.val()) {
-            firebase.database.ref('chats').child(chat.val()).remove()
-            firebase.database().ref('users/' + uid + '/chats').child(friendUid).remove()
+            admin.database().ref('chats').child(chat.val()).remove()
+            admin.database().ref('users/' + uid + '/chats').child(friendUid).remove()
         }
     })
 
@@ -181,7 +203,7 @@ exports.onFriendDeleted = functions.database.ref('/users/{uid}/friends/{friendUi
 
     admin.database().ref('userReps').child(uid).once('value', reps => {
         if (reps.val()) {
-            Object.key(reps.val()).forEach(rep => {
+            Object.keys(reps.val()).forEach(rep => {
                 if (reps.val()[rep] === friendUid) {
                     admin.database().ref('posts/' + rep).child('repCount').once('value', count => {
                         if (count.val()) {
@@ -189,7 +211,7 @@ exports.onFriendDeleted = functions.database.ref('/users/{uid}/friends/{friendUi
                             admin.database().ref('posts/' + rep).child('repCount').set(newCount)
                         }
                         admin.database().ref('reps/' + rep).child(uid).remove()
-                    }) 
+                    })
                 }
             })
         }
@@ -242,7 +264,7 @@ exports.deleteUserData = functions.auth.user().onDelete((deleted) => {
             })
             admin.database().ref('userPosts').child(uid).remove()
         }
-    }) 
+    })
 
     admin.database().ref('userReps').child(uid).once('value', reps => {
         if (reps.val()) {
@@ -262,7 +284,7 @@ exports.deleteUserData = functions.auth.user().onDelete((deleted) => {
     })
 
     let path = 'images/' + uid + '/avatar'
-    
+
     storage.bucket(bucket).file(path).delete().then(() => {
         return console.log(uid + ' avatar deleted')
     })

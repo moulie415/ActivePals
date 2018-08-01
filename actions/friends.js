@@ -1,9 +1,10 @@
 import * as firebase from "firebase"
-import { removeChat } from './chats'
+import { removeChat, addChat } from './chats'
 import { fetchPrivateSessions } from './sessions'
 export const SET_FRIENDS = 'SET_FRIENDS'
 export const UPDATE_FRIENDS = 'UPDATE_FRIENDS'
 export const ADD_FRIEND = 'ADD_FRIEND'
+import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
 
 
@@ -41,7 +42,7 @@ export const fetchFriends = (uids) => {
 			let promise = new Promise(function(resolve, reject) {
 				let status = uids[friend]
 				firebase.database().ref('users/' + friend).once('value', profile => {
-					firebase.storage().ref('images/' + friend ).child('avatar').getDownloadURL() 
+					firebase.storage().ref('images/' + friend ).child('avatar').getDownloadURL()
 					.then(url => {
 						resolve({...profile.val(), status, avatar: url})
 					})
@@ -66,19 +67,19 @@ export const fetchFriends = (uids) => {
 }
 
 export const addFriend = (uid) => {
-	return (dispatch) => {
+	return (dispatch, getState) => {
 		let status = uid.val()
 		return new Promise(resolve => {
 			firebase.database().ref('users/' + uid.key).once('value', profile => {
-				firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL() 
-					.then(url => {
-						resolve()
-						dispatch(addToFriends(uid.key, {...profile.val(), status, avatar: url}))
-					})
-					.catch(e => {
-						resolve()
-						dispatch(addToFriends(uid.key, {...profile.val(), status}))
-					})
+				firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL()
+				.then(url => {
+					resolve()
+					dispatch(addToFriends(uid.key, {...profile.val(), status, avatar: url}))
+				})
+				.catch(e => {
+					resolve()
+					dispatch(addToFriends(uid.key, {...profile.val(), status}))
+				})
 			})
 		})
 	}
@@ -108,5 +109,3 @@ export const deleteFriend = (uid, friendUid, profile) => {
 	}
 
 }
-
-

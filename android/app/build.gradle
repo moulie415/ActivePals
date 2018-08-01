@@ -174,7 +174,19 @@ dependencies {
     }
     compile 'com.google.firebase:firebase-core:16.0.1'
     compile 'com.google.firebase:firebase-messaging:17.1.0'
+    compile (name:'drawee-debug', ext:'aar')
 
+}
+
+allprojects {
+    repositories {
+        flatDir {
+            dirs 'libs', './libs'
+        }
+    }
+    configurations {
+        all*.exclude module: 'drawee'  // Doychev's suggested solution can be found over here
+    }
 }
 
 // Run this once to be able to run the application with BUCK

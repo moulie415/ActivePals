@@ -51,6 +51,7 @@ const showLocalNotification = (notif) => {
       FCM.presentLocalNotification({
         title: custom.title,
         body: custom.body,
+        channel: custom.channel,
         priority: custom.priority,
         sound: "light.mp3",
       //click_action: notif.click_action,
@@ -82,9 +83,9 @@ const middleware = createReactNavigationReduxMiddleware(
   "root",
   state => state.nav,
 )
-  
+
 export const addListener = createReduxBoundAddListener("root")
-  
+
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
@@ -117,7 +118,7 @@ FCM.on(FCMEvent.Notification, async (notif) => {
     if(notif.opened_from_tray){
        if (notif.data) {
               const {  type, sessionId, sessionTitle, chatId, uid, username } = notif.data
-              
+
               switch(type) {
                 case 'message':
                   dispatch(navigateMessaging(chatId, username, uid))
@@ -182,6 +183,14 @@ class FitLink extends React.Component {
     //ignore setting a timer warnings
     YellowBox.ignoreWarnings(['Setting a timer'])
 
+    FCM.createNotificationChannel({
+      id: 'REQUEST',
+      name: 'Buddy requests',
+      description: 'Channel for buddy requests',
+      priority: 'high',
+    })
+
+
     this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, token => {
       let user = firebase.auth().currentUser
       if (user) {
@@ -203,7 +212,7 @@ class FitLink extends React.Component {
 
   }
   render () {
-    return <PersistGate persistor={persistor} > 
+    return <PersistGate persistor={persistor} >
       <Root>
         <Provider store={store}>
           <App/>

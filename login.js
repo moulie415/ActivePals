@@ -45,9 +45,9 @@ import RNFetchBlob from 'rn-fetch-blob'
         this.props.onLogin()
       }
     })
-    if (this.props.loggedIn) {
-      this.props.goHome()
-    }
+    // if (this.props.loggedIn) {
+    //   this.props.goHome()
+    // }
   }
 
 
@@ -255,7 +255,7 @@ import RNFetchBlob from 'rn-fetch-blob'
                   })
                  }
 
-                  //if (user._authObj.authenticated) { THIS LINE DOES NOT WORK 
+                  //if (user._authObj.authenticated) { THIS LINE DOES NOT WORK
                     // do you login action here
                     // dispatch({
                     //  type: LOGIN_SUCCESS,
@@ -299,10 +299,7 @@ const mapStateToProps = ({ home, settings, profile }) => ({
 const mapDispatchToProps = dispatch => ({
   onLogoutPress: ()=> { dispatch(navigateLogin())},
   onLogin: ()=> {dispatch(fetchProfile()).then(profile => {
-    dispatch(doSetup(profile)).then(()=> {
-      dispatch(navigateHome())
-      dispatch(setHasLoggedIn(true))
-    })
+    dispatch(doSetup(profile))
   })},
   goHome: ()=> dispatch(navigateHome())
 })

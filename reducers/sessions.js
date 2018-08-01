@@ -21,13 +21,13 @@ export default function(state = initialState, action) {
 		case SET_SESSIONS: {
 			return {
 				...state,
-				sessions: {...state.sessions, ...action.sessions},
+				sessions: action.sessions,
 			}
 		}
 		case SET_PRIVATE_SESSIONS: {
 			return {
 				...state,
-				privateSessions: {...state.privateSessions, ...action.sessions},
+				privateSessions: action.sessions,
 			}
 		}
 		case UPDATE_SESSIONS: {

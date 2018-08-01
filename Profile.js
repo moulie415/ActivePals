@@ -1,17 +1,18 @@
 import React, { Component } from "react"
-import { 
+import {
   StyleSheet,
   Alert,
   View,
   TouchableOpacity,
   Image,
-  Platform
+  Platform,
+  ScrollView
 } from "react-native"
 import {
   Button,
   Input,
   Container,
-  Content, 
+  Content,
   Item,
   Icon,
   Header,
@@ -72,7 +73,7 @@ window.Blob = Blob
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
       }
-    })  
+    })
     this.listenForUserChanges(firebase.database().ref('users/' + this.profile.uid))
   }
 
@@ -114,10 +115,10 @@ window.Blob = Blob
         </Right>
 
         </Header>
-        
+        <ScrollView>
       <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 10}}>
-        {this.state.avatar ? 
-          <TouchableOpacity 
+        {this.state.avatar ?
+          <TouchableOpacity
           style={{marginHorizontal: 20}}
           onPress={()=> this.selectAvatar()}>
             <Image style={{height: 90, width: 90, borderRadius: 5}}
@@ -127,8 +128,8 @@ window.Blob = Blob
         onPress={()=> this.selectAvatar()}
         style={{marginHorizontal: 20, backgroundColor: '#fff7', borderRadius: 5, width: 90, height: 90, justifyContent: 'center'}}>
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <Icon name='md-contact'  
-          style={{fontSize: 80, color: colors.primary, textAlign: 'center', 
+          <Icon name='md-contact'
+          style={{fontSize: 80, color: colors.primary, textAlign: 'center',
           marginBottom: Platform.OS == 'ios' ? -5 : null}}/>
           </View>
           </TouchableOpacity>}
@@ -197,8 +198,8 @@ window.Blob = Blob
           onDateChange={(date) => this.setState({profile: {...this.state.profile, birthday: date}})}
           />
           </View>
-          <TouchableOpacity 
-          style={{flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: colors.secondary, paddingVertical: 10}} 
+          <TouchableOpacity
+          style={{flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: colors.secondary, paddingVertical: 10}}
           onPress={()=> this.props.goToSettings()}>
             <Icon
             name='md-settings'
@@ -213,6 +214,7 @@ window.Blob = Blob
         <Text style={{color: '#fff'}} >Log out</Text>
       </TouchableOpacity>
         {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
+        </ScrollView>
 
     </Container>
   )
@@ -351,7 +353,7 @@ selectAvatar() {
     })
   }
 
- 
+
 
   logout() {
     Alert.alert(
