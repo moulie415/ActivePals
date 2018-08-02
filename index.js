@@ -5,21 +5,21 @@ import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
 import * as firebase from "firebase"
 import { Root, Spinner } from 'native-base'
-import colors from 'Anyone/constants/colors'
+import colors from 'Anyone/js/constants/colors'
 import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/lib/integration/react'
 import { persistStore } from 'redux-persist'
 import { createStore, applyMiddleware, compose } from 'redux'
-import reducer from './reducers/'
+import reducer from 'Anyone/js/reducers/'
 import thunk from 'redux-thunk'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
-import App from './App'
-import { navigateMessaging, navigateMessagingSession, navigateFriends } from "./actions/navigation"
-import { newNotification, updateLastMessage } from './actions/chats'
+import App from 'Anyone/js/App'
+import { navigateMessaging, navigateMessagingSession, navigateFriends } from 'Anyone/js/actions/navigation'
+import { newNotification, updateLastMessage } from 'Anyone/js/actions/chats'
 import GeoFire from 'geofire'
-import styles from 'Anyone/styles/loginStyles'
+import styles from 'Anyone/js/styles/loginStyles'
 
 import {
   createReactNavigationReduxMiddleware,
