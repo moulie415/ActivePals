@@ -43,7 +43,6 @@ import Hyperlink from 'react-native-hyperlink'
 import StarRating from 'react-native-star-rating'
 import { geofire }  from 'Anyone/index'
 import RNFetchBlob from 'rn-fetch-blob'
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
  class Sessions extends Component {
 
@@ -172,7 +171,6 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
         </Right>
 
         </Header>
-        {this.state.switch && GooglePlacesInput()}
 
 
         {!this.state.switch && this.renderSessions(this.state.sessions)}
@@ -793,50 +791,6 @@ function deg2rad(deg) {
   return deg * (Math.PI / 180)
 }
 
-export const GooglePlacesInput = () => {
-  return (
-    <GooglePlacesAutocomplete
-      renderDescription={row => {
-      row.description
-      }} // custom description render
-      onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-        console.log(data, details);
-      }}
-        styles={{
-          description: {
-            fontWeight: 'bold',
-          },
-          predefinedPlacesDescription: {
-            color: '#1faadb',
-          },
-        }}
-
-         query={{
-        // available options: https://developers.google.com/places/web-service/autocomplete
-        key: 'AIzaSyC_lZXdWz3no4k9MhIKbyIG5789TVir48Y',
-        language: 'en', // language of the results
-        types: 'establishment' // default: 'geocode'
-      }}
-        
-        nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
-        GooglePlacesSearchQuery={{
-          // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
-          rankby: 'distance',
-          types: 'gym',
-        }}
-        renderRightButton={() => <Text>Custom text after the input</Text>}
-        placeholder='Search'
-      minLength={2} // minimum length of text to search
-      autoFocus={false}
-      listViewDisplayed='auto'    // true/false/undefined
-      fetchDetails={true}
-
-        
-        
-      />
-    
-    )
-}
 
 import { connect } from 'react-redux'
 import { navigateMessagingSession, navigateSessionType } from 'Anyone/actions/navigation'
