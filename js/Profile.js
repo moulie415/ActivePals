@@ -233,8 +233,9 @@ updateUser(initial, profile) {
       this.setState({spinner: true})
       if (this.state.initialAvatar != this.state.avatar) {
         this.uploadImage(this.state.avatar).then((url)=> {
+          this.setState({initialAvatar: url, avatar: url, spinner: false})
           profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
-          this.setState({initalAvatar: url, spinner: false})
+          
         })
         .catch(e => {
           this.setState({spinner: false})
