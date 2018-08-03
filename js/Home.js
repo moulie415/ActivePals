@@ -107,7 +107,7 @@ componentWillReceiveProps(nextProps) {
           </TouchableOpacity>
         </Right>
       </Header>
-        <View style={{flexDirection: 'row', backgroundColor: '#fff', padding: 10, alignItems: 'center'}}>
+        <View style={{flexDirection: 'row', backgroundColor: '#fff', padding: 10, alignItems: 'center', borderBottomWidth: 0.5, borderColor: '#999'}}>
         <TouchableOpacity onPress={()=> this.props.goToProfile()}>
           {this.state.profile && this.state.profile.avatar ?
             <Image source={{uri: this.props.profile.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/>

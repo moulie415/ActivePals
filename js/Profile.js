@@ -30,15 +30,8 @@ import colors from './constants/colors'
 import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')
 import ImageResizer from 'react-native-image-resizer'
-import RNFetchBlob from 'rn-fetch-blob'
 import { NavigationActions } from "react-navigation"
 
-
-// Prepare Blob support
-const Blob = RNFetchBlob.polyfill.Blob
-const fs = RNFetchBlob.fs
-window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-window.Blob = Blob
 
  class Profile extends Component {
   static navigationOptions = {

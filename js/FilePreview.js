@@ -19,13 +19,7 @@ import { guid } from './constants/utils'
 import sStyles from './styles/settingsStyles'
 //import Video from 'react-native-video'
 import TouchableOpacity from 'Anyone/js/constants/TouchableOpacityLockable'
-import RNFetchBlob from 'rn-fetch-blob'
 
-// Prepare Blob support
-const Blob = RNFetchBlob.polyfill.Blob
-const fs = RNFetchBlob.fs
-window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-window.Blob = Blob
 
 class FilePreview extends Component {
 

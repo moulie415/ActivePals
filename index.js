@@ -60,6 +60,7 @@ const showLocalNotification = (notif) => {
       lights: true,
       vibrate: 300,
       id: custom.group,
+      //groupSummary: true,
       group: custom.group,
       data: notif,
     })
