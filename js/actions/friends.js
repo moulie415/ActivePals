@@ -1,4 +1,4 @@
-import * as firebase from "firebase"
+import firebase from 'react-native-firebase'
 import { removeChat, addChat } from './chats'
 import { fetchPrivateSessions } from './sessions'
 export const SET_FRIENDS = 'SET_FRIENDS'

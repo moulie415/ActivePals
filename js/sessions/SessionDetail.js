@@ -16,7 +16,7 @@ import {
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
-import firebase from 'Anyone/index'
+import firebase from 'react-native-firebase'
 import { geofire }  from 'Anyone/index'
 import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/js/constants/colors'
@@ -132,7 +132,7 @@ class SessionDetail extends Component {
 								<Text style={{color: colors.secondary, fontSize: 20, margin: 10}}>Use my location</Text>
 							</TouchableOpacity>
 						</View>
-						<Text style={{alignSelf: 'center', marginVertical: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
+						<Text style={{alignSelf: 'center', margin: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
 					</View>
 					<View style={{flexDirection: 'row'}}>
 					<TouchableOpacity
@@ -237,19 +237,21 @@ class SessionDetail extends Component {
 
 			let type = session.private ? "privateSessions" : "sessions"
 			let val = session.private ? "private" : true
-			firebase.database().ref(type).push(session).then((snapshot)=> {
+			let ref = firebase.database().ref(type).push()
+			let key = ref.key
+			ref.set(session).then(()=> {
 				Alert.alert('Success','Session created')
 				this.props.goSessions()
 				if (this.buddies) {
 					this.buddies.forEach(buddy => {
-						firebase.database().ref('users/' + buddy + '/sessions').child(snapshot.key).set(val)
+						firebase.database().ref('users/' + buddy + '/sessions').child(key).set(val)
 					})
 				}
-				firebase.database().ref(type + '/' + snapshot.key + '/users').child(this.user.uid).set(true)
-				firebase.database().ref('users/' + this.user.uid + '/sessions').child(snapshot.key).set(val)
+				firebase.database().ref(type + '/' + key + '/users').child(this.user.uid).set(true)
+				firebase.database().ref('users/' + this.user.uid + '/sessions').child(key).set(val)
 				let coords = this.location.position
 				if (type == 'sessions') {
-					geofire.set(snapshot.key , [coords.lat, coords.lng])
+					geofire.set(key , [coords.lat, coords.lng])
 				}
 				let systemMessage = {
 					_id: 1,
@@ -257,8 +259,8 @@ class SessionDetail extends Component {
 					createdAt: new Date().toString(),
 					system: true,
 				}
-				firebase.database().ref('sessionChats/' + snapshot.key).push(systemMessage)
-				this.props.onCreate(snapshot.key, session.private)
+				firebase.database().ref('sessionChats/' + key).push(systemMessage)
+				this.props.onCreate(key, session.private)
 			})
 			.catch(err => {
 				Alert.alert('Error', err.message)

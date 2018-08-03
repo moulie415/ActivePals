@@ -1,4 +1,4 @@
-import * as firebase from "firebase"
+import firebase from 'react-native-firebase'
 export const ADD_POST = 'ADD_POST'
 export const SET_FEED = 'SET_FEED'
 export const SET_POST = 'SET_POST'
@@ -35,13 +35,15 @@ export const addPost = (item) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
 		let uids = Object.keys(getState().friends.friends)
-		return firebase.database().ref('posts').push(item).then(snapshot => {
+		let ref = firebase.database().ref('posts').push
+		let key = ref.key
+		ref.set(item).then(() => {
 			uids.forEach(friend => {
-				firebase.database().ref('userPosts/' + friend).child(snapshot.key).set(uid)
+				firebase.database().ref('userPosts/' + friend).child(key).set(uid)
 			})
-			firebase.database().ref('userPosts/' + uid).child(snapshot.key).set(uid)
-			item.key = snapshot.key
-			dispatch(addToFeed(item, snapshot.key))
+			firebase.database().ref('userPosts/' + uid).child(key).set(uid)
+			item.key = key
+			dispatch(addToFeed(item, key))
 		})
 	}
 }

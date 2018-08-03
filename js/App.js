@@ -20,7 +20,7 @@ import SecondScreen from "./SecondScreen"
 import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
 import FilePreview from './FilePreview'
-import * as firebase from "firebase"
+import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'

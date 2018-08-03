@@ -23,7 +23,7 @@ import {
   Left
 } from 'native-base'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
-import firebase from "Anyone/index"
+import firebase from 'react-native-firebase'
 import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'

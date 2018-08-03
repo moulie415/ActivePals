@@ -8,7 +8,7 @@ import {
   Image
 } from "react-native"
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
-import firebase from 'Anyone/index'
+import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import {getSimplified } from './SessionChats'

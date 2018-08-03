@@ -8,7 +8,7 @@ import {
   Icon,
   Spinner
 } from 'native-base'
-import * as firebase from "firebase"
+import firebase from 'react-native-firebase'
 import  styles  from './styles/signUpStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 

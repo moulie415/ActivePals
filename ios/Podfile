@@ -1,3 +1,4 @@
+platform :ios, '9.0'
 target 'Anyone' do
 	rn_path = '../node_modules/react-native'
 	rn_maps_path = '../node_modules/react-native-maps'
@@ -19,8 +20,11 @@ target 'Anyone' do
 	]
 
 	pod 'react-native-maps', path: rn_maps_path
-	pod 'Firebase/Core', '4.9.0'
-	pod 'Firebase/Messaging', '4.9.0'
+	pod 'Firebase/Core', '5.3.0'
+	pod 'Firebase/Messaging', '5.3.0'
+	pod 'Firebase/Database', '5.3.0'
+	pod 'Firebase/Auth', '5.3.0'
+	pod 'Firebase/Storage', '5.3.0'
 
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
@@ -51,4 +55,5 @@ post_install do |installer|
       target.remove_from_project
     end
   end
+  `rm -rf Pods/leveldb-library/port/win`
 end

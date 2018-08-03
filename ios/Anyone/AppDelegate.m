@@ -12,6 +12,7 @@
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <RNGoogleSignin/RNGoogleSignin.h>
 #import "RNFIRMessaging.h"
+#import <Firebase.h>
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import "SplashScreen.h"
@@ -23,12 +24,14 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  [FIRApp configure];
   [Fabric with:@[[Crashlytics class]]];
+  
   NSURL *jsCodeLocation;
   
 
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-
+  
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                       moduleName:@"Anyone"
                                                initialProperties:nil
@@ -41,7 +44,7 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   
-  [FIRApp configure];
+  
   [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
   
   [GMSServices provideAPIKey:@"AIzaSyDv1WqoYEnUhbOtgCogQy95X_DEPavWfr0"];

@@ -9,7 +9,7 @@ import {
   Icon,
   Spinner,
 } from 'native-base'
-import firebase from "Anyone/index"
+import firebase from 'react-native-firebase'
 import  styles  from './styles/loginStyles'
 import { GoogleSignin } from 'react-native-google-signin'
 import VersionNumber from 'react-native-version-number'

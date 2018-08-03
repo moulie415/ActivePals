@@ -30,7 +30,7 @@ import {
   Left,
   Right,
 } from 'native-base'
-import firebase from "Anyone/index"
+import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Permissions from 'react-native-permissions'
 import styles from './styles/sessionStyles'

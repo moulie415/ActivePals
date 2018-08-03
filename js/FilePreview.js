@@ -14,7 +14,7 @@ import {
     Spinner
 } from 'native-base'
 import colors from './constants/colors'
-import firebase from "Anyone/index"
+import firebase from 'react-native-firebase'
 import { guid } from './constants/utils'
 import sStyles from './styles/settingsStyles'
 //import Video from 'react-native-video'
@@ -227,7 +227,7 @@ class FilePreview extends Component {
       const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       let uploadBlob = null
       let id = guid()
-      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos').child(id)
+      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos/' + id)
 
       fs.readFile(uploadUri, 'base64')
       .then((data) => {
@@ -235,7 +235,10 @@ class FilePreview extends Component {
       })
       .then((blob) => {
           uploadBlob = blob
-          return imageRef.put(blob, { contentType: mime })
+          return imageRef.putFile(blob, { contentType: mime })
+      })
+      .catch(e => {
+        console.log(e)
       })
       .then(() => {
           uploadBlob.close()

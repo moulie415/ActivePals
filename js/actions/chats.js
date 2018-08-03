@@ -1,4 +1,4 @@
-import * as firebase from "firebase"
+import firebase from 'react-native-firebase'
 import { fetchProfile } from './profile'
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS'
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT'

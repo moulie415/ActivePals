@@ -1,5 +1,6 @@
 package com.anyone;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 
 import com.airbnb.android.react.maps.MapsPackage;
@@ -7,6 +8,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+import io.invertase.firebase.RNFirebasePackage;
 import com.devfd.RNGeocoder.RNGeocoderPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.apsl.versionnumber.RNVersionNumberPackage;
@@ -22,6 +24,11 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
 import io.fabric.sdk.android.Fabric;
+import io.invertase.firebase.auth.RNFirebaseAuthPackage;
+import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.storage.RNFirebaseStoragePackage;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,11 +40,17 @@ public class MainApplication extends Application implements ReactApplication {
       return BuildConfig.DEBUG;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
+            new RNFirebasePackage(),
+            new RNFirebaseDatabasePackage(),
+            new RNFirebaseMessagingPackage(),
             new RNGeocoderPackage(),
+            new RNFirebaseStoragePackage(),
+            new RNFirebaseAuthPackage(),
             new SplashScreenReactPackage(),
             new RNVersionNumberPackage(),
             new MapsPackage(),
@@ -45,7 +58,7 @@ public class MainApplication extends Application implements ReactApplication {
             new ImagePickerPackage(),
             new RNGoogleSigninPackage(),
             new RNFetchBlobPackage(),
-            new FIRMessagingPackage(),
+              new FIRMessagingPackage(),
               new FBSDKPackage(mCallbackManager)
       );
     }

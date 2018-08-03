@@ -22,7 +22,7 @@ import {
   ActionSheet,
   Spinner
 } from 'native-base'
-import firebase from 'Anyone/index'
+import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import  styles  from './styles/profileStyles'
 import hStyles from './styles/homeStyles'
@@ -368,8 +368,13 @@ selectAvatar() {
           this.setState({spinner: false})
         })
         .catch(e => {
-          Alert.alert(e.toString())
           this.setState({spinner: false})
+          if (e.code == 'auth/no-current-user') {
+            this.props.onLogoutPress()
+          }
+          else {
+            Alert.alert(e.toString())
+          }
         })
 
       }},

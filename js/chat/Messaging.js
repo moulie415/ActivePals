@@ -16,7 +16,7 @@ import {
   Text,
   Spinner,
 } from 'native-base'
-import firebase from "Anyone/index"
+import firebase from 'react-native-firebase'
 import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import colors from 'Anyone/js/constants/colors'
@@ -323,33 +323,6 @@ class Messaging extends React.Component {
       .then(snapshot => {
         if (snapshot.val()) {
               this.props.onOpenChat(snapshot.val(), user.username, user.uid)
-        }
-        else {
-          Alert.alert(
-            'Start a new chat with ' + user.username + '?',
-            'This will be the beginning of your chat with ' + user.username,
-            [
-            {text: 'Cancel', style: 'cancel'},
-            {text: 'OK', onPress: () => {
-
-              let systemMessage = {
-                _id: 1,
-                text: 'Beginning of chat',
-                createdAt: new Date().toString(),
-                system: true,
-              }
-              firebase.database().ref('chats').push().then(newChat => {
-                firebase.database().ref('chats/' + newChat.key).push(systemMessage)
-                firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).set(newChat.key)
-                firebase.database().ref('users/' + user.uid + '/chats').child(this.uid).set(newChat.key)
-                this.props.onOpenChat(newChat.key, user.username, user.uid)
-              })
-
-
-            }
-            , style: 'positive'},
-            ]
-            )
         }
       })
       .catch(e => Alert.alert('Error', e.message))

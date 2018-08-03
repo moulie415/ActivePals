@@ -1,4 +1,4 @@
-import * as firebase from 'firebase'
+import firebase from 'react-native-firebase'
 import { removeSessionChat, addSessionChat } from 'Anyone/js/actions/chats'
 import { geofire }  from 'Anyone/index'
 export const SET_SESSIONS = 'SET_SESSIONS'

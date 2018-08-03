@@ -3,7 +3,8 @@ import React from "react"
 import { AppRegistry, Platform, Alert, AppState, YellowBox, ImageBackground, View } from 'react-native'
 import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
-import * as firebase from "firebase"
+//import * as firebase from "firebase"
+import firebase from 'react-native-firebase' //above is web api
 import { Root, Spinner } from 'native-base'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
@@ -26,19 +27,19 @@ import {
   createReduxBoundAddListener,
 } from 'react-navigation-redux-helpers'
 
-let config = {
-  apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
-  authDomain: "anyone-80c08.firebaseapp.com",
-  databaseURL: "https://anyone-80c08.firebaseio.com",
-  projectId: "anyone-80c08",
-  storageBucket: "anyone-80c08.appspot.com",
-  messagingSenderId: "680139677816"
-}
-firebase.initializeApp(config)
+// let config = {
+//   apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
+//   authDomain: "anyone-80c08.firebaseapp.com",
+//   databaseURL: "https://anyone-80c08.firebaseio.com",
+//   projectId: "anyone-80c08",
+//   storageBucket: "anyone-80c08.appspot.com",
+//   messagingSenderId: "680139677816"
+// }
+//firebase.initializeApp(config)
 let firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
 
-export default firebase
+//export default firebase
 
 
 

@@ -25,7 +25,7 @@ import {
   Right,
   Spinner
 } from 'native-base'
-import firebase from "Anyone/index"
+import firebase from 'react-native-firebase'
 import colors from './constants/colors'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
 import  styles  from './styles/homeStyles'

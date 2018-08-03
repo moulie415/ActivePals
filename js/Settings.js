@@ -15,7 +15,7 @@ import {
   Right,
   Spinner,
 } from 'native-base'
-import firebase from "Anyone/index"
+import firebase from 'react-native-firebase'
 import VersionNumber from 'react-native-version-number'
 import colors from './constants/colors'
 import  styles  from './styles/settingsStyles'
