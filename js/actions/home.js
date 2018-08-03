@@ -35,9 +35,9 @@ export const addPost = (item) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
 		let uids = Object.keys(getState().friends.friends)
-		let ref = firebase.database().ref('posts').push
+		let ref = firebase.database().ref('posts').push()
 		let key = ref.key
-		ref.set(item).then(() => {
+		return ref.set(item).then(() => {
 			uids.forEach(friend => {
 				firebase.database().ref('userPosts/' + friend).child(key).set(uid)
 			})

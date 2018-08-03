@@ -224,24 +224,12 @@ class FilePreview extends Component {
 
   uploadImage(uri, mime = 'application/octet-stream') {
     return new Promise((resolve, reject) => {
-      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
-      let uploadBlob = null
+      //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       let id = guid()
-      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos/' + id)
+      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos').child(id)
 
-      fs.readFile(uploadUri, 'base64')
-      .then((data) => {
-          return Blob.build(data, { type: `${mime};BASE64` })
-      })
-      .then((blob) => {
-          uploadBlob = blob
-          return imageRef.putFile(blob, { contentType: mime })
-      })
-      .catch(e => {
-        console.log(e)
-      })
+      return imageRef.putFile(uri, { contentType: mime })
       .then(() => {
-          uploadBlob.close()
           return imageRef.getDownloadURL()
       })
       .then((url) => {

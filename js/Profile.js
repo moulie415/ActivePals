@@ -325,33 +325,21 @@ selectAvatar() {
 }
 
 
-  uploadImage(uri, mime = 'application/octet-stream') {
-    return new Promise((resolve, reject) => {
-      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
-      let uploadBlob = null
-
-      const imageRef = firebase.storage().ref('images/' + this.profile.uid).child('avatar')
-
-      fs.readFile(uploadUri, 'base64')
-        .then((data) => {
-          return Blob.build(data, { type: `${mime};BASE64` })
-        })
-        .then((blob) => {
-          uploadBlob = blob
-          return imageRef.put(blob, { contentType: mime })
-        })
-        .then(() => {
-          uploadBlob.close()
-          return imageRef.getDownloadURL()
-        })
-        .then((url) => {
-          resolve(url)
-        })
-        .catch((error) => {
-          reject(error)
-      })
+uploadImage(uri, mime = 'application/octet-stream') {
+  return new Promise((resolve, reject) => {
+    const imageRef = firebase.storage().ref('images/' + this.profile.uid).child('avatar')
+    return imageRef.putFile(uri, { contentType: mime })
+    .then(() => {
+      return imageRef.getDownloadURL()
     })
-  }
+    .then((url) => {
+      resolve(url)
+    })
+    .catch((error) => {
+      reject(error)
+    })
+  })
+}
 
 
 
