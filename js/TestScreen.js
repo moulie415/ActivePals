@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { StyleSheet, Text, View } from "react-native"
+import { GooglePlacesInput } from './Sessions'
 
 const styles = StyleSheet.create({
   container: {
@@ -15,22 +16,18 @@ const styles = StyleSheet.create({
   }
 });
 
-export default class SecondScreen extends Component {
+export default class TestScreen extends Component {
   constructor(props) {
     super(props)
   }
   render() {
     return (
-      <View style={styles.container}>
-      <Text style={styles.welcome}>
-      THIS IS THE SECOND SCREEN!
-      </Text>
-      </View>
+      GooglePlacesInput()
       )
   }
 }
 
-SecondScreen.navigationOptions = {
-  title: "Second Screen Title"
+TestScreen.navigationOptions = {
+  title: "Test Screen Title"
 };
 

@@ -43,6 +43,8 @@ import Hyperlink from 'react-native-hyperlink'
 import StarRating from 'react-native-star-rating'
 import { geofire }  from 'Anyone/index'
 import RNFetchBlob from 'rn-fetch-blob'
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
+import { isIphoneX } from 'react-native-iphone-x-helper'
 
  class Sessions extends Component {
 
@@ -76,11 +78,11 @@ import RNFetchBlob from 'rn-fetch-blob'
       pointsOfInterest: [],
       places: [],
       sessionKeys: [],
+      searchMultiplier: 1,
     }
   }
 
   componentDidMount() {
-
 
     firebase.auth().onAuthStateChanged( user => {
       if (user) {
@@ -157,6 +159,7 @@ import RNFetchBlob from 'rn-fetch-blob'
           <TouchableOpacity
             style={{paddingHorizontal: 10}}
             onPress={()=> {
+              this.props.test()
               this.refs.filterModal.open()
             }}>
             <Text style={{color: '#fff'}}>Filters</Text>
@@ -173,12 +176,14 @@ import RNFetchBlob from 'rn-fetch-blob'
         </Header>
 
 
-        {!this.state.switch && this.renderSessions(this.state.sessions)}
 
+
+        {!this.state.switch && this.renderSessions(this.state.sessions)}
 
         {this.state.switch && this.state.showMap && <MapView
           style={styles.map}
-          onPress={(event)=> this.handlePress(event)}
+          //onPress={(event)=> this.handlePress(event)}
+          onLongPress={event => this.handlePress(event)}
           showsUserLocation={true}
           initialRegion={{
             latitude: this.state.latitude,
@@ -197,6 +202,7 @@ import RNFetchBlob from 'rn-fetch-blob'
         {this.state.markers}
         {this.state.pointsOfInterest}
         </MapView>}
+        {this.state.switch && GooglePlacesInput(this)}
 
         <View style={{flexDirection: 'row', height: 50}}>
           <TouchableOpacity style={styles.button}
@@ -283,9 +289,10 @@ import RNFetchBlob from 'rn-fetch-blob'
             <StarRating
             disabled={true}
             style={{marginLeft: 10}}
+            containerStyle={{alignSelf: 'center'}}
             fullStarColor={colors.secondary}
             maxStars={5}
-            starSize={30}
+            starSize={20}
             halfStarEnabled={true}
             rating={this.state.selectedLocation.rating}
             /></View>}
@@ -300,7 +307,7 @@ import RNFetchBlob from 'rn-fetch-blob'
                 this.props.onContinue(null, this.state.selectedLocation)
               }}
               style={{backgroundColor: colors.secondary, padding: 10, flex: 1, marginRight: 10}}>
-                <Text style={{color: '#fff', textAlign: 'center'}}>Create session at location</Text>
+                <Text style={{color: '#fff', textAlign: 'center'}}>Create Session at location</Text>
               </TouchableOpacity>
               <TouchableOpacity
               onPress={()=> {
@@ -308,7 +315,7 @@ import RNFetchBlob from 'rn-fetch-blob'
                 this.refs.friendsModal.open()
               }}
               style={{backgroundColor: colors.secondary, padding: 10, flex: 1}}>
-                <Text style={{color: '#fff', textAlign: 'center'}}>Create private session at location</Text>
+                <Text style={{color: '#fff', textAlign: 'center'}}>Create Private session at location</Text>
               </TouchableOpacity>
             </View>
             </View>}
@@ -662,12 +669,12 @@ import RNFetchBlob from 'rn-fetch-blob'
           this.fetchPlaces(lat, lon)
           .then((results) => {
             let markers = []
-            results.forEach((result, index) => {
+            results.forEach((result) => {
               let lat = result.geometry.location.lat
               let lng = result.geometry.location.lng
               markers.push(
                 <MapView.Marker
-                key={index}
+                key={result.place_id}
                 coordinate={{
                   latitude: lat,
                   longitude: lng,
@@ -677,18 +684,9 @@ import RNFetchBlob from 'rn-fetch-blob'
                   event.stopPropagation()
                   this.setState({selectedLocation: result, latitude: lat, longitude: lng},
                     ()=> {
-                      if (result.photos && result.photos[0].photo_reference) {
-                        let url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
-                        let fullUrl = `${url}${result.photos[0].photo_reference}&key=${str.googleApiKey}`
-                          RNFetchBlob.config({fileCache : true, appendExt : 'jpg'})
-                          .fetch('GET', fullUrl).then(image => {
-                            let path = Platform.OS == 'android' ? 'file://' + image.data : image.data
-                            this.setState({locationPhoto: path}, ()=> this.refs.locationModal.open())
-                          })
-                      }
-                      else {
-                        this.setState({ locationPhoto : null}, () => this.refs.locationModal.open())
-                      }
+                      fetchPhotoPath(result).then(path => {
+                          this.setState({locationPhoto: path}, ()=> this.refs.locationModal.open())
+                      })
                     })
                 }}
                 />
@@ -791,9 +789,138 @@ function deg2rad(deg) {
   return deg * (Math.PI / 180)
 }
 
+export const GooglePlacesInput = (_this) => {
+  return (
+    <GooglePlacesAutocomplete
+      style={{flex: 0}}
+      placeholder="Search for your gym..."
+      minLength={2} // minimum length of text to search
+      autoFocus={false}
+      returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
+      listViewDisplayed='auto'    // true/false/undefined
+      fetchDetails={true}
+      renderDescription={row => {
+      return row.description
+      }} // custom description render
+      onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+        _this.setState({spinner: true})
+        let location = details.geometry.location
+        if (details && details.types && details.types.includes("gym")) {
+          fetchPhotoPath(details).then(path => {
+            let marker = <MapView.Marker
+                key={details.place_id}
+                coordinate={{
+                  latitude: location.lat,
+                  longitude: location.lng,
+                }}
+                pinColor={colors.secondary}
+                onPress={(event) => {
+                  event.stopPropagation()
+                  _this.setState({selectedLocation: details, latitude: location.lat, longitude: location.lng},
+                    ()=> {
+                          _this.setState({locationPhoto: path}, ()=> _this.refs.locationModal.open())
+                    })
+                }}
+                />
+
+            _this.setState({
+              selectedLocation: details,
+              locationPhoto: path,
+              latitude: location.lat,
+              longitude: location.lng,
+              spinner: false,
+              markers: [..._this.state.markers, marker],
+            },
+              ()=> _this.refs.locationModal.open())
+          })
+        }
+        else {
+          Alert.alert('Place selected is not a gym')
+          _this.setState({latitude: location.lat, longitude: location.lng})
+        }
+      }}
+      
+      getDefaultValue={() => ''}
+      
+      query={{
+        // available options: https://developers.google.com/places/web-service/autocomplete
+        key: str.googleApiKey,
+        language: 'en', // language of the results
+        types: 'establishment' // default: 'geocode'
+      }}
+      
+      styles={{
+        textInputContainer: {
+          width: '100%',
+        },
+        container: {
+          position: 'absolute',
+          top: getMarginNeeded(),
+          width: '100%',
+          backgroundColor: '#fff'
+        },
+        description: {
+          fontWeight: 'bold'
+        },
+        predefinedPlacesDescription: {
+          color: '#1faadb'
+        }
+      }}
+      
+      //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
+      //currentLocationLabel="Current location"
+      nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+      GoogleReverseGeocodingQuery={{
+        // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+      }}
+      GooglePlacesSearchQuery={{
+        // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
+        rankby: 'distance',
+        types: 'gym',
+      }}
+
+      //filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+      //predefinedPlaces={[homePlace, workPlace]}
+
+      debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
+      //renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
+      //renderRightButton={() => <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 30, alignSelf: 'center', marginRight: 10}}/>}
+    />
+  );
+}
+
+const getMarginNeeded = () => {
+  if (Platform.OS == 'android') {
+      return 55
+  }
+  else {
+    return isIphoneX() ? 87 : 63
+  }
+}
+
+const fetchPhotoPath = (result) => {
+  return new Promise(resolve => {
+    if (result.photos && result.photos[0].photo_reference) {
+      let url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
+      let fullUrl = `${url}${result.photos[0].photo_reference}&key=${str.googleApiKey}`
+      RNFetchBlob.config({fileCache : true, appendExt : 'jpg'})
+      .fetch('GET', fullUrl).then(image => {
+        let path = Platform.OS == 'android' ? 'file://' + image.data : image.data
+        resolve(path)
+      })
+      .catch(e => {
+        console.log(e)
+        resolve(false)
+      })
+    }
+    else resolve(false)
+
+  })
+}
+
 
 import { connect } from 'react-redux'
-import { navigateMessagingSession, navigateSessionType } from 'Anyone/js/actions/navigation'
+import { navigateMessagingSession, navigateSessionType, navigateTestScreen } from 'Anyone/js/actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
 import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
 
@@ -815,6 +942,7 @@ const mapDispatchToProps = dispatch => ({
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
   fetch: (radius, update = false) => {return Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())])},
+  test: () => dispatch(navigateTestScreen()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)

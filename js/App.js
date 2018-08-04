@@ -16,7 +16,7 @@ import Settings from './Settings'
 import Messaging from './chat/Messaging'
 import DirectMessages from './chat/DirectMessages'
 import SessionChats from './chat/SessionChats'
-import SecondScreen from "./SecondScreen"
+import TestScreen from "./TestScreen"
 import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
 import FilePreview from './FilePreview'
@@ -104,7 +104,7 @@ export const Stack = StackNavigator({
   MainNav: { screen: tabs},
   Messaging: {screen: Messaging},
   Settings: { screen: Settings },
-  SecondScreen: { screen: SecondScreen, title: "Second Screen" },
+  TestScreen: { screen: TestScreen },
   FilePreview: {screen : FilePreview}
 })
 
