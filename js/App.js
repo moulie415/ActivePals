@@ -12,11 +12,12 @@ import Home from './Home'
 import Sessions from './Sessions'
 import Friends from './Friends'
 import Profile from './Profile'
+import ProfileView from './ProfileView'
 import Settings from './Settings'
 import Messaging from './chat/Messaging'
 import DirectMessages from './chat/DirectMessages'
 import SessionChats from './chat/SessionChats'
-import TestScreen from "./TestScreen"
+import TestScreen from './TestScreen'
 import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
 import FilePreview from './FilePreview'
@@ -105,7 +106,8 @@ export const Stack = StackNavigator({
   Messaging: {screen: Messaging},
   Settings: { screen: Settings },
   TestScreen: { screen: TestScreen },
-  FilePreview: {screen : FilePreview}
+  FilePreview: {screen : FilePreview },
+  ProfileView: { screen: ProfileView },
 })
 
 class App extends React.Component {

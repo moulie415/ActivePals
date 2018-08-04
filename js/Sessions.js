@@ -159,7 +159,6 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
           <TouchableOpacity
             style={{paddingHorizontal: 10}}
             onPress={()=> {
-              this.props.test()
               this.refs.filterModal.open()
             }}>
             <Text style={{color: '#fff'}}>Filters</Text>
@@ -280,9 +279,10 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
           </View>
         </Modal>
         <Modal style={[styles.modal, {height: null}]} position={'center'} ref={"locationModal"} >
-          {this.state.selectedLocation && <View style={{margin: 10}}>
-          <Text style={{fontWeight: 'bold', marginVertical: 5}}>{this.state.selectedLocation.name}</Text>
-
+          {this.state.selectedLocation && <View>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          {this.state.selectedLocation.name}</Text>
+          <View style={{margin: 10}}>
             <Text style={{marginVertical: 5}}>{this.state.selectedLocation.vicinity}</Text>
             {this.state.selectedLocation.rating && <View style={{flexDirection: 'row'}}>
               <Text style={{marginVertical: 5}}>Google rating: </Text>
@@ -315,8 +315,9 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
                 this.refs.friendsModal.open()
               }}
               style={{backgroundColor: colors.secondary, padding: 10, flex: 1}}>
-                <Text style={{color: '#fff', textAlign: 'center'}}>Create Private session at location</Text>
+                <Text style={{color: '#fff', textAlign: 'center'}}>Create Private Session at location</Text>
               </TouchableOpacity>
+              </View>
             </View>
             </View>}
         </Modal>

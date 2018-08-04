@@ -156,7 +156,7 @@ class Messaging extends React.Component {
       messages: GiftedChat.append(previousState.messages, messages),
       }))
       this.session ? this.props.getSessionChats(this.props.profile.sessions, this.sessionId) :
-      this.props.getChats()
+      this.props.getChats(this.props.profile.chats)
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 
@@ -196,7 +196,7 @@ class Messaging extends React.Component {
                 )
             }
           }}
-          onPressAvatar={user => this.fetchUser(user)}
+          onPressAvatar={user => this.props.viewProfile(user._id)}
           onLoadEarlier={()=> {
             this.fetched = false
             this.setState({amount: this.state.amount += 15, spinner: true} ,()=> this.loadMessages())
@@ -225,40 +225,6 @@ class Messaging extends React.Component {
             </View>
             )}}
           />
-        <Modal style={[sStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
-        {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
-
-        <View style={{flexDirection: 'row'}}>
-        {this.state.selectedUser.avatar ? <Image source={{uri: this.state.selectedUser.avatar}}
-         style={{height: 90, width: 90, marginRight: 10, borderRadius: 5}} /> : null}
-        <View style={{flex: 1}}>
-          <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-            <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', color: '#fff'}}>{this.state.selectedUser.username}</Text>
-          </View>
-          {(this.state.selectedUser.first_name || this.state.selectedUser.last_name) &&
-            <View style={{flexDirection: 'row', backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-            {this.state.selectedUser.first_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
-            {this.state.selectedUser.first_name + ' '}</Text>}
-            {this.state.selectedUser.last_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
-            {this.state.selectedUser.last_name}</Text>}
-          </View>}
-          </View>
-
-          </View>
-
-          {this.state.selectedUser.birthday && <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-            <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{'Birthday: ' + this.state.selectedUser.birthday}</Text></View>}
-
-          <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{"Account type: " +
-          this.state.selectedUser.accountType}</Text></View>
-
-            <View style={{flex: 1, justifyContent: 'flex-end'}}>
-            {this.fetchFriendButton(this.state.selectedUser)}
-              </View>
-            </View>}
-
-        </Modal>
         {this.state.spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
           <Spinner color={colors.secondary}/>
         </View>}
@@ -266,57 +232,6 @@ class Messaging extends React.Component {
     )
   }
 
-  fetchFriendButton(user) {
-    if (user.status == 'connected' && this.session) {
-      return <TouchableOpacity
-      onPress={()=> {
-        this.openChat(user)
-        this.refs.modal.close()
-      }}
-      style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
-      <Text style={{color: '#fff', textAlign: 'center'}}>Send direct message</Text>
-      </TouchableOpacity>
-    }
-    else if (user.status == 'incoming') {
-      return <TouchableOpacity
-      onPress={()=> {
-        this.props.onAccept(this.uid, user.uid)
-        .then(()=> this.refs.modal.close())
-        .catch(e => Alert.alert("Error", e.message))
-      }}
-      style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
-      <Text style={{color: '#fff', textAlign: 'center'}}>Accept buddy request</Text>
-      </TouchableOpacity>
-    }
-    else if (user.status == 'outgoing') {
-      return <Text style={{color: '#fff', padding: 5}}>Friend request sent</Text>
-    }
-    else if (this.session) {
-      return <TouchableOpacity
-      onPress={()=> {
-        this.props.onRequest(this.uid, user.uid)
-        .then(()=> {
-          this.refs.modal.close()
-          Alert.alert("Success", "Request sent")
-        })
-        .catch(e => Alert.alert("Error", e.message))
-      }}
-      style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
-      <Text style={{color: '#fff', textAlign: 'center'}}>Send buddy request</Text>
-      </TouchableOpacity>
-    }
-    else return null
-
-  }
-
-  fetchUser(user) {
-    firebase.database().ref('users/' + user._id).once('value', snapshot => {
-      firebase.database().ref('users/' + this.uid + '/friends').child(user._id)
-        .once('value', status => {
-          this.setState({selectedUser: {...snapshot.val(), status: status.val(), avatar: user.avatar}}, ()=> this.refs.modal.open())
-        })
-    })
-  }
 
   openChat(user) {
     firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).once('value')
@@ -334,7 +249,7 @@ class Messaging extends React.Component {
 }
 
 import { connect } from 'react-redux'
-import { navigateMessaging, navigateProfile } from 'Anyone/js/actions/navigation'
+import { navigateMessaging, navigateProfile, navigateProfileView } from 'Anyone/js/actions/navigation'
 import { sendRequest, acceptRequest } from 'Anyone/js/actions/friends'
 import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, resetNotification } from 'Anyone/js/actions/chats'
 
@@ -364,6 +279,7 @@ const mapDispatchToProps = dispatch => ({
   getSessionMessages: (id, amount, isPrivate) => dispatch(fetchSessionMessages(id, amount, isPrivate)),
   resetNotif: () => dispatch(resetNotification()),
   navigateProfile: () => dispatch(navigateProfile()),
+  viewProfile: (uid) => dispatch(navigateProfileView(uid))
 
 })
 

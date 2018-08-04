@@ -159,53 +159,6 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
             <Text style={{fontFamily: "Avenir", color: '#fff'}}>Submit</Text>
           </TouchableOpacity>
         </Modal>
-
-        <Modal style={[sStyles.modal, {backgroundColor: colors.primary}]} position={"center"} ref={"profileModal"} isDisabled={this.state.isDisabled}>
-        {this.state.selectedUser && <View style={{margin: 10, flex: 1}}>
-
-         <View style={{flexDirection: 'row'}}>
-
-         {this.state.selectedUser.avatar? <Image source={{uri: this.state.selectedUser.avatar}}
-         style={{height: 90, width: 90, marginRight: 10, borderRadius: 5}} /> : null}
-         <View style={{flex: 1}}>
-          <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-            <Text style={{fontFamily: 'Avenir', fontWeight: 'bold', color: '#fff'}}>{this.state.selectedUser.username}</Text>
-          </View>
-          {(this.state.selectedUser.first_name || this.state.selectedUser.last_name) &&
-            <View style={{flexDirection: 'row', backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-            {this.state.selectedUser.first_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
-            {this.state.selectedUser.first_name + ' '}</Text>}
-            {this.state.selectedUser.last_name && <Text style={{fontFamily: 'Avenir', color: '#fff'}}>
-            {this.state.selectedUser.last_name}</Text>}
-          </View>}
-          </View>
-
-          </View>
-
-          {this.state.selectedUser.birthday && <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-            <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{'Birthday: ' + this.state.selectedUser.birthday}</Text></View>}
-
-          <View style={{backgroundColor: '#fff7', padding: 10, marginBottom: 10, borderRadius: 5}}>
-          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>{"Account type: " +
-          this.state.selectedUser.accountType}</Text></View>
-
-            </View>}
-          <TouchableOpacity
-          style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 10}}
-          onPress={()=> {
-            Alert.alert(
-              "Delete friend",
-              "Are you sure?",
-              [
-              {text: "Cancel", style: 'cancel'},
-              {text: "Yes", onPress: ()=> this.remove(this.state.selectedUser.uid), style: 'destructive'}
-              ]
-              )
-          }}>
-          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Delete friend</Text>
-          </TouchableOpacity>
-
-        </Modal>
         </Content>
     </Container>
   )
@@ -261,7 +214,7 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
                 <Icon name='md-chatboxes' style={{color: colors.primary, fontSize: 30}}/>
               </TouchableOpacity>
               <TouchableOpacity
-              onPress={()=> this.setState({selectedUser: friend}, ()=> this.refs.profileModal.open())}
+              onPress={()=> this.props.viewProfile(friend.uid)}
               style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-person' style={{color: colors.primary, fontSize: 30}}/>
               </TouchableOpacity>
@@ -318,7 +271,7 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
 }
 
 import { connect } from 'react-redux'
-import { navigateMessaging } from 'Anyone/js/actions/navigation'
+import { navigateMessaging, navigateProfileView } from 'Anyone/js/actions/navigation'
 import { fetchFriends, sendRequest, acceptRequest, deleteFriend, removeFriend, addFriend } from 'Anyone/js/actions/friends'
 import { removeChat, addChat } from 'Anyone/js/actions/chats'
 import { fetchProfile } from 'Anyone/js/actions/profile'
@@ -334,7 +287,7 @@ const mapDispatchToProps = dispatch => ({
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onRemove: (uid, friendUid, profile)=> {return dispatch(deleteFriend(uid, friendUid, profile))},
   removeLocal: (uid) => dispatch(removeFriend(uid)),
-  getProfile: ()=> {return dispatch(fetchProfile())},
+  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   add: (friend) => dispatch(addFriend(friend)),
   addChat: (chat) => dispatch(addChat(chat)),
