@@ -24,7 +24,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  [FIRApp configure];
+  
   [Fabric with:@[[Crashlytics class]]];
   
   NSURL *jsCodeLocation;
@@ -43,7 +43,7 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
-  
+  [FIRApp configure];
   
   [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
   

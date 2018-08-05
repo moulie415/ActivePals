@@ -467,7 +467,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
             })
             firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
             this.refs.modal.close()
-            Alert.alert("Session joined", "You should now see this session in your session chats")
+            Alert.alert('Session joined', 'You should now see this session in your session chats')
           }}
           style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
             <Text style={{color: '#fff', textAlign: 'center'}}>Join session</Text>
@@ -490,7 +490,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
                 options: ['Create session', 'Create private session', 'Cancel'],
                 cancelButtonIndex: 2,
                 //destructiveButtonIndex: DESTRUCTIVE_INDEX,
-                title: "Create session at location?"
+                title: 'Create session at location?'
               },
               buttonIndex => {
                 //this.setState({ clicked: BUTTONS[buttonIndex] });
@@ -502,7 +502,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
                     this.refs.friendsModal.open()
                   }
                   else {
-                    Alert.alert("Sorry", "You must have at least one buddy to create a private session")
+                    Alert.alert('Sorry', 'You must have at least one buddy to create a private session')
                   }
                 }
               }
@@ -595,14 +595,10 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
     let ampm = hours >= 12 ? 'pm' : 'am'
     hours = hours % 12
     hours = hours ? hours : 12
-    minutes = minutes < 10 ? '0'+minutes : minutes
+    minutes = minutes < 10 ? '0' + minutes : minutes
     let strTime = hours + ':' + minutes + ampm
-
-    let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     let day = date.getDate()
-    return `${days[date.getDay()].toString()} ${day.toString() + this.nth(day)} ${months[date.getMonth()].toString()} ${strTime}`
+    return `${str.days[date.getDay()].toString()} ${day.toString() + this.nth(day)} ${str.months[date.getMonth()].toString()} ${strTime}`
   }
 
   nth(d) {

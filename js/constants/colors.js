@@ -9,6 +9,7 @@ const colors = {
 	secondary: '#0091ba',
 	tertiary: '#fff',
 	primaryLighter: '#0d57774d',
+	secondaryLighter: '#0091ba4d',
 }
 
 export default colors

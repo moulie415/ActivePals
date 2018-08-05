@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Alert,
   View,
-  TouchableOpacity,
   Image,
   Platform,
   ScrollView
@@ -27,6 +26,7 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import  styles  from './styles/profileStyles'
 import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
+import TouchableOpacity from './constants/TouchableOpacityLockable'
 import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')
 import ImageResizer from 'react-native-image-resizer'
@@ -50,6 +50,10 @@ import { NavigationActions } from "react-navigation"
     this.profile = this.props.profile
 
     this.database = firebase.database().ref('users')
+    firebase.storage().ref('images/' + this.profile.uid ).child('backdrop').getDownloadURL()
+    .then(backdrop => this.setState({backdrop}))
+    .catch(e => console.log(e))
+
     this.user = null
     this.state = {
       email: this.profile.email,
@@ -58,6 +62,8 @@ import { NavigationActions } from "react-navigation"
       spinner: false,
       initialAvatar: this.profile.avatar,
       avatar: this.profile.avatar,
+      initialBackdrop: this.profile.backdrop,
+      backdrop: this.profile.backdrop,
     }
   }
 
@@ -68,6 +74,7 @@ import { NavigationActions } from "react-navigation"
       }
     })
     this.listenForUserChanges(firebase.database().ref('users/' + this.profile.uid))
+
   }
 
   listenForUserChanges(ref) {
@@ -82,7 +89,7 @@ import { NavigationActions } from "react-navigation"
   componentWillReceiveProps(nextProps) {
     if (nextProps.profile) {
       let profile = nextProps.profile
-      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar})
+      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar, initialBackdrop: profile.backdrop})
     }
   }
 
@@ -94,23 +101,51 @@ import { NavigationActions } from "react-navigation"
         <Left style={{flex: 1}} >
         {this.hasChanged() && <TouchableOpacity
             onPress={() => {
-              this.setState({profile: this.state.initialProfile, avatar: this.state.initialAvatar})
+              this.setState({
+                profile: this.state.initialProfile,
+                avatar: this.state.initialAvatar,
+                backdrop: this.state.backdrop
+              })
           }}>
             <Text style={{color: '#fff'}}>UNDO</Text>
           </TouchableOpacity>}
         </Left>
         <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Profile</Title>
         <Right>
-          <Button onPress={()=> this.updateUser(this.state.initialProfile, this.state.profile)}
+          <TouchableOpacity onPress={(mutex)=> {
+            mutex.lockFor(1000)
+            this.updateUser(this.state.initialProfile, this.state.profile)
+          }}
           style={{backgroundColor: 'transparent', elevation: 0}}>
             <Text style={{color: '#fff'}}>SAVE</Text>
-          </Button>
+          </TouchableOpacity>
         </Right>
 
         </Header>
         <ScrollView>
-      <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 10}}>
-        {this.state.avatar ?
+      <View style={{alignItems: 'center', marginBottom: 10}}>
+      <TouchableOpacity 
+      style={{width: '100%'}}
+      onPress={()=> this.selectAvatar(true)}>
+        {this.state.backdrop ? <Image style={{height: 150}}
+          resizeMode='cover'
+          source={{uri: this.state.backdrop}} /> :
+          <View style={{height: 150, backgroundColor: colors.primaryLighter, justifyContent: 'center'}}>
+            <Icon name='ios-add' style={{color: '#fff', textAlign: 'center'}}/>
+          </View>}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{marginTop: -45}}
+          onPress={()=> this.selectAvatar()}>
+          {this.state.avatar ? <Image source={{uri: this.state.avatar}}
+          style={{width:90, height: 90, alignSelf: 'center', borderWidth: 0.5, borderColor: '#fff'}} /> :
+          <View
+          style={{width: 80, height: 80, alignSelf: 'center', backgroundColor: colors.secondary, justifyContent: 'center', borderRadius: 15}}>
+            <Icon name='ios-add' style={{color: '#fff', textAlign: 'center'}}/>
+          </View>}
+          </TouchableOpacity>
+
+        {/*this.state.avatar ?
           <TouchableOpacity
           style={{marginHorizontal: 20}}
           onPress={()=> this.selectAvatar()}>
@@ -125,16 +160,16 @@ import { NavigationActions } from "react-navigation"
           style={{fontSize: 80, color: colors.primary, textAlign: 'center',
           marginBottom: Platform.OS == 'ios' ? -5 : null}}/>
           </View>
-          </TouchableOpacity>}
-        <View style={{flex: 1, marginRight: 10}}>
-            <Text style={{color: '#999'}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
-            <Text style={{color: '#999'}}>Account type: <Text style={{color: colors.secondary}}>
-            {this.state.profile && this.state.profile.accountType}</Text></Text>
-        </View>
+          </TouchableOpacity>*/}
 
       </View>
 
 
+      <View style={{flex: 1, marginRight: 10}}>
+        <Text style={{color: '#999', marginLeft: 20}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
+        <Text style={{color: '#999', marginLeft: 20, marginBottom: 10}}>Account type: <Text style={{color: colors.secondary}}>
+        {this.state.profile && this.state.profile.accountType}</Text></Text>
+      </View>
       <View style={styles.inputGrp}>
         <Text style={{alignSelf: 'center'}}>Username: </Text>
             <Input
@@ -233,14 +268,37 @@ updateUser(initial, profile) {
       this.setState({spinner: true})
       if (this.state.initialAvatar != this.state.avatar) {
         this.uploadImage(this.state.avatar).then((url)=> {
-          this.setState({initialAvatar: url, avatar: url, spinner: false})
-          profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
-          
+          this.setState({initialAvatar: url, avatar: url})
+          if (this.state.initialBackdrop != this.state.backdrop) {
+            this.uploadImage(this.state.backdrop, true).then((url)=> {
+              this.setState({initialBackdrop: url, backdrop: url})
+              firebase.database().ref('users/' + this.profile.uid).child('backdrop').set(url)
+              profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
+            })
+            .catch(e => {
+              this.setState({spinner: false})
+              Alert.alert('Error', e.message)
+            })
+
+          }
+          else profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
         })
         .catch(e => {
           this.setState({spinner: false})
           Alert.alert('Error', e.message)
         })
+      }
+      else if (this.state.initialBackdrop != this.state.backdrop) {
+        this.uploadImage(this.state.backdrop, true).then((url)=> {
+          this.setState({initialBackdrop: url, backdrop: url})
+          firebase.database().ref('users/' + this.profile.uid).child('backdrop').set(url)
+          profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
+        })
+        .catch(e => {
+          this.setState({spinner: false})
+          Alert.alert('Error', e.message)
+        })
+
       }
       else {
         this.checkUsername(initial, profile)
@@ -249,6 +307,33 @@ updateUser(initial, profile) {
   }
   this.props.onSave()
 }
+          /*if (this.state.initialBackdrop != this.state.backdrop) {
+            this.uploadImage(this.state.backdrop, true).then(url => {
+              this.setState({initialBackdrop: url, backdrop: url})
+              firebase.database().ref('users/' + this.profile.uid).child('backdrop').set(url)
+              profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
+            })
+            .catch(e => {
+              this.setState({spinner: false})
+              Alert.alert('Error', e.message)
+            })
+          }
+          else {
+            if (this.state.initialBackdrop != this.state.backdrop) {
+              this.uploadImage(this.state.backdrop, true).then(url => {
+                this.setState({initialBackdrop: url, backdrop: url})
+                firebase.database().ref('users/' + this.profile.uid).child('backdrop').set(url)
+                profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
+              })
+              .catch(e => {
+                this.setState({spinner: false})
+                Alert.alert('Error', e.message)
+              })
+            }
+            else {
+              profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
+            }
+          }*/
 
 checkUsername(initial, profile){
   delete profile.avatar
@@ -257,24 +342,25 @@ checkUsername(initial, profile){
     initial.username && firebase.database().ref('usernames').child(initial.username).remove()
     firebase.database().ref('usernames').child(profile.username).set(profile.uid)
     .then(() => {
-      Alert.alert("Success", 'Profile saved')
+      Alert.alert('Success', 'Profile saved')
       this.setState({spinner: false})
     })
   })
   .catch(e => {
-    Alert.alert('Error', e.message + "\nthat username may have already been taken")
+    Alert.alert('Error', e.message + '\nthat username may have already been taken')
     this.setState({spinner: false})
   })
 }
 
 hasChanged() {
   return !((JSON.stringify(this.state.initialProfile) === JSON.stringify(this.state.profile)
-    && (this.state.initialAvatar == this.state.avatar)))
+    && (this.state.initialAvatar == this.state.avatar)
+    && (this.state.backdrop == this.state.initialBackdrop)))
 }
 
-selectAvatar() {
+selectAvatar(backdrop = false) {
   var options = {
-    title: 'Select Avatar',
+    title: backdrop ? 'Select Backdrop' : 'Select Avatar',
     mediaType: 'photo',
     noData: true,
     storageOptions: {
@@ -301,6 +387,7 @@ selectAvatar() {
     else {
       let source = { uri: response.uri }
 
+
     // You can also display the image using data:
     // let source = { uri: 'data:image/jpeg;base64,' + response.data };
     ImageResizer.createResizedImage(response.uri, 200, 200, 'PNG', 100).then((resized) => {
@@ -308,7 +395,8 @@ selectAvatar() {
       // response.path is the path of the new image
       // response.name is the name of the new image with the extension
       // response.size is the size of the new image
-      this.setState({avatar: resized.uri, spinner: false})
+      this.setState(backdrop ? {backdrop: resized.uri} : {avatar: resized.uri})
+      this.setState({spinner: false})
 
     }).catch((e) => {
       Alert.alert('Error', e.message)
@@ -319,9 +407,9 @@ selectAvatar() {
 }
 
 
-uploadImage(uri, mime = 'application/octet-stream') {
+uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
   return new Promise((resolve, reject) => {
-    const imageRef = firebase.storage().ref('images/' + this.profile.uid).child('avatar')
+    const imageRef = firebase.storage().ref('images/' + this.profile.uid).child(backdrop ? 'backdrop' : 'avatar')
     return imageRef.putFile(uri, { contentType: mime })
     .then(() => {
       return imageRef.getDownloadURL()

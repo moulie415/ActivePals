@@ -25,8 +25,10 @@ import {
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import  styles  from './styles/profileStyles'
+import str from './constants/strings'
 import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
+import { calculateAge } from './constants/utils'
 
 
  class ProfileView extends Component {
@@ -45,23 +47,18 @@ import colors from './constants/colors'
     super(props)
     this.params = this.props.navigation.state.params
     this.uid = this.params.uid
-    this.isFriend = false
 
-    if (this.props.friends[this.uid]) {
-      this.profile = this.props.friends[this.uid]
-      this.isFriend = true
-    }
-    else if (this.props.users[this.uid]) {
-      this.profile = this.props.users[this.uid]
-    }
-    else {
-      firebase.database().ref('users/' + this.uid).once('value', user => {
-        this.profile = user.val()
-      })
-    }
+    firebase.database().ref('users/' + this.uid).once('value', user => {
+      this.setState({profile: user.val()})
+      if (this.props.friends[user.val().uid]){
+        this.setState({isFriend: true})
+      }
+    })
 
     this.user = null
     this.state = {
+      isFriend: false,
+      profile: {}
     }
   }
 
@@ -76,6 +73,7 @@ import colors from './constants/colors'
 
 
   render () {
+    const {  username, first_name, last_name, birthday, email, uid, accountType } = this.state.profile
     return (
     <Container>
     <Header style={{backgroundColor: colors.primary}}>
@@ -86,64 +84,65 @@ import colors from './constants/colors'
             <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>
           </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Profile</Title>
+        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>{username || 'Profile'}</Title>
         <Right/>
 
         </Header>
-        <ScrollView>
-      <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 10}}>
+        <View style={{flex: 1, justifyContent: 'space-between'}}>
+        <View>
+      <View style={{alignItems: 'center', marginVertical: 10}}>
         {this.state.avatar ?
             <Image style={{height: 90, width: 90, borderRadius: 5, marginHorizontal: 20}}
             source={{uri: this.state.avatar}} />
           : <Icon name='md-contact'
           style={{fontSize: 80, color: colors.primary, textAlign: 'center',
           marginBottom: Platform.OS == 'ios' ? -5 : null, marginHorizontal: 20}}/>}
-        <View style={{flex: 1, marginRight: 10}}>
-            <Text style={{color: '#999'}}>Email: <Text style={{color: colors.secondary}}>{this.profile && this.profile.email}</Text></Text>
-            <Text style={{color: '#999'}}>Account type: <Text style={{color: colors.secondary}}>
-            {this.state.profile && this.state.profile.accountType}</Text></Text>
-        </View>
 
       </View>
 
 
-      <View style={styles.inputGrp}>
-        <Text style={{alignSelf: 'center'}}>Username: </Text>
-          </View>
-          <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>First name: </Text>
-          </View>
-          <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>Last name: </Text>
-          </View>
-          <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>Birthday: </Text>
-          </View>
-        {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
-          <TouchableOpacity
-          style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 10}}
+        <Text style={{alignSelf: 'center', fontSize: 15, textAlign: 'center', fontWeight: 'bold'}}>
+        <Text>{username}</Text>
+        {(first_name || last_name) &&
+          <Text style={{marginLeft: 10, marginVertical: 5}}> ({first_name && 
+            <Text>{`${first_name}${last_name ? ' ' : ''}`}</Text>}
+            {last_name && <Text>{last_name}</Text>})</Text>}
+        </Text>
+        <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Email: <Text style={{color: colors.secondary}}>{email}</Text></Text>
+        {accountType && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Account type:
+        <Text style={{color: colors.secondary}}> {accountType}</Text></Text>}
+        {birthday && <Text style={{marginLeft: 10, marginVertical: 5}}>
+       <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Birthday: </Text>
+       <Text style={{color: colors.secondary}}>
+       {`${this.getFormattedBirthday(birthday)} (${calculateAge(new Date(birthday))})`}</Text></Text>}
+        </View>
+
+          {this.state.isFriend && <TouchableOpacity
+          style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 30}}
           onPress={()=> {
             Alert.alert(
-              "Delete friend",
-              "Are you sure?",
+              'Delete Buddy',
+              'Are you sure?',
               [
-              {text: "Cancel", style: 'cancel'},
-              {text: "Yes", onPress: ()=> this.remove(this.state.selectedUser.uid), style: 'destructive'}
+              {text: 'Cancel', style: 'cancel'},
+              {text: 'Yes', onPress: ()=> this.remove(uid), style: 'destructive'}
               ]
               )
           }}>
           <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Delete friend</Text>
-          </TouchableOpacity>
-        </ScrollView>
+          </TouchableOpacity>}
+        </View>
+        {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
 
     </Container>
   )
   }
 
-  getDate(date) {
+  getFormattedBirthday(date) {
     if (date) {
-      let formatted = date.replace(/-/g, "/")
-      return new Date(formatted)
+      let d = new Date(date)
+      return `${str.months[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}`
+
     }
     else return null
   }

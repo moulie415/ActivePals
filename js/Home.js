@@ -225,19 +225,10 @@ componentWillReceiveProps(nextProps) {
         return (
           <View style={{padding: 10, margin: 5}}>
           <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-          <TouchableOpacity onPress={()=> {
-            console.log("navigate to profile")
-          }}>
             {this.fetchAvatar(item.uid)}
-          </TouchableOpacity>
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <TouchableOpacity onPress={()=> {
-                  console.log("navigate to profile")
-                }}>
-                  <Text style={{fontWeight: 'bold', color: colors.secondary, flex: 1}}>
-                  {item.uid == this.props.profile.uid ? 'You' : this.getUsername(item.uid)}</Text>
-                </TouchableOpacity>
+                {this.getUsernameFormatted(item.uid)}
                 <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
               </View>
               <Text style={{color: '#000'}}>{item.text}</Text>
@@ -256,20 +247,10 @@ componentWillReceiveProps(nextProps) {
       return (
           <View>
           <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
-          <TouchableOpacity
-          onPress={()=> {
-            console.log("navigate to profile")
-          }}>
             {this.fetchAvatar(item.uid)}
-          </TouchableOpacity>
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <TouchableOpacity onPress={()=> {
-                  console.log("navigate to profile")
-                }}>
-                  <Text style={{fontWeight: 'bold', color: colors.secondary, flex: 1, marginTop: 5}}>
-                  {item.uid == this.props.profile.uid ? 'You' : this.getUsername(item.uid)}</Text>
-                </TouchableOpacity>
+              {this.getUsernameFormatted(item.uid)}
                 <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
               </View>
               <Text style={{color: '#000'}}>{item.text}</Text>
@@ -325,13 +306,33 @@ componentWillReceiveProps(nextProps) {
   }
 
   fetchAvatar(uid) {
-    if (uid == this.props.profile.uid && this.state.profile.avatar) {
-      return <Image source={{uri: this.props.profile.avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
+    if (this.state.profile.avatar && uid == this.props.profile.uid) {
+      return <TouchableOpacity
+      onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
+      <Image source={{uri: this.props.profile.avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
+      </TouchableOpacity>
     }
-    else if (uid != this.props.profile.uid && this.props.friends[uid].avatar) {
-      return <Image source={{uri: this.props.friends[uid].avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
+    else if (this.props.friends[uid].avatar) {
+      return <TouchableOpacity
+      onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
+      <Image source={{uri: this.props.friends[uid].avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
+      </TouchableOpacity>
     }
-    else return <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary, marginRight: 10}}/>
+    else {
+      return <TouchableOpacity
+      onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
+      <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary, marginRight: 10}}/>
+    </TouchableOpacity>
+    }
+  }
+
+  getUsernameFormatted(uid) {
+    return <TouchableOpacity onPress={()=> {
+      uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()
+    }}>
+    <Text style={{fontWeight: 'bold', color: colors.secondary, flex: 1}}>
+    {uid == this.props.profile.uid ? 'You' : this.getUsername(uid)}</Text>
+    </TouchableOpacity>
   }
 
 showPicker() {
@@ -412,7 +413,7 @@ showPicker() {
 
 
 import { connect } from 'react-redux'
-import { navigateProfile, navigateFilePreview } from 'Anyone/js/actions/navigation'
+import { navigateProfile, navigateProfileView, navigateFilePreview } from 'Anyone/js/actions/navigation'
 import { addPost, repPost } from 'Anyone/js/actions/home'
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -424,6 +425,7 @@ const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
 
 const mapDispatchToProps = dispatch => ({
   goToProfile: () => dispatch(navigateProfile()),
+  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   postStatus: (status) => {return dispatch(addPost(status))},
   onRepPost: (item) => dispatch(repPost(item)),
   previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
