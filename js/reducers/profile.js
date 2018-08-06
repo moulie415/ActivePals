@@ -2,6 +2,8 @@ import {
 	SET_PROFILE,
 	SET_LOGGED_IN,
  	SET_LOGGED_OUT,
+ 	SET_GYM,
+ 	REMOVE_GYM,
 } from 'Anyone/js/actions/profile'
 
 const initialState = {
@@ -20,6 +22,16 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				loggedIn: action.loggedIn,
+			}
+		case SET_GYM:
+			return {
+				...state,
+				profile: {...state.profile, gym: action.id},
+			}
+		case REMOVE_GYM:
+			return {
+				...state,
+				profile: {...state.profile, gym: null}
 			}
 		case SET_LOGGED_OUT:
 			return initialState

@@ -30,6 +30,7 @@
     "react-native-maps": "^0.21.0",
     "react-native-modalbox": "^1.6.0",
     "react-native-permissions": "^1.0.6",
+    "react-native-picker-select": "^4.2.0",
     "react-native-splash-screen": "^3.0.9",
     "react-native-star-rating": "^1.0.9",
     "react-native-version-number": "^0.3.2",

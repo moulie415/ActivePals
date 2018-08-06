@@ -235,7 +235,7 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
   }
 
   remove(friend) {
-    this.props.onRemove(this.uid, friend, this.props.profile)
+    this.props.onRemove(friend)
     .then(()=> this.refs.profileModal.close())
     .catch(e => Alert.alert("Error", e.message))
 
@@ -244,11 +244,14 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
   sendRequest(username) {
     if (username != this.props.profile.username) {
       firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
+        if (snapshot.val()) {
         this.props.onRequest(this.uid, snapshot.val()).then(() => {
           Alert.alert("Success", "Request sent")
           this.refs.modal.close()
         })
         .catch(e => Alert.alert("Error", e.message))
+      }
+      else Alert.alert('Sorry','Username does not exist')
       })
       .catch(e => Alert.alert("Error", e.message))
     }
@@ -282,10 +285,10 @@ const mapStateToProps = ({ friends, profile }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getFriends: (uids)=> { return dispatch(fetchFriends(uids))},
-  onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
-  onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
-  onRemove: (uid, friendUid, profile)=> {return dispatch(deleteFriend(uid, friendUid, profile))},
+  getFriends: (uids)=> dispatch(fetchFriends(uids)),
+  onRequest: (uid, friendUid)=> dispatch(sendRequest(uid, friendUid)),
+  onAccept: (uid, friendUid)=> dispatch(acceptRequest(uid, friendUid)),
+  onRemove: (uid)=> {return dispatch(deleteFriend(uid))},
   removeLocal: (uid) => dispatch(removeFriend(uid)),
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),

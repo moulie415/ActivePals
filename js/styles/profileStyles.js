@@ -16,7 +16,7 @@ export default styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     paddingLeft: 10,
-    minHeight: 50,
+    height: 40,
     alignItems: 'center'
   },
 })

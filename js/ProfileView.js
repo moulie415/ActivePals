@@ -48,13 +48,7 @@ import { calculateAge } from './constants/utils'
     this.params = this.props.navigation.state.params
     this.uid = this.params.uid
 
-    firebase.storage().ref('images/' + this.uid ).child('backdrop').getDownloadURL()
-    .then(backdrop => this.setState({backdrop}))
-    .catch(e => console.log(e))
-
-    firebase.storage().ref('images/' + this.uid ).child('avatar').getDownloadURL()
-    .then(avatar => this.setState({avatar}))
-    .catch(e => console.log(e))
+    this.fetch()
 
     firebase.database().ref('users/' + this.uid).once('value', user => {
       this.setState({profile: user.val()})
@@ -71,6 +65,16 @@ import { calculateAge } from './constants/utils'
     }
   }
 
+  fetch() {
+    firebase.storage().ref('images/' + this.uid ).child('backdrop').getDownloadURL()
+    .then(backdrop => this.setState({backdrop}))
+    .catch(e => console.log(e))
+
+    firebase.storage().ref('images/' + this.uid ).child('avatar').getDownloadURL()
+    .then(avatar => this.setState({avatar}))
+    .catch(e => console.log(e))
+  }
+
 
   componentDidMount() {
 
@@ -82,7 +86,7 @@ import { calculateAge } from './constants/utils'
 
 
   render () {
-    const {  username, first_name, last_name, birthday, email, uid, accountType } = this.state.profile
+    const {  username, first_name, last_name, birthday, email, uid, accountType, activity, level } = this.state.profile
     return (
     <Container>
     <Header style={{backgroundColor: colors.primary}}>
@@ -121,28 +125,63 @@ import { calculateAge } from './constants/utils'
             <Text>{`${first_name}${last_name ? ' ' : ''}`}</Text>}
             {last_name && <Text>{last_name}</Text>})</Text>}
         </Text>
-        <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Email: <Text style={{color: colors.secondary}}>{email}</Text></Text>
-        {accountType && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Account type:
+        {!this.state.isFriend && 
+          <TouchableOpacity 
+          onPress={()=> {
+            Alert.alert(
+              'Send Buddy request',
+              'Are you sure?',
+              [
+              {text: 'Cancel', style: 'cancel'},
+              {text: 'Yes', onPress: ()=> {
+                this.props.request(this.props.profile.uid ,uid)
+                .then(() => {
+                  this.props.goBack()
+                  Alert.alert('Success', 'Request sent')
+                })
+                .catch(e => Alert.alert('Error', e.message))
+              }, style: 'destructive'},
+              ]
+              )
+          }}
+          style={{padding: 10, backgroundColor: colors.secondary, margin: 10, alignSelf: 'center'}}>
+          <Text style={{color: '#fff'}}>Send Buddy request</Text>
+          </TouchableOpacity>}
+
+
+        {this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Email: <Text style={{color: colors.secondary}}>{email}</Text></Text>}
+
+        {accountType && this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Account type:
         <Text style={{color: colors.secondary}}> {accountType}</Text></Text>}
-        {birthday && <Text style={{marginLeft: 10, marginVertical: 5}}>
+
+        {birthday && this.state.isFriend &&  <Text style={{marginLeft: 10, marginVertical: 5}}>
        <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Birthday: </Text>
        <Text style={{color: colors.secondary}}>
        {`${this.getFormattedBirthday(birthday)} (${calculateAge(new Date(birthday))})`}</Text></Text>}
+
+        {this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Preferred activity: '}
+        <Text style={{color: colors.secondary}}>{activity || 'Unspecified'}</Text></Text>}
+
+        {activity && this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Level: '}
+        <Text style={{color: colors.secondary}}>{level || 'Unspecified'}</Text></Text>}
         </View>
 
           {this.state.isFriend && <TouchableOpacity
           style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 30}}
           onPress={()=> {
             Alert.alert(
-              'Delete Buddy',
+              'Remove Buddy',
               'Are you sure?',
               [
               {text: 'Cancel', style: 'cancel'},
-              {text: 'Yes', onPress: ()=> this.remove(uid), style: 'destructive'}
+              {text: 'Yes', onPress: ()=> {
+                this.props.remove(uid)
+                .then(() => this.props.goBack())
+              }, style: 'destructive'},
               ]
               )
           }}>
-          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Delete friend</Text>
+          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Remove Buddy</Text>
           </TouchableOpacity>}
         </View>
         {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
@@ -166,16 +205,19 @@ import { calculateAge } from './constants/utils'
 
 
 import { connect } from 'react-redux'
-import { navigateLogin, navigateSettings, navigateBack } from 'Anyone/js/actions/navigation'
-import { fetchProfile, setLoggedOut } from 'Anyone/js/actions/profile'
+import { navigateBack } from 'Anyone/js/actions/navigation'
+import { deleteFriend, sendRequest } from 'Anyone/js/actions/friends'
 
-const mapStateToProps = ({ friends, sharedInfo }) => ({
+const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
   friends: friends.friends,
   users: sharedInfo.users,
+  profile: profile.profile
 })
 
 const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
-})
+  remove: (uid) => dispatch(deleteFriend(uid)),
+  request: (uid, friendUid) => dispatch(sendRequest(uid, friendUid))
+ })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileView)

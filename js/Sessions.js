@@ -300,7 +300,20 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
               <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
               {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
             {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
+            {this.props.profile.gym == this.state.selectedLocation.place_id ? 
+              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your gym</Text> :
+              <TouchableOpacity
+              onPress={()=> this.setGym(this.state.selectedLocation)}
+              style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
+              <Text style={{color: '#fff'}}>Set as your gym</Text>
+              </TouchableOpacity>}
             {this.state.locationPhoto && <Image style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} resizeMode={'contain'} source={{uri: this.state.locationPhoto}}/>}
+            {this.props.profile.gym == this.state.selectedLocation.place_id && 
+              <TouchableOpacity 
+              onPress={() => this.props.removeGym()}
+              style={{padding: 5, alignSelf: 'center', marginBottom: 5}}>
+              <Text style={{color: 'red'}}>Remove as your gym</Text>
+              </TouchableOpacity>}
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
               <TouchableOpacity
               onPress={()=> {
@@ -780,6 +793,27 @@ getDistance(item) {
   }
   else return 'unknown'
 }
+
+setGym(location) {
+  if (this.props.profile.gym) {
+    this.props.removeGym()
+  }
+  this.props.setGym(location.place_id)
+  firebase.database().ref('users/' + this.props.profile.uid).child('gym').set(location.place_id)
+  firebase.database().ref('gyms').child(location.place_id).once('value', gym => {
+    if (!gym.val()) {
+      location.users = {[this.props.profile.uid]: true}
+      location.userCount = 1
+      firebase.database().ref('gyms').child(location.place_id).set(location)
+    }
+    else {
+      let count = gym.val().count ? gym.val().count + 1 : 1
+      firebase.database().ref('gyms/' + gym.val().place_id).child('userCount').set(count)
+      firebase.database().ref('gyms/' + gym.val().place_id + '/users').child(this.props.profile.uid).set(true)
+    }
+  })
+}
+
 }
 
 function deg2rad(deg) {
@@ -916,10 +950,12 @@ const fetchPhotoPath = (result) => {
 }
 
 
+
 import { connect } from 'react-redux'
 import { navigateMessagingSession, navigateSessionType, navigateTestScreen } from 'Anyone/js/actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
 import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
+import { setGym, removeGym } from 'Anyone/js/actions/profile'
 
 const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
   friends: friends.friends,
@@ -930,6 +966,8 @@ const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
+  setGym: (id) => dispatch(setGym(id)),
+  removeGym: () => dispatch(removeGym()),
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onJoin: (session, isPrivate) => {
     dispatch(addUser(session, isPrivate))

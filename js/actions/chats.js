@@ -129,7 +129,7 @@ export const addChat = (chat) => {
 			}
 			firebase.database().ref('users/' + uid).child('username').once('value', username => {
 				FCM.createNotificationChannel({
-					id: chatId,
+					id: uid,
 					name: username.val(),
 					description: 'Notifications from ' + username.val(),
 					priority: 'high',
@@ -171,6 +171,12 @@ export const fetchSessionChats = (sessions, uid) => {
 								message = Object.values(lastMessage.val())[0]
 							}
 							resolve({...snapshot.val(), key: session, lastMessage: message})
+						})
+						FCM.createNotificationChannel({
+							id: session,
+							name: snapshot.val().title,
+							description: 'Notifications from ' + snapshot.val().title,
+							priority: 'high',
 						})
 					}
 					else {

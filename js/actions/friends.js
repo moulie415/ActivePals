@@ -38,6 +38,7 @@ export const removeFriend = (uid) => {
 export const fetchFriends = (uids) => {
 	return (dispatch) => {
 		let friends = []
+		if (uids) {
 		Object.keys(uids).forEach(friend => {
 			let promise = new Promise(function(resolve, reject) {
 				let status = uids[friend]
@@ -63,6 +64,8 @@ export const fetchFriends = (uids) => {
 			dispatch(setFriends(obj))
 			dispatch(fetchPrivateSessions())
 		})
+	}
+	else dispatch(setFriends({}))
 	}
 }
 
@@ -101,10 +104,12 @@ export const acceptRequest = (uid, friendUid) => {
 	}
 }
 
-export const deleteFriend = (uid, friendUid, profile) => {
-	return (dispatch) => {
+export const deleteFriend = (uid) => {
+	return (dispatch, getState) => {
+		let you = getState().profile.profile.uid
 		//handle most the deletion server side using cloud function
-		return firebase.database().ref('users/' + uid + '/friends').child(friendUid).remove()
+		dispatch(removeFriend(uid))
+		return firebase.database().ref('users/' + you + '/friends').child(uid).remove()
 
 	}
 

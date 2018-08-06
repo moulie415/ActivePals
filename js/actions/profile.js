@@ -2,6 +2,8 @@ import firebase from 'react-native-firebase'
 export const SET_PROFILE = 'SET_PROFILE'
 export const SET_LOGGED_IN = 'SET_LOGGED_IN'
 export const SET_LOGGED_OUT = 'SET_LOGGED_OUT'
+export const SET_GYM = 'SET_GYM'
+export const REMOVE_GYM = 'REMOVE_GYM'
 import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats } from './chats'
 import { fetchPosts } from './home'
@@ -22,6 +24,16 @@ export const setHasLoggedIn = (loggedIn) => ({
 export const setLoggedOut = () => ({
 	type: SET_LOGGED_OUT,
 })
+
+export const setGym = (id) => ({
+	type: SET_GYM,
+	id,
+})
+
+export const resetGym = () => ({
+	type: REMOVE_GYM,
+})
+
 
 export const fetchProfile = () => {
 	return (dispatch) => {
@@ -51,7 +63,7 @@ export const doSetup = (profile) => {
 		}
 		dispatch(setHasLoggedIn(true))
 		return Promise.all([
-			friends && dispatch(fetchFriends(friends)),
+			dispatch(fetchFriends(friends)),
 			profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),
 			profile.chats && dispatch(fetchChats(profile.chats)),
 			dispatch(fetchPosts(uid, 30)),
@@ -70,6 +82,21 @@ export const removeUser = () => {
 		})
 	}
 }
+
+export const removeGym = () => {
+	return (dispatch, getState) => {
+		let currentGym = getState().profile.profile.gym
+		let uid = getState().profile.profile.uid
+		firebase.database().ref('users/' + uid).child('gym').set(null)
+		firebase.database().ref('gyms').child(currentGym).once('value', gym => {
+			let count = gym.val().userCount - 1
+			firebase.database().ref('gyms/' + currentGym).child('userCount').set(count)
+			firebase.database().ref('gyms/' + currentGym + '/users').child(uid).remove()
+		})
+		dispatch(resetGym())
+	}
+}
+
 
 
 

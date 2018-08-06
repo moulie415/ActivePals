@@ -5,7 +5,7 @@ import {
   View,
   Image,
   Platform,
-  ScrollView
+  ScrollView,
 } from "react-native"
 import {
   Button,
@@ -30,7 +30,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable'
 import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')
 import ImageResizer from 'react-native-image-resizer'
-import { NavigationActions } from "react-navigation"
+import RNPickerSelect from 'react-native-picker-select'
 
 
  class Profile extends Component {
@@ -51,8 +51,14 @@ import { NavigationActions } from "react-navigation"
 
     this.database = firebase.database().ref('users')
     firebase.storage().ref('images/' + this.profile.uid ).child('backdrop').getDownloadURL()
-    .then(backdrop => this.setState({backdrop}))
+    .then(backdrop => this.setState({backdrop, initialBackdrop: backdrop}))
     .catch(e => console.log(e))
+
+    if (this.profile.gym) {
+      firebase.database().ref('gyms/' + this.profile.gym).once('value', gym => {
+        this.setState({gym: gym.val()})
+      })
+    }
 
     this.user = null
     this.state = {
@@ -62,8 +68,6 @@ import { NavigationActions } from "react-navigation"
       spinner: false,
       initialAvatar: this.profile.avatar,
       avatar: this.profile.avatar,
-      initialBackdrop: this.profile.backdrop,
-      backdrop: this.profile.backdrop,
     }
   }
 
@@ -89,7 +93,13 @@ import { NavigationActions } from "react-navigation"
   componentWillReceiveProps(nextProps) {
     if (nextProps.profile) {
       let profile = nextProps.profile
-      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar, initialBackdrop: profile.backdrop})
+      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar})
+      if (nextProps.profile.gym) {
+        firebase.database().ref('gyms/' + nextProps.profile.gym).once('value', gym => {
+          this.setState({gym: gym.val()})
+        })
+      }
+      else this.setState({gym: null})
     }
   }
 
@@ -166,9 +176,11 @@ import { NavigationActions } from "react-navigation"
 
 
       <View style={{flex: 1, marginRight: 10}}>
-        <Text style={{color: '#999', marginLeft: 20}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
-        <Text style={{color: '#999', marginLeft: 20, marginBottom: 10}}>Account type: <Text style={{color: colors.secondary}}>
+        <Text style={{color: '#999', marginHorizontal: 20}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
+        <Text style={{color: '#999', marginHorizontal: 20, marginBottom: this.state.gym ? 0 : 10}}>Account type: <Text style={{color: colors.secondary}}>
         {this.state.profile && this.state.profile.accountType}</Text></Text>
+        {this.state.gym && <Text style={{color: '#999', marginHorizontal: 20, marginBottom: 10}}>Gym: <Text style={{color: colors.secondary}}>
+        {this.state.gym.name}</Text></Text>}
       </View>
       <View style={styles.inputGrp}>
         <Text style={{alignSelf: 'center'}}>Username: </Text>
@@ -203,6 +215,71 @@ import { NavigationActions } from "react-navigation"
             autoCorrect={false}
         />
           </View>
+
+          <View style={styles.inputGrp}>
+            <Text style={{alignSelf: 'center'}}>Preferred activity: </Text>
+          <RNPickerSelect
+          placeholder={{
+            label: 'Unspecified',
+            value: null,
+          }}
+          hideIcon={true}
+          items={pickerItems(activities)}
+          style={{
+          viewContainer: {
+           flex: 1,
+           justifyContent: 'center',
+           paddingHorizontal: 5,
+          },
+          placeholderColor: '#fff',
+          inputAndroid: {
+            color:'#fff',
+          },
+          inputIOS: {
+            color: '#fff',
+          },
+        }}
+          onValueChange={(value) => {
+            this.setState({
+              profile: {...this.state.profile, activity: value},
+            });
+          }}
+          //style={{ ...pickerSelectStyles }}
+          value={this.state.profile.activity}
+          />
+          </View>
+          {this.state.profile.activity  && <View style={styles.inputGrp}>
+            <Text style={{alignSelf: 'center'}}>Level: </Text>
+          <RNPickerSelect
+          placeholder={{
+            label: 'Unspecified',
+            value: null,
+          }}
+          hideIcon={true}
+          items={pickerItems(levels)}
+          style={{
+          viewContainer: {
+           flex: 1,
+           justifyContent: 'center',
+           paddingHorizontal: 5,
+          },
+          placeholderColor: '#fff',
+          inputAndroid: {
+            color:'#fff',
+          },
+          inputIOS: {
+            color: '#fff',
+          },
+        }}
+          onValueChange={(value) => {
+            this.setState({
+              profile: {...this.state.profile, level: value},
+            });
+          }}
+          //style={{ ...pickerSelectStyles }}
+          value={this.state.profile.level}
+          />
+          </View>}
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Birthday: </Text>
           <DatePicker
@@ -221,7 +298,7 @@ import { NavigationActions } from "react-navigation"
             },
             dateInput: {
               borderWidth: 0,
-            }
+            },
           }}
           onDateChange={(date) => this.setState({profile: {...this.state.profile, birthday: date}})}
           />
@@ -237,7 +314,7 @@ import { NavigationActions } from "react-navigation"
           </TouchableOpacity>
 
       <TouchableOpacity
-        style={{backgroundColor: colors.secondary, marginTop: 20, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20}}
+        style={{backgroundColor: colors.secondary, margin: 20, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20}}
         onPress={()=> this.logout()}>
         <Text style={{color: '#fff'}} >Log out</Text>
       </TouchableOpacity>
@@ -307,33 +384,6 @@ updateUser(initial, profile) {
   }
   this.props.onSave()
 }
-          /*if (this.state.initialBackdrop != this.state.backdrop) {
-            this.uploadImage(this.state.backdrop, true).then(url => {
-              this.setState({initialBackdrop: url, backdrop: url})
-              firebase.database().ref('users/' + this.profile.uid).child('backdrop').set(url)
-              profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
-            })
-            .catch(e => {
-              this.setState({spinner: false})
-              Alert.alert('Error', e.message)
-            })
-          }
-          else {
-            if (this.state.initialBackdrop != this.state.backdrop) {
-              this.uploadImage(this.state.backdrop, true).then(url => {
-                this.setState({initialBackdrop: url, backdrop: url})
-                firebase.database().ref('users/' + this.profile.uid).child('backdrop').set(url)
-                profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
-              })
-              .catch(e => {
-                this.setState({spinner: false})
-                Alert.alert('Error', e.message)
-              })
-            }
-            else {
-              profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
-            }
-          }*/
 
 checkUsername(initial, profile){
   delete profile.avatar
@@ -451,6 +501,17 @@ uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
       ])
   }
 }
+
+const pickerItems = (array) => {
+  let items = []
+  array.forEach(item => {
+    items.push({label: item, value: item})
+  })
+  return items
+}
+
+const activities = ['Bodybuilding', 'Powerlifting', 'Swimming', 'Cycling', 'Running', 'Sprinting']
+const levels = ['Beginner', 'Intermediate', 'Advanced']
 
 
 import { connect } from 'react-redux'

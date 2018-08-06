@@ -29,7 +29,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                     priority: 'high',
                     sound: 'light.mp3',
                     id: chatId,
-                    channel: chatId,
+                    channel: user._id,
                     group: chatId,
                 }),
                 username: user.name,
