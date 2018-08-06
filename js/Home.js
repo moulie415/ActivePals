@@ -384,7 +384,8 @@ showPicker() {
       }
     }
     else {
-      ImageResizer.createResizedImage(response.uri, 500, 500, 'PNG', 100).then((resized) => {
+      const size = 640
+      ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then((resized) => {
         this.setState({spinner: false})
         this.props.previewFile('image', resized.uri)
 

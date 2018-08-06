@@ -104,7 +104,7 @@ import { NavigationActions } from "react-navigation"
               this.setState({
                 profile: this.state.initialProfile,
                 avatar: this.state.initialAvatar,
-                backdrop: this.state.backdrop
+                backdrop: this.state.initialBackdrop
               })
           }}>
             <Text style={{color: '#fff'}}>UNDO</Text>
@@ -387,10 +387,10 @@ selectAvatar(backdrop = false) {
     else {
       let source = { uri: response.uri }
 
-
+    const size = 640
     // You can also display the image using data:
     // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-    ImageResizer.createResizedImage(response.uri, 200, 200, 'PNG', 100).then((resized) => {
+    ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then((resized) => {
       // response.uri is the URI of the new image that can now be displayed, uploaded...
       // response.path is the path of the new image
       // response.name is the name of the new image with the extension

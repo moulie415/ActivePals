@@ -48,12 +48,21 @@ import { calculateAge } from './constants/utils'
     this.params = this.props.navigation.state.params
     this.uid = this.params.uid
 
+    firebase.storage().ref('images/' + this.uid ).child('backdrop').getDownloadURL()
+    .then(backdrop => this.setState({backdrop}))
+    .catch(e => console.log(e))
+
+    firebase.storage().ref('images/' + this.uid ).child('avatar').getDownloadURL()
+    .then(avatar => this.setState({avatar}))
+    .catch(e => console.log(e))
+
     firebase.database().ref('users/' + this.uid).once('value', user => {
       this.setState({profile: user.val()})
       if (this.props.friends[user.val().uid]){
         this.setState({isFriend: true})
       }
     })
+
 
     this.user = null
     this.state = {
@@ -90,13 +99,17 @@ import { calculateAge } from './constants/utils'
         </Header>
         <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View>
-      <View style={{alignItems: 'center', marginVertical: 10}}>
+      <View style={{alignItems: 'center', marginBottom: 10}}>
+      {this.state.backdrop ? <Image style={{height: 150, width: '100%'}}
+          resizeMode='cover'
+          source={{uri: this.state.backdrop}} /> :
+          <View style={{height: 150, width: '100%', backgroundColor: colors.primaryLighter, justifyContent: 'center'}}/>}
         {this.state.avatar ?
-            <Image style={{height: 90, width: 90, borderRadius: 5, marginHorizontal: 20}}
+            <Image style={{height: 90, width: 90, marginTop: -45, marginHorizontal: 20, borderWidth: 0.5, borderColor: '#fff'}}
             source={{uri: this.state.avatar}} />
           : <Icon name='md-contact'
-          style={{fontSize: 80, color: colors.primary, textAlign: 'center',
-          marginBottom: Platform.OS == 'ios' ? -5 : null, marginHorizontal: 20}}/>}
+          style={{fontSize: 80, color: colors.primary, marginTop: -45, textAlign: 'center', backgroundColor: '#fff',
+          marginBottom: 10, paddingHorizontal: 10, paddingTop: Platform.OS == 'ios' ? 5 : 0, borderWidth: 1, borderColor: colors.secondary}}/>}
 
       </View>
 
