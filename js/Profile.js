@@ -150,7 +150,7 @@ import RNPickerSelect from 'react-native-picker-select'
           {this.state.avatar ? <Image source={{uri: this.state.avatar}}
           style={{width:90, height: 90, alignSelf: 'center', borderWidth: 0.5, borderColor: '#fff'}} /> :
           <View
-          style={{width: 80, height: 80, alignSelf: 'center', backgroundColor: colors.secondary, justifyContent: 'center', borderRadius: 15}}>
+          style={{width: 80, height: 80, alignSelf: 'center', backgroundColor: colors.secondary, justifyContent: 'center'}}>
             <Icon name='ios-add' style={{color: '#fff', textAlign: 'center'}}/>
           </View>}
           </TouchableOpacity>
@@ -245,10 +245,10 @@ import RNPickerSelect from 'react-native-picker-select'
             });
           }}
           //style={{ ...pickerSelectStyles }}
-          value={this.state.profile.activity}
+          value={this.state.profile ? this.state.profile.activity : null}
           />
           </View>
-          {this.state.profile.activity  && <View style={styles.inputGrp}>
+          {this.state.profile && this.state.profile.activity  && <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Level: </Text>
           <RNPickerSelect
           placeholder={{
@@ -349,7 +349,6 @@ updateUser(initial, profile) {
           if (this.state.initialBackdrop != this.state.backdrop) {
             this.uploadImage(this.state.backdrop, true).then((url)=> {
               this.setState({initialBackdrop: url, backdrop: url})
-              firebase.database().ref('users/' + this.profile.uid).child('backdrop').set(url)
               profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
             })
             .catch(e => {

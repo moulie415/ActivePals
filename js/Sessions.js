@@ -283,7 +283,10 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
           {this.state.selectedLocation.name}</Text>
           <View style={{margin: 10}}>
-            <Text style={{marginVertical: 5}}>{this.state.selectedLocation.vicinity}</Text>
+            <Text style={{marginVertical: 5}}>
+            <Text>{this.state.selectedLocation.vicinity}</Text>
+            <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
+            </Text>
             {this.state.selectedLocation.rating && <View style={{flexDirection: 'row'}}>
               <Text style={{marginVertical: 5}}>Google rating: </Text>
             <StarRating
@@ -301,19 +304,19 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
               {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
             {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
             {this.props.profile.gym == this.state.selectedLocation.place_id ? 
-              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your gym</Text> :
+              <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your gym</Text>
+              <TouchableOpacity 
+              onPress={() => this.props.removeGym()}
+              style={{padding: 5, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red'}}>
+              <Text style={{color: '#fff'}}>Remove as your gym</Text>
+              </TouchableOpacity></View> :
               <TouchableOpacity
               onPress={()=> this.setGym(this.state.selectedLocation)}
               style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
               <Text style={{color: '#fff'}}>Set as your gym</Text>
               </TouchableOpacity>}
             {this.state.locationPhoto && <Image style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} resizeMode={'contain'} source={{uri: this.state.locationPhoto}}/>}
-            {this.props.profile.gym == this.state.selectedLocation.place_id && 
-              <TouchableOpacity 
-              onPress={() => this.props.removeGym()}
-              style={{padding: 5, alignSelf: 'center', marginBottom: 5}}>
-              <Text style={{color: 'red'}}>Remove as your gym</Text>
-              </TouchableOpacity>}
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
               <TouchableOpacity
               onPress={()=> {
@@ -773,12 +776,20 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
     else return <Text>N/A</Text>
   }
 
-getDistance(item) {
-  if (this.state.latitude) {
-    let lat1 = this.state.latitude
-    let lon1 = this.state.longitude
-    let lat2 = item.location.position.lat
-    let lon2 = item.location.position.lng
+getDistance(item, gym = false) {
+  if (this.state.yourLocation) {
+    let lat1 = this.state.yourLocation.latitude
+    let lon1 =  this.state.yourLocation.longitude
+    let lat2
+    let lon2
+    if (gym) {
+      lat2 = item.geometry.location.lat
+      lon2 = item.geometry.location.lng
+    }
+    else {
+      lat2 = item.location.position.lat
+      lon2 = item.location.position.lng
+    }
     let R = 6371
     let dLat = deg2rad(lat2 - lat1)
     let dLon = deg2rad(lon2 - lon1)

@@ -21,7 +21,7 @@
 		0A36828A20BC802B0003EEF6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A36824F20BC802A0003EEF6 /* GoogleService-Info.plist */; };
 		0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1F215A210A8E1800896D4A /* libRNGoogleSignin.a */; };
 		0A73102420F6780A00CCF377 /* Running-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A730FE820F6780A00CCF377 /* Running-background.jpg */; };
-		0A73113B20F6BF2B00CCF377 /* libreact-native-splash-screen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */; };
+		0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */; };
 		0AB3810F20098C9700BCD283 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB380DD20098C9700BCD283 /* Bolts.framework */; };
 		0AB3811320098CC000BCD283 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811020098CBC00BCD283 /* FBSDKLoginKit.framework */; };
 		0AB3811420098CC000BCD283 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811120098CBD00BCD283 /* FBSDKShareKit.framework */; };
@@ -284,6 +284,34 @@
 			proxyType = 2;
 			remoteGlobalIDString = B1DCF6BA7CE9E4C24A17D48755A38EF2;
 			remoteInfo = "react-native-splash-screen";
+		};
+		0A7CEE8B2118B2AF00F09932 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E8A2C504F8210A6F852DF4EE855B96F5;
+			remoteInfo = FirebaseAuth;
+		};
+		0A7CEE8D2118B2AF00F09932 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 59BC7E43556CAC7BFD0B0D599F0199CD;
+			remoteInfo = FirebaseStorage;
+		};
+		0A7CEE8F2118B2AF00F09932 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D01299C21A02C546F6FF1FB9A3E4CA9F;
+			remoteInfo = GTMSessionFetcher;
+		};
+		0A7CEFB5211909B300F09932 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9D23B34F1C767B80008B4819;
+			remoteInfo = ReactNativePermissions;
 		};
 		0A88FFBA201D6E19004A17CD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -576,6 +604,7 @@
 		0A1F22B2210DF55200896D4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0A36824F20BC802A0003EEF6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0A730FE820F6780A00CCF377 /* Running-background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "Running-background.jpg"; path = "../assets/images/Running-background.jpg"; sourceTree = "<group>"; };
+		0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 		0A88FFAF201D6E18004A17CD /* RNGeocoder.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNGeocoder.xcodeproj; path = "../node_modules/react-native-geocoder/ios/RNGeocoder.xcodeproj"; sourceTree = "<group>"; };
 		0AB380DD20098C9700BCD283 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		0AB3811020098CBC00BCD283 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
@@ -643,10 +672,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */,
 				0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */,
 				0A1F225D210BE24200896D4A /* libRCTFBSDK.a in Frameworks */,
 				0A1F21CF210A909500896D4A /* libRCTWebSocket.a in Frameworks */,
-				0A73113B20F6BF2B00CCF377 /* libreact-native-splash-screen.a in Frameworks */,
 				0A19E30B203771B50036DFF2 /* libreact-native-geocoder.a in Frameworks */,
 				0A19E29D20376EB60036DFF2 /* libreact-native-fcm.a in Frameworks */,
 				0DEC0B3B247E40D1953C8594 /* SafariServices.framework in Frameworks */,
@@ -773,6 +802,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		0A7CEF75211909B200F09932 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A7CEFB6211909B300F09932 /* libReactNativePermissions.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		0A88FFB0201D6E18004A17CD /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -809,11 +846,14 @@
 		0AB3819720099F9900BCD283 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				0A7CEE8C2118B2AF00F09932 /* libFirebaseAuth.a */,
 				0A3E956C2113C8FB00BCD60F /* libFirebaseCore.a */,
 				0A3E956E2113C8FB00BCD60F /* libFirebaseDatabase.a */,
 				0A3E95702113C8FB00BCD60F /* libFirebaseMessaging.a */,
+				0A7CEE8E2118B2AF00F09932 /* libFirebaseStorage.a */,
 				0A1F21A0210A908F00896D4A /* libGoogle-Maps-iOS-Utils.a */,
 				0A1F211F210A8E1800896D4A /* libGoogleToolboxForMac.a */,
+				0A7CEE902118B2AF00F09932 /* libGTMSessionFetcher.a */,
 				0A3E95722113C8FB00BCD60F /* libleveldb-library.a */,
 				0A988CAC210E2795006C6974 /* libnanopb.a */,
 				0A1F2121210A8E1800896D4A /* libPods-Anyone.a */,
@@ -954,6 +994,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */,
 				0AF6E8D320F28303003AA11A /* SplashScreen.xcodeproj */,
 				0ACB4D772060847B003BB865 /* RCTImageResizer.xcodeproj */,
 				0ACB4D70206082B4003BB865 /* RNImagePicker.xcodeproj */,
@@ -1260,6 +1301,10 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
+					ProductGroup = 0A7CEF75211909B200F09932 /* Products */;
+					ProjectRef = 0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */;
+				},
+				{
 					ProductGroup = 0AB463642113AB24003C51E2 /* Products */;
 					ProjectRef = A9305896DB9F47359A33ECC5 /* RNFirebase.xcodeproj */;
 				},
@@ -1500,6 +1545,34 @@
 			fileType = archive.ar;
 			path = "libreact-native-splash-screen.a";
 			remoteRef = 0A73110A20F6BF0000CCF377 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A7CEE8C2118B2AF00F09932 /* libFirebaseAuth.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFirebaseAuth.a;
+			remoteRef = 0A7CEE8B2118B2AF00F09932 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A7CEE8E2118B2AF00F09932 /* libFirebaseStorage.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFirebaseStorage.a;
+			remoteRef = 0A7CEE8D2118B2AF00F09932 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A7CEE902118B2AF00F09932 /* libGTMSessionFetcher.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGTMSessionFetcher.a;
+			remoteRef = 0A7CEE8F2118B2AF00F09932 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A7CEFB6211909B300F09932 /* libReactNativePermissions.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libReactNativePermissions.a;
+			remoteRef = 0A7CEFB5211909B300F09932 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A88FFBB201D6E19004A17CD /* libreact-native-google-maps.a */ = {

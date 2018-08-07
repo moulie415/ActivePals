@@ -103,7 +103,7 @@ PODS:
   - Protobuf (3.6.0)
   - React (0.56.0):
     - React/Core (= 0.56.0)
-  - react-native-fcm (16.0.0):
+  - react-native-fcm (16.1.0):
     - Firebase/Messaging
     - React
   - react-native-geocoder (0.5.0):

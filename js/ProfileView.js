@@ -52,16 +52,23 @@ import { calculateAge } from './constants/utils'
 
     firebase.database().ref('users/' + this.uid).once('value', user => {
       this.setState({profile: user.val()})
+      if (user.val().gym) {
+        firebase.database().ref('gyms/' + user.val().gym).once('value', gym => {
+          this.setState({gym: gym.val()})
+        })
+      }
       if (this.props.friends[user.val().uid]){
         this.setState({isFriend: true})
       }
     })
 
 
+
     this.user = null
     this.state = {
       isFriend: false,
-      profile: {}
+      profile: {},
+      gym: {}
     }
   }
 
@@ -86,7 +93,7 @@ import { calculateAge } from './constants/utils'
 
 
   render () {
-    const {  username, first_name, last_name, birthday, email, uid, accountType, activity, level } = this.state.profile
+    const {  username, first_name, last_name, birthday, email, uid, accountType, activity, level} = this.state.profile
     return (
     <Container>
     <Header style={{backgroundColor: colors.primary}}>
@@ -153,6 +160,10 @@ import { calculateAge } from './constants/utils'
 
         {accountType && this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Account type:
         <Text style={{color: colors.secondary}}> {accountType}</Text></Text>}
+
+        {this.state.gym && this.state.gym.name && 
+          this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Gym:
+        <Text style={{color: colors.secondary}}> {this.state.gym.name}</Text></Text>}
 
         {birthday && this.state.isFriend &&  <Text style={{marginLeft: 10, marginVertical: 5}}>
        <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Birthday: </Text>

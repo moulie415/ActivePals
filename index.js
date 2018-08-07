@@ -192,6 +192,7 @@ class FitLink extends React.Component {
       priority: 'high',
     })
 
+    
 
     this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, token => {
       let user = firebase.auth().currentUser

@@ -223,7 +223,8 @@ import RNFetchBlob from 'rn-fetch-blob'
 
   gLogin() {
     GoogleSignin.configure({
-      iosClientId: '680139677816-3eoc0cs830fbns898khlh01e6f685k1u.apps.googleusercontent.com'
+      iosClientId: '680139677816-3eoc0cs830fbns898khlh01e6f685k1u.apps.googleusercontent.com',
+      webClientId: '680139677816-fp071bo61qp0dfk5olqu4tke2477u6jc.apps.googleusercontent.com'
     }).then(() => {
       GoogleSignin.hasPlayServices({ autoResolve: true })
         .then(() => {
@@ -242,8 +243,8 @@ import RNFetchBlob from 'rn-fetch-blob'
                 .signInWithCredential(credential)
                 .then(user => {
                   console.log("user firebase ", user)
-                  let userData = {uid: user.uid, email: user.email, token: user.refreshToken}
-                  this.createUser(user.uid, userData, user.refreshToken)
+                  let userData = {uid: user.uid, email: user.email, token: user.token}
+                  this.createUser(user.uid, userData, user.token)
 
                   if (user.emailVerified) {
                  }

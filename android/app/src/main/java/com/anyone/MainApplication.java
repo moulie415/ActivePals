@@ -8,13 +8,16 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+import co.apptailor.googlesignin.RNGoogleSigninPackage;
+import org.devio.rn.splashscreen.SplashScreenReactPackage;
+
+import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import com.devfd.RNGeocoder.RNGeocoderPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.apsl.versionnumber.RNVersionNumberPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.imagepicker.ImagePickerPackage;
-import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
@@ -50,13 +53,13 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFirebaseMessagingPackage(),
             new RNGeocoderPackage(),
             new RNFirebaseStoragePackage(),
+            new RNGoogleSigninPackage(),
             new RNFirebaseAuthPackage(),
             new SplashScreenReactPackage(),
             new RNVersionNumberPackage(),
             new MapsPackage(),
             new ImageResizerPackage(),
             new ImagePickerPackage(),
-            new RNGoogleSigninPackage(),
             new RNFetchBlobPackage(),
               new FIRMessagingPackage(),
               new FBSDKPackage(mCallbackManager)
