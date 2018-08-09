@@ -43,22 +43,18 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
     firebase.auth().onAuthStateChanged(user => {
       if (user && user.emailVerified && !this.state.waitForData) {
         this.setState({spinner: true})
-        firebase.database().ref('users/' + user.uid).once('value', snapshot => {
-          if (snapshot.val() && snapshot.val().uid) {
+        firebase.auth().fetchProvidersForEmail(user.email).then(providers => {
+        this.setState({spinner: false})
+          if (providers.length > 0) {
             this.props.onLogin()
           }
-          else {
-            let userData = {uid: user.uid, email: user.email, token: user.token }
-            this.createUser(user.uid, userData, user.token).then(() => {
-              this.props.onLogin()
-            })
-          }
+          else if (this.props.nav.index > 0) { 
+              this.props.logout()
+            }
         })
+        .catch(e => console.log(e))
       }
     })
-    // if (this.props.loggedIn) {
-    //   this.props.goHome()
-    // }
   }
 
 
@@ -356,10 +352,11 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
 
 import { connect } from 'react-redux'
 import { navigateLogin, navigateHome } from 'Anyone/js/actions/navigation'
-import { doSetup, fetchProfile, setHasLoggedIn } from 'Anyone/js/actions/profile'
+import { doSetup, fetchProfile, setHasLoggedIn, setLoggedOut } from 'Anyone/js/actions/profile'
 
-const mapStateToProps = ({ home, settings, profile }) => ({
+const mapStateToProps = ({ home, settings, profile, nav }) => ({
   loggedIn: profile.loggedIn,
+  nav,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -367,6 +364,10 @@ const mapDispatchToProps = dispatch => ({
   onLogin: ()=> {dispatch(fetchProfile()).then(profile => {
     dispatch(doSetup(profile))
   })},
+  logout: () => {
+    dispatch(navigateLogin())
+    dispatch(setLoggedOut())
+  },
   goHome: ()=> dispatch(navigateHome())
 })
 

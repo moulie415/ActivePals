@@ -809,7 +809,6 @@ setGym(location) {
   if (this.props.profile.gym) {
     this.props.removeGym()
   }
-  this.props.setGym(location.place_id)
   firebase.database().ref('users/' + this.props.profile.uid).child('gym').set(location.place_id)
   firebase.database().ref('gyms').child(location.place_id).once('value', gym => {
     if (!gym.val()) {
@@ -822,6 +821,7 @@ setGym(location) {
       firebase.database().ref('gyms/' + gym.val().place_id).child('userCount').set(count)
       firebase.database().ref('gyms/' + gym.val().place_id + '/users').child(this.props.profile.uid).set(true)
     }
+    this.props.setGym(location.place_id)
   })
 }
 

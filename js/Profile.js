@@ -155,22 +155,6 @@ import RNPickerSelect from 'react-native-picker-select'
           </View>}
           </TouchableOpacity>
 
-        {/*this.state.avatar ?
-          <TouchableOpacity
-          style={{marginHorizontal: 20}}
-          onPress={()=> this.selectAvatar()}>
-            <Image style={{height: 90, width: 90, borderRadius: 5}}
-            source={{uri: this.state.avatar}} />
-          </TouchableOpacity>
-         : <TouchableOpacity
-        onPress={()=> this.selectAvatar()}
-        style={{marginHorizontal: 20, backgroundColor: '#fff7', borderRadius: 5, width: 90, height: 90, justifyContent: 'center'}}>
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <Icon name='md-contact'
-          style={{fontSize: 80, color: colors.primary, textAlign: 'center',
-          marginBottom: Platform.OS == 'ios' ? -5 : null}}/>
-          </View>
-          </TouchableOpacity>*/}
 
       </View>
 
