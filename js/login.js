@@ -20,6 +20,7 @@ import colors from 'Anyone/js/constants/colors'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import SplashScreen from 'react-native-splash-screen'
 import RNFetchBlob from 'rn-fetch-blob'
+import TouchableOpacity from './constants/TouchableOpacityLockable.js'
 
 
  class Login extends Component {
@@ -40,14 +41,14 @@ import RNFetchBlob from 'rn-fetch-blob'
   componentDidMount() {
     SplashScreen.hide()
     firebase.auth().onAuthStateChanged(user => {
-      if (user && user.emailVerified) {
+      if (user && user.emailVerified && !this.state.waitForData) {
         this.setState({spinner: true})
         firebase.database().ref('users/' + user.uid).once('value', snapshot => {
           if (snapshot.val() && snapshot.val().uid) {
             this.props.onLogin()
           }
           else {
-            let userData = {uid: user.uid, email: user.email, token: user.token, photoUrl: user.photoUrl}
+            let userData = {uid: user.uid, email: user.email, token: user.token }
             this.createUser(user.uid, userData, user.token).then(() => {
               this.props.onLogin()
             })
@@ -94,39 +95,60 @@ import RNFetchBlob from 'rn-fetch-blob'
         />
         </Item>
         <View style={{flexDirection: 'row', marginVertical: 10}}>
-      <Button primary
-        onPress={() => {
+      <TouchableOpacity primary
+        onPress={(mutex) => {
+          mutex.lockFor(1000)
           this.setState({spinner: true})
           this.login(this.username, this.pass)
         }}
         style={[{marginRight: 10}, styles.button]}
         >
         <Text style={{color: '#fff'}}>Login</Text>
-        </Button>
-      <Button primary
+        </TouchableOpacity>
+      <TouchableOpacity primary
         onPress={() => this.props.navigation.navigate("SignUp")}
         style={styles.button}
         >
         <Text style={{color: '#fff'}}>Sign Up</Text>
-        </Button>
+        </TouchableOpacity>
         </View>
         <View>
-          <Button
-          onPress={()=> {
+          <TouchableOpacity
+          onPress={(mutex)=> {
+            mutex.lockFor(5000)
             this.fbLogin(this.props.navigation)
           }}
-          style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#3b5998", width: 250}}>
-            <Icon name="logo-facebook"/>
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginVertical: 10,
+            backgroundColor: "#3b5998",
+            width: 250,
+            flexDirection: 'row',
+            paddingVertical: 8,
+            borderRadius: 2
+          }}>
+            <Icon style={{color: '#fff', marginRight: 10}} name="logo-facebook"/>
             <Text style={{color: '#fff'}}>Login with Facebook</Text>
-          </Button>
-          <Button
-          onPress={()=> {
+          </TouchableOpacity>
+          <TouchableOpacity
+          onPress={(mutex)=> {
+            mutex.lockFor(5000)
             this.gLogin()
           }}
-          style={{alignSelf: 'center', justifyContent: 'center', marginVertical: 10, backgroundColor: "#ea4335", width: 250}}>
-            <Icon style={{marginLeft: 0}} name="logo-google"/>
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginVertical: 10,
+            backgroundColor: "#ea4335",
+            width: 250,
+            flexDirection: 'row',
+            paddingVertical: 8,
+            borderRadius: 2
+          }}>
+            <Icon style={{marginLeft: -15, color: '#fff', marginRight: 10}} name="logo-google"/>
             <Text style={{ color: '#fff'}}>Login with Google</Text>
-          </Button>
+          </TouchableOpacity>
         </View>
           <Text style={{color: '#fff', textAlign: 'center', position: 'absolute', bottom: 10}}>
           {'v' + VersionNumber.appVersion}</Text>
@@ -166,6 +188,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 
 
  _handleCallBack(result, navigation){
+    this.setState({spinner: true})
     let _this = this
     if (result.isCancelled) {
       //Alert.alert('Facbook login', 'cancelled')
@@ -203,10 +226,12 @@ import RNFetchBlob from 'rn-fetch-blob'
               })
               .catch(error => {
                 Alert.alert('Error', error.message)
+                this.setState({spinner: false})
               })
             })
             .catch(error => {
               Alert.alert('Error', error.message)
+              this.setState({spinner: false})
             })
           }
         )
@@ -239,6 +264,7 @@ import RNFetchBlob from 'rn-fetch-blob'
   }
 
   gLogin() {
+    this.setState({waitForData: true, spinner: true})
     GoogleSignin.configure({
       iosClientId: '680139677816-3eoc0cs830fbns898khlh01e6f685k1u.apps.googleusercontent.com',
       webClientId: '680139677816-fp071bo61qp0dfk5olqu4tke2477u6jc.apps.googleusercontent.com'
@@ -247,8 +273,9 @@ import RNFetchBlob from 'rn-fetch-blob'
         .then(() => {
           GoogleSignin.signIn()
             .then(user => {
-              this.setState({spinner: true})
               console.log(user)
+              let first_name = user.givenName
+              let last_name = user.familyName
 
               const credential = firebase.auth.GoogleAuthProvider.credential(
                 user.idToken,
@@ -261,27 +288,25 @@ import RNFetchBlob from 'rn-fetch-blob'
                 .then(result => {
                   let user = result.user
                   console.log("user firebase ", user)
-                  let userData = {uid: user.uid, email: user.email, token: user.token }
-                  this.createUser(user.uid, userData, user.token)
-
-                  if (result.additionalUserInfo && result.additionalUserInfo.isNewUser && user.photoURL) {
-                    const imageRef = firebase.storage().ref('images/' +  user.uid).child('avatar')
-                    RNFetchBlob.fetch('GET', user.photoURL).then(image => image.blob())
-                    .then(blob => {
-                      imageRef.putFile(blob._ref)
-                    })
-                    .catch(e => console.log(e))
-                  }
-
-                  if (user.emailVerified) {
-                 }
-                 else {
-                   user.sendEmailVerification().then(()=> {
-                     Alert.alert('Account created', 'You must now verify your email using the link we sent you before you can login')
-                   }).catch(error => {
-                    Alert.alert('Error', error.message)
+                  let userData = {uid: user.uid, email: user.email, token: user.token, last_name, first_name }
+                  this.createUser(user.uid, userData, user.token).then(() => {
+                    if (result.additionalUserInfo && result.additionalUserInfo.isNewUser && user.photoURL) {
+                      const imageRef = firebase.storage().ref('images/' +  user.uid).child('avatar')
+                      RNFetchBlob.fetch('GET', user.photoURL).then(image => image.blob())
+                      .then(blob => {
+                        imageRef.putFile(blob._ref).then(() => {
+                          this.checkForVerification(user)
+                        })
+                      })
+                      .catch(e => {
+                        console.log(e)
+                        this.checkForVerification(user)
+                      })
+                    }
+                    else {
+                      this.checkForVerification(user)
+                    }
                   })
-                 }
 
                   //if (user._authObj.authenticated) { THIS LINE DOES NOT WORK
                     // do you login action here
@@ -292,9 +317,8 @@ import RNFetchBlob from 'rn-fetch-blob'
                   //}
                 });
             })
-            .catch(err => {
-              console.log("WRONG SIGNIN", err.message)
-              Alert.alert("Wrong sign in", err.message)
+            .catch(e => {
+              console.log(e)
             })
             .done()
         })
@@ -304,6 +328,20 @@ import RNFetchBlob from 'rn-fetch-blob'
         })
    })
   }
+
+  checkForVerification(user) {
+    if (!user.emailVerified) {
+     user.sendEmailVerification().then(()=> {
+       Alert.alert('Account created', 'You must now verify your email using the link we sent you before you can login')
+     }).catch(error => {
+      Alert.alert('Error', error.message)
+    })
+   }
+   else {
+    this.props.onLogin()
+   }
+   this.setState({waitForData: false})
+ }
 
 
    logout() {
