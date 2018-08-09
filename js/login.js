@@ -42,7 +42,17 @@ import RNFetchBlob from 'rn-fetch-blob'
     firebase.auth().onAuthStateChanged(user => {
       if (user && user.emailVerified) {
         this.setState({spinner: true})
-        this.props.onLogin()
+        firebase.database().ref('users/' + user.uid).once('value', snapshot => {
+          if (snapshot.val() && snapshot.val().uid) {
+            this.props.onLogin()
+          }
+          else {
+            let userData = {uid: user.uid, email: user.email, token: user.token, photoUrl: user.photoUrl}
+            this.createUser(user.uid, userData, user.token).then(() => {
+              this.props.onLogin()
+            })
+          }
+        })
       }
     })
     // if (this.props.loggedIn) {
@@ -181,8 +191,9 @@ import RNFetchBlob from 'rn-fetch-blob'
                  const imageRef = firebase.storage().ref('images/' + result.uid).child('avatar')
                  RNFetchBlob.fetch('GET', fbImage).then(image => image.blob())
                  .then(blob => {
-                  imageRef.put(blob)
+                  imageRef.putFile(blob._ref)
                  })
+                 .catch(e => console.log(e))
                }).catch(error => {
                 Alert.alert('Error', error.message)
               })
@@ -210,13 +221,19 @@ import RNFetchBlob from 'rn-fetch-blob'
   }
 
   createUser = (uid,userData,token) => {
-    firebase.database().ref('admins').child(uid).once('value', snapshot => {
-      const defaults = {
-        uid,
-        token,
-        accountType: snapshot.val() ? 'admin' : 'standard',
-      }
-      firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
+    return new Promise(resolve => {
+      firebase.database().ref('admins').child(uid).once('value', snapshot => {
+        const defaults = {
+          uid,
+          token,
+          accountType: snapshot.val() ? 'admin' : 'standard',
+        }
+        firebase.database().ref('users').child(uid).update({ ...userData, ...defaults })
+        .then(() => {
+          resolve()
+        })
+
+      })
 
     })
   }
@@ -240,11 +257,21 @@ import RNFetchBlob from 'rn-fetch-blob'
 
               firebase
                 .auth()
-                .signInWithCredential(credential)
-                .then(user => {
+                .signInAndRetrieveDataWithCredential(credential)
+                .then(result => {
+                  let user = result.user
                   console.log("user firebase ", user)
-                  let userData = {uid: user.uid, email: user.email, token: user.token}
+                  let userData = {uid: user.uid, email: user.email, token: user.token }
                   this.createUser(user.uid, userData, user.token)
+
+                  if (result.additionalUserInfo && result.additionalUserInfo.isNewUser && user.photoURL) {
+                    const imageRef = firebase.storage().ref('images/' +  user.uid).child('avatar')
+                    RNFetchBlob.fetch('GET', user.photoURL).then(image => image.blob())
+                    .then(blob => {
+                      imageRef.putFile(blob._ref)
+                    })
+                    .catch(e => console.log(e))
+                  }
 
                   if (user.emailVerified) {
                  }
