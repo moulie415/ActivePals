@@ -8,6 +8,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
@@ -48,19 +49,19 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
-            new RNFirebasePackage(),
-            new RNFirebaseDatabasePackage(),
-            new RNFirebaseMessagingPackage(),
-            new RNGeocoderPackage(),
-            new RNFirebaseStoragePackage(),
-            new RNGoogleSigninPackage(),
-            new RNFirebaseAuthPackage(),
-            new SplashScreenReactPackage(),
-            new RNVersionNumberPackage(),
-            new MapsPackage(),
-            new ImageResizerPackage(),
-            new ImagePickerPackage(),
-            new RNFetchBlobPackage(),
+              new RNFirebasePackage(),
+              new RNFirebaseDatabasePackage(),
+              new RNFirebaseMessagingPackage(),
+              new RNGeocoderPackage(),
+              new RNFirebaseStoragePackage(),
+              new RNGoogleSigninPackage(),
+              new RNFirebaseAuthPackage(),
+              new SplashScreenReactPackage(),
+              new RNVersionNumberPackage(),
+              new MapsPackage(),
+              new ImageResizerPackage(),
+              new ImagePickerPackage(),
+              new RNFetchBlobPackage(),
               new FIRMessagingPackage(),
               new FBSDKPackage(mCallbackManager)
       );
