@@ -315,6 +315,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
             })
             .catch(e => {
               console.log(e)
+              Alert.alert('Error', "Code: " + e.code)
             })
             .done()
         })

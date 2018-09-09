@@ -10,6 +10,9 @@ import {
   Modal,
   SafeAreaView,
   KeyboardAvoidingView,
+  TouchableOpacity,
+  Dimensions,
+  ScrollView
 } from "react-native"
 import { 
   Button,
@@ -27,7 +30,7 @@ import {
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import colors from './constants/colors'
-import TouchableOpacity from './constants/TouchableOpacityLockable'
+import ToucableOpacity from './constants/TouchableOpacityLockable'
 import  styles  from './styles/homeStyles'
 import sStyles from './styles/settingsStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
@@ -35,9 +38,15 @@ import { getSimplified } from 'Anyone/js/chat/SessionChats'
 import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
 import ImageViewer from 'react-native-image-zoom-viewer'
+import ModalBox from 'react-native-modalbox'
+import Comments from 'react-native-comments'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
+
+const SCREEN_WIDTH = Dimensions.get('window').width
+const SCREEN_HEIGHT = Dimensions.get('window').height
+
 
 class Home extends Component {
 
@@ -61,6 +70,21 @@ class Home extends Component {
       spinner: false,
       selectedImage: null,
       showImage: false,
+      comments: [
+        {
+          "parentId": null,
+          "commentId": 1,
+          "name": "id labore ex et quam laborum",
+          "liked": true,
+          "reported": false,
+          "likes": [
+          ],
+          "email": "testUser",
+          "created_at": "2017-12-23 14:45:06",
+          "body": "laudantium enim quasi est quidem ",
+          "children": []
+        }
+      ]
     }
   }
 
@@ -197,6 +221,82 @@ componentWillReceiveProps(nextProps) {
           imageUrls={this.state.selectedImage}
             />
       </Modal>
+      <ModalBox
+          style={{
+            width: SCREEN_WIDTH - 20,
+            height: SCREEN_HEIGHT - 100,
+            marginTop: isIphoneX() ? 40 : 0,
+            borderRadius: 5,
+            }}
+          ref={"commentModal"}
+          backButtonClose={true}
+          position={'center'}
+          >
+            <Text style={styles.text}>Replace with back button</Text>
+            <ScrollView
+            onScroll={(event) => {
+                this.scrollIndex = event.nativeEvent.contentOffset.y
+            }}
+            ref={'scrollView'}>
+            <Comments
+          data={this.state.comments}
+          viewingUserName={"test"}
+          initialDisplayCount={10}
+          editMinuteLimit={900}
+          childrenPerPage={5}
+          lastCommentUpdate={this.state.lastCommentUpdate}
+          usernameTapAction={username => this.props.navigator.showModal({
+              screen: 'M.Profile',
+              passProps: {
+                profileUsername: username,
+                title: username
+              }
+            })
+          }
+          childPropName={'children'}
+          isChild={() =>this.isCommentChild(item)}
+          keyExtractor={item => item.comment_id}
+          usernameExtractor={item => this.extractUsername(item)}
+          editTimeExtractor={item => this.extractEditTime(item)}
+          createdTimeExtractor={item => this.extractCreatedTime(item)}
+          bodyExtractor={item => this.extractBody(item)}
+          imageExtractor={item => this.extractImage(item)}
+          likeExtractor={item => this.likeExtractor(item)}
+          reportedExtractor={item => this.reportedExtractor(item)}
+          likesExtractor={item => this.likesExtractor(item)}
+          childrenCountExtractor={item => this.extractChildrenCount(item)}
+          timestampExtractor={item => item.updated_at}
+          replyAction={offset => {
+            this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
+          }}
+          saveAction={(text, parentCommentId) => {
+            this.props.actions.save(this.props.id, text, 'review', parentCommentId)
+          }}
+          editAction={(text, comment) => {
+            this.props.actions.edit(this.props.id, comment, text)
+          }}
+          reportAction={(comment) => this.props.actions.report(this.props.id, comment)}
+          likeAction={(comment) => {
+            this.props.actions.like(this.props.id, comment)
+          }
+          }
+          paginateAction={(from_comment_id, direction, parent_comment_id) => {
+            this.props.actions.paginateComments(
+              review.review_id,
+              'review',
+              from_comment_id,
+              direction,
+              parent_comment_id)
+            let self = this
+            setTimeout(function () {
+              self.refs.scrollView.scrollTo(500)
+            }, 3000)
+
+          }
+          }
+        />
+        </ScrollView>
+        </ModalBox>
     </Container>
   )
   }
@@ -296,7 +396,7 @@ componentWillReceiveProps(nextProps) {
     </TouchableOpacity>
     <TouchableOpacity
     onPress={() => {
-      Alert.alert('coming soon')
+      this.refs.commentModal.open()
     }}
     style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
       <Icon name='md-chatboxes' style={{marginRight: 10, color: '#616770'}}/>
@@ -410,12 +510,83 @@ showPicker() {
      else return 'N/A'
    }
 
+  extractUsername(c) {
+    try {
+      return c.user && c.user.username && c.user.username !== '' ? JSON.parse(c.user.username) : null
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  extractBody (c) {
+    return c.body
+    // try {
+    //   return c.body && c.body !== '' ? JSON.parse(c.body) : null
+    // } catch (e) {
+    //   console.log(e)
+    // }
+  }
+
+  likesExtractor (item) {
+    return item.likes.map((like) => {
+      return {
+        image: this.config.urls.api_url+'/data/images/users/'+like.user_id+'/'+like.user.image,
+        name: JSON.parse(like.user.name),
+        user_id: like.user_id,
+        tap: (username) => {
+          this.props.navigator.showModal({
+            screen: "M.Profile",
+            passProps: {profileUsername: username},
+          title: username})
+        }
+      }
+    })
+  }
+
+  extractEditTime (item) {
+    try {
+      return item.updated_at
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  extractImage (c) {
+    try {
+      return c.user.image_id && c.user.image_id !== '' ? this.config.urls.api_url +
+        '/data/images/users/' + c.user.image_id : this.config.urls.api_url +
+        '/data/images/users/no_image.png'
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  likeExtractor (item) {
+    return item.hasUserLiked
+  }
+
+  reportedExtractor (item) {
+    return item.reported
+  }
+
+  extractChildrenCount (c) {
+    try {
+      return c.childrenCount || 0
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+
 }
+
 
 
 import { connect } from 'react-redux'
 import { navigateProfile, navigateProfileView, navigateFilePreview } from 'Anyone/js/actions/navigation'
 import { addPost, repPost } from 'Anyone/js/actions/home'
+import { isIphoneX } from "react-native-iphone-x-helper"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,
