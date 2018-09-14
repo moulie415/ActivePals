@@ -127,14 +127,6 @@ export const addChat = (chat) => {
 			if (lastMessage.val()) {
 				message = Object.values(lastMessage.val())[0]
 			}
-			firebase.database().ref('users/' + uid).child('username').once('value', username => {
-				FCM.createNotificationChannel({
-					id: uid,
-					name: username.val(),
-					description: 'Notifications from ' + username.val(),
-					priority: 'high',
-				})
-			})
 			dispatch(addToChats(uid, {uid, chatId, lastMessage: message}))
 			dispatch(fetchProfile())
 		})
@@ -172,12 +164,6 @@ export const fetchSessionChats = (sessions, uid) => {
 							}
 							resolve({...snapshot.val(), key: session, lastMessage: message})
 						})
-						FCM.createNotificationChannel({
-							id: session,
-							name: snapshot.val().title,
-							description: 'Notifications from ' + snapshot.val().title,
-							priority: 'high',
-						})
 					}
 					else {
 						resolve()
@@ -214,12 +200,6 @@ export const addSessionChat = (session, isPrivate = false) => {
 					resolve({...snapshot.val(), key: session, lastMessage: message})
 					dispatch(addToSessionChats(session, {...snapshot.val(), key: session, lastMessage: message}))
 					dispatch(fetchProfile())
-				})
-				FCM.createNotificationChannel({
-					id: session,
-					name: snapshot.val().title,
-					description: 'Notifications from ' + snapshot.val().title,
-					priority: 'high',
 				})
 			})
 		})

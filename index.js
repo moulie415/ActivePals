@@ -191,6 +191,18 @@ class FitLink extends React.Component {
       description: 'Channel for buddy requests',
       priority: 'high',
     })
+    FCM.createNotificationChannel({
+      id: 'DIRECT_MESSAGES',
+      name: 'Direct messages',
+      description: 'Channel for direct messages from buddies',
+      priority: 'high',
+    })
+    FCM.createNotificationChannel({
+      id: 'SESSION_MESSAGES',
+      name: 'Session messages',
+      description: 'Channel for session messages',
+      priority: 'high',
+    })
 
     
 

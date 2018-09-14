@@ -233,8 +233,14 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
           {this.state.selectedSession.title}</Text>
           <ScrollView style={{margin: 10}}>
           <View style={{flexDirection: 'row'}}>
+          <View style={{flexDirection: 'row', flex: 1}}>
             <Text style={{color: '#000'}}>Host: </Text>
             {this.fetchHost(this.state.selectedSession.host)}
+            </View>
+            {this.state.selectedSession.private && <View style={{flex: 1, alignItems: 'flex-end', flexDirection: 'row', justifyContent: 'flex-end'}}>
+            <Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/>
+            <Text>PRIVATE</Text>
+            </View>}
           </View>
           <Hyperlink
           linkStyle={{color: colors.secondary}}
@@ -558,8 +564,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
                       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text style={[styles.date], {color: item.inProgress ? colors.secondary : "#999"}} >
                       {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
-                      {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 15, paddingHorizontal: 5}}/>
-                      <Text style={{fontSize: 12, color: '#000'}}>PRIVATE</Text></View>}</View>
+                      {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/></View>}</View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                         <TouchableOpacity onPress={()=>{
