@@ -1,0 +1,69 @@
+{
+  "_from": "react-native-comments",
+  "_id": "react-native-comments@1.1.1",
+  "_inBundle": false,
+  "_integrity": "sha512-svOtJ78cG2mPBJsrxuawgqF7xbcJxiSWgZa9e9V2YgOjq8/Uv6pY6YYYA/Rf671k7PRTOMF/3nMI8jNRY0l+6w==",
+  "_location": "/react-native-comments",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "react-native-comments",
+    "name": "react-native-comments",
+    "escapedName": "react-native-comments",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/react-native-comments/-/react-native-comments-1.1.1.tgz",
+  "_shasum": "0ce0ed49f2dc2d0c0098fc2b24aed61da663d1a0",
+  "_spec": "react-native-comments",
+  "_where": "/Users/henrymoule/workspace/personal_projects/anyone",
+  "author": {
+    "name": "Tino Tokic",
+    "email": "ttokic1985@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/tokict/react-native-comments/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "prop-types": "^15.5.10",
+    "react-native-collapsible": "^0.9.0",
+    "react-native-timeago": "^0.4.0",
+    "react-native-vector-icons": "^4.3.0"
+  },
+  "deprecated": false,
+  "description": "Complete view component for rendering comments in RN",
+  "dev-dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "babel-preset-react-native": "4.0.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.9.1"
+  },
+  "homepage": "https://github.com/tokict/react-native-comments#readme",
+  "keywords": [
+    "react-native",
+    "react-native-comments",
+    "comments"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "react-native-comments",
+  "peerDependencies": {
+    "react-native": "0.51"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tokict/react-native-comments.git"
+  },
+  "version": "1.1.1"
+}

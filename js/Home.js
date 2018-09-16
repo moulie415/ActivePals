@@ -91,7 +91,7 @@ class Home extends Component {
           ],
           "email": "testUser",
           "created_at": "2017-12-23 14:45:06",
-          "body": "laudantium enim quasi est quidem ",
+          "text": "laudantium enim quasi est quidem ",
           "children": []
         }
       ]
@@ -247,6 +247,7 @@ componentWillReceiveProps(nextProps) {
             <Icon name={'ios-arrow-back'}  style={{color: '#000', fontSize: 30, padding: 10}}/>
            </TouchableOpacity>
             <ScrollView
+            keyboardShouldPersistTaps={'handled'}
             onScroll={(event) => {
                 this.scrollIndex = event.nativeEvent.contentOffset.y
             }}
@@ -285,7 +286,17 @@ componentWillReceiveProps(nextProps) {
             this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
           }}
           saveAction={(text, parentCommentId) => {
-            this.props.actions.save(this.props.id, text, 'review', parentCommentId)
+            if (text) {
+            this.props.comment(
+              this.props.profile.uid,
+              this.state.postId,
+              text,
+              (new Date()),toString(),
+              parentCommentId
+            ).then(() => {
+              console.log("comment sent")
+            }).catch(e => Alert.alert('Error', e.message))
+            }
           }}
           editAction={(text, comment) => {
             this.props.actions.edit(this.props.id, comment, text)
@@ -412,6 +423,7 @@ componentWillReceiveProps(nextProps) {
     <TouchableOpacity
     onPress={() => {
       this.refs.commentModal.open()
+      this.setState({postId: item.key})
     }}
     style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
       <Icon name='md-chatboxes' style={{marginRight: 10, color: '#616770'}}/>
@@ -534,7 +546,7 @@ showPicker() {
 
 import { connect } from 'react-redux'
 import { navigateProfile, navigateProfileView, navigateFilePreview } from 'Anyone/js/actions/navigation'
-import { addPost, repPost } from 'Anyone/js/actions/home'
+import { addPost, repPost, postComment } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -550,6 +562,7 @@ const mapDispatchToProps = dispatch => ({
   postStatus: (status) => {return dispatch(addPost(status))},
   onRepPost: (item) => dispatch(repPost(item)),
   previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
+  comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

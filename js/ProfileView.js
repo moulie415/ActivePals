@@ -68,7 +68,8 @@ import { calculateAge } from './constants/utils'
     this.state = {
       isFriend: false,
       profile: {},
-      gym: {}
+      gym: {},
+      //avatar: this.props.friends[this.uid] ? this.props.friends[this.uid].avatar : null
     }
   }
 

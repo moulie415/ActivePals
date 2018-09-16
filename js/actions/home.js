@@ -169,3 +169,22 @@ export const repPost = (item) => {
 		})
 	}
 }
+
+export const postComment = (uid, postId, text, created_at, parentCommentId) => {
+	return (dispatch, getState) => {
+		let ref = firebase.database().ref('comments').push()
+		let key = ref.key
+		return firebase.database().ref('comments/' + key).set({uid, postId, text, created_at, parentCommentId}).then(() => {
+			return firebase.database().ref('posts/' + postId).child('commentCount').once('value', snapshot => {
+				let count
+				if (snapshot.val()) {
+					count = snapshot.val()
+					count += 1
+				}
+				else count = 1
+				firebase.database().ref('posts/' + postId).child('commentCount').set(count)
+				return firebase.database().ref('postComments/' + postId).child(key).set(uid)
+			})
+		})
+	}
+}

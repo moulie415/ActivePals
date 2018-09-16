@@ -86,7 +86,7 @@ export function extractCreatedTime (item) {
   }
 
   export function extractBody (c) {
-    return c.body
+    return c.text
     // try {
     //   return c.body && c.body !== '' ? JSON.parse(c.body) : null
     // } catch (e) {
