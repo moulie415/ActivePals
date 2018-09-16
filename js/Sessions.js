@@ -882,7 +882,7 @@ export const GooglePlacesInput = (_this) => {
           })
         }
         else {
-          Alert.alert('Place selected is not a gym')
+          Alert.alert('Location selected not recognised as a gym, please contact support if you think this is incorrect')
           _this.setState({latitude: location.lat, longitude: location.lng})
         }
       }}

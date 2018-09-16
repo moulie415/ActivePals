@@ -1,25 +1,19 @@
 import React, { Component } from "react"
 import { 
-  StyleSheet,
   View,
   Alert,
   Image,
   TextInput,
   FlatList,
-  Platform,
   Modal,
   SafeAreaView,
-  KeyboardAvoidingView,
   TouchableOpacity,
   Dimensions,
   ScrollView
 } from "react-native"
 import { 
-  Button,
-  Input,
   Container,
   Content,
-  Item,
   Icon,
   Header,
   Title,
@@ -40,6 +34,17 @@ import ImageResizer from 'react-native-image-resizer'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import ModalBox from 'react-native-modalbox'
 import Comments from 'react-native-comments'
+import {
+  extractCreatedTime,
+  extractUsername,
+  extractBody,
+  likesExtractor,
+  likeExtractor,
+  extractChildrenCount,
+  extractEditTime,
+  extractImage,
+  reportedExtractor,
+} from './constants/utils'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -70,10 +75,15 @@ class Home extends Component {
       spinner: false,
       selectedImage: null,
       showImage: false,
+
       comments: [
         {
           "parentId": null,
           "commentId": 1,
+          "user": {
+            username: 'test',
+            uid: 12345,
+          },
           "name": "id labore ex et quam laborum",
           "liked": true,
           "reported": false,
@@ -227,12 +237,15 @@ componentWillReceiveProps(nextProps) {
             height: SCREEN_HEIGHT - 100,
             marginTop: isIphoneX() ? 40 : 0,
             borderRadius: 5,
+            padding: 5,
             }}
           ref={"commentModal"}
           backButtonClose={true}
           position={'center'}
           >
-            <Text style={styles.text}>Replace with back button</Text>
+          <TouchableOpacity onPress={()=> this.refs.commentModal.close()}>
+            <Icon name={'ios-arrow-back'}  style={{color: '#000', fontSize: 30, padding: 10}}/>
+           </TouchableOpacity>
             <ScrollView
             onScroll={(event) => {
                 this.scrollIndex = event.nativeEvent.contentOffset.y
@@ -245,26 +258,28 @@ componentWillReceiveProps(nextProps) {
           editMinuteLimit={900}
           childrenPerPage={5}
           lastCommentUpdate={this.state.lastCommentUpdate}
-          usernameTapAction={username => this.props.navigator.showModal({
-              screen: 'M.Profile',
-              passProps: {
-                profileUsername: username,
-                title: username
-              }
-            })
-          }
+          usernameTapAction={username => {
+            // this.props.navigator.showModal({
+            //   screen: 'M.Profile',
+            //   passProps: {
+            //     profileUsername: username,
+            //     title: username
+            //   }
+            // })
+          }}
           childPropName={'children'}
           isChild={() =>this.isCommentChild(item)}
           keyExtractor={item => item.comment_id}
-          usernameExtractor={item => this.extractUsername(item)}
-          editTimeExtractor={item => this.extractEditTime(item)}
-          createdTimeExtractor={item => this.extractCreatedTime(item)}
-          bodyExtractor={item => this.extractBody(item)}
-          imageExtractor={item => this.extractImage(item)}
-          likeExtractor={item => this.likeExtractor(item)}
-          reportedExtractor={item => this.reportedExtractor(item)}
-          likesExtractor={item => this.likesExtractor(item)}
-          childrenCountExtractor={item => this.extractChildrenCount(item)}
+          usernameExtractor={item => extractUsername(item)}
+          editTimeExtractor={item => extractEditTime(item)}
+          createdTimeExtractor={item => extractCreatedTime(item)}
+          bodyExtractor={item => extractBody(item)}
+          //imageExtractor={item => extractImage(item)}
+          imageExtractor={item => this.props.profile.avatar}
+          likeExtractor={item => likeExtractor(item)}
+          reportedExtractor={item => reportedExtractor(item)}
+          likesExtractor={item => likesExtractor(item)}
+          childrenCountExtractor={item => extractChildrenCount(item)}
           timestampExtractor={item => item.updated_at}
           replyAction={offset => {
             this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
@@ -280,7 +295,7 @@ componentWillReceiveProps(nextProps) {
             this.props.actions.like(this.props.id, comment)
           }
           }
-          paginateAction={(from_comment_id, direction, parent_comment_id) => {
+          fAction={(from_comment_id, direction, parent_comment_id) => {
             this.props.actions.paginateComments(
               review.review_id,
               'review',
@@ -510,73 +525,7 @@ showPicker() {
      else return 'N/A'
    }
 
-  extractUsername(c) {
-    try {
-      return c.user && c.user.username && c.user.username !== '' ? JSON.parse(c.user.username) : null
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  extractBody (c) {
-    return c.body
-    // try {
-    //   return c.body && c.body !== '' ? JSON.parse(c.body) : null
-    // } catch (e) {
-    //   console.log(e)
-    // }
-  }
-
-  likesExtractor (item) {
-    return item.likes.map((like) => {
-      return {
-        image: this.config.urls.api_url+'/data/images/users/'+like.user_id+'/'+like.user.image,
-        name: JSON.parse(like.user.name),
-        user_id: like.user_id,
-        tap: (username) => {
-          this.props.navigator.showModal({
-            screen: "M.Profile",
-            passProps: {profileUsername: username},
-          title: username})
-        }
-      }
-    })
-  }
-
-  extractEditTime (item) {
-    try {
-      return item.updated_at
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  extractImage (c) {
-    try {
-      return c.user.image_id && c.user.image_id !== '' ? this.config.urls.api_url +
-        '/data/images/users/' + c.user.image_id : this.config.urls.api_url +
-        '/data/images/users/no_image.png'
-
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  likeExtractor (item) {
-    return item.hasUserLiked
-  }
-
-  reportedExtractor (item) {
-    return item.reported
-  }
-
-  extractChildrenCount (c) {
-    try {
-      return c.childrenCount || 0
-    } catch (e) {
-      console.log(e)
-    }
-  }
+  
 
 
 }

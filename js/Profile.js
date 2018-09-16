@@ -288,7 +288,13 @@ import RNPickerSelect from 'react-native-picker-select'
           />
           </View>
           <TouchableOpacity
-          style={{flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: colors.secondary, paddingVertical: 10}}
+          style={{
+            flexDirection: 'row',
+            borderTopWidth: StyleSheet.hairlineWidth,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderColor: colors.secondary,
+            paddingVertical: 10
+            }}
           onPress={()=> this.props.goToSettings()}>
             <Icon
             name='md-settings'

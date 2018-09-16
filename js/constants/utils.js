@@ -67,3 +67,80 @@ export function calculateAge(birthday) { // birthday is a date
     var ageDate = new Date(ageDifMs); // miliseconds from epoch
     return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
+
+export function extractCreatedTime (item) {
+    try {
+      return item.created_at
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  export function extractUsername(c) {
+    try {
+      //return c.user && c.user.username && c.user.username !== '' ? JSON.parse(c.user.username) : null
+      return c.user && c.user.username ? c.user.username : null
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  export function extractBody (c) {
+    return c.body
+    // try {
+    //   return c.body && c.body !== '' ? JSON.parse(c.body) : null
+    // } catch (e) {
+    //   console.log(e)
+    // }
+  }
+
+  export function likesExtractor (item) {
+    return item.likes.map((like) => {
+      return {
+        image: this.config.urls.api_url+'/data/images/users/'+like.user_id+'/'+like.user.image,
+        name: JSON.parse(like.user.name),
+        user_id: like.user_id,
+        tap: (username) => {
+          // this.props.navigator.showModal({
+          //   screen: "M.Profile",
+          //   passProps: {profileUsername: username},
+          // title: username})
+        }
+      }
+    })
+  }
+
+  export function extractEditTime (item) {
+    try {
+      return item.updated_at
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  export function extractImage (c) {
+    try {
+      return c.user.image_id && c.user.image_id !== '' ? this.config.urls.api_url +
+        '/data/images/users/' + c.user.image_id : this.config.urls.api_url +
+        '/data/images/users/no_image.png'
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  export function likeExtractor (item) {
+    return item.hasUserLiked
+  }
+
+  export function reportedExtractor (item) {
+    return item.reported
+  }
+
+  export function extractChildrenCount (c) {
+    try {
+      return c.childrenCount || 0
+    } catch (e) {
+      console.log(e)
+    }
+  }
