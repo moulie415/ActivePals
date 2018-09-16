@@ -201,7 +201,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
         {this.state.markers}
         {this.state.pointsOfInterest}
         </MapView>}
-        {this.state.switch && GooglePlacesInput(this)}
+        {GooglePlacesInput(this)}
 
         <View style={{flexDirection: 'row', height: 50}}>
           <TouchableOpacity style={styles.button}
@@ -533,7 +533,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
 
   renderSessions(sessions) {
           return <FlatList
-          style={{backgroundColor: '#9993'}}
+          style={{backgroundColor: '#9993', marginTop: 43}}
           contentContainerStyle={{flex: 1}}
           refreshing={this.state.refreshing}
           onRefresh={()=> {
