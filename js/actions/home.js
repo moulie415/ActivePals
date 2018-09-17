@@ -4,6 +4,7 @@ export const SET_FEED = 'SET_FEED'
 export const SET_POST = 'SET_POST'
 export const SET_USER = 'SET_USER'
 export const UPDATE_USERS = 'UPDATE_USERS'
+export const SET_POST_COMMENTS = 'SET_POST_COMMENTS'
 
 const addToFeed = (post, id) => ({
 	type: ADD_POST,
@@ -29,6 +30,12 @@ const setUser = (user) => ({
 const updateUsers = (users) => ({
 	type: UPDATE_USERS,
 	users,
+})
+
+const setPostComments = (post, comments) =>  ({
+	type: SET_POST_COMMENTS,
+	post,
+	comments,
 })
 
 export const addPost = (item) => {
@@ -190,19 +197,30 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 }
 
 export const fetchComments = (key, limit = 10) => {
-	return (dispatch) => {
-		firebase.database().ref('postComments').child(key).limitToLast(limit).once('value', snapshot => {
-			let promises = []
-			if (snapshot.val()) {
-				Object.keys(snapshot.val()).forEach(comment => {
-					promises.push(firebase.database().ref('comments').child(comment).once('value'))
-				})
+  return (dispatch, getState) => {
+    firebase.database().ref("postComments").child(key).limitToLast(limit).once("value", snapshot => {
+        let promises = []
+        if (snapshot.val()) {
+          Object.keys(snapshot.val()).forEach(comment => {
+            promises.push(
+              firebase.database().ref("comments").child(comment).once("value")
+            )
+          })
+        }
+        Promise.all(promises).then(comments => {
+          let commentsArray = []
+          comments.forEach((comment, index) => {
+			obj = comment.val()
+            obj.commentId = index + 1
+            if (comment.val().uid == getState().profile.profile.uid) {
+              obj.user = getState().profile.profile
+            } else {
+              obj.user = getState().friends.friends[comment.uid]
 			}
-			Promise.all(promises).then(comments => {
-				comments.forEach(comment => {
-					console.log(comment)
-				})
-			})
-		})
-	}
+			commentsArray.push(obj)
+          })
+			dispatch(setPostComments(key, commentsArray))
+        })
+      })
+  }
 }

@@ -12,7 +12,6 @@
     "npm": "^6.3.0",
     "react": "16.4.1",
     "react-native": "0.56.0",
-    "react-native-comments": "^1.1.1",
     "react-native-datepicker": "^1.7.2",
     "react-native-event-listeners": "^1.0.3",
     "react-native-fbsdk": "^0.8.0",

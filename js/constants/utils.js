@@ -95,19 +95,16 @@ export function extractCreatedTime (item) {
   }
 
   export function likesExtractor (item) {
-    return item.likes.map((like) => {
-      return {
-        image: this.config.urls.api_url+'/data/images/users/'+like.user_id+'/'+like.user.image,
-        name: JSON.parse(like.user.name),
-        user_id: like.user_id,
-        tap: (username) => {
-          // this.props.navigator.showModal({
-          //   screen: "M.Profile",
-          //   passProps: {profileUsername: username},
-          // title: username})
-        }
-      }
-    })
+    return [{},{},{}]
+    // return item.likes.map((like) => {
+    //   return {
+    //     image: this.config.urls.api_url+'/data/images/users/'+like.user_id+'/'+like.user.image,
+    //     name: JSON.parse(like.user.name),
+    //     user_id: like.user_id,
+    //     tap: (username) => {
+    //     }
+    //   }
+    // })
   }
 
   export function extractEditTime (item) {

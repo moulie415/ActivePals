@@ -72,6 +72,7 @@ class Home extends Component {
     this.state = {
       profile: this.props.profile,
       feed: Object.values(this.props.feed),
+      feedObj: this.props.feed,
       spinner: false,
       selectedImage: null,
       showImage: false,
@@ -122,7 +123,7 @@ componentWillReceiveProps(nextProps) {
     this.setState({profile: nextProps.profile})
   }
   if (nextProps.feed) {
-    this.setState({feed: Object.values(nextProps.feed)})
+    this.setState({feed: Object.values(nextProps.feed), feedObj: nextProps.feed})
   }
 }
 
@@ -253,7 +254,8 @@ componentWillReceiveProps(nextProps) {
             }}
             ref={'scrollView'}>
             <Comments
-          data={this.state.comments}
+          data={this.state.postId && this.state.feedObj[this.state.postId] ? 
+           this.state.feedObj[this.state.postId].comments : []}
           viewingUserName={"test"}
           initialDisplayCount={10}
           editMinuteLimit={900}
@@ -275,8 +277,7 @@ componentWillReceiveProps(nextProps) {
           editTimeExtractor={item => extractEditTime(item)}
           createdTimeExtractor={item => extractCreatedTime(item)}
           bodyExtractor={item => extractBody(item)}
-          //imageExtractor={item => extractImage(item)}
-          imageExtractor={item => this.props.profile.avatar}
+          imageExtractor={item => extractImage(item)}
           likeExtractor={item => likeExtractor(item)}
           reportedExtractor={item => reportedExtractor(item)}
           likesExtractor={item => likesExtractor(item)}
@@ -445,7 +446,7 @@ componentWillReceiveProps(nextProps) {
       <Image source={{uri: this.props.profile.avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
       </TouchableOpacity>
     }
-    else if (this.props.friends[uid].avatar) {
+    else if (this.props.friends[uid] && this.props.friends[uid].avatar) {
       return <TouchableOpacity
       onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
       <Image source={{uri: this.props.friends[uid].avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
