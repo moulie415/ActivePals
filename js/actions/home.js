@@ -188,3 +188,21 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 		})
 	}
 }
+
+export const fetchComments = (key, limit = 10) => {
+	return (dispatch) => {
+		firebase.database().ref('postComments').child(key).limitToLast(limit).once('value', snapshot => {
+			let promises = []
+			if (snapshot.val()) {
+				Object.keys(snapshot.val()).forEach(comment => {
+					promises.push(firebase.database().ref('comments').child(comment).once('value'))
+				})
+			}
+			Promise.all(promises).then(comments => {
+				comments.forEach(comment => {
+					console.log(comment)
+				})
+			})
+		})
+	}
+}

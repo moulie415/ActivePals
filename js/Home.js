@@ -7,9 +7,9 @@ import {
   FlatList,
   Modal,
   SafeAreaView,
-  TouchableOpacity,
   Dimensions,
-  ScrollView
+  ScrollView,
+  StyleSheet
 } from "react-native"
 import { 
   Container,
@@ -24,7 +24,7 @@ import {
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import colors from './constants/colors'
-import ToucableOpacity from './constants/TouchableOpacityLockable'
+import TouchableOpacity from './constants/TouchableOpacityLockable'
 import  styles  from './styles/homeStyles'
 import sStyles from './styles/settingsStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
@@ -282,17 +282,17 @@ componentWillReceiveProps(nextProps) {
           likesExtractor={item => likesExtractor(item)}
           childrenCountExtractor={item => extractChildrenCount(item)}
           timestampExtractor={item => item.updated_at}
-          replyAction={offset => {
-            this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
-          }}
+          // replyAction={offset => {
+          //   //this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
+          // }}
           saveAction={(text, parentCommentId) => {
             if (text) {
             this.props.comment(
               this.props.profile.uid,
               this.state.postId,
               text,
-              (new Date()),toString(),
-              parentCommentId
+              (new Date()).toString(),
+              parentCommentId,
             ).then(() => {
               console.log("comment sent")
             }).catch(e => Alert.alert('Error', e.message))
@@ -360,12 +360,7 @@ componentWillReceiveProps(nextProps) {
               <Text style={{color: '#000'}}>{item.text}</Text>
             </View>
             </View>
-            {!!item.repCount && item.repCount > 0 &&
-              <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>}
-              {!!item.repCount && item.repCount > 0 && <View style={{marginHorizontal: 10}}>
-                  <Text style={{color: '#999'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>
-                </View>}
-            <View style={{borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
+            {this.repCommentCount(item)}
             {this.repsAndComments(item)}
           </View>
           )
@@ -394,18 +389,28 @@ componentWillReceiveProps(nextProps) {
               source={{uri: item.url}}
               />
               </TouchableOpacity>
-            {!!item.repCount && item.repCount > 0 &&
-              <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>}
-              {!!item.repCount && item.repCount > 0 && <View style={{marginHorizontal: 10}}>
-                  <Text style={{color: '#999'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>
-                </View>}
-            <View style={{borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
+              {this.repCommentCount(item)}
             <View style={{padding: 10}}>
             {this.repsAndComments(item)}
             </View>
           </View>
         )
     }
+
+  }
+
+  repCommentCount(item) {
+    if ((item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0)) {
+      return (<View><View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
+      <View style={{marginHorizontal: 10, flexDirection: 'row'}}>
+          {!!item.repCount && item.repCount > 0 && <Text style={{color: '#999', flex: 1}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>}
+          {!!item.commentCount && item.commentCount > 0 && <Text style={{color: '#999', textAlign: 'right', flex: 1}}>
+          {`${item.commentCount} ${item.commentCount > 1 ? ' comments' : ' comment'}`}</Text>}
+        </View>
+        <View style={{borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/></View>)
+
+    }
+    else return <View style={{borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
 
   }
 
@@ -423,6 +428,7 @@ componentWillReceiveProps(nextProps) {
     <TouchableOpacity
     onPress={() => {
       this.refs.commentModal.open()
+      this.props.getComments(item.key)
       this.setState({postId: item.key})
     }}
     style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
@@ -546,7 +552,7 @@ showPicker() {
 
 import { connect } from 'react-redux'
 import { navigateProfile, navigateProfileView, navigateFilePreview } from 'Anyone/js/actions/navigation'
-import { addPost, repPost, postComment } from 'Anyone/js/actions/home'
+import { addPost, repPost, postComment, fetchComments } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -562,7 +568,8 @@ const mapDispatchToProps = dispatch => ({
   postStatus: (status) => {return dispatch(addPost(status))},
   onRepPost: (item) => dispatch(repPost(item)),
   previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
-  comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId))
+  comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
+  getComments: (key) => dispatch(fetchComments(key)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)
