@@ -33,7 +33,7 @@ import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import ModalBox from 'react-native-modalbox'
-import Comments from 'react-native-comments'
+import Comments from './comments'
 import {
   extractCreatedTime,
   extractUsername,
