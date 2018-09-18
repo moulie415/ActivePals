@@ -283,6 +283,7 @@ componentWillReceiveProps(nextProps) {
           likeExtractor={item => likeExtractor(item)}
           reportedExtractor={item => reportedExtractor(item)}
           likesExtractor={item => likesExtractor(item)}
+          likeCountExtractor={item => item.repCount}
           childrenCountExtractor={item => extractChildrenCount(item)}
           timestampExtractor={item => new Date(item.created_at).toISOString()}
           // replyAction={offset => {
@@ -566,7 +567,7 @@ showPicker() {
 
 import { connect } from 'react-redux'
 import { navigateProfile, navigateProfileView, navigateFilePreview } from 'Anyone/js/actions/navigation'
-import { addPost, repPost, postComment, fetchComments } from 'Anyone/js/actions/home'
+import { addPost, repPost, postComment, fetchComments, repComment } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -584,7 +585,7 @@ const mapDispatchToProps = dispatch => ({
   previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key) => dispatch(fetchComments(key)),
-  repComment: (comment) => console.log(comment)
+  repComment: (comment) => dispatch(repComment(comment))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

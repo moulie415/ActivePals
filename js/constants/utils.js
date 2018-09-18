@@ -127,7 +127,7 @@ export function extractCreatedTime (item) {
   }
 
   export function likeExtractor (item) {
-    return item.hasUserLiked
+    return item.rep
   }
 
   export function reportedExtractor (item) {

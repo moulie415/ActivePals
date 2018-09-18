@@ -143,7 +143,7 @@ export default class Comment extends PureComponent {
                 style={styles.actionButton}
                 onPress={this.handleLike}
               >
-                <View style={{ flexDirection: "row" }}>
+                <View style={{ flexDirection: "row" , marginTop: 2}}>
                   <Text
                     style={[
                       styles.actionText,

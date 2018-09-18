@@ -164,7 +164,7 @@ export default class Comments extends PureComponent {
         username={this.props.usernameExtractor(c)}
         uid={this.props.uidExtractor(c)}
         body={this.props.bodyExtractor(c)}
-        likesNr={this.props.likesExtractor(c).length}
+        likesNr={this.props.likeCountExtractor(c)}
         canEdit={this.canUserEdit(c)}
         updatedAt={this.props.editTimeExtractor(c)}
         replyAction={this.props.replyAction ? this.handleReply : null}
@@ -374,7 +374,7 @@ export default class Comments extends PureComponent {
               >
                 <Icon
                   style={styles.submit}
-                  name="chevron-circle-right"
+                  name="chevron-right"
                   size={40}
                   color="#000"
                 />
@@ -411,8 +411,8 @@ export default class Comments extends PureComponent {
           >
             <Icon
               style={styles.submit}
-              name="arrow-circle-right"
-              size={40}
+              name="chevron-right"
+              size={30}
               color="#000"
             />
           </TouchableOpacity>
@@ -600,6 +600,7 @@ Comments.propTypes = {
   likeExtractor: PropTypes.func,
   reportedExtractor: PropTypes.func,
   likesExtractor: PropTypes.func,
+  likeCountExtractor: PropTypes.func,
   childrenCountExtractor: PropTypes.func,
   replyAction: PropTypes.func,
   saveAction: PropTypes.func.isRequired,

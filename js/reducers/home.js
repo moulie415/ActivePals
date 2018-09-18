@@ -43,7 +43,7 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				feed: {...state.feed, [action.post]: {...state.feed[action.post], 
-					comments: [...state.feed[action.post].comments, action.comment]}}
+					comments: [...state.feed[action.post].comments, action.comment]}},
 			}
 		}
 		case SET_LOGGED_OUT: {
