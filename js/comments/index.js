@@ -69,7 +69,10 @@ export default class Comments extends PureComponent {
       this.setState({
         commentsLastUpdated: new Date().getTime(),
         loadingComments: false
-      });
+      })
+    }
+    if (nextProps.focusCommentInput) {
+      this.inputMain.focus()
     }
   }
 

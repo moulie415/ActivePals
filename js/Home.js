@@ -240,6 +240,7 @@ componentWillReceiveProps(nextProps) {
             borderRadius: 5,
             padding: 5,
             }}
+          onClosed={()=> this.setState({focusCommentInput: false})}
           ref={"commentModal"}
           backButtonClose={true}
           position={'center'}
@@ -259,6 +260,7 @@ componentWillReceiveProps(nextProps) {
           viewingUserName={"test"}
           initialDisplayCount={10}
           editMinuteLimit={900}
+          focusCommentInput={this.state.focusCommentInput}
           childrenPerPage={5}
           lastCommentUpdate={this.state.lastCommentUpdate}
           usernameTapAction={(username, uid) => {
@@ -404,11 +406,20 @@ componentWillReceiveProps(nextProps) {
 
   repCommentCount(item) {
     if ((item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0)) {
-      return (<View><View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
+      return (<View>
+      <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
       <View style={{marginHorizontal: 10, flexDirection: 'row'}}>
           {!!item.repCount && item.repCount > 0 && <Text style={{color: '#999', flex: 1}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>}
-          {!!item.commentCount && item.commentCount > 0 && <Text style={{color: '#999', textAlign: 'right', flex: 1}}>
-          {`${item.commentCount} ${item.commentCount > 1 ? ' comments' : ' comment'}`}</Text>}
+          {!!item.commentCount && item.commentCount > 0 && 
+          <TouchableOpacity 
+          style={{alignSelf: 'flex-end', flex: 1}}
+          onPress={()=> {
+            this.refs.commentModal.open()
+            this.setState({ postId: item.key })
+            this.props.getComments(item.key)
+          }}>
+          <Text style={{color: '#999', textAlign: 'right'}}>
+          {`${item.commentCount} ${item.commentCount > 1 ? ' comments' : ' comment'}`}</Text></TouchableOpacity>}
         </View>
         <View style={{borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/></View>)
 
@@ -431,8 +442,8 @@ componentWillReceiveProps(nextProps) {
     <TouchableOpacity
     onPress={() => {
       this.refs.commentModal.open()
+      this.setState({focusCommentInput: true, postId: item.key})
       this.props.getComments(item.key)
-      this.setState({postId: item.key})
     }}
     style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
       <Icon name='md-chatboxes' style={{marginRight: 10, color: '#616770'}}/>
