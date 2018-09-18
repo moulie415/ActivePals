@@ -70,15 +70,18 @@ export function calculateAge(birthday) { // birthday is a date
 
 export function extractCreatedTime (item) {
     try {
-      return item.created_at
+      return new Date(item.created_at).toISOString()
     } catch (e) {
       console.log(e)
     }
   }
 
-  export function extractUsername(c) {
+  export function extractUsername(c, uid) {
     try {
       //return c.user && c.user.username && c.user.username !== '' ? JSON.parse(c.user.username) : null
+      if (c.user.uid == uid) {
+        return 'You'
+      }
       return c.user && c.user.username ? c.user.username : null
     } catch (e) {
       console.log(e)
@@ -109,7 +112,7 @@ export function extractCreatedTime (item) {
 
   export function extractEditTime (item) {
     try {
-      return item.updated_at
+      return item.updated_at || new Date(item.created_at).toISOString()
     } catch (e) {
       console.log(e)
     }
@@ -117,10 +120,7 @@ export function extractCreatedTime (item) {
 
   export function extractImage (c) {
     try {
-      return c.user.image_id && c.user.image_id !== '' ? this.config.urls.api_url +
-        '/data/images/users/' + c.user.image_id : this.config.urls.api_url +
-        '/data/images/users/no_image.png'
-
+      return c.user.avatar
     } catch (e) {
       console.log(e)
     }

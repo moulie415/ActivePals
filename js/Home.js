@@ -71,8 +71,8 @@ class Home extends Component {
 
     this.state = {
       profile: this.props.profile,
-      feed: Object.values(this.props.feed),
-      feedObj: this.props.feed,
+      feed: this.props.feed,
+      //feedObj: this.props.feed,
       spinner: false,
       selectedImage: null,
       showImage: false,
@@ -123,7 +123,7 @@ componentWillReceiveProps(nextProps) {
     this.setState({profile: nextProps.profile})
   }
   if (nextProps.feed) {
-    this.setState({feed: Object.values(nextProps.feed), feedObj: nextProps.feed})
+    this.setState({feed: nextProps.feed} /*feedObj: nextProps.feed*/)
   }
 }
 
@@ -254,26 +254,26 @@ componentWillReceiveProps(nextProps) {
             }}
             ref={'scrollView'}>
             <Comments
-          data={this.state.postId && this.state.feedObj[this.state.postId] ? 
-           this.state.feedObj[this.state.postId].comments : []}
+          data={this.state.postId && this.state.feed[this.state.postId] && this.state.feed[this.state.postId].comments ? 
+           this.state.feed[this.state.postId].comments : []}
           viewingUserName={"test"}
           initialDisplayCount={10}
           editMinuteLimit={900}
           childrenPerPage={5}
           lastCommentUpdate={this.state.lastCommentUpdate}
-          usernameTapAction={username => {
-            // this.props.navigator.showModal({
-            //   screen: 'M.Profile',
-            //   passProps: {
-            //     profileUsername: username,
-            //     title: username
-            //   }
-            // })
+          usernameTapAction={(username, uid) => {
+            if (uid == this.props.profile.uid) {
+              this.props.goToProfile()
+            }
+            else {
+              this.props.viewProfile(uid)
+            }
           }}
           childPropName={'children'}
           isChild={() =>this.isCommentChild(item)}
           keyExtractor={item => item.comment_id}
-          usernameExtractor={item => extractUsername(item)}
+          usernameExtractor={item => extractUsername(item, this.props.profile.uid)}
+          uidExtractor={item => item.user.uid}
           editTimeExtractor={item => extractEditTime(item)}
           createdTimeExtractor={item => extractCreatedTime(item)}
           bodyExtractor={item => extractBody(item)}
@@ -282,7 +282,7 @@ componentWillReceiveProps(nextProps) {
           reportedExtractor={item => reportedExtractor(item)}
           likesExtractor={item => likesExtractor(item)}
           childrenCountExtractor={item => extractChildrenCount(item)}
-          timestampExtractor={item => item.updated_at}
+          timestampExtractor={item => new Date(item.created_at).toISOString()}
           // replyAction={offset => {
           //   //this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
           // }}
@@ -302,9 +302,11 @@ componentWillReceiveProps(nextProps) {
           editAction={(text, comment) => {
             this.props.actions.edit(this.props.id, comment, text)
           }}
-          reportAction={(comment) => this.props.actions.report(this.props.id, comment)}
+          reportAction={(comment) => {
+            console.log(comment)
+          }}
           likeAction={(comment) => {
-            this.props.actions.like(this.props.id, comment)
+            this.props.repComment(comment)
           }
           }
           fAction={(from_comment_id, direction, parent_comment_id) => {
@@ -329,9 +331,9 @@ componentWillReceiveProps(nextProps) {
   }
 
   renderFeed() {
-    if (this.state.feed.length > 0) {
+    if (Object.values(this.state.feed).length > 0) {
       return <FlatList
-        data={this.sortByDate(this.state.feed)}
+        data={this.sortByDate(Object.values(this.state.feed))}
         keyExtractor={(item) => item.key}
         renderItem = {({ item }) => {
           if (item.uid == this.props.profile.uid || this.props.friends[item.uid] && this.props.friends[item.uid].status == 'connected') {
@@ -571,6 +573,7 @@ const mapDispatchToProps = dispatch => ({
   previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key) => dispatch(fetchComments(key)),
+  repComment: (comment) => console.log(comment)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

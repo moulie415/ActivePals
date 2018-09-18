@@ -17,7 +17,7 @@ import {
 } from "react-native";
 
 import PropTypes from "prop-types";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/FontAwesome"
 import styles from "./styles";
 import Collapsible from "react-native-collapsible";
 import Comment from "./Comment";
@@ -133,9 +133,9 @@ export default class Comments extends PureComponent {
     this.setEditModalVisible(!this.state.editModalVisible);
   }
 
-  handleUsernameTap(username) {
+  handleUsernameTap(username, uid) {
     if (this.props.usernameTapAction) {
-      this.props.usernameTapAction(username);
+      this.props.usernameTapAction(username, uid);
     }
   }
 
@@ -159,6 +159,7 @@ export default class Comments extends PureComponent {
         id={this.props.keyExtractor(c)}
         usernameTapAction={this.handleUsernameTap}
         username={this.props.usernameExtractor(c)}
+        uid={this.props.uidExtractor(c)}
         body={this.props.bodyExtractor(c)}
         likesNr={this.props.likesExtractor(c).length}
         canEdit={this.canUserEdit(c)}
@@ -370,7 +371,7 @@ export default class Comments extends PureComponent {
               >
                 <Icon
                   style={styles.submit}
-                  name="caret-right"
+                  name="chevron-circle-right"
                   size={40}
                   color="#000"
                 />
@@ -391,8 +392,8 @@ export default class Comments extends PureComponent {
             ref={input => this.inputMain = input}
             multiline={true}
             onChangeText={text => {
-		this.newCommentText = text
-		this.inputMain.setNativeProps({text})
+		        this.newCommentText = text
+		        this.inputMain.setNativeProps({text})
 	    }}
             placeholder={"Write comment..."}
             numberOfLines={3}
@@ -407,7 +408,7 @@ export default class Comments extends PureComponent {
           >
             <Icon
               style={styles.submit}
-              name="caret-right"
+              name="arrow-circle-right"
               size={40}
               color="#000"
             />
@@ -588,6 +589,7 @@ Comments.propTypes = {
   keyExtractor: PropTypes.func.isRequired,
   parentIdExtractor: PropTypes.func,
   usernameExtractor: PropTypes.func.isRequired,
+  uidExtractor: PropTypes.func.isRequired,
   editTimeExtractor: PropTypes.func.isRequired,
   createdTimeExtractor: PropTypes.func.isRequired,
   bodyExtractor: PropTypes.func.isRequired,

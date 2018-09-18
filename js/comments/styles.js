@@ -1,4 +1,5 @@
 import { StyleSheet, PixelRatio } from "react-native";
+import colors from '../constants/colors'
 
 module.exports = StyleSheet.create({
   commentContainer: {
@@ -80,7 +81,8 @@ module.exports = StyleSheet.create({
     backgroundColor: "#fff"
   },
   submit: {
-    padding: 10
+    padding: 10,
+    color: colors.secondary
   },
   input: {
     flex: 1,

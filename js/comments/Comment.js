@@ -18,7 +18,11 @@ import PropTypes from "prop-types";
 import TimeAgo from "react-native-timeago";
 import Icon from "react-native-vector-icons/FontAwesome";
 import styles from "./styles";
+import colors from '../constants/colors'
 import Collapsible from "react-native-collapsible";
+
+const weightUp = require('Anyone/assets/images/weightlifting_up.png')
+const weightDown = require('Anyone/assets/images/weightlifting_down.png')
 
 export default class Comment extends PureComponent {
   constructor(props) {
@@ -77,7 +81,7 @@ export default class Comment extends PureComponent {
   }
   handleUsernameTap() {
     if (this.props.usernameTapAction) {
-      this.props.usernameTapAction(this.props.username);
+      this.props.usernameTapAction(this.props.username, this.props.uid);
     }
   }
   handleLikesTap() {
@@ -106,15 +110,15 @@ export default class Comment extends PureComponent {
                 }
               />
               {this.props.likesNr && this.props.likeAction ? (
-                <TouchableHighlight
+                <TouchableOpacity
                   style={[styles.actionButton, { paddingTop: 5 }]}
                   onPress={this.handleLikesTap}
                 >
                   <View style={{ flexDirection: "row" }}>
-                    <Icon name={"heart"} color={"#df1740"} size={15} />
+                    <Image source={weightUp}  style={{width: 15, height: 15, tintColor: colors.secondary}}/>
                     <Text style={styles.likeNr}> {this.props.likesNr}</Text>
                   </View>
-                </TouchableHighlight>
+                </TouchableOpacity>
               ) : null}
             </View>
           </TouchableOpacity>
@@ -126,16 +130,16 @@ export default class Comment extends PureComponent {
         >
           <View style={styles.rightContent}>
             <View style={styles.rightContentTop}>
-              <TouchableHighlight onPress={this.handleUsernameTap}>
+              <TouchableOpacity onPress={this.handleUsernameTap}>
                 <Text style={styles.name}>{this.props.username}</Text>
-              </TouchableHighlight>
+              </TouchableOpacity>
             </View>
             <Text style={styles.body}>{this.props.body}</Text>
           </View>
           <View style={styles.rightActionBar}>
             <TimeAgo style={styles.time} time={this.props.updatedAt} />
             {this.props.likeAction ? (
-              <TouchableHighlight
+              <TouchableOpacity
                 style={styles.actionButton}
                 onPress={this.handleLike}
               >
@@ -143,21 +147,23 @@ export default class Comment extends PureComponent {
                   <Text
                     style={[
                       styles.actionText,
-                      { color: this.props.liked ? "#4DB2DF" : null }
+                      { color: this.props.liked ? "#4DB2DF" : '#999' }
                     ]}
                   >
                     Rep{" "}
                   </Text>
+                    <Image source={this.props.liked ? weightUp : weightDown}  
+                    style={{width: 15, height: 15, tintColor: this.props.liked? colors.secondary : '#999'}}/>
                 </View>
-              </TouchableHighlight>
+              </TouchableOpacity>
             ) : null}
             {this.props.replyAction ? (
-              <TouchableHighlight
+              <TouchableOpacity
                 style={styles.actionButton}
                 onPress={this.handleReply}
               >
                 <Text style={styles.actionText}>Reply</Text>
-              </TouchableHighlight>
+              </TouchableOpacity>
             ) : null}
           </View>
         </TouchableOpacity>

@@ -5,6 +5,7 @@ export const SET_POST = 'SET_POST'
 export const SET_USER = 'SET_USER'
 export const UPDATE_USERS = 'UPDATE_USERS'
 export const SET_POST_COMMENTS = 'SET_POST_COMMENTS'
+export const ADD_COMMENT = 'ADD_COMMENT'
 
 const addToFeed = (post, id) => ({
 	type: ADD_POST,
@@ -36,6 +37,12 @@ const setPostComments = (post, comments) =>  ({
 	type: SET_POST_COMMENTS,
 	post,
 	comments,
+})
+
+const addComment = (post, comment) => ({
+	type: ADD_COMMENT,
+	post,
+	comment,
 })
 
 export const addPost = (item) => {
@@ -181,7 +188,7 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 	return (dispatch, getState) => {
 		let ref = firebase.database().ref('comments').push()
 		let key = ref.key
-		return firebase.database().ref('comments/' + key).set({uid, postId, text, created_at, parentCommentId}).then(() => {
+		return firebase.database().ref('comments/' + key).set({uid, postId, text, created_at, parentCommentId, key}).then(() => {
 			return firebase.database().ref('posts/' + postId).child('commentCount').once('value', snapshot => {
 				let count
 				if (snapshot.val()) {
@@ -189,6 +196,9 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 					count += 1
 				}
 				else count = 1
+				let user = getState().profile.profile
+				let obj = {uid, postId, text, created_at, parentCommentId, comment_id: count, user, key}
+				dispatch(addComment(postId, obj))
 				firebase.database().ref('posts/' + postId).child('commentCount').set(count)
 				return firebase.database().ref('postComments/' + postId).child(key).set(uid)
 			})
@@ -211,7 +221,7 @@ export const fetchComments = (key, limit = 10) => {
           let commentsArray = []
           comments.forEach((comment, index) => {
 			obj = comment.val()
-            obj.commentId = index + 1
+            obj.comment_id = index + 1
             if (comment.val().uid == getState().profile.profile.uid) {
               obj.user = getState().profile.profile
             } else {

@@ -3,7 +3,8 @@ import {
 	SET_FEED,
 	SET_POST,
 	SET_REP_COUNT,
-	SET_POST_COMMENTS
+	SET_POST_COMMENTS,
+	ADD_COMMENT
 } from 'Anyone/js/actions/home'
 
 import {
@@ -36,6 +37,13 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				feed: {...state.feed, [action.post]: {...state.feed[action.post], comments: action.comments }},
+			}
+		}
+		case ADD_COMMENT: {
+			return {
+				...state,
+				feed: {...state.feed, [action.post]: {...state.feed[action.post], 
+					comments: [...state.feed[action.post].comments, action.comment]}}
 			}
 		}
 		case SET_LOGGED_OUT: {
