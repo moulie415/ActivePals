@@ -228,7 +228,7 @@ export const fetchComments = (key, limit = 10) => {
             if (comment.val().uid == uid) {
               obj.user = getState().profile.profile
             } else {
-              obj.user = getState().friends.friends[comment.uid]
+              obj.user = getState().friends.friends[obj.uid]
 			}
 			commentReps.push(firebase.database().ref("reps/" + obj.key).child(uid).once('value'))
 			commentsArray.push(obj)
