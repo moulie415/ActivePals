@@ -249,7 +249,7 @@ export const fetchComments = (key, limit = 10) => {
 
 export const repComment = (comment) => {
 	return (dispatch, getState) => {
-		let uid = comment.user.uid
+		let uid = getState().profile.profile.uid
 		let rep = comment.rep ? false : uid
 		if (comment.rep) {
 			comment.rep = false
