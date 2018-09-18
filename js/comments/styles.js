@@ -1,4 +1,4 @@
-import { StyleSheet, PixelRatio } from "react-native";
+import { StyleSheet, PixelRatio, Platform } from "react-native";
 import colors from '../constants/colors'
 
 module.exports = StyleSheet.create({
@@ -86,7 +86,8 @@ module.exports = StyleSheet.create({
   },
   input: {
     flex: 1,
-    padding: 10,
+    padding: Platform.OS == 'ios' ? 10 : 0,
+    marginBottom: Platform.OS == 'ios' ? 0 : 10,
     backgroundColor: "#fff",
     color: "#424242",
     borderColor: '#999',
