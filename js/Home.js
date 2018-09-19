@@ -76,6 +76,8 @@ class Home extends Component {
       spinner: false,
       selectedImage: null,
       showImage: false,
+      fetchAmount: 30,
+      refreshing: false,
 
       comments: [
         {
@@ -240,6 +242,7 @@ componentWillReceiveProps(nextProps) {
             borderRadius: 5,
             padding: 5,
             }}
+          swipeToClose={false}
           onClosed={()=> this.setState({focusCommentInput: false})}
           ref={"commentModal"}
           backButtonClose={true}
@@ -248,12 +251,6 @@ componentWillReceiveProps(nextProps) {
           <TouchableOpacity onPress={()=> this.refs.commentModal.close()}>
             <Icon name={'ios-arrow-back'}  style={{color: '#000', fontSize: 30, padding: 10}}/>
            </TouchableOpacity>
-            <ScrollView
-            keyboardShouldPersistTaps={'handled'}
-            onScroll={(event) => {
-                this.scrollIndex = event.nativeEvent.contentOffset.y
-            }}
-            ref={'scrollView'}>
             <Comments
           data={this.state.postId && this.state.feed[this.state.postId] && this.state.feed[this.state.postId].comments ? 
            this.state.feed[this.state.postId].comments : []}
@@ -327,7 +324,6 @@ componentWillReceiveProps(nextProps) {
           }
           }
         />
-        </ScrollView>
         </ModalBox>
     </Container>
   )
@@ -338,6 +334,13 @@ componentWillReceiveProps(nextProps) {
       return <FlatList
         data={this.sortByDate(Object.values(this.state.feed))}
         keyExtractor={(item) => item.key}
+        onRefresh={() => {
+          this.setState({refreshing: true})
+          this.props.getPosts(this.props.profile.uid, 30).then(() => {
+            this.setState({refreshing: false})
+          })
+        }}
+        refreshing={this.state.refreshing}
         renderItem = {({ item }) => {
           if (item.uid == this.props.profile.uid || this.props.friends[item.uid] && this.props.friends[item.uid].status == 'connected') {
             return (<Card>
@@ -566,8 +569,8 @@ showPicker() {
 
 
 import { connect } from 'react-redux'
-import { navigateProfile, navigateProfileView, navigateFilePreview } from 'Anyone/js/actions/navigation'
-import { addPost, repPost, postComment, fetchComments, repComment } from 'Anyone/js/actions/home'
+import { navigateProfile, navigateProfileView, navigateFilePreview, } from 'Anyone/js/actions/navigation'
+import { addPost, repPost, postComment, fetchComments, repComment, fetchPosts } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -585,7 +588,8 @@ const mapDispatchToProps = dispatch => ({
   previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key) => dispatch(fetchComments(key)),
-  repComment: (comment) => dispatch(repComment(comment))
+  repComment: (comment) => dispatch(repComment(comment)),
+  getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

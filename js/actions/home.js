@@ -39,10 +39,11 @@ const setPostComments = (post, comments) =>  ({
 	comments,
 })
 
-const addComment = (post, comment) => ({
+const addComment = (post, comment, count) => ({
 	type: ADD_COMMENT,
 	post,
 	comment,
+	count
 })
 
 
@@ -64,7 +65,7 @@ export const addPost = (item) => {
 }
 
 
-export const fetchPosts = (uid, amount) => {
+export const fetchPosts = (uid, amount = 30) => {
 	return (dispatch, getState) => {
 		let promises = []
 		return new Promise(resolve => {
@@ -199,7 +200,7 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 				else count = 1
 				let user = getState().profile.profile
 				let obj = {uid, postId, text, created_at, parentCommentId, comment_id: count, user, key}
-				dispatch(addComment(postId, obj))
+				dispatch(addComment(postId, obj, count))
 				firebase.database().ref('posts/' + postId).child('commentCount').set(count)
 				return firebase.database().ref('postComments/' + postId).child(key).set(uid)
 			})

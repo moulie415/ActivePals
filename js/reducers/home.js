@@ -42,7 +42,7 @@ export default function(state = initialState, action) {
 		case ADD_COMMENT: {
 			return {
 				...state,
-				feed: {...state.feed, [action.post]: {...state.feed[action.post], 
+				feed: {...state.feed, [action.post]: {...state.feed[action.post], commentCount: action.count, 
 					comments: [...state.feed[action.post].comments, action.comment]}},
 			}
 		}
