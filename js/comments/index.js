@@ -421,7 +421,7 @@ export default class Comments extends PureComponent {
           <Text style={{ textAlign: "center" }}>No comments yet</Text>
         ) : null}
 
-        {!this.state.loadingComments &&
+        {/*!this.state.loadingComments &&
         this.props.data &&
         this.props.paginateAction ? (
           <TouchableHighlight
@@ -436,7 +436,7 @@ export default class Comments extends PureComponent {
               <Text style={{ textAlign: "center" }}>Show previous</Text>
             </View>
           </TouchableHighlight>
-        ) : null}
+        ) : null*/}
         {/*Comments*/}
         {this.props.data ? (
           <FlatList
@@ -476,7 +476,7 @@ export default class Comments extends PureComponent {
         {!this.state.loadingComments &&
         this.props.data &&
         this.props.paginateAction ? (
-          <TouchableHighlight
+          <TouchableOpacity
             style={{ height: 70 }}
             onPress={() => {
               this.paginate(
@@ -488,7 +488,7 @@ export default class Comments extends PureComponent {
             }}
           >
             <Text style={{ textAlign: "center" }}>Show more</Text>
-          </TouchableHighlight>
+          </TouchableOpacity>
         ) : null}
 
         <Modal

@@ -36,7 +36,7 @@ export default function(state = initialState, action) {
 		case SET_POST_COMMENTS: {
 			return {
 				...state,
-				feed: {...state.feed, [action.post]: {...state.feed[action.post], comments: action.comments }},
+				feed: {...state.feed, [action.post]: {...state.feed[action.post], comments: action.comments, commentCount: getCommentCount(state.feed[action.post], action.incrementCount) }},
 			}
 		}
 		case ADD_COMMENT: {
@@ -52,4 +52,14 @@ export default function(state = initialState, action) {
 		default:
 			return state
 	}
+}
+
+const getCommentCount = (post, increment) => {
+	if (increment) {
+		if (post.commentCount) {
+			return post.commentCount + 1
+		}
+		else return 1
+	}
+	else return post.commentCount || 0
 }

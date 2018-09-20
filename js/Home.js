@@ -309,20 +309,9 @@ componentWillReceiveProps(nextProps) {
             this.props.repComment(comment)
           }
           }
-          fAction={(from_comment_id, direction, parent_comment_id) => {
-            this.props.actions.paginateComments(
-              review.review_id,
-              'review',
-              from_comment_id,
-              direction,
-              parent_comment_id)
-            let self = this
-            setTimeout(function () {
-              self.refs.scrollView.scrollTo(500)
-            }, 3000)
-
-          }
-          }
+          paginateAction={() => {
+            console.log('test')
+          }}
         />
         </ModalBox>
     </Container>

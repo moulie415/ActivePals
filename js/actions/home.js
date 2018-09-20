@@ -33,10 +33,11 @@ const updateUsers = (users) => ({
 	users,
 })
 
-const setPostComments = (post, comments) =>  ({
+const setPostComments = (post, comments, incrementCount) =>  ({
 	type: SET_POST_COMMENTS,
 	post,
 	comments,
+	incrementCount
 })
 
 const addComment = (post, comment, count) => ({
@@ -200,7 +201,14 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 				else count = 1
 				let user = getState().profile.profile
 				let obj = {uid, postId, text, created_at, parentCommentId, comment_id: count, user, key}
-				dispatch(addComment(postId, obj, count))
+				let postComments = getState().home.feed[postId].comments || []
+				postComments.push(obj)
+				postComments = sortComments(postComments)
+				postComments.forEach((comment, index) => {
+					comment.comment_id = index + 1
+				})
+				//dispatch(addComment(postId, obj, count))
+				dispatch(setPostComments(postId, postComments, true))
 				firebase.database().ref('posts/' + postId).child('commentCount').set(count)
 				return firebase.database().ref('postComments/' + postId).child(key).set(uid)
 			})
@@ -225,7 +233,6 @@ export const fetchComments = (key, limit = 10) => {
 		  let commentReps = []
           comments.forEach((comment, index) => {
 			obj = comment.val()
-            obj.comment_id = index + 1
             if (comment.val().uid == uid) {
               obj.user = getState().profile.profile
             } else {
@@ -239,6 +246,10 @@ export const fetchComments = (key, limit = 10) => {
 				  if (rep.val()) {
 					commentsArray[index].rep = true
 				  }
+			  })
+			  commentsArray = sortComments(commentsArray)
+			  commentsArray.forEach((comment, index) => {
+				comment.comment_id = index + 1
 			  })
 			dispatch(setPostComments(key, commentsArray))
 		  })
@@ -309,4 +320,12 @@ export const repComment = (comment) => {
 
 
 	}
+}
+
+const sortComments = (comments) => {
+		comments.sort(function(a,b){
+		  return new Date(b.created_at) - new Date(a.created_at)
+		})
+		return comments
+	  
 }
