@@ -188,6 +188,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
     let _this = this
     if (result.isCancelled) {
       //Alert.alert('Facbook login', 'cancelled')
+      this.setState({spinner: false})
     } else {
   AccessToken.getCurrentAccessToken().then(
           (data) => {
