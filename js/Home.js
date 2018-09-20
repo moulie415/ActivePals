@@ -77,6 +77,7 @@ class Home extends Component {
       selectedImage: null,
       showImage: false,
       fetchAmount: 30,
+      commentFetchAmount: 10,
       refreshing: false,
 
       comments: [
@@ -243,7 +244,7 @@ componentWillReceiveProps(nextProps) {
             padding: 5,
             }}
           swipeToClose={false}
-          onClosed={()=> this.setState({focusCommentInput: false})}
+          onClosed={()=> this.setState({focusCommentInput: false, commentFetchAmount: 10})}
           ref={"commentModal"}
           backButtonClose={true}
           position={'center'}
@@ -307,11 +308,13 @@ componentWillReceiveProps(nextProps) {
           }}
           likeAction={(comment) => {
             this.props.repComment(comment)
-          }
-          }
-          paginateAction={() => {
-            console.log('test')
           }}
+          paginateAction={this.state.feed[this.state.postId] 
+          && this.state.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
+          () => { 
+            this.setState({commentFetchAmount: this.state.commentFetchAmount += 5}, () => {
+              this.props.getComments(this.state.postId, this.state.commentFetchAmount)})
+            } : null}
         />
         </ModalBox>
     </Container>
@@ -576,7 +579,7 @@ const mapDispatchToProps = dispatch => ({
   onRepPost: (item) => dispatch(repPost(item)),
   previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
-  getComments: (key) => dispatch(fetchComments(key)),
+  getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   repComment: (comment) => dispatch(repComment(comment)),
   getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount))
 })
