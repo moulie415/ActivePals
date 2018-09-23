@@ -4,7 +4,6 @@ import {
   Platform,
   TouchableOpacity,
   View,
-  Image
 } from "react-native"
 import {
   Header,
@@ -16,6 +15,7 @@ import {
   Text,
   Spinner,
 } from 'native-base'
+import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
 import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'

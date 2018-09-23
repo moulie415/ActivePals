@@ -6,12 +6,12 @@ import {
 	Card,
 } from 'native-base'
 import {
-	Image,
 	TouchableOpacity,
 	Alert
 } from 'react-native'
 import styles from '../styles/sessionTypeStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Image from 'react-native-fast-image'
 
 
 class SessionType extends Component {

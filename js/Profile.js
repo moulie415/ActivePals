@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Alert,
   View,
-  Image,
   Platform,
   ScrollView,
 } from "react-native"
@@ -22,6 +21,7 @@ import {
   Spinner
 } from 'native-base'
 import firebase from 'react-native-firebase'
+import Image from 'react-native-fast-image'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import  styles  from './styles/profileStyles'
 import hStyles from './styles/homeStyles'

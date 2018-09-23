@@ -4,7 +4,6 @@
 import React, { PureComponent } from "react";
 import {
   View,
-  Image,
   FlatList,
   Modal,
   Dimensions,
@@ -12,14 +11,16 @@ import {
   Keyboard,
   TextInput,
   TouchableHighlight,
+  SafeAreaView,
   TouchableOpacity,
 } from "react-native";
+import Image from 'react-native-fast-image'
 
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import PropTypes from "prop-types";
 import Icon from "react-native-vector-icons/FontAwesome"
 import styles from "./styles";
-import Collapsible from "react-native-collapsible";
+import Collapsible from "react-native-collapsible"
 import Comment from "./Comment";
 
 const screen = Dimensions.get("screen");
@@ -491,7 +492,6 @@ export default class Comments extends PureComponent {
             <Text style={{ textAlign: "center" }}>Show more</Text>
           </TouchableOpacity>
         ) : null}
-
         <Modal
           animationType={"slide"}
           transparent={false}
@@ -512,11 +512,16 @@ export default class Comments extends PureComponent {
               top: 10
             }}
           >
+          <SafeAreaView>
             <View style={{ position: "relative", left: 50, top: 5 }}>
               <Icon name={"times"} size={40} />
             </View>
+            </SafeAreaView>
           </TouchableOpacity>
+          <SafeAreaView>
           <Text style={styles.likeHeader}>Users that repped the comment</Text>
+          </SafeAreaView>
+
           {this.state.likesModalVisible ? (
             <FlatList
               initialNumToRender="10"

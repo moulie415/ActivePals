@@ -2,7 +2,6 @@ import React, { Component } from "react"
 import { 
   View,
   Alert,
-  Image,
   TextInput,
   FlatList,
   Modal,
@@ -34,6 +33,8 @@ import ImageResizer from 'react-native-image-resizer'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import ModalBox from 'react-native-modalbox'
 import Comments from './comments'
+import Image from 'react-native-fast-image'
+import {Image as SlowImage } from 'react-native'
 import {
   extractCreatedTime,
   extractUsername,
@@ -434,7 +435,7 @@ componentWillReceiveProps(nextProps) {
         this.props.onRepPost(item)
       }}
       style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
-      <Image source={item.rep ? weightUp : weightDown}
+      <SlowImage source={item.rep ? weightUp : weightDown}
       style={{width: 25, height: 25, marginRight: 10, tintColor: item.rep ? colors.secondary : '#616770'}}/>
       <Text style={{color: item.rep ? colors.secondary : '#616770'}}>Rep</Text>
     </TouchableOpacity>

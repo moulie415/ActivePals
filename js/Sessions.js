@@ -4,7 +4,6 @@ import {
   Alert,
   View,
   FlatList,
-  Image,
   TouchableOpacity,
   StatusBar,
   RefreshControl,
@@ -30,6 +29,7 @@ import {
   Left,
   Right,
 } from 'native-base'
+import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Permissions from 'react-native-permissions'
@@ -45,6 +45,7 @@ import { geofire }  from 'Anyone/index'
 import RNFetchBlob from 'rn-fetch-blob'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { isIphoneX } from 'react-native-iphone-x-helper'
+import {Image as SlowImage } from 'react-native'
 
  class Sessions extends Component {
 
@@ -52,7 +53,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
     header: null,
     tabBarLabel: 'Sessions',
     tabBarIcon: ({ tintColor }) => (
-      <Image style={{width: 30, height: 30, tintColor}}
+      <SlowImage style={{width: 30, height: 30, tintColor}}
     source={require('Anyone/assets/images/dumbbell.png')} />
     ),
   }

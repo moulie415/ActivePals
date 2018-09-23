@@ -4,7 +4,6 @@
 import React, { PureComponent } from "react";
 import {
   View,
-  Image,
   FlatList,
   ActivityIndicator,
   TouchableHighlight,
@@ -13,6 +12,7 @@ import {
   Alert
 } from "react-native";
 
+import Image from 'react-native-fast-image'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import PropTypes from "prop-types";
 import TimeAgo from "react-native-timeago";
@@ -20,6 +20,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import styles from "./styles";
 import colors from '../constants/colors'
 import Collapsible from "react-native-collapsible";
+import {Image as SlowImage } from 'react-native'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -115,7 +116,7 @@ export default class Comment extends PureComponent {
                   onPress={this.handleLikesTap}
                 >
                   <View style={{ flexDirection: "row" }}>
-                    <Image source={weightUp}  style={{width: 15, height: 15, tintColor: colors.secondary}}/>
+                    <SlowImage source={weightUp}  style={{width: 15, height: 15, tintColor: colors.secondary}}/>
                     <Text style={styles.likeNr}> {this.props.likesNr}</Text>
                   </View>
                 </TouchableOpacity>
@@ -152,7 +153,7 @@ export default class Comment extends PureComponent {
                   >
                     Rep{" "}
                   </Text>
-                    <Image source={this.props.liked ? weightUp : weightDown}  
+                    <SlowImage source={this.props.liked ? weightUp : weightDown}  
                     style={{width: 15, height: 15, tintColor: this.props.liked? colors.secondary : '#999'}}/>
                 </View>
               </TouchableOpacity>

@@ -4,7 +4,6 @@ import {
   Alert,
   View,
   TouchableOpacity,
-  Image,
   Platform,
   ScrollView
 } from "react-native"
@@ -24,6 +23,7 @@ import {
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Image from 'react-native-fast-image'
 import  styles  from './styles/profileStyles'
 import str from './constants/strings'
 import hStyles from './styles/homeStyles'

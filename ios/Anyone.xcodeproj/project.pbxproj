@@ -23,6 +23,7 @@
 		0A73102420F6780A00CCF377 /* Running-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A730FE820F6780A00CCF377 /* Running-background.jpg */; };
 		0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */; };
 		0AB3811720098E4A00BCD283 /* FBSDKCoreKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811220098CC000BCD283 /* FBSDKCoreKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0AD46C1B2157C68D000E6B9C /* libFastImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AD46BC82157C683000E6B9C /* libFastImage.a */; };
 		0DEC0B3B247E40D1953C8594 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 112BFEAFFE274186B850223D /* SafariServices.framework */; };
 		133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
@@ -385,6 +386,41 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNFirebase;
 		};
+		0AD46BC72157C683000E6B9C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A287971D1DE0C0A60081BDFA;
+			remoteInfo = FastImage;
+		};
+		0AD46BE32157C683000E6B9C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B5F0DBACBBE36E6AB7F7E4FD19976986;
+			remoteInfo = Bolts;
+		};
+		0AD46BE52157C683000E6B9C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F1481BC9991AEED691FCD8CD87785EEB;
+			remoteInfo = FBSDKCoreKit;
+		};
+		0AD46BE72157C683000E6B9C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 24F4D8DD933481179409EE4D1966D699;
+			remoteInfo = FBSDKLoginKit;
+		};
+		0AD46BE92157C683000E6B9C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3CF8AF2139CF2734237EA5AEF4CD433C;
+			remoteInfo = FBSDKShareKit;
+		};
 		2DF0FFDE2056DD460020B375 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
@@ -608,6 +644,7 @@
 		0AB3819620099F9900BCD283 /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = Pods/Pods.xcodeproj; sourceTree = "<group>"; };
 		0ACB4D70206082B4003BB865 /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNImagePicker.xcodeproj; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; };
 		0ACB4D772060847B003BB865 /* RCTImageResizer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTImageResizer.xcodeproj; path = "../node_modules/react-native-image-resizer/ios/RCTImageResizer.xcodeproj"; sourceTree = "<group>"; };
+		0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FastImage.xcodeproj; path = "../node_modules/react-native-fast-image/ios/FastImage.xcodeproj"; sourceTree = "<group>"; };
 		0AF6E8D320F28303003AA11A /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
 		0D853CB2677947A0A75D6F40 /* Avenir.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Avenir.ttf; path = ../assets/fonts/Avenir.ttf; sourceTree = "<group>"; };
 		0FC4EE0746D74E029C2E6444 /* avenir.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = avenir.ttf; path = ../assets/fonts/avenir.ttf; sourceTree = "<group>"; };
@@ -666,6 +703,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AD46C1B2157C68D000E6B9C /* libFastImage.a in Frameworks */,
 				0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */,
 				0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */,
 				0A1F225D210BE24200896D4A /* libRCTFBSDK.a in Frameworks */,
@@ -835,6 +873,10 @@
 		0AB3819720099F9900BCD283 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				0AD46BE42157C683000E6B9C /* libBolts.a */,
+				0AD46BE62157C683000E6B9C /* libFBSDKCoreKit.a */,
+				0AD46BE82157C683000E6B9C /* libFBSDKLoginKit.a */,
+				0AD46BEA2157C683000E6B9C /* libFBSDKShareKit.a */,
 				0A7CEE8C2118B2AF00F09932 /* libFirebaseAuth.a */,
 				0A3E956C2113C8FB00BCD60F /* libFirebaseCore.a */,
 				0A3E956E2113C8FB00BCD60F /* libFirebaseDatabase.a */,
@@ -881,6 +923,14 @@
 			isa = PBXGroup;
 			children = (
 				0A1F212F210A8E1800896D4A /* libRCTImageResizer.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0AD46BC32157C682000E6B9C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0AD46BC82157C683000E6B9C /* libFastImage.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -982,6 +1032,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */,
 				0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */,
 				0AF6E8D320F28303003AA11A /* SplashScreen.xcodeproj */,
 				0ACB4D772060847B003BB865 /* RCTImageResizer.xcodeproj */,
@@ -1228,6 +1279,10 @@
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = 0AD46BC32157C682000E6B9C /* Products */;
+					ProjectRef = 0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */;
+				},
 				{
 					ProductGroup = 0AB3819720099F9900BCD283 /* Products */;
 					ProjectRef = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
@@ -1638,6 +1693,41 @@
 			fileType = archive.ar;
 			path = libRNFirebase.a;
 			remoteRef = 0AB463672113AB24003C51E2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0AD46BC82157C683000E6B9C /* libFastImage.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFastImage.a;
+			remoteRef = 0AD46BC72157C683000E6B9C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0AD46BE42157C683000E6B9C /* libBolts.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libBolts.a;
+			remoteRef = 0AD46BE32157C683000E6B9C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0AD46BE62157C683000E6B9C /* libFBSDKCoreKit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFBSDKCoreKit.a;
+			remoteRef = 0AD46BE52157C683000E6B9C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0AD46BE82157C683000E6B9C /* libFBSDKLoginKit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFBSDKLoginKit.a;
+			remoteRef = 0AD46BE72157C683000E6B9C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0AD46BEA2157C683000E6B9C /* libFBSDKShareKit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFBSDKShareKit.a;
+			remoteRef = 0AD46BE92157C683000E6B9C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		2DF0FFDF2056DD460020B375 /* libjsinspector.a */ = {

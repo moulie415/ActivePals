@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
+import Image from 'react-native-fast-image'
 import {
 	View,
-	Image,
 	TouchableWithoutFeedback,
 	Platform,
 	TextInput,

@@ -5,8 +5,8 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Image
 } from "react-native"
+import Image from 'react-native-fast-image'
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
