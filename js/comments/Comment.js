@@ -187,7 +187,7 @@ export default class Comment extends PureComponent {
                   <Text
                     style={[
                       styles.menuText,
-                      { fontStyle: "italic", fontSize: 11 }
+                      { fontStyle: "italic", fontSize: 11}
                     ]}
                   >
                     Reported

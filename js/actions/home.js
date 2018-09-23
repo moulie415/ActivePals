@@ -323,7 +323,35 @@ export const repComment = (comment) => {
 	}
 }
 
-export const fetchRepsUsers = (key, postId, id, limit = 10) => {
+export const fetchRepUsers = (postId, limit = 10) => {
+	return (dispatch, getState) => {
+		return firebase.database().ref('reps').child(postId).limitToLast(limit).once('value', snapshot => {
+			let users = []
+			if (snapshot.val()) {
+				Object.keys(snapshot.val()).forEach(uid => {
+					let user = {}
+					let profile
+					if (uid == getState().profile.profile.uid) {
+						profile = getState().profile.profile
+						user.username = 'You'
+					}
+					else {
+						profile = getState().friends.friends[uid]
+						user.username = profile.username
+					}
+					user.image = profile.avatar
+					user.user_id = uid
+					users.push(user)
+				})
+			}
+			let post = getState().home.feed[postId]
+			post.repUsers = users
+			dispatch(setPost(post))
+		})
+	}
+}
+
+export const fetchCommentRepsUsers = (key, postId, id, limit = 10) => {
 	return (dispatch, getState) => {
 		return firebase.database().ref('reps').child(key).limitToLast(limit).once('value', snapshot => {
 			let users = []

@@ -29,14 +29,16 @@ module.exports = StyleSheet.create({
 
   name: {
     fontWeight: "bold",
-    paddingBottom: 5
+    paddingBottom: 5,
+    color: '#000'
   },
   editIcon: {
     flex: 1,
     alignItems: "flex-end"
   },
   body: {
-    paddingBottom: 10
+    paddingBottom: 10,
+    color: '#000'
   },
   rightActionBar: {
     flexDirection: "row",

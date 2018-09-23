@@ -26,6 +26,7 @@ import colors from './constants/colors'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
 import  styles  from './styles/homeStyles'
 import sStyles from './styles/settingsStyles'
+import cStyles from './comments/styles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import { getSimplified } from 'Anyone/js/chat/SessionChats'
 import ImagePicker from 'react-native-image-picker'
@@ -33,6 +34,7 @@ import ImageResizer from 'react-native-image-resizer'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import ModalBox from 'react-native-modalbox'
 import Comments from './comments'
+import FIcon from "react-native-vector-icons/FontAwesome"
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'
 import {
@@ -80,26 +82,7 @@ class Home extends Component {
       fetchAmount: 30,
       commentFetchAmount: 10,
       refreshing: false,
-
-      comments: [
-        {
-          "parentId": null,
-          "commentId": 1,
-          "user": {
-            username: 'test',
-            uid: 12345,
-          },
-          "name": "id labore ex et quam laborum",
-          "liked": true,
-          "reported": false,
-          "likes": [
-          ],
-          "email": "testUser",
-          "created_at": "2017-12-23 14:45:06",
-          "text": "laudantium enim quasi est quidem ",
-          "children": []
-        }
-      ]
+      likesModalVisible: false
     }
   }
 
@@ -311,7 +294,7 @@ componentWillReceiveProps(nextProps) {
             this.props.repComment(comment)
           }}
           likesTapAction={(comment) => {
-            return this.props.getRepsUsers(comment.key, comment.postId, comment.comment_id)
+            return this.props.getCommentRepsUsers(comment.key, comment.postId, comment.comment_id)
           }}
           paginateAction={this.state.feed[this.state.postId] 
           && this.state.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
@@ -321,6 +304,42 @@ componentWillReceiveProps(nextProps) {
             } : null}
         />
         </ModalBox>
+        <Modal
+          animationType={"slide"}
+          transparent={false}
+          visible={this.state.likesModalVisible}
+          onRequestClose={() => this.setState({likesModalVisible: false})}
+        >
+          <TouchableOpacity
+            onPress={() => this.setState({likesModalVisible: false})}
+            style={{
+              position: "absolute",
+              width: 100,
+              zIndex: 9,
+              alignSelf: "flex-end",
+              top: 10
+            }}
+          >
+          <SafeAreaView>
+            <View style={{ position: "relative", left: 50, top: 5 }}>
+              <FIcon name={"times"} size={40} />
+            </View>
+            </SafeAreaView>
+          </TouchableOpacity>
+          <SafeAreaView>
+          <Text style={cStyles.likeHeader}>Users that repped the post</Text>
+          </SafeAreaView>
+
+          {this.state.likesModalVisible ? (
+            <FlatList
+              initialNumToRender="10"
+              keyExtractor={item => item.like_id +""}
+              data={this.state.feed[this.state.postId].repUsers}
+              renderItem={(item) => this.renderLike(item)}
+            />
+          ) : null}
+        </Modal>
+
     </Container>
   )
   }
@@ -409,7 +428,14 @@ componentWillReceiveProps(nextProps) {
       return (<View>
       <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}/>
       <View style={{marginHorizontal: 10, flexDirection: 'row'}}>
-          {!!item.repCount && item.repCount > 0 && <Text style={{color: '#999', flex: 1}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>}
+          {!!item.repCount && item.repCount > 0 && <TouchableOpacity 
+          style={{flex: 1}}
+          onPress={()=>{
+            this.props.getRepUsers(item.key)
+            this.setState({likesModalVisible: true, postId: item.key})
+          }}>
+          <Text style={{color: '#999'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}
+          </Text></TouchableOpacity>}
           {!!item.commentCount && item.commentCount > 0 && 
           <TouchableOpacity 
           style={{alignSelf: 'flex-end', flex: 1}}
@@ -557,6 +583,25 @@ showPicker() {
      else return 'N/A'
    }
 
+  renderLike(l) {
+    let like = l.item
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.setState({likesModalVisible: false})
+          like.user_id == this.props.profile.uid ? this.props.goToProfile() : this.props.viewProfile(like.user_id)
+        }}
+        style={cStyles.likeButton}
+        key={like.user_id + ""}
+      >
+        <View style={[cStyles.likeContainer]}>
+          <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
+          <Text style={[cStyles.likeName]}>{like.username}</Text>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
   
 
 
@@ -566,7 +611,16 @@ showPicker() {
 
 import { connect } from 'react-redux'
 import { navigateProfile, navigateProfileView, navigateFilePreview, } from 'Anyone/js/actions/navigation'
-import { addPost, repPost, postComment, fetchComments, repComment, fetchPosts, fetchRepsUsers } from 'Anyone/js/actions/home'
+import { 
+  addPost,
+  repPost,
+  postComment,
+  fetchComments,
+  repComment,
+  fetchPosts,
+  fetchCommentRepsUsers,
+  fetchRepUsers
+ } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -586,7 +640,8 @@ const mapDispatchToProps = dispatch => ({
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   repComment: (comment) => dispatch(repComment(comment)),
   getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount)),
-  getRepsUsers: (key, postId, id, limit) => dispatch(fetchRepsUsers(key, postId, id, limit))
+  getCommentRepsUsers: (key, postId, id, limit) => dispatch(fetchCommentRepsUsers(key, postId, id, limit)),
+  getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)
