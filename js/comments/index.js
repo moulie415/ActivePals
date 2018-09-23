@@ -144,9 +144,10 @@ export default class Comments extends PureComponent {
   }
 
   handleLikesTap(c) {
-    this.setState({ likesModalData: this.props.likesExtractor(c) });
     this.setLikesModalVisible(!this.state.likesModalVisible);
-    this.props.likesTapAction(c)
+    this.props.likesTapAction(c).then(() => {
+      this.setState({ likesModalData: this.props.likesExtractor(c) });
+    })
   }
 
   handleEditAction(c) {

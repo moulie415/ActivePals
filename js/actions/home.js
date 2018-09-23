@@ -346,7 +346,7 @@ export const fetchRepsUsers = (key, postId, id, limit = 10) => {
 			}
 			let postComments = getState().home.feed[postId].comments
 			postComments[id-1].likes = users
-			return dispatch(setPostComments(postId, postComments))
+			dispatch(setPostComments(postId, postComments))
 		})
 	}
 }

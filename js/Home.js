@@ -311,7 +311,7 @@ componentWillReceiveProps(nextProps) {
             this.props.repComment(comment)
           }}
           likesTapAction={(comment) => {
-            this.props.getRepsUsers(comment.key, comment.postId, comment.comment_id)
+            return this.props.getRepsUsers(comment.key, comment.postId, comment.comment_id)
           }}
           paginateAction={this.state.feed[this.state.postId] 
           && this.state.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
