@@ -135,7 +135,6 @@ module.exports = StyleSheet.create({
     width: 400,
     height: 300,
     borderWidth: 2,
-    borderColor: "silver"
   },
   editButtons: {
     flexDirection: "row",
@@ -146,14 +145,13 @@ module.exports = StyleSheet.create({
     paddingRight: 5,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "silver",
     borderRadius: 5,
     margin: 10
   },
   menu: {
-    borderWidth: 1,
-    borderColor: "silver",
     zIndex: 999,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#999',
     width: 200,
     right: 0,
     top: 0,
@@ -163,8 +161,10 @@ module.exports = StyleSheet.create({
   menuItem: {
     padding: 10,
     height: 40,
-
-    justifyContent: "center"
+    borderWidth: 0,
+    justifyContent: "center",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderColor: '#999'
   },
   menuText: {
     textAlign: "center"

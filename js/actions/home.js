@@ -40,6 +40,7 @@ const setPostComments = (post, comments, incrementCount) =>  ({
 	incrementCount
 })
 
+
 const addComment = (post, comment, count) => ({
 	type: ADD_COMMENT,
 	post,
@@ -319,6 +320,34 @@ export const repComment = (comment) => {
 		}
 
 
+	}
+}
+
+export const fetchRepsUsers = (key, postId, id, limit = 10) => {
+	return (dispatch, getState) => {
+		return firebase.database().ref('reps').child(key).limitToLast(limit).once('value', snapshot => {
+			let users = []
+			if (snapshot.val()) {
+				Object.keys(snapshot.val()).forEach(uid => {
+					let user = {}
+					let profile
+					if (uid == getState().profile.profile.uid) {
+						profile = getState().profile.profile
+						user.username = 'You'
+					}
+					else {
+						profile = getState().friends.friends[uid]
+						user.username = profile.username
+					}
+					user.image = profile.avatar
+					user.user_id = uid
+					users.push(user)
+				})
+			}
+			let postComments = getState().home.feed[postId].comments
+			postComments[id-1].likes = users
+			return dispatch(setPostComments(postId, postComments))
+		})
 	}
 }
 

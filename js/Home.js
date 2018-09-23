@@ -280,7 +280,7 @@ componentWillReceiveProps(nextProps) {
           imageExtractor={item => extractImage(item)}
           likeExtractor={item => likeExtractor(item)}
           reportedExtractor={item => reportedExtractor(item)}
-          likesExtractor={item => likesExtractor(item)}
+          likesExtractor={item => likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile )}
           likeCountExtractor={item => item.repCount}
           childrenCountExtractor={item => extractChildrenCount(item)}
           timestampExtractor={item => new Date(item.created_at).toISOString()}
@@ -308,6 +308,9 @@ componentWillReceiveProps(nextProps) {
           }}
           likeAction={(comment) => {
             this.props.repComment(comment)
+          }}
+          likesTapAction={(comment) => {
+            this.props.getRepsUsers(comment.key, comment.postId, comment.comment_id)
           }}
           paginateAction={this.state.feed[this.state.postId] 
           && this.state.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
@@ -562,7 +565,7 @@ showPicker() {
 
 import { connect } from 'react-redux'
 import { navigateProfile, navigateProfileView, navigateFilePreview, } from 'Anyone/js/actions/navigation'
-import { addPost, repPost, postComment, fetchComments, repComment, fetchPosts } from 'Anyone/js/actions/home'
+import { addPost, repPost, postComment, fetchComments, repComment, fetchPosts, fetchRepsUsers } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -581,7 +584,8 @@ const mapDispatchToProps = dispatch => ({
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   repComment: (comment) => dispatch(repComment(comment)),
-  getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount))
+  getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount)),
+  getRepsUsers: (key, postId, id, limit) => dispatch(fetchRepsUsers(key, postId, id, limit))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

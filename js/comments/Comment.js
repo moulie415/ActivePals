@@ -4,7 +4,6 @@
 import React, { PureComponent } from "react";
 import {
   View,
-  Text,
   Image,
   FlatList,
   ActivityIndicator,
@@ -14,6 +13,7 @@ import {
   Alert
 } from "react-native";
 
+import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import PropTypes from "prop-types";
 import TimeAgo from "react-native-timeago";
 import Icon from "react-native-vector-icons/FontAwesome";

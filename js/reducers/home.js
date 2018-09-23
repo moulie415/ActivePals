@@ -4,7 +4,7 @@ import {
 	SET_POST,
 	SET_REP_COUNT,
 	SET_POST_COMMENTS,
-	ADD_COMMENT
+	ADD_COMMENT,
 } from 'Anyone/js/actions/home'
 
 import {

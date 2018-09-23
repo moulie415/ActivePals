@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {
-	Image
+  Image,
 } from 'react-native'
 
 import {
@@ -97,17 +97,21 @@ export function extractCreatedTime (item) {
     // }
   }
 
-  export function likesExtractor (item) {
-    return [{},{},{}]
-    // return item.likes.map((like) => {
-    //   return {
-    //     image: this.config.urls.api_url+'/data/images/users/'+like.user_id+'/'+like.user.image,
-    //     name: JSON.parse(like.user.name),
-    //     user_id: like.user_id,
-    //     tap: (username) => {
-    //     }
-    //   }
-    // })
+  export function likesExtractor (item, uid, viewProfile, goToProfile) {
+    if (item.likes) {
+    return item.likes.map((like) => {
+      return {
+        image: like.image,
+        name: like.username,
+        user_id: like.user_id,
+        like_id: like.user_id,
+        tap: (username) => {
+          uid == like.user_id ? goToProfile() : viewProfile(like.user_id)
+        }
+      }
+    })
+  }
+    else return null
   }
 
   export function extractEditTime (item) {

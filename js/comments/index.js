@@ -4,7 +4,6 @@
 import React, { PureComponent } from "react";
 import {
   View,
-  Text,
   Image,
   FlatList,
   Modal,
@@ -16,6 +15,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import PropTypes from "prop-types";
 import Icon from "react-native-vector-icons/FontAwesome"
 import styles from "./styles";
@@ -145,6 +145,7 @@ export default class Comments extends PureComponent {
   handleLikesTap(c) {
     this.setState({ likesModalData: this.props.likesExtractor(c) });
     this.setLikesModalVisible(!this.state.likesModalVisible);
+    this.props.likesTapAction(c)
   }
 
   handleEditAction(c) {
@@ -179,7 +180,7 @@ export default class Comments extends PureComponent {
         editAction={this.handleEditAction}
         deleteAction={this.handleDelete}
         editComment={this.handleEdit}
-        likesTapAction={this.props.likeAction ? this.handleLikesTap : null}
+        likesTapAction={this.props.likesTapAction ? this.handleLikesTap : null}
       />
     );
   }
@@ -244,7 +245,7 @@ export default class Comments extends PureComponent {
   renderLike(l) {
     let like = l.item;
     return (
-      <TouchableHighlight
+      <TouchableOpacity
         onPress={() => {
           this.setLikesModalVisible(false), like.tap(like.name);
         }}
@@ -255,7 +256,7 @@ export default class Comments extends PureComponent {
           <Image style={[styles.likeImage]} source={{ uri: like.image }} />
           <Text style={[styles.likeName]}>{like.name}</Text>
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 
@@ -269,7 +270,7 @@ export default class Comments extends PureComponent {
         {this.generateComment(item)}
         <View style={{ marginLeft: 40 }}>
           {item.childrenCount && this.props.childPropName ? (
-            <TouchableHighlight onPress={() => this.toggleExpand(item)}>
+            <TouchableOpacity onPress={() => this.toggleExpand(item)}>
               <View style={styles.repliedSection}>
                 <Image
                   style={styles.repliedImg}
@@ -294,7 +295,7 @@ export default class Comments extends PureComponent {
                     : " reply"}
                 </Text>
               </View>
-            </TouchableHighlight>
+            </TouchableOpacity>
           ) : null}
           <Collapsible
             easing={"easeOutCubic"}
@@ -307,7 +308,7 @@ export default class Comments extends PureComponent {
                 {this.props.childPropName &&
                 this.props.childrenCountExtractor(item) >
                   item[this.props.childPropName].length ? (
-                  <TouchableHighlight
+                  <TouchableOpacity
                     onPress={() =>
                       this.paginate(
                         this.getFirstChildCommentId(item),
@@ -319,7 +320,7 @@ export default class Comments extends PureComponent {
                     <Text style={{ textAlign: "center", paddingTop: 15 }}>
                       Show previous...
                     </Text>
-                  </TouchableHighlight>
+                  </TouchableOpacity>
                 ) : null}
 
                 {this.renderChildren(
@@ -330,7 +331,7 @@ export default class Comments extends PureComponent {
                 {this.props.childrenCountExtractor(item) >
                   item[this.props.childPropName].length &&
                 this.props.paginateAction ? (
-                  <TouchableHighlight
+                  <TouchableOpacity
                     onPress={() =>
                       this.paginate(
                         this.getLastChildCommentId(item),
@@ -342,7 +343,7 @@ export default class Comments extends PureComponent {
                     <Text style={{ textAlign: "center", paddingTop: 15 }}>
                       Show more...
                     </Text>
-                  </TouchableHighlight>
+                  </TouchableOpacity>
                 ) : null}
               </View>
             ) : null}
@@ -499,8 +500,10 @@ export default class Comments extends PureComponent {
             this.setLikesModalVisible(false);
           }}
         >
-          <TouchableHighlight
-            onPress={() => this.setLikesModalVisible(false)}
+          <TouchableOpacity
+            onPress={() => {
+              this.setLikesModalVisible(false)
+              }}
             style={{
               position: "absolute",
               width: 100,
@@ -512,8 +515,8 @@ export default class Comments extends PureComponent {
             <View style={{ position: "relative", left: 50, top: 5 }}>
               <Icon name={"times"} size={40} />
             </View>
-          </TouchableHighlight>
-          <Text style={styles.likeHeader}>Users that liked the comment</Text>
+          </TouchableOpacity>
+          <Text style={styles.likeHeader}>Users that repped the comment</Text>
           {this.state.likesModalVisible ? (
             <FlatList
               initialNumToRender="10"
@@ -550,15 +553,15 @@ export default class Comments extends PureComponent {
               <View
                 style={{ flexDirection: "row", justifyContent: "space-around" }}
               >
-                <TouchableHighlight
+                <TouchableOpacity
                   onPress={() => this.setEditModalVisible(false)}
                 >
                   <View style={styles.editButtons}>
                     <Text>Cancel</Text>
                     <Icon name={"times"} size={20} />
                   </View>
-                </TouchableHighlight>
-                <TouchableHighlight
+                </TouchableOpacity>
+                <TouchableOpacity
                   onPress={() => {
                     this.props.editAction(
                       this.editCommentText,
@@ -571,7 +574,7 @@ export default class Comments extends PureComponent {
                     <Text>Save</Text>
                     <Icon name={"send"} size={20} />
                   </View>
-                </TouchableHighlight>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -608,5 +611,6 @@ Comments.propTypes = {
   editAction: PropTypes.func.isRequired,
   reportAction: PropTypes.func,
   likeAction: PropTypes.func,
+  likesTapAction: PropTypes.func,
   paginateAction: PropTypes.func
 };
