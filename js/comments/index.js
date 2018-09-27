@@ -22,6 +22,7 @@ import Icon from "react-native-vector-icons/FontAwesome"
 import styles from "./styles";
 import Collapsible from "react-native-collapsible"
 import Comment from "./Comment";
+import colors from '../constants/colors'
 
 const screen = Dimensions.get("screen");
 
@@ -342,7 +343,7 @@ export default class Comments extends PureComponent {
                       )
                     }
                   >
-                    <Text style={{ textAlign: "center", paddingTop: 15 }}>
+                    <Text style={{ textAlign: "center", paddingTop: 15, color: colors.secondary }}>
                       Show more...
                     </Text>
                   </TouchableOpacity>
@@ -490,7 +491,7 @@ export default class Comments extends PureComponent {
               );
             }}
           >
-            <Text style={{ textAlign: "center" }}>Show more</Text>
+            <Text style={{ textAlign: "center", color: colors.secondary }}>Show more</Text>
           </TouchableOpacity>
         ) : null}
         <Modal

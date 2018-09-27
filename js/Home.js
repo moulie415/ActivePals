@@ -81,6 +81,7 @@ class Home extends Component {
       showImage: false,
       fetchAmount: 30,
       commentFetchAmount: 10,
+      userFetchAmount: 10,
       refreshing: false,
       likesModalVisible: false
     }
@@ -308,7 +309,7 @@ componentWillReceiveProps(nextProps) {
           animationType={"slide"}
           transparent={false}
           visible={this.state.likesModalVisible}
-          onRequestClose={() => this.setState({likesModalVisible: false})}
+          onRequestClose={() => this.setState({likesModalVisible: false, userFetchAmount: 10})}
         >
           <TouchableOpacity
             onPress={() => this.setState({likesModalVisible: false})}
@@ -333,9 +334,10 @@ componentWillReceiveProps(nextProps) {
           {this.state.likesModalVisible ? (
             <FlatList
               initialNumToRender="10"
+              ListFooterComponent={(item) => this.renderRepsFooter()}
               keyExtractor={item => item.like_id +""}
               data={this.state.feed[this.state.postId].repUsers}
-              renderItem={(item) => this.renderLike(item)}
+              renderItem={(item) => this.renderRep(item)}
             />
           ) : null}
         </Modal>
@@ -583,7 +585,7 @@ showPicker() {
      else return 'N/A'
    }
 
-  renderLike(l) {
+  renderRep(l) {
     let like = l.item
     return (
       <TouchableOpacity
@@ -600,6 +602,23 @@ showPicker() {
         </View>
       </TouchableOpacity>
     )
+  }
+
+  renderRepsFooter() {
+    if (this.state.feed[this.state.postId].repCount > this.state.userFetchAmount) {
+      return <TouchableOpacity 
+      style={{alignItems: 'center'}}
+      onPress={()=> {
+        this.setState({userFetchAmount: this.state.userFetchAmount += 5}, () => {
+          this.props.getRepUsers(this.state.postId, this.state.userFetchAmount)
+        })
+        
+      }}>
+        <Text style={{color: colors.secondary}}>Show more</Text>
+        </TouchableOpacity>
+    }
+    else return null
+
   }
 
   
