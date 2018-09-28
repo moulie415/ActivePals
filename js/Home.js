@@ -295,7 +295,7 @@ componentWillReceiveProps(nextProps) {
             this.props.repComment(comment)
           }}
           likesTapAction={(comment) => {
-            return this.props.getCommentRepsUsers(comment.key, comment.postId, comment.comment_id)
+            return this.props.getCommentRepsUsers(comment)
           }}
           paginateAction={this.state.feed[this.state.postId] 
           && this.state.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
@@ -303,6 +303,7 @@ componentWillReceiveProps(nextProps) {
             this.setState({commentFetchAmount: this.state.commentFetchAmount += 5}, () => {
               this.props.getComments(this.state.postId, this.state.commentFetchAmount)})
             } : null}
+            getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
         />
         </ModalBox>
         <Modal
@@ -433,7 +434,7 @@ componentWillReceiveProps(nextProps) {
           {!!item.repCount && item.repCount > 0 && <TouchableOpacity 
           style={{flex: 1}}
           onPress={()=>{
-            this.props.getRepUsers(item.key)
+            this.props.getRepUsers(item.key, this.state.userFetchAmount)
             this.setState({likesModalVisible: true, postId: item.key})
           }}>
           <Text style={{color: '#999'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}
@@ -659,7 +660,7 @@ const mapDispatchToProps = dispatch => ({
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   repComment: (comment) => dispatch(repComment(comment)),
   getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount)),
-  getCommentRepsUsers: (key, postId, id, limit) => dispatch(fetchCommentRepsUsers(key, postId, id, limit)),
+  getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit))
 })
 

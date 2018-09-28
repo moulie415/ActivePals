@@ -38,7 +38,8 @@ export default class Comments extends PureComponent {
       editModalVisible: false,
       commentsLastUpdated: null,
       expanded: [],
-      pagination: []
+      pagination: [],
+      userFetchAmount: 10
    };
     this.newCommentText = null;
     this.replyCommentText = null;
@@ -147,7 +148,7 @@ export default class Comments extends PureComponent {
   handleLikesTap(c) {
     this.setLikesModalVisible(!this.state.likesModalVisible);
     this.props.likesTapAction(c).then(() => {
-      this.setState({ likesModalData: this.props.likesExtractor(c) });
+      this.setState({ likesModalData: this.props.likesExtractor(c), comment: c });
     })
   }
 
@@ -250,14 +251,14 @@ export default class Comments extends PureComponent {
     return (
       <TouchableOpacity
         onPress={() => {
-          this.setLikesModalVisible(false), like.tap(like.name);
+          this.setLikesModalVisible(false), this.handleUsernameTap(like.username, like.user_id);
         }}
         style={styles.likeButton}
         key={like.user_id + ""}
       >
         <View style={[styles.likeContainer]}>
           <Image style={[styles.likeImage]} source={{ uri: like.image }} />
-          <Text style={[styles.likeName]}>{like.name}</Text>
+          <Text style={[styles.likeName]}>{like.name || like.username}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -500,6 +501,7 @@ export default class Comments extends PureComponent {
           visible={this.state.likesModalVisible}
           onRequestClose={() => {
             this.setLikesModalVisible(false);
+            this.setState({userFetchAmount: 10})
           }}
         >
           <TouchableOpacity
@@ -527,7 +529,8 @@ export default class Comments extends PureComponent {
           {this.state.likesModalVisible ? (
             <FlatList
               initialNumToRender="10"
-              keyExtractor={item => item.like_id + ""}
+              ListFooterComponent={(item) => this.renderRepsFooter(item)}
+              keyExtractor={item => item.user_id + ""}
               data={this.state.likesModalData}
               renderItem={this.renderLike}
             />
@@ -589,6 +592,26 @@ export default class Comments extends PureComponent {
       </View>
     );
   }
+
+  renderRepsFooter() {
+    if (this.state.likesModalData && this.state.comment &&
+      this.state.comment.repCount > this.state.likesModalData.length) {
+    return <TouchableOpacity 
+      style={{alignItems: 'center'}}
+      onPress={()=> {
+        this.setState({userFetchAmount: this.state.userFetchAmount += 5}, () => {
+          this.props.getCommentRepsUsers(this.state.comment, this.state.userFetchAmount)
+            .then(users => {
+              this.setState({likesModalData: users})
+            })
+        })
+        
+      }}>
+        <Text style={{color: colors.secondary}}>Show more</Text>
+        </TouchableOpacity>
+  }
+  return null
+}
 }
 
 Comments.propTypes = {
@@ -619,5 +642,6 @@ Comments.propTypes = {
   reportAction: PropTypes.func,
   likeAction: PropTypes.func,
   likesTapAction: PropTypes.func,
-  paginateAction: PropTypes.func
+  paginateAction: PropTypes.func,
+  getCommentRepsUsers: PropTypes.func,
 };

@@ -351,30 +351,34 @@ export const fetchRepUsers = (postId, limit = 10) => {
 	}
 }
 
-export const fetchCommentRepsUsers = (key, postId, id, limit = 10) => {
+export const fetchCommentRepsUsers = (comment, limit = 10) => {
 	return (dispatch, getState) => {
-		return firebase.database().ref('reps').child(key).limitToLast(limit).once('value', snapshot => {
-			let users = []
-			if (snapshot.val()) {
-				Object.keys(snapshot.val()).forEach(uid => {
-					let user = {}
-					let profile
-					if (uid == getState().profile.profile.uid) {
-						profile = getState().profile.profile
-						user.username = 'You'
-					}
-					else {
-						profile = getState().friends.friends[uid]
-						user.username = profile.username
-					}
-					user.image = profile.avatar
-					user.user_id = uid
-					users.push(user)
-				})
-			}
-			let postComments = getState().home.feed[postId].comments
-			postComments[id-1].likes = users
-			dispatch(setPostComments(postId, postComments))
+		const {key, postId, comment_id } = comment
+		return new Promise(resolve => {
+			firebase.database().ref('reps').child(key).limitToLast(limit).once('value', snapshot => {
+				let users = []
+				if (snapshot.val()) {
+					Object.keys(snapshot.val()).forEach(uid => {
+						let user = {}
+						let profile
+						if (uid == getState().profile.profile.uid) {
+							profile = getState().profile.profile
+							user.username = 'You'
+						}
+						else {
+							profile = getState().friends.friends[uid]
+							user.username = profile.username
+						}
+						user.image = profile.avatar
+						user.user_id = uid
+						users.push(user)
+					})
+				}
+				let postComments = getState().home.feed[postId].comments
+				postComments[comment_id-1].likes = users
+				resolve(users)
+				dispatch(setPostComments(postId, postComments))
+			})
 		})
 	}
 }
