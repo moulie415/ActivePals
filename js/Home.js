@@ -286,7 +286,7 @@ componentWillReceiveProps(nextProps) {
             }
           }}
           editAction={(text, comment) => {
-            this.props.actions.edit(this.props.id, comment, text)
+            console.log(text)
           }}
           reportAction={(comment) => {
             console.log(comment)

@@ -44,7 +44,9 @@ class PostView extends Component {
         this.postId = this.params.postId
 
         this.state = {
-            comments: []
+            comments: [],
+            post: {},
+            commentFetchAmount: 10
         }
     }
 
@@ -53,8 +55,9 @@ class PostView extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.feed && nextProps.feed[this.postId]) {
+        if (nextProps.feed && nextProps.feed[this.postId] && nextProps.feed[this.postId].comments) {
             this.setState({comments: nextProps.feed[this.postId].comments})
+            this.setState({post: nextProps.feed[this.postId]})
         }
     }
 
@@ -70,12 +73,7 @@ class PostView extends Component {
                         </TouchableOpacity>
                     </Left>
                 </Header>
-                <ScrollView 
-            style={styles.container}
-            onScroll={(event) => {
-                this.scrollIndex = event.nativeEvent.contentOffset.y
-            }}
-            ref={'scrollView'}>
+                <View style={styles.container}>
     
         {this.state.comments.length ? <Comments
           data={this.state.comments}
@@ -84,66 +82,63 @@ class PostView extends Component {
         //   editMinuteLimit={900}
         //   childrenPerPage={5}
         //   lastCommentUpdate={this.state.lastCommentUpdate}
-        //   usernameTapAction={(username, uid) => {
-        //     if (uid == this.props.profile.uid) {
-        //       this.props.goToProfile()
-        //     }
-        //     else {
-        //       this.props.viewProfile(uid)
-        //     }
-        //   }}
+          usernameTapAction={(username, uid) => {
+            if (uid == this.props.profile.uid) {
+              this.props.goToProfile()
+            }
+            else {
+              this.props.viewProfile(uid)
+            }
+          }}
         //   childPropName={'children'}
           keyExtractor={item => item.comment_id}
           usernameExtractor={item => extractUsername(item, this.props.profile.uid)}
           uidExtractor={item => item.user.uid}
           editTimeExtractor={item => extractEditTime(item)}
-        //   createdTimeExtractor={item => extractCreatedTime(item)}
+          createdTimeExtractor={item => extractCreatedTime(item)}
           bodyExtractor={item => extractBody(item)}
           imageExtractor={item => extractImage(item)}
-        //   likeExtractor={item => likeExtractor(item)}
-        //   reportedExtractor={item => reportedExtractor(item)}
-        //   likesExtractor={item => likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile )}
+          likeExtractor={item => likeExtractor(item)}
+           reportedExtractor={item => reportedExtractor(item)}
+          likesExtractor={item => likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile )}
           likeCountExtractor={item => item.repCount}
           childrenCountExtractor={item => extractChildrenCount(item)}
-        //   timestampExtractor={item => new Date(item.created_at).toISOString()}
-        //   // replyAction={offset => {
-        //   //   //this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
-        //   // }}
-        //   saveAction={(text, parentCommentId) => {
-        //     if (text) {
-        //     this.props.comment(
-        //       this.props.profile.uid,
-        //       this.state.postId,
-        //       text,
-        //       (new Date()).toString(),
-        //       parentCommentId,
-        //     ).then(() => {
-        //       console.log("comment sent")
-        //     }).catch(e => Alert.alert('Error', e.message))
-        //     }
-        //   }}
-        //   editAction={(text, comment) => {
-        //     this.props.actions.edit(this.props.id, comment, text)
-        //   }}
-        //   reportAction={(comment) => {
-        //     console.log(comment)
-        //   }}
-        //   likeAction={(comment) => {
-        //     this.props.repComment(comment)
-        //   }}
-        //   likesTapAction={(comment) => {
-        //     return this.props.getCommentRepsUsers(comment)
-        //   }}
-        //   paginateAction={this.state.feed[this.state.postId] 
-        //   && this.state.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
-        //   () => { 
-        //     this.setState({commentFetchAmount: this.state.commentFetchAmount + 5}, () => {
-        //       this.props.getComments(this.state.postId, this.state.commentFetchAmount)})
-        //     } : null}
-            //getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
-        /> : <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>}
+          timestampExtractor={item => new Date(item.created_at).toISOString()}
+          saveAction={(text, parentCommentId) => {
+            if (text) {
+            this.props.comment(
+              this.props.profile.uid,
+              this.state.postId,
+              text,
+              (new Date()).toString(),
+              parentCommentId,
+            ).then(() => {
+              console.log("comment sent")
+            }).catch(e => Alert.alert('Error', e.message))
+            }
+          }}
+          editAction={(text, comment) => {
+            console.log(text)
+          }}
+          reportAction={(comment) => {
+            console.log(comment)
+          }}
+          likeAction={(comment) => {
+            this.props.repComment(comment)
+          }}
+          likesTapAction={(comment) => {
+            return this.props.getCommentRepsUsers(comment)
+          }}
+          paginateAction={this.state.post
+          && this.state.post.commentCount > this.state.commentFetchAmount ? 
+          () => { 
+            this.setState({commentFetchAmount: this.state.commentFetchAmount + 5}, () => {
+              this.props.getComments(this.postId, this.state.commentFetchAmount)})
+            } : null}
+            getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
+        /> : <View style={[sStyles.spinner, {flex: 1}]}><Spinner color={colors.secondary}/></View>}
 
-      </ScrollView>
+      </View>
             </Container>
         )
     }
@@ -154,6 +149,10 @@ import { navigateBack, navigateProfile, navigateProfileView } from 'Anyone/js/ac
 import { connect } from 'react-redux'
 import {
     fetchComments,
+    fetchCommentRepsUsers,
+    postComment,
+    repPost,
+    repComment
 } from './actions/home'
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -171,6 +170,7 @@ const mapDispatchToProps = dispatch => ({
   repComment: (comment) => dispatch(repComment(comment)),
   goBack: () => dispatch(navigateBack()),
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
+  getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostView)
