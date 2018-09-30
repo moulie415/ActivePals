@@ -13,6 +13,7 @@ import Sessions from './Sessions'
 import Friends from './Friends'
 import Profile from './Profile'
 import ProfileView from './ProfileView'
+import PostView from './PostView'
 import Settings from './Settings'
 import Messaging from './chat/Messaging'
 import DirectMessages from './chat/DirectMessages'
@@ -108,6 +109,7 @@ export const Stack = StackNavigator({
   TestScreen: { screen: TestScreen },
   FilePreview: {screen : FilePreview },
   ProfileView: { screen: ProfileView },
+  PostView: { screen: PostView }
 })
 
 class App extends React.Component {

@@ -300,7 +300,7 @@ componentWillReceiveProps(nextProps) {
           paginateAction={this.state.feed[this.state.postId] 
           && this.state.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
           () => { 
-            this.setState({commentFetchAmount: this.state.commentFetchAmount += 5}, () => {
+            this.setState({commentFetchAmount: this.state.commentFetchAmount + 5}, () => {
               this.props.getComments(this.state.postId, this.state.commentFetchAmount)})
             } : null}
             getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
@@ -356,6 +356,11 @@ componentWillReceiveProps(nextProps) {
           this.setState({refreshing: true})
           this.props.getPosts(this.props.profile.uid, 30).then(() => {
             this.setState({refreshing: false})
+          })
+        }}
+        onEndReached={()=> {
+          this.setState({fetchAmount: this.state.fetchAmount+15}, () => {
+            this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
           })
         }}
         refreshing={this.state.refreshing}
@@ -610,7 +615,7 @@ showPicker() {
       return <TouchableOpacity 
       style={{alignItems: 'center'}}
       onPress={()=> {
-        this.setState({userFetchAmount: this.state.userFetchAmount += 5}, () => {
+        this.setState({userFetchAmount: this.state.userFetchAmount + 5}, () => {
           this.props.getRepUsers(this.state.postId, this.state.userFetchAmount)
         })
         

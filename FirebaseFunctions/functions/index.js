@@ -292,3 +292,99 @@ exports.deleteUserData = functions.auth.user().onDelete((deleted) => {
         console.log(e.message)
     })
 })
+
+exports.onComment = functions.database.ref('/comments/{id}').onCreate(event => {
+    console.log(event)
+    const getValuePromise = admin.database()
+                                 .ref('comments')
+                                 .child(event.params.id)
+                                 .once('value')
+
+    return getValuePromise.then(snapshot => {
+        const { postId, text, uid, created_at } = snapshot.val()
+        return admin.database().ref('posts').child(postId).once('value', snapshot => {
+            const postUid = snapshot.val().uid
+            const type = snapshot.val().type
+            if (postUid !== uid) {
+                return admin.database().ref('users').child(postUid).once('value', snapshot => {
+                    const FCMToken = snapshot.val().FCMToken
+                    return admin.database().ref('users').child(uid).once('value', snapshot => {
+                        const username = snapshot.val().username
+                        const payload = {
+                            data: {
+                                custom_notification: JSON.stringify({
+                                    body: text,
+                                    title: username + ' commented on your ' + type,
+                                    priority: 'high',
+                                    sound: 'light.mp3',
+                                    id: postId,
+                                    channel: "COMMENT",
+                                    group: postId,
+                                }),
+                                username,
+                                uid,
+                                createdAt: created_at,
+                                type: 'comment',
+                                postId
+                
+                            },
+                            token: FCMToken,
+                        }
+                        return admin.messaging()
+                                    .send(payload)
+                    })
+                })
+            }
+        })
+    })
+})
+
+exports.onRep = functions.database.ref('/reps/{id}/{uid}').onWrite(event => {
+    const id = event.params.id
+    const uid = event.params.uid
+    const getValuePromise = admin.database()
+                                 .ref('reps/' + id)
+                                 .child(uid)
+                                 .once('value')
+
+    return getValuePromise.then(snapshot => {
+        const { type, date, post } = snapshot.val()
+        let ref = type === 'post' ? 'posts' : 'comments'
+            return admin.database().ref(ref).child(id).once('value', snapshot => {
+                if (snapshot.val()) {
+                const postUid = snapshot.val().uid
+                const text = snapshot.val().text
+                if (postUid !== uid) {
+                    return admin.database().ref('users').child(postUid).once('value', snapshot => {
+                        const FCMToken = snapshot.val().FCMToken
+                        return admin.database().ref('users').child(uid).once('value', snapshot => {
+                            const username = snapshot.val().username
+                            const payload = {
+                                data: {
+                                    custom_notification: JSON.stringify({
+                                        body: text,
+                                        title: username + ' repped your ' + type,
+                                        priority: 'high',
+                                        sound: 'light.mp3',
+                                        id,
+                                        channel: "REP",
+                                        group: id,
+                                    }),
+                                    username,
+                                    uid,
+                                    createdAt: date,
+                                    type: 'rep',
+                                    id,
+                                    postId: post,
+                                },
+                                token: FCMToken,
+                            }
+                            return admin.messaging()
+                                        .send(payload)
+                        })
+                    })
+                }
+            }
+            })
+    })
+})

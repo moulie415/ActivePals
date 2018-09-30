@@ -7,6 +7,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "firebase-admin": "^6.0.0",
+    "firebase-functions": "^2.0.5",
     "geofire": "^4.1.2",
     "native-base": "^2.8.0",
     "npm": "^6.3.0",

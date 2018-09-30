@@ -17,7 +17,7 @@ import reducer from 'Anyone/js/reducers/'
 import thunk from 'redux-thunk'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import App from 'Anyone/js/App'
-import { navigateMessaging, navigateMessagingSession, navigateFriends } from 'Anyone/js/actions/navigation'
+import { navigateMessaging, navigateMessagingSession, navigateFriends, navigatePostView } from 'Anyone/js/actions/navigation'
 import { newNotification, updateLastMessage } from 'Anyone/js/actions/chats'
 import GeoFire from 'geofire'
 import styles from 'Anyone/js/styles/loginStyles'
@@ -119,7 +119,7 @@ FCM.on(FCMEvent.Notification, async (notif) => {
     }
     if(notif.opened_from_tray){
        if (notif.data) {
-              const {  type, sessionId, sessionTitle, chatId, uid, username } = notif.data
+              const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notif.data
 
               switch(type) {
                 case 'message':
@@ -132,7 +132,12 @@ FCM.on(FCMEvent.Notification, async (notif) => {
                 case 'buddyRequest':
                   dispatch(navigateFriends())
                   break
-
+                case 'rep':
+                  dispatch(navigatePostView(postId))
+                  break
+                case 'comment':
+                  dispatch(navigatePostView(postId))
+                  break
               }
 
           }
@@ -202,6 +207,18 @@ class FitLink extends React.Component {
       name: 'Session messages',
       description: 'Channel for session messages',
       priority: 'high',
+    })
+    FCM.createNotificationChannel({
+      id: 'COMMENT',
+      name: 'Comment',
+      description: 'Channel for comments on posts',
+      priority: 'high'
+    })
+    FCM.createNotificationChannel({
+      id: 'REP',
+      name: 'Rep',
+      description: 'Channel for reps',
+      priority: 'high'
     })
 
     

@@ -12,6 +12,7 @@ import {
 import styles from '../styles/sessionTypeStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Image from 'react-native-fast-image'
+import {Image as SlowImage} from 'react-native'
 
 
 class SessionType extends Component {
@@ -38,35 +39,35 @@ class SessionType extends Component {
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} 
 				onPress={()=> this.props.onSelect("Gym", this.buddies, this.location)}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flex: 1}}>
-						<Image style={{height: 50, width: 50}} source={require('Anyone/assets/images/dumbbell.png')}/>
+						<SlowImage style={{height: 50, width: 50}} source={require('Anyone/assets/images/dumbbell.png')}/>
 						<Text style={styles.typeText}>Gym</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} 
 				onPress={()=> this.props.onSelect("Running", this.buddies, this.location)}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flex: 1}}>
-						<Image style={{height: 50, width: 50}} source={require('Anyone/assets/images/running.png')}/>
+						<SlowImage style={{height: 50, width: 50}} source={require('Anyone/assets/images/running.png')}/>
 						<Text style={styles.typeText}>Running</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} 
 				onPress={()=> this.props.onSelect("Cycling", this.buddies, this.location)}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flex: 1}}>
-						<Image style={{height: 50, width: 50}} source={require('Anyone/assets/images/bicycle.png')}/>
+						<SlowImage style={{height: 50, width: 50}} source={require('Anyone/assets/images/bicycle.png')}/>
 						<Text style={styles.typeText}>Cycling</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} 
 				onPress={()=> this.props.onSelect("Swimming", this.buddies, this.location)}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flex: 1}}>
-						<Image style={{height: 50, width: 50}} source={require('Anyone/assets/images/swim.png')}/>
+						<SlowImage style={{height: 50, width: 50}} source={require('Anyone/assets/images/swim.png')}/>
 						<Text style={styles.typeText}>Swimming</Text>
 					</Card>
 				</TouchableOpacity>
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} 
 				onPress={()=> this.props.onSelect("Custom", this.buddies, this.location)}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flex: 1}}>
-						<Image style={{height: 50, width: 50}} source={require('Anyone/assets/images/custom.png')}/>
+						<SlowImage style={{height: 50, width: 50}} source={require('Anyone/assets/images/custom.png')}/>
 						<Text style={styles.typeText}>Custom</Text>
 					</Card>
 				</TouchableOpacity>
