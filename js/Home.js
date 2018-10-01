@@ -336,7 +336,7 @@ componentWillReceiveProps(nextProps) {
             <FlatList
               initialNumToRender="10"
               ListFooterComponent={(item) => this.renderRepsFooter()}
-              keyExtractor={item => item.like_id +""}
+              keyExtractor={item => item.like_id || item.user_id}
               data={this.state.feed[this.state.postId].repUsers}
               renderItem={(item) => this.renderRep(item)}
             />

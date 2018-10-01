@@ -66,6 +66,22 @@ export const addPost = (item) => {
 	}
 }
 
+export const fetchPost = (key) => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		return firebase.database().ref('posts').child(key).once('value', snapshot => {
+			let post = snapshot.val()
+			post.key = snapshot.key
+			return firebase.database().ref('userReps/' + uid).child(key).once('value', snapshot => {
+				if (snapshot.val()) {
+					post.rep = true
+				}
+				dispatch(setPost(post))
+			})
+		})
+	}
+}
+
 
 export const fetchPosts = (uid, amount = 30) => {
 	return (dispatch, getState) => {
