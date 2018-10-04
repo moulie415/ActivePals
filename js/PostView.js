@@ -8,7 +8,8 @@ import {
 } from 'native-base'
 import {
     View,
-    Dimensions
+    Dimensions,
+    Alert
 } from 'react-native'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import firebase from 'react-native-firebase'
@@ -30,6 +31,7 @@ import {
   } from './constants/utils'
   import styles from './styles/postViewStyles'
   import Image from 'react-native-fast-image'
+  import {Image as SlowImage} from 'react-native'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -48,7 +50,7 @@ class PostView extends Component {
 
         this.state = {
             comments: [],
-            post: {},
+            //post: {},
             commentFetchAmount: 10
         }
     }
@@ -61,7 +63,10 @@ class PostView extends Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.feed && nextProps.feed[this.postId] && nextProps.feed[this.postId].comments) {
             this.setState({comments: nextProps.feed[this.postId].comments})
-            this.setState({post: nextProps.feed[this.postId]})
+            
+        }
+        if (nextProps.feed && nextProps.feed[this.postId]) {
+          this.setState({post: nextProps.feed[this.postId]})
         }
     }
 
@@ -79,6 +84,7 @@ class PostView extends Component {
                 </Header>
                 <View style={styles.container}>
         {this.state.post && <View style={{maxHeight: SCREEN_HEIGHT/2}}>{this.renderPost(this.state.post)}</View>}
+        {this.state.post && this.repCommentCount(this.state.post)}
         {this.state.comments.length ? <Comments
           data={this.state.comments}
           //viewingUserName={"test"}
@@ -162,8 +168,7 @@ class PostView extends Component {
                 <Text style={{color: '#000'}}>{item.text}</Text>
               </View>
               </View>
-              {/*this.repCommentCount(item)*/}
-              {/*this.repsAndComments(item)*/}
+              
             </View>
             )
       case 'photo':
@@ -179,23 +184,57 @@ class PostView extends Component {
                 <Text style={{color: '#000'}}>{item.text}</Text>
                 </View>
               </View>
+              
                 <View
                 style={{marginTop: 10, marginBottom: 10}}>
                 <Image
-                style={{width: '100%', height: 400}}
+                style={{width: '100%', height: 400, maxHeight: SCREEN_HEIGHT/2-55}}
                 resizeMode={'contain'}
                 source={{uri: item.url}}
                 />
+                
                 </View>
-                {/*this.repCommentCount(item)*/}
-              <View style={{padding: 10}}>
-              {/*this.repsAndComments(item)*/}
-              </View>
+                
+
             </View>
           )
       }
   
     }
+    repCommentCount(item) {
+        return (
+        <View style={{flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
+          <View style={{flex: 1, marginVertical: 10, flexDirection: 'row', alignItems: 'center'}}>
+            {!!item.commentCount && item.commentCount > 0 && 
+            <View 
+            style={{flex: 1}}
+           >
+            <Text style={{color: '#999', textAlign: 'center'}}>
+            {`${item.commentCount} ${item.commentCount > 1 ? ' comments' : ' comment'}`}</Text></View>}
+            {!!item.repCount && item.repCount > 0 && <View 
+            style={{flex: 1}}
+           >
+           <TouchableOpacity onPress={() => {
+             Alert.alert('test')
+           }}>
+            <Text style={{color: '#999', textAlign: 'center'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}
+            </Text></TouchableOpacity></View>}
+            <TouchableOpacity
+             onPress={() => {
+              this.props.onRepPost(item)
+            }}
+             style={{flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+             <SlowImage source={item.rep ? weightUp : weightDown}
+            style={{width: 25, height: 25, marginRight: 10, tintColor: item.rep ? colors.secondary : '#616770'}}/>
+            <Text style={{color: item.rep ? colors.secondary : '#616770'}}>Rep</Text>
+            </TouchableOpacity>
+            </View>
+          </View>
+          )
+  
+    }
+  
+
     fetchAvatar(uid) {
       if (this.props.profile.avatar && uid == this.props.profile.uid) {
         return <TouchableOpacity

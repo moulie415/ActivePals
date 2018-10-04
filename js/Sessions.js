@@ -560,7 +560,7 @@ import {Image as SlowImage } from 'react-native'
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 3}} numberOfLines={1}><Text  style={styles.title}>{item.title}</Text>
                         <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : this.getDistance(item)) + ' km away)'}</Text></Text>
-                        <Text numberOfLines={1} style={{fontSize: 13, color: '#000', flex: 2}}>{"gender: " + item.gender}</Text>
+                        <Text numberOfLines={1} style={{fontSize: 13, color: '#000', flex: 2, textAlign: 'right'}}>{"gender: " + item.gender}</Text>
                       </View>
                       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text style={[styles.date], {color: item.inProgress ? colors.secondary : "#999"}} >

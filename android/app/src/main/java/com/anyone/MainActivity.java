@@ -29,4 +29,10 @@ public class MainActivity extends ReactActivity {
         SplashScreen.show(this);
         super.onCreate(savedInstanceState);
     }
+
+    @Override
+    protected void onPause() {
+        SplashScreen.hide(this);
+        super.onPause();
+    }
 }
