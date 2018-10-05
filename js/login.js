@@ -43,7 +43,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
     firebase.auth().onAuthStateChanged(user => {
       if (user && user.emailVerified && !this.state.waitForData) {
         this.setState({spinner: true})
-        firebase.auth().fetchProvidersForEmail(user.email).then(providers => {
+        firebase.auth().fetchSignInMethodsForEmail(user.email).then(providers => {
         this.setState({spinner: false})
           if (providers.length > 0) {
             this.props.onLogin()
@@ -202,24 +202,26 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
               const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`
              this.authenticate(data.accessToken)
              .then(function(result){
-              if (result.emailVerified) {
+               let login = false
+              if (!result.additionalUserInfo.isNewUser) {
                 _this.props.onLogin()
               }
               else {
-               result.sendEmailVerification().then(()=> {
-                 Alert.alert("Account created", "You must now verify your email using the link we sent you before you can login")
-                 const imageRef = firebase.storage().ref('images/' + result.uid).child('avatar')
+                login = true
+                 const imageRef = firebase.storage().ref('images/' + result.user.uid).child('avatar')
                  RNFetchBlob.fetch('GET', fbImage).then(image => image.blob())
                  .then(blob => {
                   imageRef.putFile(blob._ref)
                  })
                  .catch(e => console.log(e))
-               }).catch(error => {
-                Alert.alert('Error', error.message)
-              })
              }
-             const { uid } = result
+             const { uid } = result.user
                 _this.createUser(uid,json,token)
+                .then(() => {
+                  if (login) {
+                    this.props.onLogin()
+                  }
+                })
               })
               .catch(error => {
                 Alert.alert('Error', error.message)
