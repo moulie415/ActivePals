@@ -202,26 +202,28 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
               const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`
              this.authenticate(data.accessToken)
              .then(function(result){
-               let login = false
+              const { uid } = result.user
               if (!result.additionalUserInfo.isNewUser) {
                 _this.props.onLogin()
               }
               else {
-                login = true
-                 const imageRef = firebase.storage().ref('images/' + result.user.uid).child('avatar')
+                 const imageRef = firebase.storage().ref('images/' + uid).child('avatar')
                  RNFetchBlob.fetch('GET', fbImage).then(image => image.blob())
                  .then(blob => {
-                  imageRef.putFile(blob._ref)
+                  imageRef.putFile(blob._ref).then(() => {
+                    _this.createUser(uid,json,token).then(() => {
+                      _this.props.onLogin()
+                    })
+                  })
                  })
-                 .catch(e => console.log(e))
-             }
-             const { uid } = result.user
-                _this.createUser(uid,json,token)
-                .then(() => {
-                  if (login) {
-                    this.props.onLogin()
-                  }
+                 .catch(e => {
+                   console.log(e)
+                   _this.createUser(uid,json,token).then(() => {
+                    _this.props.onLogin()
+                  })
                 })
+             }
+                _this.createUser(uid,json,token)
               })
               .catch(error => {
                 Alert.alert('Error', error.message)
