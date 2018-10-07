@@ -7,7 +7,6 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableHighlight,
-  TouchableOpacity,
   Modal,
   Alert
 } from "react-native";
@@ -21,6 +20,7 @@ import styles from "./styles";
 import colors from '../constants/colors'
 import Collapsible from "react-native-collapsible";
 import {Image as SlowImage } from 'react-native'
+import TouchableOpacity from '../constants/TouchableOpacityLockable'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -142,7 +142,10 @@ export default class Comment extends PureComponent {
             {this.props.likeAction ? (
               <TouchableOpacity
                 style={styles.actionButton}
-                onPress={this.handleLike}
+                onPress={(mutex)=> {
+                  mutex.lockFor(3000)
+                  this.handleLike()
+                  }}
               >
                 <View style={{ flexDirection: "row" , marginTop: 2}}>
                   <Text

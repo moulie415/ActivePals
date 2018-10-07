@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Image from 'react-native-fast-image'
 import {
 	View,
 	TouchableWithoutFeedback,
@@ -7,7 +6,8 @@ import {
 	TextInput,
 	KeyboardAvoidingView,
 	Keyboard,
-    Alert
+    Alert,
+    Image
 } from 'react-native'
 import {
     Icon,

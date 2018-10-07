@@ -465,7 +465,8 @@ componentWillReceiveProps(nextProps) {
   repsAndComments(item, addPadding = false) {
    return(<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
     <TouchableOpacity
-      onPress={() => {
+      onPress={(mutex) => {
+        mutex.lockFor(3000)
         this.props.onRepPost(item)
       }}
       style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>

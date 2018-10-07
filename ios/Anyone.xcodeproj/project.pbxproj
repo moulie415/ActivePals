@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -22,7 +23,6 @@
 		0A73102420F6780A00CCF377 /* Running-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A730FE820F6780A00CCF377 /* Running-background.jpg */; };
 		0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */; };
 		0AB3811720098E4A00BCD283 /* FBSDKCoreKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811220098CC000BCD283 /* FBSDKCoreKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0AD46C1B2157C68D000E6B9C /* libFastImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AD46BC82157C683000E6B9C /* libFastImage.a */; };
 		0DEC0B3B247E40D1953C8594 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 112BFEAFFE274186B850223D /* SafariServices.framework */; };
 		133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
@@ -132,6 +132,27 @@
 			proxyType = 2;
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNFIRMessaging;
+		};
+		0A1BF0E62168B63900EF5992 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5885A07964C90EC9FF30AD61338212DA;
+			remoteInfo = FLAnimatedImage;
+		};
+		0A1BF0E82168B63900EF5992 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 62671A955002EC44365523E19FC82B17;
+			remoteInfo = "react-native-fast-image";
+		};
+		0A1BF0EA2168B63900EF5992 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BD3CB54FA27DF83E865C7288B8ED87C9;
+			remoteInfo = SDWebImage;
 		};
 		0A1F210A210A8CC900896D4A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -702,7 +723,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AD46C1B2157C68D000E6B9C /* libFastImage.a in Frameworks */,
 				0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */,
 				0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */,
 				0A1F225D210BE24200896D4A /* libRCTFBSDK.a in Frameworks */,
@@ -881,6 +901,7 @@
 				0A3E956E2113C8FB00BCD60F /* libFirebaseDatabase.a */,
 				0A3E95702113C8FB00BCD60F /* libFirebaseMessaging.a */,
 				0A7CEE8E2118B2AF00F09932 /* libFirebaseStorage.a */,
+				0A1BF0E72168B63900EF5992 /* libFLAnimatedImage.a */,
 				0A1F21A0210A908F00896D4A /* libGoogle-Maps-iOS-Utils.a */,
 				0A1F211F210A8E1800896D4A /* libGoogleToolboxForMac.a */,
 				0A7CEE902118B2AF00F09932 /* libGTMSessionFetcher.a */,
@@ -888,6 +909,7 @@
 				0A988CAC210E2795006C6974 /* libnanopb.a */,
 				0A1F2121210A8E1800896D4A /* libPods-Anyone.a */,
 				0A19E24620376D230036DFF2 /* libProtobuf.a */,
+				0A1BF0E92168B63900EF5992 /* libreact-native-fast-image.a */,
 				0A19E24820376D230036DFF2 /* libreact-native-fcm.a */,
 				0A19E24A20376D230036DFF2 /* libreact-native-geocoder.a */,
 				0A88FFBB201D6E19004A17CD /* libreact-native-google-maps.a */,
@@ -897,6 +919,7 @@
 				0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */,
 				0A88FFBF201D6E19004A17CD /* libReactNativePermissions.a */,
 				0A988CAE210E2795006C6974 /* librn-fetch-blob.a */,
+				0A1BF0EB2168B63900EF5992 /* libSDWebImage.a */,
 				0A88FFC1201D6E19004A17CD /* libyoga.a */,
 			);
 			name = Products;
@@ -1447,6 +1470,27 @@
 			fileType = archive.ar;
 			path = libRNFIRMessaging.a;
 			remoteRef = 0A19E2C820376ED50036DFF2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A1BF0E72168B63900EF5992 /* libFLAnimatedImage.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFLAnimatedImage.a;
+			remoteRef = 0A1BF0E62168B63900EF5992 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A1BF0E92168B63900EF5992 /* libreact-native-fast-image.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libreact-native-fast-image.a";
+			remoteRef = 0A1BF0E82168B63900EF5992 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A1BF0EB2168B63900EF5992 /* libSDWebImage.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSDWebImage.a;
+			remoteRef = 0A1BF0EA2168B63900EF5992 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A1F211F210A8E1800896D4A /* libGoogleToolboxForMac.a */ = {

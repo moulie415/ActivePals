@@ -9,8 +9,13 @@ import {
 import {
     View,
     Dimensions,
-    Alert
+    Alert,
+    Modal,
+    SafeAreaView,
+    FlatList
 } from 'react-native'
+import FIcon from "react-native-vector-icons/FontAwesome"
+import cStyles from './comments/styles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import firebase from 'react-native-firebase'
 import colors from './constants/colors'
@@ -51,7 +56,9 @@ class PostView extends Component {
         this.state = {
             comments: [],
             //post: {},
-            commentFetchAmount: 10
+            likesModalVisible: false,
+            commentFetchAmount: 10,
+            userFetchAmount: 10,
         }
     }
 
@@ -85,7 +92,7 @@ class PostView extends Component {
                 <View style={styles.container}>
         {this.state.post && <View style={{maxHeight: SCREEN_HEIGHT/2}}>{this.renderPost(this.state.post)}</View>}
         {this.state.post && this.repCommentCount(this.state.post)}
-        {this.state.comments.length ? <Comments
+        {this.state.post ? <Comments
           data={this.state.comments}
           //viewingUserName={"test"}
           //initialDisplayCount={10}
@@ -118,7 +125,7 @@ class PostView extends Component {
             if (text) {
             this.props.comment(
               this.props.profile.uid,
-              this.state.postId,
+              this.postId,
               text,
               (new Date()).toString(),
               parentCommentId,
@@ -147,7 +154,42 @@ class PostView extends Component {
             } : null}
             getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
         /> : <View style={[sStyles.spinner, {flex: 1}]}><Spinner color={colors.secondary}/></View>}
+          <Modal
+          animationType={"slide"}
+          transparent={false}
+          visible={this.state.likesModalVisible}
+          onRequestClose={() => this.setState({likesModalVisible: false, userFetchAmount: 10})}
+        >
+          <TouchableOpacity
+            onPress={() => this.setState({likesModalVisible: false})}
+            style={{
+              position: "absolute",
+              width: 100,
+              zIndex: 9,
+              alignSelf: "flex-end",
+              top: 10
+            }}
+          >
+          <SafeAreaView>
+            <View style={{ position: "relative", left: 50, top: 5 }}>
+              <FIcon name={"times"} size={40} />
+            </View>
+            </SafeAreaView>
+          </TouchableOpacity>
+          <SafeAreaView>
+          <Text style={cStyles.likeHeader}>Users that repped the post</Text>
+          </SafeAreaView>
 
+          {this.state.likesModalVisible ? (
+            <FlatList
+              initialNumToRender="10"
+              ListFooterComponent={(item) => this.renderRepsFooter()}
+              keyExtractor={item => item.like_id || item.user_id}
+              data={this.state.post.repUsers}
+              renderItem={(item) => this.renderRep(item)}
+            />
+          ) : null}
+        </Modal>
       </View>
             </Container>
         )
@@ -215,12 +257,14 @@ class PostView extends Component {
             style={{flex: 1}}
            >
            <TouchableOpacity onPress={() => {
-             Alert.alert('test')
+             this.props.getRepUsers(item.key, this.state.userFetchAmount)
+            this.setState({likesModalVisible: true})
            }}>
             <Text style={{color: '#999', textAlign: 'center'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}
             </Text></TouchableOpacity></View>}
             <TouchableOpacity
-             onPress={() => {
+             onPress={(mutex) => {
+               mutex.lockFor(3000)
               this.props.onRepPost(item)
             }}
              style={{flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -264,6 +308,52 @@ class PostView extends Component {
       {uid == this.props.profile.uid ? 'You' : this.getUsername(uid)}</Text>
       </TouchableOpacity>
     }
+
+    renderRep(l) {
+      let like = l.item
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            this.setState({likesModalVisible: false})
+            like.user_id == this.props.profile.uid ? this.props.goToProfile() : this.props.viewProfile(like.user_id)
+          }}
+          style={cStyles.likeButton}
+          key={like.user_id + ""}
+        >
+          <View style={[cStyles.likeContainer]}>
+            <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
+            <Text style={[cStyles.likeName]}>{like.username}</Text>
+          </View>
+        </TouchableOpacity>
+      )
+    }
+  
+    renderRepsFooter() {
+      if (this.state.post.repCount > this.state.userFetchAmount) {
+        return <TouchableOpacity 
+        style={{alignItems: 'center'}}
+        onPress={()=> {
+          this.setState({userFetchAmount: this.state.userFetchAmount + 5}, () => {
+            this.props.getRepUsers(this.postId, this.state.userFetchAmount)
+          })
+          
+        }}>
+          <Text style={{color: colors.secondary}}>Show more</Text>
+          </TouchableOpacity>
+      }
+      else return null
+  
+    }
+
+    getUsername(uid) {
+      if (this.props.friends[uid]) {
+        return this.props.friends[uid].username
+      }
+     else if (this.props.users[uid]) {
+      return this.props.users[uid].username
+     }
+     else return 'N/A'
+   }
 }
 
 
@@ -275,7 +365,8 @@ import {
     postComment,
     repPost,
     repComment,
-    fetchPost
+    fetchPost,
+    fetchRepUsers
 } from './actions/home'
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -294,7 +385,8 @@ const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
-  getPost: (key) => dispatch(fetchPost(key))
+  getPost: (key) => dispatch(fetchPost(key)),
+  getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostView)

@@ -190,7 +190,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
       //Alert.alert('Facbook login', 'cancelled')
       this.setState({spinner: false})
     } else {
-  AccessToken.getCurrentAccessToken().then(
+        AccessToken.getCurrentAccessToken().then(
           (data) => {
             const token = data.accessToken
             fetch('https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,gender,birthday&access_token=' + token)
