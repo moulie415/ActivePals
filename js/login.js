@@ -146,7 +146,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
             <Text style={{ color: '#fff'}}>Login with Google</Text>
           </TouchableOpacity>
         </View>
-          <Text style={{color: '#fff', textAlign: 'center', position: 'absolute', bottom: 10}}>
+          <Text style={{color: colors.primary, textAlign: 'center', position: 'absolute', bottom: 10}}>
           {'v' + VersionNumber.appVersion}</Text>
     </ImageBackground>
   )

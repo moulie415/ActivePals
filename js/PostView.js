@@ -264,7 +264,7 @@ class PostView extends Component {
             </Text></TouchableOpacity></View>}
             <TouchableOpacity
              onPress={(mutex) => {
-               mutex.lockFor(3000)
+               mutex.lockFor(1000)
               this.props.onRepPost(item)
             }}
              style={{flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center'}}>

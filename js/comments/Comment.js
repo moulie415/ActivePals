@@ -143,7 +143,7 @@ export default class Comment extends PureComponent {
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={(mutex)=> {
-                  mutex.lockFor(3000)
+                  mutex.lockFor(1000)
                   this.handleLike()
                   }}
               >

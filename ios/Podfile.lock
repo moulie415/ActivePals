@@ -116,7 +116,7 @@ PODS:
   - Protobuf (3.6.1)
   - React (0.56.0):
     - React/Core (= 0.56.0)
-  - react-native-fast-image (5.0.3):
+  - react-native-fast-image (5.0.10):
     - FLAnimatedImage
     - React
     - SDWebImage/Core
