@@ -20,6 +20,7 @@
 		0A1F229B210C9BE600896D4A /* light.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0A1F229A210C9BE600896D4A /* light.mp3 */; };
 		0A1F22EF210DF55200896D4A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A1F22B2210DF55200896D4A /* GoogleService-Info.plist */; };
 		0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1F215A210A8E1800896D4A /* libRNGoogleSignin.a */; };
+		0A4320CF216FBDA000C79596 /* libRNVersionNumber.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2FBFA22063056F00A42267 /* libRNVersionNumber.a */; };
 		0A73102420F6780A00CCF377 /* Running-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A730FE820F6780A00CCF377 /* Running-background.jpg */; };
 		0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */; };
 		0AB3811720098E4A00BCD283 /* FBSDKCoreKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811220098CC000BCD283 /* FBSDKCoreKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -723,6 +724,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A4320CF216FBDA000C79596 /* libRNVersionNumber.a in Frameworks */,
 				0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */,
 				0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */,
 				0A1F225D210BE24200896D4A /* libRCTFBSDK.a in Frameworks */,
