@@ -37,6 +37,7 @@ import Comments from './comments'
 import FIcon from "react-native-vector-icons/FontAwesome"
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'
+import FCM from 'react-native-fcm'
 import {
   extractCreatedTime,
   extractUsername,
@@ -88,7 +89,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
-
+    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
   firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     this.user = user
