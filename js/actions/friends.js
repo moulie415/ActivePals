@@ -4,7 +4,6 @@ import { fetchPrivateSessions } from './sessions'
 export const SET_FRIENDS = 'SET_FRIENDS'
 export const UPDATE_FRIENDS = 'UPDATE_FRIENDS'
 export const ADD_FRIEND = 'ADD_FRIEND'
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
 
 

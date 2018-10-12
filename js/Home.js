@@ -48,7 +48,6 @@ import {
   extractImage,
   reportedExtractor,
 } from './constants/utils'
-import FCM from 'react-native-fcm'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -89,15 +88,21 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
-  firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    this.user = user
-    // User is signed in.
-  } else {
-    // No user is signed in.
-  }
-})
+    firebase.messaging().requestPermission()
+      .then(() => {
+       console.log("messaging permission granted")
+      })
+      .catch(error => {
+        console.log("messaging permission denied")
+      })
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+        this.user = user
+         // User is signed in.
+        } else {
+        // No user is signed in.
+        }
+      })
 }
 
 sortByDate(array) {

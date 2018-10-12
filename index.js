@@ -5,6 +5,7 @@ import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
 //import * as firebase from "firebase"
 import firebase from 'react-native-firebase' //above is web api
+import type { Notification, RemoteMessage } from 'react-native-firebase'
 import { Root, Spinner } from 'native-base'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
@@ -27,21 +28,8 @@ import {
   createReduxBoundAddListener,
 } from 'react-navigation-redux-helpers'
 
-// let config = {
-//   apiKey: "AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw",
-//   authDomain: "anyone-80c08.firebaseapp.com",
-//   databaseURL: "https://anyone-80c08.firebaseio.com",
-//   projectId: "anyone-80c08",
-//   storageBucket: "anyone-80c08.appspot.com",
-//   messagingSenderId: "680139677816"
-// }
-//firebase.initializeApp(config)
 let firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
-
-//export default firebase
-
-
 
 const showLocalNotification = (notif) => {
   if (notif.custom_notification) {
@@ -49,21 +37,19 @@ const showLocalNotification = (notif) => {
     if (notif.type != 'sessionMessage' ||
       (notif.type == 'sessionMessage' && notif.uid != user.uid)) {
       let custom = JSON.parse(notif.custom_notification)
-      FCM.presentLocalNotification({
-        title: custom.title,
-        body: custom.body,
-        channel: custom.channel,
-        priority: custom.priority,
-        sound: "light.mp3",
-      //click_action: notif.click_action,
-      show_in_foreground: true,
-      lights: true,
-      vibrate: 300,
-      id: custom.group,
-      //groupSummary: true,
-      group: custom.group,
-      data: notif,
-    })
+      const notification = new firebase.notifications.Notification()
+        .setTitle(custom.title)
+        .setBody(custom.body)
+        .setData(notif)
+        .setSound('light.mp3')
+        .android.setGroupSummary(true)
+        .android.setGroup(custom.group)
+        .android.setPriority(firebase.notifications.Android.Priority.Max)
+         //.setNotificationId('notificationId')
+      
+        firebase.notifications()
+          .displayNotification(notification)
+          .catch(err => console.error(err))
     }
   }
 
@@ -99,27 +85,10 @@ export const store = createStore(
 
 export const persistor = persistStore(store)
 
-
-
 FCM.on(FCMEvent.Notification, async (notif) => {
-  let state = AppState.currentState
-    // there are two parts of notif. notif.notification contains the notification payload, notif.data contains data payload
     const { dispatch } = store
-
-    if (!notif.opened_from_tray) {
-     if (notif.type == 'message' || notif.type == 'sessionMessage') {
-      dispatch(newNotification(notif))
-      dispatch(updateLastMessage(notif))
-    }
-  }
-
-    if(notif.local_notification){
-      //this is a local notification
-
-    }
     if(notif.opened_from_tray){
-       if (notif.data) {
-              const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notif.data
+              const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notif
 
               switch(type) {
                 case 'message':
@@ -139,49 +108,7 @@ FCM.on(FCMEvent.Notification, async (notif) => {
                   dispatch(navigatePostView(postId))
                   break
               }
-
-          }
-
-      //}
-      //iOS: app is open/resumed because user clicked banner
-      //Android: app is open/resumed because user clicked banner or tapped app icon
-    }
-    // await someAsyncCall();
-
-    if(Platform.OS ==='ios'){
-      if (notif._actionIdentifier === 'com.myapp.MyCategory.Confirm') {
-        // handle notification action here
-        // the text from user is in notif._userText if type of the action is NotificationActionType.TextInput
-      }
-      //optional
-      //iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623013-application.
-      //This library handles it for you automatically with default behavior (for remote notification, finish with NoData; for WillPresent, finish depend on "show_in_foreground"). However if you want to return different result, follow the following code to override
-      //notif._notificationType is available for iOS platfrom
-      switch(notif._notificationType){
-        case NotificationType.Remote:
-          notif.finish(RemoteNotificationResult.NewData) //other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
-          break
-          case NotificationType.NotificationResponse:
-          notif.finish()
-          break
-          case NotificationType.WillPresent:
-          notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
-          break
-        }
-
-      }
-      try {
-          if (!notif.opened_from_tray) {
-            if (Platform.OS == 'ios' || state != 'background') {
-              if (notif.type) {
-                showLocalNotification(notif)
-              }
             }
-          }
-      }
-    catch(e) {
-      Alert.alert(e.message)
-    }
   })
 
 
@@ -189,60 +116,101 @@ class FitLink extends React.Component {
   componentDidMount() {
     //ignore setting a timer warnings
     YellowBox.ignoreWarnings(['Setting a timer'])
+    const channels = []
+    channels.push(new firebase.notifications.Android.Channel('REQUEST', 'Buddy requests', firebase.notifications.Android.Importance.Max)
+        .setDescription('Channel for buddy requests')
+        .setSound('light.mp3'))
 
-    FCM.createNotificationChannel({
-      id: 'REQUEST',
-      name: 'Buddy requests',
-      description: 'Channel for buddy requests',
-      priority: 'high',
-    })
-    FCM.createNotificationChannel({
-      id: 'DIRECT_MESSAGES',
-      name: 'Direct messages',
-      description: 'Channel for direct messages from buddies',
-      priority: 'high',
-    })
-    FCM.createNotificationChannel({
-      id: 'SESSION_MESSAGES',
-      name: 'Session messages',
-      description: 'Channel for session messages',
-      priority: 'high',
-    })
-    FCM.createNotificationChannel({
-      id: 'COMMENT',
-      name: 'Comment',
-      description: 'Channel for comments on posts',
-      priority: 'high'
-    })
-    FCM.createNotificationChannel({
-      id: 'REP',
-      name: 'Rep',
-      description: 'Channel for reps',
-      priority: 'high'
+    channels.push(new firebase.notifications.Android.Channel('DIRECT_MESSAGES', 'Direct messages', firebase.notifications.Android.Importance.Max)
+        .setDescription('Channel for direct messages from buddies')
+        .setSound('light.mp3'))
+
+    channels.push(new firebase.notifications.Android.Channel('SESSION_MESSAGES', 'Session messages', firebase.notifications.Android.Importance.Max)
+        .setDescription('Channel for session messages')
+        .setSound('light.mp3'))
+
+    channels.push(new firebase.notifications.Android.Channel('COMMENT', 'Comment', firebase.notifications.Android.Importance.Max)
+        .setDescription('Channel for comments on posts')
+        .setSound('light.mp3'))
+    
+    channels.push(new firebase.notifications.Android.Channel('REP', 'Rep', firebase.notifications.Android.Importance.Max)
+        .setDescription('Channel for reps')
+        .setSound('light.mp3'))
+   
+    channels.forEach(channel => {
+      firebase.notifications().android.createChannel(channel)
     })
 
+    this.messageListener = firebase.messaging().onMessage((notification: RemoteMessage) => {
+      const { dispatch } = store
+      const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notification.data
+      if (type == 'message' || type == 'sessionMessage') {
+        dispatch(newNotification(notification.data))
+        dispatch(updateLastMessage(notification.data))
+      }
+      showLocalNotification(notification.data)
+    })
+
+    this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification: Notification) => {
+      // Process your notification as required
+      // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
+      console.log(notification)
+    })
+    this.notificationListener = firebase.notifications().onNotification((notification: Notification) => {
+      // Process your notification as required
+      console.log(notification)
+    })
+    this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen: NotificationOpen) => {
+      // Get the action triggered by the notification being opened
+      const action = notificationOpen.action;
+      // Get information about the notification that was opened
+      const notification: Notification = notificationOpen.notification;
+    })
+
+    firebase.notifications().getInitialNotification()
+      .then((notificationOpen: NotificationOpen) => {
+        if (notificationOpen) {
+          // App was opened by a notification
+          // Get the action triggered by the notification being opened
+          const action = notificationOpen.action;
+          // Get information about the notification that was opened
+          const notification: Notification = notificationOpen.notification;  
+        }
+      })
     
 
-    this.refreshTokenListener = FCM.on(FCMEvent.RefreshToken, token => {
+      this.unsubscriber = firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            firebase.messaging().getToken()
+            .then(fcmToken => {
+                if (fcmToken) {
+                    firebase.database().ref('users/' + user.uid).child('FCMToken').set(fcmToken)
+                    console.log('fcm token: ' + fcmToken)
+                } else {
+                    console.log('no token')
+                }
+            })
+        }
+      })
+
+    this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(fcmToken => {
+      // Process your token as required
       let user = firebase.auth().currentUser
       if (user) {
-        firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
-      }
-      console.log("TOKEN (refreshUnsubscribe)", token);
-    })
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.user = user
-        FCM.getFCMToken().then(token => {
-          if (user) {
-            firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
-          }
-        })
-      } else {
+        firebase.database().ref('users/' + user.uid).child('FCMToken').set(fcmToken)
       }
     })
-
   }
+
+  componentWillUnmount() {
+    this.notificationDisplayedListener()
+    this.notificationListener()
+    this.notificationOpenedListener()
+    this.onTokenRefreshListener()
+    this.messageListener()
+    this.unsubscriber()
+  }
+
   render () {
     return <PersistGate persistor={persistor} >
       <Root>
@@ -253,13 +221,5 @@ class FitLink extends React.Component {
       </PersistGate>
   }
 }
-
-
-// const sessionNav = StackNavigator({
-
-// })
-
-
-
 
 AppRegistry.registerComponent('Anyone', () => FitLink)

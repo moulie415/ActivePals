@@ -9,7 +9,6 @@ export const NEW_NOTIF = 'NEW_NOTIF'
 export const RESET_NOTIFICATION = 'RESET_NOTIFICATION'
 export const UPDATE_CHAT = 'UPDATE_CHAT'
 export const UPDATE_SESSION_CHAT = 'UPDATE_SESSION_CHAT'
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
 
 const setSessionChats = (sessionChats) => ({
@@ -142,9 +141,6 @@ export const removeChat = (uid) => {
 			return acc
 		}, {})
 		dispatch(setChats(obj))
-		if (chats[uid]) {
-			FCM.deleteNotificationChannel(chats[uid].chatId)
-		}
 	}
 }
 
@@ -217,7 +213,6 @@ export const removeSessionChat = (key) => {
 			return acc
 		}, {})
 		dispatch(setSessionChats(obj))
-		FCM.deleteNotificationChannel(key)
 	}
 }
 

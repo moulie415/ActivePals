@@ -18,7 +18,6 @@ import {
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
 import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import colors from 'Anyone/js/constants/colors'
 import Modal from 'react-native-modalbox'
 import sStyles from 'Anyone/js/styles/sessionStyles'
@@ -66,15 +65,6 @@ class Messaging extends React.Component {
 
     this.props.profile.avatar ? this.setState({avatar: this.props.profile.avatar}) : this.setState({avatar: ''})
 
-    FCM.getFCMToken().then(token => {
-      firebase.database().ref('users/' + this.uid).child('FCMToken').set(token)
-    })
-
-    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
-
-    FCM.getInitialNotification().then(notif => {
-     console.log(notif)
-   })
   }
 
   loadMessages() {

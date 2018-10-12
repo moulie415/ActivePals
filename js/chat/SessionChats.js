@@ -8,7 +8,6 @@ import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-bas
 import firebase from 'react-native-firebase'
 import { getType } from 'Anyone/js/constants/utils'
 import colors from 'Anyone/js/constants/colors'
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 
 //import  styles  from './styles/loginStyles'
 
@@ -41,8 +40,6 @@ import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, 
         //let sessionsRef = firebase.database().ref('users/' + this.user.uid).child('sessions')
       }
     })
-
-    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
   }
 

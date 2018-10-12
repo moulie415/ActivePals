@@ -31,7 +31,6 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import reducer from './reducers/'
 import thunk from 'redux-thunk'
 import { StackNavigator,  TabNavigator, addNavigationHelpers, NavigationActions } from "react-navigation"
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import { addListener } from 'Anyone/index'
 
 // const sessions = StackNavigator({
@@ -129,9 +128,6 @@ class App extends React.Component {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.user = user
-        // FCM.getFCMToken().then(token => {
-        //   firebase.database().ref('users/' + user.uid).child('FCMToken').set(token)
-        // })
       } else {
       }
     })

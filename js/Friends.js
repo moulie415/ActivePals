@@ -27,7 +27,6 @@ import firebase from 'react-native-firebase'
 import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import sStyles from 'Anyone/js/styles/sessionStyles'
 
 
@@ -65,7 +64,6 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
     let chatRef = firebase.database().ref('users/' + this.uid).child('chats')
     this.listenForFriends(friendsRef)
     this.listenForChats(chatRef)
-    FCM.requestPermissions().then(()=>console.log('granted')).catch(()=>console.log('notification permission rejected'))
 
   }
 
