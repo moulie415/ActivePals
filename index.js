@@ -21,6 +21,7 @@ import App from 'Anyone/js/App'
 import { navigateMessaging, navigateMessagingSession, navigateFriends, navigatePostView } from 'Anyone/js/actions/navigation'
 import { newNotification, updateLastMessage } from 'Anyone/js/actions/chats'
 import GeoFire from 'geofire'
+import bgMessaging from './js/bgMessaging'
 import styles from 'Anyone/js/styles/loginStyles'
 
 import {
@@ -31,7 +32,7 @@ import {
 let firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
 
-const showLocalNotification = (notif) => {
+export const showLocalNotification = (notif) => {
   if (notif.custom_notification) {
     let user = firebase.auth().currentUser
     if (notif.type != 'sessionMessage' ||
@@ -229,3 +230,4 @@ class FitLink extends React.Component {
 }
 
 AppRegistry.registerComponent('Anyone', () => FitLink)
+AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => bgMessaging);

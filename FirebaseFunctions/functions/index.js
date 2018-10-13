@@ -38,7 +38,8 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                 _id,
                 avatar: user.avatar ,
                 type: 'message',
-                chatId
+                chatId,
+                priority: 'high'
 
             },
             token: FCMToken,
@@ -92,9 +93,11 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                             type: 'sessionMessage',
                             sessionId,
                             sessionTitle,
+                            priority: 'high'
 
                         },
                         token: token.val(),
+			
                     }
                     promises.push(admin.messaging().send(payload))
                 })
@@ -132,10 +135,11 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
                                 channel: 'REQUEST',
                                 group: 'REQUEST',
                             }),
-                            type: 'buddyRequest'
-
+                            type: 'buddyRequest',
+                            priority: 'high',
                         },
                         token: FCMToken,
+			    
                     }
                     resolve(admin.messaging().send(payload))
                 })
@@ -325,10 +329,12 @@ exports.onComment = functions.database.ref('/comments/{id}').onCreate(event => {
                                 uid,
                                 createdAt: created_at,
                                 type: 'comment',
-                                postId
+                                postId,
+                                priority: 'high',
                 
                             },
                             token: FCMToken,
+                           
                         }
                         return admin.messaging()
                                     .send(payload)
@@ -376,8 +382,10 @@ exports.onRep = functions.database.ref('/reps/{id}/{uid}').onWrite(event => {
                                     type: 'rep',
                                     id,
                                     postId: post,
+                                    priority: 'high',
                                 },
                                 token: FCMToken,
+                                
                             }
                             return admin.messaging()
                                         .send(payload)
