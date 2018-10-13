@@ -42,10 +42,13 @@ const showLocalNotification = (notif) => {
         .setBody(custom.body)
         .setData(notif)
         .setSound('light.mp3')
+        .android.setAutoCancel(true)
         .android.setGroupSummary(true)
         .android.setGroup(custom.group)
         .android.setPriority(firebase.notifications.Android.Priority.Max)
-         //.setNotificationId('notificationId')
+        .android.setChannelId(custom.channel)
+        //.android.setGroupAlertBehaviour(firebase.notifications.Android.GroupAlert.Children)
+        .setNotificationId(custom.group)
       
         firebase.notifications()
           .displayNotification(notification)
@@ -53,6 +56,29 @@ const showLocalNotification = (notif) => {
     }
   }
 
+}
+
+const navigateFromNotif = (notif) => {
+  const { dispatch } = store
+  const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notif
+  switch(type) {
+    case 'message':
+      dispatch(navigateMessaging(chatId, username, uid))
+      break
+    case 'sessionMessage':
+      let session = {key: sessionId, title: sessionTitle}
+      dispatch(navigateMessagingSession(session))
+      break
+    case 'buddyRequest':
+      dispatch(navigateFriends())
+      break
+    case 'rep':
+      dispatch(navigatePostView(postId))
+      break
+    case 'comment':
+      dispatch(navigatePostView(postId))
+      break
+  }
 }
 
 const reactNavigationMiddleware = store => dispatch => action => {
@@ -86,31 +112,10 @@ export const store = createStore(
 export const persistor = persistStore(store)
 
 FCM.on(FCMEvent.Notification, async (notif) => {
-    const { dispatch } = store
     if(notif.opened_from_tray){
-              const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notif
-
-              switch(type) {
-                case 'message':
-                  dispatch(navigateMessaging(chatId, username, uid))
-                  break
-                case 'sessionMessage':
-                  let session = {key: sessionId, title: sessionTitle}
-                  dispatch(navigateMessagingSession(session))
-                  break
-                case 'buddyRequest':
-                  dispatch(navigateFriends())
-                  break
-                case 'rep':
-                  dispatch(navigatePostView(postId))
-                  break
-                case 'comment':
-                  dispatch(navigatePostView(postId))
-                  break
-              }
-            }
+      navigateFromNotif(notif)
+    }
   })
-
 
 class FitLink extends React.Component {
   componentDidMount() {
@@ -165,6 +170,7 @@ class FitLink extends React.Component {
       const action = notificationOpen.action;
       // Get information about the notification that was opened
       const notification: Notification = notificationOpen.notification;
+      navigateFromNotif(notification.data)
     })
 
     firebase.notifications().getInitialNotification()

@@ -57,6 +57,15 @@ export const fetchProfile = () => {
 export const doSetup = (profile) => {
 	return (dispatch, getState) => {
 		let uid = profile.uid
+		firebase.messaging().getToken()
+            .then(fcmToken => {
+                if (fcmToken) {
+                    firebase.database().ref('users/' + uid).child('FCMToken').set(fcmToken)
+                    console.log('fcm token: ' + fcmToken)
+                } else {
+                    console.log('no token')
+                }
+            })
 		let friends = profile.friends
 		if (getState().nav.index == 0) {
 			dispatch(navigateHome())
