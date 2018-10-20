@@ -28,6 +28,7 @@ import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'
 import sStyles from 'Anyone/js/styles/sessionStyles'
+import { arraysEqual } from './constants/utils'
 
 
  class Friends extends Component {
@@ -49,7 +50,7 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
     this.user = null
     this.state = {
       friends: Object.values(this.props.friends),
-      refreshing: false
+      refreshing: false,
     }
   }
 
@@ -69,7 +70,7 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
 
   listenForFriends(ref) {
     ref.on('child_added', snapshot => {
-        this.props.add(snapshot)
+      this.props.add(snapshot)
     })
     ref.on('child_changed', snapshot => {
       this.props.add(snapshot)
@@ -140,7 +141,7 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
             {"You don't have any buddies yet, also please make sure you are connected to the internet"}
           </Text></View>}
 
-      <Modal style={styles.modal} position={"center"} ref={"modal"} >
+      <Modal backdropPressToClose={false} style={styles.modal} position={"center"} ref={"modal"} >
           <Text style={styles.modalText}>Send buddy request</Text>
           <TextInput
           underlineColorAndroid='transparent'
@@ -149,13 +150,22 @@ import sStyles from 'Anyone/js/styles/sessionStyles'
           placeholder={'Enter username'}
           onChangeText={username => this.username = username}
           />
+          <View style={{flexDirection: 'row', marginTop: 10}}>
+          <TouchableOpacity onPress={()=> {
+            this.refs.modal.close()
+          }}
+          style={{padding: 10, backgroundColor: 'red', marginHorizontal: 10}}>
+            <Text style={{fontFamily: "Avenir", color: '#fff'}}>Cancel</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={(mutex)=> {
             mutex.lockFor(1000)
             this.sendRequest(this.username)
           }}
-          style={{padding: 10, backgroundColor: colors.primary, marginTop: 10}}>
+          style={{padding: 10, backgroundColor: colors.primary, marginHorizontal: 10}}>
             <Text style={{fontFamily: "Avenir", color: '#fff'}}>Submit</Text>
           </TouchableOpacity>
+          
+          </View>
         </Modal>
         </Content>
     </Container>

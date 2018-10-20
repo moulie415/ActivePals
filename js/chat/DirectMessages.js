@@ -10,7 +10,6 @@ import Image from 'react-native-fast-image'
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import {getSimplified } from './SessionChats'
 //import  styles  from './styles/loginStyles'
 
@@ -43,12 +42,6 @@ import {getSimplified } from './SessionChats'
         this.listenForChats(chatRef)
       }
     })
-    FCM.on(FCMEvent.Notification, async (notif) => {
-      //update last message on notification
-      if (notif.type == 'message') {
-        this.props.getChats(this.props.profile.chats)
-      }
-    })
   }
 
   componentWillReceiveProps(nextProps) {
@@ -59,7 +52,7 @@ import {getSimplified } from './SessionChats'
 
   listenForChats(ref) {
     ref.on('child_added', snapshot => {
-        this.props.add(snapshot)
+      this.props.add(snapshot)
     })
     ref.on('child_changed', snapshot => {
         this.props.add(snapshot)

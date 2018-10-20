@@ -5,7 +5,9 @@ import {
   View,
   TouchableOpacity,
   Platform,
-  ScrollView
+  ScrollView,
+  Modal,
+  SafeAreaView
 } from "react-native"
 import {
   Button,
@@ -28,6 +30,7 @@ import  styles  from './styles/profileStyles'
 import str from './constants/strings'
 import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
+import ImageViewer from 'react-native-image-zoom-viewer'
 import { calculateAge } from './constants/utils'
 
 
@@ -69,6 +72,7 @@ import { calculateAge } from './constants/utils'
       isFriend: false,
       profile: {},
       gym: {},
+      showImage: false
       //avatar: this.props.friends[this.uid] ? this.props.friends[this.uid].avatar : null
     }
   }
@@ -112,13 +116,24 @@ import { calculateAge } from './constants/utils'
         <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View>
       <View style={{alignItems: 'center', marginBottom: 10}}>
-      {this.state.backdrop ? <Image style={{height: 150, width: '100%'}}
+      {this.state.backdrop ? <TouchableOpacity
+      style={{height: 150, width: '100%'}}
+      onPress={() => {
+        this.setState({selectedImage: [{url: this.state.backdrop}], showImage: true})
+      }}>
+      <Image style={{height: 150, width: '100%'}}
           resizeMode='cover'
-          source={{uri: this.state.backdrop}} /> :
+          source={{uri: this.state.backdrop}} />
+          </TouchableOpacity> :
           <View style={{height: 150, width: '100%', backgroundColor: colors.primaryLighter, justifyContent: 'center'}}/>}
         {this.state.avatar ?
-            <Image style={{height: 90, width: 90, marginTop: -45, marginHorizontal: 20, borderWidth: 0.5, borderColor: '#fff'}}
-            source={{uri: this.state.avatar}} />
+          <TouchableOpacity 
+          onPress={()=> {
+            this.setState({selectedImage: [{url: this.state.avatar}], showImage: true})
+          }}
+          style={{marginTop: -45, marginHorizontal: 20, borderWidth: 0.5, borderColor: '#fff'}}>
+            <Image style={{height: 90, width: 90}} source={{uri: this.state.avatar}} />
+          </TouchableOpacity>
           : <Icon name='md-contact'
           style={{fontSize: 80, color: colors.primary, marginTop: -45, textAlign: 'center', backgroundColor: '#fff',
           marginBottom: 10, paddingHorizontal: 10, paddingTop: Platform.OS == 'ios' ? 5 : 0, borderWidth: 1, borderColor: colors.secondary}}/>}
@@ -157,7 +172,6 @@ import { calculateAge } from './constants/utils'
           </TouchableOpacity>}
 
 
-        {this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Email: <Text style={{color: colors.secondary}}>{email}</Text></Text>}
 
         {accountType && this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Account type:
         <Text style={{color: colors.secondary}}> {accountType}</Text></Text>}
@@ -197,7 +211,27 @@ import { calculateAge } from './constants/utils'
           </TouchableOpacity>}
         </View>
         {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
-
+        <Modal onRequestClose={()=> null}
+          visible={this.state.showImage} transparent={true}>
+        <ImageViewer
+          renderIndicator= {(currentIndex, allSize) => null}
+          loadingRender={()=> <SafeAreaView><Text style={{color: '#fff', fontSize: 20}}>Loading...</Text></SafeAreaView>}
+          renderHeader={()=> {
+            return (<TouchableOpacity style={{position: 'absolute', top: 20, left: 10, padding: 10, zIndex: 9999}}
+              onPress={()=> this.setState({selectedImage: null, showImage: false})}>
+                <View style={{
+                  backgroundColor: '#0007',
+                  paddingHorizontal: 15,
+                  paddingVertical: 2,
+                  borderRadius: 10,
+                }}>
+                  <Icon name={'ios-arrow-back'}  style={{color: '#fff', fontSize: 40}}/>
+                </View>
+              </TouchableOpacity>)
+          }}
+          imageUrls={this.state.selectedImage}
+            />
+      </Modal>
     </Container>
   )
   }

@@ -133,7 +133,7 @@ class Messaging extends React.Component {
         converted.push({...message, createdAt: message.createdAt.toString(), sessionTitle: this.sessionTitle, sessionId: this.sessionId, type})
       }
       else {
-        converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, FCMToken: this.friendToken})
+        converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, FCMToken: this.friendToken, friendUid: this.friendUid})
       }
     })
 

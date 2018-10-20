@@ -21,6 +21,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
         console.log(snapshot.val())
         const { user, text, FCMToken, createdAt, _id, chatId } = snapshot.val()[Object.keys(snapshot.val())[0]]
 
+
         const payload = {
             data: {
                 custom_notification: JSON.stringify({
@@ -39,8 +40,9 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                 avatar: user.avatar ,
                 type: 'message',
                 chatId,
-                priority: 'high'
-
+                priority: 'high',
+		contentAvailable: 'true',
+		content_available: 'true'
             },
             token: FCMToken,
 
@@ -93,7 +95,8 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                             type: 'sessionMessage',
                             sessionId,
                             sessionTitle,
-                            priority: 'high'
+                            priority: 'high',
+			    contentAvailable: 'true'
 
                         },
                         token: token.val(),
@@ -137,6 +140,7 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
                             }),
                             type: 'buddyRequest',
                             priority: 'high',
+			    contentAvailable: 'true'
                         },
                         token: FCMToken,
 			    
@@ -331,6 +335,7 @@ exports.onComment = functions.database.ref('/comments/{id}').onCreate(event => {
                                 type: 'comment',
                                 postId,
                                 priority: 'high',
+			    	contentAvailable: 'true'
                 
                             },
                             token: FCMToken,
@@ -383,6 +388,7 @@ exports.onRep = functions.database.ref('/reps/{id}/{uid}').onWrite(event => {
                                     id,
                                     postId: post,
                                     priority: 'high',
+				    contentAvailable: 'true'
                                 },
                                 token: FCMToken,
                                 
