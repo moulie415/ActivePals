@@ -130,7 +130,7 @@ componentWillReceiveProps(nextProps) {
         <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir', flex: 1}}>Feed</Title>
         <Right>
           <TouchableOpacity onPress={()=> {
-            Alert.alert("coming soon")
+            this.props.onNotificationPress()
           }}>
             <Icon name='ios-notifications' style={{color: '#fff', marginRight: 10}}/>
           </TouchableOpacity>
@@ -642,7 +642,12 @@ showPicker() {
 
 
 import { connect } from 'react-redux'
-import { navigateProfile, navigateProfileView, navigateFilePreview, } from 'Anyone/js/actions/navigation'
+import {
+  navigateProfile,
+  navigateProfileView,
+  navigateFilePreview,
+  navigateNotifications
+} from 'Anyone/js/actions/navigation'
 import { 
   addPost,
   repPost,
@@ -673,7 +678,8 @@ const mapDispatchToProps = dispatch => ({
   repComment: (comment) => dispatch(repComment(comment)),
   getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
-  getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit))
+  getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit)),
+  onNotificationPress: () => dispatch(navigateNotifications())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

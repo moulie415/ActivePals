@@ -6,6 +6,7 @@ import {
 import {
 	Icon
 } from 'native-base'
+import str from './strings'
 
 
 export function getType(type, size) {
@@ -145,3 +146,37 @@ export function extractCreatedTime (item) {
       console.log(e)
     }
   }
+
+  export function formatDateTime(dateTime) {
+    dateTime = dateTime.replace(/-/g, "/")
+    let date = new Date(dateTime)
+    let hours = date.getHours()
+    let minutes = date.getMinutes()
+    let ampm = hours >= 12 ? 'pm' : 'am'
+    hours = hours % 12
+    hours = hours ? hours : 12
+    minutes = minutes < 10 ? '0' + minutes : minutes
+    let strTime = hours + ':' + minutes + ampm
+    let day = date.getDate()
+    return `${str.days[date.getDay()].toString()} ${day.toString() + nth(day)} ${str.months[date.getMonth()].toString()} ${strTime}`
+  }
+
+  export function nth(d) {
+  if (d > 3 && d < 21) return 'th'
+  switch (d % 10) {
+        case 1:  return "st"
+        case 2:  return "nd"
+        case 3:  return "rd"
+        default: return "th"
+    }
+}
+
+export function dayDiff(first, second, round = true) {
+  let start = new Date(first)
+  let end = new Date(second)
+  let timeDiff = Math.abs(end.getTime() - start.getTime())
+  if (round) {
+    return Math.ceil(timeDiff / (1000 * 3600 * 24))
+  }
+  else return (timeDiff / (1000 * 3600 * 24))
+}

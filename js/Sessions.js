@@ -5,20 +5,13 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  StatusBar,
-  RefreshControl,
   ScrollView,
   Linking,
   Slider,
-  Platform,
-  ImageBackground
+  Platform
 } from "react-native"
 import {
-  Button,
-  Input,
   Container,
-  Content,
-  Item,
   Icon,
   Spinner,
   Switch,
@@ -46,6 +39,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { isIphoneX } from 'react-native-iphone-x-helper'
 import {Image as SlowImage } from 'react-native'
+import { formatDateTime } from './constants/utils'
 
  class Sessions extends Component {
 
@@ -248,7 +242,7 @@ import {Image as SlowImage } from 'react-native'
           linkDefault={ true }>
             <Text style={{marginVertical: 5, color: '#000'}}>{this.state.selectedSession.details}</Text>
           </Hyperlink>
-          <Text style={{marginVertical: 5, color: '#000'}}>{(this.formatDateTime(this.state.selectedSession.dateTime))
+          <Text style={{marginVertical: 5, color: '#000'}}>{(formatDateTime(this.state.selectedSession.dateTime))
             + " for " + (this.state.selectedSession.duration) + " " +
             (this.state.selectedSession.duration > 1 ? 'hours' : 'hour') }</Text>
             <Text style={{marginVertical: 5}}>
@@ -564,7 +558,7 @@ import {Image as SlowImage } from 'react-native'
                       </View>
                       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text style={[styles.date], {color: item.inProgress ? colors.secondary : "#999"}} >
-                      {item.inProgress? "In progress" : this.formatDateTime(item.dateTime)}</Text>
+                      {item.inProgress? "In progress" : formatDateTime(item.dateTime)}</Text>
                       {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/></View>}</View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.location.formattedAddress}</Text>
@@ -609,29 +603,7 @@ import {Image as SlowImage } from 'react-native'
     return markers
   }
 
-  formatDateTime(dateTime) {
-    dateTime = dateTime.replace(/-/g, "/")
-    let date = new Date(dateTime)
-    let hours = date.getHours()
-    let minutes = date.getMinutes()
-    let ampm = hours >= 12 ? 'pm' : 'am'
-    hours = hours % 12
-    hours = hours ? hours : 12
-    minutes = minutes < 10 ? '0' + minutes : minutes
-    let strTime = hours + ':' + minutes + ampm
-    let day = date.getDate()
-    return `${str.days[date.getDay()].toString()} ${day.toString() + this.nth(day)} ${str.months[date.getMonth()].toString()} ${strTime}`
-  }
-
-  nth(d) {
-  if (d > 3 && d < 21) return 'th'
-  switch (d % 10) {
-        case 1:  return "st"
-        case 2:  return "nd"
-        case 3:  return "rd"
-        default: return "th"
-    }
-}
+ 
 
   // This is a common pattern when asking for permissions.
   // iOS only gives you once chance to show the permission dialog,

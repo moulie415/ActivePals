@@ -22,6 +22,7 @@ import TestScreen from './TestScreen'
 import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
 import FilePreview from './FilePreview'
+import Notifications from './notifications'
 import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
@@ -108,7 +109,8 @@ export const Stack = StackNavigator({
   TestScreen: { screen: TestScreen },
   FilePreview: {screen : FilePreview },
   ProfileView: { screen: ProfileView },
-  PostView: { screen: PostView }
+  PostView: { screen: PostView },
+  Notifications: { screen: Notifications }
 })
 
 class App extends React.Component {
