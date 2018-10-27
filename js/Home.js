@@ -28,7 +28,6 @@ import  styles  from './styles/homeStyles'
 import sStyles from './styles/settingsStyles'
 import cStyles from './comments/styles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
-import { getSimplified } from 'Anyone/js/chat/SessionChats'
 import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
 import ImageViewer from 'react-native-image-zoom-viewer'
@@ -47,6 +46,7 @@ import {
   extractEditTime,
   extractImage,
   reportedExtractor,
+  getSimplifiedTime
 } from './constants/utils'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
@@ -83,7 +83,8 @@ class Home extends Component {
       commentFetchAmount: 10,
       userFetchAmount: 10,
       refreshing: false,
-      likesModalVisible: false
+      likesModalVisible: false,
+      loadMore: true,
     }
   }
 
@@ -364,10 +365,31 @@ componentWillReceiveProps(nextProps) {
             this.setState({refreshing: false})
           })
         }}
-        onEndReached={()=> {
-          this.setState({fetchAmount: this.state.fetchAmount+15}, () => {
-            this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
-          })
+        // onEndReached={()=> {
+        //   this.setState({fetchAmount: this.state.fetchAmount+15}, () => {
+        //     this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
+        //   })
+        // }}
+        ListFooterComponent={()=> {
+          let initial = Object.values(this.state.feed).length
+          if (initial == this.state.fetchAmount && this.state.loadMore) {
+            return <TouchableOpacity 
+              style={{alignItems: 'center'}}
+              onPress={()=> {
+                this.setState({fetchAmount: this.state.fetchAmount+15, spinner: true}, () => {
+                  this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
+                  .then(() => {
+                    if (Object.values(this.state.feed).length == initial) {
+                      this.setState({loadMore: false})
+                    }
+                    this.setState({spinner: false})
+                  })
+                })
+              }}>
+            <Text style={{color: colors.secondary}}>Load more</Text>
+            </TouchableOpacity>
+          }
+          else return null
         }}
         refreshing={this.state.refreshing}
         renderItem = {({ item }) => {
@@ -393,7 +415,7 @@ componentWillReceiveProps(nextProps) {
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 {this.getUsernameFormatted(item.uid)}
-                <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
+                <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
               <Text style={{color: '#000'}}>{item.text}</Text>
             </View>
@@ -410,7 +432,7 @@ componentWillReceiveProps(nextProps) {
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               {this.getUsernameFormatted(item.uid)}
-                <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
+                <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
               <Text style={{color: '#000'}}>{item.text}</Text>
               </View>
@@ -445,8 +467,10 @@ componentWillReceiveProps(nextProps) {
           {!!item.repCount && item.repCount > 0 && <TouchableOpacity 
           style={{flex: 1}}
           onPress={()=>{
-            this.props.getRepUsers(item.key, this.state.userFetchAmount)
             this.setState({likesModalVisible: true, postId: item.key})
+            this.props.getRepUsers(item.key, this.state.userFetchAmount)
+              .catch(e => Alert.alert('Error', e.message))
+            
           }}>
           <Text style={{color: '#999'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}
           </Text></TouchableOpacity>}

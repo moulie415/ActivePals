@@ -6,6 +6,7 @@ export const SET_USER = 'SET_USER'
 export const UPDATE_USERS = 'UPDATE_USERS'
 export const SET_POST_COMMENTS = 'SET_POST_COMMENTS'
 export const ADD_COMMENT = 'ADD_COMMENT'
+export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS'
 
 const addToFeed = (post, id) => ({
 	type: ADD_POST,
@@ -46,6 +47,11 @@ const addComment = (post, comment, count) => ({
 	post,
 	comment,
 	count
+})
+
+const setNotifications = (notifications) => ({
+	type: SET_NOTIFICATIONS,
+	notifications
 })
 
 
@@ -167,7 +173,18 @@ export const repPost = (item) => {
 		dispatch(setPost(obj))
 		return new Promise(resolve => {
 			if (rep) {
-			firebase.database().ref('reps/' + post).child(uid).set({date: new Date().toString(), uid, post, type: 'post'}).then(() => {
+			let date  = new Date().toString()
+			firebase.database().ref('reps/' + post).child(uid).set({date, uid, post, type: 'post'}).then(() => {
+				if (uid != obj.uid) {
+					//add notification for user
+					firebase.database().ref('userNotifications/' + obj.uid).child(post + uid).once('value', snapshot => {
+						if (!snapshot.val()) {
+							firebase.database().ref('notifications').child(post + uid).set({date, uid, postId: post, type: 'postRep'})
+								.then(()=> firebase.database().ref('userNotifications/' + obj.uid).child(post + uid).set(true))
+						}
+					})
+					
+				}
 				firebase.database().ref('posts/' + post).child('repCount').once('value', snapshot => {
 					let count
 					if (snapshot.val()) {
@@ -217,6 +234,16 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 				}
 				else count = 1
 				let user = getState().profile.profile
+
+				//add notification for user
+				firebase.database().ref('posts/' + postId).child('uid').once('value', snapshot => {
+					if (snapshot.val() && snapshot.val() != user.uid) {
+						let date  = new Date().toString()
+						firebase.database().ref('notifications').child(key + user.uid).set({date, uid: user.uid, postId, type: 'comment'})
+							.then(()=> firebase.database().ref('userNotifications/' + snapshot.val()).child(key + user.uid).set(true))
+					}
+				})
+
 				let obj = {uid, postId, text, created_at, parentCommentId, comment_id: count, user, key}
 				let postComments = getState().home.feed[postId].comments || []
 				postComments.push(obj)
@@ -280,6 +307,7 @@ export const repComment = (comment) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
 		let rep = comment.rep ? false : uid
+		let date = new Date().toString()
 		if (comment.rep) {
 			comment.rep = false
 			comment.repCount -= 1
@@ -296,7 +324,7 @@ export const repComment = (comment) => {
 		dispatch(setPostComments(comment.postId, postComments))
 		if (rep) {
 			firebase.database().ref('reps/' + comment.key).child(uid).set({
-				date: new Date().toString(),
+				date,
 				uid, 
 				post: comment.postId,
 				type: 'comment'
@@ -314,6 +342,16 @@ export const repComment = (comment) => {
 						})
 					})
 				})
+				if (uid != comment.uid) {
+					//add notification for user
+					firebase.database().ref('userNotifications/' + comment.uid).child(comment.key + uid).once('value', snapshot => {
+						if (!snapshot.val()) {
+							firebase.database().ref('notifications').child(comment.key + uid).set({date, uid, postId: comment.postId, type: 'commentRep'})
+								.then(()=> firebase.database().ref('userNotifications/' + obj.uid).child(comment.key + uid).set(true))
+						}
+					})
+					
+				}
 			})
 		}
 		else {
@@ -405,4 +443,25 @@ const sortComments = (comments) => {
 		})
 		return comments
 	  
+}
+
+export const getNotifications = (limit = 10) => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		let refs = []
+		return firebase.database().ref('userNotifications').child(uid).limitToLast(limit).once('value', snapshot => {
+			Object.keys(snapshot.val()).forEach(key => {
+				refs.push(firebase.database().ref('notifications').child(key).once('value'))
+			})
+			return Promise.all(refs).then(notifications => {
+				console.log(notifications)
+				let obj = {}
+				notifications.forEach(notification => {
+					obj[notification.key] = notification.val()
+					obj[notification.key].key = notification.key
+				})
+				dispatch(setNotifications(obj))
+			})
+		})
+	}
 }

@@ -5,14 +5,17 @@ import {
 	SET_REP_COUNT,
 	SET_POST_COMMENTS,
 	ADD_COMMENT,
+	SET_NOTIFICATIONS
 } from 'Anyone/js/actions/home'
 
 import {
 	SET_LOGGED_OUT,
 } from 'Anyone/js/actions/profile'
+import { ActionSheet } from 'native-base';
 
 const initialState = {
 	feed: {},
+	notifications: {}
 }
 
 export default function(state = initialState, action) {
@@ -44,6 +47,12 @@ export default function(state = initialState, action) {
 				...state,
 				feed: {...state.feed, [action.post]: {...state.feed[action.post], commentCount: action.count, 
 					comments: [...state.feed[action.post].comments, action.comment]}},
+			}
+		}
+		case SET_NOTIFICATIONS: {
+			return {
+				...state,
+				notifications: action.notifications
 			}
 		}
 		case SET_LOGGED_OUT: {

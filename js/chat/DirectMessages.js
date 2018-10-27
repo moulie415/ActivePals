@@ -10,7 +10,7 @@ import Image from 'react-native-fast-image'
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
-import {getSimplified } from './SessionChats'
+import {getSimplifiedTime } from '../constants/utils'
 //import  styles  from './styles/loginStyles'
 
  class DirectMessages extends Component {
@@ -99,7 +99,7 @@ import {getSimplified } from './SessionChats'
                 <Text numberOfLines={1} style={{color: '#999'}}>{chat.lastMessage.text}</Text>
               </View>
                {chat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
-                <Text style={{color: '#999'}}>{getSimplified(chat.lastMessage.createdAt)}</Text></View>}
+                <Text style={{color: '#999'}}>{getSimplifiedTime(chat.lastMessage.createdAt)}</Text></View>}
             </View>
           </TouchableOpacity>
           )

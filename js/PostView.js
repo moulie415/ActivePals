@@ -22,7 +22,6 @@ import colors from './constants/colors'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
 import Comments from './comments'
 import sStyles from './styles/settingsStyles'
-import { getSimplified } from 'Anyone/js/chat/SessionChats'
 import {
     extractCreatedTime,
     extractUsername,
@@ -33,6 +32,7 @@ import {
     extractEditTime,
     extractImage,
     reportedExtractor,
+    getSimplifiedTime
   } from './constants/utils'
   import styles from './styles/postViewStyles'
   import Image from 'react-native-fast-image'
@@ -205,7 +205,7 @@ class PostView extends Component {
               <View style={{flex: 1}}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                   {this.getUsernameFormatted(item.uid)}
-                  <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
+                  <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
                 <Text style={{color: '#000'}}>{item.text}</Text>
               </View>
@@ -221,7 +221,7 @@ class PostView extends Component {
               <View style={{flex: 1}}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 {this.getUsernameFormatted(item.uid)}
-                  <Text style={{color: '#999'}}>{getSimplified(item.createdAt)}</Text>
+                  <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
                 <Text style={{color: '#000'}}>{item.text}</Text>
                 </View>

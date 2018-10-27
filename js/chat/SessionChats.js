@@ -6,7 +6,7 @@ import {
 } from 'react-native'
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import firebase from 'react-native-firebase'
-import { getType } from 'Anyone/js/constants/utils'
+import { getType, getSimplifiedTime } from 'Anyone/js/constants/utils'
 import colors from 'Anyone/js/constants/colors'
 
 //import  styles  from './styles/loginStyles'
@@ -83,7 +83,7 @@ import colors from 'Anyone/js/constants/colors'
               <Text numberOfLines={1} style={{color: '#999'}}>{detail.lastMessage.text}</Text>
             </View>
             {detail.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
-              <Text style={{color: '#999'}}>{getSimplified(detail.lastMessage.createdAt)}</Text></View>}
+              <Text style={{color: '#999'}}>{getSimplifiedTime(detail.lastMessage.createdAt)}</Text></View>}
           </View>
         </TouchableOpacity>
         )
@@ -93,36 +93,6 @@ import colors from 'Anyone/js/constants/colors'
   }
 
 }
-
-export function getSimplified(createdAt) {
-  let timeStamp = new Date(createdAt)
-
-  let now = new Date()
-  let today0 = new Date()
-  let yesterday0 = new Date(today0.setHours(0,0,0,0))
-  yesterday0.setDate(today0.getDate() -1)
-
-
-  if (timeStamp < yesterday0) dateString = timeStamp.toDateString()
-    else if (timeStamp < today0) dateString = 'Yesterday'
-      else {
-        let minsBeforeNow = Math.floor((now.getTime() - timeStamp.getTime())/(1000*60))
-        let hoursBeforeNow = Math.floor(minsBeforeNow/60)
-        if (hoursBeforeNow > 0) {
-          dateString = hoursBeforeNow+' '+
-          (hoursBeforeNow == 1? 'hour' : 'hours')
-          +' ago'
-        }
-        else if (minsBeforeNow > 0) {
-          dateString = minsBeforeNow+' '+
-          (minsBeforeNow == 1? 'min' : 'mins')
-          +' ago'
-        } else {
-          dateString = 'Just Now'
-        }
-      }
-      return dateString
-    }
 
 
 import { connect } from 'react-redux'

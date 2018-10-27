@@ -180,3 +180,33 @@ export function dayDiff(first, second, round = true) {
   }
   else return (timeDiff / (1000 * 3600 * 24))
 }
+
+export function getSimplifiedTime(createdAt) {
+  let timeStamp = new Date(createdAt)
+
+  let now = new Date()
+  let today0 = new Date()
+  let yesterday0 = new Date(today0.setHours(0,0,0,0))
+  yesterday0.setDate(today0.getDate() -1)
+
+
+  if (timeStamp < yesterday0) dateString = timeStamp.toDateString()
+    else if (timeStamp < today0) dateString = 'Yesterday'
+      else {
+        let minsBeforeNow = Math.floor((now.getTime() - timeStamp.getTime())/(1000*60))
+        let hoursBeforeNow = Math.floor(minsBeforeNow/60)
+        if (hoursBeforeNow > 0) {
+          dateString = hoursBeforeNow+' '+
+          (hoursBeforeNow == 1? 'hour' : 'hours')
+          +' ago'
+        }
+        else if (minsBeforeNow > 0) {
+          dateString = minsBeforeNow+' '+
+          (minsBeforeNow == 1? 'min' : 'mins')
+          +' ago'
+        } else {
+          dateString = 'Just Now'
+        }
+      }
+      return dateString
+    }
