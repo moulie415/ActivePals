@@ -253,18 +253,25 @@ import { arraysEqual } from './constants/utils'
     if (username != this.props.profile.username) {
       firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
         if (snapshot.val()) {
-        this.props.onRequest(this.uid, snapshot.val()).then(() => {
-          Alert.alert("Success", "Request sent")
-          this.refs.modal.close()
+        firebase.database().ref('users/' + this.uid + '/friends').child(snapshot.val()).once('value', status => {
+          if (status.val()) {
+            Alert.alert('Sorry', "You've already added this user as a buddy")
+          }
+          else {
+            this.props.onRequest(this.uid , snapshot.val()).then(() => {
+              Alert.alert("Success", "Request sent")
+              this.refs.modal.close()
+            })
+            .catch(e => Alert.alert("Error", e.message))
+          }
         })
-        .catch(e => Alert.alert("Error", e.message))
       }
       else Alert.alert('Sorry','Username does not exist')
       })
       .catch(e => Alert.alert("Error", e.message))
     }
     else {
-      Alert.alert("Error", "You cannot add yourself as a friend")
+      Alert.alert("Error", "You cannot add yourself as a buddy")
     }
   }
 
