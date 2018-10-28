@@ -44,6 +44,7 @@ class Notifications extends Component {
   
   componentDidMount() {
     this.props.fetchNotifications()
+    this.props.setRead()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -156,7 +157,7 @@ class Notifications extends Component {
 
 import { connect } from 'react-redux'
 import { navigateBack, navigatePostView } from 'Anyone/js/actions/navigation'
-import { getNotifications } from './actions/home' 
+import { getNotifications, setNotificationsRead } from './actions/home' 
 
 const matchStateToProps = ({profile, home, friends}) => ({
     profile: profile.profile,
@@ -169,7 +170,8 @@ const matchStateToProps = ({profile, home, friends}) => ({
   onNotificationPress: (id) => console.log(id),
   goBack: () => dispatch(navigateBack()),
   fetchNotifications: (limit = 10) => dispatch(getNotifications(limit)),
-  viewPost: (post) => dispatch(navigatePostView(post))
+  viewPost: (post) => dispatch(navigatePostView(post)),
+  setRead: () => dispatch(setNotificationsRead())
  })
 
 export default connect(matchStateToProps, mapDispatchToProps)(Notifications)

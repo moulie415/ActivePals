@@ -5,7 +5,7 @@ import {
 	SET_REP_COUNT,
 	SET_POST_COMMENTS,
 	ADD_COMMENT,
-	SET_NOTIFICATIONS
+	SET_NOTIFICATIONS,
 } from 'Anyone/js/actions/home'
 
 import {
@@ -15,7 +15,7 @@ import { ActionSheet } from 'native-base';
 
 const initialState = {
 	feed: {},
-	notifications: {}
+	notifications: {},
 }
 
 export default function(state = initialState, action) {

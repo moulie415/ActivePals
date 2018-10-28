@@ -7,6 +7,7 @@ export const UPDATE_USERS = 'UPDATE_USERS'
 export const SET_POST_COMMENTS = 'SET_POST_COMMENTS'
 export const ADD_COMMENT = 'ADD_COMMENT'
 export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS'
+export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
 
 const addToFeed = (post, id) => ({
 	type: ADD_POST,
@@ -52,6 +53,11 @@ const addComment = (post, comment, count) => ({
 const setNotifications = (notifications) => ({
 	type: SET_NOTIFICATIONS,
 	notifications
+})
+
+export const setNotificationCount = (count) => ({
+	type: SET_NOTIFICATION_COUNT,
+	count
 })
 
 
@@ -181,6 +187,7 @@ export const repPost = (item) => {
 						if (!snapshot.val()) {
 							firebase.database().ref('notifications').child(post + uid).set({date, uid, postId: post, type: 'postRep'})
 								.then(()=> firebase.database().ref('userNotifications/' + obj.uid).child(post + uid).set(true))
+								.then(() => upUnreadCount(obj.uid))
 						}
 					})
 					
@@ -241,6 +248,7 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 						let date  = new Date().toString()
 						firebase.database().ref('notifications').child(key + user.uid).set({date, uid: user.uid, postId, type: 'comment'})
 							.then(()=> firebase.database().ref('userNotifications/' + snapshot.val()).child(key + user.uid).set(true))
+							.then(() => upUnreadCount(snapshot.val()))
 					}
 				})
 
@@ -348,6 +356,7 @@ export const repComment = (comment) => {
 						if (!snapshot.val()) {
 							firebase.database().ref('notifications').child(comment.key + uid).set({date, uid, postId: comment.postId, type: 'commentRep'})
 								.then(()=> firebase.database().ref('userNotifications/' + obj.uid).child(comment.key + uid).set(true))
+								.then(() => upUnreadCount(obj.uid))
 						}
 					})
 					
@@ -464,4 +473,23 @@ export const getNotifications = (limit = 10) => {
 			})
 		})
 	}
+}
+
+export const upUnreadCount = (uid) => {
+	return firebase.database().ref('users/' + uid).child('unreadCount').once('value', snapshot => {
+		let count = 1
+		if (snapshot.val()) {
+			count = snapshot.val() + 1
+		}
+		return firebase.database().ref('users/' + uid).child('unreadCount').set(count)
+	})
+}
+
+export const setNotificationsRead = () => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		dispatch(setNotificationCount(0))
+		return firebase.database().ref('users/' + uid).child('unreadCount').set(0)
+		
+	} 
 }

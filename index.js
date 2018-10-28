@@ -28,6 +28,7 @@ import {
   createReactNavigationReduxMiddleware,
   createReduxBoundAddListener,
 } from 'react-navigation-redux-helpers'
+import { setNotificationCount } from "./js/actions/home";
 
 let firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
@@ -148,11 +149,15 @@ class FitLink extends React.Component {
     })
 
     this.messageListener = firebase.messaging().onMessage((notification: RemoteMessage) => {
-      const { dispatch } = store
+      const { dispatch, getState } = store
       const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notification.data
       if (type == 'message' || type == 'sessionMessage') {
         dispatch(newNotification(notification.data))
         dispatch(updateLastMessage(notification.data))
+      }
+      if (type == 'rep' || type == 'comment') {
+        let count = getState().profile.profile.unreadCount
+        dispatch(setNotificationCount(count+1))
       }
       showLocalNotification(notification.data)
     })

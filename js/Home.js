@@ -123,7 +123,7 @@ componentWillReceiveProps(nextProps) {
 }
 
   render () {
-    const { uid, username, users } = this.props.profile
+    const { uid, username, users, unreadCount } = this.props.profile
     return (
     <Container >
       <Header style={{backgroundColor: colors.primary}}>
@@ -133,7 +133,16 @@ componentWillReceiveProps(nextProps) {
           <TouchableOpacity onPress={()=> {
             this.props.onNotificationPress()
           }}>
-            <Icon name='ios-notifications' style={{color: '#fff', marginRight: 10}}/>
+            {/*<Icon name='ios-notifications' style={{color: '#fff', marginRight: 10}}/>*/}
+            <View style={{width: 30, alignItems: 'center'}}>
+              <Icon name='ios-notifications' style={{ color: '#fff', marginLeft: -10 }} />
+			        {!!unreadCount && unreadCount > 0 && <View 
+				        style={styles.unreadBadge}>
+				          <Text numberOfLines={1} 
+				          adjustsFontSizeToFit={unreadCount > 0}
+				          style={{ fontSize: 10, color: '#fff'}}>{unreadCount}</Text>
+			            </View>}
+		              </View>
           </TouchableOpacity>
         </Right>
       </Header>
@@ -361,6 +370,7 @@ componentWillReceiveProps(nextProps) {
         keyExtractor={(item) => item.key}
         onRefresh={() => {
           this.setState({refreshing: true})
+          this.props.getProfile()
           this.props.getPosts(this.props.profile.uid, 30).then(() => {
             this.setState({refreshing: false})
           })
@@ -683,6 +693,7 @@ import {
   fetchRepUsers
  } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
+import { fetchProfile } from "./actions/profile";
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,
@@ -703,7 +714,8 @@ const mapDispatchToProps = dispatch => ({
   getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit)),
-  onNotificationPress: () => dispatch(navigateNotifications())
+  onNotificationPress: () => dispatch(navigateNotifications()),
+  getProfile: () => dispatch(fetchProfile())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

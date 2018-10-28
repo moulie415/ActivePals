@@ -3,8 +3,12 @@ import {
 	SET_LOGGED_IN,
  	SET_LOGGED_OUT,
  	SET_GYM,
- 	REMOVE_GYM,
+	REMOVE_GYM,
 } from 'Anyone/js/actions/profile'
+
+import {
+	SET_NOTIFICATION_COUNT
+} from '../actions/home'
 
 const initialState = {
 	profile: {},
@@ -32,6 +36,11 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				profile: {...state.profile, gym: null}
+			}
+		case SET_NOTIFICATION_COUNT:
+			return {
+				...state,
+				profile: {...state.profile, unreadCount: action.count }
 			}
 		case SET_LOGGED_OUT:
 			return initialState
