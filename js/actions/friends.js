@@ -1,6 +1,7 @@
 import firebase from 'react-native-firebase'
 import { removeChat, addChat } from './chats'
 import { fetchPrivateSessions } from './sessions'
+import { upUnreadCount } from './home'
 export const SET_FRIENDS = 'SET_FRIENDS'
 export const UPDATE_FRIENDS = 'UPDATE_FRIENDS'
 export const ADD_FRIEND = 'ADD_FRIEND'
@@ -91,7 +92,14 @@ export const sendRequest = (uid, friendUid) => {
 	return (dispatch) => {
 		let promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("outgoing")
 		let promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("incoming")
-		return Promise.all([promise1, promise2])
+		return Promise.all([promise1, promise2]).then(() => {
+				let date = new Date().toString()
+				let ref = firebase.database().ref('notifications').push()
+				let key = ref.key
+				ref.set({date, uid, type: 'buddyRequest'})
+					.then(()=> firebase.database().ref('userNotifications/' + friendUid).child(key).set(true))
+					.then(() => upUnreadCount(friendUid))
+			})
 	}
 }
 

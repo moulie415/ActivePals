@@ -108,12 +108,12 @@ class Notifications extends Component {
             if (item.postId) {
               this.props.viewPost(item.postId)
             }
+            else if (item.type == 'buddyRequest') {
+              this.props.goToFriends()
+            }
           }}>
             <View style={styles.inboxItem}>
-              {item.type == 'comment' ? <Icon name={'md-chatboxes'} 
-              style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/> :
-              <SlowImage source={weightUp}
-             style={{width: 25, height: 25, marginRight: 15, tintColor: colors.secondary}}/>}
+             {this.getTypeImage(item.type)}
               <View style={{flex: 8}}>
                 <Text style={{color: '#000', fontSize: 15}}>{this.getNotificationString(item)}</Text>
                 <Text style={{color: '#999', fontSize: 12}}>{getSimplifiedTime(new Date(item.date))}</Text>
@@ -145,19 +145,6 @@ class Notifications extends Component {
       />
   }
 
-  stringifyDate(date) {
-    let diff = dayDiff(date, new Date()) - 1
-    if (diff == 0) {
-      return 'Today'
-    }
-    else if (diff == 1) {
-      return 'Yesterday'
-    }
-    else {
-      return diff + ' days ago'
-    }
-  }
-
   getNotificationString(item) {
     let user
     if (this.props.friends[item.uid]) {
@@ -173,6 +160,20 @@ class Notifications extends Component {
         return user + ' repped your comment'
       case 'comment':
         return user + ' commented on your post'
+      case 'buddyRequest':
+        return user + ' sent you a buddy request'
+    }
+  }
+
+  getTypeImage(type) {
+    switch(type) {
+      case 'comment':
+        return <Icon name={'md-chatboxes'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
+      case 'buddyRequest':
+        return <Icon name={'md-people'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
+      default:
+        return <SlowImage source={weightUp} style={{width: 25, height: 25, marginRight: 15, tintColor: colors.secondary}}/>
+
     }
   }
 
@@ -183,6 +184,7 @@ class Notifications extends Component {
 import { connect } from 'react-redux'
 import { navigateBack, navigatePostView } from 'Anyone/js/actions/navigation'
 import { getNotifications, setNotificationsRead } from './actions/home' 
+import { navigateFriends } from "./actions/navigation";
 
 const matchStateToProps = ({profile, home, friends}) => ({
     profile: profile.profile,
@@ -196,7 +198,8 @@ const matchStateToProps = ({profile, home, friends}) => ({
   goBack: () => dispatch(navigateBack()),
   fetchNotifications: (limit = 10) => dispatch(getNotifications(limit)),
   viewPost: (post) => dispatch(navigatePostView(post)),
-  setRead: () => dispatch(setNotificationsRead())
+  setRead: () => dispatch(setNotificationsRead()),
+  goToFriends: () => dispatch(navigateFriends())
  })
 
 export default connect(matchStateToProps, mapDispatchToProps)(Notifications)
