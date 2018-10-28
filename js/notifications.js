@@ -5,6 +5,7 @@ import {
   ScrollView,
   Alert,
   Linking,
+  FlatList
 } from "react-native"
 import {
   Container,
@@ -78,24 +79,17 @@ class Notifications extends Component {
   }
 
   renderNotifications() {
-    let rows = []
-    let notifications = Object.values(this.state.notifications)
-
-    // let sorted = inboxArray.sort(function(a, b) {
-    //   return new Date(b.timestamp) - new Date(a.timestamp)
-    // })
-
-    notifications.forEach( item => {
-      let swipeoutBtns = [{
-        text: 'Delete',
-        backgroundColor: 'red',
-        onPress: () => {
-          console.log(item)
-        }
-      }]
-
-      rows.push(
-        <Swipeout right={swipeoutBtns} key={item.key} close={this.state.close}> 
+      return <FlatList 
+        data={Object.values(this.state.notifications)}
+        renderItem={({item}) => {
+          let swipeoutBtns = [{
+            text: 'Delete',
+            backgroundColor: 'red',
+            onPress: () => {
+              console.log(item)
+            }
+          }]
+          return <Swipeout right={swipeoutBtns} key={item.key} close={this.state.close}> 
           <TouchableOpacity onPress = {(mutex) => {
             mutex.lockFor(1000)
             if (item.postId) {
@@ -115,9 +109,18 @@ class Notifications extends Component {
             </View>
           </TouchableOpacity>
         </Swipeout>
-      )
-    })
-    return rows
+        }}
+        keyExtractor={(item)=> item.key}
+        ListFooterComponent={() => {
+          return <TouchableOpacity 
+          onPress={()=> {
+            this.props.loadMore()
+          }}
+          style={{backgroundColor: '#fff', paddingVertical: 10}}>
+            <Text style={{color: colors.secondary, textAlign: 'center'}}>Load More</Text>
+          </TouchableOpacity>
+        }}
+      />
   }
 
   stringifyDate(date) {
