@@ -244,7 +244,7 @@ import { arraysEqual } from './constants/utils'
 
   remove(friend) {
     this.props.onRemove(friend)
-    .then(()=> this.refs.profileModal.close())
+    .then(()=> this.refs.modal.close())
     .catch(e => Alert.alert("Error", e.message))
 
   }

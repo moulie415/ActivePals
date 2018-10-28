@@ -99,7 +99,10 @@ class Notifications extends Component {
             text: 'Delete',
             backgroundColor: 'red',
             onPress: () => {
-              console.log(item)
+              this.props.delete(item.key)
+                .then(()=> this.props.fetchNotifications(this.state.fetchAmount))
+                .catch(e => Alert.alert('Error', e.message))
+              this.setState({close: true})
             }
           }]
           return <Swipeout right={swipeoutBtns} key={item.key} close={this.state.close}> 
@@ -183,8 +186,9 @@ class Notifications extends Component {
 
 import { connect } from 'react-redux'
 import { navigateBack, navigatePostView } from 'Anyone/js/actions/navigation'
-import { getNotifications, setNotificationsRead } from './actions/home' 
+import { getNotifications, setNotificationsRead, deleteNotification } from './actions/home' 
 import { navigateFriends } from "./actions/navigation";
+import firebase from "react-native-firebase";
 
 const matchStateToProps = ({profile, home, friends}) => ({
     profile: profile.profile,
@@ -193,13 +197,12 @@ const matchStateToProps = ({profile, home, friends}) => ({
 })
 
  const mapDispatchToProps = dispatch => ({
-  onDeleteMessage: (id) => console.log(id),
-  onNotificationPress: (id) => console.log(id),
   goBack: () => dispatch(navigateBack()),
   fetchNotifications: (limit = 10) => dispatch(getNotifications(limit)),
   viewPost: (post) => dispatch(navigatePostView(post)),
   setRead: () => dispatch(setNotificationsRead()),
-  goToFriends: () => dispatch(navigateFriends())
+  goToFriends: () => dispatch(navigateFriends()),
+  delete: (key) => dispatch(deleteNotification(key))
  })
 
 export default connect(matchStateToProps, mapDispatchToProps)(Notifications)

@@ -61,6 +61,7 @@ export const setNotificationCount = (count) => ({
 })
 
 
+
 export const addPost = (item) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
@@ -355,8 +356,8 @@ export const repComment = (comment) => {
 					firebase.database().ref('userNotifications/' + comment.uid).child(comment.key + uid).once('value', snapshot => {
 						if (!snapshot.val()) {
 							firebase.database().ref('notifications').child(comment.key + uid).set({date, uid, postId: comment.postId, type: 'commentRep'})
-								.then(()=> firebase.database().ref('userNotifications/' + obj.uid).child(comment.key + uid).set(true))
-								.then(() => upUnreadCount(obj.uid))
+								.then(()=> firebase.database().ref('userNotifications/' + comment.uid).child(comment.key + uid).set(true))
+								.then(() => upUnreadCount(comment.uid))
 						}
 					})
 					
@@ -491,4 +492,16 @@ export const setNotificationsRead = () => {
 		return firebase.database().ref('users/' + uid).child('unreadCount').set(0)
 		
 	} 
+}
+
+export const deleteNotification = (key) => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		let notifs = getState().home.notifications
+		delete notifs[key]
+		dispatch(setNotifications(notifs))
+		let ref = firebase.database().ref('notifications').child(key).remove()
+		let ref1 = firebase.database().ref('userNotifications/' + uid).child(key).remove()
+		return Promise.all([ref, ref1])
+	}
 }

@@ -6,6 +6,7 @@ import {
 	SET_POST_COMMENTS,
 	ADD_COMMENT,
 	SET_NOTIFICATIONS,
+	REMOVE_NOTIFICATION
 } from 'Anyone/js/actions/home'
 
 import {
@@ -53,6 +54,12 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				notifications: action.notifications
+			}
+		}
+		case REMOVE_NOTIFICATION: {
+			return {
+				...state,
+				notifications: {}
 			}
 		}
 		case SET_LOGGED_OUT: {
