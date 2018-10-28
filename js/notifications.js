@@ -39,7 +39,10 @@ class Notifications extends Component {
     this.state = {
       close: false,
       spinner: true,
-      notifications: {}
+      notifications: {},
+      loadingMore: false,
+      fetchAmount: 10,
+      showLoadMore: false,
     }
   }
   
@@ -51,8 +54,17 @@ class Notifications extends Component {
   componentWillReceiveProps(nextProps) {
     this.setState({spinner: false})
     if (nextProps.notifications) {
-      this.setState({notifications: nextProps.notifications})
+      this.setState({notifications: nextProps.notifications,
+        showLoadMore: (Object.values(nextProps.notifications).length == this.state.fetchAmount)
+      })
     }
+  }
+
+  sortByDate(array) {
+    array.sort(function(a,b){
+      return new Date(b.date) - new Date(a.date)
+    })
+    return array
   }
 
   render() {
@@ -79,8 +91,9 @@ class Notifications extends Component {
   }
 
   renderNotifications() {
-      return <FlatList 
-        data={Object.values(this.state.notifications)}
+      return <FlatList
+        ref={ref => this.flatList = ref}
+        data={this.sortByDate(Object.values(this.state.notifications))}
         renderItem={({item}) => {
           let swipeoutBtns = [{
             text: 'Delete',
@@ -112,13 +125,22 @@ class Notifications extends Component {
         }}
         keyExtractor={(item)=> item.key}
         ListFooterComponent={() => {
-          return <TouchableOpacity 
-          onPress={()=> {
-            this.props.loadMore()
-          }}
-          style={{backgroundColor: '#fff', paddingVertical: 10}}>
-            <Text style={{color: colors.secondary, textAlign: 'center'}}>Load More</Text>
-          </TouchableOpacity>
+          if (this.state.showLoadMore) {
+            return <TouchableOpacity 
+            onPress={()=> {
+              this.setState({loadingMore: true, fetchAmount: this.state.fetchAmount + 10}, ()=> {
+                this.props.fetchNotifications(this.state.fetchAmount).then(() => {
+                  this.setState({loadingMore: false})
+                  })
+              })
+              
+            }}
+            style={{backgroundColor: '#fff', paddingVertical: this.state.loadingMore ? 0 : 10}}>
+              {this.state.loadingMore ? <Spinner color={colors.secondary } size='small' style={{height: 35}} /> : 
+              <Text style={{color: colors.secondary, textAlign: 'center'}}>Load More</Text>}
+            </TouchableOpacity>
+          }
+          else return null
         }}
       />
   }

@@ -463,7 +463,6 @@ export const getNotifications = (limit = 10) => {
 				refs.push(firebase.database().ref('notifications').child(key).once('value'))
 			})
 			return Promise.all(refs).then(notifications => {
-				console.log(notifications)
 				let obj = {}
 				notifications.forEach(notification => {
 					obj[notification.key] = notification.val()
