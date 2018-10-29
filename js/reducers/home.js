@@ -12,7 +12,7 @@ import {
 import {
 	SET_LOGGED_OUT,
 } from 'Anyone/js/actions/profile'
-import { ActionSheet } from 'native-base';
+import { ActionSheet } from 'native-base'
 
 const initialState = {
 	feed: {},
@@ -54,12 +54,6 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				notifications: action.notifications
-			}
-		}
-		case REMOVE_NOTIFICATION: {
-			return {
-				...state,
-				notifications: {}
 			}
 		}
 		case SET_LOGGED_OUT: {

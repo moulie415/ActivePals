@@ -22,6 +22,7 @@
 		0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1F215A210A8E1800896D4A /* libRNGoogleSignin.a */; };
 		0A4320CF216FBDA000C79596 /* libRNVersionNumber.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2FBFA22063056F00A42267 /* libRNVersionNumber.a */; };
 		0A73102420F6780A00CCF377 /* Running-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A730FE820F6780A00CCF377 /* Running-background.jpg */; };
+		0A7CE457218693AC00CEB53A /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A7CE4542186939B00CEB53A /* libRCTPushNotification.a */; };
 		0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */; };
 		0AB3811720098E4A00BCD283 /* FBSDKCoreKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AB3811220098CC000BCD283 /* FBSDKCoreKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0DEC0B3B247E40D1953C8594 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 112BFEAFFE274186B850223D /* SafariServices.framework */; };
@@ -301,6 +302,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = B1DCF6BA7CE9E4C24A17D48755A38EF2;
 			remoteInfo = "react-native-splash-screen";
+		};
+		0A7CE4532186939B00CEB53A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A7CE44E2186939A00CEB53A /* RCTPushNotification.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RCTPushNotification;
+		};
+		0A7CE4552186939B00CEB53A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A7CE44E2186939A00CEB53A /* RCTPushNotification.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3D05745F1DE6004600184BB4;
+			remoteInfo = "RCTPushNotification-tvOS";
 		};
 		0A7CEE8B2118B2AF00F09932 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -655,6 +670,7 @@
 		0A1F229A210C9BE600896D4A /* light.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = light.mp3; path = ../../../../Downloads/light.mp3; sourceTree = "<group>"; };
 		0A1F22B2210DF55200896D4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0A730FE820F6780A00CCF377 /* Running-background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "Running-background.jpg"; path = "../assets/images/Running-background.jpg"; sourceTree = "<group>"; };
+		0A7CE44E2186939A00CEB53A /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 		0A88FFAF201D6E18004A17CD /* RNGeocoder.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNGeocoder.xcodeproj; path = "../node_modules/react-native-geocoder/ios/RNGeocoder.xcodeproj"; sourceTree = "<group>"; };
 		0AB380DD20098C9700BCD283 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
@@ -724,6 +740,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A7CE457218693AC00CEB53A /* libRCTPushNotification.a in Frameworks */,
 				0A4320CF216FBDA000C79596 /* libRNVersionNumber.a in Frameworks */,
 				0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */,
 				0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */,
@@ -846,6 +863,15 @@
 			children = (
 				0A2FBFA22063056F00A42267 /* libRNVersionNumber.a */,
 				0A2FBFA42063056F00A42267 /* libRNVersionNumber-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0A7CE44F2186939A00CEB53A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A7CE4542186939B00CEB53A /* libRCTPushNotification.a */,
+				0A7CE4562186939B00CEB53A /* libRCTPushNotification-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1056,6 +1082,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				0A7CE44E2186939A00CEB53A /* RCTPushNotification.xcodeproj */,
 				0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */,
 				0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */,
 				0AF6E8D320F28303003AA11A /* SplashScreen.xcodeproj */,
@@ -1348,6 +1375,10 @@
 					ProjectRef = 00C302D31ABCB9D200DB3ED1 /* RCTNetwork.xcodeproj */;
 				},
 				{
+					ProductGroup = 0A7CE44F2186939A00CEB53A /* Products */;
+					ProjectRef = 0A7CE44E2186939A00CEB53A /* RCTPushNotification.xcodeproj */;
+				},
+				{
 					ProductGroup = 139105B71AF99BAD00B5F7CC /* Products */;
 					ProjectRef = 139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */;
 				},
@@ -1633,6 +1664,20 @@
 			fileType = archive.ar;
 			path = "libreact-native-splash-screen.a";
 			remoteRef = 0A73110A20F6BF0000CCF377 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A7CE4542186939B00CEB53A /* libRCTPushNotification.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTPushNotification.a;
+			remoteRef = 0A7CE4532186939B00CEB53A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A7CE4562186939B00CEB53A /* libRCTPushNotification-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRCTPushNotification-tvOS.a";
+			remoteRef = 0A7CE4552186939B00CEB53A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A7CEE8C2118B2AF00F09932 /* libFirebaseAuth.a */ = {

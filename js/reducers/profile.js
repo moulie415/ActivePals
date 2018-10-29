@@ -5,6 +5,7 @@ import {
  	SET_GYM,
 	REMOVE_GYM,
 } from 'Anyone/js/actions/profile'
+import { Platform, PushNotificationIOS } from 'react-native'
 
 import {
 	SET_NOTIFICATION_COUNT
@@ -38,6 +39,9 @@ export default function(state = initialState, action) {
 				profile: {...state.profile, gym: null}
 			}
 		case SET_NOTIFICATION_COUNT:
+			if (Platform.OS == 'ios') {
+				PushNotificationIOS.setApplicationIconBadgeNumber(action.count)
+			}
 			return {
 				...state,
 				profile: {...state.profile, unreadCount: action.count }
