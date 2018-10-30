@@ -1,11 +1,10 @@
 import { StyleSheet } from "react-native"
+import colors from '../constants/colors'
 
 export default styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#002b31"
+    backgroundColor: "#999"
   },
   welcome: {
     fontSize: 20,
@@ -23,6 +22,7 @@ export default styles = StyleSheet.create({
   inputGrp: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255,255,255,0.3)',
+    paddingLeft: 10,
     marginBottom: 20,
     borderWidth: 0,
     borderColor: 'transparent',

@@ -288,8 +288,16 @@ export const fetchComments = (key, limit = 10) => {
 			obj = comment.val()
             if (comment.val().uid == uid) {
               obj.user = getState().profile.profile
-            } else {
+            } else if (getState().friends.friends[obj.uid]){
               obj.user = getState().friends.friends[obj.uid]
+			}
+			else {
+				if (getState().sharedInfo.users[obj.uid]) {
+					obj.user = getState().sharedInfo.users[obj.uid]
+				}
+				else {
+					obj.user = fetchUser(obj.uid)
+				}
 			}
 			commentReps.push(firebase.database().ref("reps/" + obj.key).child(uid).once('value'))
 			commentsArray.push(obj)
@@ -504,4 +512,13 @@ export const deleteNotification = (key) => {
 		let ref1 = firebase.database().ref('userNotifications/' + uid).child(key).remove()
 		return Promise.all([ref, ref1])
 	}
+}
+
+async function fetchUser(uid) {
+	console.log(uid)
+	let user = await firebase.database().ref('users/' + uid).once('value')
+	let avatar = await firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
+	console.log(uid)
+	return user = {...user.val(), avatar}
+	
 }

@@ -94,8 +94,11 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
       <TouchableOpacity primary
         onPress={(mutex) => {
           mutex.lockFor(1000)
-          this.setState({spinner: true})
-          this.login(this.username, this.pass)
+          if (this.username && this.pass) {
+            this.setState({spinner: true})
+            this.login(this.username, this.pass)
+          }
+          else Alert.alert("Sorry", "Please enter both your email and your password")
         }}
         style={[{marginRight: 10}, styles.button]}
         >
@@ -156,7 +159,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
   async login(email, pass) {
     try {
       await firebase.auth()
-      .signInWithEmailAndPassword(email, pass).then(user => {
+      .signInWithEmailAndPassword(email, pass).then(({info, user}) => {
         if (user.emailVerified) {
           this.props.onLogin()
        }
@@ -321,12 +324,15 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
             .catch(e => {
               console.log(e)
               Alert.alert('Error', "Code: " + e.code)
+              this.setState({spinner: false})
             })
             .done()
+            
         })
         .catch(err => {
           console.log("Play services error", err.code, err.message)
           Alert.alert("Play services error", err.code, err.message)
+          this.setState({spinner: false})
         })
    })
   }

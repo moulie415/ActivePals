@@ -110,7 +110,7 @@ class PostView extends Component {
         //   childPropName={'children'}
           keyExtractor={item => item.comment_id}
           usernameExtractor={item => extractUsername(item, this.props.profile.uid)}
-          uidExtractor={item => item.user.uid}
+          uidExtractor={item => item.user ? item.user.uid : null}
           editTimeExtractor={item => extractEditTime(item)}
           createdTimeExtractor={item => extractCreatedTime(item)}
           bodyExtractor={item => extractBody(item)}

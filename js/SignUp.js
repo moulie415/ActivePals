@@ -1,18 +1,31 @@
 import React, { Component } from "react"
-import { StyleSheet, Alert } from "react-native"
+import {
+  Alert,
+  View
+ } from "react-native"
 import {
   Button,
   Input,
   Container,
   Item,
   Icon,
-  Spinner
+  Spinner,
+  Header,
+  Right,
+  Left,
+  Title
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import  styles  from './styles/signUpStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import colors from './constants/colors'
+import TouchableOpacity from './constants/TouchableOpacityLockable.js'
 
  class SignUp extends Component {
+
+  static navigationOptions = {
+    header: null,
+  }
 
   constructor(props) {
     super(props)
@@ -41,11 +54,23 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
   render () {
     return (
     <Container style={styles.container}>
+      <Header style={{backgroundColor: colors.primary}}>
+      <Left style={{flex: 1}}>
+          <TouchableOpacity onPress={() => {
+            this.props.goBack()
+          } }>
+            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
+          </TouchableOpacity>
+          </Left>
+        <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir', flex: 1}}>Sign up</Title>
+        <Right />
+      </Header>
       {this.state.spinner && <Spinner />}
-      <Item rounded style={styles.inputGrp}>
+      <View style={{justifyContent: 'center', flex: 1}}>
+      <Item style={styles.inputGrp}>
       <Icon name="person" style={{color: "#fff"}} />
         <Input
-        placeholder="Username (optional)"
+        placeholder="Username"
         onChangeText={u => this.username = u}
         placeholderTextColor="#FFF"
         style={styles.input}
@@ -54,7 +79,7 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
         keyboardType={'email-address'}
         />
         </Item>
-      <Item rounded style={styles.inputGrp}>
+      <Item style={styles.inputGrp}>
       <Icon name="mail" style={{color: "#fff"}} />
         <Input
         placeholder="Email"
@@ -66,7 +91,7 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
         keyboardType={'email-address'}
         />
         </Item>
-      <Item rounded style={styles.inputGrp}>
+      <Item style={styles.inputGrp}>
       <Icon name="unlock" style={{color: "#fff"}} />
       <Input
         placeholder="Password"
@@ -76,7 +101,7 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
         style={styles.input}
         />
         </Item>
-      <Item rounded style={styles.inputGrp}>
+      <Item style={styles.inputGrp}>
       <Icon name="unlock" style={{color: "#fff"}} />
       <Input
         placeholder="Confirm Password"
@@ -86,7 +111,8 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
         style={styles.input}
         />
         </Item>
-        <Button primary rounded
+        <TouchableOpacity 
+        style={{backgroundColor: colors.secondary, padding: 10, paddingHorizontal: 20, alignSelf: 'center'}}
         onPress={() => {
           if (this.pass == this.confirm) {
             this.setState({spinner: true})
@@ -103,7 +129,8 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
               }) 
             }
             else {
-              this.signup(this.email, this.pass)
+              Alert.alert('Sorry', 'Please choose a username')
+              this.setState({spinner: false})
             }
           }
           else {
@@ -111,10 +138,10 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
             this.setState({spinner: false})
           }
         }}
-        style={{alignSelf: 'center'}}
         >
-        <Text>Sign up</Text>
-        </Button>
+        <Text style={{color: '#fff'}}>Sign up</Text>
+        </TouchableOpacity>
+        </View>
     </Container>
   )
   }
@@ -123,10 +150,11 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 
       try {
         await firebase.auth()
-        .createUserWithEmailAndPassword(email, pass).then(user => {
+        .createUserWithEmailAndPassword(email, pass).then(({info, user}) => {
          let userData = {uid: user.uid, email: user.email, username: this.username}
          this.createUser(user.uid, userData, "")
          user.sendEmailVerification().then(()=> {
+           this.props.goBack()
            Alert.alert('Account created', 'You must now verify your email using the link we sent you before you can login')
            this.setState({spinner: false})
          }).catch(error => {
@@ -164,10 +192,12 @@ createUser = (uid,userData,token) => {
 }
 
 import { connect } from 'react-redux'
+import { navigateBack } from './actions/navigation'
 // const mapStateToProps = ({ home, settings, profile }) => ({
 // })
 
-// const mapDispatchToProps = dispatch => ({
-// })
+ const mapDispatchToProps = dispatch => ({
+   goBack: () => dispatch(navigateBack())
+})
 
-export default connect(null, null)(SignUp)
+export default connect(null, mapDispatchToProps)(SignUp)
