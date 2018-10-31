@@ -522,3 +522,17 @@ async function fetchUser(uid) {
 	return user = {...user.val(), avatar}
 	
 }
+
+export const fetchUser = (uid) => {
+		return firebase.database().ref('users/' + uid).once('value', profile => {
+			return firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
+			.then(url => {
+				//resolve({...profile.val(), status, avatar: url})
+				//addUser to users
+			})
+			.catch(e => {
+				//resolve({...profile.val(), status})
+				//addUser to shared users
+			})
+	})
+}

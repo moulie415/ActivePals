@@ -57,9 +57,10 @@ import { calculateAge } from './constants/utils'
       this.setState({profile: user.val()})
       if (user.val().gym) {
         firebase.database().ref('gyms/' + user.val().gym).once('value', gym => {
-          this.setState({gym: gym.val()})
+          this.setState({gym: gym.val(), loaded: true})
         })
       }
+      else this.setState({loaded: true})
       if (this.props.friends[user.val().uid]){
         this.setState({isFriend: true})
       }
@@ -72,7 +73,8 @@ import { calculateAge } from './constants/utils'
       isFriend: false,
       profile: {},
       gym: {},
-      showImage: false
+      showImage: false,
+      loaded: false
       //avatar: this.props.friends[this.uid] ? this.props.friends[this.uid].avatar : null
     }
   }
@@ -113,7 +115,7 @@ import { calculateAge } from './constants/utils'
         <Right/>
 
         </Header>
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
+        {this.state.loaded ? <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View>
       <View style={{alignItems: 'center', marginBottom: 10}}>
       {this.state.backdrop ? <TouchableOpacity
@@ -209,7 +211,7 @@ import { calculateAge } from './constants/utils'
           }}>
           <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Remove Buddy</Text>
           </TouchableOpacity>}
-        </View>
+        </View> : <View style={hStyles.spinner}><Spinner color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
         <Modal onRequestClose={()=> null}
           visible={this.state.showImage} transparent={true}>
