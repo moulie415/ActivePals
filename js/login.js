@@ -34,6 +34,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
     this.state = {
       user: null,
       spinner: false,
+      secure: true
     }
     const navigation = props.navigation
   }
@@ -84,18 +85,21 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
       <Icon name="unlock" style={{color: '#fff'}}/>
       <Input
         placeholder="Password"
-        secureTextEntry={true}
+        secureTextEntry={this.state.secure}
         placeholderTextColor={'#fff'}
         onChangeText={p => this.pass = p}
         style={styles.input}
         />
+        <TouchableOpacity onPress={()=> this.setState({secure: !this.state.secure})}>
+          <Icon name={this.state.secure ? "ios-eye" : "ios-eye-off"} style={{color: '#fff', fontSize: 30}} />
+        </TouchableOpacity>
         </Item>
         <View style={{flexDirection: 'row', marginVertical: 10}}>
       <TouchableOpacity primary
         onPress={(mutex) => {
           mutex.lockFor(1000)
           if (this.username && this.pass) {
-            this.setState({spinner: true})
+            this.setState({spinner: true, secure: true})
             this.login(this.username, this.pass)
           }
           else Alert.alert("Sorry", "Please enter both your email and your password")
@@ -168,7 +172,6 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
        }
        console.log('Logged In!')
       })
-      this.setState({spinner: false})
         //Navigate to the Home page
       } catch (error) {
         this.setState({spinner: false})
