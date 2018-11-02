@@ -156,7 +156,7 @@ class FitLink extends React.Component {
         dispatch(updateLastMessage(notification.data))
       }
       if (type == 'rep' || type == 'comment' || 'buddyRequest') {
-        let count = getState().profile.profile.unreadCount
+        let count = getState().profile.profile.unreadCount || 0
         dispatch(setNotificationCount(count+1))
       }
       showLocalNotification(notification.data)

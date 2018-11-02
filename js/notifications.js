@@ -153,6 +153,9 @@ class Notifications extends Component {
     if (this.props.friends[item.uid]) {
       user = this.props.friends[item.uid].username
     }
+    else if(this.props.users[item.uid]) {
+      user = this.props.users[item.uid].username
+    }
     else {
       user = 'Unknown user'
     }
@@ -190,10 +193,11 @@ import { getNotifications, setNotificationsRead, deleteNotification } from './ac
 import { navigateFriends } from "./actions/navigation";
 import firebase from "react-native-firebase";
 
-const matchStateToProps = ({profile, home, friends}) => ({
+const matchStateToProps = ({profile, home, friends, sharedInfo}) => ({
     profile: profile.profile,
     notifications: home.notifications,
-    friends: friends.friends
+    friends: friends.friends,
+    users: sharedInfo.users
 })
 
  const mapDispatchToProps = dispatch => ({

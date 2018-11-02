@@ -36,8 +36,11 @@ export const removeFriend = (uid) => {
 
 
 export const fetchFriends = (uids) => {
-	return (dispatch) => {
+	return (dispatch, getState) => {
 		let friends = []
+		if (!uids) {
+			uids = getState().friends.friends
+		}
 		if (uids) {
 		Object.keys(uids).forEach(friend => {
 			let promise = new Promise(function(resolve, reject) {

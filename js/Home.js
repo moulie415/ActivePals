@@ -370,6 +370,7 @@ componentWillReceiveProps(nextProps) {
         keyExtractor={(item) => item.key}
         onRefresh={() => {
           this.setState({refreshing: true})
+          this.props.fetchFriends()
           this.props.getProfile()
           this.props.getPosts(this.props.profile.uid, 30).then(() => {
             this.setState({refreshing: false})
@@ -644,7 +645,7 @@ showPicker() {
         key={like.user_id + ""}
       >
         <View style={[cStyles.likeContainer]}>
-          <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
+          {like.image ? <Image style={[cStyles.likeImage]} source={{ uri: like.image }} /> : <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary, }} />}
           <Text style={[cStyles.likeName]}>{like.username}</Text>
         </View>
       </TouchableOpacity>
@@ -693,7 +694,8 @@ import {
   fetchRepUsers
  } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
-import { fetchProfile } from "./actions/profile";
+import { fetchProfile } from "./actions/profile"
+import { fetchFriends } from "./actions/friends";
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,
@@ -715,7 +717,8 @@ const mapDispatchToProps = dispatch => ({
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit)),
   onNotificationPress: () => dispatch(navigateNotifications()),
-  getProfile: () => dispatch(fetchProfile())
+  getProfile: () => dispatch(fetchProfile()),
+  getFriends: () => dispatch(fetchFriends())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

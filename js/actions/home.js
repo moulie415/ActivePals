@@ -271,6 +271,7 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 
 export const fetchComments = (key, limit = 10) => {
   return (dispatch, getState) => {
+	let userFetches = []
 	let uid = getState().profile.profile.uid
     firebase.database().ref("postComments").child(key).limitToLast(limit).once("value", snapshot => {
         let promises = []
@@ -296,7 +297,10 @@ export const fetchComments = (key, limit = 10) => {
 					obj.user = getState().sharedInfo.users[obj.uid]
 				}
 				else {
-					obj.user = fetchUser(obj.uid)
+					if (!userFetches.includes(obj.uid)) {
+						userFetches.push(obj.uid)
+					}
+					
 				}
 			}
 			commentReps.push(firebase.database().ref("reps/" + obj.key).child(uid).once('value'))
@@ -312,7 +316,26 @@ export const fetchComments = (key, limit = 10) => {
 			  commentsArray.forEach((comment, index) => {
 				comment.comment_id = index + 1
 			  })
-			dispatch(setPostComments(key, commentsArray))
+			  if (userFetches.length > 0) {
+				fetchUsers(userFetches).then(users => {
+					let sharedUsers = {}
+					users.forEach(user => {
+						if (user.uid) {
+							sharedUsers[user.uid] = user
+						}
+					})
+					dispatch(updateUsers(sharedUsers))
+					commentsArray.forEach(comment => {
+						if (!comment.user) {
+							comment.user = getState().sharedInfo.users[comment.uid]
+						}
+					})
+					dispatch(setPostComments(key, commentsArray))
+				})
+			  }
+			  else {
+				dispatch(setPostComments(key, commentsArray))
+			  }
 		  })
 
         })
@@ -397,6 +420,7 @@ export const repComment = (comment) => {
 
 export const fetchRepUsers = (postId, limit = 10) => {
 	return (dispatch, getState) => {
+		let userFetches = []
 		return firebase.database().ref('reps').child(postId).limitToLast(limit).once('value', snapshot => {
 			let users = []
 			if (snapshot.val()) {
@@ -406,25 +430,65 @@ export const fetchRepUsers = (postId, limit = 10) => {
 					if (uid == getState().profile.profile.uid) {
 						profile = getState().profile.profile
 						user.username = 'You'
+						user.image = profile.avatar
+						user.user_id = uid
+						users.push(user)
 					}
-					else {
+					else if (getState().friends.friends[uid]) {
 						profile = getState().friends.friends[uid]
 						user.username = profile.username
+						user.image = profile.avatar
+						user.user_id = uid
+						users.push(user)
 					}
-					user.image = profile.avatar
-					user.user_id = uid
-					users.push(user)
+					else {
+						if (getState().sharedInfo.users[uid]) {
+							profile = getState().sharedInfo.users[uid]
+							user.username = profile.username
+							user.image = profile.avatar
+							user.user_id = uid
+							users.push(user)
+						}
+						else {
+							if (!userFetches.includes(uid)) {
+								userFetches.push(uid)
+							}
+						}
+					}
+					
 				})
 			}
 			let post = getState().home.feed[postId]
-			post.repUsers = users
-			dispatch(setPost(post))
+			if (userFetches.length > 0) {
+				return fetchUsers(userFetches).then(fetched => {
+					let sharedUsers = {}
+					fetched.forEach(user => {
+						if (user.uid) {
+							sharedUsers[user.uid] = user
+							user.image = user.avatar
+							user.user_id = user.uid
+							users.push(user)
+						}
+					})
+					post.repUsers = users
+					dispatch(setPost(post))
+					dispatch(updateUsers(sharedUsers))
+
+				})
+			}
+			else {
+				post.repUsers = users
+				dispatch(setPost(post))
+			}
 		})
 	}
 }
 
+
+
 export const fetchCommentRepsUsers = (comment, limit = 10) => {
 	return (dispatch, getState) => {
+		let userFetches = []
 		const {key, postId, comment_id } = comment
 		return new Promise(resolve => {
 			firebase.database().ref('reps').child(key).limitToLast(limit).once('value', snapshot => {
@@ -436,20 +500,59 @@ export const fetchCommentRepsUsers = (comment, limit = 10) => {
 						if (uid == getState().profile.profile.uid) {
 							profile = getState().profile.profile
 							user.username = 'You'
+							user.image = profile.avatar
+							user.user_id = uid
+							users.push(user)
 						}
-						else {
+						else if (getState().friends.friends[uid]) {
 							profile = getState().friends.friends[uid]
 							user.username = profile.username
+							user.image = profile.avatar
+							user.user_id = uid
+							users.push(user)
 						}
-						user.image = profile.avatar
-						user.user_id = uid
-						users.push(user)
+						else {
+							if (getState().sharedInfo.users[uid]) {
+								profile = getState().sharedInfo.users[uid]
+								user.image = profile.avatar
+								user.user_id = uid
+								users.push(user)
+							}
+							else {
+								if (!userFetches.includes(uid)) {
+									userFetches.push(uid)
+								}
+							}
+						}
+						
 					})
 				}
+				
 				let postComments = getState().home.feed[postId].comments
-				postComments[comment_id-1].likes = users
-				resolve(users)
-				dispatch(setPostComments(postId, postComments))
+				if (userFetches.length > 0) {
+					fetchUsers(userFetches).then(fetched => {
+						let sharedUsers = {}
+						fetched.forEach(user => {
+							if (user.uid) {
+								sharedUsers[user.uid] = user
+								user.image = user.avatar
+								user.user_id = user.uid
+								users.push(user)
+							}
+						})
+						postComments[comment_id-1].likes = users
+						resolve(users)
+						dispatch(setPostComments(postId, postComments))
+						dispatch(updateUsers(sharedUsers))
+
+	
+					})
+				}
+				else {
+					postComments[comment_id-1].likes = users
+					resolve(users)
+					dispatch(setPostComments(postId, postComments))
+				}
 			})
 		})
 	}
@@ -468,17 +571,19 @@ export const getNotifications = (limit = 10) => {
 		let uid = getState().profile.profile.uid
 		let refs = []
 		return firebase.database().ref('userNotifications').child(uid).limitToLast(limit).once('value', snapshot => {
-			Object.keys(snapshot.val()).forEach(key => {
-				refs.push(firebase.database().ref('notifications').child(key).once('value'))
-			})
-			return Promise.all(refs).then(notifications => {
-				let obj = {}
-				notifications.forEach(notification => {
-					obj[notification.key] = notification.val()
-					obj[notification.key].key = notification.key
+			if (snapshot.val()) {
+				Object.keys(snapshot.val()).forEach(key => {
+					refs.push(firebase.database().ref('notifications').child(key).once('value'))
 				})
-				dispatch(setNotifications(obj))
-			})
+				return Promise.all(refs).then(notifications => {
+					let obj = {}
+					notifications.forEach(notification => {
+						obj[notification.key] = notification.val()
+						obj[notification.key].key = notification.key
+					})
+					dispatch(setNotifications(obj))
+				})
+			}
 		})
 	}
 }
@@ -514,25 +619,36 @@ export const deleteNotification = (key) => {
 	}
 }
 
-async function fetchUser(uid) {
-	console.log(uid)
-	let user = await firebase.database().ref('users/' + uid).once('value')
-	let avatar = await firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
-	console.log(uid)
-	return user = {...user.val(), avatar}
-	
-}
 
 export const fetchUser = (uid) => {
-		return firebase.database().ref('users/' + uid).once('value', profile => {
-			return firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
-			.then(url => {
-				//resolve({...profile.val(), status, avatar: url})
-				//addUser to users
+		return new Promise(resolve => {
+			firebase.database().ref('users/' + uid).once('value', profile => {
+				firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
+				.then(url => {
+					resolve({...profile.val(), avatar: url})
+				})
+				.catch(e => {
+					resolve({...profile.val()})
+				})
+		})
+		})
+		
+}
+
+export const fetchUsers = (uids) => {
+	let promises = []
+	uids.forEach(uid => {
+		promises.push(new Promise(resolve => {
+			firebase.database().ref('users/' + uid).once('value', profile => {
+				firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
+					.then(url => {
+						resolve({...profile.val(), avatar: url})
+					})
+					.catch(e => {
+						resolve({...profile.val()})
+					})
 			})
-			.catch(e => {
-				//resolve({...profile.val(), status})
-				//addUser to shared users
-			})
-	})
+		}))
+		})
+		return Promise.all(promises)
 }
