@@ -19,7 +19,6 @@ import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
 import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
 import colors from 'Anyone/js/constants/colors'
-import Modal from 'react-native-modalbox'
 import sStyles from 'Anyone/js/styles/sessionStyles'
 
 class Messaging extends React.Component {

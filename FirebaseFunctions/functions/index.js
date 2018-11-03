@@ -63,9 +63,15 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
     .once('value')
 
     return getValuePromise.then(snapshot => {
+        console.log('snapshot')
+        console.log(snapshot.val())
         const { user, text, sessionId, createdAt, _id, sessionTitle, type } = snapshot.val()[Object.keys(snapshot.val())[0]]
         return admin.database().ref('/'+ type +'/' + sessionId).child('users').once('value', users => {
             let refs = []
+            console.log('users')
+            console.log(users)
+            console.log('users.val()')
+            console.log(users.val())
             Object.keys(users.val()).forEach(child => {
                 if (child !== user._id) {
                     refs.push(admin.database().ref('/users/' + child).child("FCMToken").once('value'))

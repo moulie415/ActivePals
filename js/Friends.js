@@ -141,7 +141,12 @@ import { arraysEqual } from './constants/utils'
             {"You don't have any buddies yet, also please make sure you are connected to the internet"}
           </Text></View>}
 
-      <Modal backdropPressToClose={false} style={styles.modal} position={"center"} ref={"modal"} >
+      <Modal 
+      backButtonClose={true}
+      backdropPressToClose={false}
+      style={styles.modal}
+      position={"center"}
+      ref={"modal"} >
           <Text style={styles.modalText}>Send buddy request</Text>
           <TextInput
           underlineColorAndroid='transparent'

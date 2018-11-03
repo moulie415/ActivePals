@@ -1,6 +1,7 @@
 import firebase from 'react-native-firebase'
 import { removeSessionChat, addSessionChat } from 'Anyone/js/actions/chats'
 import { geofire }  from 'Anyone/index'
+import {fetchUsers, updateUsers } from './home'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
 export const UPDATE_PRIVATE_SESSIONS = 'UPDATE_PRIVATE_SESSIONS'
@@ -117,6 +118,7 @@ export const fetchSessions = (radius = 10, update = false) => {
 export const fetchPrivateSessions = () =>  {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
+		userFetches = []
 		return firebase.database().ref('users/' + uid).child('sessions').on('value', snapshot => {
 			let privateSessions = []
 			let uids = []
@@ -142,9 +144,16 @@ export const fetchPrivateSessions = () =>  {
 						if (session.val().host == uid) {
 							host = getState().profile.profile
 						}
+						else if (getState().friends.friends[session.val().host]){
+							host = getState().friends.friends[session.val().host]
+							
+						}
+						else if (getState().sharedInfo.users[session.val().host]) {
+							host = getState().sharedInfo.users[session.val().host]
+						}
 						else {
-							let friends = getState().friends.friends
-							host = friends[session.val().host]
+							host = {uid: session.val().host}
+							userFetches.push(session.val().host)
 						}
 						privateSessions.push({...session.val(), key: session.key, inProgress, host})
 						//this.props.onJoin(session.key, true)
@@ -170,6 +179,17 @@ export const fetchPrivateSessions = () =>  {
 					return acc
 				}, {})
 				dispatch(setPrivateSessions(obj))
+				if (userFetches.length > 0) {
+					fetchUsers(userFetches).then(users => {
+						let sharedUsers = {}
+						users.forEach(user => {
+							if (user.uid) {
+								sharedUsers[user.uid] = user
+							}
+						})
+						dispatch(updateUsers(sharedUsers))
+					})
+				}
 			})
 		})
 	}
