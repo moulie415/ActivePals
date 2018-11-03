@@ -370,7 +370,7 @@ componentWillReceiveProps(nextProps) {
         keyExtractor={(item) => item.key}
         onRefresh={() => {
           this.setState({refreshing: true})
-          this.props.fetchFriends()
+          this.props.getFriends()
           this.props.getProfile()
           this.props.getPosts(this.props.profile.uid, 30).then(() => {
             this.setState({refreshing: false})

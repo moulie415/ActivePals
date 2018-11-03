@@ -22,6 +22,7 @@ import colors from './constants/colors'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
 import Comments from './comments'
 import sStyles from './styles/settingsStyles'
+import ImageViewer from 'react-native-image-zoom-viewer'
 import {
     extractCreatedTime,
     extractUsername,
@@ -59,6 +60,7 @@ class PostView extends Component {
             likesModalVisible: false,
             commentFetchAmount: 10,
             userFetchAmount: 10,
+            showImage: false
         }
     }
 
@@ -190,6 +192,27 @@ class PostView extends Component {
             />
           ) : null}
         </Modal>
+        <Modal onRequestClose={()=> null}
+          visible={this.state.showImage} transparent={true}>
+        <ImageViewer
+          renderIndicator= {(currentIndex, allSize) => null}
+          loadingRender={()=> <SafeAreaView><Text style={{color: '#fff', fontSize: 20}}>Loading...</Text></SafeAreaView>}
+          renderHeader={()=> {
+            return (<TouchableOpacity style={{position: 'absolute', top: 20, left: 10, padding: 10, zIndex: 9999}}
+              onPress={()=> this.setState({selectedImage: null, showImage: false})}>
+                <View style={{
+                  backgroundColor: '#0007',
+                  paddingHorizontal: 15,
+                  paddingVertical: 2,
+                  borderRadius: 10,
+                }}>
+                  <Icon name={'ios-arrow-back'}  style={{color: '#fff', fontSize: 40}}/>
+                </View>
+              </TouchableOpacity>)
+          }}
+          imageUrls={this.state.selectedImage}
+            />
+      </Modal>
       </View>
             </Container>
         )
@@ -227,7 +250,7 @@ class PostView extends Component {
                 </View>
               </View>
               
-                <View
+                <TouchableOpacity onPress={()=> this.setState({selectedImage: [{url: item.url}], showImage: true})}
                 style={{marginTop: 10, marginBottom: 10}}>
                 <Image
                 style={{width: '100%', height: 400, maxHeight: SCREEN_HEIGHT/2-55}}
@@ -235,7 +258,7 @@ class PostView extends Component {
                 source={{uri: item.url}}
                 />
                 
-                </View>
+                </TouchableOpacity>
                 
 
             </View>
