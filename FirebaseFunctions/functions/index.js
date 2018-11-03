@@ -21,7 +21,6 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
         console.log(snapshot.val())
         const { user, text, FCMToken, createdAt, _id, chatId } = snapshot.val()[Object.keys(snapshot.val())[0]]
 
-
         const payload = {
             data: {
                 custom_notification: JSON.stringify({
@@ -41,8 +40,8 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                 type: 'message',
                 chatId,
                 priority: 'high',
-		contentAvailable: 'true',
-		content_available: 'true'
+		        contentAvailable: 'true',
+		        content_available: 'true'
             },
             token: FCMToken,
 
@@ -64,16 +63,15 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
     .once('value')
 
     return getValuePromise.then(snapshot => {
-        console.log(snapshot.val())
         const { user, text, sessionId, createdAt, _id, sessionTitle, type } = snapshot.val()[Object.keys(snapshot.val())[0]]
         return admin.database().ref('/'+ type +'/' + sessionId).child('users').once('value', users => {
-            let tokens = []
-            users.forEach(child => {
-                if (child.key !== user._id) {
-                    tokens.push(admin.database().ref('/users/' + child.key).child("FCMToken").once('value'))
+            let refs = []
+            Object.keys(users.val()).forEach(child => {
+                if (child !== user._id) {
+                    refs.push(admin.database().ref('/users/' + child).child("FCMToken").once('value'))
                 }
             })
-            return Promise.all(tokens).then(tokens => {
+            return Promise.all(refs).then(tokens => {
                 let promises = []
                 tokens.forEach(token => {
                     const payload = {
@@ -96,13 +94,14 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                             sessionId,
                             sessionTitle,
                             priority: 'high',
-			    contentAvailable: 'true'
-
+			                contentAvailable: 'true',
+                            content_available: 'true'
                         },
                         token: token.val(),
 			
                     }
                     promises.push(admin.messaging().send(payload))
+                    console.log("sent push to user with FCMToken: " + token.val())
                 })
                 return Promise.all(promises)
             })
@@ -140,7 +139,8 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
                             }),
                             type: 'buddyRequest',
                             priority: 'high',
-			    contentAvailable: 'true'
+                            contentAvailable: 'true',
+                            content_available: 'true'
                         },
                         token: FCMToken,
 			    
@@ -335,7 +335,8 @@ exports.onComment = functions.database.ref('/comments/{id}').onCreate(event => {
                                 type: 'comment',
                                 postId,
                                 priority: 'high',
-			    	contentAvailable: 'true'
+                                contentAvailable: 'true',
+                                content_available: 'true'
                 
                             },
                             token: FCMToken,
@@ -388,7 +389,8 @@ exports.onRep = functions.database.ref('/reps/{id}/{uid}').onWrite(event => {
                                     id,
                                     postId: post,
                                     priority: 'high',
-				    contentAvailable: 'true'
+                                    contentAvailable: 'true',
+                                    content_available: 'true'
                                 },
                                 token: FCMToken,
                                 

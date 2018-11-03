@@ -212,7 +212,7 @@ import { arraysEqual } from './constants/utils'
             <View style={{flexDirection: 'row', alignItems: 'center', height: 50, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
-                <Icon name='md-contact'  style={{fontSize: 65, color: colors.primary, }}/>}
+                <Icon name='md-contact'  style={{fontSize: 65, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
                 <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
               </View>
               <View style={{flexDirection: 'row'}}>
