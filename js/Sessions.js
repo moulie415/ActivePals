@@ -252,7 +252,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             </Text>
             <TouchableOpacity onPress={()=> this.getPosition(true)}
             style={{marginVertical: 5}}>
-              <Text style={{color: colors.secondary}}>Get directions</Text>
+              <Text style={{color: colors.secondary}}>Get directions (opens in browser)</Text>
             </TouchableOpacity>
             </ScrollView>
              {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>}
@@ -308,10 +308,10 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
               <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
               {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
             {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
-            {/*<TouchableOpacity onPress={()=> this.getPosition(true)}
+            {<TouchableOpacity onPress={()=> this.getPosition(true, true)}
             style={{marginVertical: 5}}>
-              <Text style={{color: colors.secondary}}>Get directions</Text>
-            </TouchableOpacity>*/}
+              <Text style={{color: colors.secondary}}>Get directions (opens in browser)</Text>
+            </TouchableOpacity>}
             {this.props.profile.gym == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your gym</Text>
@@ -715,7 +715,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
     })
   }
 
-  getPosition(getDirections = false) {
+  getPosition(getDirections = false, gym = false) {
     //to watch position:
     //this.watchID = navigator.geolocation.watchPosition((position) => {
     navigator.geolocation.getCurrentPosition(
@@ -728,7 +728,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
           yourLocation: position.coords,
           error: null,
           showMap: true,
-          spinner: false}, ()=> getDirections && this.getDirections())
+          spinner: false}, ()=> getDirections && this.getDirections(gym))
 
           this.fetchPlaces(lat, lon)
           .then((results) => {
@@ -801,12 +801,19 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
     })
   }
 
-  getDirections() {
+  getDirections(gym) {
     if (this.state.yourLocation) {
-      let lat1 = this.state.yourLocation.latitude
-      let lng1 = this.state.yourLocation.longitude
-      let lat2 = this.state.selectedSession.location.position.lat
-      let lng2 = this.state.selectedSession.location.position.lng
+      let lat2, lng2
+      const lat1 = this.state.yourLocation.latitude
+      const lng1 = this.state.yourLocation.longitude
+      if (gym) {
+        lat2  = this.state.selectedLocation.geometry.location.lat
+        lng2 = this.state.selectedLocation.geometry.location.lng
+      }
+      else {
+        lat2 = this.state.selectedSession.location.position.lat
+        lng2 = this.state.selectedSession.location.position.lng
+      }
       let url = `https://www.google.com/maps/dir/?api=1&origin=${lat1},${lng1}&destination=${lat2},${lng2}`
       Linking.openURL(url).catch(err => console.error('An error occurred', err))
     }

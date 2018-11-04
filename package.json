@@ -14,6 +14,7 @@
     "npm": "^6.3.0",
     "react": "16.4.1",
     "react-native": "0.56.0",
+    "react-native-calendar-events": "^1.6.3",
     "react-native-collapsible": "^0.13.0",
     "react-native-datepicker": "^1.7.2",
     "react-native-event-listeners": "^1.0.3",
