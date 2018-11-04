@@ -116,7 +116,7 @@ PODS:
   - Protobuf (3.6.1)
   - React (0.56.0):
     - React/Core (= 0.56.0)
-  - react-native-fast-image (5.0.10):
+  - react-native-fast-image (5.0.11):
     - FLAnimatedImage
     - React
     - SDWebImage/Core
@@ -316,6 +316,6 @@ SPEC CHECKSUMS:
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
 
-PODFILE CHECKSUM: b35732edfae798b974e52b335a7715173a74c522
+PODFILE CHECKSUM: 28fcb4e78bfc7f9c0837ae50973d341133ff59d7
 
 COCOAPODS: 1.5.3

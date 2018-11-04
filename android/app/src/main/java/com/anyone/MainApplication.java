@@ -8,6 +8,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+import com.calendarevents.CalendarEventsPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
@@ -51,6 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
+            new CalendarEventsPackage(),
             new FastImageViewPackage(),
               new RNFirebasePackage(),
               new RNFirebaseNotificationsPackage(),

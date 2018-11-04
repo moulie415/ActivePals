@@ -9,7 +9,8 @@ import {
   Linking,
   Slider,
   Platform,
-  Dimensions
+  Dimensions,
+  RefreshControl
 } from "react-native"
 import {
   Container,
@@ -22,7 +23,7 @@ import {
   ActionSheet,
   Left,
   Right,
-  Content
+  Content,
 } from 'native-base'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
@@ -171,7 +172,18 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
           </View>
         </Right>
         </Header>
-        <Content contentContainerStyle={{flex: 1}}>
+        <View 
+        /*refreshControl={
+              <RefreshControl
+            tintColor={colors.secondary}
+            refreshing={this.state.refreshing}
+            onRefresh={()=> {
+            this.setState({refreshing: true})
+            this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
+            this.getPosition()
+          }}
+/>}*/
+        style={{flex: 1}}>
         {!this.state.switch && this.renderLists()}
 
         {this.state.switch && this.state.showMap && <MapView
@@ -386,7 +398,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
               </TouchableOpacity>
             </View>
         </Modal>
-        </Content>
+        </View>
       </Container>
       )
   }
@@ -557,9 +569,8 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             />
           {this.state.selectedIndex == 0 ? <FlatList
           style={{backgroundColor: '#9993'}}
-          contentContainerStyle={{flex: 1}}
           refreshing={this.state.refreshing}
-          onRefresh={()=> {
+            onRefresh={()=> {
             this.setState({refreshing: true})
             this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
             this.getPosition()
@@ -604,6 +615,12 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
           )}
       /> : <FlatList 
             data={this.state.gyms}
+            refreshing={this.state.refreshing}
+            onRefresh={()=> {
+            this.setState({refreshing: true})
+            this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
+            this.getPosition()
+          }}
             style={{backgroundColor: '#9993'}}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {

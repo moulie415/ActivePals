@@ -7,6 +7,7 @@ import {
 	Icon,
 	Button,
 	Content,
+	Switch
 } from 'native-base'
 import {
 	Text,
@@ -21,6 +22,7 @@ import { geofire }  from 'Anyone/index'
 import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/js/constants/colors'
 import TouchableOpacity from 'Anyone/js/constants/TouchableOpacityLockable'
+import RNCalendarEvents from 'react-native-calendar-events'
 
 
 class SessionDetail extends Component {
@@ -44,7 +46,8 @@ class SessionDetail extends Component {
 			gender: 'Unspecified',
 			formattedAddress: 'none',
 			date: null,
-			duration: 1
+			duration: 1,
+			addToCalendar: false
 		}
 
 	}
@@ -85,7 +88,10 @@ class SessionDetail extends Component {
 						placeholder={"Select date and time"}
 						mode={'datetime'}
 						androidMode={'spinner'}
-						onDateChange={(date) => {this.setState({date})}}
+						onDateChange={(date) => {
+							this.setState({date})
+							console.log(date)
+							}}
 						confirmBtnText={'Confirm'}
 						cancelBtnText={'Cancel'}
 						minDate={(new Date()).toISOString()}/>
@@ -93,16 +99,36 @@ class SessionDetail extends Component {
 							<TouchableOpacity onPress={()=> {
 								this.state.duration > 1 && this.setState({duration: this.state.duration-=1})
 							}}>
-								<Icon name='arrow-dropdown-circle' style={{color: colors.primary, marginRight: 5, fontSize: 40}}/>
+								<Icon name='arrow-dropdown-circle' style={{color: colors.primary, fontSize: 40}}/>
 							</TouchableOpacity>
-							<Text style={{marginRight: 5, width: 50, textAlign: 'center'}}>{this.state.duration + (this.state.duration > 1? ' hrs' :' hr')}</Text>
+							<Text style={{ width: 50, textAlign: 'center'}}>{this.state.duration + (this.state.duration > 1? ' hrs' :' hr')}</Text>
 							<TouchableOpacity onPress={()=> {
 								this.state.duration < 24 && this.setState({duration: this.state.duration+=1})
 							}}>
 								<Icon name='arrow-dropup-circle' style={{color: colors.primary, fontSize: 40}}/>
 							</TouchableOpacity>
+							
 						</View>
+						
 					</View>
+					<View style={{flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10}}>
+							<Text style={{marginRight: 5}}>Add to calendar</Text>
+							<Switch 
+							value={this.state.addToCalendar}
+							onValueChange={(val)=> {
+								this.setState({addToCalendar: val})
+								if (val) {
+									RNCalendarEvents.authorizeEventStore().then(result => {
+										this.setState({addToCalendar: result == 'authorized' })
+									})
+									.catch(e => {
+										Alert.alert('Error', error.message)
+										this.setState({addToCalendar: false})
+									})
+								}
+								}}
+							/>
+							</View>
 
 
 					<View style={{flex: 2, borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
@@ -261,6 +287,17 @@ class SessionDetail extends Component {
 				}
 				firebase.database().ref('sessionChats/' + key).push(systemMessage)
 				this.props.onCreate(key, session.private)
+				if (this.state.addToCalendar) {
+					let endDate = new Date(this.state.date)
+					endDate.setHours(endDate.getHours()+this.state.duration)
+					RNCalendarEvents.saveEvent(this.title, {
+						//calendarId: '141',
+						startDate: new Date(this.state.date).toString(),
+						endDate: endDate.toString(),
+						location: this.state.formattedAddress,
+						notes: this.details,
+					  }) 
+				}
 			})
 			.catch(err => {
 				Alert.alert('Error', err.message)

@@ -13,6 +13,7 @@
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
 		00E356F31AD99517003FC87E /* AnyoneTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* AnyoneTests.m */; };
+		0A12E3EB218F402F009424C7 /* libRNCalendarEvents.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A12E3E2218F401E009424C7 /* libRNCalendarEvents.a */; };
 		0A19E29D20376EB60036DFF2 /* libreact-native-fcm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A19E24820376D230036DFF2 /* libreact-native-fcm.a */; };
 		0A19E30B203771B50036DFF2 /* libreact-native-geocoder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A19E24A20376D230036DFF2 /* libreact-native-geocoder.a */; };
 		0A1F21CF210A909500896D4A /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1F2140210A8E1800896D4A /* libRCTWebSocket.a */; };
@@ -106,6 +107,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = Anyone;
+		};
+		0A12E3E1218F401E009424C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A12E395218F401E009424C7 /* RNCalendarEvents.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BEC43C6A1C723089001221C6;
+			remoteInfo = RNCalendarEvents;
 		};
 		0A19E24520376D230036DFF2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -665,6 +673,7 @@
 		00E356EE1AD99517003FC87E /* AnyoneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnyoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* AnyoneTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnyoneTests.m; sourceTree = "<group>"; };
+		0A12E395218F401E009424C7 /* RNCalendarEvents.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCalendarEvents.xcodeproj; path = "../node_modules/react-native-calendar-events/RNCalendarEvents.xcodeproj"; sourceTree = "<group>"; };
 		0A19E27120376D310036DFF2 /* Anyone.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Anyone.entitlements; path = Anyone/Anyone.entitlements; sourceTree = "<group>"; };
 		0A19E2C420376ED50036DFF2 /* RNFIRMessaging.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFIRMessaging.xcodeproj; path = "../node_modules/react-native-fcm/ios/RNFIRMessaging.xcodeproj"; sourceTree = "<group>"; };
 		0A1F229A210C9BE600896D4A /* light.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = light.mp3; path = ../../../../Downloads/light.mp3; sourceTree = "<group>"; };
@@ -740,6 +749,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A12E3EB218F402F009424C7 /* libRNCalendarEvents.a in Frameworks */,
 				0A7CE457218693AC00CEB53A /* libRCTPushNotification.a in Frameworks */,
 				0A4320CF216FBDA000C79596 /* libRNVersionNumber.a in Frameworks */,
 				0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */,
@@ -848,6 +858,14 @@
 				00E356F11AD99517003FC87E /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		0A12E396218F401E009424C7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A12E3E2218F401E009424C7 /* libRNCalendarEvents.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		0A19E2C520376ED50036DFF2 /* Products */ = {
@@ -1082,6 +1100,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				0A12E395218F401E009424C7 /* RNCalendarEvents.xcodeproj */,
 				0A7CE44E2186939A00CEB53A /* RCTPushNotification.xcodeproj */,
 				0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */,
 				0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */,
@@ -1403,6 +1422,10 @@
 					ProjectRef = 0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */;
 				},
 				{
+					ProductGroup = 0A12E396218F401E009424C7 /* Products */;
+					ProjectRef = 0A12E395218F401E009424C7 /* RNCalendarEvents.xcodeproj */;
+				},
+				{
 					ProductGroup = 0AB463642113AB24003C51E2 /* Products */;
 					ProjectRef = A9305896DB9F47359A33ECC5 /* RNFirebase.xcodeproj */;
 				},
@@ -1475,6 +1498,13 @@
 			fileType = archive.ar;
 			path = libRCTVibration.a;
 			remoteRef = 00C302E31ABCB9EE00DB3ED1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A12E3E2218F401E009424C7 /* libRNCalendarEvents.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNCalendarEvents.a;
+			remoteRef = 0A12E3E1218F401E009424C7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A19E24620376D230036DFF2 /* libProtobuf.a */ = {
