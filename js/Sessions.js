@@ -8,7 +8,8 @@ import {
   ScrollView,
   Linking,
   Slider,
-  Platform
+  Platform,
+  Dimensions
 } from "react-native"
 import {
   Container,
@@ -21,6 +22,7 @@ import {
   ActionSheet,
   Left,
   Right,
+  Content
 } from 'native-base'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
@@ -40,6 +42,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { isIphoneX } from 'react-native-iphone-x-helper'
 import {Image as SlowImage } from 'react-native'
 import { formatDateTime } from './constants/utils'
+import SegmentedControlTab from 'react-native-segmented-control-tab'
 
  class Sessions extends Component {
 
@@ -74,6 +77,7 @@ import { formatDateTime } from './constants/utils'
       places: [],
       sessionKeys: [],
       searchMultiplier: 1,
+      selectedIndex: 0,
     }
   }
 
@@ -166,13 +170,9 @@ import { formatDateTime } from './constants/utils'
             <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
           </View>
         </Right>
-
         </Header>
-
-
-
-
-        {!this.state.switch && this.renderSessions(this.state.sessions)}
+        <Content contentContainerStyle={{flex: 1}}>
+        {!this.state.switch && this.renderLists()}
 
         {this.state.switch && this.state.showMap && <MapView
           style={styles.map}
@@ -279,7 +279,11 @@ import { formatDateTime } from './constants/utils'
             </TouchableOpacity>
           </View>
         </Modal>
-        <Modal style={[styles.modal, {height: null}]} position={'center'} ref={"locationModal"} >
+        <Modal
+          style={[styles.modal, {height: null}]} 
+          position={'center'} 
+          ref={"locationModal"} 
+          onClosed={()=> this.setState({loadedGymImage: false})}>
           {this.state.selectedLocation && <View>
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
           {this.state.selectedLocation.name}</Text>
@@ -304,6 +308,10 @@ import { formatDateTime } from './constants/utils'
               <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
               {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
             {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
+            {/*<TouchableOpacity onPress={()=> this.getPosition(true)}
+            style={{marginVertical: 5}}>
+              <Text style={{color: colors.secondary}}>Get directions</Text>
+            </TouchableOpacity>*/}
             {this.props.profile.gym == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your gym</Text>
@@ -317,7 +325,14 @@ import { formatDateTime } from './constants/utils'
               style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
               <Text style={{color: '#fff'}}>Set as your gym</Text>
               </TouchableOpacity>}
-            {this.state.locationPhoto && <Image style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} resizeMode={'contain'} source={{uri: this.state.locationPhoto}}/>}
+            {this.state.locationPhoto ?
+            this.state.loadedGymImage ? <Image 
+              style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} 
+             resizeMode={'contain'} 
+             source={{uri: this.state.locationPhoto}}/> : 
+             <View style={{alignItems: 'center', justifyContent: 'center', height: 200}}>
+              <Spinner color={colors.secondary} size={'small'}/>
+              </View> : null}
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
               <TouchableOpacity
               onPress={()=> {
@@ -371,6 +386,7 @@ import { formatDateTime } from './constants/utils'
               </TouchableOpacity>
             </View>
         </Modal>
+        </Content>
       </Container>
       )
   }
@@ -526,9 +542,21 @@ import { formatDateTime } from './constants/utils'
             )
   }
 
-  renderSessions(sessions) {
-          return <FlatList
-          style={{backgroundColor: '#9993', marginTop: 43}}
+  renderLists() {
+          return <View style={{flex: 1, marginTop: 45}}>
+          <SegmentedControlTab
+            values={['Sessions', 'Gyms near you']}
+            selectedIndex={this.state.selectedIndex}
+            onTabPress={(index)=> {
+              this.setState({selectedIndex: index})
+            }}
+            tabsContainerStyle={{marginHorizontal:8, marginVertical: 5}}
+            tabStyle={{borderColor:colors.secondary}}
+            tabTextStyle={{color:colors.secondary}}
+            activeTabStyle={{backgroundColor:colors.secondary}}
+            />
+          {this.state.selectedIndex == 0 ? <FlatList
+          style={{backgroundColor: '#9993'}}
           contentContainerStyle={{flex: 1}}
           refreshing={this.state.refreshing}
           onRefresh={()=> {
@@ -540,13 +568,13 @@ import { formatDateTime } from './constants/utils'
             <Text style={{color: colors.primary, textAlign: 'center'}}>
             No sessions have been created yet, also please make sure you are connected to the internet
           </Text></View>}
-          data={sessions}
+          data={this.state.sessions}
           keyExtractor={(item) => item.key}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <TouchableOpacity onPress={() => {
                 this.setState({selectedSession: item}, ()=> this.refs.modal.open())
             }}>
-              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
                 <View style={{flexDirection: 'row'}} >
 
                   <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
@@ -574,7 +602,52 @@ import { formatDateTime } from './constants/utils'
               </View>
             </TouchableOpacity>
           )}
-      />
+      /> : <FlatList 
+            data={this.state.gyms}
+            style={{backgroundColor: '#9993'}}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item, index }) => {
+              console.log(item)
+              const { lat, lng } = item.geometry.location
+              return <TouchableOpacity onPress={() => {
+                this.setState({selectedLocation: item, latitude: lat, longitude: lng},
+                    ()=> {
+                      //this.refs.locationModal.open()
+                      fetchPhotoPath(item).then(path => {
+                          this.setState({locationPhoto: path, loadedGymImage: true}, ()=> this.refs.locationModal.open())
+                      })
+                    })
+            }}>
+              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
+                <View style={{flexDirection: 'row'}} >
+
+                    <View style={{flex: 1}}>
+                      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                        <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
+                        <Text style={{color: '#999', flex: 1, textAlign: 'right'}}>{' (' +  this.getDistance(item, true) + ' km away)'}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                      {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/></View>}</View>
+                      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                        <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
+                        <TouchableOpacity onPress={()=>{
+                          this.setState({longitude: lng, latitude: lat, switch: true})
+                        }}
+                        style={{flex: 1}}>
+                          <Text style={{color: colors.secondary, textAlign: 'right'}}>View on map</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <Text style={{color: item.opening_hours && item.opening_hours.open_now ? colors.secondary : '#999'}}>
+                      {item.opening_hours && item.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          }}
+
+
+      />}
+      </View>
     }
 
   markers(sessions) {
@@ -675,15 +748,16 @@ import { formatDateTime } from './constants/utils'
                   event.stopPropagation()
                   this.setState({selectedLocation: result, latitude: lat, longitude: lng},
                     ()=> {
+                      //this.refs.locationModal.open()
                       fetchPhotoPath(result).then(path => {
-                          this.setState({locationPhoto: path}, ()=> this.refs.locationModal.open())
+                          this.setState({locationPhoto: path, loadedGymImage: true}, ()=> this.refs.locationModal.open() )
                       })
                     })
                 }}
                 />
                 )
             })
-            this.setState({pointsOfInterest: markers})
+            this.setState({pointsOfInterest: markers, gyms: results})
 
           })
 
@@ -747,8 +821,13 @@ import { formatDateTime } from './constants/utils'
       return <Text style={{fontWeight: 'bold'}}>You</Text>
     }
     else if (host.username) {
-      return <TouchableOpacity>
+      return <TouchableOpacity onPress={()=> this.props.viewProfile(host.uid)}>
               <Text style={{color: colors.secondary}}>{host.username}</Text>
+            </TouchableOpacity>
+    }
+    else if (this.props.users[host.uid]) {
+      return <TouchableOpacity onPress={()=> this.props.viewProfile(host.uid)}>
+              <Text style={{color: colors.secondary}}>{this.props.users[host.uid].username}</Text>
             </TouchableOpacity>
     }
     else return <Text>N/A</Text>
@@ -875,7 +954,7 @@ export const GooglePlacesInput = (_this) => {
         },
         container: {
           position: 'absolute',
-          top: getMarginNeeded(),
+          //top: getMarginNeeded(),
           width: '100%',
           backgroundColor: '#fff'
         },
@@ -941,21 +1020,23 @@ const fetchPhotoPath = (result) => {
 
 
 import { connect } from 'react-redux'
-import { navigateMessagingSession, navigateSessionType, navigateTestScreen } from 'Anyone/js/actions/navigation'
+import { navigateMessagingSession, navigateSessionType, navigateTestScreen, navigateProfileView } from 'Anyone/js/actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
 import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
 import { setGym, removeGym } from 'Anyone/js/actions/profile'
 
-const mapStateToProps = ({ friends, profile, chats, sessions }) => ({
+const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => ({
   friends: friends.friends,
   profile: profile.profile,
   chats: chats.sessionChats,
   sessions: sessions.sessions,
   privateSessions: sessions.privateSessions,
+  users: sharedInfo.users
 })
 
 const mapDispatchToProps = dispatch => ({
   setGym: (id) => dispatch(setGym(id)),
+  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   removeGym: () => dispatch(removeGym()),
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   onJoin: (session, isPrivate) => {
