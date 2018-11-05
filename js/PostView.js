@@ -344,7 +344,7 @@ class PostView extends Component {
           key={like.user_id + ""}
         >
           <View style={[cStyles.likeContainer]}>
-            <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
+            {like.image ? <Image style={[cStyles.likeImage]} source={{ uri: like.image }} /> : <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary, }} />}
             <Text style={[cStyles.likeName]}>{like.username}</Text>
           </View>
         </TouchableOpacity>
