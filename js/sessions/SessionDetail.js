@@ -23,6 +23,7 @@ import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/js/constants/colors'
 import TouchableOpacity from 'Anyone/js/constants/TouchableOpacityLockable'
 import RNCalendarEvents from 'react-native-calendar-events'
+import { guid } from '../constants/utils'
 
 
 class SessionDetail extends Component {
@@ -117,10 +118,26 @@ class SessionDetail extends Component {
 							value={this.state.addToCalendar}
 							onValueChange={(val)=> {
 								this.setState({addToCalendar: val})
+								
 								if (val) {
 									RNCalendarEvents.authorizeEventStore().then(result => {
-										this.setState({addToCalendar: result == 'authorized' })
+										if (result == 'authorized') {
+											RNCalendarEvents.findCalendars().then(calendars => {
+  												let validList = calendars.filter(calendar => calendar.allowsModifications)
+												if (validList && validList.length > 0) {
+													this.setState({calendarId: validList[0].id})
+												}
+												else {
+													Alert.alert("Sorry", "You don't have any calendars that allow modification")
+													this.setState({addToCalendar: false})
+												}
+											})
+										}
+										else {
+											this.setState({addToCalendar: false})
+										}
 									})
+										
 									.catch(e => {
 										Alert.alert('Error', error.message)
 										this.setState({addToCalendar: false})
@@ -288,14 +305,18 @@ class SessionDetail extends Component {
 				firebase.database().ref('sessionChats/' + key).push(systemMessage)
 				this.props.onCreate(key, session.private)
 				if (this.state.addToCalendar) {
-					let endDate = new Date(this.state.date)
+					let date = new Date(this.state.date.replace(/-/g, '/'))
+					let  startDate =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+					date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds())
+					let endDate = new Date(startDate)
 					endDate.setHours(endDate.getHours()+this.state.duration)
 					RNCalendarEvents.saveEvent(this.title, {
-						//calendarId: '141',
-						startDate: new Date(this.state.date).toString(),
-						endDate: endDate.toString(),
+						calendarId: this.state.calendarId,
+						startDate: new Date(startDate).toISOString(),
+						endDate: endDate.toISOString(),
 						location: this.state.formattedAddress,
 						notes: this.details,
+						description: this.details
 					  }) 
 				}
 			})
