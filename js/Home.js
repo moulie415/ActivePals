@@ -79,7 +79,6 @@ class Home extends Component {
       spinner: false,
       selectedImage: null,
       showImage: false,
-      fetchAmount: 30,
       commentFetchAmount: 10,
       userFetchAmount: 10,
       refreshing: false,
@@ -366,6 +365,7 @@ componentWillReceiveProps(nextProps) {
   renderFeed() {
     if (Object.values(this.state.feed).length > 0) {
       return <FlatList
+        ref={(ref) => this.feed = ref}
         data={this.sortByDate(Object.values(this.state.feed))}
         keyExtractor={(item) => item.key}
         onRefresh={() => {
@@ -383,12 +383,15 @@ componentWillReceiveProps(nextProps) {
         // }}
         ListFooterComponent={()=> {
           let initial = Object.values(this.state.feed).length
-          if (initial == this.state.fetchAmount && this.state.loadMore) {
-            return <TouchableOpacity 
-              style={{alignItems: 'center'}}
+            if (initial > 29 && this.state.loadMore) {
+            return <Card>
+            <TouchableOpacity 
+              style={{alignItems: 'center', paddingVertical: 10}}
               onPress={()=> {
-                this.setState({fetchAmount: this.state.fetchAmount+15, spinner: true}, () => {
-                  this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
+                let feed = Object.keys(this.state.feed)
+                let startAt = feed[feed.length-1]
+                this.setState({spinner:  true}, () => {
+                  this.props.getPosts(this.props.profile.uid, 30, startAt)
                   .then(() => {
                     if (Object.values(this.state.feed).length == initial) {
                       this.setState({loadMore: false})
@@ -398,7 +401,7 @@ componentWillReceiveProps(nextProps) {
                 })
               }}>
             <Text style={{color: colors.secondary}}>Load more</Text>
-            </TouchableOpacity>
+            </TouchableOpacity></Card> 
           }
           else return null
         }}
@@ -713,7 +716,7 @@ const mapDispatchToProps = dispatch => ({
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   repComment: (comment) => dispatch(repComment(comment)),
-  getPosts: (uid, amount) => dispatch(fetchPosts(uid, amount)),
+  getPosts: (uid, amount, startAt) => dispatch(fetchPosts(uid, amount, startAt)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit)),
   onNotificationPress: () => dispatch(navigateNotifications()),

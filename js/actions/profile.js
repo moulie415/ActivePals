@@ -75,7 +75,7 @@ export const doSetup = (profile) => {
 			dispatch(fetchFriends(friends)),
 			profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),
 			profile.chats && dispatch(fetchChats(profile.chats)),
-			dispatch(fetchPosts(uid, 30)),
+			dispatch(fetchPosts(uid)),
 			dispatch(fetchSessions()),
 			])
 	}

@@ -96,11 +96,11 @@ export const fetchPost = (key) => {
 }
 
 
-export const fetchPosts = (uid, amount = 30) => {
+export const fetchPosts = (uid, amount = 30, startAt = null) => {
 	return (dispatch, getState) => {
 		let promises = []
 		return new Promise(resolve => {
-			firebase.database().ref('userPosts/' + uid).orderByKey().limitToLast(amount).on('value', snapshot => {
+			firebase.database().ref('userPosts/' + uid).orderByKey().endAt(startAt).limitToLast(amount).on('value', snapshot => {
 				if (snapshot.val()) {
 					Object.keys(snapshot.val()).forEach(post => {
 						promises.push(firebase.database().ref('posts/' + post).once('value'))

@@ -39,7 +39,7 @@ export const fetchFriends = (uids) => {
 	return (dispatch, getState) => {
 		let friends = []
 		if (!uids) {
-			uids = getState().friends.friends
+			uids = getState().profile.profile.friends
 		}
 		if (uids) {
 		Object.keys(uids).forEach(friend => {
