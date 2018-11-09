@@ -121,9 +121,6 @@ PODS:
     - React
     - SDWebImage/Core
     - SDWebImage/GIF
-  - react-native-fcm (16.2.3):
-    - Firebase/Messaging
-    - React
   - react-native-geocoder (0.5.0):
     - React
   - react-native-google-maps (0.21.0):
@@ -189,7 +186,6 @@ DEPENDENCIES:
   - Google/SignIn
   - GoogleMaps
   - react-native-fast-image (from `../node_modules/react-native-fast-image`)
-  - react-native-fcm (from `../node_modules/react-native-fcm`)
   - react-native-geocoder (from `../node_modules/react-native-geocoder`)
   - react-native-google-maps (from `../node_modules/react-native-maps`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
@@ -250,8 +246,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   react-native-fast-image:
     :path: "../node_modules/react-native-fast-image"
-  react-native-fcm:
-    :path: "../node_modules/react-native-fcm"
   react-native-geocoder:
     :path: "../node_modules/react-native-geocoder"
   react-native-google-maps:
@@ -304,7 +298,6 @@ SPEC CHECKSUMS:
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
   React: 1fe0eb13d90b625d94c3b117c274dcfd2e760e11
   react-native-fast-image: cba3d9bf9c2cf8ddb643d887a686c53a5dd90a2c
-  react-native-fcm: 7de3ba1108aba709c3d2b4237594554eb5f6f026
   react-native-geocoder: 33b16a5929aa868fef37acb4f7ee10a428cd5fff
   react-native-google-maps: 2cfe3b01f8422c7dae51d8764139fd70f888cfce
   react-native-image-picker: b303e31c3c4ada1d7cb1342423d328d2efb07fb3
@@ -316,6 +309,6 @@ SPEC CHECKSUMS:
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
 
-PODFILE CHECKSUM: 28fcb4e78bfc7f9c0837ae50973d341133ff59d7
+PODFILE CHECKSUM: f457a70bc6e68a41443261b3ce1c19c0ecce7fbe
 
 COCOAPODS: 1.5.3

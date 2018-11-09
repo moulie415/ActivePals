@@ -16,7 +16,7 @@ import { persistStore } from 'redux-persist'
 import { createStore, applyMiddleware, compose } from 'redux'
 import reducer from 'Anyone/js/reducers/'
 import thunk from 'redux-thunk'
-import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
+//import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import App from 'Anyone/js/App'
 import { navigateMessaging, navigateMessagingSession, navigateFriends, navigatePostView } from 'Anyone/js/actions/navigation'
 import { newNotification, updateLastMessage } from 'Anyone/js/actions/chats'
@@ -113,11 +113,6 @@ export const store = createStore(
 
 export const persistor = persistStore(store)
 
-FCM.on(FCMEvent.Notification, async (notif) => {
-    if(notif.opened_from_tray){
-      navigateFromNotif(notif)
-    }
-  })
 
 class FitLink extends React.Component {
   componentDidMount() {
@@ -159,7 +154,11 @@ class FitLink extends React.Component {
         let count = getState().profile.profile.unreadCount || 0
         dispatch(setNotificationCount(count+1))
       }
-      showLocalNotification(notification.data)
+
+
+      //if (AppState.currentState == 'background' || Platform.OS == 'android') {
+        showLocalNotification(notification.data)
+      //}
     })
 
     this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification: Notification) => {
@@ -176,7 +175,17 @@ class FitLink extends React.Component {
       const action = notificationOpen.action;
       // Get information about the notification that was opened
       const notification: Notification = notificationOpen.notification;
-      navigateFromNotif(notification.data)
+      let nav = store.getState().nav
+      let routes = nav.routes
+      let route
+      if (routes) {
+        route = routes[nav.index]
+      }
+      if (!route.params || (route.params.chatId != notification.data.chatId &&
+         route.params.session && route.params.session.key != notification.data.sessionId)) {
+          navigateFromNotif(notification.data)
+         }
+     
     })
 
     firebase.notifications().getInitialNotification()

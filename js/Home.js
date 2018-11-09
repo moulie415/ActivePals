@@ -389,9 +389,9 @@ componentWillReceiveProps(nextProps) {
               style={{alignItems: 'center', paddingVertical: 10}}
               onPress={()=> {
                 let feed = Object.keys(this.state.feed)
-                let startAt = feed[feed.length-1]
+                let endAt = feed[feed.length-1]
                 this.setState({spinner:  true}, () => {
-                  this.props.getPosts(this.props.profile.uid, 30, startAt)
+                  this.props.getPosts(this.props.profile.uid, 30, endAt)
                   .then(() => {
                     if (Object.values(this.state.feed).length == initial) {
                       this.setState({loadMore: false})
@@ -716,7 +716,7 @@ const mapDispatchToProps = dispatch => ({
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   repComment: (comment) => dispatch(repComment(comment)),
-  getPosts: (uid, amount, startAt) => dispatch(fetchPosts(uid, amount, startAt)),
+  getPosts: (uid, amount, endAt) => dispatch(fetchPosts(uid, amount, endAt)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit)),
   onNotificationPress: () => dispatch(navigateNotifications()),
