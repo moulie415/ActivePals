@@ -173,23 +173,14 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
         </Right>
         </Header>
         <View 
-        /*refreshControl={
-              <RefreshControl
-            tintColor={colors.secondary}
-            refreshing={this.state.refreshing}
-            onRefresh={()=> {
-            this.setState({refreshing: true})
-            this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
-            this.getPosition()
-          }}
-/>}*/
+
         style={{flex: 1}}>
         {!this.state.switch && this.renderLists()}
 
         {this.state.switch && this.state.showMap && <MapView
           style={styles.map}
-          //onPress={(event)=> this.handlePress(event)}
-          onLongPress={event => this.handlePress(event)}
+          onPress={(event)=> this.handlePress(event)}
+          //onLongPress={event => this.handlePress(event)}
           showsUserLocation={true}
           initialRegion={{
             latitude: this.state.latitude,
@@ -324,7 +315,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             style={{marginVertical: 5}}>
               <Text style={{color: colors.secondary}}>Get directions (opens in browser)</Text>
             </TouchableOpacity>}
-            {this.props.profile.gym == this.state.selectedLocation.place_id ? 
+            {this.props.profile.gym && this.props.profile.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your gym</Text>
               <TouchableOpacity 
@@ -555,6 +546,8 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
   }
 
   renderLists() {
+        const gym = this.props.profile.gym
+        const { lat, lng } = gym.geometry.location
           return <View style={{flex: 1, marginTop: 45}}>
           <SegmentedControlTab
             values={['Sessions', 'Gyms near you']}
@@ -567,6 +560,46 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             tabTextStyle={{color:colors.secondary}}
             activeTabStyle={{backgroundColor:colors.secondary}}
             />
+              {gym && this.state.selectedIndex == 1 && <TouchableOpacity onPress={() => {
+                this.setState({selectedLocation: gym, latitude: lat, longitude: lng},
+                    ()=> {
+                      //this.refs.locationModal.open()
+                      fetchPhotoPath(gym).then(path => {
+                          this.setState({locationPhoto: path, loadedGymImage: true}, ()=> this.refs.locationModal.open())
+                      })
+                    })
+            }}>
+              <View style={{padding: 10, backgroundColor: '#fff', borderWidth: 2, borderColor: colors.secondary}}>
+                <View style={{flexDirection: 'row'}} >
+
+                    <View style={{flex: 1}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <View>
+                      <Text style={{color: colors.secondary}}>Your gym:</Text>
+                      <Text>{gym.name}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                      <TouchableOpacity 
+                      onPress={() => {
+                        console.log('go to gym chat')
+                      }}
+                      style={{justifyContent: 'center', marginRight: 20}}>
+                        <Icon name='md-chatboxes' style={{color: colors.secondary}}/>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                      onPress={() => {
+                        console.log('go to detail screen')
+                      }}
+                      style={{justifyContent: 'center'}}>
+                        <Icon name='ios-paper' style={{color: colors.secondary}}/>
+                      </TouchableOpacity>
+                      </View>
+                    </View>
+
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>}
           {this.state.selectedIndex == 0 ? <FlatList
           style={{backgroundColor: '#9993'}}
           refreshing={this.state.refreshing}
@@ -624,7 +657,6 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             style={{backgroundColor: '#9993'}}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
-              console.log(item)
               const { lat, lng } = item.geometry.location
               return <TouchableOpacity onPress={() => {
                 this.setState({selectedLocation: item, latitude: lat, longitude: lng},
@@ -643,8 +675,6 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
                         <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
                         <Text style={{color: '#999', flex: 1, textAlign: 'right'}}>{' (' +  this.getDistance(item, true) + ' km away)'}</Text>
                       </View>
-                      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                      {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/></View>}</View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
                         <TouchableOpacity onPress={()=>{
@@ -692,8 +722,6 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
     })
     return markers
   }
-
- 
 
   // This is a common pattern when asking for permissions.
   // iOS only gives you once chance to show the permission dialog,
@@ -902,7 +930,7 @@ setGym(location) {
       firebase.database().ref('gyms/' + gym.val().place_id).child('userCount').set(count)
       firebase.database().ref('gyms/' + gym.val().place_id + '/users').child(this.props.profile.uid).set(true)
     }
-    this.props.setGym(location.place_id)
+    this.props.setGym(location)
   })
 }
 

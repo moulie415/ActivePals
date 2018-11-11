@@ -31,7 +31,7 @@ export default function(state = initialState, action) {
 		case SET_GYM:
 			return {
 				...state,
-				profile: {...state.profile, gym: action.id},
+				profile: {...state.profile, gym: action.gym},
 			}
 		case REMOVE_GYM:
 			return {

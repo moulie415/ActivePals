@@ -25,9 +25,9 @@ export const setLoggedOut = () => ({
 	type: SET_LOGGED_OUT,
 })
 
-export const setGym = (id) => ({
+export const setGym = (gym) => ({
 	type: SET_GYM,
-	id,
+	gym,
 })
 
 export const resetGym = () => ({
@@ -43,13 +43,24 @@ export const fetchProfile = () => {
 				firebase.storage().ref('images/' + user.uid ).child('avatar').getDownloadURL()
 				.then(url => {
 					dispatch(setProfile({...snapshot.val(), avatar: url}))
+					fetchGym(snapshot.val(), dispatch)
 					resolve({...snapshot.val(), avatar: url})
 				})
 				.catch(e => {
 					dispatch(setProfile(snapshot.val()))
+					fetchGym(snapshot.val(), dispatch)
 					resolve(snapshot.val())
 				})
+				
 			})
+		})
+	}
+}
+
+const fetchGym = (profile, dispatch) => {
+	if (profile.gym) {
+		firebase.database().ref('gyms/' + profile.gym).once('value', gym => {
+			dispatch(setGym(gym.val()))
 		})
 	}
 }

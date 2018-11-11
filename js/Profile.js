@@ -54,11 +54,6 @@ import RNPickerSelect from 'react-native-picker-select'
     .then(backdrop => this.setState({backdrop, initialBackdrop: backdrop}))
     .catch(e => console.log(e))
 
-    if (this.profile.gym) {
-      firebase.database().ref('gyms/' + this.profile.gym).once('value', gym => {
-        this.setState({gym: gym.val()})
-      })
-    }
 
     this.user = null
     this.state = {
@@ -68,6 +63,7 @@ import RNPickerSelect from 'react-native-picker-select'
       spinner: false,
       initialAvatar: this.profile.avatar,
       avatar: this.profile.avatar,
+      gym: this.profile.gym
     }
   }
 
@@ -93,13 +89,7 @@ import RNPickerSelect from 'react-native-picker-select'
   componentWillReceiveProps(nextProps) {
     if (nextProps.profile) {
       let profile = nextProps.profile
-      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar})
-      if (nextProps.profile.gym) {
-        firebase.database().ref('gyms/' + nextProps.profile.gym).once('value', gym => {
-          this.setState({gym: gym.val()})
-        })
-      }
-      else this.setState({gym: null})
+      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar, gym: profile.gym})
     }
   }
 

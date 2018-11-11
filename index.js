@@ -177,7 +177,7 @@ class FitLink extends React.Component {
       const notification: Notification = notificationOpen.notification;
       let nav = store.getState().nav
       let routes = nav.routes
-      let route
+      let route = {}
       if (routes) {
         route = routes[nav.index]
       }
