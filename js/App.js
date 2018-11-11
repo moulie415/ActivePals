@@ -23,6 +23,7 @@ import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
 import FilePreview from './FilePreview'
 import Notifications from './notifications'
+import Gym from './Gym'
 import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
@@ -110,7 +111,8 @@ export const Stack = StackNavigator({
   FilePreview: {screen : FilePreview },
   ProfileView: { screen: ProfileView },
   PostView: { screen: PostView },
-  Notifications: { screen: Notifications }
+  Notifications: { screen: Notifications },
+  Gym: { screen: Gym }
 })
 
 class App extends React.Component {

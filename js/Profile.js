@@ -63,7 +63,7 @@ import RNPickerSelect from 'react-native-picker-select'
       spinner: false,
       initialAvatar: this.profile.avatar,
       avatar: this.profile.avatar,
-      gym: this.profile.gym
+      gym: this.props.gym
     }
   }
 
@@ -89,7 +89,10 @@ import RNPickerSelect from 'react-native-picker-select'
   componentWillReceiveProps(nextProps) {
     if (nextProps.profile) {
       let profile = nextProps.profile
-      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar, gym: profile.gym})
+      this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar})
+    }
+    if (nextProps.gym) {
+      this.setState({gym: nextProps.gym})
     }
   }
 
@@ -499,6 +502,7 @@ import { fetchProfile, setLoggedOut } from 'Anyone/js/actions/profile'
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile,
+  gym: profile.gym
 })
 
 const mapDispatchToProps = dispatch => ({

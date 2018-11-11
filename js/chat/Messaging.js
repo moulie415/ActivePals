@@ -156,7 +156,7 @@ class Messaging extends React.Component {
     return (
       <Container style={{flex: 1, backgroundColor: '#9993'}}>
       <Header style={{backgroundColor: colors.primary}}>
-        <Left style={{flex: 1}}>
+        <Left>
           <TouchableOpacity onPress={() => {
             navigation.goBack()
           } }>
@@ -164,9 +164,9 @@ class Messaging extends React.Component {
           </TouchableOpacity>
           </Left>
         <Text numberOfLines={1}
-        style={{alignSelf: 'center', flex: 1, color: '#fff', textAlign: 'center', fontFamily: 'Avenir'}}>
+        style={{alignSelf: 'center', color: '#fff', textAlign: 'center', fontFamily: 'Avenir', maxWidth: 250}}>
         {this.friendUsername || this.sessionTitle}</Text>
-        <Right style={{flex: 1}}/>
+        <Right/>
       </Header>
         <GiftedChat
           messages={this.state.messages}

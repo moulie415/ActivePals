@@ -253,10 +253,13 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
               <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
                 this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
             </Text>
-            <TouchableOpacity onPress={()=> this.getPosition(true)}
-            style={{marginVertical: 5}}>
-              <Text style={{color: colors.secondary}}>Get directions (opens in browser)</Text>
-            </TouchableOpacity>
+            <View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center'}}>
+              <TouchableOpacity onPress={()=> this.getPosition(true)}
+              style={{backgroundColor: colors.secondary, padding: 5, marginRight: 10}}>
+                <Text style={{color: '#fff'}}>Get directions</Text>
+              </TouchableOpacity>
+              <Text style={{color: '#999'}}>(opens in browser)</Text>
+            </View>
             </ScrollView>
              {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>}
             </View>}
@@ -295,6 +298,13 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             <Text>{this.state.selectedLocation.vicinity}</Text>
             <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
             </Text>
+            {<View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center'}}>
+              <TouchableOpacity onPress={()=> this.getPosition(true, true)}
+              style={{backgroundColor: colors.secondary, padding: 5, marginRight: 10}}>
+                <Text style={{color: '#fff'}}>Get directions</Text>
+              </TouchableOpacity>
+              <Text style={{color: '#999'}}>(opens in browser)</Text>
+            </View>}
             {this.state.selectedLocation.rating && <View style={{flexDirection: 'row'}}>
               <Text style={{marginVertical: 5}}>Google rating: </Text>
             <StarRating
@@ -311,11 +321,8 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
               <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
               {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
             {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
-            {<TouchableOpacity onPress={()=> this.getPosition(true, true)}
-            style={{marginVertical: 5}}>
-              <Text style={{color: colors.secondary}}>Get directions (opens in browser)</Text>
-            </TouchableOpacity>}
-            {this.props.profile.gym && this.props.profile.gym.place_id == this.state.selectedLocation.place_id ? 
+            
+            {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your gym</Text>
               <TouchableOpacity 
@@ -546,7 +553,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
   }
 
   renderLists() {
-        const gym = this.props.profile.gym
+        const gym = this.props.gym
         const { lat, lng } = gym.geometry.location
           return <View style={{flex: 1, marginTop: 45}}>
           <SegmentedControlTab
@@ -560,16 +567,8 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             tabTextStyle={{color:colors.secondary}}
             activeTabStyle={{backgroundColor:colors.secondary}}
             />
-              {gym && this.state.selectedIndex == 1 && <TouchableOpacity onPress={() => {
-                this.setState({selectedLocation: gym, latitude: lat, longitude: lng},
-                    ()=> {
-                      //this.refs.locationModal.open()
-                      fetchPhotoPath(gym).then(path => {
-                          this.setState({locationPhoto: path, loadedGymImage: true}, ()=> this.refs.locationModal.open())
-                      })
-                    })
-            }}>
-              <View style={{padding: 10, backgroundColor: '#fff', borderWidth: 2, borderColor: colors.secondary}}>
+              {gym && this.state.selectedIndex == 1 && 
+              <View style={{padding: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: colors.secondary}}>
                 <View style={{flexDirection: 'row'}} >
 
                     <View style={{flex: 1}}>
@@ -581,14 +580,14 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
                     <View style={{flexDirection: 'row'}}>
                       <TouchableOpacity 
                       onPress={() => {
-                        console.log('go to gym chat')
+                          console.log('go to gym chat')
                       }}
                       style={{justifyContent: 'center', marginRight: 20}}>
                         <Icon name='md-chatboxes' style={{color: colors.secondary}}/>
                       </TouchableOpacity>
                       <TouchableOpacity 
                       onPress={() => {
-                        console.log('go to detail screen')
+                        this.props.viewGym(gym.place_id)
                       }}
                       style={{justifyContent: 'center'}}>
                         <Icon name='ios-paper' style={{color: colors.secondary}}/>
@@ -598,8 +597,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
 
                   </View>
                 </View>
-              </View>
-            </TouchableOpacity>}
+              </View>}
           {this.state.selectedIndex == 0 ? <FlatList
           style={{backgroundColor: '#9993'}}
           refreshing={this.state.refreshing}
@@ -846,6 +844,8 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
     })
   }
 
+
+
   getDirections(gym) {
     if (this.state.yourLocation) {
       let lat2, lng2
@@ -915,7 +915,7 @@ getDistance(item, gym = false) {
 }
 
 setGym(location) {
-  if (this.props.profile.gym) {
+  if (this.props.gym) {
     this.props.removeGym()
   }
   firebase.database().ref('users/' + this.props.profile.uid).child('gym').set(location.place_id)
@@ -1006,7 +1006,6 @@ export const GooglePlacesInput = (_this) => {
         },
         container: {
           position: 'absolute',
-          //top: getMarginNeeded(),
           width: '100%',
           backgroundColor: '#fff'
         },
@@ -1040,16 +1039,7 @@ export const GooglePlacesInput = (_this) => {
   );
 }
 
-const getMarginNeeded = () => {
-  if (Platform.OS == 'android') {
-      return 55
-  }
-  else {
-    return isIphoneX() ? 87 : 63
-  }
-}
-
-const fetchPhotoPath = (result) => {
+export const fetchPhotoPath = (result) => {
   return new Promise(resolve => {
     if (result.photos && result.photos[0].photo_reference) {
       let url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
@@ -1072,7 +1062,13 @@ const fetchPhotoPath = (result) => {
 
 
 import { connect } from 'react-redux'
-import { navigateMessagingSession, navigateSessionType, navigateTestScreen, navigateProfileView } from 'Anyone/js/actions/navigation'
+import {
+  navigateMessagingSession,
+  navigateSessionType,
+  navigateTestScreen,
+  navigateProfileView,
+  navigateGym
+} from 'Anyone/js/actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
 import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
 import { setGym, removeGym } from 'Anyone/js/actions/profile'
@@ -1080,6 +1076,7 @@ import { setGym, removeGym } from 'Anyone/js/actions/profile'
 const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => ({
   friends: friends.friends,
   profile: profile.profile,
+  gym: profile.gym,
   chats: chats.sessionChats,
   sessions: sessions.sessions,
   privateSessions: sessions.privateSessions,
@@ -1099,6 +1096,7 @@ const mapDispatchToProps = dispatch => ({
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
   fetch: (radius, update = false) => {return Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())])},
+  viewGym: (id) => dispatch(navigateGym(id)),
   test: () => dispatch(navigateTestScreen()),
 })
 

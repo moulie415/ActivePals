@@ -13,6 +13,7 @@ import {
 
 const initialState = {
 	profile: {},
+	gym: {},
 	loggedIn: false,
 }
 
@@ -31,12 +32,12 @@ export default function(state = initialState, action) {
 		case SET_GYM:
 			return {
 				...state,
-				profile: {...state.profile, gym: action.gym},
+				gym:  action.gym,
 			}
 		case REMOVE_GYM:
 			return {
 				...state,
-				profile: {...state.profile, gym: null}
+				gym: null
 			}
 		case SET_NOTIFICATION_COUNT:
 			if (Platform.OS == 'ios') {
