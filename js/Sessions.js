@@ -324,17 +324,34 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your gym</Text>
+              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
               <TouchableOpacity 
               onPress={() => this.props.removeGym()}
-              style={{padding: 5, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red'}}>
+              style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red'}}>
               <Text style={{color: '#fff'}}>Remove as your gym</Text>
               </TouchableOpacity></View> :
-              <TouchableOpacity
-              onPress={()=> this.setGym(this.state.selectedLocation)}
-              style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
-              <Text style={{color: '#fff'}}>Set as your gym</Text>
-              </TouchableOpacity>}
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <TouchableOpacity
+                onPress={()=> this.setGym(this.state.selectedLocation)}
+                style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
+                <Text style={{color: '#fff'}}>Set as your gym</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                onPress={()=> this.props.viewGym(this.state.selectedLocation.place_id)}
+                style={{
+                  backgroundColor: colors.secondary,
+                  padding: 5,
+                  paddingHorizontal: 8,
+                  alignSelf: 'center',
+                  alignItems: 'center',
+                  marginBottom: 10,
+                  flexDirection: 'row',
+                  justifyContent: 'center'
+                  }}>
+                <Text style={{color: '#fff', marginRight: 10}}>View detail</Text>
+                <Icon name={'ios-paper'} style={{color: '#fff'}}/>
+                </TouchableOpacity>
+              </View>}
             {this.state.locationPhoto ?
             this.state.loadedGymImage ? <Image 
               style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} 
@@ -553,8 +570,12 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
   }
 
   renderLists() {
-        const gym = this.props.gym
-        const { lat, lng } = gym.geometry.location
+    let gym, lat, lng
+      if (this.props.gym) {
+        gym = this.props.gym
+        lat = gym.geometry.location.lat
+        lng = gym.geometry.location.lng
+      }
           return <View style={{flex: 1, marginTop: 45}}>
           <SegmentedControlTab
             values={['Sessions', 'Gyms near you']}

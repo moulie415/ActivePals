@@ -22,6 +22,7 @@ import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
 import { Image as SlowImage } from 'react-native'
 import { fetchPhotoPath } from './Sessions'
+import Hyperlink from 'react-native-hyperlink'
 
 
 
@@ -77,7 +78,7 @@ import { fetchPhotoPath } from './Sessions'
           resizeMode='cover'
           source={{uri: this.state.photo}} /> :
           <View style={{height: 150, width: '100%', backgroundColor: colors.primaryLighter, justifyContent: 'center'}}/>}
-          <SlowImage 
+          {<SlowImage 
             style={{width: 80,
             padding: 10,
             height: 80,
@@ -86,9 +87,13 @@ import { fetchPhotoPath } from './Sessions'
             borderWidth: 1,
             borderColor: colors.secondary,
             backgroundColor: '#fff'}}
-            source={require('Anyone/assets/images/dumbbell.png')}/>
+            source={require('Anyone/assets/images/dumbbell.png')}/>}
           </View>
-        {this.state.loaded ? <View style={{flex: 1, justifyContent: 'space-between'}}>
+        {this.state.loaded ? <View>
+            <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{this.state.gym.name}</Text>
+            {this.state.gym.website && <Hyperlink linkDefault={true}>
+            <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
+        <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{this.state.gym.website}</Text></Text></Hyperlink>}
         </View> : <View style={hStyles.spinner}><Spinner color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
 
