@@ -991,7 +991,7 @@ export const GooglePlacesInput = (_this) => {
                   event.stopPropagation()
                   _this.setState({selectedLocation: details, latitude: location.lat, longitude: location.lng},
                     ()=> {
-                          _this.setState({locationPhoto: path}, ()=> _this.refs.locationModal.open())
+                          _this.setState({locationPhoto: path, loadedGymImage: true}, ()=> _this.refs.locationModal.open())
                     })
                 }}
                 />
@@ -999,6 +999,7 @@ export const GooglePlacesInput = (_this) => {
             _this.setState({
               selectedLocation: details,
               locationPhoto: path,
+              loadedGymImage: true,
               latitude: location.lat,
               longitude: location.lng,
               spinner: false,
