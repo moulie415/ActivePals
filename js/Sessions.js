@@ -324,17 +324,38 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
+              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Currently your active gym</Text>
               <TouchableOpacity 
-              onPress={() => this.props.removeGym()}
+              onPress={() => {
+                Alert.alert(
+                      'Leave Gym',
+                      'Are you sure?',
+                      [
+                          {text: 'Cancel', style: 'cancel'},
+                          {text: 'Yes', onPress: () => this.props.removeGym(), style: 'destructive'}
+                      ]
+                  )
+                }}
               style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red'}}>
-              <Text style={{color: '#fff'}}>Remove as your gym</Text>
+              <Text style={{color: '#fff'}}>Leave Gym</Text>
               </TouchableOpacity></View> :
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <TouchableOpacity
-                onPress={()=> this.setGym(this.state.selectedLocation)}
+                onPress={()=> {
+                  if (this.props.gym) {
+                        Alert.alert(
+                        'Join Gym',
+                        'This will leave your current Gym?',
+                        [
+                            {text: 'Cancel', style: 'cancel'},
+                            {text: 'Yes', onPress: () => this.props.join(this.state.selectedLocation)}
+                        ]
+                    )
+                    }
+                    else this.props.join(this.state.selectedLocation)
+                  }}
                 style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
-                <Text style={{color: '#fff'}}>Set as your gym</Text>
+                <Text style={{color: '#fff'}}>Join Gym</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                 onPress={()=> this.props.viewGym(this.state.selectedLocation.place_id)}
@@ -935,26 +956,6 @@ getDistance(item, gym = false) {
   else return 'unknown'
 }
 
-setGym(location) {
-  if (this.props.gym) {
-    this.props.removeGym()
-  }
-  firebase.database().ref('users/' + this.props.profile.uid).child('gym').set(location.place_id)
-  firebase.database().ref('gyms').child(location.place_id).once('value', gym => {
-    if (!gym.val()) {
-      location.users = {[this.props.profile.uid]: true}
-      location.userCount = 1
-      firebase.database().ref('gyms').child(location.place_id).set(location)
-    }
-    else {
-      let count = gym.val().count ? gym.val().count + 1 : 1
-      firebase.database().ref('gyms/' + gym.val().place_id).child('userCount').set(count)
-      firebase.database().ref('gyms/' + gym.val().place_id + '/users').child(this.props.profile.uid).set(true)
-    }
-    this.props.setGym(location)
-  })
-}
-
 }
 
 function deg2rad(deg) {
@@ -1092,7 +1093,7 @@ import {
 } from 'Anyone/js/actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
 import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
-import { setGym, removeGym } from 'Anyone/js/actions/profile'
+import { removeGym, joinGym } from 'Anyone/js/actions/profile'
 
 const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => ({
   friends: friends.friends,
@@ -1105,7 +1106,7 @@ const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => (
 })
 
 const mapDispatchToProps = dispatch => ({
-  setGym: (id) => dispatch(setGym(id)),
+  join: (location) => dispatch(joinGym(location)),
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   removeGym: () => dispatch(removeGym()),
   getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},

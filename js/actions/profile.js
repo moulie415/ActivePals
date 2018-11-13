@@ -25,7 +25,7 @@ export const setLoggedOut = () => ({
 	type: SET_LOGGED_OUT,
 })
 
-export const setGym = (gym) => ({
+const setGym = (gym) => ({
 	type: SET_GYM,
 	gym,
 })
@@ -105,7 +105,7 @@ export const removeUser = () => {
 
 export const removeGym = () => {
 	return (dispatch, getState) => {
-		let currentGym = getState().profile.profile.gym
+		let currentGym = getState().profile.gym.place_id
 		let uid = getState().profile.profile.uid
 		firebase.database().ref('users/' + uid).child('gym').set(null)
 		firebase.database().ref('gyms').child(currentGym).once('value', gym => {
@@ -116,6 +116,29 @@ export const removeGym = () => {
 		dispatch(resetGym())
 	}
 }
+
+export const joinGym = (location) => {
+	return (dispatch, getState) => {
+		let uid = getState().profile.profile.uid
+		if (getState().profile.gym) {
+			dispatch(removeGym())
+		}
+		firebase.database().ref('users/' + uid).child('gym').set(location.place_id)
+		firebase.database().ref('gyms').child(location.place_id).once('value', gym => {
+		if (!gym.val()) {
+			location.users = {[uid]: true}
+			location.userCount = 1
+			firebase.database().ref('gyms').child(location.place_id).set(location)
+		}
+		else {
+			let count = gym.val().userCount ? gym.val().userCount + 1 : 1
+			firebase.database().ref('gyms/' + gym.val().place_id).child('userCount').set(count)
+			firebase.database().ref('gyms/' + gym.val().place_id + '/users').child(uid).set(true)
+		}
+		dispatch(setGym(location))
+		})
+	}
+  }
 
 
 

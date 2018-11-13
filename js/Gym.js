@@ -36,7 +36,7 @@ import Hyperlink from 'react-native-hyperlink'
     super(props)
     this.params = this.props.navigation.state.params
     this.id = this.params.id
-
+    
     fetchGym(this.id).then(gym => {
         this.setState({gym: gym.result, loaded: true})
         fetchPhotoPath(gym.result).then(path => {
@@ -53,7 +53,7 @@ import Hyperlink from 'react-native-hyperlink'
       isFriend: false,
       profile: {},
       showImage: false,
-      loaded: false
+      loaded: false,
       //avatar: this.props.friends[this.uid] ? this.props.friends[this.uid].avatar : null
     }
   }
@@ -91,9 +91,53 @@ import Hyperlink from 'react-native-hyperlink'
           </View>
         {this.state.loaded ? <View>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{this.state.gym.name}</Text>
+            {this.props.gym && this.props.gym.place_id == this.id ? 
+              <View style={{justifyContent: 'space-between', flexDirection: 'row', margin: 10}}>
+              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Currently your active gym</Text>
+              <TouchableOpacity 
+              onPress={() => {
+                  Alert.alert(
+                      'Leave Gym',
+                      'Are you sure?',
+                      [
+                          {text: 'Cancel', style: 'cancel'},
+                          {text: 'Yes', onPress: () => this.props.removeGym(), style: 'destructive'}
+                      ]
+                  )
+                  
+                  }}
+              style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red'}}>
+              <Text style={{color: '#fff'}}>Leave Gym</Text>
+              </TouchableOpacity></View> :
+              <View style={{margin: 10}}>
+                <TouchableOpacity
+                onPress={()=> {
+                    if (this.props.gym) {
+                        Alert.alert(
+                        'Join Gym',
+                        'This will leave your current Gym?',
+                        [
+                            {text: 'Cancel', style: 'cancel'},
+                            {text: 'Yes', onPress: () => this.props.join(this.state.gym)}
+                        ]
+                    )
+                    }
+                    else this.props.join(this.state.gym)
+                    
+                    }}
+                style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
+                <Text style={{color: '#fff'}}>Join Gym</Text>
+                </TouchableOpacity>
+              </View>}
+            {this.state.gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Vicinity: '}
+        <Text style={{color: colors.secondary}}>{this.state.gym.vicinity + 'SHOW DISTANCE AWAY (MAKE LOCATION PART OF GLOBAL STATE)'}</Text></Text>}
             {this.state.gym.website && <Hyperlink linkDefault={true}>
             <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
         <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{this.state.gym.website}</Text></Text></Hyperlink>}
+        {this.state.gym.formatted_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Phone number: '}
+        <Text style={{color: colors.secondary}}>{this.state.gym.formatted_phone_number}</Text></Text>}
+        {this.state.gym.international_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Intl phone number: '}
+        <Text style={{color: colors.secondary}}>{this.state.gym.international_phone_number}</Text></Text>}
         </View> : <View style={hStyles.spinner}><Spinner color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
 
@@ -114,6 +158,7 @@ const fetchGym = (id) => {
 
 import { connect } from 'react-redux'
 import { navigateBack } from 'Anyone/js/actions/navigation'
+import { removeGym, joinGym } from './actions/profile'
 
 
 const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
@@ -125,6 +170,8 @@ const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
 
 const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
+  join: (location) => dispatch(joinGym(location)),
+  removeGym: () => dispatch(removeGym()),
  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Gym)
