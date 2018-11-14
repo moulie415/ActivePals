@@ -10,7 +10,6 @@ import {
 import {
   Container,
   Icon,
-  Header,
   Title,
   Left,
   Right,
@@ -25,6 +24,7 @@ import Swipeout from 'react-native-swipeout'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
 import colors from './constants/colors'
 import { getSimplifiedTime } from './constants/utils'
+import Header from './header/header'
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 
 
@@ -69,17 +69,10 @@ class Notifications extends Component {
 
   render() {
     return <Container style={{backgroundColor: '#9993'}}>
-      <Header style={{backgroundColor: colors.primary}}>
-      <Left style={{flex: 1}}>
-          <TouchableOpacity onPress={() => {
-            this.props.goBack()
-          } }>
-            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>
-          </Left>
-        <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir', flex: 1}}>Notifications</Title>
-        <Right />
-      </Header>
+      <Header 
+        hasBack={true}
+        title={'Notifications'}
+        />
       {Object.keys(this.state.notifications).length > 0 ?
       <ScrollView>
         {this.renderNotifications()}

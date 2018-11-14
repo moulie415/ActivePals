@@ -13,7 +13,6 @@ import {
   Content,
   Item,
   Icon,
-  Header,
   Left,
   Title,
   Right,
@@ -31,6 +30,7 @@ import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')
 import ImageResizer from 'react-native-image-resizer'
 import RNPickerSelect from 'react-native-picker-select'
+import Header from './header/header'
 
 
  class Profile extends Component {
@@ -100,9 +100,8 @@ import RNPickerSelect from 'react-native-picker-select'
   render () {
     return (
     <Container>
-    <Header style={{backgroundColor: colors.primary}}>
-        <Left style={{flex: 1}} >
-        {this.hasChanged() && <TouchableOpacity
+    <Header 
+        left={this.hasChanged() && <TouchableOpacity
             onPress={() => {
               this.setState({
                 profile: this.state.initialProfile,
@@ -112,19 +111,15 @@ import RNPickerSelect from 'react-native-picker-select'
           }}>
             <Text style={{color: '#fff'}}>UNDO</Text>
           </TouchableOpacity>}
-        </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Profile</Title>
-        <Right>
-          <TouchableOpacity onPress={(mutex)=> {
+        title={'Profile'}
+          right={<TouchableOpacity onPress={(mutex)=> {
             mutex.lockFor(1000)
             this.updateUser(this.state.initialProfile, this.state.profile)
           }}
           style={{backgroundColor: 'transparent', elevation: 0}}>
             <Text style={{color: '#fff'}}>SAVE</Text>
-          </TouchableOpacity>
-        </Right>
-
-        </Header>
+          </TouchableOpacity>}
+          />
         <ScrollView>
       <View style={{alignItems: 'center', marginBottom: 10}}>
       <TouchableOpacity 

@@ -14,7 +14,7 @@ import {
   Container,
   Content,
   Icon,
-  Header,
+  //Header,
   Title,
   Card,
   Left,
@@ -36,6 +36,7 @@ import Comments from './comments'
 import FIcon from "react-native-vector-icons/FontAwesome"
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'
+import Header from './header/header'
 import {
   extractCreatedTime,
   extractUsername,
@@ -125,11 +126,9 @@ componentWillReceiveProps(nextProps) {
     const { uid, username, users, unreadCount } = this.props.profile
     return (
     <Container >
-      <Header style={{backgroundColor: colors.primary}}>
-        <Left style={{flex: 1}}/>
-        <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir', flex: 1}}>Feed</Title>
-        <Right>
-          <TouchableOpacity onPress={()=> {
+      <Header 
+        title={'Feed'}
+        right={<TouchableOpacity onPress={()=> {
             this.props.onNotificationPress()
           }}>
             {/*<Icon name='ios-notifications' style={{color: '#fff', marginRight: 10}}/>*/}
@@ -142,9 +141,8 @@ componentWillReceiveProps(nextProps) {
 				          style={{ fontSize: 10, color: '#fff'}}>{unreadCount}</Text>
 			            </View>}
 		              </View>
-          </TouchableOpacity>
-        </Right>
-      </Header>
+          </TouchableOpacity>}
+      />
         <View style={{flexDirection: 'row', backgroundColor: '#fff', padding: 10, alignItems: 'center', borderBottomWidth: 0.5, borderColor: '#999'}}>
         <TouchableOpacity onPress={()=> this.props.goToProfile()}>
           {this.state.profile && this.state.profile.avatar ?

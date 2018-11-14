@@ -22,7 +22,6 @@ import com.apsl.versionnumber.RNVersionNumberPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
-import com.evollu.react.fcm.FIRMessagingPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -68,7 +67,6 @@ public class MainApplication extends Application implements ReactApplication {
               new ImageResizerPackage(),
               new ImagePickerPackage(),
               new RNFetchBlobPackage(),
-              new FIRMessagingPackage(),
               new FBSDKPackage(mCallbackManager)
       );
     }

@@ -9,7 +9,6 @@ import {
   Container,
   Content,
   Icon,
-  Header,
   Title,
   Left,
   Right,
@@ -20,6 +19,7 @@ import VersionNumber from 'react-native-version-number'
 import colors from './constants/colors'
 import  styles  from './styles/settingsStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Header from './header/header'
 
 
  class Settings extends Component {
@@ -52,17 +52,10 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
   render () {
     return (
     <Container style={styles.container}>
-      <Header style={{backgroundColor: colors.primary}}>
-      <Left style={{flex: 1}}>
-          <TouchableOpacity onPress={() => {
-            this.props.goBack()
-          } }>
-            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>
-          </Left>
-        <Title style={{alignSelf: 'center', color: '#fff'}}>Settings</Title>
-        <Right style={{flex: 1}} />
-      </Header>
+      <Header 
+      hasBack={true}
+       title={'Settings'}
+        />
       <Content>
         <TouchableOpacity
         onPress={()=> {

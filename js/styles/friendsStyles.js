@@ -19,7 +19,7 @@ export default styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 5,
     padding: 5,
-    fontSize: 15 
+    fontSize: 15,
   }
 
 })

@@ -17,7 +17,6 @@ import {
   Icon,
   Spinner,
   Switch,
-  Header,
   Card,
   Title,
   ActionSheet,
@@ -45,6 +44,7 @@ import {Image as SlowImage } from 'react-native'
 import { formatDateTime } from './constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
 import { showLocation, Popup } from 'react-native-map-link'
+import Header from './header/header'
 
  class Sessions extends Component {
 
@@ -156,24 +156,20 @@ import { showLocation, Popup } from 'react-native-map-link'
       <Container>
 
       {this.state.spinner && <Spinner style={styles.spinner} />}
-        <Header style={{backgroundColor: colors.primary}}>
-        <Left style={{flex: 1}} >
-          <TouchableOpacity
+        <Header 
+          left={<TouchableOpacity
             style={{paddingHorizontal: 10}}
             onPress={()=> {
               this.refs.filterModal.open()
             }}>
             <Text style={{color: '#fff'}}>Filters</Text>
-          </TouchableOpacity>
-        </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>Sessions</Title>
-        <Right>
-           <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex: 1}}>
+          </TouchableOpacity>}
+          title={'Sessions'}
+           right={<View style={{flexDirection: 'row'}}>
             <Text style={{color: '#fff'}}>Map: </Text>
             <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
-          </View>
-        </Right>
-        </Header>
+          </View>}
+        />
         <View 
 
         style={{flex: 1}}>

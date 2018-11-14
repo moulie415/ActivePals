@@ -8,7 +8,6 @@ import {
 import {
   Container,
   Icon,
-  Header,
   Left,
   Title,
   Right,
@@ -25,7 +24,7 @@ import { fetchPhotoPath } from './Sessions'
 import Hyperlink from 'react-native-hyperlink'
 import { showLocation } from 'react-native-map-link'
 import { deg2rad } from './Sessions'
-
+import Header from './header/header'
 
 
  class Gym extends Component {
@@ -63,17 +62,10 @@ import { deg2rad } from './Sessions'
   render () {
     return (
     <Container>
-    <Header style={{backgroundColor: colors.primary}}>
-    <Left>
-          <TouchableOpacity onPress={() => {
-            this.props.goBack()
-          } }>
-            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>
-          </Left>
-        <Title style={{alignSelf: 'center', color: '#fff', maxWidth: 250}}>{'Gym'}</Title>
-        <Right/>
-        </Header>
+    <Header 
+    hasBack={true}
+     title={'Gym'}
+      />
         <View style={{alignItems: 'center', marginBottom: 10}}>
         {this.state.photo ?
       <Image style={{height: 150, width: '100%'}}

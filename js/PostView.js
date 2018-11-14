@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import {
     Container,
-    Header,
     Left,
     Icon,
     Spinner
@@ -38,6 +37,7 @@ import {
   import styles from './styles/postViewStyles'
   import Image from 'react-native-fast-image'
   import {Image as SlowImage} from 'react-native'
+  import Header from './header/header'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -82,15 +82,9 @@ class PostView extends Component {
     render() {
         return(
             <Container>
-                <Header style={{backgroundColor: colors.primary}}>
-                    <Left style={{flex: 1}}>
-                        <TouchableOpacity onPress={() => {
-                            this.props.goBack()
-                        }}>
-                            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
-                        </TouchableOpacity>
-                    </Left>
-                </Header>
+                <Header 
+                hasBack={true}
+                />
                 <View style={styles.container}>
         {this.state.post && <View style={{maxHeight: SCREEN_HEIGHT/2}}>{this.renderPost(this.state.post)}</View>}
         {this.state.post && this.repCommentCount(this.state.post)}

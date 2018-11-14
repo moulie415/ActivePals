@@ -16,7 +16,6 @@ import {
   Content,
   Item,
   Icon,
-  Header,
   Left,
   Title,
   Right,
@@ -32,6 +31,7 @@ import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import { calculateAge } from './constants/utils'
+import Header from './header/header'
 
 
  class ProfileView extends Component {
@@ -89,32 +89,14 @@ import { calculateAge } from './constants/utils'
     .catch(e => console.log(e))
   }
 
-
-  componentDidMount() {
-
-  }
-
-
-  componentWillReceiveProps(nextProps) {
-  }
-
-
   render () {
     const {  username, first_name, last_name, birthday, email, uid, accountType, activity, level} = this.state.profile
     return (
     <Container>
-    <Header style={{backgroundColor: colors.primary}}>
-    <Left style={{flex: 1}}>
-          <TouchableOpacity onPress={() => {
-            this.props.goBack()
-          } }>
-            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>
-          </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff'}}>{username || 'Profile'}</Title>
-        <Right/>
-
-        </Header>
+      <Header 
+      hasBack={true}
+      title={username || 'Profile'}
+      />
         {this.state.loaded ? <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View>
       <View style={{alignItems: 'center', marginBottom: 10}}>

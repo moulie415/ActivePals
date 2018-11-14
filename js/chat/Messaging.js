@@ -6,7 +6,6 @@ import {
   View,
 } from "react-native"
 import {
-  Header,
   Container,
   Title,
   Left,
@@ -20,6 +19,7 @@ import firebase from 'react-native-firebase'
 import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
 import colors from 'Anyone/js/constants/colors'
 import sStyles from 'Anyone/js/styles/sessionStyles'
+import Header from '../header/header'
 
 class Messaging extends React.Component {
   static navigationOptions = {
@@ -155,19 +155,10 @@ class Messaging extends React.Component {
     const { navigation } = this.props
     return (
       <Container style={{flex: 1, backgroundColor: '#9993'}}>
-      <Header style={{backgroundColor: colors.primary}}>
-        <Left>
-          <TouchableOpacity onPress={() => {
-            navigation.goBack()
-          } }>
-            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>
-          </Left>
-        <Text numberOfLines={1}
-        style={{alignSelf: 'center', color: '#fff', textAlign: 'center', fontFamily: 'Avenir', maxWidth: 250}}>
-        {this.friendUsername || this.sessionTitle}</Text>
-        <Right/>
-      </Header>
+      <Header 
+      hasBack={true}
+      title={this.friendUsername || this.sessionTitle}
+       />
         <GiftedChat
           messages={this.state.messages}
           onSend={messages => {

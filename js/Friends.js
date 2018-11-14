@@ -17,7 +17,6 @@ import {
   Content,
   Item,
   Icon,
-  Header,
   Title,
   Right,
   Left
@@ -29,6 +28,7 @@ import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'
 import sStyles from 'Anyone/js/styles/sessionStyles'
 import { arraysEqual } from './constants/utils'
+import Header from './header/header'
 
 
  class Friends extends Component {
@@ -110,21 +110,17 @@ import { arraysEqual } from './constants/utils'
   render () {
     return (
     <Container>
-      <Header style={{backgroundColor: colors.primary}}>
-        <Left style={{flex: 1}}>
-          </Left>
-        <Title style={{alignSelf: 'center', flex: 1, color: '#fff', fontFamily: 'Avenir'}}>Buddies</Title>
-        <Right style={{flex: 1}}>
-          <TouchableOpacity onPress={() => {
+      <Header 
+        title={'Buddies'}
+        right={<TouchableOpacity onPress={() => {
         firebase.database().ref('users/' + this.uid).child('username')
           .once('value', snapshot => {
             snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a buddy")
           })
           }}>
             <Icon name='md-add' style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>
-        </Right>
-      </Header>
+          </TouchableOpacity>}
+      />
       <Content contentContainerStyle={{flex: 1}}
       refreshControl={
           <RefreshControl

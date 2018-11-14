@@ -174,7 +174,6 @@ dependencies {
     implementation(project(":react-native-google-signin")){
         exclude group: "com.google.android.gms" // very important
     }
-    implementation project(':react-native-fcm')
     implementation project(':react-native-fbsdk')
 
     implementation(project(':react-native-maps')){

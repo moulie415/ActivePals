@@ -10,7 +10,6 @@ import {
   Item,
   Icon,
   Spinner,
-  Header,
   Right,
   Left,
   Title
@@ -20,6 +19,7 @@ import  styles  from './styles/signUpStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import colors from './constants/colors'
 import TouchableOpacity from './constants/TouchableOpacityLockable.js'
+import Header from './header/header'
 
  class SignUp extends Component {
 
@@ -54,17 +54,10 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
   render () {
     return (
     <Container style={styles.container}>
-      <Header style={{backgroundColor: colors.primary}}>
-      <Left style={{flex: 1}}>
-          <TouchableOpacity onPress={() => {
-            this.props.goBack()
-          } }>
-            <Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>
-          </Left>
-        <Title style={{alignSelf: 'center', color: '#fff', fontFamily: 'Avenir', flex: 1}}>Sign up</Title>
-        <Right />
-      </Header>
+      <Header 
+      hasBack={true}
+      title={'Sign up'}
+      />
       {this.state.spinner && <Spinner />}
       <View style={{justifyContent: 'center', flex: 1}}>
       <Item style={styles.inputGrp}>

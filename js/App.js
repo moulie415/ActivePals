@@ -44,7 +44,6 @@ import { addListener } from 'Anyone/index'
 //   headerMode: 'none'
 // })
 
-
 const chats = TabNavigator({
   SessionChats: {screen: SessionChats},
   DirectMessages: {screen: DirectMessages},
@@ -58,7 +57,7 @@ const chats = TabNavigator({
     showLabel: true,
     labelStyle: {
       fontSize: 15,
-      fontFamily: 'Avenir'
+      fontFamily: 'Avenir',
     },
     activeTintColor: '#fff',
     inactiveTintColor: colors.secondary,
