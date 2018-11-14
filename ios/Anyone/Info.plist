@@ -119,6 +119,17 @@
 		<string>avenir.ttf</string>
 		<string>Avenir.ttf</string>
 	</array>
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+    <string>comgooglemaps</string>
+    <string>citymapper</string>
+    <string>uber</string>
+    <string>lyft</string>
+    <string>transit</string>
+    <string>waze</string>
+    <string>yandexnavi</string>
+    <string>moovit</string>
+  </array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

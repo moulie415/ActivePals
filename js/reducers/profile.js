@@ -4,6 +4,7 @@ import {
  	SET_LOGGED_OUT,
  	SET_GYM,
 	REMOVE_GYM,
+	SET_LOCATION
 } from 'Anyone/js/actions/profile'
 import { Platform, PushNotificationIOS } from 'react-native'
 
@@ -13,7 +14,6 @@ import {
 
 const initialState = {
 	profile: {},
-	gym: {},
 	loggedIn: false,
 }
 
@@ -47,6 +47,12 @@ export default function(state = initialState, action) {
 				...state,
 				profile: {...state.profile, unreadCount: action.count }
 			}
+		case SET_LOCATION: {
+			return {
+				...state,
+				location: action.location
+			}
+		}
 		case SET_LOGGED_OUT:
 			return initialState
 		default:

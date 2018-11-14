@@ -44,6 +44,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
 import {Image as SlowImage } from 'react-native'
 import { formatDateTime } from './constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
+import { showLocation, Popup } from 'react-native-map-link'
 
  class Sessions extends Component {
 
@@ -79,6 +80,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
       sessionKeys: [],
       searchMultiplier: 1,
       selectedIndex: 0,
+      popUpVisible: false
     }
   }
 
@@ -254,11 +256,22 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
                 this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
             </Text>
             <View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center'}}>
-              <TouchableOpacity onPress={()=> this.getPosition(true)}
+              <TouchableOpacity onPress={()=> {
+                this.getPosition(true)
+                const { lat, lng } = this.state.selectedSession.location.position
+                let options = {
+                  latitude: lat,
+                  longitude: lng,
+                  cancelText: 'Cancel',
+                  sourceLatitude: this.state.yourLocation.latitude,  
+                  sourceLongitude: this.state.yourLocation.longitude,  
+                  }
+                  this.setState({popUpVisible: true, options})
+                }}
               style={{backgroundColor: colors.secondary, padding: 5, marginRight: 10}}>
                 <Text style={{color: '#fff'}}>Get directions</Text>
               </TouchableOpacity>
-              <Text style={{color: '#999'}}>(opens in browser)</Text>
+            
             </View>
             </ScrollView>
              {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>}
@@ -299,11 +312,25 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
             <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
             </Text>
             {<View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center'}}>
-              <TouchableOpacity onPress={()=> this.getPosition(true, true)}
+              <TouchableOpacity onPress={()=> {
+                this.getPosition(true, true)
+                const { lat, lng } = this.state.selectedLocation.geometry.location
+                const place_id = this.state.selectedLocation.place_id
+
+                let options = {
+                  latitude: lat,
+                  longitude: lng,
+                  cancelText: 'Cancel',
+                  sourceLatitude: this.state.yourLocation.latitude,  
+                  sourceLongitude: this.state.yourLocation.longitude,  
+                  googlePlaceId: place_id, 
+                  }
+                  this.setState({popUpVisible: true, options})
+                }}
               style={{backgroundColor: colors.secondary, padding: 5, marginRight: 10}}>
                 <Text style={{color: '#fff'}}>Get directions</Text>
               </TouchableOpacity>
-              <Text style={{color: '#999'}}>(opens in browser)</Text>
+              
             </View>}
             {this.state.selectedLocation.rating && <View style={{flexDirection: 'row'}}>
               <Text style={{marginVertical: 5}}>Google rating: </Text>
@@ -434,6 +461,19 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
               </TouchableOpacity>
             </View>
         </Modal>
+        <Popup
+          isVisible={this.state.popUpVisible}
+          onCancelPressed={() => this.setState({ popUpVisible: false })}
+          onAppPressed={() => this.setState({ popUpVisible: false })}
+          onBackButtonPressed={() => this.setState({ popUpVisible: false })}
+          modalProps={{ 
+              animationIn: 'slideInUp'
+          }}
+          options={this.state.options}
+          style={{
+            cancelButtonText: {color: colors.secondary},
+          }}
+          />
         </View>
       </Container>
       )
@@ -592,7 +632,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
 
   renderLists() {
     let gym, lat, lng
-      if (this.props.gym) {
+      if (this.props.gym && this.props.gym.geometry) {
         gym = this.props.gym
         lat = gym.geometry.location.lat
         lng = gym.geometry.location.lng
@@ -807,13 +847,14 @@ import SegmentedControlTab from 'react-native-segmented-control-tab'
       (position) => {
         let lat = position.coords.latitude
         let lon = position.coords.longitude
+        this.props.setLocation({lat, lon})
         this.setState({
           latitude: lat,
           longitude: lon,
           yourLocation: position.coords,
           error: null,
           showMap: true,
-          spinner: false}, ()=> getDirections && this.getDirections(gym))
+          spinner: false}, /*()=> getDirections && this.getDirections(gym)*/)
 
           this.fetchPlaces(lat, lon)
           .then((results) => {
@@ -958,7 +999,7 @@ getDistance(item, gym = false) {
 
 }
 
-function deg2rad(deg) {
+export function deg2rad(deg) {
   return deg * (Math.PI / 180)
 }
 
@@ -1094,7 +1135,7 @@ import {
 } from 'Anyone/js/actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
 import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
-import { removeGym, joinGym } from 'Anyone/js/actions/profile'
+import { removeGym, joinGym, setLocation } from 'Anyone/js/actions/profile'
 
 const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => ({
   friends: friends.friends,
@@ -1120,6 +1161,7 @@ const mapDispatchToProps = dispatch => ({
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
   fetch: (radius, update = false) => {return Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())])},
   viewGym: (id) => dispatch(navigateGym(id)),
+  setLocation: (location) => dispatch(setLocation(location)),
   test: () => dispatch(navigateTestScreen()),
 })
 

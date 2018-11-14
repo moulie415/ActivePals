@@ -4,6 +4,7 @@ export const SET_LOGGED_IN = 'SET_LOGGED_IN'
 export const SET_LOGGED_OUT = 'SET_LOGGED_OUT'
 export const SET_GYM = 'SET_GYM'
 export const REMOVE_GYM = 'REMOVE_GYM'
+export const SET_LOCATION = 'SET_LOCATION'
 import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats } from './chats'
 import { fetchPosts } from './home'
@@ -32,6 +33,11 @@ const setGym = (gym) => ({
 
 export const resetGym = () => ({
 	type: REMOVE_GYM,
+})
+
+export const setLocation = (location) => ({
+	type: SET_LOCATION,
+	location
 })
 
 

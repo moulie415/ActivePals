@@ -23,6 +23,8 @@ import colors from './constants/colors'
 import { Image as SlowImage } from 'react-native'
 import { fetchPhotoPath } from './Sessions'
 import Hyperlink from 'react-native-hyperlink'
+import { showLocation } from 'react-native-map-link'
+import { deg2rad } from './Sessions'
 
 
 
@@ -130,7 +132,8 @@ import Hyperlink from 'react-native-hyperlink'
                 </TouchableOpacity>
               </View>}
             {this.state.gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Vicinity: '}
-        <Text style={{color: colors.secondary}}>{this.state.gym.vicinity + 'SHOW DISTANCE AWAY (MAKE LOCATION PART OF GLOBAL STATE)'}</Text></Text>}
+        <Text style={{color: colors.secondary}}>{this.state.gym.vicinity}</Text>{this.props.location && 
+        <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.gym) + ' km away)'}</Text>}</Text>}
             {this.state.gym.website && <Hyperlink linkDefault={true}>
             <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
         <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{this.state.gym.website}</Text></Text></Hyperlink>}
@@ -143,6 +146,23 @@ import Hyperlink from 'react-native-hyperlink'
 
     </Container>
   )
+  }
+  getDistance(item) {
+      let lat1 = this.props.location.lat
+      let lon1 =  this.props.location.lon
+      let lat2 = item.geometry.location.lat
+      let lon2 = item.geometry.location.lng
+      let R = 6371
+      let dLat = deg2rad(lat2 - lat1)
+      let dLon = deg2rad(lon2 - lon1)
+      let a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  
+      let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+      let d = R * c
+      return d.toFixed(2)
   }
 
 
@@ -165,7 +185,8 @@ const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
   friends: friends.friends,
   users: sharedInfo.users,
   profile: profile.profile,
-  gym: profile.gym
+  gym: profile.gym,
+  location: profile.location
 })
 
 const mapDispatchToProps = dispatch => ({
