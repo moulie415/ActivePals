@@ -149,16 +149,12 @@ class FitLink extends React.Component {
       if (type == 'message' || type == 'sessionMessage') {
         dispatch(newNotification(notification.data))
         dispatch(updateLastMessage(notification.data))
+        showLocalNotification(notification.data)
       }
       if (type == 'rep' || type == 'comment' || 'buddyRequest') {
         let count = getState().profile.profile.unreadCount || 0
         dispatch(setNotificationCount(count+1))
       }
-
-
-      //if (AppState.currentState == 'background' || Platform.OS == 'android') {
-        showLocalNotification(notification.data)
-      //}
     })
 
     this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification: Notification) => {
