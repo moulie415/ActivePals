@@ -17,7 +17,7 @@ import {
   Title,
   Right,
   ActionSheet,
-  Spinner
+  Spinner,
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import Image from 'react-native-fast-image'
@@ -100,8 +100,10 @@ import Header from './header/header'
   render () {
     return (
     <Container>
+    
     <Header 
         left={this.hasChanged() && <TouchableOpacity
+          style = {{position:'absolute', top:8, bottom:0, left:0, justifyContent: 'center', paddingLeft: 10}}
             onPress={() => {
               this.setState({
                 profile: this.state.initialProfile,
@@ -111,6 +113,7 @@ import Header from './header/header'
           }}>
             <Text style={{color: '#fff'}}>UNDO</Text>
           </TouchableOpacity>}
+
         title={'Profile'}
           right={<TouchableOpacity onPress={(mutex)=> {
             mutex.lockFor(1000)

@@ -158,7 +158,7 @@ import Header from './header/header'
       {this.state.spinner && <Spinner style={styles.spinner} />}
         <Header 
           left={<TouchableOpacity
-            style={{paddingHorizontal: 10}}
+            style = {{position:'absolute', top:8, bottom:0, left:0, justifyContent: 'center', paddingLeft: 10}}
             onPress={()=> {
               this.refs.filterModal.open()
             }}>
