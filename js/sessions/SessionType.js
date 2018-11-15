@@ -13,10 +13,12 @@ import styles from '../styles/sessionTypeStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Image from 'react-native-fast-image'
 import {Image as SlowImage} from 'react-native'
+import Header from '../header/header'
 
 
 class SessionType extends Component {
 	static navigationOptions = {
+	header: null,
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-home'
@@ -36,6 +38,9 @@ class SessionType extends Component {
 	render() {
 		return (
 			<Container>
+			<Header 
+			hasBack={true}
+			title={'Select type'} />
 				<TouchableOpacity style={{flex: 1, marginHorizontal: 10}} 
 				onPress={()=> this.props.onSelect("Gym", this.buddies, this.location)}>
 					<Card style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flex: 1}}>

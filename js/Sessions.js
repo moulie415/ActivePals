@@ -165,7 +165,7 @@ import Header from './header/header'
             <Text style={{color: '#fff'}}>Filters</Text>
           </TouchableOpacity>}
           title={'Sessions'}
-           right={<View style={{flexDirection: 'row'}}>
+           right={<View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
             <Text style={{color: '#fff'}}>Map: </Text>
             <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
           </View>}

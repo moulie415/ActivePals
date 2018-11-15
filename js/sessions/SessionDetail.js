@@ -24,10 +24,12 @@ import colors from 'Anyone/js/constants/colors'
 import TouchableOpacity from 'Anyone/js/constants/TouchableOpacityLockable'
 import RNCalendarEvents from 'react-native-calendar-events'
 import { guid } from '../constants/utils'
+import Header from '../header/header'
 
 
 class SessionDetail extends Component {
 	static navigationOptions = {
+	header: null,
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-home'
@@ -69,6 +71,9 @@ class SessionDetail extends Component {
 	render() {
 		return (
 			<Container style={{ flex: 1}}>
+			<Header title={'Enter details'} 
+				hasBack={true}
+			/>
 				<Content>
 					<TextInput
 					style={{padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10}}
