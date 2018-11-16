@@ -18,6 +18,7 @@ import Settings from './Settings'
 import Messaging from './chat/Messaging'
 import DirectMessages from './chat/DirectMessages'
 import SessionChats from './chat/SessionChats'
+import GymChat from './chat/GymChat'
 import TestScreen from './TestScreen'
 import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
@@ -47,6 +48,7 @@ import { addListener } from 'Anyone/index'
 const chats = TabNavigator({
   SessionChats: {screen: SessionChats},
   DirectMessages: {screen: DirectMessages},
+  Gym: {screen: GymChat}
 }, {
   tabBarPosition: 'top',
   swipeEnabled: false,
