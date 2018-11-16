@@ -20,11 +20,12 @@ import str from './constants/strings'
 import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
 import { Image as SlowImage } from 'react-native'
-import { fetchPhotoPath } from './Sessions'
+import { fetchPhotoPath, renderTags, deg2rad  } from './Sessions'
 import Hyperlink from 'react-native-hyperlink'
 import { showLocation } from 'react-native-map-link'
-import { deg2rad } from './Sessions'
 import Header from './header/header'
+import StarRating from 'react-native-star-rating'
+
 
 
  class Gym extends Component {
@@ -87,7 +88,14 @@ import Header from './header/header'
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{this.state.gym.name}</Text>
             {this.props.gym && this.props.gym.place_id == this.id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row', margin: 10}}>
-              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Currently your active gym</Text>
+              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
+              <TouchableOpacity 
+                  onPress={() => {
+                    this.props.onOpenGymChat(this.state.gym.place_id)
+                  }}
+                  style={{justifyContent: 'center', marginRight: 20}}>
+                  <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
+              </TouchableOpacity>
               <TouchableOpacity 
               onPress={() => {
                   Alert.alert(
@@ -129,10 +137,23 @@ import Header from './header/header'
             {this.state.gym.website && <Hyperlink linkDefault={true}>
             <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
         <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{this.state.gym.website}</Text></Text></Hyperlink>}
+        {this.state.gym.rating && <View style={{flexDirection: 'row', marginVertical: 5}}>
+              <Text style={{marginLeft: 10, color: '#999'}}>Google rating: </Text>
+            <StarRating
+            disabled={true}
+            style={{marginLeft: 10}}
+            containerStyle={{alignSelf: 'center'}}
+            fullStarColor={colors.secondary}
+            maxStars={5}
+            starSize={20}
+            halfStarEnabled={true}
+            rating={this.state.gym.rating}
+            /></View>}
         {this.state.gym.formatted_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Phone number: '}
         <Text style={{color: colors.secondary}}>{this.state.gym.formatted_phone_number}</Text></Text>}
         {this.state.gym.international_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Intl phone number: '}
         <Text style={{color: colors.secondary}}>{this.state.gym.international_phone_number}</Text></Text>}
+        {this.state.gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(this.state.gym.types)}</Text>}
         </View> : <View style={hStyles.spinner}><Spinner color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
 
@@ -169,7 +190,7 @@ const fetchGym = (id) => {
 
 
 import { connect } from 'react-redux'
-import { navigateBack } from 'Anyone/js/actions/navigation'
+import { navigateBack, navigateGymMessaging } from 'Anyone/js/actions/navigation'
 import { removeGym, joinGym } from './actions/profile'
 
 
@@ -185,6 +206,7 @@ const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
   join: (location) => dispatch(joinGym(location)),
   removeGym: () => dispatch(removeGym()),
+  onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Gym)

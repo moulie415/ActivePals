@@ -131,6 +131,10 @@ class FitLink extends React.Component {
         .setDescription('Channel for session messages')
         .setSound('light.mp3'))
 
+    channels.push(new firebase.notifications.Android.Channel('GYM_MESSAGES', 'Gym messages', firebase.notifications.Android.Importance.Max)
+        .setDescription('Channel for gym messages')
+        .setSound('light.mp3'))
+
     channels.push(new firebase.notifications.Android.Channel('COMMENT', 'Comment', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for comments on posts')
         .setSound('light.mp3'))

@@ -35,7 +35,6 @@ import Modal from 'react-native-modalbox'
 import { getType, getResource } from './constants/utils'
 import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
-import StarRating from 'react-native-star-rating'
 import { geofire }  from 'Anyone/index'
 import RNFetchBlob from 'rn-fetch-blob'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -328,26 +327,22 @@ import Header from './header/header'
               </TouchableOpacity>
               
             </View>}
-            {this.state.selectedLocation.rating && <View style={{flexDirection: 'row'}}>
-              <Text style={{marginVertical: 5}}>Google rating: </Text>
-            <StarRating
-            disabled={true}
-            style={{marginLeft: 10}}
-            containerStyle={{alignSelf: 'center'}}
-            fullStarColor={colors.secondary}
-            maxStars={5}
-            starSize={20}
-            halfStarEnabled={true}
-            rating={this.state.selectedLocation.rating}
-            /></View>}
+            
             {this.state.selectedLocation.opening_hours &&
               <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
               {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
-            {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + this.renderTags(this.state.selectedLocation.types)}</Text>}
+            {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + renderTags(this.state.selectedLocation.types)}</Text>}
             
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Currently your active gym</Text>
+              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
+              <TouchableOpacity 
+                  onPress={() => {
+                    this.props.onOpenGymChat(this.state.selectedLocation.place_id)
+                  }}
+                  style={{justifyContent: 'center', marginRight: 20}}>
+                  <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
+              </TouchableOpacity>
               <TouchableOpacity 
               onPress={() => {
                 Alert.alert(
@@ -443,7 +438,7 @@ import Header from './header/header'
                 />
               </View>
             </View>
-              <Text style={{fontSize: 12, textAlign: 'right'}}>*Public only</Text>
+              <Text style={{fontSize: 12, textAlign: 'right'}}>*Public only (private sessions should always be visible)</Text>
           </View>
             <View style={{backgroundColor: colors.primary}}>
               <TouchableOpacity
@@ -475,16 +470,7 @@ import Header from './header/header'
       )
   }
 
-  renderTags(tags) {
-    let string = ""
-    tags.forEach((tag, index, array) => {
-      if (index === array.length - 1){
-        string += tag
-      }
-      else string += tag + ", "
-    })
-    return string
-  }
+
 
   renderFriendsSelection() {
     let friends = []
@@ -658,7 +644,7 @@ import Header from './header/header'
                     <View style={{flexDirection: 'row'}}>
                       <TouchableOpacity 
                       onPress={() => {
-                          console.log('go to gym chat')
+                          this.props.onOpenGymChat(gym.place_id)
                       }}
                       style={{justifyContent: 'center', marginRight: 20}}>
                         <Icon name='md-chatboxes' style={{color: colors.secondary}}/>
@@ -1119,6 +1105,17 @@ export const fetchPhotoPath = (result) => {
   })
 }
 
+export const renderTags = (tags) => {
+  let string = ""
+  tags.forEach((tag, index, array) => {
+    if (index === array.length - 1){
+      string += tag
+    }
+    else string += tag + ", "
+  })
+  return string
+}
+
 
 
 import { connect } from 'react-redux'
@@ -1127,7 +1124,8 @@ import {
   navigateSessionType,
   navigateTestScreen,
   navigateProfileView,
-  navigateGym
+  navigateGym,
+  navigateGymMessaging
 } from 'Anyone/js/actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
 import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
@@ -1157,6 +1155,7 @@ const mapDispatchToProps = dispatch => ({
   onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
   fetch: (radius, update = false) => {return Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())])},
   viewGym: (id) => dispatch(navigateGym(id)),
+  onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
   setLocation: (location) => dispatch(setLocation(location)),
   test: () => dispatch(navigateTestScreen()),
 })

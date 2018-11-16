@@ -283,3 +283,42 @@ export const fetchSessionMessages = (id, amount, isPrivate = false) => {
 		})
 	}
 }
+
+export const fetchGymMessages = (id, amount) => {
+	return (dispatch) => {
+		return firebase.database().ref('gymChats/' + id).orderByKey().limitToLast(amount)
+		.once('value', snapshot => {
+			let messages = []
+			let promises = []
+			firebase.database().ref('gyms/' + id).child('users').once('value', users => {
+				users.forEach(child => {
+					promises.push(new Promise(resolve => {
+						firebase.storage().ref('images/' + child.key ).child('avatar').getDownloadURL()
+						.then(url => resolve({[child.key]: url}))
+						.catch(e => resolve({[child.key]: null}))
+					}))
+				})
+				Promise.all(promises).then(array => {
+					let avatars = {}
+					array.forEach((avatar, index) => {
+						let key = Object.keys(avatar)[0]
+						if (key) {
+							avatars[key] = avatar[key]
+						}
+					})
+					snapshot.forEach(child => {
+						let avatar = child.val().user ? avatars[child.val().user._id] : ""
+						if (avatar) {
+							messages.push({...child.val(), createdAt: new Date(child.val().createdAt),
+								user: {...child.val().user, avatar}})
+						}
+						else {
+							messages.push({...child.val(), createdAt: new Date(child.val().createdAt)})
+							}
+					})
+					dispatch(setMessageSession(id, messages))
+				})
+			})
+		})
+	}
+}

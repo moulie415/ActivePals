@@ -54,6 +54,9 @@ export default function(state = initialState, action) {
 			}
 		}
 		case SET_LOGGED_OUT:
+			if (Platform.OS == 'ios') {
+				PushNotificationIOS.setApplicationIconBadgeNumber(0)
+			}
 			return initialState
 		default:
 			return state

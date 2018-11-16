@@ -29,6 +29,7 @@ class Messaging extends React.Component {
     super(props)
     this.params = this.props.navigation.state.params
     this.session = this.params.session
+    this.gymId = this.params.gymId
     this.uid = this.props.profile.uid
     this.nav = this.props.navigation
 
@@ -36,6 +37,9 @@ class Messaging extends React.Component {
     if (this.session) {
       this.sessionId = this.session.key
       this.sessionTitle = this.session.title
+    }
+    else if (this.gymId) {
+      this.gymName = this.props.gym.name
     }
     else {
       this.chatId = this.params.chatId
@@ -56,7 +60,7 @@ class Messaging extends React.Component {
   componentDidMount() {
     this.loadMessages()
 
-    if (!this.session) {
+    if (!this.session && !this.gymId) {
       firebase.database().ref('users/' + this.friendUid).child('FCMToken').once('value', snapshot => {
         this.friendToken = snapshot.val()
       })
@@ -70,6 +74,9 @@ class Messaging extends React.Component {
     this.setState({spinner: true})
     if (this.session) {
       this.props.getSessionMessages(this.sessionId, this.state.amount, this.session.private)
+    }
+    else if (this.gymId) {
+      this.props.getGymMessages(this.gymId, this.state.amount)
     }
     else {
       this.props.getMessages(this.chatId, this.state.amount, this.friendUid)
@@ -88,7 +95,18 @@ class Messaging extends React.Component {
       this.props.resetNotif()
       //ignore inital fetch when component mounts
       if (this.listenForNotif) {
-        const { type, uid, username, _id, body, title, sessionId, sessionTitle, avatar, createdAt, custom_notification } = nextProps.notif
+        const { 
+          type,
+          uid,
+          username,
+          _id,
+          body,
+          sessionId,
+          avatar,
+          createdAt,
+          custom_notification,
+          gymId,
+         } = nextProps.notif
         if (type == 'message' || type == 'sessionMessage') {
           let message
           let date = new Date(createdAt)
@@ -100,7 +118,8 @@ class Messaging extends React.Component {
             message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}}
           }
           if ((type == 'message' && this.friendUid == uid) ||
-            (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid)) {
+            (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid) ||
+            (type == 'gymMessage' && this.gymId == gymId && this.uid != uid)) {
             this.setState(previousState => ({
               messages: GiftedChat.append(previousState.messages, message),
             }))
@@ -111,18 +130,6 @@ class Messaging extends React.Component {
   this.listenForNotif = true
 }
 
-
-  // isFriend(uid) {
-  //   let isFriend = false
-  //   this.props.friends.forEach(friend => {
-  //     if (friend.uid = uid) {
-  //       isFriend = friend
-  //     }
-  //   })
-  //   return friend
-
-  // }
-
   onSend(messages = []) {
     //make messages database friendly
     let converted = []
@@ -131,6 +138,9 @@ class Messaging extends React.Component {
         let type = this.session.private ? 'privateSessions' : 'sessions'
         converted.push({...message, createdAt: message.createdAt.toString(), sessionTitle: this.sessionTitle, sessionId: this.sessionId, type})
       }
+      else if (this.gymId) {
+        converted.push({...message, createdAt: message.createdAt.toString(), gymId: this.gymId, gymName: this.gymName})
+      }
       else {
         converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, FCMToken: this.friendToken, friendUid: this.friendUid})
       }
@@ -138,6 +148,10 @@ class Messaging extends React.Component {
 
     let ref = this.session ? firebase.database().ref('sessionChats').child(this.sessionId) :
     firebase.database().ref('chats').child(this.chatId)
+
+    if (this.gymId) {
+      ref = firebase.database().ref('gymChats').child(this.gymId)
+    }
 
     ref.push(...converted)
     .then(() => {
@@ -157,7 +171,7 @@ class Messaging extends React.Component {
       <Container style={{flex: 1, backgroundColor: '#9993'}}>
       <Header 
       hasBack={true}
-      title={this.friendUsername || this.sessionTitle}
+      title={this.friendUsername || this.sessionTitle || this.gymName}
        />
         <GiftedChat
           messages={this.state.messages}
@@ -231,11 +245,14 @@ class Messaging extends React.Component {
 import { connect } from 'react-redux'
 import { navigateMessaging, navigateProfile, navigateProfileView } from 'Anyone/js/actions/navigation'
 import { sendRequest, acceptRequest } from 'Anyone/js/actions/friends'
-import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, resetNotification } from 'Anyone/js/actions/chats'
+import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, fetchGymMessages, resetNotification } from 'Anyone/js/actions/chats'
 
 const fetchId = (params) => {
   if (params.session) {
     return params.session.key
+  }
+  else if (params.gymId) {
+    return params.gymId
   }
   else return params.chatId
 }
@@ -243,6 +260,7 @@ const fetchId = (params) => {
 const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
   friends: friends.friends,
   profile: profile.profile,
+  gym: profile.gym,
   sessionChats: chats.sessionChats,
   chats: chats.chats,
   messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)],
@@ -257,6 +275,7 @@ const mapDispatchToProps = dispatch => ({
   onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
   getMessages: (id, amount, uid) => dispatch(fetchMessages(id, amount, uid)),
   getSessionMessages: (id, amount, isPrivate) => dispatch(fetchSessionMessages(id, amount, isPrivate)),
+  getGymMessages: (id, amount) => dispatch(fetchGymMessages(id, amount)),
   resetNotif: () => dispatch(resetNotification()),
   navigateProfile: () => dispatch(navigateProfile()),
   viewProfile: (uid) => dispatch(navigateProfileView(uid))

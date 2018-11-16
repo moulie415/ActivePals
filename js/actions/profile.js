@@ -135,6 +135,14 @@ export const joinGym = (location) => {
 			location.users = {[uid]: true}
 			location.userCount = 1
 			firebase.database().ref('gyms').child(location.place_id).set(location)
+			let systemMessage = {
+				_id: 1,
+				text: 'Beginning of chat',
+				createdAt: new Date().toString(),
+				system: true,
+			}
+			firebase.database().ref('gymChats/' + location.place_id).push(systemMessage)
+
 		}
 		else {
 			let count = gym.val().userCount ? gym.val().userCount + 1 : 1
