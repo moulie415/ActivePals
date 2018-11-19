@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  FlatList
 } from "react-native"
 import Image from 'react-native-fast-image'
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
@@ -16,7 +17,7 @@ import {getSimplifiedTime } from '../constants/utils'
  class DirectMessages extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Direct Messages',
+    tabBarLabel: 'Buddies',
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-chatboxes'
@@ -68,9 +69,7 @@ import {getSimplifiedTime } from '../constants/utils'
     return (
     <Container>
     {this.state.chats.length > 0?
-      <ScrollView style={{backgroundColor: '#9993'}}>
-        {this.renderChats()}
-      </ScrollView> :
+      this.renderChats() :
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
             {"You haven't started any chats yet, also please make sure you are connected to the internet"}
@@ -80,33 +79,29 @@ import {getSimplifiedTime } from '../constants/utils'
   }
 
   renderChats() {
-    let list = []
-    let index = 1
-    this.state.chats.forEach(chat => {
-      let friend = this.props.friends[chat.uid]
-      if (friend) {
-        list.push(
-          <TouchableOpacity
-          key={index}
+    return <FlatList 
+      style={{backgroundColor: colors.bgColor}}
+      data={this.state.chats}
+      keyExtractor={(chat)=> chat.key}
+      renderItem={({item}) => {
+        let friend = this.props.friends[item.uid]
+        return <TouchableOpacity
           onPress={()=> {
-            this.props.onOpenChat(chat.chatId, friend.username, chat.uid)
+            this.props.onOpenChat(item.chatId, friend.username, item.uid)
           }}>
             <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
             {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
                   <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
               <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
                 <Text>{friend.username}</Text>
-                <Text numberOfLines={1} style={{color: '#999'}}>{chat.lastMessage.text}</Text>
+                <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>
               </View>
-               {chat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
-                <Text style={{color: '#999'}}>{getSimplifiedTime(chat.lastMessage.createdAt)}</Text></View>}
+               {item.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
+                <Text style={{color: '#999'}}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text></View>}
             </View>
           </TouchableOpacity>
-          )
-      index++
-    }
-    })
-    return list
+      }}
+    />
   }
 
 }

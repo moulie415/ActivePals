@@ -10,6 +10,7 @@ const colors = {
 	tertiary: '#fff',
 	primaryLighter: '#0d57774d',
 	secondaryLighter: '#0091ba4d',
+	bgColor: '#9993'
 }
 
 export default colors

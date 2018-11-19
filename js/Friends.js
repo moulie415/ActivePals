@@ -7,7 +7,8 @@ import {
   ScrollView,
   RefreshControl,
   Image,
-  Platform
+  Platform,
+  FlatList
 } from "react-native"
 import {
   Button,
@@ -93,7 +94,7 @@ import Header from './header/header'
   }
 
 
-  _onRefresh() {
+  onRefresh() {
     if (this.props.profile.friends) {
       this.setState({refreshing: true})
       this.props.getFriends(this.props.profile.friends)
@@ -121,17 +122,9 @@ import Header from './header/header'
             <Icon name='md-add' style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>}
       />
-      <Content contentContainerStyle={{flex: 1}}
-      refreshControl={
-          <RefreshControl
-            refreshing={this.state.refreshing}
-            onRefresh={this._onRefresh.bind(this)}
-          />
-        }>
+      <Content contentContainerStyle={{flex: 1}}>
       {this.state.friends.length > 0 ?
-      <ScrollView style={{backgroundColor: '#9993'}}>
-      {this.renderFriends()}
-      </ScrollView> :
+      this.renderFriends() :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
             {"You don't have any buddies yet, also please make sure you are connected to the internet"}
@@ -175,66 +168,61 @@ import Header from './header/header'
 
 
   renderFriends() {
-    let list = []
-    let index = 1
-    this.state.friends.forEach(friend => {
-        if (friend.status == 'outgoing') {
-        list.push(
-          <View key={index}
-          style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+    return <FlatList 
+      style={{backgroundColor: '#9993'}}
+      data={this.state.friends}
+      keyExtractor={(friend)=> friend.uid}
+      onRefresh={()=> this.onRefresh()}
+      refreshing={this.state.refreshing}
+      renderItem={({item}) => {
+        if (item.status == 'outgoing') {
+        return <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
             <View style={{flexDirection: 'row', height: 40, alignItems: 'center'}} >
-              <Text style={{marginHorizontal: 10}}>{friend.username + ' request sent'}</Text>
+              <Text style={{marginHorizontal: 10}}>{item.username + ' request sent'}</Text>
             </View>
           </View>
-          )
       }
-      else if (friend.status == 'incoming') {
-        list.push(
-          <View key={index}
-          style={{paddingVertical: 20, paddingHorizontal: 15, backgroundColor: '#fff'}}>
+      else if (item.status == 'incoming') {
+        return <View style={{paddingVertical: 20, paddingHorizontal: 15, backgroundColor: '#fff'}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
-              <Text style={{marginRight: 5, flex: 4}}>{friend.username + ' has sent you a buddy request'}</Text>
+              <Text style={{marginRight: 5, flex: 4}}>{item.username + ' has sent you a buddy request'}</Text>
               <View style={{flexDirection: 'row', flex: 1}}>
-                <TouchableOpacity onPress={()=> this.accept(friend.uid)}>
+                <TouchableOpacity onPress={()=> this.accept(item.uid)}>
                  <Icon name='ios-checkmark' style={{color: 'green', fontSize: 50, paddingHorizontal: 10, alignSelf: 'center'}}/>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=> this.remove(friend.uid)}>
+                <TouchableOpacity onPress={()=> this.remove(item.uid)}>
                   <Icon name='ios-close' style={{color: 'red', fontSize: 50, paddingHorizontal: 10, alignSelf: 'center'}}/>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-        )
       }
-      else if (friend.status == 'connected') {
-        list.push(
-          <View key={index}
-          style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10}}>
+      else if (item.status == 'connected') {
+        return <View style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 50, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
+              {item.avatar? <Image source={{uri: item.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
                 <Icon name='md-contact'  style={{fontSize: 65, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
-                <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
+                <Text style={{marginHorizontal: 10}}>{item.username}</Text>
               </View>
               <View style={{flexDirection: 'row'}}>
               <TouchableOpacity
-                onPress={()=> this.openChat(friend.uid, friend.username)}
+                onPress={()=> this.openChat(item.uid, item.username)}
                 style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-chatboxes' style={{color: colors.primary, fontSize: 30}}/>
               </TouchableOpacity>
               <TouchableOpacity
-              onPress={()=> this.props.viewProfile(friend.uid)}
+              onPress={()=> this.props.viewProfile(item.uid)}
               style={{padding: 5, marginHorizontal: 5}}>
                 <Icon name='md-person' style={{color: colors.primary, fontSize: 30}}/>
               </TouchableOpacity>
               </View>
             </View>
           </View>
-          )
       }
-      index++
-    })
-    return list
+      else return null
+      }}
+    />
   }
 
   accept(friend) {

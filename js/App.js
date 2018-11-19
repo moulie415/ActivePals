@@ -48,7 +48,7 @@ import { addListener } from 'Anyone/index'
 const chats = TabNavigator({
   SessionChats: {screen: SessionChats},
   DirectMessages: {screen: DirectMessages},
-  Gym: {screen: GymChat}
+  GymChat: {screen: GymChat}
 }, {
   tabBarPosition: 'top',
   swipeEnabled: false,
