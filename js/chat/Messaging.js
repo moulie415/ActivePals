@@ -158,8 +158,18 @@ class Messaging extends React.Component {
       this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
       }))
-      this.session ? this.props.getSessionChats(this.props.profile.sessions, this.sessionId) :
-      this.props.getChats(this.props.profile.chats)
+
+
+      if (this.session) {
+        this.props.getSessionChats(this.props.profile.sessions, this.sessionId)
+      }
+      else if (this.gymId) {
+        this.props.getGymChat(this.gymId)
+      }
+      else {
+        this.props.getChats(this.props.profile.chats)
+      }
+      
     })
     .catch(e => Alert.alert("Error sending message", e.message))
 
@@ -246,6 +256,7 @@ import { connect } from 'react-redux'
 import { navigateMessaging, navigateProfile, navigateProfileView } from 'Anyone/js/actions/navigation'
 import { sendRequest, acceptRequest } from 'Anyone/js/actions/friends'
 import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, fetchGymMessages, resetNotification } from 'Anyone/js/actions/chats'
+import { fetchGymChat } from "../actions/chats";
 
 const fetchId = (params) => {
   if (params.session) {
@@ -263,6 +274,7 @@ const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
   gym: profile.gym,
   sessionChats: chats.sessionChats,
   chats: chats.chats,
+  gymChat: chats.gymChat,
   messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)],
   notif: chats.notif,
 })
@@ -270,6 +282,7 @@ const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
 const mapDispatchToProps = dispatch => ({
   getChats: (chats) => {return dispatch(fetchChats(chats))},
   getSessionChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
+  getGymChat: (gym) => dispatch(fetchGymChat(gym)),
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},

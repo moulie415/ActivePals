@@ -6,7 +6,7 @@ export const SET_GYM = 'SET_GYM'
 export const REMOVE_GYM = 'REMOVE_GYM'
 export const SET_LOCATION = 'SET_LOCATION'
 import { fetchFriends } from './friends'
-import { fetchSessionChats, fetchChats } from './chats'
+import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat } from './chats'
 import { fetchPosts } from './home'
 import { fetchSessions, fetchPrivateSessions } from './sessions'
 import { navigateLogin, navigateHome } from './navigation'
@@ -92,6 +92,7 @@ export const doSetup = (profile) => {
 			dispatch(fetchFriends(friends)),
 			profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),
 			profile.chats && dispatch(fetchChats(profile.chats)),
+			profile.gym && dispatch(fetchGymChat(profile.gym)),
 			dispatch(fetchPosts(uid)),
 			dispatch(fetchSessions()),
 			])
@@ -120,6 +121,7 @@ export const removeGym = () => {
 			firebase.database().ref('gyms/' + currentGym + '/users').child(uid).remove()
 		})
 		dispatch(resetGym())
+		dispatch(setGymChat(null))
 	}
 }
 
@@ -141,13 +143,16 @@ export const joinGym = (location) => {
 				createdAt: new Date().toString(),
 				system: true,
 			}
-			firebase.database().ref('gymChats/' + location.place_id).push(systemMessage)
+			firebase.database().ref('gymChats/' + location.place_id).push(systemMessage).then(() => {
+				dispatch(fetchGymChat(location.place_id))
+			})
 
 		}
 		else {
 			let count = gym.val().userCount ? gym.val().userCount + 1 : 1
 			firebase.database().ref('gyms/' + gym.val().place_id).child('userCount').set(count)
 			firebase.database().ref('gyms/' + gym.val().place_id + '/users').child(uid).set(true)
+			dispatch(fetchGymChat(location.place_id))
 		}
 		dispatch(setGym(location))
 		})

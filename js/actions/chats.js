@@ -9,6 +9,7 @@ export const NEW_NOTIF = 'NEW_NOTIF'
 export const RESET_NOTIFICATION = 'RESET_NOTIFICATION'
 export const UPDATE_CHAT = 'UPDATE_CHAT'
 export const UPDATE_SESSION_CHAT = 'UPDATE_SESSION_CHAT'
+export const SET_GYM_CHAT = 'SET_GYM_CHAT'
 
 
 const setSessionChats = (sessionChats) => ({
@@ -51,6 +52,10 @@ const updateSessionChat = (key, lastMessage) => ({
 	lastMessage,
 })
 
+export const setGymChat = (chat) => ({
+	type: SET_GYM_CHAT,
+	chat
+})
 
 export const newNotification = (notif) => ({
 	type: NEW_NOTIF,
@@ -280,6 +285,22 @@ export const fetchSessionMessages = (id, amount, isPrivate = false) => {
 					dispatch(setMessageSession(id, messages))
 				})
 			})
+		})
+	}
+}
+
+export const fetchGymChat = (gym) => {
+	return (dispatch, getState) => {
+		return firebase.database().ref('gymChats').child(gym).orderByKey().limitToLast(1)
+		.once('value', lastMessage => {
+			if (lastMessage.val()) {
+				message = Object.values(lastMessage.val())[0]
+				let chat = {lastMessage: message, key: gym}
+				dispatch(setGymChat(chat))
+			}
+			else {
+				dispatch(setGymChat(null))
+			}
 		})
 	}
 }

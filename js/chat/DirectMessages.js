@@ -29,9 +29,10 @@ import {getSimplifiedTime } from '../constants/utils'
   constructor(props) {
     super(props)
     this.nav = this.props.navigation
-    this.user = null
+    this.user = null,
     this.state = {
       chats: Object.values(this.props.chats),
+      refreshing: false,
     }
   }
 
@@ -82,7 +83,14 @@ import {getSimplifiedTime } from '../constants/utils'
     return <FlatList 
       style={{backgroundColor: colors.bgColor}}
       data={this.state.chats}
-      keyExtractor={(chat)=> chat.key}
+      // refreshing={this.state.refreshing}
+      // onRefresh={()=> {
+      //   this.setState({refreshing: true})
+      //   this.props.getChats().then(() => {
+      //     this.setState({refreshing: false})
+      //   })
+      // }}
+      keyExtractor={(chat)=> chat.chatId}
       renderItem={({item}) => {
         let friend = this.props.friends[item.uid]
         return <TouchableOpacity
@@ -118,7 +126,7 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getChats: (chats) => {return dispatch(fetchChats(chats))},
+  getChats: (chats) => dispatch(fetchChats(chats)),
   getProfile: () => {return dispatch(fetchProfile())},
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   add: (chat) => dispatch(addChat(chat)),

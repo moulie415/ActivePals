@@ -3,6 +3,7 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  RefreshControl
 } from 'react-native'
 import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
 import firebase from 'react-native-firebase'
@@ -30,6 +31,7 @@ import colors from 'Anyone/js/constants/colors'
     this.state = {
       email: "",
       username: "",
+      refreshing: false
 
     }
   }
@@ -46,10 +48,23 @@ import colors from 'Anyone/js/constants/colors'
 
   render () {
     const gym = this.props.gym
+    const gymChat = this.props.gymChat
     return (
     <Container>
     {this.props.gym ?
-      <ScrollView style={{backgroundColor: '#9993'}}>
+      <ScrollView 
+      refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={() => {
+              this.setState({refreshing: true})
+              this.props.getChat(gym.place_id).then(() => {
+                this.setState({refreshing: false})
+              })
+            }}
+          />
+        }
+      style={{backgroundColor: '#9993'}}>
         <TouchableOpacity
         onPress={()=> {
             this.props.onOpenChat(gym.place_id)
@@ -58,10 +73,10 @@ import colors from 'Anyone/js/constants/colors'
             <View>{getType('Gym', 50)}</View>
             <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
               <Text numberOfLines={1} >{gym.name}</Text>
-              {/*<Text numberOfLines={1} style={{color: '#999'}}>{detail.lastMessage.text}</Text>*/}
+              { gymChat && <Text numberOfLines={1} style={{color: '#999'}}>{gymChat.lastMessage.text}</Text>}
             </View>
-            {/*detail.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
-              <Text style={{color: '#999'}}>{getSimplifiedTime(detail.lastMessage.createdAt)}</Text></View>*/}
+            { gymChat && gymChat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
+              <Text style={{color: '#999'}}>{getSimplifiedTime(gymChat.lastMessage.createdAt)}</Text></View>}
           </View>
         </TouchableOpacity>
       </ScrollView> :
@@ -79,15 +94,18 @@ import colors from 'Anyone/js/constants/colors'
 
 import { connect } from 'react-redux'
 import { navigateGymMessaging } from 'Anyone/js/actions/navigation'
+import { fetchGymChat } from "../actions/chats";
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
   friends: friends.friends,
   profile: profile.profile,
-  gym: profile.gym
+  gym: profile.gym,
+  gymChat: chats.gymChat
 })
 
 const mapDispatchToProps = dispatch => ({
-  onOpenChat: (gymId) => {return dispatch(navigateGymMessaging(gymId))}
+  onOpenChat: (gymId) => {return dispatch(navigateGymMessaging(gymId))},
+  getChat: (gym) => dispatch(fetchGymChat(gym))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(GymChat)
