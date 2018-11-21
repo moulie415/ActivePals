@@ -107,7 +107,7 @@ class Messaging extends React.Component {
           custom_notification,
           gymId,
          } = nextProps.notif
-        if (type == 'message' || type == 'sessionMessage') {
+        if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage') {
           let message
           let date = new Date(createdAt)
           if (custom_notification) {
@@ -175,6 +175,15 @@ class Messaging extends React.Component {
 
   }
 
+  getRightHandIcon() {
+    if (this.gymId) {
+      return <TouchableOpacity onPress={()=> this.props.goToGym(this.gymId)}>
+        <Icon name='ios-paper' style={{color: '#fff'}}/>
+      </TouchableOpacity>
+    }
+    else return null
+  }
+
   render() {
     const { navigation } = this.props
     return (
@@ -182,6 +191,7 @@ class Messaging extends React.Component {
       <Header 
       hasBack={true}
       title={this.friendUsername || this.sessionTitle || this.gymName}
+      right={this.getRightHandIcon()}
        />
         <GiftedChat
           messages={this.state.messages}
@@ -253,7 +263,7 @@ class Messaging extends React.Component {
 }
 
 import { connect } from 'react-redux'
-import { navigateMessaging, navigateProfile, navigateProfileView } from 'Anyone/js/actions/navigation'
+import { navigateMessaging, navigateProfile, navigateProfileView, navigateGym } from 'Anyone/js/actions/navigation'
 import { sendRequest, acceptRequest } from 'Anyone/js/actions/friends'
 import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, fetchGymMessages, resetNotification } from 'Anyone/js/actions/chats'
 import { fetchGymChat } from "../actions/chats";
@@ -291,7 +301,8 @@ const mapDispatchToProps = dispatch => ({
   getGymMessages: (id, amount) => dispatch(fetchGymMessages(id, amount)),
   resetNotif: () => dispatch(resetNotification()),
   navigateProfile: () => dispatch(navigateProfile()),
-  viewProfile: (uid) => dispatch(navigateProfileView(uid))
+  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
+  goToGym: (gym) => dispatch(navigateGym(gym))
 
 })
 

@@ -184,8 +184,10 @@ class FitLink extends React.Component {
       if (routes) {
         route = routes[nav.index]
       }
-      if (!route.params || (route.params.chatId != notification.data.chatId ||
-         route.params.session && route.params.session.key != notification.data.sessionId)) {
+      if (!route.params || 
+        (route.params.chatId && route.params.chatId != notification.data.chatId ||
+         route.params.session && route.params.session.key != notification.data.sessionId ||
+         route.params.gymId && route.params.gymId != notification.data.gymId)) {
           navigateFromNotif(notification.data)
          }
      

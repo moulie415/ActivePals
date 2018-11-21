@@ -86,6 +86,9 @@ export const updateLastMessage = (notif) => {
 				})
 
 		}
+		else if (notif.type == 'gymMessage') {
+			dispatch(fetchGymChat(notif.gymId))
+		}
 	}
 }
 

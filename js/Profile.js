@@ -154,8 +154,10 @@ import Header from './header/header'
         <Text style={{color: '#999', marginHorizontal: 20}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
         <Text style={{color: '#999', marginHorizontal: 20, marginBottom: this.state.gym ? 0 : 10}}>Account type: <Text style={{color: colors.secondary}}>
         {this.state.profile && this.state.profile.accountType}</Text></Text>
-        {this.state.gym && <Text style={{color: '#999', marginHorizontal: 20, marginBottom: 10}}>Gym: <Text style={{color: colors.secondary}}>
-        {this.state.gym.name}</Text></Text>}
+        {this.state.gym && <TouchableOpacity onPress={() => this.props.goToGym(this.state.gym.place_id)}>
+          <Text style={{color: '#999', marginHorizontal: 20, marginBottom: 10}}>{"Gym: "}
+          <Text style={{color: colors.secondary}}>{this.state.gym.name}</Text></Text>
+        </TouchableOpacity>}
       </View>
       <View style={styles.inputGrp}>
         <Text style={{alignSelf: 'center'}}>Username: </Text>
@@ -497,6 +499,7 @@ const levels = ['Beginner', 'Intermediate', 'Advanced']
 import { connect } from 'react-redux'
 import { navigateLogin, navigateSettings } from 'Anyone/js/actions/navigation'
 import { fetchProfile, setLoggedOut } from 'Anyone/js/actions/profile'
+import { navigateGym } from "./actions/navigation";
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile,
@@ -510,6 +513,7 @@ const mapDispatchToProps = dispatch => ({
   },
   onSave: ()=> dispatch(fetchProfile()),
   goToSettings: ()=> dispatch(navigateSettings()),
+  goToGym: (gym)=> dispatch(navigateGym(gym))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile)

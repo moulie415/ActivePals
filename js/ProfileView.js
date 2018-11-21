@@ -161,8 +161,9 @@ import Header from './header/header'
         <Text style={{color: colors.secondary}}> {accountType}</Text></Text>}
 
         {this.state.gym && this.state.gym.name && 
-          this.state.isFriend && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Gym:
-        <Text style={{color: colors.secondary}}> {this.state.gym.name}</Text></Text>}
+          this.state.isFriend && <TouchableOpacity onPress={()=>this.props.goToGym(this.state.gym.place_id)}>
+          <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Gym:
+        <Text style={{color: colors.secondary}}> {this.state.gym.name}</Text></Text></TouchableOpacity>}
 
         {birthday && this.state.isFriend &&  <Text style={{marginLeft: 10, marginVertical: 5}}>
        <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>Birthday: </Text>
@@ -235,7 +236,7 @@ import Header from './header/header'
 
 
 import { connect } from 'react-redux'
-import { navigateBack } from 'Anyone/js/actions/navigation'
+import { navigateBack, navigateGym } from 'Anyone/js/actions/navigation'
 import { deleteFriend, sendRequest } from 'Anyone/js/actions/friends'
 
 const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
@@ -247,7 +248,8 @@ const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
 const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
   remove: (uid) => dispatch(deleteFriend(uid)),
-  request: (uid, friendUid) => dispatch(sendRequest(uid, friendUid))
+  request: (uid, friendUid) => dispatch(sendRequest(uid, friendUid)),
+  goToGym: (gym) => dispatch(navigateGym(gym))
  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileView)

@@ -28,8 +28,8 @@ target 'Anyone' do
 
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
-	pod 'Fabric'
-	pod 'Crashlytics', '~> 3.10'
+	pod 'Fabric', '1.8.1'
+	pod 'Crashlytics', '~> 3.11.1'
   pod 'react-native-geocoder', :path => '../node_modules/react-native-geocoder'
 
 
