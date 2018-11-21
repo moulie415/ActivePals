@@ -29,6 +29,7 @@ import {
   createReduxBoundAddListener,
 } from 'react-navigation-redux-helpers'
 import { setNotificationCount } from "./js/actions/home";
+import { navigateGymMessaging } from "./js/actions/navigation";
 
 let firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
@@ -36,8 +37,7 @@ export const geofire = new GeoFire(firebaseRef)
 export const showLocalNotification = (notif) => {
   if (notif.custom_notification) {
     let user = firebase.auth().currentUser
-    if (notif.type != 'sessionMessage' ||
-      (notif.type == 'sessionMessage' && notif.uid != user.uid)) {
+    if (notif.uid != user.uid) {
       let custom = JSON.parse(notif.custom_notification)
       const notification = new firebase.notifications.Notification()
         .setTitle(custom.title)
@@ -62,7 +62,7 @@ export const showLocalNotification = (notif) => {
 
 const navigateFromNotif = (notif) => {
   const { dispatch } = store
-  const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notif
+  const {  type, sessionId, sessionTitle, chatId, uid, username, postId, gymId } = notif
   switch(type) {
     case 'message':
       dispatch(navigateMessaging(chatId, username, uid))
@@ -70,6 +70,9 @@ const navigateFromNotif = (notif) => {
     case 'sessionMessage':
       let session = {key: sessionId, title: sessionTitle}
       dispatch(navigateMessagingSession(session))
+      break
+    case 'gymMessage':
+      dispatch(navigateGymMessaging(gymId))
       break
     case 'buddyRequest':
       dispatch(navigateFriends())
@@ -150,7 +153,7 @@ class FitLink extends React.Component {
     this.messageListener = firebase.messaging().onMessage((notification: RemoteMessage) => {
       const { dispatch, getState } = store
       const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notification.data
-      if (type == 'message' || type == 'sessionMessage') {
+      if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage') {
         dispatch(newNotification(notification.data))
         dispatch(updateLastMessage(notification.data))
         showLocalNotification(notification.data)
@@ -181,7 +184,7 @@ class FitLink extends React.Component {
       if (routes) {
         route = routes[nav.index]
       }
-      if (!route.params || (route.params.chatId != notification.data.chatId &&
+      if (!route.params || (route.params.chatId != notification.data.chatId ||
          route.params.session && route.params.session.key != notification.data.sessionId)) {
           navigateFromNotif(notification.data)
          }

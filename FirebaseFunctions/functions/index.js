@@ -115,6 +115,73 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
     })
 })
 
+exports.sendNewGymMessageNotification = functions.database.ref('/gymChats/{id}').onWrite(event => {
+    console.log(event)
+
+    const getValuePromise = admin.database()
+    .ref('gymChats')
+    .child(event.params.id)
+    .orderByKey()
+    .limitToLast(1)
+    .once('value')
+
+    return getValuePromise.then(snapshot => {
+        console.log('snapshot')
+        console.log(snapshot.val())
+        const { user, text, createdAt, _id, gymId, gymName } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        return admin.database().ref('gyms/' + gymId).child('users').once('value', users => {
+            let refs = []
+            console.log('users')
+            console.log(users)
+            console.log('users.val()')
+            console.log(users.val())
+            Object.keys(users.val()).forEach(child => {
+                if (child !== user._id) {
+                    refs.push(admin.database().ref('/users/' + child).child("FCMToken").once('value'))
+                }
+            })
+            return Promise.all(refs).then(tokens => {
+                let promises = []
+                console.log('tokens')
+                console.log(tokens)
+                tokens.forEach(token => {
+                    const payload = {
+                        data: {
+                            custom_notification: JSON.stringify({
+                                body: text,
+                                title: user.name + ' sent a message to ' + gymName,
+                                priority: 'high',
+                                sound: 'light.mp3',
+                                id: gymId,
+                                channel: "GYM_MESSAGES",
+                                group: gymId,
+                            }),
+                            username: user.name,
+                            uid: user._id,
+                            createdAt,
+                            _id,
+                            avatar: user.avatar,
+                            type: 'gymMessage',
+                            gymId,
+                            gymName,
+                            priority: 'high',
+			                contentAvailable: 'true',
+                            content_available: 'true'
+                        },
+                        token: token.val(),
+			
+                    }
+                    promises.push(admin.messaging().send(payload))
+                    console.log("sent push to user with FCMToken: " + token.val())
+                })
+                return Promise.all(promises).catch(e => {
+                    console.log(e)
+                })
+            })
+        })
+    })
+})
+
 
 exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/friends/{friend}').onWrite(event => {
     console.log(event.params.id)
