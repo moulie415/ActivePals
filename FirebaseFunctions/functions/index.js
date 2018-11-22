@@ -18,37 +18,40 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                                  .once('value')
 
     return getValuePromise.then(snapshot => {
-        console.log(snapshot.val())
-        const { user, text, FCMToken, createdAt, _id, chatId } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        const { user, text, FCMToken, createdAt, _id, chatId, friendUid } = snapshot.val()[Object.keys(snapshot.val())[0]]
 
-        const payload = {
-            data: {
-                custom_notification: JSON.stringify({
-                    body: text,
-                    title: user.name + ' sent you a message',
+        return admin.database().ref('users/' + friendUid).child('FCMToken').once('value', snapshot => {
+            const payload = {
+                data: {
+                    custom_notification: JSON.stringify({
+                        body: text,
+                        title: user.name + ' sent you a message',
+                        priority: 'high',
+                        sound: 'light.mp3',
+                        id: chatId,
+                        channel: "DIRECT_MESSAGES",
+                        group: chatId,
+                    }),
+                    username: user.name,
+                    uid: user._id,
+                    createdAt,
+                    _id,
+                    avatar: user.avatar ,
+                    type: 'message',
+                    chatId,
                     priority: 'high',
-                    sound: 'light.mp3',
-                    id: chatId,
-                    channel: "DIRECT_MESSAGES",
-                    group: chatId,
-                }),
-                username: user.name,
-                uid: user._id,
-                createdAt,
-                _id,
-                avatar: user.avatar ,
-                type: 'message',
-                chatId,
-                priority: 'high',
-		        contentAvailable: 'true',
-		        content_available: 'true'
-            },
-            token: FCMToken,
+                    contentAvailable: 'true',
+                    content_available: 'true'
+                },
+                token: snapshot.val(),
+    
+            }
+    
+            return admin.messaging()
+                        .send(payload)
+        })
 
-        }
-
-        return admin.messaging()
-                    .send(payload)
+        
     })
 })
 
@@ -63,15 +66,10 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
     .once('value')
 
     return getValuePromise.then(snapshot => {
-        console.log('snapshot')
-        console.log(snapshot.val())
         const { user, text, sessionId, createdAt, _id, sessionTitle, type } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        let private  = (type == 'privateSessions')
         return admin.database().ref('/'+ type +'/' + sessionId).child('users').once('value', users => {
             let refs = []
-            console.log('users')
-            console.log(users)
-            console.log('users.val()')
-            console.log(users.val())
             Object.keys(users.val()).forEach(child => {
                 if (child !== user._id) {
                     refs.push(admin.database().ref('/users/' + child).child("FCMToken").once('value'))
@@ -97,6 +95,7 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                             _id,
                             avatar: user.avatar,
                             type: 'sessionMessage',
+                            private,
                             sessionId,
                             sessionTitle,
                             priority: 'high',
@@ -131,10 +130,6 @@ exports.sendNewGymMessageNotification = functions.database.ref('/gymChats/{id}')
         const { user, text, createdAt, _id, gymId, gymName } = snapshot.val()[Object.keys(snapshot.val())[0]]
         return admin.database().ref('gyms/' + gymId).child('users').once('value', users => {
             let refs = []
-            console.log('users')
-            console.log(users)
-            console.log('users.val()')
-            console.log(users.val())
             Object.keys(users.val()).forEach(child => {
                 if (child !== user._id) {
                     refs.push(admin.database().ref('/users/' + child).child("FCMToken").once('value'))
