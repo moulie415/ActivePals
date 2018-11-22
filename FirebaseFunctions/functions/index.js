@@ -67,7 +67,7 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
 
     return getValuePromise.then(snapshot => {
         const { user, text, sessionId, createdAt, _id, sessionTitle, type } = snapshot.val()[Object.keys(snapshot.val())[0]]
-        let private  = (type == 'privateSessions')
+        let isPrivate = (type === 'privateSessions')
         return admin.database().ref('/'+ type +'/' + sessionId).child('users').once('value', users => {
             let refs = []
             Object.keys(users.val()).forEach(child => {
@@ -95,7 +95,7 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                             _id,
                             avatar: user.avatar,
                             type: 'sessionMessage',
-                            private,
+                            private: isPrivate,
                             sessionId,
                             sessionTitle,
                             priority: 'high',
