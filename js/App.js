@@ -29,6 +29,7 @@ import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'
+import Welcome from './Welcome'
 import { Provider, connect } from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
 import reducer from './reducers/'
@@ -113,7 +114,8 @@ export const Stack = StackNavigator({
   ProfileView: { screen: ProfileView },
   PostView: { screen: PostView },
   Notifications: { screen: Notifications },
-  Gym: { screen: Gym }
+  Gym: { screen: Gym },
+  Welcome: {screen: Welcome, navigationOptions: {header: null}}
 })
 
 class App extends React.Component {

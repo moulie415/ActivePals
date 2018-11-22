@@ -12,7 +12,8 @@ export default styles = StyleSheet.create({
 		borderColor: "#999",
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignItems: 'center'
+		alignItems: 'center',
+		minHeight: 50
 	},
 	spinner: {
 		position: 'absolute',

@@ -66,6 +66,14 @@ import Header from './header/header'
           <Text>Contact Support</Text>
           <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
         </TouchableOpacity>
+        <TouchableOpacity
+        onPress={()=> {
+          this.props.viewWelcome(true)
+        }}
+        style={styles.contact}>
+          <Text>View Welcome Swiper</Text>
+          <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
+        </TouchableOpacity>
           <View style={styles.contact}>
               <Text >Version no: </Text>
               <Text style={{color: colors.primary, fontWeight: 'bold'}}>{VersionNumber.appVersion}</Text>
@@ -106,7 +114,7 @@ import Header from './header/header'
 
 
 import { connect } from 'react-redux'
-import { navigateBack } from 'Anyone/js/actions/navigation'
+import { navigateBack, navigateWelcome } from 'Anyone/js/actions/navigation'
 import { removeUser } from 'Anyone/js/actions/profile'
 //import {  } from 'Anyone/js/actions/chats'
 
@@ -116,6 +124,8 @@ import { removeUser } from 'Anyone/js/actions/profile'
 const mapDispatchToProps = dispatch => ({
   goBack: ()=> dispatch(navigateBack()),
   removeUser: ()=> dispatch(removeUser()),
+  viewWelcome: (goBack)=> dispatch(navigateWelcome(goBack))
+
 })
 
 export default connect(null, mapDispatchToProps)(Settings)

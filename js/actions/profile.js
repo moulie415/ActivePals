@@ -9,7 +9,7 @@ import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat } from './chats'
 import { fetchPosts } from './home'
 import { fetchSessions, fetchPrivateSessions } from './sessions'
-import { navigateLogin, navigateHome } from './navigation'
+import { navigateLogin, navigateHome, navigateWelcome } from './navigation'
 
 
 const setProfile = (profile) => ({
@@ -85,7 +85,12 @@ export const doSetup = (profile) => {
             })
 		let friends = profile.friends
 		if (getState().nav.index == 0) {
+			if (getState().profile.hasViewedWelcome) {
 			dispatch(navigateHome())
+			}
+			else {
+				dispatch(navigateWelcome())
+			}
 		}
 		dispatch(setHasLoggedIn(true))
 		return Promise.all([
