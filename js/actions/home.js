@@ -572,7 +572,7 @@ export const getNotifications = (limit = 10) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
 		let refs = []
-		return firebase.database().ref('userNotifications').child(uid).limitToLast(limit).once('value', snapshot => {
+		return firebase.database().ref('userNotifications').child(uid).orderByKey().limitToLast(limit).once('value', snapshot => {
 			if (snapshot.val()) {
 				Object.keys(snapshot.val()).forEach(key => {
 					refs.push(firebase.database().ref('notifications').child(key).once('value'))

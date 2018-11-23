@@ -3,7 +3,7 @@ import {
     Container,
     Left,
     Icon,
-    Spinner
+    Spinner,
 } from 'native-base'
 import {
     View,
@@ -11,7 +11,10 @@ import {
     Alert,
     Modal,
     SafeAreaView,
-    FlatList
+    FlatList,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform
 } from 'react-native'
 import FIcon from "react-native-vector-icons/FontAwesome"
 import cStyles from './comments/styles'
@@ -81,11 +84,14 @@ class PostView extends Component {
 
     render() {
         return(
-            <Container>
+            <KeyboardAvoidingView
+            contentContainerStyle={{flex: 1}}
+            style={{flex: 1}}
+            behavior='position'>
                 <Header 
                 hasBack={true}
                 />
-                <View style={styles.container}>
+                <ScrollView style={styles.container}>
         {this.state.post && <View style={{maxHeight: SCREEN_HEIGHT/2}}>{this.renderPost(this.state.post)}</View>}
         {this.state.post && this.repCommentCount(this.state.post)}
         {this.state.post ? <Comments
@@ -207,8 +213,8 @@ class PostView extends Component {
           imageUrls={this.state.selectedImage}
             />
       </Modal>
-      </View>
-            </Container>
+      </ScrollView>
+            </KeyboardAvoidingView>
         )
     }
 
