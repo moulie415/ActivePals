@@ -119,10 +119,13 @@ export const fetchPosts = (uid, amount = 30, endAt) => {
 						let reps = []
 						let users = []
 						posts.forEach(post => {
-							feed[post.key] = post.val()
-							feed[post.key].key = post.key
-							reps.push(firebase.database().ref('userReps/' + uid).child(post.key).once('value'))
-							users.push(firebase.database().ref('users/' + post.val().uid).once('value'))
+							let friends = getState().friends.friends
+							if (post.val().uid == uid || friends[post.val().uid] && friends[post.val().uid].status == 'connected') {
+								feed[post.key] = post.val()
+								feed[post.key].key = post.key
+								reps.push(firebase.database().ref('userReps/' + uid).child(post.key).once('value'))
+								users.push(firebase.database().ref('users/' + post.val().uid).once('value'))
+							}
 
 						})
 						Promise.all(reps).then(reps => {

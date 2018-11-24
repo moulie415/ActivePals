@@ -47,9 +47,11 @@
 		2DCD954D1E0B4F2C00145EB5 /* AnyoneTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* AnyoneTests.m */; };
 		2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
+		5F7D25945D4E4B798AE15D10 /* libReactNativeAdsFacebook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A5CD9DE3273649038E45E375 /* libReactNativeAdsFacebook.a */; };
 		67D9DF43A9E74825BEDD421D /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 38218FF39F6D4C2EB87A2D8A /* FontAwesome.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		8BCE8FA7CE7A4CB2A49EFB78 /* avenir.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0FC4EE0746D74E029C2E6444 /* avenir.ttf */; };
+		A26CE25BB68641D09098D39F /* libRNAdMobManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C59C36C013324F0A986CA81A /* libRNAdMobManager.a */; };
 		B7FC08C0FE434E4B83F08991 /* libRNFirebase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6493616FCDB54D6D90091BB6 /* libRNFirebase.a */; };
 		BB6F0F22EF534635A8E9F6B8 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1782690CCFF84E2FBD44A97B /* SimpleLineIcons.ttf */; };
 		BDE8BA6430FD4BEDA2524117 /* Avenir.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0D853CB2677947A0A75D6F40 /* Avenir.ttf */; };
@@ -415,6 +417,20 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNFirebase;
 		};
+		0ABF963C21A9807A00D9EE84 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 751D61DAD92C4FD8938F3025 /* RNAdMobManager.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A96DA7741C146D7200FC639B;
+			remoteInfo = RNAdMobManager;
+		};
+		0ABF96E221A98D1100D9EE84 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B4B4F7FEF7074D33AB401EA6 /* ReactNativeAdsFacebook.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AFD333211B138E00580DF0;
+			remoteInfo = ReactNativeAdsFacebook;
+		};
 		0AD46BC72157C683000E6B9C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */;
@@ -702,6 +718,7 @@
 		5EAA881670AB49B7935D6E6E /* AddressBook.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		61BA46C5CA0E4D089E455B82 /* RNGoogleSignin.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNGoogleSignin.xcodeproj; path = "../node_modules/react-native-google-signin/ios/RNGoogleSignin.xcodeproj"; sourceTree = "<group>"; };
 		6493616FCDB54D6D90091BB6 /* libRNFirebase.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFirebase.a; sourceTree = "<group>"; };
+		751D61DAD92C4FD8938F3025 /* RNAdMobManager.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNAdMobManager.xcodeproj; path = "../node_modules/react-native-admob/ios/RNAdMobManager.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		8290EFF7FDC14B51AF0C130F /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/native-base/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
@@ -710,11 +727,14 @@
 		9B5F91B7A0D9485B8C284C6C /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/native-base/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		9FF3F95A889C427E94C514B4 /* libRNVersionNumber.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVersionNumber.a; sourceTree = "<group>"; };
 		A04C36EA213249619A93C397 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
+		A5CD9DE3273649038E45E375 /* libReactNativeAdsFacebook.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativeAdsFacebook.a; sourceTree = "<group>"; };
 		A65D9D76D05448C6B54F6744 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		A9305896DB9F47359A33ECC5 /* RNFirebase.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFirebase.xcodeproj; path = "../node_modules/react-native-firebase/ios/RNFirebase.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		B02AA9EA156046A8B0423ADE /* RCTFBSDK.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTFBSDK.xcodeproj; path = "../node_modules/react-native-fbsdk/ios/RCTFBSDK.xcodeproj"; sourceTree = "<group>"; };
 		B1DC02725D48428A914ECDBB /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
+		B4B4F7FEF7074D33AB401EA6 /* ReactNativeAdsFacebook.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeAdsFacebook.xcodeproj; path = "../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook.xcodeproj"; sourceTree = "<group>"; };
+		C59C36C013324F0A986CA81A /* libRNAdMobManager.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNAdMobManager.a; sourceTree = "<group>"; };
 		C6EC2C9FB3E94AC48111159C /* SystemConfiguration.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E1BD295473AA4BFA8717D6C0 /* RNVersionNumber.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVersionNumber.xcodeproj; path = "../node_modules/react-native-version-number/ios/RNVersionNumber.xcodeproj"; sourceTree = "<group>"; };
 		FA31FF201D5640E2C0B4D203 /* Pods-Anyone.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Anyone.release.xcconfig"; path = "Pods/Target Support Files/Pods-Anyone/Pods-Anyone.release.xcconfig"; sourceTree = "<group>"; };
@@ -755,6 +775,8 @@
 				E8D5821B437C413BA6C91BAB /* SystemConfiguration.framework in Frameworks */,
 				F5A4E5AEFAD58D99249A8511 /* libPods-Anyone.a in Frameworks */,
 				B7FC08C0FE434E4B83F08991 /* libRNFirebase.a in Frameworks */,
+				A26CE25BB68641D09098D39F /* libRNAdMobManager.a in Frameworks */,
+				5F7D25945D4E4B798AE15D10 /* libReactNativeAdsFacebook.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -890,6 +912,8 @@
 			children = (
 				9FF3F95A889C427E94C514B4 /* libRNVersionNumber.a */,
 				6493616FCDB54D6D90091BB6 /* libRNFirebase.a */,
+				C59C36C013324F0A986CA81A /* libRNAdMobManager.a */,
+				A5CD9DE3273649038E45E375 /* libReactNativeAdsFacebook.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -949,6 +973,22 @@
 			isa = PBXGroup;
 			children = (
 				0AB463682113AB24003C51E2 /* libRNFirebase.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0ABF963921A9807900D9EE84 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0ABF963D21A9807A00D9EE84 /* libRNAdMobManager.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0ABF96DF21A98D1100D9EE84 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0ABF96E321A98D1100D9EE84 /* libReactNativeAdsFacebook.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1099,6 +1139,8 @@
 				61BA46C5CA0E4D089E455B82 /* RNGoogleSignin.xcodeproj */,
 				E1BD295473AA4BFA8717D6C0 /* RNVersionNumber.xcodeproj */,
 				A9305896DB9F47359A33ECC5 /* RNFirebase.xcodeproj */,
+				751D61DAD92C4FD8938F3025 /* RNAdMobManager.xcodeproj */,
+				B4B4F7FEF7074D33AB401EA6 /* ReactNativeAdsFacebook.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1391,8 +1433,16 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
+					ProductGroup = 0ABF96DF21A98D1100D9EE84 /* Products */;
+					ProjectRef = B4B4F7FEF7074D33AB401EA6 /* ReactNativeAdsFacebook.xcodeproj */;
+				},
+				{
 					ProductGroup = 0A7CEF75211909B200F09932 /* Products */;
 					ProjectRef = 0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */;
+				},
+				{
+					ProductGroup = 0ABF963921A9807900D9EE84 /* Products */;
+					ProjectRef = 751D61DAD92C4FD8938F3025 /* RNAdMobManager.xcodeproj */;
 				},
 				{
 					ProductGroup = 0A12E396218F401E009424C7 /* Products */;
@@ -1768,6 +1818,20 @@
 			fileType = archive.ar;
 			path = libRNFirebase.a;
 			remoteRef = 0AB463672113AB24003C51E2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0ABF963D21A9807A00D9EE84 /* libRNAdMobManager.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNAdMobManager.a;
+			remoteRef = 0ABF963C21A9807A00D9EE84 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0ABF96E321A98D1100D9EE84 /* libReactNativeAdsFacebook.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libReactNativeAdsFacebook.a;
+			remoteRef = 0ABF96E221A98D1100D9EE84 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0AD46BC82157C683000E6B9C /* libFastImage.a */ = {
@@ -2202,12 +2266,16 @@
 					"$(SRCROOT)/../node_modules/react-native-google-signin/ios/RNGoogleSignin/**",
 					"$(SRCROOT)/../node_modules/react-native-version-number/ios",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-admob/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook",
 				);
 				INFOPLIST_FILE = AnyoneTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2234,12 +2302,16 @@
 					"$(SRCROOT)/../node_modules/react-native-google-signin/ios/RNGoogleSignin/**",
 					"$(SRCROOT)/../node_modules/react-native-version-number/ios",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-admob/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook",
 				);
 				INFOPLIST_FILE = AnyoneTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2279,6 +2351,8 @@
 					"$(SRCROOT)/../node_modules/react-native-version-number/ios",
 					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-admob/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook",
 				);
 				INFOPLIST_FILE = Anyone/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2319,6 +2393,8 @@
 					"$(SRCROOT)/../node_modules/react-native-version-number/ios",
 					"$(SRCROOT)/../node_modules/react-native-splash-screen/ios",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-admob/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook",
 				);
 				INFOPLIST_FILE = Anyone/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2353,11 +2429,15 @@
 					"$(SRCROOT)/../node_modules/react-native-google-signin/ios/RNGoogleSignin/**",
 					"$(SRCROOT)/../node_modules/react-native-version-number/ios",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-admob/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook",
 				);
 				INFOPLIST_FILE = "Anyone-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2394,11 +2474,15 @@
 					"$(SRCROOT)/../node_modules/react-native-google-signin/ios/RNGoogleSignin/**",
 					"$(SRCROOT)/../node_modules/react-native-version-number/ios",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-admob/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook",
 				);
 				INFOPLIST_FILE = "Anyone-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2431,11 +2515,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-admob/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook",
 				);
 				INFOPLIST_FILE = "Anyone-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -2465,11 +2553,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-admob/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbads/ios/ReactNativeAdsFacebook",
 				);
 				INFOPLIST_FILE = "Anyone-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (

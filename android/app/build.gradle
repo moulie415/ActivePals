@@ -101,8 +101,8 @@ android {
         applicationId "com.anyone"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 30
-        versionName "3.9"
+        versionCode 31
+        versionName "4.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -158,6 +158,8 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-fbads')
+    compile project(':react-native-admob')
     implementation project(':react-native-calendar-events')
     implementation project(':react-native-fast-image')
     //implementation project(':react-native-firebase')
@@ -181,6 +183,7 @@ dependencies {
         exclude group: 'com.google.android.gms', module: 'play-services-maps'
     }
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
 
 
     implementation 'com.facebook.android:facebook-login:4.36.0'

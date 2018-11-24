@@ -8,6 +8,8 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+import suraj.tiwari.reactnativefbads.FBAdsPackage;
+import com.sbugert.rnadmob.RNAdMobPackage;
 import com.calendarevents.CalendarEventsPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
@@ -51,8 +53,10 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
-            new CalendarEventsPackage(),
-            new FastImageViewPackage(),
+              new FBAdsPackage(),
+              new RNAdMobPackage(),
+              new CalendarEventsPackage(),
+              new FastImageViewPackage(),
               new RNFirebasePackage(),
               new RNFirebaseNotificationsPackage(),
               new RNFirebaseDatabasePackage(),

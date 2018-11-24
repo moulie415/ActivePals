@@ -8,6 +8,7 @@ PODS:
   - Crashlytics (3.11.1):
     - Fabric (~> 1.8.1)
   - Fabric (1.8.1)
+  - FBAudienceNetwork (5.1.0)
   - FBSDKCoreKit (4.38.1):
     - Bolts (~> 1.9)
   - FBSDKLoginKit (4.38.1):
@@ -71,6 +72,7 @@ PODS:
     - GoogleMaps
   - Google-Maps-iOS-Utils/QuadTree (2.1.0):
     - GoogleMaps
+  - Google-Mobile-Ads-SDK (7.36.0)
   - Google/Core (2.0.4):
     - GoogleInterchangeUtilities (~> 1.0)
     - GoogleNetworkingUtilities (~> 1.0)
@@ -176,6 +178,7 @@ PODS:
 DEPENDENCIES:
   - Crashlytics (~> 3.11.1)
   - Fabric (= 1.8.1)
+  - FBAudienceNetwork
   - FBSDKLoginKit
   - FBSDKShareKit
   - Firebase/Auth (= 5.3.0)
@@ -183,6 +186,7 @@ DEPENDENCIES:
   - Firebase/Database (= 5.3.0)
   - Firebase/Messaging (= 5.3.0)
   - Firebase/Storage (= 5.3.0)
+  - Google-Mobile-Ads-SDK
   - Google/SignIn
   - GoogleMaps
   - react-native-fast-image (from `../node_modules/react-native-fast-image`)
@@ -212,6 +216,7 @@ SPEC REPOS:
     - Bolts
     - Crashlytics
     - Fabric
+    - FBAudienceNetwork
     - FBSDKCoreKit
     - FBSDKLoginKit
     - FBSDKShareKit
@@ -226,6 +231,7 @@ SPEC REPOS:
     - FLAnimatedImage
     - Google
     - Google-Maps-iOS-Utils
+    - Google-Mobile-Ads-SDK
     - GoogleAppUtilities
     - GoogleAuthUtilities
     - GoogleInterchangeUtilities
@@ -269,6 +275,7 @@ SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Crashlytics: ca7ab4bc304aa216bdc2e4c1a96389ee77252203
   Fabric: 43ed7bac010f588f63ee23ab1a0276b296db5e17
+  FBAudienceNetwork: 95efd4f20dc44f97254dbd3dfe5a4d19164092a8
   FBSDKCoreKit: 8d47857400e2f5bdea697a80daff882e91c84ef6
   FBSDKLoginKit: 4621c690d9dd8628031a4791497062183ea34b0d
   FBSDKShareKit: 6ffe22f0a0618eb7424d4104ab0ef3ce9643d42a
@@ -283,6 +290,7 @@ SPEC CHECKSUMS:
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   Google: d536877ec602555b755cc28ce6fed104825c693c
   Google-Maps-iOS-Utils: c32891ff472eaaa1fca032beedafa1a013af7875
+  Google-Mobile-Ads-SDK: 5bb4d2cea811842e104a24780caef63b4808e1bd
   GoogleAppUtilities: a8a552aa74f6597f805e45b5a3962766c3134973
   GoogleAuthUtilities: ccad2e0a9284699973ff57c0dd24c3893657fda4
   GoogleInterchangeUtilities: d5bc4d88d5b661ab72f9d70c58d02ca8c27ad1f7
@@ -309,6 +317,6 @@ SPEC CHECKSUMS:
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
 
-PODFILE CHECKSUM: 1a9f0ac82e32387064f3487474d14c0d996840d0
+PODFILE CHECKSUM: cd0bc55f5f957e889d148d69d79483105c196e14
 
 COCOAPODS: 1.5.3

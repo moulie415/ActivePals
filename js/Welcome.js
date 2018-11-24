@@ -62,7 +62,7 @@ class Welcome extends Component {
               {this.skip()}
                 <Text style={styles.text}>Search for and join your local Gym</Text>
                 <Image
-                  style={{tintColor: '#fff', height: 50, width: 50, margin: 10}}
+                  style={{tintColor: '#fff', height: 50, width: 50, marginHorizontal: 10}}
                   source={getResource('Gym')}/>
                 <Text style={styles.text}>{'Are you a personal trainer? \nWhy not get verified? \n(coming soon)'}</Text>
                 <Image
@@ -75,7 +75,7 @@ class Welcome extends Component {
                 <Icon name="md-chatboxes" style={{color: '#fff', fontSize: 50}} />
               </View>
               <View style={styles.slide3}>
-                <Text style={styles.text}>Make sure to set a username, your friends can use this to add you as a buddy</Text>
+                <Text style={styles.text}>Make sure to set a username so your buddies can add you</Text>
                 <TextInput
                   value={this.state.username}
                   onChangeText={username => this.setState({username})}

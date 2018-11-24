@@ -49,6 +49,15 @@ import {
   reportedExtractor,
   getSimplifiedTime
 } from './constants/utils'
+import { AdSettings, NativeAdsManager  } from 'react-native-fbads'
+import str from './constants/strings'
+import NativeAdView from './AdView'
+
+const adsManager = new NativeAdsManager(str.nativePlacementId);
+
+AdSettings.clearTestDevices()
+AdSettings.setLogLevel('none')
+AdSettings.addTestDevice(AdSettings.currentDeviceHash);
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -72,8 +81,7 @@ class Home extends Component {
 
   constructor(props) {
     super(props)
-
-    this.state = {
+    this.state = { 
       profile: this.props.profile,
       feed: this.props.feed,
       //feedObj: this.props.feed,
@@ -89,6 +97,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    
     firebase.messaging().requestPermission()
       .then(() => {
        console.log("messaging permission granted")
@@ -404,13 +413,16 @@ componentWillReceiveProps(nextProps) {
           else return null
         }}
         refreshing={this.state.refreshing}
-        renderItem = {({ item }) => {
-          if (item.uid == this.props.profile.uid || this.props.friends[item.uid] && this.props.friends[item.uid].status == 'connected') {
-            return (<Card>
-              {this.renderFeedItem(item)}
+        renderItem = {({ item, index }) => {
+            return (<View>
+              <Card>
+                {this.renderFeedItem(item)}
               </Card>
+              {(index > 0 && index % 4 == 0) && <Card>
+                <NativeAdView adsManager={adsManager} />
+                </Card>}
+              </View>
               )}
-          }
         }
       />
     }

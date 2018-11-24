@@ -98,14 +98,16 @@ export const doSetup = (profile) => {
 			}
 		}
 		dispatch(setHasLoggedIn(true))
-		return Promise.all([
-			dispatch(fetchFriends(friends)),
-			profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),
-			profile.chats && dispatch(fetchChats(profile.chats)),
-			profile.gym && dispatch(fetchGymChat(profile.gym)),
-			dispatch(fetchPosts(uid)),
-			dispatch(fetchSessions()),
-			])
+		return dispatch(fetchFriends(friends)).then(() => {
+			return Promise.all([
+				profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),
+				profile.chats && dispatch(fetchChats(profile.chats)),
+				profile.gym && dispatch(fetchGymChat(profile.gym)),
+				dispatch(fetchPosts(uid)),
+				dispatch(fetchSessions()),
+				])
+		})
+
 	}
 }
 
