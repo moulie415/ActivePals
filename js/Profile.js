@@ -379,7 +379,7 @@ checkUsername(initial, profile){
     })
   })
   .catch(e => {
-    Alert.alert('Error', e.message + '\nthat username may have already been taken')
+    Alert.alert('Error', 'That username may have already been taken')
     this.setState({spinner: false})
   })
 }

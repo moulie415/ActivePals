@@ -21,6 +21,7 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import SplashScreen from 'react-native-splash-screen'
 import RNFetchBlob from 'rn-fetch-blob'
 import TouchableOpacity from './constants/TouchableOpacityLockable.js'
+import str from './constants/strings'
 
 
  class Login extends Component {
@@ -65,8 +66,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
     <ImageBackground style={styles.container} source={background}>
       {this.state.spinner && <Spinner color={colors.secondary}/>}
       <View style={{marginBottom: 40}}>
-        <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>F I T</Text>
-        <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>L I N K</Text>
+        <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>{str.appNameFormatted}</Text>
       </View>
       <Item style={styles.inputGrp}>
       <Icon name="mail" style={{color: '#fff'}} />
