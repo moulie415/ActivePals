@@ -30,6 +30,10 @@ class Welcome extends Component {
         }
         
     }
+
+    componentDidMount() {
+      this.props.viewedWelcome()
+    }
     render() {
         return (
             <Swiper
@@ -71,7 +75,7 @@ class Welcome extends Component {
                 <Icon name="md-chatboxes" style={{color: '#fff', fontSize: 50}} />
               </View>
               <View style={styles.slide3}>
-                <Text style={styles.text}>Make sure to set a username</Text>
+                <Text style={styles.text}>Make sure to set a username, your friends can use this to add you as a buddy</Text>
                 <TextInput
                   value={this.state.username}
                   onChangeText={username => this.setState({username})}
@@ -147,6 +151,7 @@ class Welcome extends Component {
 import { connect } from 'react-redux'
 import { navigateBack, navigateHome } from 'Anyone/js/actions/navigation'
 import { doSetup, fetchProfile, setHasLoggedIn, setLoggedOut } from 'Anyone/js/actions/profile'
+import { setHasViewedWelcome } from './actions/profile';
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile
@@ -154,7 +159,8 @@ const mapStateToProps = ({ profile }) => ({
 
 const mapDispatchToProps = dispatch => ({
  goHome: ()=> dispatch(navigateHome()),
- goBack: ()=> dispatch(navigateBack())
+ goBack: ()=> dispatch(navigateBack()),
+ viewedWelcome: ()=> dispatch(setHasViewedWelcome())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Welcome)

@@ -4,7 +4,8 @@ import {
  	SET_LOGGED_OUT,
  	SET_GYM,
 	REMOVE_GYM,
-	SET_LOCATION
+	SET_LOCATION,
+	SET_HAS_VIEWED_WELCOME
 } from 'Anyone/js/actions/profile'
 import { Platform, PushNotificationIOS } from 'react-native'
 
@@ -15,6 +16,7 @@ import {
 const initialState = {
 	profile: {},
 	loggedIn: false,
+	hasViewedWelcome: false
 }
 
 export default function(state = initialState, action) {
@@ -53,11 +55,17 @@ export default function(state = initialState, action) {
 				location: action.location
 			}
 		}
+		case SET_HAS_VIEWED_WELCOME: {
+			return {
+				...state,
+				hasViewedWelcome: true
+			}
+		}
 		case SET_LOGGED_OUT:
 			if (Platform.OS == 'ios') {
 				PushNotificationIOS.setApplicationIconBadgeNumber(0)
 			}
-			return initialState
+			return {...initialState, hasViewedWelcome: state.hasViewedWelcome}
 		default:
 			return state
 	}

@@ -5,6 +5,7 @@ export const SET_LOGGED_OUT = 'SET_LOGGED_OUT'
 export const SET_GYM = 'SET_GYM'
 export const REMOVE_GYM = 'REMOVE_GYM'
 export const SET_LOCATION = 'SET_LOCATION'
+export const SET_HAS_VIEWED_WELCOME = 'SET_HAS_VIEWED_WELCOME'
 import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat } from './chats'
 import { fetchPosts } from './home'
@@ -38,6 +39,10 @@ export const resetGym = () => ({
 export const setLocation = (location) => ({
 	type: SET_LOCATION,
 	location
+})
+
+export const setHasViewedWelcome = () => ({
+	type: SET_HAS_VIEWED_WELCOME
 })
 
 
@@ -86,7 +91,7 @@ export const doSetup = (profile) => {
 		let friends = profile.friends
 		if (getState().nav.index == 0) {
 			if (getState().profile.hasViewedWelcome) {
-			dispatch(navigateHome())
+				dispatch(navigateHome())
 			}
 			else {
 				dispatch(navigateWelcome())
