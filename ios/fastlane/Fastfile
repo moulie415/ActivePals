@@ -21,7 +21,7 @@ platform :ios do
     # add actions here: https://docs.fastlane.tools/actions
   end
    lane :beta do
-      build_app(workspace: "Anyone.xcworkspace", scheme: "Anyone", export_method: "ad-hoc")
+      build_app
       crashlytics(api_token: "02b81ce5d7bf283724b7770acab0ff9fbf69990e",
                 build_secret: "a7b73c4c3ae1f288f81d101b26bb014cdd224a67eff5e331e3babd33c6bd7a85")
  

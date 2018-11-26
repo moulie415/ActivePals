@@ -79,6 +79,7 @@ const fetchGym = (profile, dispatch) => {
 export const doSetup = (profile) => {
 	return (dispatch, getState) => {
 		let uid = profile.uid
+		setupPresence(uid)
 		firebase.messaging().getToken()
             .then(fcmToken => {
                 if (fcmToken) {
@@ -107,6 +108,8 @@ export const doSetup = (profile) => {
 				dispatch(fetchSessions()),
 				])
 		})
+
+		
 
 	}
 }
@@ -169,6 +172,19 @@ export const joinGym = (location) => {
 		dispatch(setGym(location))
 		})
 	}
+  }
+
+  const setupPresence = (uid) => {
+
+	let ref = firebase.database().ref('users/' + uid).child('state')
+
+	let connectedRef = firebase.database().ref('.info/connected')
+	connectedRef.on('value', (snap) => {
+	if (snap.val() === true) {
+		ref.onDisconnect().remove()
+		ref.set(true)
+	}
+	})
   }
 
 

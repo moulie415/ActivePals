@@ -166,7 +166,19 @@ import Header from './header/header'
           title={'Sessions'}
            right={<View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
             <Text style={{color: '#fff'}}>Map: </Text>
-            <Switch value={this.state.switch} onValueChange={(val)=> this.setState({switch: val})} />
+            <Switch value={this.state.switch} onValueChange={(val)=> {
+              if (val) {
+                if (this.state.latitude && this.state.longitude) {
+                  this.setState({switch: val})
+                }
+                else {
+                  Alert.alert('Error', 'Sorry your location could not be found')
+                }
+              }
+              else {
+                this.setState({switch: val})
+              }
+              }} />
           </View>}
         />
         <View 
@@ -670,8 +682,8 @@ import Header from './header/header'
             this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
             this.getPosition()
           }}
-          ListEmptyComponent={<View style={{flex: 1, justifyContent: 'center', alignSelf: 'center', marginHorizontal: 20}}>
-            <Text style={{color: colors.primary, textAlign: 'center'}}>
+          ListEmptyComponent={<View style={{flex: 1, justifyContent: 'center', alignSelf: 'center'}}>
+            <Text style={{color: colors.primary, textAlign: 'center', margin: 20}}>
             No sessions have been created yet, also please make sure you are connected to the internet
           </Text></View>}
           data={this.state.sessions}

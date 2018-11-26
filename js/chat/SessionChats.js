@@ -57,8 +57,8 @@ import colors from 'Anyone/js/constants/colors'
     <Container>
     {this.state.chats.length > 0 && this.state.chats[0].type ?
         this.renderChats() :
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
-            <Text style={{color: colors.primary, textAlign: 'center'}}>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bgColor}}>
+            <Text style={{color: colors.primary, textAlign: 'center', marginHorizontal: 20}}>
             You haven't joined any sessions yet, join a session to start a session chat also please make sure you are connected to the internet
           </Text></View>}
     </Container>

@@ -27,8 +27,8 @@ import {
         <View style={{flexDirection: 'row', flex: 1, alignItems: 'center', marginTop: 10}}>
           <AdIconView style={{ width: 40, height: 40, marginRight: 10}} />
           <TriggerableView>
-          <Text style={{color: '#000', marginRight: 10}}>{this.props.nativeAd.advertiserName}</Text>
-          <Text style={{color: '#999', marginRight: 10}}>{'\n' + this.props.nativeAd.bodyText}</Text>
+            <Text style={{color: '#000', marginRight: 10}}>{this.props.nativeAd.advertiserName}</Text>
+            <Text style={{color: '#999', marginRight: 10, flexWrap: 'wrap', flex: 1}}>{'\n' + this.props.nativeAd.bodyText}</Text>
          </TriggerableView>
         
 

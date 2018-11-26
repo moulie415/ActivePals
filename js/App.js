@@ -4,7 +4,7 @@ import {
   Platform,
   Alert,
   AppState,
-  BackHandler
+  BackHandler,
 } from 'react-native'
 import Login from './login'
 import SignUp from './SignUp'
@@ -25,6 +25,7 @@ import SessionDetail from './sessions/SessionDetail'
 import FilePreview from './FilePreview'
 import Notifications from './notifications'
 import Gym from './Gym'
+import Credits from './Credits'
 import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
@@ -36,15 +37,6 @@ import reducer from './reducers/'
 import thunk from 'redux-thunk'
 import { StackNavigator,  TabNavigator, addNavigationHelpers, NavigationActions } from "react-navigation"
 import { addListener } from 'Anyone/index'
-
-// const sessions = StackNavigator({
-//   Home : {screen: Home},
-//   SessionType: { screen: SessionType, navigationOptions: {tabBarVisible: false} },
-//   SessionDetail: { screen: SessionDetail, navigationOptions: {tabBarVisible: false} },
-// },{
-//   mode: 'modal',
-//   headerMode: 'none'
-// })
 
 const chats = TabNavigator({
   SessionChats: {screen: SessionChats},
@@ -115,7 +107,8 @@ export const Stack = StackNavigator({
   PostView: { screen: PostView },
   Notifications: { screen: Notifications },
   Gym: { screen: Gym },
-  Welcome: {screen: Welcome, navigationOptions: {header: null}}
+  Welcome: {screen: Welcome, navigationOptions: {header: null}},
+  Credits: {screen: Credits, navigationOptions: {header: null}}
 })
 
 class App extends React.Component {
@@ -130,21 +123,35 @@ class App extends React.Component {
         }
         return true
     }
-  componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.user = user
-      } else {
-      }
-    })
 
-  }
+  componentDidMount() {
+      BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
+      AppState.addEventListener('change', this._handleAppStateChange);
+    }
+  
+    componentWillUnmount() {
+      AppState.removeEventListener('change', this._handleAppStateChange);
+    }
+
+    _handleAppStateChange = (nextAppState) => {
+      let user = firebase.auth().currentUser
+      if (user) {
+        if (nextAppState == 'active') {
+          firebase.database().ref('users/' + user.uid).child('state').set(true)
+        }
+        else {
+          firebase.database().ref('users/' + user.uid).child('state').set('away')
+        }
+      }
+    }
+
   render () {
     const { nav, dispatch } = this.props
     return <Stack navigation={addNavigationHelpers({ dispatch, state:nav, addListener })} />
   }
 }
+
+
 
 export default connect(({nav})=>({nav}))(App)
 

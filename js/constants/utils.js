@@ -210,3 +210,14 @@ export function getSimplifiedTime(createdAt) {
       }
       return dateString
     }
+
+    export const getStateColor = (state) => {
+      switch(state) {
+        case 'online':
+          return 'green'
+        case 'away':
+          return '#F9BD49'
+        case 'offline':
+          return 'red'
+      }
+    }

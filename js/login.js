@@ -1,5 +1,10 @@
 import React, { Component } from "react"
-import { Alert, View, ImageBackground } from "react-native"
+import {
+  Alert,
+  View,
+  ImageBackground,
+  Image
+ } from "react-native"
 import {
   Button,
   Input,
@@ -66,7 +71,7 @@ import str from './constants/strings'
     <ImageBackground style={styles.container} source={background}>
       {this.state.spinner && <Spinner color={colors.secondary}/>}
       <View style={{marginBottom: 40}}>
-        <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>{str.appNameFormatted}</Text>
+        <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>{str.appName}</Text>
       </View>
       <Item style={styles.inputGrp}>
       <Icon name="mail" style={{color: '#fff'}} />

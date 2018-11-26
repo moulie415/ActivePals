@@ -153,12 +153,12 @@ class FitLink extends React.Component {
     this.messageListener = firebase.messaging().onMessage((notification: RemoteMessage) => {
       const { dispatch, getState } = store
       const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notification.data
-      if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage') {
+      if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'buddyRequest') {
         dispatch(newNotification(notification.data))
         dispatch(updateLastMessage(notification.data))
         showLocalNotification(notification.data)
       }
-      if (type == 'rep' || type == 'comment' || 'buddyRequest') {
+      if (type == 'rep' || type == 'comment' || type == 'buddyRequest') {
         let count = getState().profile.profile.unreadCount || 0
         dispatch(setNotificationCount(count+1))
       }

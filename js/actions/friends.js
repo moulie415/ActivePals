@@ -3,8 +3,8 @@ import { removeChat, addChat } from './chats'
 import { fetchPrivateSessions } from './sessions'
 import { upUnreadCount } from './home'
 export const SET_FRIENDS = 'SET_FRIENDS'
-export const UPDATE_FRIENDS = 'UPDATE_FRIENDS'
 export const ADD_FRIEND = 'ADD_FRIEND'
+export const UPDATE_FRIEND_STATE = 'UPDATE_FRIEND_STATE'
 
 
 
@@ -19,6 +19,11 @@ const addToFriends = (uid,friend) => ({
 	friend,
 })
 
+export const updateFriendState = (uid, state) => ({
+	type: UPDATE_FRIEND_STATE,
+	uid,
+	state
+})
 
 export const removeFriend = (uid) => {
 	return (dispatch, getState) => {
@@ -46,12 +51,19 @@ export const fetchFriends = (uids) => {
 			let promise = new Promise(function(resolve, reject) {
 				let status = uids[friend]
 				firebase.database().ref('users/' + friend).once('value', profile => {
+					let state
+					if (profile.state) {
+						state = profile.state
+					}
+					else {
+						state = 'offline'
+					}
 					firebase.storage().ref('images/' + friend ).child('avatar').getDownloadURL()
 					.then(url => {
-						resolve({...profile.val(), status, avatar: url})
+						resolve({...profile.val(), status, avatar: url, state})
 					})
 					.catch(e => {
-						resolve({...profile.val(), status})
+						resolve({...profile.val(), status, state})
 					})
 
 				})
@@ -77,14 +89,21 @@ export const addFriend = (uid) => {
 		let status = uid.val()
 		return new Promise(resolve => {
 			firebase.database().ref('users/' + uid.key).once('value', profile => {
+				let state
+					if (profile.state) {
+						state = profile.state
+					}
+					else {
+						state = 'offline'
+					}
 				firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL()
 				.then(url => {
 					resolve()
-					dispatch(addToFriends(uid.key, {...profile.val(), status, avatar: url}))
+					dispatch(addToFriends(uid.key, {...profile.val(), status, avatar: url, state}))
 				})
 				.catch(e => {
 					resolve()
-					dispatch(addToFriends(uid.key, {...profile.val(), status}))
+					dispatch(addToFriends(uid.key, {...profile.val(), status, state}))
 				})
 			})
 		})
@@ -124,3 +143,4 @@ export const deleteFriend = (uid) => {
 	}
 
 }
+

@@ -28,7 +28,7 @@ import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'
 import sStyles from 'Anyone/js/styles/sessionStyles'
-import { arraysEqual } from './constants/utils'
+import { arraysEqual, getStateColor } from './constants/utils'
 import Header from './header/header'
 
 
@@ -65,13 +65,15 @@ import Header from './header/header'
     let friendsRef = firebase.database().ref('users/' + this.uid + '/friends')
     let chatRef = firebase.database().ref('users/' + this.uid).child('chats')
     this.listenForFriends(friendsRef)
-    this.listenForChats(chatRef)
+    this.listenForState(this.state.friends)
 
   }
 
   listenForFriends(ref) {
     ref.on('child_added', snapshot => {
-      this.props.add(snapshot)
+      if (!this.props.friends[snapshot.key]) {
+        this.props.add(snapshot)
+      }
     })
     ref.on('child_changed', snapshot => {
       this.props.add(snapshot)
@@ -81,15 +83,19 @@ import Header from './header/header'
     })
   }
 
-  listenForChats(ref) {
-    ref.on('child_added', snapshot => {
-        this.props.addChat(snapshot)
-    })
-    ref.on('child_changed', snapshot => {
-        this.props.addChat(snapshot)
-    })
-    ref.on('child_removed', snapshot => {
-        this.props.removeChat(snapshot.key)
+  listenForState(friends) {
+    friends.forEach(friend => {
+      firebase.database().ref('users/' + friend.uid).child('state').on('value', snapshot => {
+        if (snapshot.val() && snapshot.val() == 'away') {
+          this.props.updateFriendState(friend.uid, 'away')
+        }
+        else if (snapshot.val()) {
+          this.props.updateFriendState(friend.uid, 'online')
+        }
+        else {
+          this.props.updateFriendState(friend.uid, 'offline')
+        }
+      })
     })
   }
 
@@ -206,6 +212,14 @@ import Header from './header/header'
                 <Text style={{marginHorizontal: 10}}>{item.username}</Text>
               </View>
               <View style={{flexDirection: 'row'}}>
+              {item.state && <Text style={{color: getStateColor(item.state), alignSelf: 'center', marginRight: 10}}>{item.state}</Text>}
+              {item.state && <View style={{
+                width: 10,
+                height: 10, 
+                borderRadius: 5,
+                backgroundColor: getStateColor(item.state),
+                alignSelf: 'center'
+                }}/>}
               <TouchableOpacity
                 onPress={()=> this.openChat(item.uid, item.username)}
                 style={{padding: 5, marginHorizontal: 5}}>
@@ -279,7 +293,15 @@ import Header from './header/header'
 
 import { connect } from 'react-redux'
 import { navigateMessaging, navigateProfileView } from 'Anyone/js/actions/navigation'
-import { fetchFriends, sendRequest, acceptRequest, deleteFriend, removeFriend, addFriend } from 'Anyone/js/actions/friends'
+import {
+  fetchFriends,
+  sendRequest,
+  acceptRequest,
+  deleteFriend,
+  removeFriend,
+  addFriend,
+  updateFriendState,
+} from 'Anyone/js/actions/friends'
 import { removeChat, addChat } from 'Anyone/js/actions/chats'
 import { fetchProfile } from 'Anyone/js/actions/profile'
 
@@ -298,7 +320,8 @@ const mapDispatchToProps = dispatch => ({
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   add: (friend) => dispatch(addFriend(friend)),
   addChat: (chat) => dispatch(addChat(chat)),
-  removeChat: (chat) => dispatch(removeChat(chat))
+  removeChat: (chat) => dispatch(removeChat(chat)),
+  updateFriendState: (uid, state) => dispatch(updateFriendState(uid, state))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends)
