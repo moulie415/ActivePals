@@ -494,7 +494,7 @@ import Header from './header/header'
             <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
-                <Icon name='md-contact'  style={{fontSize: 30, color: colors.primary}}/>}
+                <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0}}/>}
                 <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
                 {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
               </View>

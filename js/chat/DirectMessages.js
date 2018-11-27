@@ -54,13 +54,21 @@ import {getSimplifiedTime } from '../constants/utils'
 
   listenForChats(ref) {
     ref.on('child_added', snapshot => {
-      this.props.add(snapshot)
+      if (!this.props.chats[snapshot.key]) {
+        this.props.add(snapshot)
+      }
     })
     ref.on('child_changed', snapshot => {
         this.props.add(snapshot)
     })
     ref.on('child_removed', snapshot => {
         this.props.remove(snapshot.key)
+    })
+  }
+
+  sortByDate(array) {
+    return array.sort((a,b) => {
+      return new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt)
     })
   }
 
@@ -82,7 +90,7 @@ import {getSimplifiedTime } from '../constants/utils'
   renderChats() {
     return <FlatList 
       style={{backgroundColor: colors.bgColor}}
-      data={this.state.chats}
+      data={this.sortByDate(this.state.chats)}
       // refreshing={this.state.refreshing}
       // onRefresh={()=> {
       //   this.setState({refreshing: true})

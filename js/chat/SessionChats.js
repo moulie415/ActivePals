@@ -65,10 +65,16 @@ import colors from 'Anyone/js/constants/colors'
   )
   }
 
+  sortByDate(array) {
+    return array.sort((a,b) => {
+      return new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt)
+    })
+  }
+
   renderChats() {
     return <FlatList 
       style={{backgroundColor: colors.bgColor}}
-      data={this.state.chats}
+      data={this.sortByDate(this.state.chats)}
       keyExtractor={(chat) => chat.key}
       renderItem={({item}) => {
         return <TouchableOpacity
