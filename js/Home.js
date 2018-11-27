@@ -55,9 +55,9 @@ import NativeAdView from './AdView'
 
 const adsManager = new NativeAdsManager(str.nativePlacementId);
 
-AdSettings.clearTestDevices()
-AdSettings.setLogLevel('none')
-AdSettings.addTestDevice(AdSettings.currentDeviceHash);
+// AdSettings.clearTestDevices()
+// AdSettings.setLogLevel('none')
+// AdSettings.addTestDevice(AdSettings.currentDeviceHash)
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')

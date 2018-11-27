@@ -24,13 +24,12 @@ import {
             textAlign: 'right',
             }}>{this.props.nativeAd.sponsoredTranslation}</Text>
         </TriggerableView>
-        <View style={{flexDirection: 'row', flex: 1, alignItems: 'center', marginTop: 10}}>
-          <AdIconView style={{ width: 40, height: 40, marginRight: 10}} />
-          <TriggerableView>
-            <Text style={{color: '#000', marginRight: 10}}>{this.props.nativeAd.advertiserName}</Text>
-            <Text style={{color: '#999', marginRight: 10, flexWrap: 'wrap', flex: 1}}>{'\n' + this.props.nativeAd.bodyText}</Text>
-         </TriggerableView>
-        
+        <View style={{flexDirection: 'row', marginTop: 10}}>
+          <AdIconView style={{ width: 40, height: 40, marginRight: 10, alignSelf: 'center'}} />
+          <TriggerableView style={{marginRight: 10, flex: 1, flexWrap: 'wrap'}}>
+            <Text numberOfLines={1} style={{color: '#000'}}>{this.props.nativeAd.advertiserName + '\n'}</Text>          
+            <Text numberOfLines={2} style={{color: '#999'}}>{this.props.nativeAd.bodyText}</Text>
+          </TriggerableView>
 
           </View>
           <MediaView style={{ width: '100%', height: 300, marginTop: 10 }} />
