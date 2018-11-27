@@ -86,18 +86,29 @@ import Header from './header/header'
   listenForState(friends) {
     friends.forEach(friend => {
       firebase.database().ref('users/' + friend.uid).child('state').on('value', snapshot => {
-        if (snapshot.val() && snapshot.val() == 'away') {
-          this.props.updateFriendState(friend.uid, 'away')
+        if (snapshot.val() && snapshot.val() == 'away' && this.props.friends[friend.uid].state != 'away') {
+            this.props.updateFriendState(friend.uid, 'away')
         }
-        else if (snapshot.val()) {
+        else if (snapshot.val() && this.props.friends[friend.uid].state != 'online') {
           this.props.updateFriendState(friend.uid, 'online')
         }
         else {
-          this.props.updateFriendState(friend.uid, 'offline')
+          if (!snapshot.val() && this.props.friends[friend.uid].state != 'offline') {
+            this.props.updateFriendState(friend.uid, 'offline')
+          }
         }
       })
     })
   }
+
+  sortByState(friends) {
+    return friends.sort((a,b) => {
+      let stateA = getStateVal(a.state)
+      let stateB = getStateVal(b.state)
+      return stateB - stateA
+    })
+  }
+
 
 
   onRefresh() {
@@ -176,7 +187,7 @@ import Header from './header/header'
   renderFriends() {
     return <FlatList 
       style={{backgroundColor: '#9993'}}
-      data={this.state.friends}
+      data={this.sortByState(this.state.friends)}
       keyExtractor={(friend)=> friend.uid}
       onRefresh={()=> this.onRefresh()}
       refreshing={this.state.refreshing}
@@ -288,6 +299,17 @@ import Header from './header/header'
         }
       })
       .catch(e => Alert.alert('Error', e.message))
+  }
+}
+
+const getStateVal = (state) => {
+  switch(state) {
+    case 'online':
+      return 3
+    case 'away':
+      return 2
+    default :
+      return 1
   }
 }
 
