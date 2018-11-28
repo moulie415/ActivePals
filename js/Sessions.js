@@ -227,7 +227,7 @@ import Header from './header/header'
               this.refs.friendsModal.open()
             }
             else {
-              Alert.alert("Sorry", "You must have at least one buddy to create a private session")
+              Alert.alert("Sorry", "You must have at least one pal to create a private session")
             }
           }}>
             <Text adjustsFontSizeToFit={true}
@@ -287,7 +287,7 @@ import Header from './header/header'
         </Modal>
         <Modal style={styles.modal} position={"center"} ref={"friendsModal"} >
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
-          Select buddies</Text>
+          Select pals</Text>
           <ScrollView style={{backgroundColor: '#d6d6d6'}}>
           {this.renderFriendsSelection()}
           </ScrollView>
@@ -297,7 +297,7 @@ import Header from './header/header'
                 this.props.onContinue(this.state.selectedFriends, this.state.selectedLocation)
               }
               else {
-                Alert.alert("Sorry", "Please select at least one buddy")
+                Alert.alert("Sorry", "Please select at least one pal")
               }
             }}
             style={{padding: 5}}>
@@ -617,7 +617,7 @@ import Header from './header/header'
                     this.refs.friendsModal.open()
                   }
                   else {
-                    Alert.alert('Sorry', 'You must have at least one buddy to create a private session')
+                    Alert.alert('Sorry', 'You must have at least one pal to create a private session')
                   }
                 }
               }

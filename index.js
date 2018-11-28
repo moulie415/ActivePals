@@ -123,8 +123,8 @@ class FitLink extends React.Component {
     //ignore setting a timer warnings
     YellowBox.ignoreWarnings(['Setting a timer'])
     const channels = []
-    channels.push(new firebase.notifications.Android.Channel('REQUEST', 'Buddy requests', firebase.notifications.Android.Importance.Max)
-        .setDescription('Channel for buddy requests')
+    channels.push(new firebase.notifications.Android.Channel('REQUEST', 'Pal requests', firebase.notifications.Android.Importance.Max)
+        .setDescription('Channel for pal requests')
         .setSound('light.mp3'))
 
     channels.push(new firebase.notifications.Android.Channel('DIRECT_MESSAGES', 'Direct messages', firebase.notifications.Android.Importance.Max)

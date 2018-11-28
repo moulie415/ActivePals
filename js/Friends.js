@@ -35,7 +35,7 @@ import Header from './header/header'
  class Friends extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Buddies',
+    tabBarLabel: 'Pals',
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-people'
@@ -129,11 +129,11 @@ import Header from './header/header'
     return (
     <Container>
       <Header 
-        title={'Buddies'}
+        title={'Pals'}
         right={<TouchableOpacity onPress={() => {
         firebase.database().ref('users/' + this.uid).child('username')
           .once('value', snapshot => {
-            snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a buddy")
+            snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a pal")
           })
           }}>
             <Icon name='md-add' style={{color: '#fff', padding: 5}} />
@@ -144,7 +144,7 @@ import Header from './header/header'
       this.renderFriends() :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
-            {"You don't have any buddies yet, also please make sure you are connected to the internet"}
+            {"You don't have any pals yet, also please make sure you are connected to the internet"}
           </Text></View>}
 
       <Modal 
@@ -153,7 +153,7 @@ import Header from './header/header'
       style={styles.modal}
       position={"center"}
       ref={"modal"} >
-          <Text style={styles.modalText}>Send buddy request</Text>
+          <Text style={styles.modalText}>Send pal request</Text>
           <TextInput
           underlineColorAndroid='transparent'
           style={styles.usernameInput}
@@ -202,7 +202,7 @@ import Header from './header/header'
       else if (item.status == 'incoming') {
         return <View style={{paddingVertical: 20, paddingHorizontal: 15, backgroundColor: '#fff'}}>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
-              <Text style={{marginRight: 5, flex: 4}}>{item.username + ' has sent you a buddy request'}</Text>
+              <Text style={{marginRight: 5, flex: 4}}>{item.username + ' has sent you a pal request'}</Text>
               <View style={{flexDirection: 'row', flex: 1}}>
                 <TouchableOpacity onPress={()=> this.accept(item.uid)}>
                  <Icon name='ios-checkmark' style={{color: 'green', fontSize: 50, paddingHorizontal: 10, alignSelf: 'center'}}/>
@@ -269,7 +269,7 @@ import Header from './header/header'
         if (snapshot.val()) {
         firebase.database().ref('users/' + this.uid + '/friends').child(snapshot.val()).once('value', status => {
           if (status.val()) {
-            Alert.alert('Sorry', "You've already added this user as a buddy")
+            Alert.alert('Sorry', "You've already added this user as a pal")
           }
           else {
             this.props.onRequest(this.uid , snapshot.val()).then(() => {
@@ -285,7 +285,7 @@ import Header from './header/header'
       .catch(e => Alert.alert("Error", e.message))
     }
     else {
-      Alert.alert("Error", "You cannot add yourself as a buddy")
+      Alert.alert("Error", "You cannot add yourself as a pal")
     }
   }
 

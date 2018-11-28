@@ -163,7 +163,7 @@ componentWillReceiveProps(nextProps) {
             value={this.state.status}
             autoCorrect={false}
             onChangeText={(status) => this.setState({status})}
-            placeholder="Post a status for your buddies..."
+            placeholder="Post a status for your pals..."
             style={{flex: 1, borderColor: '#999', borderWidth: 0.5, marginHorizontal: 10, height: 40, padding: 5}}/>
             <TouchableOpacity onPress={()=> {
               if (username) {

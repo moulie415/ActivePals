@@ -136,7 +136,7 @@ import Header from './header/header'
           <TouchableOpacity 
           onPress={()=> {
             Alert.alert(
-              'Send Buddy request',
+              'Send pal request',
               'Are you sure?',
               [
               {text: 'Cancel', style: 'cancel'},
@@ -152,7 +152,7 @@ import Header from './header/header'
               )
           }}
           style={{padding: 10, backgroundColor: colors.secondary, margin: 10, alignSelf: 'center'}}>
-          <Text style={{color: '#fff'}}>Send Buddy request</Text>
+          <Text style={{color: '#fff'}}>Send pal request</Text>
           </TouchableOpacity>}
 
 
@@ -181,7 +181,7 @@ import Header from './header/header'
           style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 30}}
           onPress={()=> {
             Alert.alert(
-              'Remove Buddy',
+              'Remove pal',
               'Are you sure?',
               [
               {text: 'Cancel', style: 'cancel'},
@@ -192,7 +192,7 @@ import Header from './header/header'
               ]
               )
           }}>
-          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Remove Buddy</Text>
+          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Remove pal</Text>
           </TouchableOpacity>}
         </View> : <View style={hStyles.spinner}><Spinner color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}

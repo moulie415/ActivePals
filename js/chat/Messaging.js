@@ -20,6 +20,7 @@ import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-cha
 import colors from 'Anyone/js/constants/colors'
 import sStyles from 'Anyone/js/styles/sessionStyles'
 import Header from '../header/header'
+import { isIphoneX } from 'react-native-iphone-x-helper'
 
 class Messaging extends React.Component {
   static navigationOptions = {
@@ -238,6 +239,12 @@ class Messaging extends React.Component {
               <MessageText {...props} />
             </View>
             )}}
+            renderActions={() => {
+              return <TouchableOpacity 
+              style={{marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 10}}>
+                <Icon name="ios-attach"/>
+              </TouchableOpacity>
+            }}
           />
         {this.state.spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
           <Spinner color={colors.secondary}/>

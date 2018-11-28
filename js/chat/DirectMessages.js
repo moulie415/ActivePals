@@ -17,7 +17,7 @@ import {getSimplifiedTime } from '../constants/utils'
  class DirectMessages extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Buddies',
+    tabBarLabel: 'Pals',
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-chatboxes'

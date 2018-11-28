@@ -160,7 +160,7 @@ class Notifications extends Component {
       case 'comment':
         return user + ' commented on your post'
       case 'buddyRequest':
-        return user + ' sent you a buddy request'
+        return user + ' sent you a pal request'
     }
   }
 
