@@ -32,6 +32,7 @@ class FilePreview extends Component {
         this.params = this.props.navigation.state.params
         this.type = this.params.type
         this.uri = this.params.uri
+        this.message = this.params.message
 		this.state = {
 			paused: true,
 			text: "",
@@ -194,26 +195,33 @@ class FilePreview extends Component {
         this.uploadImage(this.uri).then(image => {
             let profile = this.props.profile
             let date = new Date().toString()
-            firebase.database().ref('userPhotos/' + profile.uid).child(image.id).set({createdAt: date, url: image.url})
-            this.props.postStatus({
-              type: 'photo',
-              url: image.url,
-              text: this.state.text, uid: profile.uid,
-              createdAt: date})
-            .then(() => {
+            if (this.message) {
                 this.props.goBack()
-                Alert.alert('Success', 'Post submitted')
+                this.props.setMessage(image.url, this.state.text)
+            }
+            else {
+                firebase.database().ref('userPhotos/' + profile.uid).child(image.id).set({createdAt: date, url: image.url})
+                this.props.postStatus({
+                type: 'photo',
+                url: image.url,
+                text: this.state.text, uid: profile.uid,
+                createdAt: date})
+                .then(() => {
+                    this.props.goBack()
+                    Alert.alert('Success', 'Post submitted')
+                    this.setState({spinner: false})
+                })
+                .catch(e => {
+                Alert.alert('Error', e.message)
                 this.setState({spinner: false})
             })
-            .catch(e => {
-              Alert.alert('Error', e.message)
-              this.setState({spinner: false})
-          })
+        }
         })
         .catch(e => {
             Alert.alert('Error', e.message)
             this.setState({spinner: false})
         })
+    
     }
 
   uploadImage(uri, mime = 'application/octet-stream') {
@@ -240,6 +248,7 @@ import { connect } from 'react-redux'
 
 import { navigateBack } from 'Anyone/js/actions/navigation'
 import { addPost } from 'Anyone/js/actions/home'
+import { setMessage } from '../js/actions/chats'
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile,
 })
@@ -247,6 +256,7 @@ const mapStateToProps = ({ profile }) => ({
 const mapDispatchToProps = dispatch => ({
     goBack: () => dispatch(navigateBack()),
   postStatus: (status) => {return dispatch(addPost(status))},
+  setMessage: (url, text) => dispatch(setMessage(url, text))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(FilePreview)

@@ -10,6 +10,8 @@ export const RESET_NOTIFICATION = 'RESET_NOTIFICATION'
 export const UPDATE_CHAT = 'UPDATE_CHAT'
 export const UPDATE_SESSION_CHAT = 'UPDATE_SESSION_CHAT'
 export const SET_GYM_CHAT = 'SET_GYM_CHAT'
+export const SET_MESSAGE = 'SET_MESSAGE'
+export const RESET_MESSAGE = 'RESET_MESSAGE'
 
 
 const setSessionChats = (sessionChats) => ({
@@ -64,6 +66,16 @@ export const newNotification = (notif) => ({
 
 export const resetNotification = () => ({
        type: RESET_NOTIFICATION,
+})
+
+export const setMessage = (url, text) => ({
+	type: SET_MESSAGE,
+	url,
+	text
+})
+
+export const resetMessage = () => ({
+	type: RESET_MESSAGE
 })
 
 

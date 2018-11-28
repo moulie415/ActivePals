@@ -111,7 +111,9 @@ import {getSimplifiedTime } from '../constants/utils'
                   <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
               <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
                 <Text>{friend.username}</Text>
-                <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>
+                {!!item.lastMessage.text && <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>}
+                {!item.lastMessage.text && item.lastMessage.image && <Text numberOfLines={1} style={{color: '#999', fontStyle: 'italic'}}>
+                {item.lastMessage.user._id == this.props.profile.uid ? 'you sent an image' : 'sent you an image'}</Text>}
               </View>
                {item.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text></View>}

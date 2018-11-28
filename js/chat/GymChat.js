@@ -73,7 +73,7 @@ import colors from 'Anyone/js/constants/colors'
             <View>{getType('Gym', 50)}</View>
             <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
               <Text numberOfLines={1} >{gym.name}</Text>
-              { gymChat && <Text numberOfLines={1} style={{color: '#999'}}>{gymChat.lastMessage.text}</Text>}
+              { gymChat && gymChat.lastMessage.text && <Text numberOfLines={1} style={{color: '#999'}}>{gymChat.lastMessage.text}</Text>}
             </View>
             { gymChat && gymChat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
               <Text style={{color: '#999'}}>{getSimplifiedTime(gymChat.lastMessage.createdAt)}</Text></View>}

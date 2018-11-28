@@ -18,8 +18,8 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                                  .once('value')
 
     return getValuePromise.then(snapshot => {
-        const { user, text, FCMToken, createdAt, _id, chatId, friendUid } = snapshot.val()[Object.keys(snapshot.val())[0]]
-
+        const { user, text, FCMToken, createdAt, _id, chatId, friendUid, image } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        let imageVal = image || ""
         return admin.database().ref('users/' + friendUid).child('FCMToken').once('value', snapshot => {
             const payload = {
                 data: {
@@ -39,6 +39,7 @@ exports.sendNewMessageNotification = functions.database.ref('/chats/{id}').onWri
                     avatar: user.avatar ,
                     type: 'message',
                     chatId,
+                    image: imageVal,
                     priority: 'high',
                     contentAvailable: 'true',
                     content_available: 'true'
@@ -66,7 +67,8 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
     .once('value')
 
     return getValuePromise.then(snapshot => {
-        const { user, text, sessionId, createdAt, _id, sessionTitle, type } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        const { user, text, sessionId, createdAt, _id, sessionTitle, type, image } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        let imageVal = image || ""
         return admin.database().ref('/'+ type +'/' + sessionId).child('users').once('value', users => {
             let refs = []
             Object.keys(users.val()).forEach(child => {
@@ -97,6 +99,7 @@ exports.sendNewSessionMessageNotification = functions.database.ref('/sessionChat
                             private: type,
                             sessionId,
                             sessionTitle,
+                            image: imageVal,
                             priority: 'high',
 			                contentAvailable: 'true',
                             content_available: 'true'
@@ -126,7 +129,8 @@ exports.sendNewGymMessageNotification = functions.database.ref('/gymChats/{id}')
     return getValuePromise.then(snapshot => {
         console.log('snapshot')
         console.log(snapshot.val())
-        const { user, text, createdAt, _id, gymId, gymName } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        const { user, text, createdAt, _id, gymId, gymName, image } = snapshot.val()[Object.keys(snapshot.val())[0]]
+        let imageVal = image || ""
         return admin.database().ref('gyms/' + gymId).child('users').once('value', users => {
             let refs = []
             Object.keys(users.val()).forEach(child => {
@@ -158,6 +162,7 @@ exports.sendNewGymMessageNotification = functions.database.ref('/gymChats/{id}')
                             type: 'gymMessage',
                             gymId,
                             gymName,
+                            image: imageVal,
                             priority: 'high',
 			                contentAvailable: 'true',
                             content_available: 'true'

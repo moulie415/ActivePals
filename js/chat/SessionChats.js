@@ -86,6 +86,7 @@ import colors from 'Anyone/js/constants/colors'
             <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
               <Text numberOfLines={1} >{item.title}</Text>
               <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>
+              {!!item.lastMessage.text && <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>}
             </View>
             {item.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
               <Text style={{color: '#999'}}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text></View>}

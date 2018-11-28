@@ -8,7 +8,9 @@ import {
 	NEW_NOTIF,
 	UPDATE_CHAT,
 	UPDATE_SESSION_CHAT,
-	SET_GYM_CHAT
+	SET_GYM_CHAT,
+	SET_MESSAGE,
+	RESET_MESSAGE
 } from 'Anyone/js/actions/chats'
 
 import {
@@ -72,6 +74,16 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				gymChat: action.chat
+			}
+		case SET_MESSAGE:
+			return {
+				...state,
+				message: {url: action.url, text: action.text}
+			}
+		case RESET_MESSAGE:
+			return {
+				...state,
+				message: null
 			}
         case SET_LOGGED_OUT: {
 			return initialState

@@ -21,6 +21,9 @@ import colors from 'Anyone/js/constants/colors'
 import sStyles from 'Anyone/js/styles/sessionStyles'
 import Header from '../header/header'
 import { isIphoneX } from 'react-native-iphone-x-helper'
+import { guid } from '../constants/utils'
+import ImagePicker from 'react-native-image-picker'
+import ImageResizer from 'react-native-image-resizer'
 
 class Messaging extends React.Component {
   static navigationOptions = {
@@ -85,6 +88,21 @@ class Messaging extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.message) {
+      let message = {
+        _id: guid(),
+        createdAt: new Date(),
+        text: nextProps.message.text,
+        image: nextProps.message.url,
+        user: {
+          _id: this.uid,
+          name: this.props.profile.username,
+          avatar: this.state.avatar
+        }
+      }
+      this.onSend([message])
+      this.props.resetMessage()
+    }
     if (nextProps.messageSession && !this.fetched) {
       this.fetched = true
       this.setState({messages: nextProps.messageSession.reverse(), spinner: false})
@@ -107,16 +125,17 @@ class Messaging extends React.Component {
           createdAt,
           custom_notification,
           gymId,
+          image
          } = nextProps.notif
         if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage') {
           let message
           let date = new Date(createdAt)
           if (custom_notification) {
             let custom = JSON.parse(custom_notification)
-            message = {createdAt: date, _id, text: custom.body, user: {_id: uid, name: username, avatar}}
+            message = {createdAt: date, _id, text: custom.body, user: {_id: uid, name: username, avatar}, image}
           }
           else {
-            message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}}
+            message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}, image}
           }
           if ((type == 'message' && this.friendUid == uid) ||
             (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid) ||
@@ -240,7 +259,8 @@ class Messaging extends React.Component {
             </View>
             )}}
             renderActions={() => {
-              return <TouchableOpacity 
+              return <TouchableOpacity
+              onPress={()=> this.showPicker()}
               style={{marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 10}}>
                 <Icon name="ios-attach"/>
               </TouchableOpacity>
@@ -264,15 +284,93 @@ class Messaging extends React.Component {
       .catch(e => Alert.alert('Error', e.message))
   }
 
+  showPicker() {
+    let videoOptions = {
+      mediaType: 'video',
+      durationLimit: 30,
+    }
+    let options = {
+      title: null,
+      mediaType: 'photo',
+      // customButtons: [
+      // {name: 'video', title: 'Shoot video (coming soon)'},
+      // {name: 'uploadVideo', title: 'Choose video from library (coming soon)'},
+      // ],
+      noData: true,
+      storageOptions: {
+        skipBackup: true,
+      }
+    }
+    ImagePicker.showImagePicker(options, (response) => {
+      this.setState({spinner: true})
+      console.log('Response = ', response)
+  
+      if (response.didCancel) {
+        console.log('User cancelled image picker')
+        this.setState({spinner: false})
+      }
+      else if (response.error) {
+        Alert.alert('Error', response.error)
+        this.setState({spinner: false})
+      }
+      else if (response.customButton) {
+        if (response.customButton == 'uploadVideo') {
+          ImagePicker.launchImageLibrary(videoOptions, (response)  => {
+            if (response.error) {
+              Alert.alert('Error',response.error)
+              this.setState({spinner: false})
+            }
+          })
+        }
+        else if (response.customButton == 'video') {
+          ImagePicker.launchCamera(videoOptions, (response)  => {
+            if (response.error) {
+              Alert.alert('Error', response.error)
+              this.setState({spinner: false})
+            }
+          })
+  
+        }
+      }
+      else {
+        const size = 640
+        ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then((resized) => {
+          this.setState({spinner: false})
+          this.props.previewFile('image', resized.uri)
+  
+      }).catch((e) => {
+        Alert.alert('Error', e.message)
+        this.setState({spinner: false})
+      })
+  
+  
+      }
+    })
+  }
+
   // componentWillUnmount() {
 
   //   }
 }
 
 import { connect } from 'react-redux'
-import { navigateMessaging, navigateProfile, navigateProfileView, navigateGym } from 'Anyone/js/actions/navigation'
+import {
+  navigateMessaging,
+  navigateProfile,
+  navigateProfileView,
+  navigateGym,
+  navigateFilePreview
+} from 'Anyone/js/actions/navigation'
 import { sendRequest, acceptRequest } from 'Anyone/js/actions/friends'
-import { fetchChats, fetchSessionChats, fetchMessages, fetchSessionMessages, fetchGymMessages, resetNotification } from 'Anyone/js/actions/chats'
+import {
+  fetchChats,
+  fetchSessionChats,
+  fetchMessages,
+  fetchSessionMessages,
+  fetchGymMessages,
+  resetNotification,
+  resetMessage
+} from 'Anyone/js/actions/chats'
 import { fetchGymChat } from "../actions/chats";
 
 const fetchId = (params) => {
@@ -291,6 +389,7 @@ const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
   gym: profile.gym,
   sessionChats: chats.sessionChats,
   chats: chats.chats,
+  message: chats.message,
   gymChat: chats.gymChat,
   messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)],
   notif: chats.notif,
@@ -309,7 +408,9 @@ const mapDispatchToProps = dispatch => ({
   resetNotif: () => dispatch(resetNotification()),
   navigateProfile: () => dispatch(navigateProfile()),
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
-  goToGym: (gym) => dispatch(navigateGym(gym))
+  goToGym: (gym) => dispatch(navigateGym(gym)),
+  resetMessage: () => dispatch(resetMessage()),
+  previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri, true)),
 
 })
 
