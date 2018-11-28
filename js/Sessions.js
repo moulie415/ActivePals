@@ -399,8 +399,8 @@ import Header from './header/header'
                   flexDirection: 'row',
                   justifyContent: 'center'
                   }}>
-                <Text style={{color: '#fff', marginRight: 10}}>View detail</Text>
-                <Icon name={'ios-paper'} style={{color: '#fff'}}/>
+                <Text style={{color: '#fff', marginRight: 10}}>View info</Text>
+                <Icon name={'md-information-circle'} style={{color: '#fff'}}/>
                 </TouchableOpacity>
               </View>}
             {this.state.locationPhoto ?
@@ -666,7 +666,7 @@ import Header from './header/header'
                         this.props.viewGym(gym.place_id)
                       }}
                       style={{justifyContent: 'center'}}>
-                        <Icon name='ios-paper' style={{color: colors.secondary}}/>
+                        <Icon name='md-information-circle' style={{color: colors.secondary}}/>
                       </TouchableOpacity>
                       </View>
                     </View>

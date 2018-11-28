@@ -179,7 +179,7 @@ class Messaging extends React.Component {
   getRightHandIcon() {
     if (this.gymId) {
       return <TouchableOpacity onPress={()=> this.props.goToGym(this.gymId)}>
-        <Icon name='ios-paper' style={{color: '#fff'}}/>
+        <Icon name='md-information-circle' style={{color: '#fff'}}/>
       </TouchableOpacity>
     }
     else return null
