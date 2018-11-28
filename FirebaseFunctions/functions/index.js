@@ -196,7 +196,7 @@ exports.sendFriendRequestNotification = functions.database.ref('/users/{id}/frie
                     const payload = {
                         data: {
                             custom_notification: JSON.stringify({
-                                body: 'sent you a buddy request',
+                                body: 'sent you a pal request',
                                 title: username,
                                 priority: 'high',
                                 sound: 'default',

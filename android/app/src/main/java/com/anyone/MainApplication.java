@@ -8,6 +8,8 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+
+import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import suraj.tiwari.reactnativefbads.FBAdsPackage;
 import com.sbugert.rnadmob.RNAdMobPackage;
 import com.calendarevents.CalendarEventsPackage;
@@ -71,6 +73,7 @@ public class MainApplication extends Application implements ReactApplication {
               new ImageResizerPackage(),
               new ImagePickerPackage(),
               new RNFetchBlobPackage(),
+              new RNFirebaseInstanceIdPackage(),
               new FBSDKPackage(mCallbackManager)
       );
     }

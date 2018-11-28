@@ -62,14 +62,14 @@ import Header from './header/header'
       } else {
       }
     })
-    let friendsRef = firebase.database().ref('users/' + this.uid + '/friends')
     let chatRef = firebase.database().ref('users/' + this.uid).child('chats')
-    this.listenForFriends(friendsRef)
+    this.listenForFriends()
     this.listenForState(this.state.friends)
 
   }
 
-  listenForFriends(ref) {
+  listenForFriends() {
+    let ref = firebase.database().ref('users/' + this.uid + '/friends')
     ref.on('child_added', snapshot => {
       if (!this.props.friends[snapshot.key]) {
         this.props.add(snapshot)
@@ -86,17 +86,19 @@ import Header from './header/header'
   listenForState(friends) {
     friends.forEach(friend => {
       firebase.database().ref('users/' + friend.uid).child('state').on('value', snapshot => {
-        if (snapshot.val() && snapshot.val() == 'away' && this.props.friends[friend.uid].state != 'away') {
-            this.props.updateFriendState(friend.uid, 'away')
-        }
-        else if (snapshot.val() && this.props.friends[friend.uid].state != 'online') {
-          this.props.updateFriendState(friend.uid, 'online')
-        }
-        else {
-          if (!snapshot.val() && this.props.friends[friend.uid].state != 'offline') {
-            this.props.updateFriendState(friend.uid, 'offline')
+        if (this.props.friends[friend.uid]) {
+          if (snapshot.val() && snapshot.val() == 'away' && this.props.friends[friend.uid].state != 'away') {
+              this.props.updateFriendState(friend.uid, 'away')
           }
-        }
+          else if (snapshot.val() && this.props.friends[friend.uid].state != 'online') {
+            this.props.updateFriendState(friend.uid, 'online')
+          }
+          else {
+            if (!snapshot.val() && this.props.friends[friend.uid].state != 'offline') {
+              this.props.updateFriendState(friend.uid, 'offline')
+            }
+          }
+      }
       })
     })
   }
@@ -252,6 +254,7 @@ import Header from './header/header'
 
   accept(friend) {
     this.props.onAccept(this.uid, friend)
+    .then(this.listenForFriends())
     .catch(e => Alert.alert("Error", e.message))
 
   }

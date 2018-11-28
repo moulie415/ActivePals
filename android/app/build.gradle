@@ -199,10 +199,11 @@ dependencies {
     implementation "com.google.android.gms:play-services-base:16.0.1"
     implementation 'com.google.firebase:firebase-core:16.0.5'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
-    implementation "com.google.firebase:firebase-database:16.0.4"
+    implementation "com.google.firebase:firebase-database:16.0.5"
     implementation "com.google.firebase:firebase-config:16.1.0"
     implementation "com.google.firebase:firebase-auth:16.0.5"
-    implementation "com.google.firebase:firebase-storage:16.0.4"
+    implementation "com.google.firebase:firebase-storage:16.0.5"
+    implementation "com.google.firebase:firebase-iid:17.0.4"
     implementation (name:'drawee-debug', ext:'aar')
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
 

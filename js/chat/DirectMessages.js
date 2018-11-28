@@ -101,6 +101,7 @@ import {getSimplifiedTime } from '../constants/utils'
       keyExtractor={(chat)=> chat.chatId}
       renderItem={({item}) => {
         let friend = this.props.friends[item.uid]
+        if (friend) {
         return <TouchableOpacity
           onPress={()=> {
             this.props.onOpenChat(item.chatId, friend.username, item.uid)
@@ -116,6 +117,8 @@ import {getSimplifiedTime } from '../constants/utils'
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text></View>}
             </View>
           </TouchableOpacity>
+        }
+        else return null
       }}
     />
   }
