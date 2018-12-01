@@ -383,7 +383,7 @@ class Messaging extends React.Component {
         const size = 640
         ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then((resized) => {
           this.setState({spinner: false})
-          this.props.previewFile('image', resized.uri)
+          this.props.previewFile('image', resized.uri, true, this.state.text)
   
       }).catch((e) => {
         Alert.alert('Error', e.message)
@@ -455,7 +455,7 @@ const mapDispatchToProps = dispatch => ({
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   goToGym: (gym) => dispatch(navigateGym(gym)),
   resetMessage: () => dispatch(resetMessage()),
-  previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri, true)),
+  previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   goBack: () => dispatch(navigateBack())
 
 })

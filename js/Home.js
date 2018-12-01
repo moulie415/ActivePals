@@ -623,7 +623,7 @@ showPicker() {
       const size = 640
       ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then((resized) => {
         this.setState({spinner: false})
-        this.props.previewFile('image', resized.uri)
+        this.props.previewFile('image', resized.uri, false, this.state.status)
 
     }).catch((e) => {
       Alert.alert('Error', e.message)
@@ -722,7 +722,7 @@ const mapDispatchToProps = dispatch => ({
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   postStatus: (status) => {return dispatch(addPost(status))},
   onRepPost: (item) => dispatch(repPost(item)),
-  previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri)),
+  previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   repComment: (comment) => dispatch(repComment(comment)),

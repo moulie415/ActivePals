@@ -35,7 +35,7 @@ class FilePreview extends Component {
         this.message = this.params.message
 		this.state = {
 			paused: true,
-			text: "",
+			text: this.params.text,
             spinner: false
 		}
 	}
