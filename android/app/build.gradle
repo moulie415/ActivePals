@@ -101,8 +101,8 @@ android {
         applicationId "com.anyone"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "0.0.1"
+        versionCode 3
+        versionName "0.0.2"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -158,6 +158,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-vector-icons')
     compile project(':react-native-fbads')
     compile project(':react-native-admob')
     implementation project(':react-native-calendar-events')

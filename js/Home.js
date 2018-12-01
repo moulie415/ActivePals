@@ -180,7 +180,7 @@ componentWillReceiveProps(nextProps) {
                   )
               }
             }}>
-              <Icon name="ios-camera" style={{color: colors.secondary, fontSize: 40, marginRight: 10}} />
+              <Icon name="md-image" style={{color: colors.secondary, fontSize: 40, marginRight: 10}} />
             </TouchableOpacity>
             <TouchableOpacity onPress={(mutex) => {
               mutex.lockFor(1000)
@@ -214,7 +214,7 @@ componentWillReceiveProps(nextProps) {
                 //alert no status
               }
             }}>
-              <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 40}}/>
+              <FIcon name="chevron-circle-right" style={{color: colors.secondary, fontSize: 40}}/>
             </TouchableOpacity>
         </View>
       <Content contentContainerStyle={{backgroundColor: '#9993', flex: 1}}>

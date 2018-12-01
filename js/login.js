@@ -74,7 +74,7 @@ import str from './constants/strings'
         <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>{str.appName}</Text>
       </View>
       <Item style={styles.inputGrp}>
-      <Icon name="mail" style={{color: '#fff'}} />
+      <Icon name="md-mail" style={{color: '#fff'}} />
         <Input
         placeholder="Email"
         onChangeText={u => this.username = u}
@@ -87,7 +87,7 @@ import str from './constants/strings'
         />
         </Item>
       <Item style={styles.inputGrp}>
-      <Icon name="unlock" style={{color: '#fff'}}/>
+      <Icon name="md-unlock" style={{color: '#fff'}}/>
       <Input
         placeholder="Password"
         secureTextEntry={this.state.secure}

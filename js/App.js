@@ -112,9 +112,6 @@ export const Stack = StackNavigator({
 })
 
 class App extends React.Component {
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress());
-    }
 
     onBackPress() {
         const { dispatch, nav } = this.props
@@ -131,6 +128,7 @@ class App extends React.Component {
   
     componentWillUnmount() {
       AppState.removeEventListener('change', this._handleAppStateChange);
+      BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress());
     }
 
     _handleAppStateChange = (nextAppState) => {

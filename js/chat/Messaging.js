@@ -4,6 +4,8 @@ import {
   Platform,
   TouchableOpacity,
   View,
+  BackHandler,
+  Keyboard
 } from "react-native"
 import {
   Container,
@@ -24,6 +26,8 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
 import { guid } from '../constants/utils'
 import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
+import EmojiInput from 'react-native-emoji-input'
+import { NavigationActions } from "react-navigation"
 
 class Messaging extends React.Component {
   static navigationOptions = {
@@ -55,13 +59,25 @@ class Messaging extends React.Component {
       user: {},
       avatar: '',
       spinner: false,
-      amount: 30,
-      showLoadEarlier: true
+      amount: 15,
+      showLoadEarlier: true,
     }
   }
 
+  onBackPress() {
+        if (this.state.showEmojiKeyboard) {
+          this.setState({showEmojiKeyboard: false})
+        }
+        else {
+          this.props.goBack()
+        }
+        return true
+    }
 
   componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress())
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
+
     this.loadMessages()
 
     if (!this.session && !this.gymId) {
@@ -73,6 +89,18 @@ class Messaging extends React.Component {
     this.props.profile.avatar ? this.setState({avatar: this.props.profile.avatar}) : this.setState({avatar: ''})
 
   }
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress())
+    this.keyboardDidShowListener.remove()
+  }
+
+  keyboardDidShow() {
+    if (Platform.OS == 'ios') {
+      this.setState({showEmojiKeyboard: false})
+    }
+  
+  }
+  
 
   loadMessages() {
     this.setState({spinner: true})
@@ -214,6 +242,9 @@ class Messaging extends React.Component {
       right={this.getRightHandIcon()}
        />
         <GiftedChat
+          ref={ref => this.chat = ref}
+          text={this.state.text}
+          onInputTextChanged={text => this.setState({text})}
           messages={this.state.messages}
           onSend={messages => {
             if (this.props.profile.username) {
@@ -259,13 +290,29 @@ class Messaging extends React.Component {
             </View>
             )}}
             renderActions={() => {
-              return <TouchableOpacity
+              return <View style={{flexDirection: 'row'}}>
+              <TouchableOpacity
               onPress={()=> this.showPicker()}
-              style={{marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 10}}>
-                <Icon name="ios-attach"/>
+              style={{marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 15, paddingRight: 10}}>
+                <Icon name="ios-attach" style={{color: colors.secondary}}/>
               </TouchableOpacity>
+              <TouchableOpacity 
+              style={{padding: 5}}
+              onPress={() => {
+                this.setState({showEmojiKeyboard: !this.state.showEmojiKeyboard})
+                Keyboard.dismiss()
+                }}>
+                <Icon name="md-happy" style={{color: colors.secondary, marginTop: Platform.OS == 'ios' ? 0 : -1}}/>
+              </TouchableOpacity>
+              </View>
             }}
           />
+          {this.state.showEmojiKeyboard &&  <EmojiInput
+            enableSearch={Platform.OS == 'android'}
+	              onEmojiSelected={(emoji) => {
+                    this.setState({text: this.state.text += emoji.char})
+                  }}
+	            />}
         {this.state.spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
           <Spinner color={colors.secondary}/>
         </View>}
@@ -348,9 +395,6 @@ class Messaging extends React.Component {
     })
   }
 
-  // componentWillUnmount() {
-
-  //   }
 }
 
 import { connect } from 'react-redux'
@@ -359,7 +403,8 @@ import {
   navigateProfile,
   navigateProfileView,
   navigateGym,
-  navigateFilePreview
+  navigateFilePreview,
+  navigateBack
 } from 'Anyone/js/actions/navigation'
 import { sendRequest, acceptRequest } from 'Anyone/js/actions/friends'
 import {
@@ -411,6 +456,7 @@ const mapDispatchToProps = dispatch => ({
   goToGym: (gym) => dispatch(navigateGym(gym)),
   resetMessage: () => dispatch(resetMessage()),
   previewFile: (type, uri) => dispatch(navigateFilePreview(type, uri, true)),
+  goBack: () => dispatch(navigateBack())
 
 })
 

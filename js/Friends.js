@@ -174,7 +174,7 @@ import Header from './header/header'
             mutex.lockFor(1000)
             this.sendRequest(this.username)
           }}
-          style={{padding: 10, backgroundColor: colors.primary, marginHorizontal: 10}}>
+          style={{padding: 10, backgroundColor: colors.secondary, marginHorizontal: 10}}>
             <Text style={{fontFamily: "Avenir", color: '#fff'}}>Submit</Text>
           </TouchableOpacity>
           
@@ -236,12 +236,12 @@ import Header from './header/header'
               <TouchableOpacity
                 onPress={()=> this.openChat(item.uid, item.username)}
                 style={{padding: 5, marginHorizontal: 5}}>
-                <Icon name='md-chatboxes' style={{color: colors.primary, fontSize: 30}}/>
+                <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 30}}/>
               </TouchableOpacity>
               <TouchableOpacity
               onPress={()=> this.props.viewProfile(item.uid)}
               style={{padding: 5, marginHorizontal: 5}}>
-                <Icon name='md-person' style={{color: colors.primary, fontSize: 30}}/>
+                <Icon name='md-person' style={{color: colors.secondary, fontSize: 30}}/>
               </TouchableOpacity>
               </View>
             </View>

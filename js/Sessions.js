@@ -546,7 +546,7 @@ import Header from './header/header'
           onPress={()=> {
             this.props.onOpenChat(session)
           }}
-          style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
+          style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
             <Text style={{color: '#fff', textAlign: 'center'}}>Open chat</Text>
           </TouchableOpacity>
           </View>

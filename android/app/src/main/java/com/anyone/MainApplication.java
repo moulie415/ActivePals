@@ -8,6 +8,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
+import com.oblador.vectoricons.VectorIconsPackage;
 
 import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import suraj.tiwari.reactnativefbads.FBAdsPackage;
@@ -55,6 +56,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
+            new VectorIconsPackage(),
               new FBAdsPackage(),
               new RNAdMobPackage(),
               new CalendarEventsPackage(),
