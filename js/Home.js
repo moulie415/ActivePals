@@ -748,6 +748,7 @@ showPicker() {
             this.props.viewProfile(snapshot.val())
           }
         })
+        .catch(e => console.log(e))
       }
       
      

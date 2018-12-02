@@ -8,6 +8,8 @@ export const SET_POST_COMMENTS = 'SET_POST_COMMENTS'
 export const ADD_COMMENT = 'ADD_COMMENT'
 export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS'
 export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
+import str from '../constants/strings'
+import { create } from 'domain';
 
 const addToFeed = (post, id) => ({
 	type: ADD_POST,
@@ -68,14 +70,48 @@ export const addPost = (item) => {
 		let uids = Object.keys(getState().friends.friends)
 		let ref = firebase.database().ref('posts').push()
 		let key = ref.key
+		let friends = Object.values(getState().friends.friends)
 		return ref.set(item).then(() => {
 			uids.forEach(friend => {
 				firebase.database().ref('userPosts/' + friend).child(key).set(uid)
 			})
 			firebase.database().ref('userPosts/' + uid).child(key).set(uid)
+			sendMentionNotifs(item, key, friends)
 			item.key = key
 			dispatch(addToFeed(item, key))
 		})
+		
+	}
+}
+
+const sendMentionNotifs = (item, key, friends, commentMention = false, postUid) => {
+	if (item.text) {
+		let split = item.text.split(" ")
+		let mentions = []
+		split.forEach(word => {
+			if (!mentions.includes(word)) {
+				let mention = word.match(str.mentionRegex)
+				if (mention) {
+					mentions.push(word)
+					let username = mention.input.substring(1)
+					let friend = friends.find(friend => friend.username == username)
+					if (friend && friend.uid != postUid && friend.uid != item.uid) {
+						//add notification for user
+						let id = key + item.uid + 'mention'
+						let type = commentMention ? 'commentMention' : 'postMention'
+						firebase.database().ref('userNotifications/' + friend.uid).child(id).once('value', snapshot => {
+							if (!snapshot.val()) {
+								firebase.database().ref('notifications').child(id).set({date: item.createdAt, uid: item.uid, postId: key, type})
+									.then(()=> firebase.database().ref('userNotifications/' + friend.uid).child(id).set(true))
+									.then(() => upUnreadCount(friend.uid))
+							}
+						})
+					}
+
+				}
+			}
+		})
+		
 	}
 }
 
@@ -248,10 +284,16 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 				else count = 1
 				let user = getState().profile.profile
 
+				
 				//add notification for user
 				firebase.database().ref('posts/' + postId).child('uid').once('value', snapshot => {
+					if (snapshot.val()) {
+						let friends = Object.values(getState().friends.friends)
+						sendMentionNotifs({text, uid, createdAt: created_at}, key, friends, true, snapshot.val())
+					}
 					if (snapshot.val() && snapshot.val() != user.uid) {
-						let date  = new Date().toString()
+						
+						let date  = created_at
 						firebase.database().ref('notifications').child(key + user.uid).set({date, uid: user.uid, postId, type: 'comment'})
 							.then(()=> firebase.database().ref('userNotifications/' + snapshot.val()).child(key + user.uid).set(true))
 							.then(() => upUnreadCount(snapshot.val()))
@@ -575,7 +617,7 @@ export const getNotifications = (limit = 10) => {
 	return (dispatch, getState) => {
 		let uid = getState().profile.profile.uid
 		let refs = []
-		return firebase.database().ref('userNotifications').child(uid).orderByKey().limitToLast(limit).once('value', snapshot => {
+		return firebase.database().ref('userNotifications').child(uid).limitToLast(limit).once('value', snapshot => {
 			if (snapshot.val()) {
 				Object.keys(snapshot.val()).forEach(key => {
 					refs.push(firebase.database().ref('notifications').child(key).once('value'))
