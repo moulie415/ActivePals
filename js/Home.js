@@ -47,11 +47,13 @@ import {
   extractEditTime,
   extractImage,
   reportedExtractor,
-  getSimplifiedTime
+  getSimplifiedTime,
+  getMentionsList,
 } from './constants/utils'
 import { AdSettings, NativeAdsManager  } from 'react-native-fbads'
 import str from './constants/strings'
 import NativeAdView from './AdView'
+import ParsedText from 'react-native-parsed-text'
 
 const adsManager = new NativeAdsManager(str.nativePlacementId);
 
@@ -134,7 +136,7 @@ componentWillReceiveProps(nextProps) {
   render () {
     const { uid, username, users, unreadCount } = this.props.profile
     return (
-    <Container >
+    <Container>
       <Header 
         title={'Feed'}
         right={<TouchableOpacity onPress={()=> {
@@ -159,10 +161,17 @@ componentWillReceiveProps(nextProps) {
             : <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
             </TouchableOpacity> 
             <TextInput 
+            ref={(ref) => this.input = ref}
             underlineColorAndroid={"transparent"}
             value={this.state.status}
+            multiline={true}
             autoCorrect={false}
-            onChangeText={(status) => this.setState({status})}
+            onChangeText={(status) => {
+              this.setState({status})
+              let friends = Object.values(this.props.friends)
+              let list = getMentionsList(status, friends)
+              list ? this.setState({mentionList: list}) : this.setState({mentionList: null})              
+            }}
             placeholder="Post a status for your pals..."
             style={{flex: 1, borderColor: '#999', borderWidth: 0.5, marginHorizontal: 10, height: 40, padding: 5}}/>
             <TouchableOpacity onPress={()=> {
@@ -217,7 +226,33 @@ componentWillReceiveProps(nextProps) {
               <FIcon name="chevron-circle-right" style={{color: colors.secondary, fontSize: 40}}/>
             </TouchableOpacity>
         </View>
+        
       <Content contentContainerStyle={{backgroundColor: '#9993', flex: 1}}>
+      {/*this.state.mentionList && 
+            <View style={{height: 30, backgroundColor: 'red', position: 'absolute', left: 5, right: 5, zIndex: 999}} />*/}
+            {this.state.mentionList && 
+            <View style={{position: 'absolute', left: 5, right: 5, zIndex: 999}}>
+            <FlatList 
+              keyboardShouldPersistTaps={'handled'}
+              data={this.state.mentionList}
+              style={{backgroundColor: '#fff'}}
+              keyExtractor={(item) => item.uid}
+              renderItem={({item}) => {
+                return <TouchableOpacity
+                onPress={() => {
+                  console.log('test')
+                  let split = this.state.status.split(" ")
+                  split[split.length - 1] = "@" + item.username + " "
+                  this.setState({status: split.join(" "), mentionList: null})
+
+                }}
+                style={{backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5}}>
+                  {item.avatar ? <Image source={{uri: item.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/>
+            : <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary}}/>}
+                  <Text style={{marginLeft: 10}}>{item.username}</Text>
+                </TouchableOpacity>
+              }}
+            /></View>}
         {this.props.friends && this.state.profile && this.renderFeed()}
       </Content>
       {this.state.spinner && <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>}
@@ -364,7 +399,7 @@ componentWillReceiveProps(nextProps) {
             />
           ) : null}
         </Modal>
-
+        
     </Container>
   )
   }
@@ -441,7 +476,7 @@ componentWillReceiveProps(nextProps) {
                 {this.getUsernameFormatted(item.uid)}
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              <Text style={{color: '#000'}}>{item.text}</Text>
+              {this.getParsedText(item.text)}
             </View>
             </View>
             {this.repCommentCount(item)}
@@ -458,7 +493,7 @@ componentWillReceiveProps(nextProps) {
               {this.getUsernameFormatted(item.uid)}
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              <Text style={{color: '#000'}}>{item.text}</Text>
+              {this.getParsedText(item.text)}
               </View>
             </View>
               <TouchableOpacity
@@ -682,12 +717,44 @@ showPicker() {
 
   }
 
-  
+  getParsedText(text) {
+    return <ParsedText 
+    style={{color: '#000'}}
+    parse={
+      [
+        {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: this.handleUsernamePress.bind(this) }
+      ]
+    }
+    >{text}
+    </ParsedText>
+  }
 
+  handleUsernamePress(name) {
+    name = name.substring(1)
+    let friends = Object.values(this.props.friends)
+    let users = Object.values(this.props.users)
+    let combined = [...friends, ...users]
+    if (name == this.props.profile.username) {
+      this.props.goToProfile()
+    }
+    else {
+      let found = combined.find(friend => friend.username == name)
+      if (found) {
+        this.props.viewProfile(found.uid)
+      }
+      else {
+        firebase.database().ref('usernames').child(name).once('value', snapshot => {
+          if (snapshot.val()) {
+            this.props.viewProfile(snapshot.val())
+          }
+        })
+      }
+      
+     
+    }
+  }
 
 }
-
-
 
 import { connect } from 'react-redux'
 import {

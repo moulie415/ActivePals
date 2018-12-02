@@ -30,7 +30,24 @@ export function getType(type, size) {
 		return <Image style={{width: size, height: size}}
 		source={require('Anyone/assets/images/swim.png')} />
 	}
+}
 
+export const getMentionsList = (status, friends) => {
+  let split = status.split(" ")
+  let last = split[split.length - 1]
+  let reduced = last.substring(1)
+  if (status && last && str.mentionRegex.test(last)) {
+    filtered = friends.filter(friend => {
+      return friend.username && 
+      friend.username.toLowerCase().includes(reduced.toLowerCase())
+    })
+    if (filtered.length > 0) {
+      return filtered
+    }
+  }
+  else if (last == "@") {
+    return friends
+  }
 }
 
 export function guid() {

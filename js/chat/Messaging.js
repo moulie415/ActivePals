@@ -380,7 +380,7 @@ class Messaging extends React.Component {
         }
       }
       else {
-        const size = 640
+        const size = 720
         ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then((resized) => {
           this.setState({spinner: false})
           this.props.previewFile('image', resized.uri, true, this.state.text)
