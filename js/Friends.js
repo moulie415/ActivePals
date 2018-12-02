@@ -90,7 +90,7 @@ import Header from './header/header'
           if (snapshot.val() && snapshot.val() == 'away' && this.props.friends[friend.uid].state != 'away') {
               this.props.updateFriendState(friend.uid, 'away')
           }
-          else if (snapshot.val() && this.props.friends[friend.uid].state != 'online') {
+          else if (snapshot.val() && snapshot.val() != 'away' && this.props.friends[friend.uid].state != 'online') {
             this.props.updateFriendState(friend.uid, 'online')
           }
           else {

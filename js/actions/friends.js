@@ -51,11 +51,11 @@ export const fetchFriends = (uids) => {
 			let promise = new Promise(function(resolve, reject) {
 				let status = uids[friend]
 				firebase.database().ref('users/' + friend).once('value', profile => {
-					let state
-					if (profile.state) {
-						state = profile.state
+					let state = profile.val().state
+					if (state && state != 'away') {
+						state = 'online'
 					}
-					else {
+					else if (!state) {
 						state = 'offline'
 					}
 					firebase.storage().ref('images/' + friend ).child('avatar').getDownloadURL()
@@ -89,13 +89,13 @@ export const addFriend = (uid) => {
 		let status = uid.val()
 		return new Promise(resolve => {
 			firebase.database().ref('users/' + uid.key).once('value', profile => {
-				let state
-					if (profile.state) {
-						state = profile.state
-					}
-					else {
-						state = 'offline'
-					}
+				let state = profile.val().state
+				if (state && state != 'away') {
+					state = 'online'
+				}
+				else if (!state) {
+					state = 'offline'
+				}
 				firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL()
 				.then(url => {
 					resolve()
