@@ -44,7 +44,7 @@ export const getMentionsList = (status, friends) => {
     if (filtered.length > 0) {
       return filtered
     }
-  }
+  } 
   else if (last == "@") {
     return friends
   }
