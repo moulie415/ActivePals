@@ -135,6 +135,7 @@ componentWillReceiveProps(nextProps) {
 
   render () {
     const { uid, username, users, unreadCount } = this.props.profile
+    let combined = { ...this.props.users, ...this.props.friends}
     return (
     <Container>
       <Header 
@@ -228,19 +229,21 @@ componentWillReceiveProps(nextProps) {
         </View>
         
       <Content contentContainerStyle={{backgroundColor: '#9993', flex: 1}}>
-      {/*this.state.mentionList && 
-            <View style={{height: 30, backgroundColor: 'red', position: 'absolute', left: 5, right: 5, zIndex: 999}} />*/}
             {this.state.mentionList && 
-            <View style={{position: 'absolute', left: 5, right: 5, zIndex: 999}}>
+            <View style={{position: 'absolute', left: 10, right: 10, zIndex: 999, elevation:4,
+shadowOffset: { width: 5, height: 5 },
+shadowColor: "grey",
+shadowOpacity: 0.5,
+shadowRadius: 10}}>
             <FlatList 
               keyboardShouldPersistTaps={'handled'}
               data={this.state.mentionList}
               style={{backgroundColor: '#fff'}}
               keyExtractor={(item) => item.uid}
-              renderItem={({item}) => {
+              renderItem={({item, index}) => {
+                if (index < 10) {
                 return <TouchableOpacity
                 onPress={() => {
-                  console.log('test')
                   let split = this.state.status.split(" ")
                   split[split.length - 1] = "@" + item.username + " "
                   this.setState({status: split.join(" "), mentionList: null})
@@ -251,6 +254,8 @@ componentWillReceiveProps(nextProps) {
             : <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary}}/>}
                   <Text style={{marginLeft: 10}}>{item.username}</Text>
                 </TouchableOpacity>
+                }
+                return null
               }}
             /></View>}
         {this.props.friends && this.state.profile && this.renderFeed()}
@@ -297,12 +302,13 @@ componentWillReceiveProps(nextProps) {
             <Comments
           data={this.state.postId && this.state.feed[this.state.postId] && this.state.feed[this.state.postId].comments ? 
            this.state.feed[this.state.postId].comments : []}
-          viewingUserName={"test"}
+          viewingUserName={this.props.profile.username}
           initialDisplayCount={10}
           editMinuteLimit={900}
           focusCommentInput={this.state.focusCommentInput}
           childrenPerPage={5}
           lastCommentUpdate={this.state.lastCommentUpdate}
+          users={Object.values(combined)}
           usernameTapAction={(username, uid) => {
             if (uid == this.props.profile.uid) {
               this.props.goToProfile()

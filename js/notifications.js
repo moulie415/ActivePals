@@ -161,6 +161,10 @@ class Notifications extends Component {
         return user + ' commented on your post'
       case 'buddyRequest':
         return user + ' sent you a pal request'
+      case 'commentMention':
+        return user + ' mentioned you in a comment'
+      case 'postMention':
+        return user + ' mentioned you in a post'
     }
   }
 
@@ -190,7 +194,8 @@ const matchStateToProps = ({profile, home, friends, sharedInfo}) => ({
     profile: profile.profile,
     notifications: home.notifications,
     friends: friends.friends,
-    users: sharedInfo.users
+    users: sharedInfo.users,
+    feed: home.feed
 })
 
  const mapDispatchToProps = dispatch => ({

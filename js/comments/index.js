@@ -24,6 +24,7 @@ import styles from "./styles";
 import Collapsible from "react-native-collapsible"
 import Comment from "./Comment";
 import colors from '../constants/colors'
+import { getMentionsList } from '../constants/utils'
 
 const screen = Dimensions.get("screen");
 
@@ -168,7 +169,9 @@ export default class Comments extends PureComponent {
         id={this.props.keyExtractor(c)}
         usernameTapAction={this.handleUsernameTap}
         username={this.props.usernameExtractor(c)}
+        viewingUserName={this.props.viewingUserName}
         uid={this.props.uidExtractor(c)}
+        users={this.props.users}
         body={this.props.bodyExtractor(c)}
         likesNr={this.props.likeCountExtractor(c)}
         canEdit={this.canUserEdit(c)}
@@ -400,9 +403,13 @@ export default class Comments extends PureComponent {
             style={styles.input}
             ref={input => this.inputMain = input}
             multiline={true}
+            value={this.state.text}
             onChangeText={text => {
 		        this.newCommentText = text
+            this.setState({text})
 		        this.inputMain.setNativeProps({text})
+            let list = getMentionsList(text, this.props.users)
+            list ? this.setState({mentionList: list}) : this.setState({mentionList: null})   
 	    }}
             placeholder={"Write comment..."}
             numberOfLines={3}
@@ -411,8 +418,8 @@ export default class Comments extends PureComponent {
             onPress={() => {
               this.props.saveAction(this.newCommentText, false);
               this.newCommentText = null;
-              this.inputMain.clear();
-              Keyboard.dismiss();
+              this.inputMain.clear()
+              Keyboard.dismiss()
             }}
           >
             <Icon
@@ -423,6 +430,31 @@ export default class Comments extends PureComponent {
             />
           </TouchableOpacity>
         </View>
+        {this.state.mentionList && 
+            <View style={styles.mentionsList}>
+            <FlatList 
+              keyboardShouldPersistTaps={'handled'}
+              data={this.state.mentionList}
+              style={{backgroundColor: '#fff'}}
+              keyExtractor={(item) => item.uid}
+              renderItem={({item, index}) => {
+                if (index < 10) {
+                return <TouchableOpacity
+                onPress={() => {
+                  let split = this.state.text.split(" ")
+                  split[split.length - 1] = "@" + item.username + " "
+                  this.inputMain.set
+                  this.setState({text: split.join(" "), mentionList: null})
+                }}
+                style={{backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5}}>
+                  {item.avatar ? <Image source={{uri: item.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/>
+            : <IIcon name='md-contact'  style={{fontSize: 35, color: colors.primary}}/>}
+                  <Text style={{marginLeft: 10}}>{item.username}</Text>
+                </TouchableOpacity>
+                }
+                return null
+              }}
+            /></View>}
         {!this.state.loadingComments && !this.props.data ? (
           <Text style={{ textAlign: "center" }}>No comments yet</Text>
         ) : null}

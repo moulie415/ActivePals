@@ -170,5 +170,20 @@ module.exports = StyleSheet.create({
   },
   menuText: {
     textAlign: "center"
+  },
+  mentionsList: {
+    position: 'absolute',
+    left: 5,
+    right: 5,
+    zIndex: 999,
+    marginTop: 50,
+    elevation:4,
+    shadowOffset: {
+      width: 5,
+      height: 5 
+    },
+    shadowColor: "grey",
+    shadowOpacity: 0.5,
+    shadowRadius: 10
   }
 });

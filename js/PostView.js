@@ -96,7 +96,7 @@ class PostView extends Component {
         {this.state.post && this.repCommentCount(this.state.post)}
         {this.state.post ? <Comments
           data={this.state.comments}
-          //viewingUserName={"test"}
+          viewingUserName={this.props.profile.username}
           //initialDisplayCount={10}
           //editMinuteLimit={900}
           //childrenPerPage={5}

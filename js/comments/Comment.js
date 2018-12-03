@@ -21,9 +21,12 @@ import colors from '../constants/colors'
 import Collapsible from "react-native-collapsible";
 import {Image as SlowImage } from 'react-native'
 import TouchableOpacity from '../constants/TouchableOpacityLockable'
+import str from '../constants/strings'
+import firebase from 'react-native-firebase'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
+import ParsedText from 'react-native-parsed-text'
 
 export default class Comment extends PureComponent {
   constructor(props) {
@@ -135,7 +138,13 @@ export default class Comment extends PureComponent {
                 <Text style={styles.name}>{this.props.username}</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.body}>{this.props.body}</Text>
+            <ParsedText 
+            parse={
+              [
+                {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: this.handleUsernamePress.bind(this) }
+              ]
+            }
+            style={styles.body}>{this.props.body}</ParsedText>
           </View>
           <View style={styles.rightActionBar}>
             <TimeAgo style={styles.time} time={this.props.updatedAt} />
@@ -212,6 +221,37 @@ export default class Comment extends PureComponent {
         ) : null}
       </View>
     );
+  }
+
+  handleUsernamePress(name) {
+    name = name.substring(1)
+    let users = this.props.users
+    if (name == this.props.viewingUserName) {
+      //this.props.goToProfile()
+    }
+    else {
+      if (users) {
+        let found = users.find(user => user.username == name)
+        if (found) {
+          this.props.usernameTapAction(name, found.uid);
+        }
+        else {
+          this.fetchUser(name)
+        }
+      }
+      else {
+        this.fetchUser(name)
+      }
+     
+    }
+  }
+  fetchUser(name) {
+    firebase.database().ref('usernames').child(name).once('value', snapshot => {
+      if (snapshot.val()) {
+        this.props.usernameTapAction(name, snapshot.val())
+      }
+    })
+    .catch(e => console.log(e))
   }
 }
 
