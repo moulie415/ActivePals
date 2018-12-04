@@ -68,8 +68,11 @@ class PostView extends Component {
     }
 
     componentDidMount() {
-        this.props.getComments(this.postId)
-        this.props.getPost(this.postId)
+        
+        this.props.getPost(this.postId).then(() => {
+          this.props.getComments(this.postId)
+        })
+        
     }
 
     componentWillReceiveProps(nextProps) {
@@ -83,8 +86,9 @@ class PostView extends Component {
     }
 
     render() {
+      let combined = { ...this.props.users, ...this.props.friends}
         return(
-            <KeyboardAvoidingView
+            this.state.post ? <KeyboardAvoidingView
             contentContainerStyle={{flex: 1}}
             style={{flex: 1}}
             behavior='position'>
@@ -94,8 +98,9 @@ class PostView extends Component {
                 <ScrollView style={styles.container}>
         {this.state.post && <View style={{maxHeight: SCREEN_HEIGHT/2}}>{this.renderPost(this.state.post)}</View>}
         {this.state.post && this.repCommentCount(this.state.post)}
-        {this.state.post ? <Comments
+        {this.state.post && <Comments
           data={this.state.comments}
+          users={Object.values(combined)}
           viewingUserName={this.props.profile.username}
           //initialDisplayCount={10}
           //editMinuteLimit={900}
@@ -155,7 +160,7 @@ class PostView extends Component {
               this.props.getComments(this.postId, this.state.commentFetchAmount)})
             } : null}
             getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
-        /> : <View style={[sStyles.spinner, {flex: 1}]}><Spinner color={colors.secondary}/></View>}
+        /> }
           <Modal
           animationType={"slide"}
           transparent={false}
@@ -214,7 +219,7 @@ class PostView extends Component {
             />
       </Modal>
       </ScrollView>
-            </KeyboardAvoidingView>
+            </KeyboardAvoidingView> : <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>
         )
     }
 

@@ -119,27 +119,31 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 
 export const fetchPost = (key) => {
 	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
-		return firebase.database().ref('posts').child(key).once('value', snapshot => {
-			let post = snapshot.val()
-			post.key = snapshot.key
-			return firebase.database().ref('userReps/' + uid).child(key).once('value', snapshot => {
-				if (snapshot.val()) {
-					post.rep = true
-				}
-				if (!getState().friends.friends[post.uid] && !getState().sharedInfo.users[post.uid]) {
-					fetchUser(post.uid).then(user => {
-						let sharedUsers = {}
-						sharedUsers[post.uid] = user
-						dispatch(updateUsers(sharedUsers))
+		return new Promise(resolve => {
+			let uid = getState().profile.profile.uid
+			firebase.database().ref('posts').child(key).once('value', snapshot => {
+				let post = snapshot.val()
+				post.key = snapshot.key
+				firebase.database().ref('userReps/' + uid).child(key).once('value', snapshot => {
+					if (snapshot.val()) {
+						post.rep = true
+					}
+					if (!getState().friends.friends[post.uid] && !getState().sharedInfo.users[post.uid]) {
+						fetchUser(post.uid).then(user => {
+							let sharedUsers = {}
+							sharedUsers[post.uid] = user
+							dispatch(updateUsers(sharedUsers))
+							dispatch(setPost(post))
+							resolve()
+						})
+					}
+					else {
 						dispatch(setPost(post))
-					})
-				}
-				else {
-					dispatch(setPost(post))
-				}
+						resolve()
+					}
+				})
 			})
-		})
+	})
 	}
 }
 
