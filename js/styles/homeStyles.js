@@ -21,4 +21,11 @@ export default styles = StyleSheet.create({
 		position: 'absolute',
 		backgroundColor: 'red'
 	  },
+	  mentionList: {
+		  position: 'absolute', left: 10, right: 10, zIndex: 999, elevation:4,
+		  shadowOffset: { width: 5, height: 5 },
+		  shadowColor: "grey",
+		  shadowOpacity: 0.5,
+		  shadowRadius: 10
+		}
 })

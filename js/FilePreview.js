@@ -7,7 +7,7 @@ import {
 	KeyboardAvoidingView,
 	Keyboard,
     Alert,
-    Image
+    FlatList
 } from 'react-native'
 import {
     Icon,
@@ -17,8 +17,13 @@ import colors from './constants/colors'
 import firebase from 'react-native-firebase'
 import { guid } from './constants/utils'
 import sStyles from './styles/settingsStyles'
+import styles from './styles/homeStyles'
 //import Video from 'react-native-video'
 import TouchableOpacity from 'Anyone/js/constants/TouchableOpacityLockable'
+import { getMentionsList } from './constants/utils'
+import Image from 'react-native-fast-image'
+import {Image as SlowImage } from 'react-native'
+import Text from './constants/Text'
 
 
 class FilePreview extends Component {
@@ -81,7 +86,7 @@ class FilePreview extends Component {
         onPress = {Keyboard.dismiss}
         style = {{flex: 1}}>
             <View style={{flex: 1}}>
-                <Image
+                <SlowImage
                 style={{flex: 1, resizeMode: 'contain'}}
                 //use uri to display image else it won't display on android
                 source={{uri: this.uri}}
@@ -102,6 +107,7 @@ class FilePreview extends Component {
                         style={{color: '#fff', fontSize: 30}}/>
                     </TouchableOpacity>
                 </View>
+                {this.state.mentionList && !this.message && this.renderMentionList()}
                 <TextInput
                 style = {{
                     height: 50,
@@ -111,7 +117,12 @@ class FilePreview extends Component {
                     backgroundColor: '#fff'
                 }}
                 underlineColorAndroid = 'transparent'
-                onChangeText={(text) => this.setState({text})}
+                onChangeText={(text) => {
+                    this.setState({text})
+                    let friends = Object.values(this.props.friends)
+                    let list = getMentionsList(text, friends)
+                    list ? this.setState({mentionList: list}) : this.setState({mentionList: null})
+                    }}
                 value={this.state.text}
                 multiline = {false}
                 autoCorrect={true}
@@ -166,6 +177,7 @@ class FilePreview extends Component {
             			size = {30}/>
                     </TouchableOpacity>
                 </View>
+                {this.state.mentionList && !this.message && this.renderMentionList()}
                 <TextInput
                 style = {{
                     height: 50,
@@ -175,7 +187,15 @@ class FilePreview extends Component {
                     backgroundColor: '#fff'
                 }}
 				underlineColorAndroid = 'transparent'
-				onChangeText={(text) => this.setState({text})}
+				onChangeText={(text) => {
+                    this.setState({text})
+                    let friends = Object.values(this.props.friends)
+                    let list = getMentionsList(text, friends)
+                    if (list) {
+                        alert('test')
+                    }
+                    list ? this.setState({mentionList: list}) : this.setState({mentionList: null})
+                    }}
 				value={this.state.text}
 				multiline = {false}
 				autoCorrect={true}
@@ -242,6 +262,33 @@ class FilePreview extends Component {
       })
   })
 }
+
+renderMentionList() {
+    return <View style={[styles.mentionList, { bottom: 0, marginBottom: 40}] }>
+    <FlatList 
+      keyboardShouldPersistTaps={'handled'}
+      data={this.state.mentionList}
+      style={{backgroundColor: '#fff'}}
+      keyExtractor={(item) => item.uid}
+      renderItem={({item, index}) => {
+        if (index < 10) {
+        return <TouchableOpacity
+        onPress={() => {
+          let split = this.state.text.split(" ")
+          split[split.length - 1] = "@" + item.username + " "
+          this.setState({text: split.join(" "), mentionList: null})
+
+        }}
+        style={{backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5}}>
+          {item.avatar ? <Image source={{uri: item.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/>
+    : <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary}}/>}
+          <Text style={{marginLeft: 10}}>{item.username}</Text>
+        </TouchableOpacity>
+        }
+        return null
+      }}
+    /></View>
+}
 }
 
 import { connect } from 'react-redux'
@@ -249,8 +296,9 @@ import { connect } from 'react-redux'
 import { navigateBack } from 'Anyone/js/actions/navigation'
 import { addPost } from 'Anyone/js/actions/home'
 import { setMessage } from '../js/actions/chats'
-const mapStateToProps = ({ profile }) => ({
+const mapStateToProps = ({ profile, friends }) => ({
   profile: profile.profile,
+  friends: friends.friends
 })
 
 const mapDispatchToProps = dispatch => ({

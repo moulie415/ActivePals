@@ -230,11 +230,7 @@ componentWillReceiveProps(nextProps) {
         
       <Content contentContainerStyle={{backgroundColor: '#9993', flex: 1}}>
             {this.state.mentionList && 
-            <View style={{position: 'absolute', left: 10, right: 10, zIndex: 999, elevation:4,
-shadowOffset: { width: 5, height: 5 },
-shadowColor: "grey",
-shadowOpacity: 0.5,
-shadowRadius: 10}}>
+            <View style={styles.mentionList}>
             <FlatList 
               keyboardShouldPersistTaps={'handled'}
               data={this.state.mentionList}
