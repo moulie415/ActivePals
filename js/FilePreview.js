@@ -18,7 +18,7 @@ import firebase from 'react-native-firebase'
 import { guid } from './constants/utils'
 import sStyles from './styles/settingsStyles'
 import styles from './styles/homeStyles'
-//import Video from 'react-native-video'
+import Video from 'react-native-video'
 import TouchableOpacity from 'Anyone/js/constants/TouchableOpacityLockable'
 import { getMentionsList } from './constants/utils'
 import Image from 'react-native-fast-image'
@@ -152,29 +152,26 @@ class FilePreview extends Component {
         			<TouchableOpacity 
                     //style = {{backgroundColor: 'white', borderRadius: 50}}
                     onPress={() => this.setState({paused: false})}>
-            			<Icon
-            			style = {this.state.paused ? {backgroundColor: 'transparent', opacity: 0.8} : {display: 'none'}}
-            			size = {100}
-            			name = {'controller-play'}
-            			color = {'#fff'}/>
+            			{this.state.paused && <Icon
+            			name = {'md-play'}
+                        style={{color: '#fff', fontSize: 75, backgroundColor: 'transparent', opacity: 0.8}}
+                        />}
                     </TouchableOpacity>
                 </View>
                 <View style={{position: 'absolute', margin: 20}}>
                     <TouchableOpacity onPress={() => this.rejectPressed()}
                     style={{backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5}}>
                         <Icon
-                        name = {'x'}
-                        color={'#fff'}
-                        size = {30}/>
+                        name = {'md-close'}
+                        style={{color: '#fff', fontSize: 30}}/>
                     </TouchableOpacity>
                 </View>
                 <View style={{position: 'absolute', margin: 20, right: 0}}>
                     <TouchableOpacity onPress={() => {this.acceptPressed()}}
                     style={{backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5}}>
                         <Icon
-            			name ={'check'}
-            			color={'#fff'}
-            			size = {30}/>
+            			name ={'md-checkmark'}
+                        style={{color: '#fff', fontSize: 30}}/>
                     </TouchableOpacity>
                 </View>
                 {this.state.mentionList && !this.message && this.renderMentionList()}
@@ -191,9 +188,6 @@ class FilePreview extends Component {
                     this.setState({text})
                     let friends = Object.values(this.props.friends)
                     let list = getMentionsList(text, friends)
-                    if (list) {
-                        alert('test')
-                    }
                     list ? this.setState({mentionList: list}) : this.setState({mentionList: null})
                     }}
 				value={this.state.text}
@@ -212,35 +206,38 @@ class FilePreview extends Component {
 
 	acceptPressed() {
         this.setState({spinner: true})
-        this.uploadImage(this.uri).then(image => {
-            let profile = this.props.profile
-            let date = new Date().toString()
-            if (this.message) {
-                this.props.goBack()
-                this.props.setMessage(image.url, this.state.text)
-            }
-            else {
-                firebase.database().ref('userPhotos/' + profile.uid).child(image.id).set({createdAt: date, url: image.url})
-                this.props.postStatus({
-                type: 'photo',
-                url: image.url,
-                text: this.state.text, uid: profile.uid,
-                createdAt: date})
-                .then(() => {
+
+        if (this.type == 'image') {
+            this.uploadImage(this.uri).then(image => {
+                let profile = this.props.profile
+                let date = new Date().toString()
+                if (this.message) {
                     this.props.goBack()
-                    Alert.alert('Success', 'Post submitted')
+                    this.props.setMessage(image.url, this.state.text)
+                }
+                else {
+                    firebase.database().ref('userPhotos/' + profile.uid).child(image.id).set({createdAt: date, url: image.url})
+                    this.props.postStatus({
+                    type: 'photo',
+                    url: image.url,
+                    text: this.state.text, uid: profile.uid,
+                    createdAt: date})
+                    .then(() => {
+                        this.props.goBack()
+                        Alert.alert('Success', 'Post submitted')
+                        this.setState({spinner: false})
+                    })
+                    .catch(e => {
+                    Alert.alert('Error', e.message)
                     this.setState({spinner: false})
                 })
-                .catch(e => {
+            }
+            })
+            .catch(e => {
                 Alert.alert('Error', e.message)
                 this.setState({spinner: false})
             })
         }
-        })
-        .catch(e => {
-            Alert.alert('Error', e.message)
-            this.setState({spinner: false})
-        })
     
     }
 
@@ -264,7 +261,7 @@ class FilePreview extends Component {
 }
 
 renderMentionList() {
-    return <View style={[styles.mentionList, { bottom: 0, marginBottom: 40}] }>
+    return <View style={[styles.mentionList, { bottom: 0, marginBottom: 50}] }>
     <FlatList 
       keyboardShouldPersistTaps={'handled'}
       data={this.state.mentionList}

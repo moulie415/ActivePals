@@ -7,6 +7,7 @@ PODS:
   - Bolts/Tasks (1.9.0)
   - Crashlytics (3.11.1):
     - Fabric (~> 1.8.1)
+  - DVAssetLoaderDelegate (0.3.2)
   - Fabric (1.8.1)
   - FBAudienceNetwork (5.1.0)
   - FBSDKCoreKit (4.38.1):
@@ -137,6 +138,13 @@ PODS:
     - React
   - react-native-splash-screen (3.0.9):
     - React
+  - react-native-video/Video (4.0.1):
+    - React
+  - react-native-video/VideoCaching (4.0.1):
+    - DVAssetLoaderDelegate (~> 0.3.1)
+    - React
+    - react-native-video/Video
+    - SPTPersistentCache (~> 1.1.0)
   - React/Core (0.56.0):
     - yoga (= 0.56.0.React)
   - React/fishhook (0.56.0)
@@ -175,6 +183,7 @@ PODS:
   - SDWebImage/GIF (4.4.2):
     - FLAnimatedImage (~> 1.0)
     - SDWebImage/Core
+  - SPTPersistentCache (1.1.0)
   - yoga (0.56.0.React)
 
 DEPENDENCIES:
@@ -198,6 +207,7 @@ DEPENDENCIES:
   - react-native-image-resizer (from `../node_modules/react-native-image-resizer`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - react-native-video/VideoCaching (from `../node_modules/react-native-video/react-native-video.podspec`)
   - React/Core (from `../node_modules/react-native`)
   - React/RCTActionSheet (from `../node_modules/react-native`)
   - React/RCTAnimation (from `../node_modules/react-native`)
@@ -218,6 +228,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Bolts
     - Crashlytics
+    - DVAssetLoaderDelegate
     - Fabric
     - FBAudienceNetwork
     - FBSDKCoreKit
@@ -249,6 +260,7 @@ SPEC REPOS:
     - nanopb
     - Protobuf
     - SDWebImage
+    - SPTPersistentCache
 
 EXTERNAL SOURCES:
   React:
@@ -267,6 +279,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-maps"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
+  react-native-video:
+    :path: "../node_modules/react-native-video/react-native-video.podspec"
   ReactNativePermissions:
     :path: "../node_modules/react-native-permissions"
   rn-fetch-blob:
@@ -279,6 +293,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Crashlytics: ca7ab4bc304aa216bdc2e4c1a96389ee77252203
+  DVAssetLoaderDelegate: 38a24530292bf77900fdfdf635434f7f9b49486d
   Fabric: 43ed7bac010f588f63ee23ab1a0276b296db5e17
   FBAudienceNetwork: 95efd4f20dc44f97254dbd3dfe5a4d19164092a8
   FBSDKCoreKit: 8d47857400e2f5bdea697a80daff882e91c84ef6
@@ -317,12 +332,14 @@ SPEC CHECKSUMS:
   react-native-image-resizer: 04a3409e7d4ad646c4468671c69dec490def139c
   react-native-maps: 066c2afcc89e18726377bcc685315f989ca22449
   react-native-splash-screen: 8e3f866dc79bfe533baeffd0a38c33f7a7eae7f8
+  react-native-video: 44c6befbc1526283ca1919891fcebe4680feade4
   ReactNativePermissions: 9f2d9c45c98800795e6c2ed330e25d11a66a8169
   rn-fetch-blob: 76a8f798dae965bbcd146a2438f2e1d381c91ae3
   RNVectorIcons: 8c52e1e8da1153613fdef44748e865c25556cb9c
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
+  SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
 
-PODFILE CHECKSUM: a36f7799eb59801566d07f55900f0eee7f506c24
+PODFILE CHECKSUM: 3ba7c45d2df4efa352c76d78b5ee9df8fb64d03f
 
 COCOAPODS: 1.5.3

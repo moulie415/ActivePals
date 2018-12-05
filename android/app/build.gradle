@@ -94,6 +94,10 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
@@ -158,6 +162,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-video')
     compile project(':react-native-vector-icons')
     compile project(':react-native-fbads')
     compile project(':react-native-admob')
@@ -185,6 +190,7 @@ dependencies {
     }
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
     implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.9.1'
 
 
     implementation 'com.facebook.android:facebook-login:4.36.0'

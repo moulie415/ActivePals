@@ -617,8 +617,8 @@ showPicker() {
     title: null,
     mediaType: 'photo',
     customButtons: [
-    {name: 'video', title: 'Shoot video (coming soon)'},
-    {name: 'uploadVideo', title: 'Choose video from library (coming soon)'},
+    {name: 'video', title: 'Shoot video...'},
+    {name: 'uploadVideo', title: 'Choose video from library...'},
     ],
     noData: true,
     storageOptions: {
@@ -640,17 +640,23 @@ showPicker() {
     else if (response.customButton) {
       if (response.customButton == 'uploadVideo') {
         ImagePicker.launchImageLibrary(videoOptions, (response)  => {
+          this.setState({spinner: false})
           if (response.error) {
             Alert.alert('Error',response.error)
-            this.setState({spinner: false})
+          }
+          else if (response.uri) {
+            this.props.previewFile('video', response.uri, false, this.state.status)
           }
         })
       }
       else if (response.customButton == 'video') {
         ImagePicker.launchCamera(videoOptions, (response)  => {
+          this.setState({spinner: false})
           if (response.error) {
-            Alert.alert('Error', response.error)
-            this.setState({spinner: false})
+            Alert.alert('Error', response.error) 
+          }
+          else if (response.uri) {
+            this.props.previewFile('video', response.uri, false, this.state.status)
           }
         })
 
