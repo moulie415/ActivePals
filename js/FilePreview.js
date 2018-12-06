@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import {
     Icon,
-    Spinner
+    Spinner,
 } from 'native-base'
 import colors from './constants/colors'
 import firebase from 'react-native-firebase'
@@ -148,9 +148,8 @@ class FilePreview extends Component {
                 resizeMode = 'cover'
                 />
                 <View 
-                style={{position: 'absolute', top: 0, right: 0, left: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
+                style={styles.playButtonContainer}>
         			<TouchableOpacity 
-                    //style = {{backgroundColor: 'white', borderRadius: 50}}
                     onPress={() => this.setState({paused: false})}>
             			{this.state.paused && <Icon
             			name = {'md-play'}
@@ -207,7 +206,16 @@ class FilePreview extends Component {
 	acceptPressed() {
         this.setState({spinner: true})
 
+        let type, ref
         if (this.type == 'image') {
+            type = 'photo'
+            ref = 'userPhotos/'
+        }
+        else if (this.type == 'video') {
+            type = 'video'
+            ref = 'userVideos/'
+        }
+
             this.uploadImage(this.uri).then(image => {
                 let profile = this.props.profile
                 let date = new Date().toString()
@@ -216,9 +224,9 @@ class FilePreview extends Component {
                     this.props.setMessage(image.url, this.state.text)
                 }
                 else {
-                    firebase.database().ref('userPhotos/' + profile.uid).child(image.id).set({createdAt: date, url: image.url})
+                    firebase.database().ref(ref + profile.uid).child(image.id).set({createdAt: date, url: image.url})
                     this.props.postStatus({
-                    type: 'photo',
+                    type: type,
                     url: image.url,
                     text: this.state.text, uid: profile.uid,
                     createdAt: date})
@@ -237,15 +245,20 @@ class FilePreview extends Component {
                 Alert.alert('Error', e.message)
                 this.setState({spinner: false})
             })
-        }
     
     }
 
   uploadImage(uri, mime = 'application/octet-stream') {
+    if (this.type == 'video') {
+        mime = 'video/mp4'
+    }
+    let uid = this.props.profile.uid
+    let ref = this.type == 'image' ? 'images/' + uid + '/photos' : 'videos/' + uid 
+  
     return new Promise((resolve, reject) => {
       //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       let id = guid()
-      const imageRef = firebase.storage().ref('images/' + this.props.profile.uid + '/photos').child(id)
+      const imageRef = firebase.storage().ref(ref).child(id)
 
       return imageRef.putFile(uri, { contentType: mime })
       .then(() => {

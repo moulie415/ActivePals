@@ -27,5 +27,14 @@ export default styles = StyleSheet.create({
 		  shadowColor: "grey",
 		  shadowOpacity: 0.5,
 		  shadowRadius: 10
+		},
+		playButtonContainer: {
+			position: 'absolute',
+			top: 0,
+			right: 0,
+			left: 0,
+			bottom: 0,
+			alignItems: 'center',
+			justifyContent: 'center'
 		}
 })

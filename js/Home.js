@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   Dimensions,
   ScrollView,
-  StyleSheet
+  TouchableWithoutFeedback
 } from "react-native"
 import { 
   Container,
@@ -54,6 +54,7 @@ import { AdSettings, NativeAdsManager  } from 'react-native-fbads'
 import str from './constants/strings'
 import NativeAdView from './AdView'
 import ParsedText from 'react-native-parsed-text'
+import Video from 'react-native-video'
 
 const adsManager = new NativeAdsManager(str.nativePlacementId);
 
@@ -95,6 +96,7 @@ class Home extends Component {
       refreshing: false,
       likesModalVisible: false,
       loadMore: true,
+      paused: true
     }
   }
 
@@ -516,6 +518,57 @@ componentWillReceiveProps(nextProps) {
             </View>
           </View>
         )
+      case 'video':
+              return (
+                <TouchableWithoutFeedback onPress = {() => {
+                  this.setState({paused: true})
+                }}>
+                <View>
+          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
+            {this.fetchAvatar(item.uid)}
+            <View style={{flex: 1}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              {this.getUsernameFormatted(item.uid)}
+                <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
+              </View>
+              {this.getParsedText(item.text)}
+              </View>
+            </View>
+            <Video 
+                source = {{uri: item.url}}
+                style={{width: '100%', height: 400}}
+                paused = {this.state.paused}
+                ignoreSilentSwitch = 'ignore'
+                repeat = {true}
+                resizeMode = 'cover'
+                onBuffer={() => {
+                  console.log('buffering')
+                }}                // Callback when remote video is buffering
+                onError={(e)=> {
+                  if (e.error) {
+                    Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain)
+                  }
+                  else Alert.alert('Error', 'Error playing video')
+                }}  
+                />
+                <View 
+                style={styles.playButtonContainer}>
+        			<TouchableOpacity 
+                    onPress={() => this.setState({paused: false})}>
+            			{this.state.paused && <Icon
+            			name = {'md-play'}
+                        style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
+                        />}
+                    </TouchableOpacity>
+                 
+                </View>
+              {this.repCommentCount(item)}
+            <View style={{padding: 10}}>
+            {this.repsAndComments(item)}
+            </View>
+            </View>
+          </TouchableWithoutFeedback>
+              )
     }
 
   }

@@ -24,7 +24,7 @@ export default function(state = initialState, action) {
 		case SET_FEED: {
 			return {
 				...state,
-				feed: {...state.feed, ...action.feed}
+				feed: action.feed
 			}
 		}
 		case ADD_POST:
