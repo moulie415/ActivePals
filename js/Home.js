@@ -7,14 +7,12 @@ import {
   Modal,
   SafeAreaView,
   Dimensions,
-  ScrollView,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native"
 import { 
   Container,
   Content,
   Icon,
-  //Header,
   Title,
   Card,
   Left,
@@ -167,7 +165,7 @@ componentWillReceiveProps(nextProps) {
             ref={(ref) => this.input = ref}
             underlineColorAndroid={"transparent"}
             value={this.state.status}
-            multiline={true}
+            maxLength={280}
             autoCorrect={false}
             onChangeText={(status) => {
               this.setState({status})
@@ -176,7 +174,14 @@ componentWillReceiveProps(nextProps) {
               list ? this.setState({mentionList: list}) : this.setState({mentionList: null})              
             }}
             placeholder="Post a status for your pals..."
-            style={{flex: 1, borderColor: '#999', borderWidth: 0.5, marginHorizontal: 10, height: 40, padding: 5}}/>
+            style={{
+              flex: 1,
+              borderColor: '#999',
+              borderWidth: 0.5,
+              marginHorizontal: 10,
+              height: 40,
+              padding: 5,
+              }}/>
             <TouchableOpacity onPress={()=> {
               if (username) {
                 this.showPicker()

@@ -404,6 +404,7 @@ export default class Comments extends PureComponent {
             ref={input => this.inputMain = input}
             multiline={true}
             value={this.state.text}
+            maxLength={280}
             onChangeText={text => {
 		        this.newCommentText = text
             this.setState({text})

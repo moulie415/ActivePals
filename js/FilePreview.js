@@ -116,6 +116,7 @@ class FilePreview extends Component {
                     fontSize: 18,
                     backgroundColor: '#fff'
                 }}
+                maxLength={280}
                 underlineColorAndroid = 'transparent'
                 onChangeText={(text) => {
                     this.setState({text})
