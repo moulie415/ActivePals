@@ -82,6 +82,7 @@ class Home extends Component {
 
   constructor(props) {
     super(props)
+    this.players = {}
     this.state = { 
       profile: this.props.profile,
       feed: this.props.feed,
@@ -94,7 +95,7 @@ class Home extends Component {
       refreshing: false,
       likesModalVisible: false,
       loadMore: true,
-      paused: true
+      paused: true,
     }
   }
 
@@ -539,7 +540,8 @@ componentWillReceiveProps(nextProps) {
               {this.getParsedText(item.text)}
               </View>
             </View>
-            <Video 
+            <Video
+                ref={(ref) => this.players[item.uid] = ref}
                 source = {{uri: item.url}}
                 style={{width: '100%', height: 400}}
                 paused = {this.state.paused}
@@ -565,7 +567,23 @@ componentWillReceiveProps(nextProps) {
                         style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
                         />}
                     </TouchableOpacity>
-                 
+                    <TouchableOpacity 
+                    style={{
+                      bottom: 70,
+                      right: 15,
+                      position: 'absolute',
+                      padding: 10,
+                    }}
+                    onPress={()=> {
+                      this.players[item.uid].presentFullscreenPlayer()
+                    }}>
+                 {this.state.paused && <Icon name='md-expand'
+                 style={{
+                   fontSize: 30,
+                   backgroundColor: 'transparent',
+                   color: '#fff'
+                   }}/>}
+                   </TouchableOpacity>
                 </View>
               {this.repCommentCount(item)}
             <View style={{padding: 10}}>
