@@ -32,5 +32,6 @@ export const navigateFilePreview = (type, uri, message = false, text) => nav('Fi
 export const navigateGym = (id) => nav('Gym', {id})
 export const navigateWelcome = (goBack) => nav('Welcome', {goBack})
 export const navigateCredits = () => nav('Credits')
+export const navigateFullScreenVideo = (uri) => nav('FullScreenVideo', {uri})
 export const navigateBack = () => NavigationActions.back()
 export const navigateTestScreen = () => nav('TestScreen')

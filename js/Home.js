@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Dimensions,
   TouchableWithoutFeedback,
+  Platform
 } from "react-native"
 import { 
   Container,
@@ -409,6 +410,7 @@ componentWillReceiveProps(nextProps) {
             />
           ) : null}
         </Modal>
+      
         
     </Container>
   )
@@ -575,7 +577,12 @@ componentWillReceiveProps(nextProps) {
                       padding: 10,
                     }}
                     onPress={()=> {
-                      this.players[item.uid].presentFullscreenPlayer()
+                      if (Platform.OS == 'ios') {
+                        this.players[item.uid].presentFullscreenPlayer()
+                      }
+                      else {
+                        this.props.navigateFullScreenVideo(item.url)
+                      }
                     }}>
                  {this.state.paused && <Icon name='md-expand'
                  style={{
@@ -846,7 +853,8 @@ import {
   navigateProfile,
   navigateProfileView,
   navigateFilePreview,
-  navigateNotifications
+  navigateNotifications,
+  navigateFullScreenVideo
 } from 'Anyone/js/actions/navigation'
 import { 
   addPost,
@@ -883,7 +891,9 @@ const mapDispatchToProps = dispatch => ({
   getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit)),
   onNotificationPress: () => dispatch(navigateNotifications()),
   getProfile: () => dispatch(fetchProfile()),
-  getFriends: () => dispatch(fetchFriends())
+  getFriends: () => dispatch(fetchFriends()),
+  navigateFullScreenVideo: (uri) => dispatch(navigateFullScreenVideo(uri))
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

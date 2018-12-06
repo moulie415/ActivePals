@@ -30,6 +30,7 @@ import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'
+import FullScreenVideo from './FullScreenVideo'
 import Welcome from './Welcome'
 import { Provider, connect } from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
@@ -108,7 +109,8 @@ export const Stack = StackNavigator({
   Notifications: { screen: Notifications },
   Gym: { screen: Gym },
   Welcome: {screen: Welcome, navigationOptions: {header: null}},
-  Credits: {screen: Credits, navigationOptions: {header: null}}
+  Credits: {screen: Credits, navigationOptions: {header: null}},
+  FullScreenVideo: {screen: FullScreenVideo, navigationOptions: { header: null}}
 })
 
 class App extends React.Component {
