@@ -50,6 +50,7 @@
     "react-native-version-number": "^0.3.4",
     "react-native-video": "^4.0.1",
     "react-native-video-controls": "^2.2.3",
+    "react-native-video-processing": "^1.20.0",
     "react-navigation": "^1.6.1",
     "react-navigation-redux-helpers": "^1.1.2",
     "react-redux": "^5.0.7",

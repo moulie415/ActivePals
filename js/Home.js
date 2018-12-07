@@ -54,8 +54,9 @@ import str from './constants/strings'
 import NativeAdView from './AdView'
 import ParsedText from 'react-native-parsed-text'
 import Video from 'react-native-video'
+import RNFetchBlob from 'rn-fetch-blob'
 
-const adsManager = new NativeAdsManager(str.nativePlacementId);
+const adsManager = new NativeAdsManager(str.nativePlacementId)
 
 // AdSettings.clearTestDevices()
 // AdSettings.setLogLevel('none')
@@ -66,6 +67,7 @@ const weightDown = require('Anyone/assets/images/weightlifting_down.png')
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 const SCREEN_HEIGHT = Dimensions.get('window').height
+const MAX_VIDEO_SIZE = 30000000 //30mb
 
 
 class Home extends Component {
@@ -97,6 +99,7 @@ class Home extends Component {
       likesModalVisible: false,
       loadMore: true,
       paused: true,
+      playing: {}
     }
   }
 
@@ -465,7 +468,7 @@ componentWillReceiveProps(nextProps) {
               <Card>
                 {this.renderFeedItem(item)}
               </Card>
-              {(index > 0 && index % 4 == 0) && <Card>
+              {(index > 0 && index % 4 == 0 && Platform.OS =='android') && <Card>
                 <NativeAdView adsManager={adsManager} />
                 </Card>}
               </View>
@@ -529,7 +532,7 @@ componentWillReceiveProps(nextProps) {
       case 'video':
               return (
                 <TouchableWithoutFeedback onPress = {() => {
-                  this.setState({paused: true})
+                  this.setState({playing: {[item.uid]: false}})
                 }}>
                 <View>
           <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
@@ -546,16 +549,20 @@ componentWillReceiveProps(nextProps) {
                 ref={(ref) => this.players[item.uid] = ref}
                 source = {{uri: item.url}}
                 style={{width: '100%', height: 400}}
-                paused = {this.state.paused}
+                paused = {!this.state.playing[item.uid]}
                 ignoreSilentSwitch = 'ignore'
                 repeat = {true}
+                onFullscreenPlayerDidPresent={()=> this.setState({playing: {[item.uid]: false}})}
                 resizeMode = 'cover'
                 onBuffer={() => {
                   console.log('buffering')
                 }}                // Callback when remote video is buffering
                 onError={(e)=> {
-                  if (e.error) {
+                  if (e.error && e.error.code) {
                     Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain)
+                  }
+                  else if (e.message) {
+                    Alert.alert('Error', e.message)
                   }
                   else Alert.alert('Error', 'Error playing video')
                 }}  
@@ -563,7 +570,7 @@ componentWillReceiveProps(nextProps) {
                 <View 
                 style={styles.playButtonContainer}>
         			<TouchableOpacity 
-                    onPress={() => this.setState({paused: false})}>
+                    onPress={() => this.setState({playing: {[item.uid]: true}})}>
             			{this.state.paused && <Icon
             			name = {'md-play'}
                         style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
@@ -574,9 +581,13 @@ componentWillReceiveProps(nextProps) {
                       bottom: 70,
                       right: 15,
                       position: 'absolute',
-                      padding: 10,
+                      padding: 2,
+                      paddingHorizontal: 6,
+                      backgroundColor: 'rgba(0,0,0,0.3)',
+                      borderRadius: 5
                     }}
                     onPress={()=> {
+                      this.setState({playing: {[item.uid]: false}})
                       if (Platform.OS == 'ios') {
                         this.players[item.uid].presentFullscreenPlayer()
                       }
@@ -695,6 +706,7 @@ showPicker() {
   let videoOptions = {
     mediaType: 'video',
     durationLimit: 30,
+    videoQuality: Platform.OS == 'ios' ? 'medium' : 'low'
   }
   let options = {
     title: null,
@@ -728,7 +740,7 @@ showPicker() {
             Alert.alert('Error',response.error)
           }
           else if (response.uri) {
-            this.props.previewFile('video', response.uri, false, this.state.status)
+            this.processVideo(response.uri)  
           }
         })
       }
@@ -739,7 +751,7 @@ showPicker() {
             Alert.alert('Error', response.error) 
           }
           else if (response.uri) {
-            this.props.previewFile('video', response.uri, false, this.state.status)
+            this.processVideo(response.uri)
           }
         })
 
@@ -759,6 +771,27 @@ showPicker() {
 
     }
   })
+}
+
+processVideo(uri) {
+  const statURI = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+  //if (Platform.OS == 'ios') {
+    //TODO android needs compressing
+    RNFetchBlob.fs.stat(statURI)
+      .then((stats) => {
+        console.log(stats)
+        if (stats.size < MAX_VIDEO_SIZE) {
+          this.props.previewFile('video', uri, false, this.state.status)
+        }
+        else {
+          Alert.alert('Error', 'Sorry the file size is too large')
+        }
+      })
+      .catch((err) => {
+        Alert.alert('Error', err.message)
+      })
+ // }
+
 }
 
 

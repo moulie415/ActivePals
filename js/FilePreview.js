@@ -194,7 +194,11 @@ class FilePreview extends Component {
 				multiline = {false}
 				autoCorrect={true}
 				placeholder = {'Add comment...'}/>
-              {this.state.spinner && <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>}
+              {this.state.spinner && 
+              <View style={sStyles.spinner}>
+                <Spinner color={colors.secondary}/>
+                {!!this.state.progress && <Text>{this.state.progress + '%'}</Text>}
+                </View>}
 			</View>
 		</TouchableWithoutFeedback>
 	}
@@ -254,23 +258,36 @@ class FilePreview extends Component {
         mime = 'video/mp4'
     }
     let uid = this.props.profile.uid
-    let ref = this.type == 'image' ? 'images/' + uid + '/photos' : 'videos/' + uid 
+    let imagePath = this.message ? '/messages' : '/photos'
+    let ref = this.type == 'image' ? 'images/' + uid + imagePath : 'videos/' + uid 
   
     return new Promise((resolve, reject) => {
       //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       let id = guid()
       const imageRef = firebase.storage().ref(ref).child(id)
 
-      return imageRef.putFile(uri, { contentType: mime })
-      .then(() => {
-          return imageRef.getDownloadURL()
-      })
-      .then((url) => {
-          resolve({url, id})
-      })
-      .catch((error) => {
-          reject(error)
-      })
+        imageRef.putFile(uri, { contentType: mime }).on('state_changed', snapshot => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            this.setState({progress})
+            switch (snapshot.state) {
+                case firebase.storage.TaskState.SUCCESS: // or 'success'
+                    console.log('Upload is complete');
+                    break;
+                case firebase.storage.TaskState.RUNNING: // or 'running'
+                    console.log('Upload is running')
+                    break;
+                default:
+                console.log(snapshot.state)
+            }
+        }, e => {
+            Alert.alert('Error', e.message)
+            reject()
+        }, result => {
+            if (result && result.downloadURL) {
+                resolve({url: result.downloadURL, id})
+            }
+            else reject()
+        })
   })
 }
 
@@ -314,8 +331,8 @@ const mapStateToProps = ({ profile, friends }) => ({
 
 const mapDispatchToProps = dispatch => ({
     goBack: () => dispatch(navigateBack()),
-  postStatus: (status) => {return dispatch(addPost(status))},
-  setMessage: (url, text) => dispatch(setMessage(url, text))
+    postStatus: (status) => {return dispatch(addPost(status))},
+    setMessage: (url, text) => dispatch(setMessage(url, text))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(FilePreview)
