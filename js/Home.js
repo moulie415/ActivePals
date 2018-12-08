@@ -48,19 +48,12 @@ import {
   reportedExtractor,
   getSimplifiedTime,
   getMentionsList,
+  renderAd
 } from './constants/utils'
-import { AdSettings, NativeAdsManager  } from 'react-native-fbads'
 import str from './constants/strings'
-import NativeAdView from './AdView'
 import ParsedText from 'react-native-parsed-text'
 import Video from 'react-native-video'
 import RNFetchBlob from 'rn-fetch-blob'
-
-const adsManager = new NativeAdsManager(str.nativePlacementId)
-
-// AdSettings.clearTestDevices()
-// AdSettings.setLogLevel('none')
-// AdSettings.addTestDevice(AdSettings.currentDeviceHash)
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -468,9 +461,7 @@ componentWillReceiveProps(nextProps) {
               <Card>
                 {this.renderFeedItem(item)}
               </Card>
-              {(index > 0 && index % 4 == 0 && Platform.OS =='android') && <Card>
-                <NativeAdView adsManager={adsManager} />
-                </Card>}
+              {renderAd(index)}
               </View>
               )}
         }
@@ -546,13 +537,13 @@ componentWillReceiveProps(nextProps) {
               </View>
             </View>
             <Video
-                ref={(ref) => this.players[item.uid] = ref}
+                ref={(ref) => this.players[item.key] = ref}
                 source = {{uri: item.url}}
                 style={{width: '100%', height: 400}}
-                paused = {!this.state.playing[item.uid]}
+                paused = {!this.state.playing[item.key]}
                 ignoreSilentSwitch = 'ignore'
                 repeat = {true}
-                onFullscreenPlayerDidPresent={()=> this.setState({playing: {[item.uid]: false}})}
+                onFullscreenPlayerDidPresent={()=> this.setState({playing: {[item.key]: false}})}
                 resizeMode = 'cover'
                 onBuffer={() => {
                   console.log('buffering')
@@ -570,8 +561,8 @@ componentWillReceiveProps(nextProps) {
                 <View 
                 style={styles.playButtonContainer}>
         			<TouchableOpacity 
-                    onPress={() => this.setState({playing: {[item.uid]: true}})}>
-            			{this.state.paused && <Icon
+                    onPress={() => this.setState({playing: {[item.key]: true}})}>
+            			{!this.state.playing[item.key] && <Icon
             			name = {'md-play'}
                         style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
                         />}
@@ -587,15 +578,15 @@ componentWillReceiveProps(nextProps) {
                       borderRadius: 5
                     }}
                     onPress={()=> {
-                      this.setState({playing: {[item.uid]: false}})
+                      this.setState({playing: {[item.key]: false}})
                       if (Platform.OS == 'ios') {
-                        this.players[item.uid].presentFullscreenPlayer()
+                        this.players[item.key].presentFullscreenPlayer()
                       }
                       else {
                         this.props.navigateFullScreenVideo(item.url)
                       }
                     }}>
-                 {this.state.paused && <Icon name='md-expand'
+                 {!this.state.playing[item.key] && <Icon name='md-expand'
                  style={{
                    fontSize: 30,
                    backgroundColor: 'transparent',
