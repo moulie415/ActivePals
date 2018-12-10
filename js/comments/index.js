@@ -419,6 +419,7 @@ export default class Comments extends PureComponent {
             onPress={() => {
               this.props.saveAction(this.newCommentText, false);
               this.newCommentText = null;
+              this.setState({text: null})
               this.inputMain.clear()
               Keyboard.dismiss()
             }}
@@ -444,8 +445,9 @@ export default class Comments extends PureComponent {
                 onPress={() => {
                   let split = this.state.text.split(" ")
                   split[split.length - 1] = "@" + item.username + " "
-                  this.inputMain.set
-                  this.setState({text: split.join(" "), mentionList: null})
+                  this.setState({text: split.join(" "), mentionList: null}, () => {
+                    this.newCommentText = this.state.text
+                  })
                 }}
                 style={{backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5}}>
                   {item.avatar ? <Image source={{uri: item.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/>
