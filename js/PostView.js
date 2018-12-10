@@ -264,8 +264,6 @@ class PostView extends Component {
                 />
                 
                 </TouchableOpacity>
-                
-
             </View>
           )
       }

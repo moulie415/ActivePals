@@ -5,7 +5,8 @@ import {
 } from 'react-native'
 
 import {
-	Icon
+  Icon,
+  Card
 } from 'native-base'
 import str from './strings'
 import NativeAdView from '../AdView'

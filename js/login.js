@@ -27,6 +27,7 @@ import SplashScreen from 'react-native-splash-screen'
 import RNFetchBlob from 'rn-fetch-blob'
 import TouchableOpacity from './constants/TouchableOpacityLockable.js'
 import str from './constants/strings'
+import SpinnerButton from 'react-native-spinner-button'
 
 
  class Login extends Component {
@@ -121,12 +122,13 @@ import str from './constants/strings'
         </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity
-          onPress={(mutex)=> {
-            mutex.lockFor(5000)
+          <SpinnerButton
+          onPress={()=> {
             this.fbLogin(this.props.navigation)
           }}
-          style={{
+          isLoading={this.state.facebookLoading}
+          spinnerType={str.spinner}
+          buttonStyle={{
             alignItems: 'center',
             justifyContent: 'center',
             marginVertical: 10,
@@ -138,25 +140,27 @@ import str from './constants/strings'
           }}>
             <Icon style={{color: '#fff', marginRight: 10}} name="logo-facebook"/>
             <Text style={{color: '#fff'}}>Login with Facebook</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-          onPress={(mutex)=> {
-            mutex.lockFor(5000)
+          </SpinnerButton>
+          <SpinnerButton
+          isLoading={this.state.googleLoading}
+          spinnerType={str.spinner}
+          onPress={()=> {
+            this.setState({googleLoading: true})
             this.gLogin()
           }}
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginVertical: 10,
-            backgroundColor: "#ea4335",
-            width: 250,
-            flexDirection: 'row',
-            paddingVertical: 8,
-            borderRadius: 2
+          buttonStyle={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginVertical: 10,
+              backgroundColor: "#ea4335",
+              width: 250,
+              flexDirection: 'row',
+              paddingVertical: 8,
+              borderRadius: 2
           }}>
             <Icon style={{marginLeft: -15, color: '#fff', marginRight: 10}} name="logo-google"/>
             <Text style={{ color: '#fff'}}>Login with Google</Text>
-          </TouchableOpacity>
+          </SpinnerButton>
         </View>
           <Text style={{color: colors.primary, textAlign: 'center', position: 'absolute', bottom: 10}}>
           {'v' + VersionNumber.appVersion}</Text>
@@ -185,6 +189,7 @@ import str from './constants/strings'
     }
 
     fbLogin(navigation) {
+      this.setState({facebookLoading: true})
       LoginManager.logInWithReadPermissions(['public_profile', 'email'])
       .then((result) => this._handleCallBack(result, navigation),
         function(error) {
@@ -195,11 +200,10 @@ import str from './constants/strings'
 
 
  _handleCallBack(result, navigation){
-    this.setState({spinner: true})
     let _this = this
     if (result.isCancelled) {
       //Alert.alert('Facbook login', 'cancelled')
-      this.setState({spinner: false})
+      this.setState({facebookLoading: false})
     } else {
         AccessToken.getCurrentAccessToken().then(
           (data) => {
@@ -238,12 +242,12 @@ import str from './constants/strings'
               })
               .catch(error => {
                 Alert.alert('Error', error.message)
-                this.setState({spinner: false})
+                this.setState({facebookLoading: false})
               })
             })
             .catch(error => {
               Alert.alert('Error', error.message)
-              this.setState({spinner: false})
+              this.setState({facebookLoading: false})
             })
           }
         )
@@ -276,7 +280,7 @@ import str from './constants/strings'
   }
 
   gLogin() {
-    this.setState({waitForData: true, spinner: true})
+    this.setState({waitForData: true})
     GoogleSignin.configure({
       iosClientId: '680139677816-3eoc0cs830fbns898khlh01e6f685k1u.apps.googleusercontent.com',
       webClientId: '680139677816-fp071bo61qp0dfk5olqu4tke2477u6jc.apps.googleusercontent.com'
@@ -331,8 +335,10 @@ import str from './constants/strings'
             })
             .catch(e => {
               console.log(e)
-              Alert.alert('Error', "Code: " + e.code)
-              this.setState({spinner: false})
+              this.setState({googleLoading: false})
+              if (e.code != 12501) {
+                Alert.alert('Error', "Code: " + e.code)
+              }
             })
             .done()
             
@@ -340,7 +346,7 @@ import str from './constants/strings'
         .catch(err => {
           console.log("Play services error", err.code, err.message)
           Alert.alert("Play services error", err.code, err.message)
-          this.setState({spinner: false})
+          this.setState({googleLoading: false})
         })
    })
   }
