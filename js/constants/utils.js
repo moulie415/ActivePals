@@ -36,7 +36,9 @@ export function renderAd(index) {
         style={{alignSelf: 'center'}}
         adUnitID={str.admobBanner}
         testDevices={str.testDevices}
-        onAdFailedToLoad={error => console.error(error)}
+        onAdFailedToLoad={error => {
+          console.log(error)
+          }}
         />
       }
     }
@@ -46,7 +48,9 @@ export function renderAd(index) {
       style={{alignSelf: 'center'}}
       adUnitID={str.admobBanner}
       testDevices={str.testDevices}
-      onAdFailedToLoad={error => console.error(error)}
+      onAdFailedToLoad={error => {
+        console.log(error)
+        }}
       />
     }
   }

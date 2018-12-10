@@ -14,7 +14,8 @@ import {
     FlatList,
     ScrollView,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    TouchableWithoutFeedback
 } from 'react-native'
 import FIcon from "react-native-vector-icons/FontAwesome"
 import cStyles from './comments/styles'
@@ -235,7 +236,7 @@ class PostView extends Component {
                   {this.getUsernameFormatted(item.uid)}
                   <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                <Text style={{color: '#000'}}>{item.text}</Text>
+                {this.getParsedText(item.text)}
               </View>
               </View>
               
@@ -251,7 +252,7 @@ class PostView extends Component {
                 {this.getUsernameFormatted(item.uid)}
                   <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                <Text style={{color: '#000'}}>{item.text}</Text>
+                {this.getParsedText{item.text}}
                 </View>
               </View>
               
@@ -265,6 +266,87 @@ class PostView extends Component {
                 
                 </TouchableOpacity>
             </View>
+          )
+          case 'video':
+          return (
+            <TouchableWithoutFeedback onPress = {() => {
+              this.setState({playing: {[item.uid]: false}})
+            }}>
+            <View>
+      <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
+        {this.fetchAvatar(item.uid)}
+        <View style={{flex: 1}}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          {this.getUsernameFormatted(item.uid)}
+            <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
+          </View>
+          {this.getParsedText(item.text)}
+          </View>
+        </View>
+        <Video
+            ref={(ref) => this.players[item.key] = ref}
+            source = {{uri: item.url}}
+            style={{width: '100%', height: 400, maxHeight: SCREEN_HEIGHT/2-55}}
+            paused = {!this.state.playing[item.key]}
+            ignoreSilentSwitch = 'ignore'
+            repeat = {true}
+            onFullscreenPlayerDidPresent={()=> this.setState({playing: {[item.key]: false}})}
+            resizeMode = 'cover'
+            onBuffer={() => {
+              console.log('buffering')
+            }}                // Callback when remote video is buffering
+            onError={(e)=> {
+              if (e.error && e.error.code) {
+                Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain)
+              }
+              else if (e.message) {
+                Alert.alert('Error', e.message)
+              }
+              else Alert.alert('Error', 'Error playing video')
+            }}  
+            />
+            <View 
+            style={styles.playButtonContainer}>
+          <TouchableOpacity 
+                onPress={() => this.setState({playing: {[item.key]: true}})}>
+              {!this.state.playing[item.key] && <Icon
+              name = {'md-play'}
+                    style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
+                    />}
+                </TouchableOpacity>
+                <TouchableOpacity 
+                style={{
+                  bottom: 70,
+                  right: 15,
+                  position: 'absolute',
+                  padding: 2,
+                  paddingHorizontal: 6,
+                  backgroundColor: 'rgba(0,0,0,0.3)',
+                  borderRadius: 5
+                }}
+                onPress={()=> {
+                  this.setState({playing: {[item.key]: false}})
+                  if (Platform.OS == 'ios') {
+                    this.players[item.key].presentFullscreenPlayer()
+                  }
+                  else {
+                    this.props.navigateFullScreenVideo(item.url)
+                  }
+                }}>
+             {!this.state.playing[item.key] && <Icon name='md-expand'
+             style={{
+               fontSize: 30,
+               backgroundColor: 'transparent',
+               color: '#fff'
+               }}/>}
+               </TouchableOpacity>
+            </View>
+          {this.repCommentCount(item)}
+        <View style={{padding: 10}}>
+        {this.repsAndComments(item)}
+        </View>
+        </View>
+      </TouchableWithoutFeedback>
           )
       }
   
@@ -369,6 +451,43 @@ class PostView extends Component {
       }
       else return null
   
+    }
+
+    getParsedText(text) {
+      return <ParsedText 
+      style={{color: '#000'}}
+      parse={
+        [
+          {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: this.handleUsernamePress.bind(this) }
+        ]
+      }
+      >{text}
+      </ParsedText>
+    }
+    handleUsernamePress(name) {
+      name = name.substring(1)
+      let friends = Object.values(this.props.friends)
+      let users = Object.values(this.props.users)
+      let combined = [...friends, ...users]
+      if (name == this.props.profile.username) {
+        this.props.goToProfile()
+      }
+      else {
+        let found = combined.find(friend => friend.username == name)
+        if (found) {
+          this.props.viewProfile(found.uid)
+        }
+        else {
+          firebase.database().ref('usernames').child(name).once('value', snapshot => {
+            if (snapshot.val()) {
+              this.props.viewProfile(snapshot.val())
+            }
+          })
+          .catch(e => console.log(e))
+        }
+        
+       
+      }
     }
 
     getUsername(uid) {

@@ -197,7 +197,7 @@ class FilePreview extends Component {
               {this.state.spinner && 
               <View style={sStyles.spinner}>
                 <Spinner color={colors.secondary}/>
-                {!!this.state.progress && <Text>{this.state.progress + '%'}</Text>}
+                {!!this.state.progress && <Text style={{color: '#fff'}}>{this.state.progress + '%'}</Text>}
                 </View>}
 			</View>
 		</TouchableWithoutFeedback>
