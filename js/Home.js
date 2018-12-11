@@ -523,7 +523,7 @@ componentWillReceiveProps(nextProps) {
       case 'video':
               return (
                 <View>
-                <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0, zIndex: 2}}>
             {this.fetchAvatar(item.uid)}
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
