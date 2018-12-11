@@ -26,6 +26,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable'
 import Comments from './comments'
 import sStyles from './styles/settingsStyles'
 import ImageViewer from 'react-native-image-zoom-viewer'
+import ParsedText from 'react-native-parsed-text'
 import {
     extractCreatedTime,
     extractUsername,
@@ -42,6 +43,9 @@ import {
   import Image from 'react-native-fast-image'
   import {Image as SlowImage} from 'react-native'
   import Header from './header/header'
+  import str from './constants/strings'
+  import Video from 'react-native-video'
+  import hStyles from './styles/homeStyles'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -97,7 +101,7 @@ class PostView extends Component {
                 hasBack={true}
                 />
                 <ScrollView style={styles.container}>
-        {this.state.post && <View style={{maxHeight: SCREEN_HEIGHT/2}}>{this.renderPost(this.state.post)}</View>}
+        {this.state.post && <View>{this.renderPost(this.state.post)}</View>}
         {this.state.post && this.repCommentCount(this.state.post)}
         {this.state.post && <Comments
           data={this.state.comments}
@@ -252,14 +256,14 @@ class PostView extends Component {
                 {this.getUsernameFormatted(item.uid)}
                   <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                {this.getParsedText{item.text}}
+                {this.getParsedText(item.text)}
                 </View>
               </View>
               
                 <TouchableOpacity onPress={()=> this.setState({selectedImage: [{url: item.url}], showImage: true})}
                 style={{marginTop: 10, marginBottom: 10}}>
                 <Image
-                style={{width: '100%', height: 400, maxHeight: SCREEN_HEIGHT/2-55}}
+                style={{width: '100%', height: SCREEN_HEIGHT/2-55}}
                 resizeMode={'contain'}
                 source={{uri: item.url}}
                 />
@@ -269,8 +273,9 @@ class PostView extends Component {
           )
           case 'video':
           return (
-            <TouchableWithoutFeedback onPress = {() => {
-              this.setState({playing: {[item.uid]: false}})
+            <TouchableWithoutFeedback 
+            onPress = {() => {
+              this.setState({playing: false})
             }}>
             <View>
       <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
@@ -284,14 +289,14 @@ class PostView extends Component {
           </View>
         </View>
         <Video
-            ref={(ref) => this.players[item.key] = ref}
+            ref ={(ref) => this.player = ref}
             source = {{uri: item.url}}
-            style={{width: '100%', height: 400, maxHeight: SCREEN_HEIGHT/2-55}}
-            paused = {!this.state.playing[item.key]}
+            style={{width: '100%', height: SCREEN_HEIGHT/2-55}}
+            paused = {!this.state.playing}
             ignoreSilentSwitch = 'ignore'
             repeat = {true}
-            onFullscreenPlayerDidPresent={()=> this.setState({playing: {[item.key]: false}})}
-            resizeMode = 'cover'
+            onFullscreenPlayerDidPresent={()=> this.setState({playing: false})}
+            resizeMode = 'contain'
             onBuffer={() => {
               console.log('buffering')
             }}                // Callback when remote video is buffering
@@ -305,18 +310,17 @@ class PostView extends Component {
               else Alert.alert('Error', 'Error playing video')
             }}  
             />
-            <View 
-            style={styles.playButtonContainer}>
+           {!this.state.playing &&  <View 
+            style={hStyles.playButtonContainer}>
           <TouchableOpacity 
-                onPress={() => this.setState({playing: {[item.key]: true}})}>
-              {!this.state.playing[item.key] && <Icon
-              name = {'md-play'}
+                onPress={() => this.setState({playing: true})}>
+                <Icon name = {'md-play'}
                     style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
-                    />}
+                    />
                 </TouchableOpacity>
                 <TouchableOpacity 
                 style={{
-                  bottom: 70,
+                  bottom: 20,
                   right: 15,
                   position: 'absolute',
                   padding: 2,
@@ -325,26 +329,22 @@ class PostView extends Component {
                   borderRadius: 5
                 }}
                 onPress={()=> {
-                  this.setState({playing: {[item.key]: false}})
+                  this.setState({playing: false})
                   if (Platform.OS == 'ios') {
-                    this.players[item.key].presentFullscreenPlayer()
+                    this.player.presentFullscreenPlayer()
                   }
                   else {
                     this.props.navigateFullScreenVideo(item.url)
                   }
                 }}>
-             {!this.state.playing[item.key] && <Icon name='md-expand'
+                <Icon name='md-expand'
              style={{
                fontSize: 30,
                backgroundColor: 'transparent',
                color: '#fff'
-               }}/>}
+               }}/>
                </TouchableOpacity>
-            </View>
-          {this.repCommentCount(item)}
-        <View style={{padding: 10}}>
-        {this.repsAndComments(item)}
-        </View>
+            </View>}
         </View>
       </TouchableWithoutFeedback>
           )
@@ -502,7 +502,12 @@ class PostView extends Component {
 }
 
 
-import { navigateBack, navigateProfile, navigateProfileView } from 'Anyone/js/actions/navigation'
+import {
+  navigateBack,
+  navigateProfile,
+  navigateProfileView,
+  navigateFullScreenVideo
+} from './actions/navigation'
 import { connect } from 'react-redux'
 import {
     fetchComments,
@@ -531,7 +536,8 @@ const mapDispatchToProps = dispatch => ({
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getPost: (key) => dispatch(fetchPost(key)),
-  getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit))
+  getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit)),
+  navigateFullScreenVideo: (url) => dispatch(navigateFullScreenVideo(url))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostView)

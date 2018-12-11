@@ -55,7 +55,7 @@ class Welcome extends Component {
               {this.skip()}
                 <Text style={styles.text}>Create and join sessions with people in your area</Text>
                 {this.renderImages()}
-                <Text style={styles.text}>Or create private sessions for you and your buddies</Text>
+                <Text style={styles.text}>Or create private sessions for you and your pals</Text>
                 <Icon name="ios-lock" style={{color: '#fff', fontSize: 50}} />
               </View>
               <View style={styles.slide2}>
@@ -71,11 +71,11 @@ class Welcome extends Component {
               </View>
               <View style={styles.slide2}>
               {this.skip()}
-                <Text style={styles.text}>Participate in chats with your buddies, in sessions and with members of your gym!!</Text>
+                <Text style={styles.text}>Participate in chats with your pals, in sessions and with members of your gym!!</Text>
                 <Icon name="md-chatboxes" style={{color: '#fff', fontSize: 50}} />
               </View>
               <View style={styles.slide3}>
-                <Text style={styles.text}>Make sure to set a username so your buddies can add you</Text>
+                <Text style={styles.text}>Make sure to set a username so your pals can add you</Text>
                 <TextInput
                   value={this.state.username}
                   onChangeText={username => this.setState({username})}

@@ -522,11 +522,8 @@ componentWillReceiveProps(nextProps) {
         )
       case 'video':
               return (
-                <TouchableWithoutFeedback onPress = {() => {
-                  this.setState({playing: {[item.uid]: false}})
-                }}>
                 <View>
-          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
             {this.fetchAvatar(item.uid)}
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -536,6 +533,9 @@ componentWillReceiveProps(nextProps) {
               {this.getParsedText(item.text)}
               </View>
             </View>
+            <TouchableWithoutFeedback onPress = {() => {
+                  this.setState({playing: {[item.uid]: false}})
+                }}>
             <Video
                 ref={(ref) => this.players[item.key] = ref}
                 source = {{uri: item.url}}
@@ -558,18 +558,20 @@ componentWillReceiveProps(nextProps) {
                   else Alert.alert('Error', 'Error playing video')
                 }}  
                 />
-                <View 
+                
+                </TouchableWithoutFeedback>
+                {!this.state.playing[item.key] && <View 
                 style={styles.playButtonContainer}>
         			<TouchableOpacity 
                     onPress={() => this.setState({playing: {[item.key]: true}})}>
-            			{!this.state.playing[item.key] && <Icon
+            			<Icon
             			name = {'md-play'}
                         style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
-                        />}
+                        />
                     </TouchableOpacity>
                     <TouchableOpacity 
                     style={{
-                      bottom: 70,
+                      bottom: ((item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0)) ? 110 : 70,
                       right: 15,
                       position: 'absolute',
                       padding: 2,
@@ -586,20 +588,20 @@ componentWillReceiveProps(nextProps) {
                         this.props.navigateFullScreenVideo(item.url)
                       }
                     }}>
-                 {!this.state.playing[item.key] && <Icon name='md-expand'
+                    <Icon name='md-expand'
                  style={{
                    fontSize: 30,
                    backgroundColor: 'transparent',
                    color: '#fff'
-                   }}/>}
+                   }}/>
                    </TouchableOpacity>
-                </View>
-              {this.repCommentCount(item)}
+                </View>}
+                {this.repCommentCount(item)}
             <View style={{padding: 10}}>
             {this.repsAndComments(item)}
             </View>
-            </View>
-          </TouchableWithoutFeedback>
+                </View>
+          
               )
     }
 
