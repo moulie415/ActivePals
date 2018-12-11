@@ -39,6 +39,8 @@ class Credits extends Component {
                             return 'www.freepik.com'
                         case 'https://www.flaticon.com/authors/monkik':
                             return 'www.flaticon.com/authors/monkik'
+                        case 'https://www.zapsplat.com':
+                            return 'zapsplat.com'
                         default: {
                             return url
                         }
@@ -71,6 +73,11 @@ class Credits extends Component {
                     {renderImage(require('../assets/images/logo.png'), 30, 5)}  
                     <Text style={{textAlign:'center', marginHorizontal: 20, marginBottom: 10}}>
                     {'Icon made by monkik from \nhttps://www.flaticon.com/authors/monkik'}</Text>
+                    </View>
+                    <View style={{alignItems: 'center'}}>
+                     
+                    <Text style={{textAlign:'center', marginHorizontal: 20, marginBottom: 10}}>
+                    {'Sound effects obtained from \nhttps://www.zapsplat.com'}</Text>
                     </View>
                 </Hyperlink>
 

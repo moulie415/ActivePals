@@ -43,7 +43,7 @@ export const showLocalNotification = (notif) => {
         .setTitle(custom.title)
         .setBody(custom.body)
         .setData(notif)
-        .setSound('light.mp3')
+        .setSound('notif.wav')
         .android.setSmallIcon('ic_notification')
         .android.setAutoCancel(true)
         .android.setGroupSummary(true)
@@ -125,27 +125,27 @@ class FitLink extends React.Component {
     const channels = []
     channels.push(new firebase.notifications.Android.Channel('REQUEST', 'Pal requests', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for pal requests')
-        .setSound('light.mp3'))
+        .setSound('notif.wav'))
 
     channels.push(new firebase.notifications.Android.Channel('DIRECT_MESSAGES', 'Direct messages', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for direct messages from buddies')
-        .setSound('light.mp3'))
+        .setSound('notif.wav'))
 
     channels.push(new firebase.notifications.Android.Channel('SESSION_MESSAGES', 'Session messages', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for session messages')
-        .setSound('light.mp3'))
+        .setSound('notif.wav'))
 
     channels.push(new firebase.notifications.Android.Channel('GYM_MESSAGES', 'Gym messages', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for gym messages')
-        .setSound('light.mp3'))
+        .setSound('notif.wav'))
 
     channels.push(new firebase.notifications.Android.Channel('COMMENT', 'Comment', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for comments on posts')
-        .setSound('light.mp3'))
+        .setSound('notif.wav'))
     
     channels.push(new firebase.notifications.Android.Channel('REP', 'Rep', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for reps')
-        .setSound('light.mp3'))
+        .setSound('notif.wav'))
    
     channels.forEach(channel => {
       firebase.notifications().android.createChannel(channel)

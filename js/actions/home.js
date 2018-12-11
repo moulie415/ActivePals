@@ -1,4 +1,5 @@
 import firebase from 'react-native-firebase'
+import Sound from 'react-native-sound'
 export const ADD_POST = 'ADD_POST'
 export const SET_FEED = 'SET_FEED'
 export const SET_POST = 'SET_POST'
@@ -9,6 +10,14 @@ export const ADD_COMMENT = 'ADD_COMMENT'
 export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS'
 export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
 import str from '../constants/strings'
+
+const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, (error) => {
+	if (error) {
+	  console.log('failed to load the sound', error);
+	  return;
+	}
+  })
+
 
 const addToFeed = (post, id) => ({
 	type: ADD_POST,
@@ -219,6 +228,7 @@ export const resetFeed = () => {
 
 export const repPost = (item) => {
 	return (dispatch, getState) => {
+		repSound.play()
 		let post = item.key
 		let uid = getState().profile.profile.uid
 		let obj = getState().home.feed[post]
@@ -407,6 +417,7 @@ export const fetchComments = (key, limit = 10) => {
 
 export const repComment = (comment) => {
 	return (dispatch, getState) => {
+		repSound.play()
 		let uid = getState().profile.profile.uid
 		let rep = comment.rep ? false : uid
 		let date = new Date().toString()

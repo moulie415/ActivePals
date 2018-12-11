@@ -54,6 +54,8 @@ target 'Anyone' do
 
   pod 'react-native-video/VideoCaching', :path => '../node_modules/react-native-video/react-native-video.podspec'
 
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+
 end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
