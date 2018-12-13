@@ -32,6 +32,7 @@ import color from 'color'
 import { isIphoneX } from 'react-native-iphone-x-helper'
 import FullScreenVideo from './FullScreenVideo'
 import Welcome from './Welcome'
+import PersonalTraining from './PersonalTraining'
 import { Provider, connect } from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
 import reducer from './reducers/'
@@ -76,7 +77,8 @@ const tabs = TabNavigator({
 	Home : {screen: Home},
   Sessions: {screen: Sessions},
   Friends: {screen: Friends},
-  Chat: {screen: chats},
+  Chat: {screen: chats, navigationOptions: {tabBarLabel: 'Chats'}},
+  PersonalTraining: { screen: PersonalTraining },
 	Profile: {screen: Profile},
 }, {
   tabBarPosition: 'bottom',
@@ -90,7 +92,7 @@ const tabs = TabNavigator({
     style: { backgroundColor: '#fff' },
     indicatorStyle: { backgroundColor: colors.primary },
     showIcon: true,
-    showLabel: false,
+    //showLabel: false,
   },
 })
 

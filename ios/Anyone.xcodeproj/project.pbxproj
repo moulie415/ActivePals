@@ -21,6 +21,7 @@
 		0A1F22EF210DF55200896D4A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A1F22B2210DF55200896D4A /* GoogleService-Info.plist */; };
 		0A1FA0E521C08115002DE30F /* rep.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0A1FA0E321C08115002DE30F /* rep.wav */; };
 		0A1FA0E721C083AE002DE30F /* notif.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0A1FA0E621C083AE002DE30F /* notif.wav */; };
+		0A396BFE21C1D91800ABE181 /* libRNSound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A396BFA21C1D90D00ABE181 /* libRNSound.a */; };
 		0A3E95A22113CA9B00BCD60F /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1F215A210A8E1800896D4A /* libRNGoogleSignin.a */; };
 		0A4320CF216FBDA000C79596 /* libRNVersionNumber.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2FBFA22063056F00A42267 /* libRNVersionNumber.a */; };
 		0A73102420F6780A00CCF377 /* Running-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A730FE820F6780A00CCF377 /* Running-background.jpg */; };
@@ -307,6 +308,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 2858ECD01F8B91B400610575;
 			remoteInfo = "RNVersionNumber-tvOS";
+		};
+		0A396BF921C1D90D00ABE181 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A396BA321C1D90D00ABE181 /* RNSound.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 19825A1E1BD4A89800EE0337;
+			remoteInfo = RNSound;
 		};
 		0A3E956B2113C8FB00BCD60F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -726,6 +734,7 @@
 		0A1F22B2210DF55200896D4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0A1FA0E321C08115002DE30F /* rep.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = rep.wav; path = ../android/app/src/main/res/raw/rep.wav; sourceTree = "<group>"; };
 		0A1FA0E621C083AE002DE30F /* notif.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = notif.wav; sourceTree = "<group>"; };
+		0A396BA321C1D90D00ABE181 /* RNSound.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSound.xcodeproj; path = "../node_modules/react-native-sound/RNSound.xcodeproj"; sourceTree = "<group>"; };
 		0A730FE820F6780A00CCF377 /* Running-background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "Running-background.jpg"; path = "../assets/images/Running-background.jpg"; sourceTree = "<group>"; };
 		0A7CE44E2186939A00CEB53A /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		0A7CEF74211909B200F09932 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
@@ -815,6 +824,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A396BFE21C1D91800ABE181 /* libRNSound.a in Frameworks */,
 				0A12E3EB218F402F009424C7 /* libRNCalendarEvents.a in Frameworks */,
 				0A7CE457218693AC00CEB53A /* libRCTPushNotification.a in Frameworks */,
 				0A4320CF216FBDA000C79596 /* libRNVersionNumber.a in Frameworks */,
@@ -940,6 +950,14 @@
 			children = (
 				0A2FBFA22063056F00A42267 /* libRNVersionNumber.a */,
 				0A2FBFA42063056F00A42267 /* libRNVersionNumber-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0A396BA421C1D90D00ABE181 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A396BFA21C1D90D00ABE181 /* libRNSound.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1180,6 +1198,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				0A396BA321C1D90D00ABE181 /* RNSound.xcodeproj */,
 				0A12E395218F401E009424C7 /* RNCalendarEvents.xcodeproj */,
 				0A7CE44E2186939A00CEB53A /* RCTPushNotification.xcodeproj */,
 				0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */,
@@ -1549,6 +1568,10 @@
 					ProjectRef = 0ACB4D70206082B4003BB865 /* RNImagePicker.xcodeproj */;
 				},
 				{
+					ProductGroup = 0A396BA421C1D90D00ABE181 /* Products */;
+					ProjectRef = 0A396BA321C1D90D00ABE181 /* RNSound.xcodeproj */;
+				},
+				{
 					ProductGroup = 0A2FBF9D2063056F00A42267 /* Products */;
 					ProjectRef = E1BD295473AA4BFA8717D6C0 /* RNVersionNumber.xcodeproj */;
 				},
@@ -1776,6 +1799,13 @@
 			fileType = archive.ar;
 			path = "libRNVersionNumber-tvOS.a";
 			remoteRef = 0A2FBFA32063056F00A42267 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A396BFA21C1D90D00ABE181 /* libRNSound.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNSound.a;
+			remoteRef = 0A396BF921C1D90D00ABE181 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A3E956C2113C8FB00BCD60F /* libFirebaseCore.a */ = {

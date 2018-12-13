@@ -24,14 +24,13 @@ const adsManager = new NativeAdsManager(str.nativePlacementId)
 
 export function renderAd(index) {
   if (index > 0 && index % 4 == 0) {
-    if (Platform.OS == 'android') {
-      if (index % 8 == 0) {
+    if (Platform.OS == 'android' && (index % 8 == 0)) {
         return <Card>
             <NativeAdView adsManager={adsManager} />
         </Card>
-      }
-      else {
-        return <AdMobBanner
+    }
+    else {
+      return <Card style={{padding: 10}}><AdMobBanner
         adSize="largeBanner"
         style={{alignSelf: 'center'}}
         adUnitID={str.admobBanner}
@@ -40,18 +39,7 @@ export function renderAd(index) {
           console.log(error)
           }}
         />
-      }
-    }
-    else {
-      return <AdMobBanner
-      adSize="largeBanner"
-      style={{alignSelf: 'center'}}
-      adUnitID={str.admobBanner}
-      testDevices={str.testDevices}
-      onAdFailedToLoad={error => {
-        console.log(error)
-        }}
-      />
+        </Card>
     }
   }
   else return null

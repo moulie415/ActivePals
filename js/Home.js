@@ -67,7 +67,7 @@ class Home extends Component {
 
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Sessions',
+    tabBarLabel: 'Home',
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-home'
