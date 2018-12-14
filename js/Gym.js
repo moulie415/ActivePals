@@ -11,8 +11,8 @@ import {
   Left,
   Title,
   Right,
-  Spinner
 } from 'native-base'
+import { PulseIndicator } from 'react-native-indicators'
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Image from 'react-native-fast-image'
@@ -154,8 +154,8 @@ import StarRating from 'react-native-star-rating'
         {this.state.gym.international_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Intl phone number: '}
         <Text style={{color: colors.secondary}}>{this.state.gym.international_phone_number}</Text></Text>}
         {this.state.gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(this.state.gym.types)}</Text>}
-        </View> : <View style={hStyles.spinner}><Spinner color={colors.secondary} /></View>}
-        {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
+        </View> : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
+        {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
 
     </Container>
   )

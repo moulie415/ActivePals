@@ -18,8 +18,8 @@ import {
   Card,
   Left,
   Right,
-  Spinner
 } from 'native-base'
+import { PulseIndicator } from 'react-native-indicators'
 import firebase from 'react-native-firebase'
 import colors from './constants/colors'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
@@ -261,7 +261,7 @@ componentWillReceiveProps(nextProps) {
             /></View>}
         {this.props.friends && this.state.profile && this.renderFeed()}
       </Content>
-      {this.state.spinner && <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>}
+      {this.state.spinner && <View style={sStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
       <Modal onRequestClose={()=> null}
           visible={this.state.showImage} transparent={true}>
         <ImageViewer

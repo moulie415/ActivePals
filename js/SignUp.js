@@ -9,7 +9,6 @@ import {
   Container,
   Item,
   Icon,
-  Spinner,
   Right,
   Left,
   Title
@@ -20,6 +19,8 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import colors from './constants/colors'
 import TouchableOpacity from './constants/TouchableOpacityLockable.js'
 import Header from './header/header'
+import { PulseIndicator } from 'react-native-indicators'
+
 
  class SignUp extends Component {
 
@@ -58,7 +59,7 @@ import Header from './header/header'
       hasBack={true}
       title={'Sign up'}
       />
-      {this.state.spinner && <Spinner />}
+      {this.state.spinner && <PulseIndicator />}
       <View style={{justifyContent: 'center', flex: 1}}>
       <Item style={styles.inputGrp}>
       <Icon name="person" style={{color: "#fff"}} />

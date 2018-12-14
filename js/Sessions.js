@@ -15,7 +15,6 @@ import {
 import {
   Container,
   Icon,
-  Spinner,
   Switch,
   Card,
   Title,
@@ -24,6 +23,7 @@ import {
   Right,
   Content,
 } from 'native-base'
+import { PulseIndicator } from 'react-native-indicators'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
@@ -154,7 +154,7 @@ import Header from './header/header'
     return (
       <Container>
 
-      {this.state.spinner && <Spinner style={styles.spinner} />}
+      {this.state.spinner && <PulseIndicator style={styles.spinner} />}
         <Header 
           left={<TouchableOpacity
             style = {{position:'absolute', top:8, bottom:0, left:0, justifyContent: 'center', paddingLeft: 10}}
@@ -409,7 +409,7 @@ import Header from './header/header'
              resizeMode={'contain'} 
              source={{uri: this.state.locationPhoto}}/> : 
              <View style={{alignItems: 'center', justifyContent: 'center', height: 200}}>
-              <Spinner color={colors.secondary} size={'small'}/>
+              <PulseIndicator color={colors.secondary} />
               </View> : null}
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
               <TouchableOpacity

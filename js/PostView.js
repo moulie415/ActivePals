@@ -3,7 +3,6 @@ import {
     Container,
     Left,
     Icon,
-    Spinner,
 } from 'native-base'
 import {
     View,
@@ -46,6 +45,7 @@ import {
   import str from './constants/strings'
   import Video from 'react-native-video'
   import hStyles from './styles/homeStyles'
+  import { PulseIndicator } from 'react-native-indicators'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -224,7 +224,7 @@ class PostView extends Component {
             />
       </Modal>
       </ScrollView>
-            </KeyboardAvoidingView> : <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>
+            </KeyboardAvoidingView> : <View style={sStyles.spinner}><PulseIndicator color={colors.secondary}/></View>
         )
     }
 

@@ -17,7 +17,6 @@ import {
   Title,
   Right,
   ActionSheet,
-  Spinner,
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import Image from 'react-native-fast-image'
@@ -31,6 +30,7 @@ var ImagePicker = require('react-native-image-picker')
 import ImageResizer from 'react-native-image-resizer'
 import RNPickerSelect from 'react-native-picker-select'
 import Header from './header/header'
+import { PulseIndicator } from 'react-native-indicators'
 
 
  class Profile extends Component {
@@ -301,7 +301,7 @@ import Header from './header/header'
         onPress={()=> this.logout()}>
         <Text style={{color: '#fff'}} >Log out</Text>
       </TouchableOpacity>
-        {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
+        {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
         </ScrollView>
 
     </Container>

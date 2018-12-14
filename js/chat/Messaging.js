@@ -14,7 +14,6 @@ import {
   Right,
   Icon,
   Text,
-  Spinner,
 } from 'native-base'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
@@ -28,6 +27,7 @@ import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
 import EmojiInput from 'react-native-emoji-input'
 import { NavigationActions } from "react-navigation"
+import { PulseIndicator } from 'react-native-indicators'
 
 class Messaging extends React.Component {
   static navigationOptions = {
@@ -314,7 +314,7 @@ class Messaging extends React.Component {
                   }}
 	            />}
         {this.state.spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
-          <Spinner color={colors.secondary}/>
+          <PulseIndicator color={colors.secondary}/>
         </View>}
       </Container>
     )

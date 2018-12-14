@@ -12,7 +12,6 @@ import {
   Title,
   Left,
   Right,
-  Spinner,
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import VersionNumber from 'react-native-version-number'
@@ -20,6 +19,7 @@ import colors from './constants/colors'
 import  styles  from './styles/settingsStyles'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Header from './header/header'
+import { PulseIndicator } from 'react-native-indicators'
 
 
  class Settings extends Component {
@@ -113,7 +113,7 @@ import Header from './header/header'
           </TouchableOpacity>
       </Content>
      {this.state.spinner && <View style={styles.spinner}>
-      <Spinner color={colors.secondary}/>
+      <PulseIndicator color={colors.secondary}/>
       </View>}
     </Container>
   )

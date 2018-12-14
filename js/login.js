@@ -12,10 +12,10 @@ import {
   Content,
   Item,
   Icon,
-  Spinner,
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import  styles  from './styles/loginStyles'
+import sStyles from './styles/settingsStyles'
 import { GoogleSignin } from 'react-native-google-signin'
 import VersionNumber from 'react-native-version-number'
 const FBSDK = require('react-native-fbsdk')
@@ -28,6 +28,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 import TouchableOpacity from './constants/TouchableOpacityLockable.js'
 import str from './constants/strings'
 import SpinnerButton from 'react-native-spinner-button'
+import { PulseIndicator } from 'react-native-indicators'
 
 
  class Login extends Component {
@@ -70,7 +71,7 @@ import SpinnerButton from 'react-native-spinner-button'
   render () {
     return (
     <ImageBackground style={styles.container} source={background}>
-      {this.state.spinner && <Spinner color={colors.secondary}/>}
+      {this.state.spinner && <View style={sStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
       <View style={{marginBottom: 40}}>
         <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>{str.appName}</Text>
       </View>

@@ -11,7 +11,6 @@ import {
 } from 'react-native'
 import {
     Icon,
-    Spinner,
 } from 'native-base'
 import colors from './constants/colors'
 import firebase from 'react-native-firebase'
@@ -24,6 +23,7 @@ import { getMentionsList } from './constants/utils'
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'
 import Text from './constants/Text'
+import { PulseIndicator } from 'react-native-indicators'
 
 
 class FilePreview extends Component {
@@ -128,7 +128,7 @@ class FilePreview extends Component {
                 multiline = {false}
                 autoCorrect={true}
                 placeholder = {'Add comment...'}/>
-              {this.state.spinner && <View style={sStyles.spinner}><Spinner color={colors.secondary}/></View>}
+              {this.state.spinner && <View style={sStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
             </View>
         </TouchableWithoutFeedback>
     }
@@ -196,7 +196,7 @@ class FilePreview extends Component {
 				placeholder = {'Add comment...'}/>
               {this.state.spinner && 
               <View style={sStyles.spinner}>
-                <Spinner color={colors.secondary}/>
+                <PulseIndicator color={colors.secondary}/>
                 {!!this.state.progress && <Text style={{color: '#fff'}}>{this.state.progress + '%'}</Text>}
                 </View>}
 			</View>

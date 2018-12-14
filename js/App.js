@@ -76,9 +76,9 @@ const chats = TabNavigator({
 const tabs = TabNavigator({
 	Home : {screen: Home},
   Sessions: {screen: Sessions},
+  PersonalTraining: { screen: PersonalTraining },
   Friends: {screen: Friends},
   Chat: {screen: chats, navigationOptions: {tabBarLabel: 'Chats'}},
-  PersonalTraining: { screen: PersonalTraining },
 	Profile: {screen: Profile},
 }, {
   tabBarPosition: 'bottom',

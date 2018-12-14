@@ -13,7 +13,6 @@ import {
   Title,
   Left,
   Right,
-  Spinner
 } from "native-base"
 import { Image as SlowImage } from 'react-native'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
@@ -26,6 +25,7 @@ import colors from './constants/colors'
 import { getSimplifiedTime } from './constants/utils'
 import Header from './header/header'
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
+import { PulseIndicator } from 'react-native-indicators'
 
 
 class Notifications extends Component {
@@ -76,7 +76,7 @@ class Notifications extends Component {
       {Object.keys(this.state.notifications).length > 0 ?
       <ScrollView>
         {this.renderNotifications()}
-      </ScrollView> : this.state.spinner ? <View style={styles.indicator}><Spinner color={colors.secondary}/></View> 
+      </ScrollView> : this.state.spinner ? <View style={styles.indicator}><PulseIndicator color={colors.secondary}/></View> 
       : <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text style={{textAlign: 'center', color: '#999', fontSize: 20}}>No notifications yet</Text></View> 
          }
@@ -132,7 +132,7 @@ class Notifications extends Component {
               
             }}
             style={{backgroundColor: '#fff', paddingVertical: this.state.loadingMore ? 0 : 10}}>
-              {this.state.loadingMore ? <Spinner color={colors.secondary } size='small' style={{height: 35}} /> : 
+              {this.state.loadingMore ? <PulseIndicator color={colors.secondary } style={{height: 35}} /> : 
               <Text style={{color: colors.secondary, textAlign: 'center'}}>Load More</Text>}
             </TouchableOpacity>
           }

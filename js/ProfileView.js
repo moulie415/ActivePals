@@ -20,7 +20,6 @@ import {
   Title,
   Right,
   ActionSheet,
-  Spinner
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
@@ -32,6 +31,7 @@ import colors from './constants/colors'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import { calculateAge } from './constants/utils'
 import Header from './header/header'
+import { PulseIndicator } from 'react-native-indicators'
 
 
  class ProfileView extends Component {
@@ -194,8 +194,8 @@ import Header from './header/header'
           }}>
           <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Remove pal</Text>
           </TouchableOpacity>}
-        </View> : <View style={hStyles.spinner}><Spinner color={colors.secondary} /></View>}
-        {this.state.spinner && <View style={hStyles.spinner}><Spinner color={colors.secondary}/></View>}
+        </View> : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
+        {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
         <Modal onRequestClose={()=> null}
           visible={this.state.showImage} transparent={true}>
         <ImageViewer
