@@ -33,6 +33,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
 import FullScreenVideo from './FullScreenVideo'
 import Welcome from './Welcome'
 import PersonalTraining from './PersonalTraining'
+import Form from './Form'
 import { Provider, connect } from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
 import reducer from './reducers/'
@@ -92,6 +93,10 @@ const tabs = TabNavigator({
     style: { backgroundColor: '#fff' },
     indicatorStyle: { backgroundColor: colors.primary },
     showIcon: true,
+    upperCaseLabel: false,
+    labelStyle: {
+      fontSize: Platform.OS == 'android' ? 8 : 10
+    }
     //showLabel: false,
   },
 })
@@ -112,7 +117,8 @@ export const Stack = StackNavigator({
   Gym: { screen: Gym },
   Welcome: {screen: Welcome, navigationOptions: {header: null}},
   Credits: {screen: Credits, navigationOptions: {header: null}},
-  FullScreenVideo: {screen: FullScreenVideo, navigationOptions: { header: null}}
+  FullScreenVideo: {screen: FullScreenVideo, navigationOptions: { header: null}},
+  Form: { screen: Form, navigationOptions: {header: null}}
 })
 
 class App extends React.Component {
