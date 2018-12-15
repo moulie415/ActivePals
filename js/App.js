@@ -95,7 +95,10 @@ const tabs = TabNavigator({
     showIcon: true,
     upperCaseLabel: false,
     labelStyle: {
-      fontSize: Platform.OS == 'android' ? 8 : 10
+      fontSize: 10,
+      margin: 0,
+      marginTop: Platform.OS == 'android' ?  5 : 0,
+      padding: 0
     }
     //showLabel: false,
   },
