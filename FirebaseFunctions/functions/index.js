@@ -1,9 +1,21 @@
 const functions = require('firebase-functions')
+const nodemailer = require('nodemailer')
 const admin = require('firebase-admin')
 const Storage = require('@google-cloud/storage')
 const storage = new Storage()
 const bucket = 'anyone-80c08.appspot.com'
 const _ = require('lodash')
+const gmailEmail = functions.config().gmail.email;
+const gmailPassword = functions.config().gmail.password;
+const mailTransport = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: gmailEmail,
+    pass: gmailPassword,
+  },
+})
+
+const APP_NAME = 'ActivePals'
 
 admin.initializeApp(functions.config().firebase)
 
@@ -302,7 +314,6 @@ exports.onFriendDeleted = functions.database.ref('/users/{uid}/friends/{friendUi
 })
 
 exports.deleteUserData = functions.auth.user().onDelete((deleted) => {
-    //perhaps send goodbye email
     console.log(deleted)
     const uid = deleted.data.uid
 
@@ -476,3 +487,28 @@ exports.onRep = functions.database.ref('/reps/{id}/{uid}').onWrite(event => {
             })
     })
 })
+
+exports.sendWelcomeEmail = functions.auth.user().onCreate((user) => {
+    // [END onCreateTrigger]
+      // [START eventAttributes]
+      const email = user.email; // The email of the user.
+      const displayName = user.displayName; // The display name of the user.
+      // [END eventAttributes]
+    
+      return sendWelcomeEmail(email, displayName);
+    })
+
+// Sends a welcome email to the given user.
+function sendWelcomeEmail(email, username) {
+    const mailOptions = {
+      from: `${APP_NAME} <noreply@firebase.com>`,
+      to: email,
+    };
+  
+    // The user subscribed to the newsletter.
+    mailOptions.subject = `Welcome to ${APP_NAME}!`;
+    mailOptions.text = `Hey ${displayName || ''}! Welcome to ${APP_NAME}. I hope you will enjoy our app.`;
+    return mailTransport.sendMail(mailOptions).then(() => {
+      return console.log('New welcome email sent to:', email);
+    });
+  }
