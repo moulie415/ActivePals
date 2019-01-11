@@ -154,7 +154,7 @@ import Header from './header/header'
     return (
       <Container>
 
-      {this.state.spinner && <PulseIndicator style={styles.spinner} />}
+      {this.state.spinner && <PulseIndicator color={colors.secondary} style={styles.spinner} />}
         <Header 
           left={<TouchableOpacity
             style = {{position:'absolute', top:8, bottom:0, left:0, justifyContent: 'center', paddingLeft: 10}}
