@@ -26,14 +26,18 @@ class PersonalTraining extends Component {
     }
 
     render() {
-        return <Container>
+        return <Container style={{backgroundColor: colors.bgColor}}>
         <Header title={'Personal Training'}/>
         {!this.props.profile.trainer && <View>
-        <Text>Are you a personal trainer? Why not get verified on our platform?</Text>
-            <TouchableOpacity onPress={()=> {
+        <Text style={{color: colors.secondary, margin: 20, textAlign: 'center'}}>
+        Are you a personal trainer? Why not get verified on our platform?
+        </Text>
+            <TouchableOpacity 
+            style={{backgroundColor: colors.secondary, alignSelf: 'center', padding: 10}}
+            onPress={()=> {
                 this.props.navigateVerification()
             }}>
-                <Text>Get verified</Text>
+                <Text style={{color: '#fff'}}>Get verified</Text>
             </TouchableOpacity></View>}
         </Container>
     }
@@ -43,6 +47,7 @@ class PersonalTraining extends Component {
 
 import { connect } from 'react-redux'
 import { navigateForm } from './actions/navigation';
+import colors from './constants/colors';
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
     profile: profile.profile,

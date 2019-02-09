@@ -6,7 +6,6 @@ import {
   TextInput,
   ScrollView,
   RefreshControl,
-  Image,
   Platform,
   FlatList
 } from "react-native"
@@ -30,6 +29,7 @@ import styles from './styles/friendsStyles'
 import sStyles from 'Anyone/js/styles/sessionStyles'
 import { arraysEqual, getStateColor } from './constants/utils'
 import Header from './header/header'
+import Image from 'react-native-fast-image'
 
 
  class Friends extends Component {
@@ -188,7 +188,7 @@ import Header from './header/header'
 
   renderFriends() {
     return <FlatList 
-      style={{backgroundColor: '#9993'}}
+      style={{backgroundColor: colors.bgColor}}
       data={this.sortByState(this.state.friends)}
       keyExtractor={(friend)=> friend.uid}
       onRefresh={()=> this.onRefresh()}

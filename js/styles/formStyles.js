@@ -19,14 +19,12 @@ export default styles = StyleSheet.create({
         alignItems: 'center'
     },
     headerMainText: {
-        fontFamily: 'Avenir',
         color: 'rgba(0, 0, 0, 0.6)' ,
         fontWeight: 'bold',
         fontSize: 16
     },
     headerSubText: {
         color: 'rgba(0, 0, 0, 0.6)',
-        fontFamily: 'Avenir',
         fontSize: 12
     },
     listCell: {
@@ -34,8 +32,8 @@ export default styles = StyleSheet.create({
         marginBottom: 5
     },
     listCellText: {
-        fontFamily: 'Avenir',
         fontWeight: '600',
+        color: colors.secondary,
         marginBottom: 4,
         marginTop: 4,
         fontSize: 15,
@@ -48,7 +46,6 @@ export default styles = StyleSheet.create({
         borderColor: 'grey',
         borderWidth: 0.5, 
         paddingLeft: 6,
-        fontFamily: 'Avenir', 
         fontSize: 15,
         paddingTop: 6,
         paddingBottom: 6
@@ -99,13 +96,11 @@ export default styles = StyleSheet.create({
     },
     sendIndicatorTextTop: {
         color: 'white',
-        fontFamily: 'Avenir', 
         marginBottom: 10,
         fontWeight: '800'
     },
     sendIndicatorTextBottom: {
         color: 'white', 
-        fontFamily: 'Avenir',
         width: 200, 
         textAlign: 'center'
      }
