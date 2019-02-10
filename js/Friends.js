@@ -299,6 +299,7 @@ import Image from 'react-native-fast-image'
           this.props.onOpenChat(snapshot.val(), username, uid)
         }
         else {
+          Alert.alert('Error', 'You should not be seeing this error message, please contact support')
         }
       })
       .catch(e => Alert.alert('Error', e.message))

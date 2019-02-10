@@ -64,6 +64,12 @@ class Messaging extends React.Component {
     }
   }
 
+  sortByDate(array) {
+    return array.sort((a,b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt)
+    })
+  }
+
   onBackPress() {
         if (this.state.showEmojiKeyboard) {
           this.setState({showEmojiKeyboard: false})
@@ -133,8 +139,8 @@ class Messaging extends React.Component {
     }
     if (nextProps.messageSession && !this.fetched) {
       this.fetched = true
-      this.setState({messages: nextProps.messageSession.reverse(), spinner: false})
-      if (nextProps.messageSession.some(message => message._id == 1)) {
+      this.setState({messages: nextProps.messageSession, spinner: false})
+      if (nextProps.messageSession && Object.values(nextProps.messageSession).some(message => message._id == 1)) {
         this.setState({showLoadEarlier: false})
       }
     }
@@ -169,7 +175,7 @@ class Messaging extends React.Component {
             (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid) ||
             (type == 'gymMessage' && this.gymId == gymId && this.uid != uid)) {
             this.setState(previousState => ({
-              messages: GiftedChat.append(previousState.messages, message),
+              messages: GiftedChat.append(Object.values(previousState.messages), message),
             }))
         }
       }
@@ -204,7 +210,7 @@ class Messaging extends React.Component {
     ref.push(...converted)
     .then(() => {
       this.setState(previousState => ({
-      messages: GiftedChat.append(previousState.messages, messages),
+      messages: GiftedChat.append(Object.values(previousState.messages), messages),
       }))
 
 
@@ -245,7 +251,7 @@ class Messaging extends React.Component {
           ref={ref => this.chat = ref}
           text={this.state.text}
           onInputTextChanged={text => this.setState({text})}
-          messages={this.state.messages}
+          messages={this.state.messages ? this.sortByDate(Object.values(this.state.messages)) : []}
           onSend={messages => {
             if (this.props.profile.username) {
               this.onSend(messages)
@@ -266,7 +272,7 @@ class Messaging extends React.Component {
             this.fetched = false
             this.setState({amount: this.state.amount += 15, spinner: true} ,()=> this.loadMessages())
           }}
-          loadEarlier={this.state.messages && this.state.messages.length > 29 && this.state.showLoadEarlier}
+          loadEarlier={this.state.messages && Object.values(this.state.messages).length > 29 && this.state.showLoadEarlier}
           user={{
             _id: this.uid,
             name: this.props.profile.username,
