@@ -59,7 +59,7 @@ import { PulseIndicator } from 'react-native-indicators'
       hasBack={true}
       title={'Sign up'}
       />
-      {this.state.spinner && <PulseIndicator />}
+      {this.state.spinner && <PulseIndicator color={colors.secondary}/>}
       <View style={{justifyContent: 'center', flex: 1}}>
       <Item style={styles.inputGrp}>
       <Icon name="person" style={{color: "#fff"}} />

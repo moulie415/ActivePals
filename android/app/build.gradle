@@ -144,6 +144,10 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
+            manifestPlaceholders = [isDebug:false]
+        }
+        debug {
+            manifestPlaceholders = [isDebug:true]
         }
     }
     // applicationVariants are e.g. debug, release

@@ -115,7 +115,7 @@ import { PulseIndicator } from 'react-native-indicators'
           </TouchableOpacity>}
 
         title={'Profile'}
-          right={<TouchableOpacity onPress={(mutex)=> {
+          right={this.hasChanged() && <TouchableOpacity onPress={(mutex)=> {
             mutex.lockFor(1000)
             this.updateUser(this.state.initialProfile, this.state.profile)
           }}

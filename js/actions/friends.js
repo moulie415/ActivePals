@@ -80,7 +80,13 @@ export const fetchFriends = (uids) => {
 			dispatch(fetchPrivateSessions())
 		})
 	}
-	else dispatch(setFriends({}))
+	else {
+			return new Promise(resolve => {
+				dispatch(setFriends({}))
+				resolve()
+			})
+			
+		}	
 	}
 }
 

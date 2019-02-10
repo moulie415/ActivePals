@@ -101,11 +101,11 @@ export const doSetup = (profile) => {
 		dispatch(setHasLoggedIn(true))
 		return dispatch(fetchFriends(friends)).then(() => {
 			return Promise.all([
-				profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),
-				profile.chats && dispatch(fetchChats(profile.chats)),
-				profile.gym && dispatch(fetchGymChat(profile.gym)),
-				dispatch(fetchPosts(uid)),
-				dispatch(fetchSessions()),
+					profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),
+					profile.chats && dispatch(fetchChats(profile.chats)),
+					profile.gym && dispatch(fetchGymChat(profile.gym)),
+					dispatch(fetchPosts(uid)),
+					dispatch(fetchSessions()),
 				])
 		})
 
