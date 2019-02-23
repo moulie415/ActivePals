@@ -236,27 +236,28 @@ export const removeSessionChat = (key) => {
 	}
 }
 
-export const fetchMessages = (id, amount, uid) => {
+export const fetchMessages = (id, amount, uid, endAt) => {
 	return (dispatch) => {
-		return firebase.database().ref('chats/' + id).orderByKey().limitToLast(amount)
-		.once('value', snapshot => {
+		let ref = endAt ? firebase.database().ref('chats/' + id).orderByKey().endAt(endAt).limitToLast(amount) :
+		firebase.database().ref('chats/' + id).orderByKey().limitToLast(amount)
+		return ref.once('value', snapshot => {
 			let messages = {}
 			firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
 			.then (url => {
 				snapshot.forEach(child => {
 					if (child.val().user && child.val().user._id == uid) {
-						messages[child.key] = {...child.val(), createdAt: new Date(child.val().createdAt),
+						messages[child.key] = {...child.val(), key: child.key, createdAt: new Date(child.val().createdAt),
 							user: {...child.val().user, avatar: url}}
 					}
 					else {
-						messages[child.key] = {...child.val(), createdAt: new Date(child.val().createdAt)}
+						messages[child.key] = {...child.val(), key: child.key,  createdAt: new Date(child.val().createdAt)}
 					}
 				})
 				dispatch(setMessageSession(id, messages))
 			})
 			.catch(e => {
 				snapshot.forEach(child => {
-					messages[child.key] = {...child.val(), createdAt: new Date(child.val().createdAt)}
+					messages[child.key] = {...child.val(), key: child.key, createdAt: new Date(child.val().createdAt)}
 				})
 				dispatch(setMessageSession(id, messages))
 			})
@@ -264,10 +265,10 @@ export const fetchMessages = (id, amount, uid) => {
 	}
 }
 
-export const fetchSessionMessages = (id, amount, isPrivate = false) => {
+export const fetchSessionMessages = (id, amount, isPrivate = false, startAt) => {
 	return (dispatch) => {
 		let type = isPrivate ? 'privateSessions' : 'sessions'
-		return firebase.database().ref('sessionChats/' + id).orderByKey().limitToLast(amount)
+		return firebase.database().ref('sessionChats/' + id).endAt(startAt).limitToLast(amount)
 		.once('value', snapshot => {
 			let messages = {}
 			let promises = []
@@ -290,11 +291,11 @@ export const fetchSessionMessages = (id, amount, isPrivate = false) => {
 					snapshot.forEach(child => {
 						let avatar = child.val().user ? avatars[child.val().user._id] : ""
 						if (avatar) {
-							messages[child.key] = {...child.val(), createdAt: new Date(child.val().createdAt),
+							messages[child.key] = {...child.val(), key: child.key, createdAt: new Date(child.val().createdAt),
 								user: {...child.val().user, avatar}}
 						}
 						else {
-							messages[child.key] = {...child.val(), createdAt: new Date(child.val().createdAt)}
+							messages[child.key] = {...child.val(), key: child.key, createdAt: new Date(child.val().createdAt)}
 							}
 					})
 					dispatch(setMessageSession(id, messages))
@@ -320,9 +321,9 @@ export const fetchGymChat = (gym) => {
 	}
 }
 
-export const fetchGymMessages = (id, amount) => {
+export const fetchGymMessages = (id, amount, startAt) => {
 	return (dispatch) => {
-		return firebase.database().ref('gymChats/' + id).orderByKey().limitToLast(amount)
+		return firebase.database().ref('gymChats/' + id).endAt(startAt).limitToLast(amount)
 		.once('value', snapshot => {
 			let messages = {}
 			let promises = []
@@ -345,11 +346,11 @@ export const fetchGymMessages = (id, amount) => {
 					snapshot.forEach(child => {
 						let avatar = child.val().user ? avatars[child.val().user._id] : ""
 						if (avatar) {
-							messages[child.key] = {...child.val(), createdAt: new Date(child.val().createdAt),
+							messages[child.key] = {...child.val(), key: child.key, createdAt: new Date(child.val().createdAt),
 								user: {...child.val().user, avatar}}
 						}
 						else {
-							messages[child.key] = {...child.val(), createdAt: new Date(child.val().createdAt)}
+							messages[child.key] = {...child.val(), key: child.key, createdAt: new Date(child.val().createdAt)}
 							}
 					})
 					dispatch(setMessageSession(id, messages))

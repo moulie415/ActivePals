@@ -58,7 +58,7 @@ export default function(state = initialState, action) {
 		case SET_MESSAGE_SESSION:
 			return {
 				...state,
-				messageSessions: {...state.messageSessions, [action.id]: action.messages},
+				messageSessions: {...state.messageSessions, [action.id]: {...state.messageSessions[action.id], ...action.messages}},
 			}
 		case NEW_NOTIF:
 			return {

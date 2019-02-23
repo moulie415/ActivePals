@@ -108,16 +108,16 @@ class Messaging extends React.Component {
   }
   
 
-  loadMessages() {
+  loadMessages(startAt) {
     this.setState({spinner: true})
     if (this.session) {
-      this.props.getSessionMessages(this.sessionId, this.state.amount, this.session.private)
+      this.props.getSessionMessages(this.sessionId, this.state.amount, this.session.private, startAt)
     }
     else if (this.gymId) {
-      this.props.getGymMessages(this.gymId, this.state.amount)
+      this.props.getGymMessages(this.gymId, this.state.amount, startAt)
     }
     else {
-      this.props.getMessages(this.chatId, this.state.amount, this.friendUid)
+      this.props.getMessages(this.chatId, this.state.amount, this.friendUid, startAt)
     }
   }
 
@@ -248,6 +248,7 @@ class Messaging extends React.Component {
       right={this.getRightHandIcon()}
        />
         <GiftedChat
+          //inverted={false}
           ref={ref => this.chat = ref}
           text={this.state.text}
           onInputTextChanged={text => this.setState({text})}
@@ -270,9 +271,11 @@ class Messaging extends React.Component {
           onPressAvatar={user => this.props.viewProfile(user._id)}
           onLoadEarlier={()=> {
             this.fetched = false
-            this.setState({amount: this.state.amount += 15, spinner: true} ,()=> this.loadMessages())
+            const messages = this.sortByDate(Object.values(this.state.messages))
+            let endAt = messages[messages.length-1].key
+            this.setState({spinner: true} ,()=> this.loadMessages(endAt))
           }}
-          loadEarlier={this.state.messages && Object.values(this.state.messages).length > 29 && this.state.showLoadEarlier}
+          loadEarlier={this.state.messages && Object.values(this.state.messages).length > 14 && this.state.showLoadEarlier}
           user={{
             _id: this.uid,
             name: this.props.profile.username,
@@ -453,9 +456,9 @@ const mapDispatchToProps = dispatch => ({
   onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
-  getMessages: (id, amount, uid) => dispatch(fetchMessages(id, amount, uid)),
-  getSessionMessages: (id, amount, isPrivate) => dispatch(fetchSessionMessages(id, amount, isPrivate)),
-  getGymMessages: (id, amount) => dispatch(fetchGymMessages(id, amount)),
+  getMessages: (id, amount, uid, endAt) => dispatch(fetchMessages(id, amount, uid, endAt)),
+  getSessionMessages: (id, amount, isPrivate, endAt) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
+  getGymMessages: (id, amount, endAt) => dispatch(fetchGymMessages(id, amount, endAt)),
   resetNotif: () => dispatch(resetNotification()),
   navigateProfile: () => dispatch(navigateProfile()),
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
