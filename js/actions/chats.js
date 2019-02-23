@@ -265,11 +265,12 @@ export const fetchMessages = (id, amount, uid, endAt) => {
 	}
 }
 
-export const fetchSessionMessages = (id, amount, isPrivate = false, startAt) => {
+export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
 	return (dispatch) => {
 		let type = isPrivate ? 'privateSessions' : 'sessions'
-		return firebase.database().ref('sessionChats/' + id).endAt(startAt).limitToLast(amount)
-		.once('value', snapshot => {
+		let ref = endAt ? firebase.database().ref('sessionChats/' + id).endAt(endAt).limitToLast(amount) :
+		firebase.database().ref('sessionChats/' + id).limitToLast(amount)
+		return ref.once('value', snapshot => {
 			let messages = {}
 			let promises = []
 			firebase.database().ref(type + '/' + id).child('users').once('value', users => {
@@ -321,10 +322,11 @@ export const fetchGymChat = (gym) => {
 	}
 }
 
-export const fetchGymMessages = (id, amount, startAt) => {
+export const fetchGymMessages = (id, amount, endAt) => {
 	return (dispatch) => {
-		return firebase.database().ref('gymChats/' + id).endAt(startAt).limitToLast(amount)
-		.once('value', snapshot => {
+		let ref  = endAt ? firebase.database().ref('gymChats/' + id).endAt(endAt).limitToLast(amount) :
+		firebase.database().ref('gymChats/' + id).limitToLast(amount)
+		return ref.once('value', snapshot => {
 			let messages = {}
 			let promises = []
 			firebase.database().ref('gyms/' + id).child('users').once('value', users => {

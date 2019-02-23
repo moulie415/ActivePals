@@ -108,16 +108,16 @@ class Messaging extends React.Component {
   }
   
 
-  loadMessages(startAt) {
+  loadMessages(endAt) {
     this.setState({spinner: true})
     if (this.session) {
-      this.props.getSessionMessages(this.sessionId, this.state.amount, this.session.private, startAt)
+      this.props.getSessionMessages(this.sessionId, this.state.amount, this.session.private, endAt)
     }
     else if (this.gymId) {
-      this.props.getGymMessages(this.gymId, this.state.amount, startAt)
+      this.props.getGymMessages(this.gymId, this.state.amount, endAt)
     }
     else {
-      this.props.getMessages(this.chatId, this.state.amount, this.friendUid, startAt)
+      this.props.getMessages(this.chatId, this.state.amount, this.friendUid, endAt)
     }
   }
 
