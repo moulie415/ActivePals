@@ -14,7 +14,7 @@ import { navigateBack } from '../actions/navigation'
 const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, style, fitTitle, backgroundColor, left }) => {
 	return <SafeAreaView style={{backgroundColor: backgroundColor || colors.primary}} forceInset={{top:'always'}}>
 		<Header
-			style = {{backgroundColor: backgroundColor || colors.primary, borderBottomWidth:0, alignItems:'stretch', paddingTop:0, elevation: 0}}
+			style = {{backgroundColor: backgroundColor || colors.primary, borderBottomWidth:0, alignItems:'stretch', elevation: 0}}
 			androidStatusBarColor={colors.primary}
 		>
 			<View style = {{flex:1, alignItems: 'center', justifyContent: 'center'}}>

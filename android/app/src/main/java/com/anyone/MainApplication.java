@@ -8,8 +8,9 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
-import com.zmxv.RNSound.RNSoundPackage;
 import com.shahenlibrary.RNVideoProcessingPackage;
+import co.apptailor.googlesignin.RNGoogleSigninPackage;
+import com.zmxv.RNSound.RNSoundPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 
@@ -20,16 +21,12 @@ import com.calendarevents.CalendarEventsPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
-import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
-import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import com.devfd.RNGeocoder.RNGeocoderPackage;
-import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.apsl.versionnumber.RNVersionNumberPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.imagepicker.ImagePickerPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -59,8 +56,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
-            new RNSoundPackage(),
             new RNVideoProcessingPackage(),
+            new RNGoogleSigninPackage(),
+            new RNSoundPackage(),
             new ReactVideoPackage(),
             new VectorIconsPackage(),
               new FBAdsPackage(),
@@ -73,7 +71,6 @@ public class MainApplication extends Application implements ReactApplication {
               new RNFirebaseMessagingPackage(),
               new RNGeocoderPackage(),
               new RNFirebaseStoragePackage(),
-              new RNGoogleSigninPackage(),
               new RNFirebaseAuthPackage(),
               new SplashScreenReactPackage(),
               new RNVersionNumberPackage(),

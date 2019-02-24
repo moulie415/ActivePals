@@ -25,7 +25,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
 import { guid } from '../constants/utils'
 import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
-import EmojiInput from 'react-native-emoji-input'
+//import EmojiInput from 'react-native-emoji-input'
 import { NavigationActions } from "react-navigation"
 import { PulseIndicator } from 'react-native-indicators'
 
@@ -305,23 +305,23 @@ class Messaging extends React.Component {
               style={{marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 15, paddingRight: 10}}>
                 <Icon name="ios-attach" style={{color: colors.secondary}}/>
               </TouchableOpacity>
-              <TouchableOpacity 
+              {/*<TouchableOpacity 
               style={{padding: 5}}
               onPress={() => {
                 this.setState({showEmojiKeyboard: !this.state.showEmojiKeyboard})
                 Keyboard.dismiss()
                 }}>
                 <Icon name="md-happy" style={{color: colors.secondary, marginTop: Platform.OS == 'ios' ? 0 : -1}}/>
-              </TouchableOpacity>
+              </TouchableOpacity>*/}
               </View>
             }}
           />
-          {this.state.showEmojiKeyboard &&  <EmojiInput
+          {/*this.state.showEmojiKeyboard &&  <EmojiInput
             enableSearch={Platform.OS == 'android'}
 	              onEmojiSelected={(emoji) => {
                     this.setState({text: this.state.text += emoji.char})
                   }}
-	            />}
+	            />*/}
         {this.state.spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
           <PulseIndicator color={colors.secondary}/>
         </View>}

@@ -106,7 +106,7 @@ class Form extends Component {
                                         if (index+1 < this.textInputs.length) this.textInputs[index+1].focus()
                                     }}
                                     style = {[
-                                        styles.listCellInput,
+                                        styles.listCellInput, 
                                         item.large && styles.listCellInputLarge,
                                         required && styles.listCellInputRequired
                                     ]}

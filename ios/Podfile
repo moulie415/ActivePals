@@ -56,6 +56,9 @@ target 'Anyone' do
 
   pod 'RNSound', :path => '../node_modules/react-native-sound'
 
+
+  pod 'react-native-video', :path => '../node_modules/react-native-video'
+
 end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
