@@ -79,7 +79,7 @@ import {getSimplifiedTime } from '../constants/utils'
     <Container>
     {this.state.chats.length > 0?
       this.renderChats() :
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20, backgroundColor: colors.bgColor}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
             {"You haven't started any chats yet, also please make sure you are connected to the internet"}
           </Text></View>}
