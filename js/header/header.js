@@ -12,8 +12,7 @@ import { connect } from 'react-redux'
 import { navigateBack } from '../actions/navigation'
 
 const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, style, fitTitle, backgroundColor, left }) => {
-	return <SafeAreaView style={{backgroundColor: backgroundColor || colors.primary}} forceInset={{top:'always'}}>
-		<Header
+	return <Header
 			style = {{backgroundColor: backgroundColor || colors.primary, borderBottomWidth:0, alignItems:'stretch', elevation: 0}}
 			androidStatusBarColor={colors.primary}
 		>
@@ -34,7 +33,6 @@ const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, style,
 		    	}
 			</View>
 		</Header>
-	</SafeAreaView>
 }
 
 // Connected Header
