@@ -59,6 +59,8 @@ target 'Anyone' do
 
   pod 'react-native-video', :path => '../node_modules/react-native-video'
 
+  pod 'react-native-config', :path => '../node_modules/react-native-config'
+
 end
 post_install do |installer|
   installer.pods_project.targets.each do |target|

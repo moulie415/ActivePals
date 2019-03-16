@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "start": "node node_modules/react-native/local-cli/cli.js ENV=development ./envscript.sh && ENVFILE=.env.dev start",
+    "start-prod": "node node_modules/react-native/local-cli/cli.js ENV=production ./envscript.sh && ENVFILE=.env.prod start",
+    "build-android-prod": "ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
     "test": "jest"
   },
   "dependencies": {
@@ -17,6 +19,7 @@
     "react-native-admob": "^2.0.0-beta.5",
     "react-native-calendar-events": "^1.6.4",
     "react-native-collapsible": "^0.13.0",
+    "react-native-config": "^0.11.7",
     "react-native-datepicker": "^1.7.2",
     "react-native-emoji-input": "^1.1.8",
     "react-native-event-listeners": "^1.0.3",
