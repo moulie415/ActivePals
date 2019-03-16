@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js ENV=development ./envscript.sh && ENVFILE=.env.dev start",
     "start-prod": "node node_modules/react-native/local-cli/cli.js ENV=production ./envscript.sh && ENVFILE=.env.prod start",
-    "build-android-prod": "ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
+    "build-android-prod": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
     "test": "jest"
   },
   "dependencies": {
