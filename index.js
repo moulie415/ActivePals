@@ -5,7 +5,6 @@ import { StackNavigator } from "react-navigation"
 import { TabNavigator } from "react-navigation"
 //import * as firebase from "firebase"
 import firebase from 'react-native-firebase' //above is web api
-import type { Notification, RemoteMessage } from 'react-native-firebase'
 import { Root, Spinner } from 'native-base'
 import colors from 'Anyone/js/constants/colors'
 import color from 'color'
@@ -28,8 +27,8 @@ import {
   createReactNavigationReduxMiddleware,
   createReduxBoundAddListener,
 } from 'react-navigation-redux-helpers'
-import { setNotificationCount } from "./js/actions/home";
-import { navigateGymMessaging } from "./js/actions/navigation";
+import { setNotificationCount } from "./js/actions/home"
+import { navigateGymMessaging } from "./js/actions/navigation"
 
 let firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
@@ -151,7 +150,7 @@ class FitLink extends React.Component {
       firebase.notifications().android.createChannel(channel)
     })
 
-    this.messageListener = firebase.messaging().onMessage((notification: RemoteMessage) => {
+    this.messageListener = firebase.messaging().onMessage((notification) => {
       const { dispatch, getState } = store
       const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notification.data
       if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'buddyRequest') {
@@ -165,20 +164,20 @@ class FitLink extends React.Component {
       }
     })
 
-    this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification: Notification) => {
+    this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification) => {
       // Process your notification as required
       // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
       console.log(notification)
     })
-    this.notificationListener = firebase.notifications().onNotification((notification: Notification) => {
+    this.notificationListener = firebase.notifications().onNotification((notification) => {
       // Process your notification as required
       console.log(notification)
     })
-    this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen: NotificationOpen) => {
+    this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
       // Get the action triggered by the notification being opened
-      const action = notificationOpen.action;
+      const action = notificationOpen.action
       // Get information about the notification that was opened
-      const notification: Notification = notificationOpen.notification;
+      const notification = notificationOpen.notification
       let nav = store.getState().nav
       let routes = nav.routes
       let route = {}
@@ -195,13 +194,13 @@ class FitLink extends React.Component {
     })
 
     firebase.notifications().getInitialNotification()
-      .then((notificationOpen: NotificationOpen) => {
+      .then((notificationOpen) => {
         if (notificationOpen) {
           // App was opened by a notification
           // Get the action triggered by the notification being opened
-          const action = notificationOpen.action;
+          const action = notificationOpen.action
           // Get information about the notification that was opened
-          const notification: Notification = notificationOpen.notification;  
+          const notification = notificationOpen.notification
         }
       })
     
@@ -250,4 +249,4 @@ class FitLink extends React.Component {
 }
 
 AppRegistry.registerComponent('Anyone', () => FitLink)
-AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => bgMessaging);
+AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => bgMessaging)
