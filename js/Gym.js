@@ -22,9 +22,9 @@ import colors from './constants/colors'
 import { Image as SlowImage } from 'react-native'
 import { fetchPhotoPath, renderTags, deg2rad  } from './Sessions'
 import Hyperlink from 'react-native-hyperlink'
-import { showLocation } from 'react-native-map-link'
 import Header from './header/header'
 import StarRating from 'react-native-star-rating'
+import { showLocation, Popup } from 'react-native-map-link'
 
 
 
@@ -56,6 +56,7 @@ import StarRating from 'react-native-star-rating'
       profile: {},
       showImage: false,
       loaded: false,
+      popUpVisible: false
       //avatar: this.props.friends[this.uid] ? this.props.friends[this.uid].avatar : null
     }
   }
@@ -134,6 +135,24 @@ import StarRating from 'react-native-star-rating'
             {this.state.gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Vicinity: '}
         <Text style={{color: colors.secondary}}>{this.state.gym.vicinity}</Text>{this.props.location && 
         <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.gym) + ' km away)'}</Text>}</Text>}
+        <TouchableOpacity onPress={()=> {
+
+                const { lat, lng } = this.state.gym.geometry.location
+                const place_id = this.state.gym.place_id
+
+                let options = {
+                  latitude: lat,
+                  longitude: lng,
+                  cancelText: 'Cancel',
+                  sourceLatitude: this.state.gym.latitude,  
+                  sourceLongitude: this.state.gym.longitude,  
+                  googlePlaceId: place_id, 
+                  }
+                  this.setState({popUpVisible: true, options})
+                }}
+              style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 10, width: 110}}>
+                <Text style={{color: '#fff'}}>Get directions</Text>
+              </TouchableOpacity>
             {this.state.gym.website && <Hyperlink linkDefault={true}>
             <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
         <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{this.state.gym.website}</Text></Text></Hyperlink>}
@@ -156,7 +175,19 @@ import StarRating from 'react-native-star-rating'
         {this.state.gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(this.state.gym.types)}</Text>}
         </View> : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
-
+        <Popup
+          isVisible={this.state.popUpVisible}
+          onCancelPressed={() => this.setState({ popUpVisible: false })}
+          onAppPressed={() => this.setState({ popUpVisible: false })}
+          onBackButtonPressed={() => this.setState({ popUpVisible: false })}
+          modalProps={{ 
+              animationIn: 'slideInUp'
+          }}
+          options={this.state.options}
+          style={{
+            cancelButtonText: {color: colors.secondary},
+          }}
+          />
     </Container>
   )
   }

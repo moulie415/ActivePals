@@ -318,7 +318,7 @@ import Header from './header/header'
             <Text>{this.state.selectedLocation.vicinity}</Text>
             <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
             </Text>
-            {<View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center'}}>
+            {<View style={{flexDirection: 'row', marginTop: 5, alignItems: 'center'}}>
               <TouchableOpacity onPress={()=> {
                 this.getPosition(true, true)
                 const { lat, lng } = this.state.selectedLocation.geometry.location
@@ -339,11 +339,9 @@ import Header from './header/header'
               </TouchableOpacity>
               
             </View>}
-            
-            {this.state.selectedLocation.opening_hours &&
-              <Text style={{color: this.state.selectedLocation.opening_hours.open_now ? colors.secondary : '#999', marginVertical: 5}}>
-              {this.state.selectedLocation.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>}
-            {this.state.selectedLocation.types && <Text style={{fontSize: 12, color: '#999', marginBottom: 5}}>{"Tags: " + renderTags(this.state.selectedLocation.types)}</Text>}
+            {this.state.selectedLocation.rating && <Text style={{marginVertical: 5}}>{'Google rating: '}
+                      <Text style={{color: colors.secondary}}>{this.state.selectedLocation.rating}</Text>
+                      </Text>}
             
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -758,8 +756,9 @@ import Header from './header/header'
                           <Text style={{color: colors.secondary, textAlign: 'right'}}>View on map</Text>
                         </TouchableOpacity>
                       </View>
-                      <Text style={{color: item.opening_hours && item.opening_hours.open_now ? colors.secondary : '#999'}}>
-                      {item.opening_hours && item.opening_hours.open_now ? 'Open now' : 'Closed now'}</Text>
+                      {item.rating && <Text>{'Google rating: '}
+                      <Text style={{color: colors.secondary}}>{item.rating}</Text>
+                      </Text>}
                   </View>
                 </View>
               </View>

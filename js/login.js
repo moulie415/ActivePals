@@ -29,6 +29,7 @@ import TouchableOpacity from './constants/TouchableOpacityLockable.js'
 import str from './constants/strings'
 import SpinnerButton from 'react-native-spinner-button'
 import { PulseIndicator } from 'react-native-indicators'
+import Config from 'react-native-config'
 
 
  class Login extends Component {
@@ -283,8 +284,8 @@ import { PulseIndicator } from 'react-native-indicators'
   gLogin() {
     this.setState({waitForData: true})
     GoogleSignin.configure({
-      iosClientId: '680139677816-3eoc0cs830fbns898khlh01e6f685k1u.apps.googleusercontent.com',
-      webClientId: '680139677816-fp071bo61qp0dfk5olqu4tke2477u6jc.apps.googleusercontent.com'
+      iosClientId: Config.GOOGLE_IOS_ID,
+      webClientId: Config.GOOGLE_WEB_ID
     }).then(() => {
       GoogleSignin.hasPlayServices({ autoResolve: true })
         .then(() => {
@@ -324,15 +325,7 @@ import { PulseIndicator } from 'react-native-indicators'
                       this.checkForVerification(user)
                     }
                   })
-
-                  //if (user._authObj.authenticated) { THIS LINE DOES NOT WORK
-                    // do you login action here
-                    // dispatch({
-                    //  type: LOGIN_SUCCESS,
-                    //  payload: { ...user._user, loggedIn: true }
-                    //});
-                  //}
-                });
+                })
             })
             .catch(e => {
               console.log(e)

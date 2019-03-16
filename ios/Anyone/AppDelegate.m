@@ -17,6 +17,7 @@
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import "SplashScreen.h"
+#import "ReactNativeConfig.h"
 @import GoogleMaps;
 
 
@@ -48,7 +49,7 @@
   
   
   
-  [GMSServices provideAPIKey:@"AIzaSyDv1WqoYEnUhbOtgCogQy95X_DEPavWfr0"];
+  [GMSServices provideAPIKey:[ReactNativeConfig envFor:@"GOOGLE_API_KEY"]];
   
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
