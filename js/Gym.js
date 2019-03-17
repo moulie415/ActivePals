@@ -3,7 +3,8 @@ import {
   Alert,
   View,
   TouchableOpacity,
-  Platform
+  Platform,
+  ScrollView
 } from "react-native"
 import {
   Container,
@@ -85,7 +86,7 @@ import { showLocation, Popup } from 'react-native-map-link'
             backgroundColor: '#fff'}}
             source={require('Anyone/assets/images/dumbbell.png')}/>}
           </View>
-        {this.state.loaded ? <View>
+        {this.state.loaded ? <ScrollView>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{this.state.gym.name}</Text>
             {this.props.gym && this.props.gym.place_id == this.id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row', margin: 10}}>
@@ -132,27 +133,26 @@ import { showLocation, Popup } from 'react-native-map-link'
                 <Text style={{color: '#fff'}}>Join Gym</Text>
                 </TouchableOpacity>
               </View>}
+              <TouchableOpacity onPress={()=> {
+              const { lat, lng } = this.state.gym.geometry.location
+              const place_id = this.state.gym.place_id
+
+              let options = {
+                latitude: lat,
+                longitude: lng,
+                cancelText: 'Cancel',
+                sourceLatitude:  this.props.location.lat,
+                sourceLongitude:   this.props.location.lon,
+                googlePlaceId: place_id, 
+                }
+                this.setState({popUpVisible: true, options})
+              }}
+              style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 10, width: 110}}>
+              <Text style={{color: '#fff'}}>Get directions</Text>
+              </TouchableOpacity>
             {this.state.gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Vicinity: '}
         <Text style={{color: colors.secondary}}>{this.state.gym.vicinity}</Text>{this.props.location && 
         <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.gym) + ' km away)'}</Text>}</Text>}
-        <TouchableOpacity onPress={()=> {
-
-                const { lat, lng } = this.state.gym.geometry.location
-                const place_id = this.state.gym.place_id
-
-                let options = {
-                  latitude: lat,
-                  longitude: lng,
-                  cancelText: 'Cancel',
-                  sourceLatitude: this.state.gym.latitude,  
-                  sourceLongitude: this.state.gym.longitude,  
-                  googlePlaceId: place_id, 
-                  }
-                  this.setState({popUpVisible: true, options})
-                }}
-              style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 10, width: 110}}>
-                <Text style={{color: '#fff'}}>Get directions</Text>
-              </TouchableOpacity>
             {this.state.gym.website && <Hyperlink linkDefault={true}>
             <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
         <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{this.state.gym.website}</Text></Text></Hyperlink>}
@@ -160,20 +160,25 @@ import { showLocation, Popup } from 'react-native-map-link'
               <Text style={{marginLeft: 10, color: '#999'}}>Google rating: </Text>
             <StarRating
             disabled={true}
-            style={{marginLeft: 10}}
-            containerStyle={{alignSelf: 'center'}}
+            containerStyle={{alignSelf: 'center', marginHorizontal: 5}}
             fullStarColor={colors.secondary}
             maxStars={5}
             starSize={20}
             halfStarEnabled={true}
             rating={this.state.gym.rating}
-            /></View>}
+            />{this.state.gym.user_ratings_total && 
+            <Text>{`from ${this.state.gym.user_ratings_total} ${this.state.gym.user_ratings_total > 1? 'ratings' : 'rating'}`}</Text>}</View>}
         {this.state.gym.formatted_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Phone number: '}
         <Text style={{color: colors.secondary}}>{this.state.gym.formatted_phone_number}</Text></Text>}
         {this.state.gym.international_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Intl phone number: '}
         <Text style={{color: colors.secondary}}>{this.state.gym.international_phone_number}</Text></Text>}
+        {this.state.gym.opening_hours && this.state.gym.opening_hours.weekday_text && 
+        <View style={{marginHorizontal: 10, marginTop: 10}}>
+          <Text>Opening Hours:</Text>
+          <View style={{marginLeft: 5}}>{this.renderOpeningHours(this.state.gym.opening_hours.weekday_text)}</View>
+        </View>}
         {this.state.gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(this.state.gym.types)}</Text>}
-        </View> : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
+        </ScrollView> : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
         <Popup
           isVisible={this.state.popUpVisible}
@@ -207,6 +212,14 @@ import { showLocation, Popup } from 'react-native-map-link'
       let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
       let d = R * c
       return d.toFixed(2)
+  }
+
+  renderOpeningHours(hours) {
+    let text = []
+    hours.forEach(hour => {
+      text.push(<Text style={{marginVertical: 5, color: colors.secondary}}>{hour}</Text>)
+    })
+    return text
   }
 
 
