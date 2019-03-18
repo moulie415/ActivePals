@@ -217,6 +217,7 @@ import globalStyles from './styles/globalStyles'
           hideIcon={true}
           items={pickerItems(activities)}
           style={{
+          underline: { opacity: 0 },
           viewContainer: {
            flex: 1,
            justifyContent: 'center',
@@ -249,6 +250,7 @@ import globalStyles from './styles/globalStyles'
           hideIcon={true}
           items={pickerItems(levels)}
           style={{
+          underline: { opacity: 0 },
           viewContainer: {
            flex: 1,
            justifyContent: 'center',
