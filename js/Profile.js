@@ -31,6 +31,7 @@ import ImageResizer from 'react-native-image-resizer'
 import RNPickerSelect from 'react-native-picker-select'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
+import globalStyles from './styles/globalStyles'
 
 
  class Profile extends Component {
@@ -136,7 +137,7 @@ import { PulseIndicator } from 'react-native-indicators'
           </View>}
           </TouchableOpacity>
 
-          <TouchableOpacity style={{marginTop: -45}}
+          <TouchableOpacity style={[{marginTop: -45}, globalStyles.shadow]}
           onPress={()=> this.selectAvatar()}>
           {this.state.avatar ? <Image source={{uri: this.state.avatar}}
           style={{width:90, height: 90, alignSelf: 'center', borderWidth: 0.5, borderColor: '#fff'}} /> :
@@ -150,14 +151,27 @@ import { PulseIndicator } from 'react-native-indicators'
       </View>
 
 
-      <View style={{flex: 1, marginRight: 10}}>
-        <Text style={{color: '#999', marginHorizontal: 20}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
-        <Text style={{color: '#999', marginHorizontal: 20, marginBottom: this.state.gym ? 0 : 10}}>Account type: <Text style={{color: colors.secondary}}>
-        {this.state.profile && this.state.profile.accountType}</Text></Text>
-        {this.state.gym && <TouchableOpacity onPress={() => this.props.goToGym(this.state.gym.place_id)}>
-          <Text style={{color: '#999', marginHorizontal: 20, marginBottom: 10}}>{"Gym: "}
-          <Text style={{color: colors.secondary}}>{this.state.gym.name}</Text></Text>
-        </TouchableOpacity>}
+      <View style={{flex: 1, marginRight: 10, flexDirection: 'row', justifyContent: 'space-between'}}>
+        <View>
+          <Text style={{color: '#999', marginHorizontal: 20}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
+          <Text style={{color: '#999', marginHorizontal: 20, marginBottom: this.state.gym ? 0 : 10}}>Account type: <Text style={{color: colors.secondary}}>
+          {this.state.profile && this.state.profile.accountType}</Text></Text>
+          {this.state.gym && <TouchableOpacity onPress={() => this.props.goToGym(this.state.gym.place_id)}>
+            <Text style={{color: '#999', marginHorizontal: 20, marginBottom: 10}}>{"Gym: "}
+            <Text style={{color: colors.secondary}}>{this.state.gym.name}</Text></Text>
+          </TouchableOpacity>}
+        </View>
+        <View style={{flex: 1, marginRight: 20}}>
+        <TouchableOpacity
+          style={{flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}
+          onPress={()=> this.props.goToSettings()}>
+          <Text style={{color: colors.secondary, marginRight: 10}}>Settings</Text>
+            <Icon
+            name='md-settings'
+            style={{ color: colors.secondary}}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={styles.inputGrp}>
         <Text style={{alignSelf: 'center'}}>Username: </Text>
@@ -280,21 +294,7 @@ import { PulseIndicator } from 'react-native-indicators'
           onDateChange={(date) => this.setState({profile: {...this.state.profile, birthday: date}})}
           />
           </View>
-          <TouchableOpacity
-          style={{
-            flexDirection: 'row',
-            borderTopWidth: StyleSheet.hairlineWidth,
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            borderColor: colors.secondary,
-            paddingVertical: 10
-            }}
-          onPress={()=> this.props.goToSettings()}>
-            <Icon
-            name='md-settings'
-            style={{ color: colors.secondary, marginLeft: 20}}
-            />
-            <Text style={{color: colors.secondary, alignSelf: 'center', marginLeft: 20}}>Settings</Text>
-          </TouchableOpacity>
+         
 
       <TouchableOpacity
         style={{backgroundColor: colors.secondary, margin: 20, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20}}

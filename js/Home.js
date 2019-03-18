@@ -153,10 +153,18 @@ componentWillReceiveProps(nextProps) {
 		              </View>
           </TouchableOpacity>}
       />
-        <View style={{flexDirection: 'row', backgroundColor: '#fff', padding: 10, alignItems: 'center', borderBottomWidth: 0.5, borderColor: '#999'}}>
+        <View style={{
+          flexDirection: 'row',
+          backgroundColor: '#fff',
+          padding: 10,
+          alignItems: 'center',
+          borderBottomWidth: 0.5,
+          borderColor: '#999',
+        }}>
         <TouchableOpacity onPress={()=> this.props.goToProfile()}>
           {this.state.profile && this.state.profile.avatar ?
-            <Image source={{uri: this.props.profile.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/>
+            <Image source={{uri: this.props.profile.avatar}} 
+            style={{height: 50, width: 50, borderRadius: 25}}/>
             : <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
             </TouchableOpacity> 
             <TextInput 
@@ -233,7 +241,7 @@ componentWillReceiveProps(nextProps) {
             </TouchableOpacity>
         </View>
         
-      <Content contentContainerStyle={{backgroundColor: '#9993', flex: 1}}>
+      <Content contentContainerStyle={{backgroundColor: '#9993', flex: 1, paddingTop: 10}}>
             {this.state.mentionList && 
             <View style={styles.mentionList}>
             <FlatList 
@@ -894,7 +902,7 @@ import {
  } from 'Anyone/js/actions/home'
 import { isIphoneX } from "react-native-iphone-x-helper"
 import { fetchProfile } from "./actions/profile"
-import { fetchFriends } from "./actions/friends";
+import { fetchFriends } from "./actions/friends"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,

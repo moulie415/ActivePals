@@ -28,7 +28,8 @@ export default styles = StyleSheet.create({
   },
   modal: {
     height: 400,
-    width: '90%'
+    width: '90%',
+    borderRadius: 20
   },
   modalText: {
     color: "black",
