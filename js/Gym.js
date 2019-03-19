@@ -26,6 +26,7 @@ import Hyperlink from 'react-native-hyperlink'
 import Header from './header/header'
 import StarRating from 'react-native-star-rating'
 import { showLocation, Popup } from 'react-native-map-link'
+import globalStyles from './styles/globalStyles'
 
 
 
@@ -75,7 +76,8 @@ import { showLocation, Popup } from 'react-native-map-link'
           resizeMode='cover'
           source={{uri: this.state.photo}} /> :
           <View style={{height: 150, width: '100%', backgroundColor: colors.primaryLighter, justifyContent: 'center'}}/>}
-          {<SlowImage 
+          <View style={globalStyles.shadow}>
+          <SlowImage 
             style={{width: 80,
             padding: 10,
             height: 80,
@@ -84,7 +86,8 @@ import { showLocation, Popup } from 'react-native-map-link'
             borderWidth: 1,
             borderColor: colors.secondary,
             backgroundColor: '#fff'}}
-            source={require('Anyone/assets/images/dumbbell.png')}/>}
+            source={require('Anyone/assets/images/dumbbell.png')}/>
+            </View>
           </View>
         {this.state.loaded ? <ScrollView>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{this.state.gym.name}</Text>
@@ -217,7 +220,7 @@ import { showLocation, Popup } from 'react-native-map-link'
   renderOpeningHours(hours) {
     let text = []
     hours.forEach(hour => {
-      text.push(<Text style={{marginVertical: 5, color: colors.secondary}}>{hour}</Text>)
+      text.push(<Text key={hour} style={{marginVertical: 5, color: colors.secondary}}>{hour}</Text>)
     })
     return text
   }

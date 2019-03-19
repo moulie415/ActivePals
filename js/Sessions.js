@@ -701,7 +701,7 @@ import Header from './header/header'
                         <Text numberOfLines={1} style={{fontSize: 13, color: '#000', flex: 2, textAlign: 'right'}}>{"gender: " + item.gender}</Text>
                       </View>
                       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                      <Text style={[styles.date], {color: item.inProgress ? colors.secondary : "#999"}} >
+                      <Text style={[styles.date, {color: item.inProgress ? colors.secondary : "#999"}]} >
                       {item.inProgress? "In progress" : formatDateTime(item.dateTime)}</Text>
                       {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/></View>}</View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>

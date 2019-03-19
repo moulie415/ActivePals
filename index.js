@@ -120,7 +120,7 @@ export const persistor = persistStore(store)
 class FitLink extends React.Component {
   componentDidMount() {
     //ignore setting a timer warnings
-    YellowBox.ignoreWarnings(['Setting a timer'])
+    YellowBox.ignoreWarnings(['Setting a timer', 'Require cycle:'])
     const channels = []
     channels.push(new firebase.notifications.Android.Channel('REQUEST', 'Pal requests', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for pal requests')

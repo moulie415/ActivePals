@@ -28,8 +28,8 @@ target 'Anyone' do
 
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
-	pod 'Fabric', '1.8.1'
-	pod 'Crashlytics', '~> 3.11.1'
+	pod 'Fabric', '1.9.0'
+	pod 'Crashlytics', '~> 3.12.0'
   pod 'react-native-geocoder', :path => '../node_modules/react-native-geocoder'
 
 
@@ -56,10 +56,6 @@ target 'Anyone' do
 
   pod 'RNSound', :path => '../node_modules/react-native-sound'
 
-
-  pod 'react-native-video', :path => '../node_modules/react-native-video'
-
-  pod 'react-native-config', :path => '../node_modules/react-native-config'
 
 end
 post_install do |installer|

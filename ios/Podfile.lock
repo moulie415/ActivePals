@@ -5,10 +5,10 @@ PODS:
   - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.9.0)
-  - Crashlytics (3.11.1):
-    - Fabric (~> 1.8.1)
+  - Crashlytics (3.12.0):
+    - Fabric (~> 1.9.0)
   - DVAssetLoaderDelegate (0.3.2)
-  - Fabric (1.8.1)
+  - Fabric (1.9.0)
   - FBAudienceNetwork (5.2.0)
   - FBSDKCoreKit (4.40.0):
     - Bolts (~> 1.9)
@@ -220,8 +220,8 @@ PODS:
   - yoga (0.58.5.React)
 
 DEPENDENCIES:
-  - Crashlytics (~> 3.11.1)
-  - Fabric (= 1.8.1)
+  - Crashlytics (~> 3.12.0)
+  - Fabric (= 1.9.0)
   - FBAudienceNetwork
   - FBSDKLoginKit
   - FBSDKShareKit
@@ -329,9 +329,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Crashlytics: ca7ab4bc304aa216bdc2e4c1a96389ee77252203
+  Crashlytics: 07fb167b1694128c1c9a5a5cc319b0e9c3ca0933
   DVAssetLoaderDelegate: 38a24530292bf77900fdfdf635434f7f9b49486d
-  Fabric: 43ed7bac010f588f63ee23ab1a0276b296db5e17
+  Fabric: f988e33c97f08930a413e08123064d2e5f68d655
   FBAudienceNetwork: 43eadf7ab00fe58a66ca52171de324e25a0a4a1c
   FBSDKCoreKit: ae214474b25033399c131dc81d258e412582a2ba
   FBSDKLoginKit: 7a1e411d46acc8834588eca437daf34de42e1d52
@@ -379,6 +379,6 @@ SPEC CHECKSUMS:
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 0e0009ffb2544aeead64a1209f3d488d3849947b
 
-PODFILE CHECKSUM: 15ef07108baa3179ab394389380f6c48eb3af2c2
+PODFILE CHECKSUM: fb40c89bed15a578f72939ebf7f9d503124821e3
 
-COCOAPODS: 1.7.0.beta.1
+COCOAPODS: 1.6.1
