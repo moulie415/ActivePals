@@ -177,7 +177,7 @@ import globalStyles from './styles/globalStyles'
         <Text style={{color: colors.secondary}}>{this.state.gym.international_phone_number}</Text></Text>}
         {this.state.gym.opening_hours && this.state.gym.opening_hours.weekday_text && 
         <View style={{marginHorizontal: 10, marginTop: 10}}>
-          <Text>Opening Hours:</Text>
+          <Text style={{color: '#999'}}>Opening Hours:</Text>
           <View style={{marginLeft: 5}}>{this.renderOpeningHours(this.state.gym.opening_hours.weekday_text)}</View>
         </View>}
         {this.state.gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(this.state.gym.types)}</Text>}

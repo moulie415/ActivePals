@@ -44,18 +44,11 @@ import colors from 'Anyone/js/constants/colors'
 
   }
 
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.chats) {
-      this.setState({chats: Object.values(nextProps.chats)})
-    }
-  }
-
-
   render () {
     return (
     <Container>
-    {this.state.chats.length > 0 && this.state.chats[0].type ?
+    {Object.values(this.props.chats).length > 0 && 
+    Object.values(this.props.chats)[0].type ?
         this.renderChats() :
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bgColor}}>
             <Text style={{color: colors.primary, textAlign: 'center', marginHorizontal: 20}}>
@@ -74,7 +67,7 @@ import colors from 'Anyone/js/constants/colors'
   renderChats() {
     return <FlatList 
       style={{backgroundColor: colors.bgColor}}
-      data={this.sortByDate(this.state.chats)}
+      data={this.sortByDate(Object.values(this.props.chats))}
       keyExtractor={(chat) => chat.key}
       renderItem={({item}) => {
         return <TouchableOpacity

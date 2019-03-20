@@ -64,7 +64,7 @@ import Image from 'react-native-fast-image'
     })
     let chatRef = firebase.database().ref('users/' + this.uid).child('chats')
     this.listenForFriends()
-    this.listenForState(this.state.friends)
+    this.listenForState()
 
   }
 
@@ -83,24 +83,27 @@ import Image from 'react-native-fast-image'
     })
   }
 
-  listenForState(friends) {
-    friends.forEach(friend => {
-      firebase.database().ref('users/' + friend.uid).child('state').on('value', snapshot => {
-        if (this.props.friends[friend.uid]) {
-          if (snapshot.val() && snapshot.val() == 'away' && this.props.friends[friend.uid].state != 'away') {
-              this.props.updateFriendState(friend.uid, 'away')
-          }
-          else if (snapshot.val() && snapshot.val() != 'away' && this.props.friends[friend.uid].state != 'online') {
-            this.props.updateFriendState(friend.uid, 'online')
-          }
-          else {
-            if (!snapshot.val() && this.props.friends[friend.uid].state != 'offline') {
-              this.props.updateFriendState(friend.uid, 'offline')
+  listenForState() {
+    const friends = Object.values(this.props.friends)
+    if (friends) {
+      friends.forEach(friend => {
+        firebase.database().ref('users/' + friend.uid).child('state').on('value', snapshot => {
+          if (this.props.friends[friend.uid]) {
+            if (snapshot.val() && snapshot.val() == 'away' && this.props.friends[friend.uid].state != 'away') {
+                this.props.updateFriendState(friend.uid, 'away')
             }
-          }
-      }
+            else if (snapshot.val() && snapshot.val() != 'away' && this.props.friends[friend.uid].state != 'online') {
+              this.props.updateFriendState(friend.uid, 'online')
+            }
+            else {
+              if (!snapshot.val() && this.props.friends[friend.uid].state != 'offline') {
+                this.props.updateFriendState(friend.uid, 'offline')
+              }
+            }
+        }
+        })
       })
-    })
+    }
   }
 
   sortByState(friends) {
@@ -111,21 +114,14 @@ import Image from 'react-native-fast-image'
     })
   }
 
-
-
   onRefresh() {
     if (this.props.profile.friends) {
       this.setState({refreshing: true})
-      this.props.getFriends(this.props.profile.friends)
+      this.props.getFriends(this.props.profile.friends).then(() => {
+        this.setState({refreshing: false})
+      })
     }
   }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.friends) {
-      this.setState({refreshing: false, friends: Object.values(nextProps.friends)})
-    }
-  }
-
 
   render () {
     return (
@@ -142,7 +138,7 @@ import Image from 'react-native-fast-image'
           </TouchableOpacity>}
       />
       <Content contentContainerStyle={{flex: 1}}>
-      {this.state.friends.length > 0 ?
+      {Object.values(this.props.friends).length > 0 ?
       this.renderFriends() :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
@@ -189,7 +185,7 @@ import Image from 'react-native-fast-image'
   renderFriends() {
     return <FlatList 
       style={{backgroundColor: colors.bgColor}}
-      data={this.sortByState(this.state.friends)}
+      data={this.sortByState(Object.values(this.props.friends))}
       keyExtractor={(friend)=> friend.uid}
       onRefresh={()=> this.onRefresh()}
       refreshing={this.state.refreshing}
@@ -254,7 +250,10 @@ import Image from 'react-native-fast-image'
 
   accept(friend) {
     this.props.onAccept(this.uid, friend)
-    .then(this.listenForFriends())
+    .then(() => {
+      this.listenForFriends()
+      this.listenForState()
+    })
     .catch(e => Alert.alert("Error", e.message))
 
   }

@@ -80,9 +80,6 @@ class Home extends Component {
     super(props)
     this.players = {}
     this.state = { 
-      profile: this.props.profile,
-      feed: this.props.feed,
-      //feedObj: this.props.feed,
       spinner: false,
       selectedImage: null,
       showImage: false,
@@ -122,15 +119,6 @@ sortByDate(array) {
   return array
 }
 
-componentWillReceiveProps(nextProps) {
-  if (nextProps.profile) {
-    this.setState({profile: nextProps.profile})
-  }
-  if (nextProps.feed) {
-    this.setState({feed: nextProps.feed} /*feedObj: nextProps.feed*/)
-  }
-}
-
   render () {
     const { uid, username, users, unreadCount } = this.props.profile
     let combined = { ...this.props.users, ...this.props.friends}
@@ -162,7 +150,7 @@ componentWillReceiveProps(nextProps) {
           borderColor: '#999',
         }}>
         <TouchableOpacity onPress={()=> this.props.goToProfile()}>
-          {this.state.profile && this.state.profile.avatar ?
+          {this.props.profile && this.props.profile.avatar ?
             <Image source={{uri: this.props.profile.avatar}} 
             style={{height: 50, width: 50, borderRadius: 25}}/>
             : <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
@@ -267,7 +255,7 @@ componentWillReceiveProps(nextProps) {
                 return null
               }}
             /></View>}
-        {this.props.friends && this.state.profile && this.renderFeed()}
+        {this.props.friends && this.props.profile && this.renderFeed()}
       </Content>
       {this.state.spinner && <View style={sStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
       <Modal onRequestClose={()=> null}
@@ -309,8 +297,8 @@ componentWillReceiveProps(nextProps) {
             <Icon name={'ios-arrow-back'}  style={{color: '#000', fontSize: 30, padding: 10}}/>
            </TouchableOpacity>
             <Comments
-          data={this.state.postId && this.state.feed[this.state.postId] && this.state.feed[this.state.postId].comments ? 
-           this.state.feed[this.state.postId].comments : []}
+          data={this.state.postId && this.props.feed[this.state.postId] && this.props.feed[this.state.postId].comments ? 
+           this.props.feed[this.state.postId].comments : []}
           viewingUserName={this.props.profile.username}
           initialDisplayCount={10}
           editMinuteLimit={900}
@@ -369,8 +357,8 @@ componentWillReceiveProps(nextProps) {
           likesTapAction={(comment) => {
             return this.props.getCommentRepsUsers(comment)
           }}
-          paginateAction={this.state.feed[this.state.postId] 
-          && this.state.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
+          paginateAction={this.props.feed[this.state.postId] 
+          && this.props.feed[this.state.postId].commentCount > this.state.commentFetchAmount ? 
           () => { 
             this.setState({commentFetchAmount: this.state.commentFetchAmount + 5}, () => {
               this.props.getComments(this.state.postId, this.state.commentFetchAmount)})
@@ -409,7 +397,7 @@ componentWillReceiveProps(nextProps) {
               initialNumToRender="10"
               ListFooterComponent={(item) => this.renderRepsFooter()}
               keyExtractor={item => item.like_id || item.user_id}
-              data={this.state.feed[this.state.postId].repUsers}
+              data={this.props.feed[this.state.postId].repUsers}
               renderItem={(item) => this.renderRep(item)}
             />
           ) : null}
@@ -421,10 +409,11 @@ componentWillReceiveProps(nextProps) {
   }
 
   renderFeed() {
-    if (Object.values(this.state.feed).length > 0) {
+    const { feed } = this.props
+    if (Object.values(feed).length > 0) {
       return <FlatList
         ref={(ref) => this.feed = ref}
-        data={this.sortByDate(Object.values(this.state.feed))}
+        data={this.sortByDate(Object.values(feed))}
         keyExtractor={(item) => item.key}
         onRefresh={() => {
           this.setState({refreshing: true})
@@ -440,18 +429,18 @@ componentWillReceiveProps(nextProps) {
         //   })
         // }}
         ListFooterComponent={()=> {
-          let initial = Object.values(this.state.feed).length
+          let initial = Object.values(feed).length
             if (initial > 29 && this.state.loadMore) {
             return <Card>
             <TouchableOpacity 
               style={{alignItems: 'center', paddingVertical: 10}}
               onPress={()=> {
-                let feed = Object.keys(this.state.feed)
+                let feed = Object.keys(feed)
                 let endAt = feed[feed.length-1]
                 this.setState({spinner:  true}, () => {
                   this.props.getPosts(this.props.profile.uid, 30, endAt)
                   .then(() => {
-                    if (Object.values(this.state.feed).length == initial) {
+                    if (Object.values(feed).length == initial) {
                       this.setState({loadMore: false})
                     }
                     this.setState({spinner: false})
@@ -674,7 +663,7 @@ componentWillReceiveProps(nextProps) {
   }
 
   fetchAvatar(uid) {
-    if (this.state.profile.avatar && uid == this.props.profile.uid) {
+    if (this.props.profile.avatar && uid == this.props.profile.uid) {
       return <TouchableOpacity
       onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
       <Image source={{uri: this.props.profile.avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
@@ -826,7 +815,7 @@ processVideo(uri) {
   }
 
   renderRepsFooter() {
-    if (this.state.feed[this.state.postId].repCount > this.state.userFetchAmount) {
+    if (this.props.feed[this.state.postId].repCount > this.state.userFetchAmount) {
       return <TouchableOpacity 
       style={{alignItems: 'center'}}
       onPress={()=> {

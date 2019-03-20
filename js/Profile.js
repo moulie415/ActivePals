@@ -64,7 +64,6 @@ import globalStyles from './styles/globalStyles'
       spinner: false,
       initialAvatar: this.profile.avatar,
       avatar: this.profile.avatar,
-      gym: this.props.gym
     }
   }
 
@@ -92,13 +91,11 @@ import globalStyles from './styles/globalStyles'
       let profile = nextProps.profile
       this.setState({profile, initialProfile: profile, initialAvatar: profile.avatar})
     }
-    if (nextProps.gym) {
-      this.setState({gym: nextProps.gym})
-    }
   }
 
 
   render () {
+    const { gym } = this.props
     return (
     <Container>
     
@@ -146,19 +143,16 @@ import globalStyles from './styles/globalStyles'
             <Icon name='ios-add' style={{color: '#fff', textAlign: 'center'}}/>
           </View>}
           </TouchableOpacity>
-
-
       </View>
 
-
       <View style={{flex: 1, marginRight: 10, flexDirection: 'row', justifyContent: 'space-between'}}>
-        <View>
+        <View style={{width: '60%'}}>
           <Text style={{color: '#999', marginHorizontal: 20}}>Email: <Text style={{color: colors.secondary}}>{this.state.email}</Text></Text>
-          <Text style={{color: '#999', marginHorizontal: 20, marginBottom: this.state.gym ? 0 : 10}}>Account type: <Text style={{color: colors.secondary}}>
+          <Text style={{color: '#999', marginHorizontal: 20, marginBottom: gym ? 0 : 10}}>Account type: <Text style={{color: colors.secondary}}>
           {this.state.profile && this.state.profile.accountType}</Text></Text>
-          {this.state.gym && <TouchableOpacity onPress={() => this.props.goToGym(this.state.gym.place_id)}>
+          {gym && <TouchableOpacity onPress={() => this.props.goToGym(gym.place_id)}>
             <Text style={{color: '#999', marginHorizontal: 20, marginBottom: 10}}>{"Gym: "}
-            <Text style={{color: colors.secondary}}>{this.state.gym.name}</Text></Text>
+            <Text style={{color: colors.secondary}}>{gym.name}</Text></Text>
           </TouchableOpacity>}
         </View>
         <View style={{flex: 1, marginRight: 20}}>

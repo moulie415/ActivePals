@@ -39,7 +39,6 @@ class Notifications extends Component {
     this.state = {
       close: false,
       spinner: true,
-      notifications: {},
       loadingMore: false,
       fetchAmount: 10,
       showLoadMore: false,
@@ -54,9 +53,7 @@ class Notifications extends Component {
   componentWillReceiveProps(nextProps) {
     this.setState({spinner: false})
     if (nextProps.notifications) {
-      this.setState({notifications: nextProps.notifications,
-        showLoadMore: (Object.values(nextProps.notifications).length == this.state.fetchAmount)
-      })
+      this.setState({showLoadMore: (Object.values(nextProps.notifications).length == this.state.fetchAmount)})
     }
   }
 
@@ -73,7 +70,7 @@ class Notifications extends Component {
         hasBack={true}
         title={'Notifications'}
         />
-      {Object.keys(this.state.notifications).length > 0 ?
+      {Object.keys(this.props.notifications).length > 0 ?
       <ScrollView>
         {this.renderNotifications()}
       </ScrollView> : this.state.spinner ? <View style={styles.indicator}><PulseIndicator color={colors.secondary}/></View> 
@@ -86,7 +83,7 @@ class Notifications extends Component {
   renderNotifications() {
       return <FlatList
         ref={ref => this.flatList = ref}
-        data={this.sortByDate(Object.values(this.state.notifications))}
+        data={this.sortByDate(Object.values(this.props.notifications))}
         renderItem={({item}) => {
           let swipeoutBtns = [{
             text: 'Delete',

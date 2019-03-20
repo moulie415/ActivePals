@@ -46,12 +46,6 @@ import {getSimplifiedTime } from '../constants/utils'
     })
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.chats) {
-      this.setState({chats: Object.values(nextProps.chats)})
-    }
-  }
-
   listenForChats(ref) {
     ref.on('child_added', snapshot => {
       if (!this.props.chats[snapshot.key]) {
@@ -77,7 +71,7 @@ import {getSimplifiedTime } from '../constants/utils'
   render () {
     return (
     <Container>
-    {this.state.chats.length > 0?
+    {Object.values(this.props.chats).length > 0?
       this.renderChats() :
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20, backgroundColor: colors.bgColor}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
@@ -90,7 +84,7 @@ import {getSimplifiedTime } from '../constants/utils'
   renderChats() {
     return <FlatList 
       style={{backgroundColor: colors.bgColor}}
-      data={this.sortByDate(this.state.chats)}
+      data={this.sortByDate(Object.values(this.props.chats))}
       // refreshing={this.state.refreshing}
       // onRefresh={()=> {
       //   this.setState({refreshing: true})

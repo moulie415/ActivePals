@@ -32,6 +32,7 @@ import ImageViewer from 'react-native-image-zoom-viewer'
 import { calculateAge } from './constants/utils'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
+import globalStyles from "./styles/globalStyles"
 
 
  class ProfileView extends Component {
@@ -115,7 +116,7 @@ import { PulseIndicator } from 'react-native-indicators'
           onPress={()=> {
             this.setState({selectedImage: [{url: this.state.avatar}], showImage: true})
           }}
-          style={{marginTop: -45, marginHorizontal: 20, borderWidth: 0.5, borderColor: '#fff'}}>
+          style={[{marginTop: -45, marginHorizontal: 20, borderWidth: 0.5, borderColor: '#fff'}, globalStyles.shadow]}>
             <Image style={{height: 90, width: 90}} source={{uri: this.state.avatar}} />
           </TouchableOpacity>
           : <Icon name='md-contact'
