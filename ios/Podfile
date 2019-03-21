@@ -2,7 +2,7 @@ platform :ios, '9.0'
 target 'Anyone' do
 	rn_path = '../node_modules/react-native'
 	rn_maps_path = '../node_modules/react-native-maps'
-	pod 'Google/SignIn'
+	pod 'GoogleSignIn', '~> 4.4.0'
 	pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
 	pod 'yoga', path: "#{rn_path}/ReactCommon/yoga/yoga.podspec"
 	pod 'React', path: rn_path, subspecs: [
