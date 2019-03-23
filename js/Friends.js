@@ -72,10 +72,12 @@ import Image from 'react-native-fast-image'
     let ref = firebase.database().ref('users/' + this.uid + '/friends')
     ref.on('child_added', snapshot => {
       if (!this.props.friends[snapshot.key]) {
+        this.listenForState()
         this.props.add(snapshot)
       }
     })
     ref.on('child_changed', snapshot => {
+      this.listenForState()
       this.props.add(snapshot)
     })
     ref.on('child_removed', snapshot => {
