@@ -35,6 +35,8 @@ class Welcome extends Component {
       this.props.viewedWelcome()
     }
     render() {
+
+      const { profile } = this.props
         return (
             <Swiper
             style={styles.wrapper}
@@ -96,14 +98,17 @@ class Welcome extends Component {
                 <TouchableOpacity 
                 style={{backgroundColor: colors.secondary, padding: 10}}
                 onPress={()=> {
-                  if (this.state.username && this.state.username == this.props.profile.username) {
+                  if (this.state.username && this.state.username == profile.username) {
                     this.nav()
                   }
                   else if (!this.state.username) {
                     Alert.alert('Sorry', 'Please set a username before continuing')
                   }
                   else {
-                    firebase.database().ref('users/' + this.props.profile.uid).child('username').set(this.state.username)
+                    Promise.all([
+                      firebase.database().ref('usernames').child(this.state.username).set(profile.uid),
+                      firebase.database().ref('users/' + profile.uid).child('username').set(this.state.username)
+                    ])
                       .then(() => {
                         this.nav()
                         Alert.alert('Success', 'Username saved')
