@@ -360,7 +360,6 @@ updateUser(initial, profile) {
       }
     }
   }
-  this.props.onSave()
 }
 
 checkUsername(initial, profile){
