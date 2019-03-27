@@ -1,7 +1,7 @@
 import firebase from 'react-native-firebase'
 import { removeChat, addChat } from './chats'
 import { fetchPrivateSessions } from './sessions'
-import { upUnreadCount } from './home'
+import { upUnreadCount, fetchUsers } from './home'
 export const SET_FRIENDS = 'SET_FRIENDS'
 export const ADD_FRIEND = 'ADD_FRIEND'
 export const UPDATE_FRIEND_STATE = 'UPDATE_FRIEND_STATE'
@@ -148,5 +148,18 @@ export const deleteFriend = (uid) => {
 
 	}
 
+}
+
+export const getFbFriends = (token) => {
+    fetch('https://graph.facebook.com/v2.8/me?fields=friends&access_token=' + token)
+      .then(response => response.json())
+      .then(async json => {
+				if (json.friends && json.friends.data) {
+					const uids = await Promise.all(json.friends.data.forEach(friend => {
+						return firebase.database().ref('fbusers').child(friend.id).once('value')
+					}))
+					return fetchUsers(uids)
+				}
+			})
 }
 

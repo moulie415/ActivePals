@@ -18,6 +18,7 @@ import Text from './constants/Text'
 import str from './constants/strings'
 import { getResource } from './constants/utils'
 import firebase from 'react-native-firebase'
+import { getFbFriends } from './actions/friends'
 
 
 class Welcome extends Component {
@@ -104,14 +105,34 @@ class Welcome extends Component {
                   else if (!this.state.username) {
                     Alert.alert('Sorry', 'Please set a username before continuing')
                   }
+                  else if (this.state.username.length < 5) {
+                    Alert.alert('Sorry', 'Username must be at least 5 characters long')
+                  }
                   else {
                     Promise.all([
                       firebase.database().ref('usernames').child(this.state.username).set(profile.uid),
                       firebase.database().ref('users/' + profile.uid).child('username').set(this.state.username)
                     ])
                       .then(() => {
-                        this.nav()
-                        Alert.alert('Success', 'Username saved')
+                        if (profile.fb_login) {
+                          Alert.alert(
+                            'Success',
+                            'Username saved, do you want to find Facebook friends who are already using the app?',
+                            [
+                              {
+                              text: 'No',
+                              onPress: () => this.nav(),
+                            },
+                            {text: 'OK', onPress: () => console.log('OK Pressed')}
+                            ],
+                            {cancelable: false},
+                            )
+                        }
+                        else {
+                          this.nav()
+                          Alert.alert('Success', 'Username saved')
+                        }
+                        
                       })
                       .catch(e => {
                         Alert.alert('Error', 'That username may have already been taken')
@@ -155,8 +176,7 @@ class Welcome extends Component {
 
 import { connect } from 'react-redux'
 import { navigateBack, navigateHome } from 'Anyone/js/actions/navigation'
-import { doSetup, fetchProfile, setHasLoggedIn, setLoggedOut } from 'Anyone/js/actions/profile'
-import { setHasViewedWelcome } from './actions/profile';
+import { setHasViewedWelcome } from './actions/profile'
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile

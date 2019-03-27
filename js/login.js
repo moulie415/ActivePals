@@ -126,7 +126,7 @@ import Config from 'react-native-config'
         <View>
           <SpinnerButton
           onPress={()=> {
-            this.fbLogin(this.props.navigation)
+            this.fbLogin()
           }}
           isLoading={this.state.facebookLoading}
           spinnerType={str.spinner}
@@ -190,10 +190,10 @@ import Config from 'react-native-config'
       }
     }
 
-    fbLogin(navigation) {
+    fbLogin() {
       this.setState({facebookLoading: true})
-      LoginManager.logInWithReadPermissions(['public_profile', 'email'])
-      .then((result) => this._handleCallBack(result, navigation),
+      LoginManager.logInWithReadPermissions(['public_profile', 'email', 'user_friends'])
+      .then((result) => this._handleCallBack(result),
         function(error) {
           alert('Login fail with error: ' + error)
         }
@@ -201,7 +201,7 @@ import Config from 'react-native-config'
     }
 
 
- _handleCallBack(result, navigation){
+ _handleCallBack(result){
     let _this = this
     if (result.isCancelled) {
       //Alert.alert('Facbook login', 'cancelled')
@@ -213,13 +213,14 @@ import Config from 'react-native-config'
             fetch('https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,gender,birthday&access_token=' + token)
             .then((response) => response.json())
             .then((json) => {
-
+              json.fb_login = true
               const imageSize = 200
               const facebookID = json.id
               const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`
              this.authenticate(data.accessToken)
              .then(function(result){
               const { uid } = result.user
+              firebase.database().ref('fbusers').child(facebookID).set(uid)
               if (!result.additionalUserInfo.isNewUser) {
                 _this.props.onLogin()
               }

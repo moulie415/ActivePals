@@ -14,10 +14,7 @@ import {
   Container,
   Content,
   Icon,
-  Title,
   Card,
-  Left,
-  Right,
 } from 'native-base'
 import { PulseIndicator } from 'react-native-indicators'
 import firebase from 'react-native-firebase'
@@ -36,6 +33,7 @@ import FIcon from "react-native-vector-icons/FontAwesome"
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'
 import Header from './header/header'
+import { getFbFriends } from './actions/friends'
 import {
   extractCreatedTime,
   extractUsername,
@@ -102,7 +100,7 @@ class Home extends Component {
       .catch(error => {
         console.log("messaging permission denied")
       })
-      firebase.auth().onAuthStateChanged(function(user) {
+      firebase.auth().onAuthStateChanged(user => {
         if (user) {
         this.user = user
          // User is signed in.
@@ -110,6 +108,13 @@ class Home extends Component {
         // No user is signed in.
         }
       })
+
+
+      if (this.props.profile.fb_login) {
+        getFbFriends(this.props.profile.token)
+      }
+
+
 }
 
 sortByDate(array) {

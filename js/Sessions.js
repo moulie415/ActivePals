@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import {
-  StyleSheet,
   Alert,
   View,
   FlatList,
@@ -9,19 +8,12 @@ import {
   Linking,
   Slider,
   Platform,
-  Dimensions,
-  RefreshControl
 } from "react-native"
 import {
   Container,
   Icon,
   Switch,
-  Card,
-  Title,
   ActionSheet,
-  Left,
-  Right,
-  Content,
 } from 'native-base'
 import { PulseIndicator } from 'react-native-indicators'
 import Image from 'react-native-fast-image'
@@ -35,10 +27,8 @@ import Modal from 'react-native-modalbox'
 import { getType, getResource } from './constants/utils'
 import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
-import { geofire }  from 'Anyone/index'
 import RNFetchBlob from 'rn-fetch-blob'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
-import { isIphoneX } from 'react-native-iphone-x-helper'
 import {Image as SlowImage } from 'react-native'
 import { formatDateTime } from './constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
