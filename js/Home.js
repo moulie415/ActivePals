@@ -52,6 +52,7 @@ import str from './constants/strings'
 import ParsedText from 'react-native-parsed-text'
 import Video from 'react-native-video'
 import RNFetchBlob from 'rn-fetch-blob'
+import FbFriendsModal from './components/FbFriendsModal'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -87,7 +88,9 @@ class Home extends Component {
       likesModalVisible: false,
       loadMore: true,
       paused: true,
-      playing: {}
+      playing: {},
+      fbModalOpen: false,
+      fbFriends: []
     }
   }
 
@@ -111,7 +114,9 @@ class Home extends Component {
 
 
       if (this.props.profile.fb_login) {
-        getFbFriends(this.props.profile.token)
+        getFbFriends(this.props.profile.token).then(friends => {
+          this.setState({fbModalOpen: true, fbFriends: friends})
+        })
       }
 
 
@@ -407,7 +412,9 @@ sortByDate(array) {
             />
           ) : null}
         </Modal>
-      
+            <FbFriendsModal 
+            isOpen={this.state.fbModalOpen}
+            friends={this.state.fbFriends}/>
         
     </Container>
   )
