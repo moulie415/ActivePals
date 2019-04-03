@@ -9,9 +9,6 @@ import {
   Container,
   Content,
   Icon,
-  Title,
-  Left,
-  Right,
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import VersionNumber from 'react-native-version-number'

@@ -13,8 +13,8 @@ import {
   Left,
   Right,
   Icon,
-  Text,
 } from 'native-base'
+import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
 import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
@@ -453,7 +453,7 @@ const mapDispatchToProps = dispatch => ({
   getChats: (chats) => {return dispatch(fetchChats(chats))},
   getSessionChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
   getGymChat: (gym) => dispatch(fetchGymChat(gym)),
-  onRequest: (uid, friendUid)=> {return dispatch(sendRequest(uid, friendUid))},
+  onRequest: (friendUid)=> {return dispatch(sendRequest(friendUid))},
   onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
   onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
   getMessages: (id, amount, uid, endAt) => dispatch(fetchMessages(id, amount, uid, endAt)),

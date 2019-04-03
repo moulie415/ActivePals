@@ -3,38 +3,59 @@ import Modal from 'react-native-modalbox'
 import styles from './styles'
 import  TouchableOpacity from '../../constants/TouchableOpacityLockable'
 import {
-  Text,
   View,
   ScrollView,
-  Platform
+  Platform,
+  Alert
 } from 'react-native'
 import Image from 'react-native-fast-image'
 import { Icon } from 'native-base'
 import colors from '../../constants/colors'
+import { getFbFriends } from '../../actions/friends'
+import { PulseIndicator } from 'react-native-indicators'
+import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 
 class FbFriendsModal extends Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      selectedFriends: []
+      selectedFriends: [],
+      loading: true,
+      fbFriends: [],
     }
   }
 
+  componentDidMount() {
+    getFbFriends(this.props.profile.token).then(friends => {
+      this.setState({fbFriends: friends, loading: false})
+    })
+  }
+
   render() {
-    return <Modal isOpen={this.props.isOpen} style={styles.modal} position={"center"} >
+    return <Modal ref={'fbModal'} 
+          onClosed={this.props.onClosed} 
+          isOpen={this.props.isOpen} 
+          style={styles.modal} 
+          position={"center"} >
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
           Select Facebook friends</Text>
-          <ScrollView style={{backgroundColor: '#d6d6d6'}}>
-          {this.props.friends && this.renderFriendsSelection()}
-          </ScrollView>
+          {this.state.loading ? <PulseIndicator color={colors.secondary}/> :this.renderFriendsSelection()}
           <View style={{backgroundColor: colors.primary}}>
             <TouchableOpacity onPress={()=> {
-              if (this.state.selectedFriends.length > 0) {
-                //send multiple pal requests
+              const length = this.state.selectedFriends.length
+              if (length > 0) {
+                Promise.all(this.state.selectedFriends.map(friend => {
+                  return this.props.request(friend)
+                })).then(() => {
+                  this.refs.fbModal.close()
+                  Alert.alert('Success', 'Pal request' + length > 1 ? 's' : '' + ' sent' )
+                }).catch(e => {
+                  Alert.alert('Error', e.message)
+                })
               }
               else {
-                Alert.alert("Sorry", "Please select at least one pal")
+                Alert.alert("Sorry", "Please select at least one friend")
               }
             }}
             style={{padding: 5}}>
@@ -49,9 +70,9 @@ class FbFriendsModal extends Component {
 
   renderFriendsSelection() {
     let friends = []
-    Object.values(this.props.friends).forEach((friend, index) => {
+    Object.values(this.state.fbFriends).forEach(friend => {
       let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
-      if (friend.username) {
+      if (friend.username && !this.props.friends[friend.uid]) {
         friends.push(
             <TouchableOpacity key={friend.uid} onPress={()=> this.onFriendPress(friend.uid)}>
             <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
@@ -70,7 +91,12 @@ class FbFriendsModal extends Component {
       }
   
     })
-    return friends
+    return friends.length > 0 ?  
+    <ScrollView style={{backgroundColor: '#d6d6d6'}}>{friends}</ScrollView> :  
+    <View style={{backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text style={{padding: 15, textAlign: 'center'}}>
+      Sorry we couldn't find anymore of your Facebook friends already using ActivePals</Text>
+    </View>
   }
 
   onFriendPress(uid) {
@@ -84,15 +110,19 @@ class FbFriendsModal extends Component {
   }
 }
 
-// const mapStateToProps = ({ profile }) => ({
-//   
-// })
-
-// const mapDispatchToProps = dispatch => ({
- 
-// })
-
 import { connect } from 'react-redux'
+import { sendRequest } from '../../actions/friends';
 
-export default connect(null, null)(FbFriendsModal)
+const mapStateToProps = ({ friends, profile }) => ({
+    friends: friends.friends,
+    profile: profile.profile
+})
+
+const mapDispatchToProps = dispatch => ({
+  request: (friendUid) => dispatch(sendRequest(friendUid))
+})
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(FbFriendsModal)
 

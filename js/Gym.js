@@ -9,9 +9,6 @@ import {
 import {
   Container,
   Icon,
-  Left,
-  Title,
-  Right,
 } from 'native-base'
 import { PulseIndicator } from 'react-native-indicators'
 import firebase from 'react-native-firebase'

@@ -9,9 +9,6 @@ import {
   Container,
   Item,
   Icon,
-  Right,
-  Left,
-  Title
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import  styles  from './styles/signUpStyles'

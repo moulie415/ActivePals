@@ -10,16 +10,8 @@ import {
   SafeAreaView
 } from "react-native"
 import {
-  Button,
-  Input,
   Container,
-  Content,
-  Item,
   Icon,
-  Left,
-  Title,
-  Right,
-  ActionSheet,
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
@@ -142,7 +134,7 @@ import globalStyles from "./styles/globalStyles"
               [
               {text: 'Cancel', style: 'cancel'},
               {text: 'Yes', onPress: ()=> {
-                this.props.request(this.props.profile.uid ,uid)
+                this.props.request(uid)
                 .then(() => {
                   this.props.goBack()
                   Alert.alert('Success', 'Request sent')
@@ -249,7 +241,7 @@ const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
 const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
   remove: (uid) => dispatch(deleteFriend(uid)),
-  request: (uid, friendUid) => dispatch(sendRequest(uid, friendUid)),
+  request: (friendUid) => dispatch(sendRequest(friendUid)),
   goToGym: (gym) => dispatch(navigateGym(gym))
  })
 

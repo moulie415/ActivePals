@@ -18,7 +18,6 @@ import Text from './constants/Text'
 import str from './constants/strings'
 import { getResource } from './constants/utils'
 import firebase from 'react-native-firebase'
-import { getFbFriends } from './actions/friends'
 
 
 class Welcome extends Component {

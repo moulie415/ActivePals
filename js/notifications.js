@@ -10,9 +10,6 @@ import {
 import {
   Container,
   Icon,
-  Title,
-  Left,
-  Right,
 } from "native-base"
 import { Image as SlowImage } from 'react-native'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'

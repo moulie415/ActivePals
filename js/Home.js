@@ -33,7 +33,6 @@ import FIcon from "react-native-vector-icons/FontAwesome"
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'
 import Header from './header/header'
-import { getFbFriends } from './actions/friends'
 import {
   extractCreatedTime,
   extractUsername,
@@ -52,7 +51,6 @@ import str from './constants/strings'
 import ParsedText from 'react-native-parsed-text'
 import Video from 'react-native-video'
 import RNFetchBlob from 'rn-fetch-blob'
-import FbFriendsModal from './components/FbFriendsModal'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -89,8 +87,6 @@ class Home extends Component {
       loadMore: true,
       paused: true,
       playing: {},
-      fbModalOpen: false,
-      fbFriends: []
     }
   }
 
@@ -111,14 +107,6 @@ class Home extends Component {
         // No user is signed in.
         }
       })
-
-
-      if (this.props.profile.fb_login) {
-        getFbFriends(this.props.profile.token).then(friends => {
-          this.setState({fbModalOpen: true, fbFriends: friends})
-        })
-      }
-
 
 }
 
@@ -380,7 +368,12 @@ sortByDate(array) {
           animationType={"slide"}
           transparent={false}
           visible={this.state.likesModalVisible}
-          onRequestClose={() => this.setState({likesModalVisible: false, userFetchAmount: 10})}
+          on
+          
+          
+          
+          
+          Close={() => this.setState({likesModalVisible: false, userFetchAmount: 10})}
         >
           <TouchableOpacity
             onPress={() => this.setState({likesModalVisible: false})}
@@ -412,9 +405,7 @@ sortByDate(array) {
             />
           ) : null}
         </Modal>
-            <FbFriendsModal 
-            isOpen={this.state.fbModalOpen}
-            friends={this.state.fbFriends}/>
+  
         
     </Container>
   )

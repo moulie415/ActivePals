@@ -1,25 +1,15 @@
 import React, { Component } from "react"
 import {
-  StyleSheet,
   Alert,
   View,
   TextInput,
-  ScrollView,
-  RefreshControl,
   Platform,
   FlatList
 } from "react-native"
 import {
-  Button,
-  Text,
-  Input,
   Container,
   Content,
-  Item,
   Icon,
-  Title,
-  Right,
-  Left
 } from 'native-base'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
 import firebase from 'react-native-firebase'
@@ -27,10 +17,12 @@ import colors from './constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from './styles/friendsStyles'
 import sStyles from 'Anyone/js/styles/sessionStyles'
+import globalStyles from './styles/globalStyles'
 import { arraysEqual, getStateColor } from './constants/utils'
 import Header from './header/header'
 import Image from 'react-native-fast-image'
-
+import FbFriendsModal from './components/FbFriendsModal'
+import Text from './constants/Text'
 
  class Friends extends Component {
   static navigationOptions = {
@@ -129,6 +121,11 @@ import Image from 'react-native-fast-image'
     return (
     <Container>
       <Header 
+        left={this.props.profile.fb_login && <TouchableOpacity 
+        style = {globalStyles.headerLeft}
+        onPress={() => this.setState({fbModalOpen: true})}>
+          <Icon name='logo-facebook' style={{color: '#fff', padding: 5}}/>
+        </TouchableOpacity>}
         title={'Pals'}
         right={<TouchableOpacity onPress={() => {
         firebase.database().ref('users/' + this.uid).child('username')
@@ -178,6 +175,10 @@ import Image from 'react-native-fast-image'
           
           </View>
         </Modal>
+        <FbFriendsModal 
+        isOpen={this.state.fbModalOpen} 
+        onClosed={() => this.setState({fbModalOpen: false})}
+        />
         </Content>
     </Container>
   )
@@ -276,7 +277,7 @@ import Image from 'react-native-fast-image'
             Alert.alert('Sorry', "You've already added this user as a pal")
           }
           else {
-            this.props.onRequest(this.uid , snapshot.val()).then(() => {
+            this.props.onRequest(snapshot.val()).then(() => {
               Alert.alert("Success", "Request sent")
               this.refs.modal.close()
             })
@@ -339,7 +340,7 @@ const mapStateToProps = ({ friends, profile }) => ({
 
 const mapDispatchToProps = dispatch => ({
   getFriends: (uids)=> dispatch(fetchFriends(uids)),
-  onRequest: (uid, friendUid)=> dispatch(sendRequest(uid, friendUid)),
+  onRequest: (friendUid)=> dispatch(sendRequest(friendUid)),
   onAccept: (uid, friendUid)=> dispatch(acceptRequest(uid, friendUid)),
   onRemove: (uid)=> {return dispatch(deleteFriend(uid))},
   removeLocal: (uid) => dispatch(removeFriend(uid)),

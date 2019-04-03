@@ -6,7 +6,7 @@ import { Icon, Header } from "native-base"
 import { TabBarBottom, SafeAreaView } from "react-navigation"
 import colors from '../constants/colors'
 
-import styles from "./styles"
+import globalStyles from '../styles/globalStyles'
 
 import { connect } from 'react-redux'
 import { navigateBack } from '../actions/navigation'
@@ -19,7 +19,7 @@ const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, style,
 			<View style = {{flex:1, alignItems: 'center', justifyContent: 'center'}}>
 			   	{left || ((hasBack || customBackPress) &&
 			      	<TouchableOpacity 
-			      		style = {{position:'absolute', top:0, bottom:0, left:0, justifyContent: 'center', paddingLeft: 10}}
+			      		style = {globalStyles.headerLeft}
 			      		onPress = {customBackPress? ()=>customBackPress(onBackPress) : onBackPress}
 			      	>
 						<Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
