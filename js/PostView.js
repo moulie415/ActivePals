@@ -1,7 +1,5 @@
 import React, { Component } from "react"
 import {
-    Container,
-    Left,
     Icon,
 } from 'native-base'
 import {
@@ -46,10 +44,13 @@ import {
   import Video from 'react-native-video'
   import hStyles from './styles/homeStyles'
   import { PulseIndicator } from 'react-native-indicators'
+  import PropTypes from 'prop-types'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
 const SCREEN_HEIGHT = Dimensions.get('window').height
+
+
 
 class PostView extends Component {
 
@@ -499,6 +500,23 @@ class PostView extends Component {
      }
      else return 'N/A'
    }
+}
+
+PostView.propTypes = {
+  friends: PropTypes.any,
+  users: PropTypes.any,
+  profile: PropTypes.any,
+  navigation: PropTypes.any,
+  feed: PropTypes.any,
+  viewProfile: PropTypes.func,
+  goToProfile: PropTypes.func,
+  getRepUsers: PropTypes.func,
+  getPost: PropTypes.func,
+  getComments: PropTypes.func,
+  comment: PropTypes.func,
+  repComment: PropTypes.func,
+  navigateFullScreenVideo: PropTypes.func,
+  getCommentRepsUsers: PropTypes.func,
 }
 
 
