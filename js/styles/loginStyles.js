@@ -39,6 +39,6 @@ export default styles = StyleSheet.create({
     width: 100, justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
-    borderRadius: 2
+    borderRadius: 5
   },
 })

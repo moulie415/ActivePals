@@ -265,7 +265,7 @@ import Header from './header/header'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
-              style={{backgroundColor: colors.secondary, padding: 5, marginRight: 10, borderRadius: 5}}>
+              style={{backgroundColor: colors.secondary, padding: 10, marginRight: 10, borderRadius: 5}}>
                 <Text style={{color: '#fff'}}>Get directions</Text>
               </TouchableOpacity>
             
@@ -526,14 +526,14 @@ import Header from './header/header'
               )
 
           }}
-          style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
+          style={{backgroundColor: 'red', padding: 10, width: '40%', borderRadius: 5}}>
             <Text style={{color: '#fff', textAlign: 'center'}}>Delete session</Text>
           </TouchableOpacity>
           <TouchableOpacity
           onPress={()=> {
             this.props.onOpenChat(session)
           }}
-          style={{backgroundColor: colors.secondary, padding: 10, width: '40%'}}>
+          style={{backgroundColor: colors.secondary, padding: 10, width: '40%', borderRadius: 5}}>
             <Text style={{color: '#fff', textAlign: 'center'}}>Open chat</Text>
           </TouchableOpacity>
           </View>

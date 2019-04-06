@@ -138,7 +138,7 @@ import Config from 'react-native-config'
             width: 250,
             flexDirection: 'row',
             paddingVertical: 8,
-            borderRadius: 2
+            borderRadius: 5
           }}>
             <Icon style={{color: '#fff', marginRight: 10}} name="logo-facebook"/>
             <Text style={{color: '#fff'}}>Login with Facebook</Text>
@@ -158,7 +158,7 @@ import Config from 'react-native-config'
               width: 250,
               flexDirection: 'row',
               paddingVertical: 8,
-              borderRadius: 2
+              borderRadius: 5
           }}>
             <Icon style={{marginLeft: -15, color: '#fff', marginRight: 10}} name="logo-google"/>
             <Text style={{ color: '#fff'}}>Login with Google</Text>

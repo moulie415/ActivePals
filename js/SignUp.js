@@ -103,7 +103,7 @@ import { PulseIndicator } from 'react-native-indicators'
         />
         </Item>
         <TouchableOpacity 
-        style={{backgroundColor: colors.secondary, padding: 10, paddingHorizontal: 20, alignSelf: 'center'}}
+        style={{backgroundColor: colors.secondary, padding: 10, paddingHorizontal: 20, alignSelf: 'center', borderRadius: 5}}
         onPress={() => {
           if (this.pass == this.confirm) {
             this.setState({spinner: true})

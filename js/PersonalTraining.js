@@ -33,7 +33,7 @@ class PersonalTraining extends Component {
         Are you a personal trainer? Why not get verified on our platform?
         </Text>
             <TouchableOpacity 
-            style={{backgroundColor: colors.secondary, alignSelf: 'center', padding: 10}}
+            style={{backgroundColor: colors.secondary, alignSelf: 'center', padding: 10, borderRadius: 5}}
             onPress={()=> {
                 this.props.navigateVerification()
             }}>
