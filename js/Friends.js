@@ -54,7 +54,6 @@ import Text from './constants/Text'
       } else {
       }
     })
-    let chatRef = firebase.database().ref('users/' + this.uid).child('chats')
     this.listenForFriends()
     this.listenForState()
 

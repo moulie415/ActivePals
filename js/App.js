@@ -1,8 +1,6 @@
 import React from "react"
 import { 
-  AppRegistry,
   Platform,
-  Alert,
   AppState,
   BackHandler,
 } from 'react-native'
@@ -20,7 +18,6 @@ import DirectMessages from './chat/DirectMessages'
 import SessionChats from './chat/SessionChats'
 import GymChat from './chat/GymChat'
 import TestScreen from './TestScreen'
-import SessionType from './sessions/SessionType'
 import SessionDetail from './sessions/SessionDetail'
 import FilePreview from './FilePreview'
 import Notifications from './notifications'
@@ -34,10 +31,7 @@ import FullScreenVideo from './FullScreenVideo'
 import Welcome from './Welcome'
 import PersonalTraining from './PersonalTraining'
 import Form from './Form'
-import { Provider, connect } from 'react-redux'
-import { createStore, applyMiddleware, compose } from 'redux'
-import reducer from './reducers/'
-import thunk from 'redux-thunk'
+import { connect } from 'react-redux'
 import { StackNavigator,  TabNavigator, addNavigationHelpers, NavigationActions } from "react-navigation"
 import { addListener } from 'Anyone/index'
 
@@ -106,7 +100,6 @@ const tabs = TabNavigator({
 
 export const Stack = StackNavigator({
   Login : { screen: Login, navigationOptions: {header: null} },
-  SessionType: { screen: SessionType, navigationOptions: {tabBarVisible: false} },
   SessionDetail: { screen: SessionDetail, navigationOptions: {tabBarVisible: false} },
   SignUp: { screen: SignUp},
   MainNav: { screen: tabs},

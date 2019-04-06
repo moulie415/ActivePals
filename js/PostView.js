@@ -84,7 +84,6 @@ class PostView extends Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.feed && nextProps.feed[this.postId] && nextProps.feed[this.postId].comments) {
             this.setState({comments: nextProps.feed[this.postId].comments})
-            
         }
         if (nextProps.feed && nextProps.feed[this.postId]) {
           this.setState({post: nextProps.feed[this.postId]})

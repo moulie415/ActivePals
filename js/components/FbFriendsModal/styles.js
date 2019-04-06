@@ -3,7 +3,7 @@ import {
 } from 'react-native'
 import colors from '../../constants/colors'
 
-export default styles = StyleSheet.create({
+export default StyleSheet.create({
   modal: {
     height: 400,
     width: '90%',
@@ -14,5 +14,5 @@ export default styles = StyleSheet.create({
     alignSelf: 'center',
     padding: 5,
     paddingHorizontal: 10
-  }
+  },
 })

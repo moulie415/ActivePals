@@ -9,7 +9,6 @@ import {
 } from 'react-native'
 import {
   Icon,
-  Input
 } from 'native-base'
 import Swiper from 'react-native-swiper'
 import styles from './styles/welcomeStyles'
@@ -18,6 +17,8 @@ import Text from './constants/Text'
 import str from './constants/strings'
 import { getResource } from './constants/utils'
 import firebase from 'react-native-firebase'
+import PropTypes from 'prop-types'
+import FbFriendsModal from './components/FbFriendsModal'
 
 
 class Welcome extends Component {
@@ -77,6 +78,11 @@ class Welcome extends Component {
                 <Icon name="md-chatboxes" style={{color: '#fff', fontSize: 50}} />
               </View>
               <View style={styles.slide3}>
+              <FbFriendsModal
+                style={{zIndex: 999}}
+                isOpen={this.state.fbModalOpen} 
+                onClosed={() => this.setState({fbModalOpen: false}, ()=> this.nav())}
+                />
                 <Text style={styles.text}>Make sure to set a username so your pals can add you</Text>
                 <TextInput
                   value={this.state.username}
@@ -116,13 +122,13 @@ class Welcome extends Component {
                         if (profile.fb_login) {
                           Alert.alert(
                             'Success',
-                            'Username saved, do you want to find Facebook friends who are already using the app?',
+                            'Username saved, do you want to find Facebook friends who are already using the app? You can do this later on the Pals screen',
                             [
                               {
-                              text: 'No',
+                              text: 'No thanks',
                               onPress: () => this.nav(),
                             },
-                            {text: 'OK', onPress: () => console.log('OK Pressed')}
+                            {text: 'OK', onPress: () => this.setState({fbModalOpen: true})}
                             ],
                             {cancelable: false},
                             )
@@ -133,7 +139,7 @@ class Welcome extends Component {
                         }
                         
                       })
-                      .catch(e => {
+                      .catch(() => {
                         Alert.alert('Error', 'That username may have already been taken')
                       })
                   }
@@ -170,6 +176,14 @@ class Welcome extends Component {
       })
       return <View style={{flexDirection: 'row'}}>{images}</View>
     }
+}
+
+Welcome.propTypes = {
+  viewedWelcome: PropTypes.func,
+  profile: PropTypes.any,
+  navigation: PropTypes.any,
+  goBack: PropTypes.func,
+  goHome: PropTypes.func,
 }
 
 

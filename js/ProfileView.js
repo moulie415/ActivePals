@@ -1,11 +1,9 @@
 import React, { Component } from "react"
 import {
-  StyleSheet,
   Alert,
   View,
   TouchableOpacity,
   Platform,
-  ScrollView,
   Modal,
   SafeAreaView
 } from "react-native"

@@ -41,7 +41,11 @@ class FbFriendsModal extends Component {
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
           Select Facebook friends</Text>
           {this.state.loading ? <PulseIndicator color={colors.secondary}/> :this.renderFriendsSelection()}
-          <View style={{backgroundColor: colors.primary}}>
+          <View style={{backgroundColor: colors.primary, flexDirection: 'row', justifyContent: 'space-evenly'}}>
+            <TouchableOpacity onPress={() => this.refs.fbModal.close()}
+            style={{padding: 5}}>
+              <Text style={[styles.button, {backgroundColor: 'red'}]}>Cancel</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={()=> {
               const length = this.state.selectedFriends.length
               if (length > 0) {
@@ -49,7 +53,7 @@ class FbFriendsModal extends Component {
                   return this.props.request(friend)
                 })).then(() => {
                   this.refs.fbModal.close()
-                  Alert.alert('Success', 'Pal request' + length > 1 ? 's' : '' + ' sent' )
+                  Alert.alert('Success', `Pal request${length > 1 ? 's' : ''} sent` )
                 }).catch(e => {
                   Alert.alert('Error', e.message)
                 })
@@ -72,16 +76,16 @@ class FbFriendsModal extends Component {
     let friends = []
     Object.values(this.state.fbFriends).forEach(friend => {
       let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
-      if (friend.username && !this.props.friends[friend.uid]) {
+      if (!this.props.friends[friend.uid]) {
         friends.push(
-            <TouchableOpacity key={friend.uid} onPress={()=> this.onFriendPress(friend.uid)}>
+            <TouchableOpacity key={friend.uid} disabled={!friend.username} onPress={()=> this.onFriendPress(friend.uid)}>
             <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
               <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
                   <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0}}/>}
                   <Text style={{marginHorizontal: 10}}>
-                  {friend.username + " " + (friend.first_name ? ("(" + friend.first_name + " " + (friend.last_name || "") + ")") : "")}</Text>
+                  {(friend.username || 'No username set') + " " + (friend.first_name ? ("(" + friend.first_name + " " + (friend.last_name || "") + ")") : "")}</Text>
                   {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
                 </View>
               </View>
@@ -95,7 +99,7 @@ class FbFriendsModal extends Component {
     <ScrollView style={{backgroundColor: '#d6d6d6'}}>{friends}</ScrollView> :  
     <View style={{backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text style={{padding: 15, textAlign: 'center'}}>
-      Sorry we couldn't find anymore of your Facebook friends already using ActivePals</Text>
+      {"Sorry we couldn't find anymore of your Facebook friends already using ActivePals"}</Text>
     </View>
   }
 

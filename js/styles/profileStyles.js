@@ -19,4 +19,12 @@ export default styles = StyleSheet.create({
     height: 40,
     alignItems: 'center'
   },
+  logout: {
+    backgroundColor: colors.secondary,
+    margin: 20,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5
+  }
 })

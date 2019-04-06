@@ -40,5 +40,5 @@ export default styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     borderRadius: 2
-  }
+  },
 })

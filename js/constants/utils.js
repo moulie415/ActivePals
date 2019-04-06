@@ -22,6 +22,8 @@ const adsManager = new NativeAdsManager(str.nativePlacementId)
 // AdSettings.setLogLevel('none')
 // AdSettings.addTestDevice(AdSettings.currentDeviceHash)
 
+
+
 export function renderAd(index) {
   if (index > 0 && index % 4 == 0) {
     if (Platform.OS == 'android' && (index % 8 == 0)) {
@@ -45,6 +47,7 @@ export function renderAd(index) {
   else return null
 }
 
+export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming']
 
 export function getType(type, size) {
 	if (type == 'Cycling') {

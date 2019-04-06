@@ -200,7 +200,7 @@ import Header from './header/header'
         </MapView>}
         {GooglePlacesInput(this)}
 
-        <View style={{flexDirection: 'row', height: 50}}>
+        <View style={{flexDirection: 'row', height: 60, backgroundColor: colors.bgColor}}>
           <TouchableOpacity style={styles.button}
           onPress={()=> {
             this.setState({selectedLocation: null})
@@ -209,7 +209,7 @@ import Header from './header/header'
             <Text adjustsFontSizeToFit={true}
             style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</Text>
           </TouchableOpacity>
-          <View style={{borderRightWidth: 1, borderRightColor: '#fff'}}/>
+          <View style={{borderRightWidth: 1, borderRightColor: colors.bgColor}}/>
           <TouchableOpacity style={styles.button}
           onPress={()=> {
             if (Object.keys(this.props.friends).length > 0) {
@@ -265,7 +265,7 @@ import Header from './header/header'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
-              style={{backgroundColor: colors.secondary, padding: 5, marginRight: 10}}>
+              style={{backgroundColor: colors.secondary, padding: 5, marginRight: 10, borderRadius: 5}}>
                 <Text style={{color: '#fff'}}>Get directions</Text>
               </TouchableOpacity>
             
@@ -308,7 +308,7 @@ import Header from './header/header'
             <Text>{this.state.selectedLocation.vicinity}</Text>
             <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
             </Text>
-            {<View style={{flexDirection: 'row', marginTop: 5, alignItems: 'center'}}>
+            <View style={{flexDirection: 'row', marginTop: 5, alignItems: 'center', justifyContent: 'space-between', marginBottom: 10}}>
               <TouchableOpacity onPress={()=> {
                 this.getPosition(true, true)
                 const { lat, lng } = this.state.selectedLocation.geometry.location
@@ -324,15 +324,13 @@ import Header from './header/header'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
-              style={{backgroundColor: colors.secondary, padding: 5, marginRight: 10}}>
+              style={{backgroundColor: colors.secondary, padding: 10, marginRight: 10, borderRadius: 5}}>
                 <Text style={{color: '#fff'}}>Get directions</Text>
               </TouchableOpacity>
-              
-            </View>}
-            {this.state.selectedLocation.rating && <Text style={{marginVertical: 5}}>{'Google rating: '}
+              {this.state.selectedLocation.rating && <Text style={{marginVertical: 5}}>{'Google rating: '}
                       <Text style={{color: colors.secondary}}>{this.state.selectedLocation.rating}</Text>
                       </Text>}
-            
+            </View>
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
@@ -354,7 +352,7 @@ import Header from './header/header'
                       ]
                   )
                 }}
-              style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red'}}>
+              style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red', borderRadius: 5}}>
               <Text style={{color: '#fff'}}>Leave Gym</Text>
               </TouchableOpacity></View> :
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -372,7 +370,7 @@ import Header from './header/header'
                     }
                     else this.props.join(this.state.selectedLocation)
                   }}
-                style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
+                style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10, borderRadius: 5}}>
                 <Text style={{color: '#fff'}}>Join Gym</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -385,7 +383,8 @@ import Header from './header/header'
                   alignItems: 'center',
                   marginBottom: 10,
                   flexDirection: 'row',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  borderRadius: 5,
                   }}>
                 <Text style={{color: '#fff', marginRight: 10}}>View info</Text>
                 <Icon name={'md-information-circle'} style={{color: '#fff'}}/>
@@ -404,16 +403,16 @@ import Header from './header/header'
               onPress={()=> {
                 this.props.onContinue(null, this.state.selectedLocation)
               }}
-              style={{backgroundColor: colors.secondary, padding: 10, flex: 1, marginRight: 10}}>
-                <Text style={{color: '#fff', textAlign: 'center'}}>Create Session at location</Text>
+              style={{backgroundColor: colors.secondary, padding: 10, flex: 1, marginRight: 10, borderRadius: 5}}>
+                <Text style={{color: '#fff', textAlign: 'center'}}>Create Session</Text>
               </TouchableOpacity>
               <TouchableOpacity
               onPress={()=> {
                 this.refs.locationModal.close()
                 this.refs.friendsModal.open()
               }}
-              style={{backgroundColor: colors.secondary, padding: 10, flex: 1}}>
-                <Text style={{color: '#fff', textAlign: 'center'}}>Create Private Session at location</Text>
+              style={{backgroundColor: colors.secondary, padding: 10, flex: 1, borderRadius: 5}}>
+                <Text style={{color: '#fff', textAlign: 'center'}}>Create Private Session</Text>
               </TouchableOpacity>
               </View>
             </View>
@@ -1122,12 +1121,12 @@ export const renderTags = (tags) => {
 import { connect } from 'react-redux'
 import {
   navigateMessagingSession,
-  navigateSessionType,
   navigateTestScreen,
   navigateProfileView,
   navigateGym,
-  navigateGymMessaging
-} from 'Anyone/js/actions/navigation'
+  navigateGymMessaging,
+  navigateSessionDetail
+} from './actions/navigation'
 import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
 import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
 import { removeGym, joinGym, setLocation } from 'Anyone/js/actions/profile'
@@ -1153,7 +1152,7 @@ const mapDispatchToProps = dispatch => ({
   },
   remove: (key, type) => dispatch(removeSession(key, type)),
   onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
-  onContinue: (buddies, location) => dispatch(navigateSessionType(buddies, location)),
+  onContinue: (buddies, location) => dispatch(navigateSessionDetail(buddies, location)),
   fetch: (radius, update = false) => {return Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())])},
   viewGym: (id) => dispatch(navigateGym(id)),
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),

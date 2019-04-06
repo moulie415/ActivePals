@@ -1,16 +1,12 @@
 import { StyleSheet } from "react-native"
 import colors from 'Anyone/js/constants/colors'
 
-export default styles = StyleSheet.create({
-  typeText: {
-    fontFamily: 'Avenir',
-    fontSize: 30, 
-    marginLeft: 10
-  },
+export default  StyleSheet.create({
   gender: {
-  	backgroundColor: colors.primary,
+  	backgroundColor: colors.secondary,
   	flex: 1,
-  	margin: 10
+		margin: 10,
+		borderRadius: 5
   },
   typeText: {
   	alignSelf: 'center',
@@ -23,8 +19,9 @@ export default styles = StyleSheet.create({
   	alignSelf: 'center',
   	borderRadius: 0,
   	padding: 10,
-  	backgroundColor: colors.primary,
-  	marginBottom: 10
+  	backgroundColor: colors.secondary,
+		marginBottom: 10,
+		borderRadius: 5
   }
 
 })

@@ -1,11 +1,8 @@
 import React, { Component } from "react"
 import {
 	Container,
-	Card,
-	Picker,
 	ActionSheet,
 	Icon,
-	Button,
 	Content,
 	Switch
 } from 'native-base'
@@ -14,6 +11,7 @@ import {
 	View,
 	Alert,
 	TextInput,
+	Picker
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
@@ -23,8 +21,9 @@ import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/js/constants/colors'
 import TouchableOpacity from 'Anyone/js/constants/TouchableOpacityLockable'
 import RNCalendarEvents from 'react-native-calendar-events'
-import { guid } from '../constants/utils'
+import { types } from '../constants/utils'
 import Header from '../header/header'
+import RNPickerSelect from 'react-native-picker-select'
 
 
 class SessionDetail extends Component {
@@ -44,13 +43,13 @@ class SessionDetail extends Component {
 		this.buddies = this.params.buddies
 		this.location = this.params.location
 
-		this.type = this.params.type
 		this.state = {
 			gender: 'Unspecified',
 			formattedAddress: 'none',
 			date: null,
 			duration: 1,
-			addToCalendar: false
+			addToCalendar: false,
+			type: 'Custom'
 		}
 
 	}
@@ -75,12 +74,13 @@ class SessionDetail extends Component {
 				hasBack={true}
 			/>
 				<Content>
-					<TextInput
-					style={{padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10}}
-					textAlignVertical={'top'}
-					underlineColorAndroid='transparent'
-					onChangeText={title => this.title = title}
-					placeholder='Title'/>
+						<TextInput
+						style={{padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10, height: 50}}
+						textAlignVertical={'top'}
+						underlineColorAndroid='transparent'
+						onChangeText={title => this.title = title}
+						placeholder='Title'/>
+						
 					<TextInput
 					style={{padding: 5, borderWidth: 0.5, borderColor: '#999', height: 100, margin: 10}}
 					placeholder='Details...'
@@ -105,13 +105,13 @@ class SessionDetail extends Component {
 							<TouchableOpacity onPress={()=> {
 								this.state.duration > 1 && this.setState({duration: this.state.duration-=1})
 							}}>
-								<Icon name='arrow-dropdown-circle' style={{color: colors.primary, fontSize: 40}}/>
+								<Icon name='arrow-dropdown-circle' style={{color: colors.secondary, fontSize: 40}}/>
 							</TouchableOpacity>
 							<Text style={{ width: 50, textAlign: 'center'}}>{this.state.duration + (this.state.duration > 1? ' hrs' :' hr')}</Text>
 							<TouchableOpacity onPress={()=> {
 								this.state.duration < 24 && this.setState({duration: this.state.duration+=1})
 							}}>
-								<Icon name='arrow-dropup-circle' style={{color: colors.primary, fontSize: 40}}/>
+								<Icon name='arrow-dropup-circle' style={{color: colors.secondary, fontSize: 40}}/>
 							</TouchableOpacity>
 							
 						</View>
@@ -142,9 +142,8 @@ class SessionDetail extends Component {
 											this.setState({addToCalendar: false})
 										}
 									})
-										
 									.catch(e => {
-										Alert.alert('Error', error.message)
+										Alert.alert('Error', e.message)
 										this.setState({addToCalendar: false})
 									})
 								}
@@ -186,30 +185,40 @@ class SessionDetail extends Component {
 					<TouchableOpacity
 					style={styles.gender}
 					onPress={()=> {
+						const options = ['Unspecified', 'Male', 'Female', 'Cancel']
 						ActionSheet.show(
 						{
-							options: ['Unspecified', 'Male', 'Female', 'Cancel'],
+							options,
 							cancelButtonIndex: 3,
 							title: "Gender?"
 						},
 						buttonIndex => {
-							switch(buttonIndex) {
-								case 0:
-									this.setState({gender: 'Unspecified'})
-									break
-								case 1:
-									this.setState({gender: 'Male'})
-									break
-								case 2:
-									this.setState({gender: 'Female'})
-									break
+							if (buttonIndex != options.length) {
+								this.setState({gender: options[buttonIndex]})
 							}
 						}
 						)
 					}}>
 						<Text style={{fontSize: 15, margin: 10, color: '#fff'}}>{'Gender: ' + this.state.gender}</Text>
 					</TouchableOpacity>
-					<Text style={styles.typeText}>{'Type: ' + this.type}</Text>
+					<TouchableOpacity
+					style={styles.gender}
+					onPress={()=> {
+						ActionSheet.show(
+						{
+							options: [...types, 'Cancel'],
+							cancelButtonIndex: types.length,
+							title: "Type"
+						},
+						buttonIndex => {
+							if (buttonIndex != types.length) {
+								this.setState({type: types[buttonIndex]})
+							}
+						}
+						)
+					}}>
+						<Text style={{fontSize: 15, margin: 10, color: '#fff'}}>{'Type: ' + this.state.type}</Text>
+					</TouchableOpacity>
 					</View>
 					<TouchableOpacity style={styles.createButton}
 					onPress={(mutex)=> {
@@ -269,7 +278,7 @@ class SessionDetail extends Component {
 				title: this.title,
 				details: this.details,
 				gender: this.state.gender,
-				type: this.type,
+				type: this.state.type,
 				host: this.user.uid,
 				dateTime: this.state.date,
 				duration: this.state.duration,

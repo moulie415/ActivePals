@@ -19,12 +19,13 @@ export default styles = StyleSheet.create({
 
   },
   button: {
-    borderRadius: 0,
+    borderRadius: 5,
     backgroundColor: colors.secondary,
     flex: 1,
     borderColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    margin: 5,
   },
   modal: {
     height: 400,

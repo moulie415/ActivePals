@@ -1,22 +1,13 @@
 import React, { Component } from "react"
 import {
-  StyleSheet,
   Alert,
   View,
-  Platform,
   ScrollView,
 } from "react-native"
 import {
-  Button,
   Input,
   Container,
-  Content,
-  Item,
   Icon,
-  Left,
-  Title,
-  Right,
-  ActionSheet,
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import Image from 'react-native-fast-image'
@@ -293,7 +284,7 @@ import globalStyles from './styles/globalStyles'
          
 
       <TouchableOpacity
-        style={{backgroundColor: colors.secondary, margin: 20, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20}}
+        style={styles.logout}
         onPress={()=> this.logout()}>
         <Text style={{color: '#fff'}} >Log out</Text>
       </TouchableOpacity>
