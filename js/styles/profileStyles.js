@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native"
 import colors from 'Anyone/js/constants/colors'
 
-export default styles = StyleSheet.create({
+export default StyleSheet.create({
   input: {
     color: '#fff',
     fontFamily: 'Avenir'

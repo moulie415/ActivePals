@@ -3,7 +3,6 @@ import {
   Alert,
   View,
   TouchableOpacity,
-  Platform,
   ScrollView
 } from "react-native"
 import {
@@ -11,7 +10,6 @@ import {
   Icon,
 } from 'native-base'
 import { PulseIndicator } from 'react-native-indicators'
-import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Image from 'react-native-fast-image'
 import str from './constants/strings'
@@ -95,7 +93,7 @@ import globalStyles from './styles/globalStyles'
                   onPress={() => {
                     this.props.onOpenGymChat(this.state.gym.place_id)
                   }}
-                  style={{justifyContent: 'center', marginRight: 20}}>
+                  style={{justifyContent: 'center', marginRight: 20, borderRadius: 5}}>
                   <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
               </TouchableOpacity>
               <TouchableOpacity 
@@ -110,7 +108,7 @@ import globalStyles from './styles/globalStyles'
                   )
                   
                   }}
-              style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red'}}>
+              style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red', borderRadius: 5}}>
               <Text style={{color: '#fff'}}>Leave Gym</Text>
               </TouchableOpacity></View> :
               <View style={{margin: 10}}>
@@ -129,30 +127,46 @@ import globalStyles from './styles/globalStyles'
                     else this.props.join(this.state.gym)
                     
                     }}
-                style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10}}>
+                style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginVertical: 10, borderRadius: 5}}>
                 <Text style={{color: '#fff'}}>Join Gym</Text>
                 </TouchableOpacity>
               </View>}
-              <TouchableOpacity onPress={()=> {
-              const { lat, lng } = this.state.gym.geometry.location
-              const place_id = this.state.gym.place_id
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
+                <TouchableOpacity onPress={()=> {
+                
+                }}
+                style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5}}>
+                <Text style={{color: '#fff'}}>Create Session</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=> {
+                
+                }}
+                style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5}}>
+                <Text style={{color: '#fff'}}>Create Private Session</Text>
+                </TouchableOpacity>
+              </View>
+            <View style={{flexDirection: 'row'}}>
+                {this.state.gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5, flex: 1}}>{'Vicinity: '}
+                <Text style={{color: colors.secondary}}>{this.state.gym.vicinity}</Text>{this.props.location && 
+                <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.gym) + ' km away)'}</Text>}</Text>}
+                <TouchableOpacity onPress={()=> {
+                const { lat, lng } = this.state.gym.geometry.location
+                const place_id = this.state.gym.place_id
 
-              let options = {
-                latitude: lat,
-                longitude: lng,
-                cancelText: 'Cancel',
-                sourceLatitude:  this.props.location.lat,
-                sourceLongitude:   this.props.location.lon,
-                googlePlaceId: place_id, 
-                }
-                this.setState({popUpVisible: true, options})
-              }}
-              style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 10, width: 110}}>
-              <Text style={{color: '#fff'}}>Get directions</Text>
-              </TouchableOpacity>
-            {this.state.gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Vicinity: '}
-        <Text style={{color: colors.secondary}}>{this.state.gym.vicinity}</Text>{this.props.location && 
-        <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.gym) + ' km away)'}</Text>}</Text>}
+                let options = {
+                  latitude: lat,
+                  longitude: lng,
+                  cancelText: 'Cancel',
+                  sourceLatitude:  this.props.location.lat,
+                  sourceLongitude:   this.props.location.lon,
+                  googlePlaceId: place_id, 
+                  }
+                  this.setState({popUpVisible: true, options})
+                }}
+                style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5, height: 40}}>
+                <Text style={{color: '#fff'}}>Get directions</Text>
+                </TouchableOpacity>
+            </View>
             {this.state.gym.website && <Hyperlink linkDefault={true}>
             <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
         <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{this.state.gym.website}</Text></Text></Hyperlink>}
@@ -215,11 +229,9 @@ import globalStyles from './styles/globalStyles'
   }
 
   renderOpeningHours(hours) {
-    let text = []
-    hours.forEach(hour => {
-      text.push(<Text key={hour} style={{marginVertical: 5, color: colors.secondary}}>{hour}</Text>)
+    return hours.map(hour => {
+      return <Text key={hour} style={{marginVertical: 5, color: colors.secondary}}>{hour}</Text>
     })
-    return text
   }
 
 

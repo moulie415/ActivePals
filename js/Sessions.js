@@ -34,6 +34,7 @@ import { formatDateTime } from './constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
 import { showLocation, Popup } from 'react-native-map-link'
 import Header from './header/header'
+import FriendsModal from './components/friendsModal'
 
  class Sessions extends Component {
 
@@ -213,8 +214,7 @@ import Header from './header/header'
           <TouchableOpacity style={styles.button}
           onPress={()=> {
             if (Object.keys(this.props.friends).length > 0) {
-              this.setState({selectedLocation: null})
-              this.refs.friendsModal.open()
+              this.setState({selectedLocation: null, friendsModalOpen: true})
             }
             else {
               Alert.alert("Sorry", "You must have at least one pal to create a private session")
@@ -275,26 +275,11 @@ import Header from './header/header'
             </View>}
 
         </Modal>
-        <Modal style={styles.modal} position={"center"} ref={"friendsModal"} >
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
-          Select pals</Text>
-          <ScrollView style={{backgroundColor: '#d6d6d6'}}>
-          {this.renderFriendsSelection()}
-          </ScrollView>
-          <View style={{backgroundColor: colors.primary}}>
-            <TouchableOpacity onPress={()=> {
-              if (this.state.selectedFriends.length > 0) {
-                this.props.onContinue(this.state.selectedFriends, this.state.selectedLocation)
-              }
-              else {
-                Alert.alert("Sorry", "Please select at least one pal")
-              }
-            }}
-            style={{padding: 5}}>
-              <Text style={{color: '#fff', backgroundColor: colors.secondary, alignSelf: 'center', padding: 5, paddingHorizontal: 10}}>Continue</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
+        <FriendsModal 
+        location={this.state.selectionLocation} 
+        onClosed={()=> this.setState({friendsModalOpen: false})}
+        isOpen={this.state.friendsModalOpen}/>
+        
         <Modal
           style={[styles.modal, {height: null}]} 
           position={'center'} 
@@ -409,7 +394,7 @@ import Header from './header/header'
               <TouchableOpacity
               onPress={()=> {
                 this.refs.locationModal.close()
-                this.refs.friendsModal.open()
+                this.setState({friendsModalOpen: true})
               }}
               style={{backgroundColor: colors.secondary, padding: 10, flex: 1, borderRadius: 5}}>
                 <Text style={{color: '#fff', textAlign: 'center'}}>Create Private Session</Text>
@@ -601,7 +586,7 @@ import Header from './header/header'
                 }
                 else if (buttonIndex == 1) {
                   if (Object.values(this.props.friends).length > 0) {
-                    this.refs.friendsModal.open()
+                    this.setState({friendsModalOpen: true})
                   }
                   else {
                     Alert.alert('Sorry', 'You must have at least one pal to create a private session')

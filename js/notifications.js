@@ -1,10 +1,8 @@
 import React, { Component } from "react"
 import {
-  ImageBackground,
   View,
   ScrollView,
   Alert,
-  Linking,
   FlatList
 } from "react-native"
 import {
@@ -15,7 +13,6 @@ import { Image as SlowImage } from 'react-native'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Image from "react-native-fast-image"
 import styles from "./styles/notificationsStyles"
-import { formatDateTime, dayDiff } from './constants/utils'
 import Swipeout from 'react-native-swipeout'
 import TouchableOpacity from './constants/TouchableOpacityLockable'
 import colors from './constants/colors'
