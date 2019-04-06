@@ -3,10 +3,8 @@ import colors from 'Anyone/js/constants/colors'
 
 export default styles = StyleSheet.create({
   modal: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 300,
-    width: 300
+    height: 200,
+    width: '90%',
   },
   modalText: {
     color: "black",
@@ -20,6 +18,15 @@ export default styles = StyleSheet.create({
     marginVertical: 5,
     padding: 5,
     fontSize: 15,
-  }
+  },
+  button: {
+    color: '#fff',
+    backgroundColor: colors.secondary,
+    alignSelf: 'center',
+    padding: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginVertical: 5
+  },
 
 })

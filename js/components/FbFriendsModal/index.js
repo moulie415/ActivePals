@@ -43,8 +43,8 @@ class FbFriendsModal extends Component {
           {this.state.loading ? <PulseIndicator color={colors.secondary}/> :this.renderFriendsSelection()}
           <View style={{backgroundColor: colors.primary, flexDirection: 'row', justifyContent: 'space-evenly'}}>
             <TouchableOpacity onPress={() => this.refs.fbModal.close()}
-            style={{padding: 5}}>
-              <Text style={[styles.button, {backgroundColor: 'red'}]}>Cancel</Text>
+            style={[styles.button, {backgroundColor: 'red'}]}>
+              <Text style={{color: '#fff'}}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=> {
               const length = this.state.selectedFriends.length
@@ -62,8 +62,8 @@ class FbFriendsModal extends Component {
                 Alert.alert("Sorry", "Please select at least one friend")
               }
             }}
-            style={{padding: 5}}>
-              <Text style={styles.button}>
+            style={styles.button}>
+              <Text style={{color: '#fff'}}>
               Send pal requests
               </Text>
             </TouchableOpacity>

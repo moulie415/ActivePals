@@ -10,7 +10,8 @@ export default StyleSheet.create({
     alignSelf: 'center',
     padding: 5,
     paddingHorizontal: 10,
-    borderRadius: 5
+    borderRadius: 5,
+    marginVertical: 5
   },
   modal: {
     height: 400,

@@ -13,6 +13,8 @@ export default StyleSheet.create({
     backgroundColor: colors.secondary,
     alignSelf: 'center',
     padding: 5,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginVertical: 5
   },
 })

@@ -35,8 +35,8 @@ class FriendsModal extends Component {
             {this.renderFriendsSelection()}
           <View style={{backgroundColor: colors.primary, flexDirection: 'row', justifyContent: 'space-evenly'}}>
             <TouchableOpacity onPress={() => this.refs.friendsModal.close()}
-            style={{padding: 5, borderRadius: 5}}>
-              <Text style={[styles.button, {backgroundColor: 'red'}]}>Cancel</Text>
+            style={[styles.button, {backgroundColor: 'red'}]}>
+              <Text style={{color: '#fff'}}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=> {
               const length = this.state.selectedFriends.length
@@ -47,8 +47,8 @@ class FriendsModal extends Component {
                 Alert.alert("Sorry", "Please select at least one friend")
               }
             }}
-            style={{padding: 5, borderRadius: 5}}>
-              <Text style={styles.button}>
+            style={styles.button}>
+              <Text style={{color: '#fff'}}>
               Continue
               </Text>
             </TouchableOpacity>

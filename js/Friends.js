@@ -154,31 +154,37 @@ import Text from './constants/Text'
       style={styles.modal}
       position={"center"}
       ref={"modal"} >
-          <Text style={styles.modalText}>Send pal request</Text>
-          <TextInput
-          underlineColorAndroid='transparent'
-          style={styles.usernameInput}
-          autoCapitalize={'none'}
-          placeholder={'Enter username'}
-          onChangeText={username => this.username = username}
-          />
-          <View style={{flexDirection: 'row', marginTop: 10}}>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          Send pal request</Text>
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <TextInput
+            underlineColorAndroid='transparent'
+            style={styles.usernameInput}
+            autoCapitalize={'none'}
+            placeholder={'Enter username'}
+            onChangeText={username => this.username = username}
+            />
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
           <TouchableOpacity onPress={()=> {
             this.refs.modal.close()
           }}
-          style={{padding: 10, backgroundColor: 'red', marginHorizontal: 10}}>
-            <Text style={{color: '#fff'}}>Cancel</Text>
+          style={[styles.button, {backgroundColor: 'red'}]}>
+            <Text style={{color: '#fff', fontSize: 20}}>Cancel</Text>
           </TouchableOpacity>
+
           <TouchableOpacity onPress={(mutex)=> {
             mutex.lockFor(1000)
             this.sendRequest(this.username)
           }}
-          style={{padding: 10, backgroundColor: colors.secondary, marginHorizontal: 10}}>
-            <Text style={{color: '#fff'}}>Submit</Text>
+          style={styles.button}>
+            <Text style={{color: '#fff', fontSize: 20}}>Submit</Text>
           </TouchableOpacity>
           
           </View>
         </Modal>
+
         <FbFriendsModal 
         isOpen={this.state.fbModalOpen} 
         onClosed={() => this.setState({fbModalOpen: false})}
