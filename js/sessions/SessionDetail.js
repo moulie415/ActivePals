@@ -11,7 +11,6 @@ import {
 	View,
 	Alert,
 	TextInput,
-	Picker
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
@@ -21,9 +20,8 @@ import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/js/constants/colors'
 import TouchableOpacity from 'Anyone/js/constants/TouchableOpacityLockable'
 import RNCalendarEvents from 'react-native-calendar-events'
-import { types } from '../constants/utils'
+import { types, getType } from '../constants/utils'
 import Header from '../header/header'
-import RNPickerSelect from 'react-native-picker-select'
 
 
 class SessionDetail extends Component {
@@ -202,7 +200,7 @@ class SessionDetail extends Component {
 						<Text style={{fontSize: 15, margin: 10, color: '#fff'}}>{'Gender: ' + this.state.gender}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
-					style={styles.gender}
+					style={[styles.gender, {flexDirection: 'row', alignItems: 'center'}]}
 					onPress={()=> {
 						ActionSheet.show(
 						{
@@ -218,6 +216,7 @@ class SessionDetail extends Component {
 						)
 					}}>
 						<Text style={{fontSize: 15, margin: 10, color: '#fff'}}>{'Type: ' + this.state.type}</Text>
+						{getType(this.state.type, 20, '#fff')}
 					</TouchableOpacity>
 					</View>
 					<TouchableOpacity style={styles.createButton}

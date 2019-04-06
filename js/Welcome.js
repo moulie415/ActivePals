@@ -15,7 +15,7 @@ import styles from './styles/welcomeStyles'
 import colors from './constants/colors'
 import Text from './constants/Text'
 import str from './constants/strings'
-import { getResource } from './constants/utils'
+import { getResource, types } from './constants/utils'
 import firebase from 'react-native-firebase'
 import PropTypes from 'prop-types'
 import FbFriendsModal from './components/FbFriendsModal'
@@ -164,17 +164,15 @@ class Welcome extends Component {
     }
 
     renderImages() {
-      let images = []
-      let types = ['Gym', 'Running', 'Cycling', 'Swimming']
-      types.forEach(type => {
-        images.push(
-          <Image
+      return <View style={{flexDirection: 'row'}}>
+      {types.map((type, index) => {
+        if (index != 0) {
+          return <Image
           key={type}
           style={{tintColor: '#fff', height: 50, width: 50, margin: 10}}
           source={getResource(type)}/>
-        )
-      })
-      return <View style={{flexDirection: 'row'}}>{images}</View>
+        }
+      })}</View>
     }
 }
 

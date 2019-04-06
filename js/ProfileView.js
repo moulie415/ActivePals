@@ -183,7 +183,7 @@ import globalStyles from "./styles/globalStyles"
               ]
               )
           }}>
-          <Text style={{fontFamily: 'Avenir', color: '#fff'}}>Remove pal</Text>
+          <Text style={{color: '#fff'}}>Remove pal</Text>
           </TouchableOpacity>}
         </View> : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}

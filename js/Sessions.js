@@ -276,7 +276,7 @@ import FriendsModal from './components/friendsModal'
 
         </Modal>
         <FriendsModal 
-        location={this.state.selectionLocation} 
+        location={this.state.selectedLocation} 
         onClosed={()=> this.setState({friendsModalOpen: false})}
         isOpen={this.state.friendsModalOpen}/>
         
@@ -762,7 +762,7 @@ import FriendsModal from './components/friendsModal'
             this.setState({selectedSession: session, latitude: lat, longitude: lng}, ()=> this.refs.modal.open())
           }}
         >
-        {getType(session.type, 40, 40)}
+        {getType(session.type, 40)}
         </MapView.Marker>
 
         )

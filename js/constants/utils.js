@@ -49,25 +49,25 @@ export function renderAd(index) {
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming']
 
-export function getType(type, size) {
+export function getType(type, size, tintColor) {
 	if (type == 'Cycling') {
-		return <Image style={{width: size, height: size}}
+		return <Image style={{width: size, height: size, tintColor}}
 		source={require('Anyone/assets/images/bicycle.png')} />
 	}
 	else if (type == 'Custom') {
-		return <Image style={{width: size, height: size}}
+		return <Image style={{width: size, height: size, tintColor}}
 		source={require('Anyone/assets/images/custom.png')} />
 	}
 	else if (type == 'Gym') {
-		return <Image style={{width: size, height: size}}
+		return <Image style={{width: size, height: size, tintColor}}
 		source={require('Anyone/assets/images/dumbbell.png')} />
 	}
 	else if (type == 'Running') {
-		return <Image style={{width: size, height: size}}
+		return <Image style={{width: size, height: size, tintColor}}
 		source={require('Anyone/assets/images/running.png')} />
 	}
 	else if (type == 'Swimming') {
-		return <Image style={{width: size, height: size}}
+		return <Image style={{width: size, height: size, tintColor}}
 		source={require('Anyone/assets/images/swim.png')} />
 	}
 }
@@ -77,7 +77,7 @@ export const getMentionsList = (status, friends) => {
   let last = split[split.length - 1]
   let reduced = last.substring(1)
   if (status && last && str.mentionRegex.test(last)) {
-    filtered = friends.filter(friend => {
+    const filtered = friends.filter(friend => {
       return friend.username && 
       friend.username.toLowerCase().includes(reduced.toLowerCase())
     })

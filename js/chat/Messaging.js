@@ -9,9 +9,6 @@ import {
 } from "react-native"
 import {
   Container,
-  Title,
-  Left,
-  Right,
   Icon,
 } from 'native-base'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
@@ -26,7 +23,6 @@ import { guid } from '../constants/utils'
 import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
 //import EmojiInput from 'react-native-emoji-input'
-import { NavigationActions } from "react-navigation"
 import { PulseIndicator } from 'react-native-indicators'
 
 class Messaging extends React.Component {
@@ -293,7 +289,7 @@ class Messaging extends React.Component {
             <View>
               {((props.previousMessage.user && props.position == 'left' && props.previousMessage.user._id != props.currentMessage.user._id) ||
               (!props.previousMessage.user && props.currentMessage.user && props.position == 'left')) &&
-              <Text style={{color: colors.secondary, fontSize: 12, fontFamily: 'Avenir', padding: 10, paddingBottom: 0}}>
+              <Text style={{color: colors.secondary, fontSize: 12, padding: 10, paddingBottom: 0}}>
               {props.currentMessage.user.name}</Text>}
               <MessageText {...props} />
             </View>

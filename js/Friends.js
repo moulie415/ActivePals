@@ -122,7 +122,12 @@ import Text from './constants/Text'
       <Header 
         left={this.props.profile.fb_login && <TouchableOpacity 
         style = {globalStyles.headerLeft}
-        onPress={() => this.setState({fbModalOpen: true})}>
+        onPress={() => {
+          firebase.database().ref('users/' + this.uid).child('username')
+          .once('value', snapshot => {
+            snapshot.val()? this.setState({fbModalOpen: true}) : Alert.alert("Please set a username before trying to add a pal")
+          })
+        }}>
           <Icon name='logo-facebook' style={{color: '#fff', padding: 5}}/>
         </TouchableOpacity>}
         title={'Pals'}
@@ -162,14 +167,14 @@ import Text from './constants/Text'
             this.refs.modal.close()
           }}
           style={{padding: 10, backgroundColor: 'red', marginHorizontal: 10}}>
-            <Text style={{fontFamily: "Avenir", color: '#fff'}}>Cancel</Text>
+            <Text style={{color: '#fff'}}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={(mutex)=> {
             mutex.lockFor(1000)
             this.sendRequest(this.username)
           }}
           style={{padding: 10, backgroundColor: colors.secondary, marginHorizontal: 10}}>
-            <Text style={{fontFamily: "Avenir", color: '#fff'}}>Submit</Text>
+            <Text style={{color: '#fff'}}>Submit</Text>
           </TouchableOpacity>
           
           </View>

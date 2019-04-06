@@ -22,6 +22,7 @@ import Header from './header/header'
 import StarRating from 'react-native-star-rating'
 import { showLocation, Popup } from 'react-native-map-link'
 import globalStyles from './styles/globalStyles'
+import FriendsModal from './components/friendsModal'
 
 
 
@@ -133,13 +134,13 @@ import globalStyles from './styles/globalStyles'
               </View>}
               <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
                 <TouchableOpacity onPress={()=> {
-                
+                  this.props.createSession(this.state.gym)
                 }}
                 style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5}}>
                 <Text style={{color: '#fff'}}>Create Session</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=> {
-                
+                  this.setState({friendsModalOpen: true})
                 }}
                 style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5}}>
                 <Text style={{color: '#fff'}}>Create Private Session</Text>
@@ -207,6 +208,9 @@ import globalStyles from './styles/globalStyles'
             cancelButtonText: {color: colors.secondary},
           }}
           />
+          <FriendsModal location={this.state.gym} 
+          onClosed={()=> this.setState({friendsModalOpen: false})}
+          isOpen={this.state.friendsModalOpen} />
     </Container>
   )
   }
@@ -238,7 +242,7 @@ import globalStyles from './styles/globalStyles'
 }
 
 const fetchGym = (id) => {
-    let url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${str.googleApiKey}`
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${str.googleApiKey}`
     return fetch(url).then(response => {
       return response.json()
     })
@@ -246,7 +250,7 @@ const fetchGym = (id) => {
 
 
 import { connect } from 'react-redux'
-import { navigateBack, navigateGymMessaging } from 'Anyone/js/actions/navigation'
+import { navigateBack, navigateGymMessaging, navigateSessionDetail } from './actions/navigation'
 import { removeGym, joinGym } from './actions/profile'
 
 
@@ -263,6 +267,7 @@ const mapDispatchToProps = dispatch => ({
   join: (location) => dispatch(joinGym(location)),
   removeGym: () => dispatch(removeGym()),
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
+  createSession: (location) => dispatch(navigateSessionDetail(null,location))
  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Gym)
