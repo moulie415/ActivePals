@@ -290,7 +290,7 @@ import GymSearch from './components/GymSearch'
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
           {this.state.selectedLocation.name}</Text>
           <View style={{margin: 10}}>
-            <View style={{flexDirection: 'row', marginTop: 5, justifyContent: 'space-between', marginBottom: 10}}>
+            <View style={{flexDirection: 'row', marginTop: 5, justifyContent: 'space-between'}}>
               <View style={{flex: 1}}>
                 <Text>
                   <Text>{this.state.selectedLocation.vicinity}</Text>
@@ -317,7 +317,7 @@ import GymSearch from './components/GymSearch'
               </TouchableOpacity>
               
             </View>
-            {this.state.selectedLocation.rating && <Text style={{marginVertical: 5}}>{'Google rating: '}
+            {this.state.selectedLocation.rating && <Text style={{marginTop: 5}}>{'Google rating: '}
                       <Text style={{color: colors.secondary}}>{this.state.selectedLocation.rating}</Text>
                       </Text>}
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
@@ -344,7 +344,7 @@ import GymSearch from './components/GymSearch'
               style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red', borderRadius: 5}}>
               <Text style={{color: '#fff'}}>Leave Gym</Text>
               </TouchableOpacity></View> :
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 5}}>
                 <TouchableOpacity
                 onPress={()=> {
                   if (this.props.gym) {
