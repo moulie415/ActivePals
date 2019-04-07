@@ -54,9 +54,7 @@ import GymSearch from './components/GymSearch'
     let privateSessions = Object.values(this.props.privateSessions)
     let combined = [...sessions, ...privateSessions]
 
-    this.user = null
     this.state = {
-      username: 'no username',
       spinner: false,
       showMap: true,
       switch: false,
@@ -64,14 +62,13 @@ import GymSearch from './components/GymSearch'
       //sessions: this.sortByDateTime(Object.values(this.props.sessions)),
       sessions: this.sortByDistance(combined),
       refreshing: false,
-      selectedFriends: [],
       markers: this.markers(combined),
       pointsOfInterest: [],
-      places: [],
-      sessionKeys: [],
-      searchMultiplier: 1,
+      gyms: [],
       selectedIndex: 0,
-      popUpVisible: false
+      popUpVisible: false,
+      loadMore: true,
+      loadingGyms: false,
     }
   }
 
@@ -79,7 +76,7 @@ import GymSearch from './components/GymSearch'
 
     firebase.auth().onAuthStateChanged( user => {
       if (user) {
-        this.user = user
+        
       }
     })
 
@@ -248,12 +245,13 @@ import GymSearch from './components/GymSearch'
           <Text style={{marginVertical: 5, color: '#000'}}>{(formatDateTime(this.state.selectedSession.dateTime))
             + " for " + (this.state.selectedSession.duration) + " " +
             (this.state.selectedSession.duration > 1 ? 'hours' : 'hour') }</Text>
-            <Text style={{marginVertical: 5}}>
-              <Text style={{color: '#000'}}>{this.state.selectedSession.location.formattedAddress}</Text>
-              <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
-                this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
-            </Text>
-            <View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center'}}>
+            
+            <View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center',justifyContent: 'space-between'}}>
+              <Text style={{flex: 1}}>
+                <Text style={{color: '#000'}}>{this.state.selectedSession.location.formattedAddress}</Text>
+                <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
+                  this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
+              </Text>
               <TouchableOpacity onPress={()=> {
                 this.getPosition(true)
                 const { lat, lng } = this.state.selectedSession.location.position
@@ -266,13 +264,15 @@ import GymSearch from './components/GymSearch'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
-              style={{backgroundColor: colors.secondary, padding: 10, marginRight: 10, borderRadius: 5}}>
+              style={{backgroundColor: colors.secondary, padding: 10, borderRadius: 5}}>
                 <Text style={{color: '#fff'}}>Get directions</Text>
               </TouchableOpacity>
             
             </View>
             </ScrollView>
-             {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>{this.fetchButtons(this.state.selectedSession, this.user.uid)}</View>}
+             {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>
+             {this.fetchButtons(this.state.selectedSession, this.props.profile.uid)}
+             </View>}
             </View>}
 
         </Modal>
@@ -290,11 +290,13 @@ import GymSearch from './components/GymSearch'
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
           {this.state.selectedLocation.name}</Text>
           <View style={{margin: 10}}>
-            <Text style={{marginVertical: 5}}>
-            <Text>{this.state.selectedLocation.vicinity}</Text>
-            <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
-            </Text>
-            <View style={{flexDirection: 'row', marginTop: 5, alignItems: 'center', justifyContent: 'space-between', marginBottom: 10}}>
+            <View style={{flexDirection: 'row', marginTop: 5, justifyContent: 'space-between', marginBottom: 10}}>
+              <View style={{flex: 1}}>
+                <Text>
+                  <Text>{this.state.selectedLocation.vicinity}</Text>
+                  <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
+                </Text>
+              </View>
               <TouchableOpacity onPress={()=> {
                 this.getPosition(true, true)
                 const { lat, lng } = this.state.selectedLocation.geometry.location
@@ -310,13 +312,14 @@ import GymSearch from './components/GymSearch'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
-              style={{backgroundColor: colors.secondary, padding: 10, marginRight: 10, borderRadius: 5}}>
+              style={{backgroundColor: colors.secondary, padding: 10, borderRadius: 5, height: 40}}>
                 <Text style={{color: '#fff'}}>Get directions</Text>
               </TouchableOpacity>
-              {this.state.selectedLocation.rating && <Text style={{marginVertical: 5}}>{'Google rating: '}
+              
+            </View>
+            {this.state.selectedLocation.rating && <Text style={{marginVertical: 5}}>{'Google rating: '}
                       <Text style={{color: colors.secondary}}>{this.state.selectedLocation.rating}</Text>
                       </Text>}
-            </View>
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
@@ -453,41 +456,6 @@ import GymSearch from './components/GymSearch'
         </View>
       </Container>
       )
-  }
-
-
-
-  renderFriendsSelection() {
-    let friends = []
-    Object.values(this.props.friends).forEach((friend, index) => {
-      let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
-      friends.push(
-          <TouchableOpacity key={index} onPress={()=> this.onFriendPress(friend.uid)}>
-          <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
-            <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
-                <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0}}/>}
-                <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
-                {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
-              </View>
-            </View>
-          </View>
-          </TouchableOpacity>
-          )
-
-    })
-    return friends
-  }
-
-  onFriendPress(uid) {
-    if (this.state.selectedFriends.some(friend => friend == uid)) {
-      let friends = this.state.selectedFriends.filter(friend => friend != uid)
-      this.setState({selectedFriends: friends})
-    }
-    else {
-      this.setState({selectedFriends: [...this.state.selectedFriends, uid]})
-    }
   }
 
   fetchButtons(session, uid) {
@@ -696,6 +664,23 @@ import GymSearch from './components/GymSearch'
       /> : <FlatList 
             data={this.state.gyms}
             refreshing={this.state.refreshing}
+            ListFooterComponent={this.state.gyms && this.state.loadMore &&
+            <TouchableOpacity 
+            disabled={this.state.loadingGyms}
+            onPress={() => {
+              this.setState({loadingGyms: true})
+              const { latitude, longitude } = this.state.yourLocation
+              this.fetchPlaces(latitude, longitude, true).then(results => {
+                this.gymMarkers(results)
+                this.setState({loadingGyms: false})
+              })
+            }}>
+              {!this.state.loadingGyms ? <Text style={{color: colors.secondary, textAlign: 'center', backgroundColor: '#fff', fontSize: 20, paddingVertical: 5}}>
+              Load more gyms
+              </Text> :
+              <PulseIndicator color={colors.secondary} />
+              }
+            </TouchableOpacity>}
             onRefresh={()=> {
             this.setState({refreshing: true})
             this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
@@ -746,18 +731,15 @@ import GymSearch from './components/GymSearch'
     }
 
   markers(sessions) {
-    let markers = []
-    sessions.forEach((session, index) => {
-      let lng = session.location.position.lng
-      let lat = session.location.position.lat
-      markers.push(
-        <MapView.Marker
+    return sessions.map((session, index) => {
+      const lng = session.location.position.lng
+      const lat = session.location.position.lat
+      return <MapView.Marker
           key={"s" + index.toString()}
           coordinate={{
             latitude: lat,
             longitude: lng,
           }}
-          //image={getResource(session.type)}
           onPress={(event) => {
             event.stopPropagation()
             this.setState({selectedSession: session, latitude: lat, longitude: lng}, ()=> this.refs.modal.open())
@@ -765,10 +747,7 @@ import GymSearch from './components/GymSearch'
         >
         {getType(session.type, 40)}
         </MapView.Marker>
-
-        )
     })
-    return markers
   }
 
   // This is a common pattern when asking for permissions.
@@ -826,33 +805,7 @@ import GymSearch from './components/GymSearch'
 
           this.fetchPlaces(lat, lon)
           .then((results) => {
-            let markers = []
-            results.forEach((result) => {
-              let lat = result.geometry.location.lat
-              let lng = result.geometry.location.lng
-              markers.push(
-                <MapView.Marker
-                key={result.place_id}
-                coordinate={{
-                  latitude: lat,
-                  longitude: lng,
-                }}
-                pinColor={colors.secondary}
-                onPress={(event) => {
-                  event.stopPropagation()
-                  this.setState({selectedLocation: result, latitude: lat, longitude: lng},
-                    ()=> {
-                      //this.refs.locationModal.open()
-                      fetchPhotoPath(result).then(path => {
-                          this.setState({locationPhoto: path, loadedGymImage: true}, ()=> this.refs.locationModal.open() )
-                      })
-                    })
-                }}
-                />
-                )
-            })
-            this.setState({pointsOfInterest: markers, gyms: results})
-
+            this.gymMarkers(results)
           })
 
       },
@@ -864,34 +817,65 @@ import GymSearch from './components/GymSearch'
     )
   }
 
-  fetchPlaces(lat, lon) {
+  fetchPlaces(lat, lon, loadMore) {
     return new Promise(resolve => {
-      let url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
-      let fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${str.googleApiKey}`
-      fetch(fullUrl).then(response => response.json())
-      .then(json => {
-        let results1 = json.results
-        if (json.next_page_token) {
-          fetch(fullUrl +  `&pagetoken=${json.next_page_token}`)
+      const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+      const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${str.googleApiKey}`
+
+      if (loadMore) {
+        if (this.state.token) {
+          fetch(fullUrl +  `&pagetoken=${this.state.token}`)
           .then(response => response.json())
           .then(json => {
-            let results2 = json.results
+            resolve(json.results)
             if (json.next_page_token) {
-              fetch(fullUrl +  `&pagetoken=${json.next_page_token}`)
-              .then(response => response.json())
-              .then(json => {
-                let results3 = json.results
-                let results = [...results1, ...results2, ...results3]
-                resolve(results)
-              })
+              this.setState({token: json.next_page_token})
             }
             else {
-              resolve([...results1, ...results2])
+              this.setState({loadMore: false})
             }
           })
         }
-        else resolve(results1)
-      })
+        else {
+          this.setState({loadMore: false})
+        }
+      }
+      else {
+        fetch(fullUrl).then(response => response.json())
+        .then(json => {
+          resolve(json.results)
+          this.setState({token: json.next_page_token})
+        })
+      }
+    })
+  }
+
+  gymMarkers(results) {
+    const markers = results.map((result) => {
+      const lat = result.geometry.location.lat
+      const lng = result.geometry.location.lng
+      return <MapView.Marker
+              key={result.place_id}
+              coordinate={{
+                latitude: lat,
+                longitude: lng,
+              }}
+              pinColor={colors.secondary}
+              onPress={(event) => {
+              event.stopPropagation()
+              this.setState({selectedLocation: result, latitude: lat, longitude: lng},
+                ()=> {
+                  //this.refs.locationModal.open()
+                  fetchPhotoPath(result).then(path => {
+                    this.setState({locationPhoto: path, loadedGymImage: true}, ()=> this.refs.locationModal.open() )
+                  })
+                })
+              }}
+          />
+    })
+    this.setState({
+      pointsOfInterest: [...this.state.pointsOfInterest, ...markers],
+      gyms: [...this.state.gyms, ...results]
     })
   }
 

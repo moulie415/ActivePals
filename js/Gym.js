@@ -3,7 +3,8 @@ import {
   Alert,
   View,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  SafeAreaView
 } from "react-native"
 import {
   Container,
@@ -85,7 +86,8 @@ import FriendsModal from './components/friendsModal'
             source={require('Anyone/assets/images/dumbbell.png')}/>
             </View>
           </View>
-        {this.state.loaded ? <ScrollView>
+        {this.state.loaded ? <View style={{flex: 1}}>
+        <ScrollView>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{this.state.gym.name}</Text>
             {this.props.gym && this.props.gym.place_id == this.id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row', margin: 10}}>
@@ -132,20 +134,6 @@ import FriendsModal from './components/friendsModal'
                 <Text style={{color: '#fff'}}>Join Gym</Text>
                 </TouchableOpacity>
               </View>}
-              <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
-                <TouchableOpacity onPress={()=> {
-                  this.props.createSession(this.state.gym)
-                }}
-                style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5}}>
-                <Text style={{color: '#fff'}}>Create Session</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=> {
-                  this.setState({friendsModalOpen: true})
-                }}
-                style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5}}>
-                <Text style={{color: '#fff'}}>Create Private Session</Text>
-                </TouchableOpacity>
-              </View>
             <View style={{flexDirection: 'row'}}>
                 {this.state.gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5, flex: 1}}>{'Vicinity: '}
                 <Text style={{color: colors.secondary}}>{this.state.gym.vicinity}</Text>{this.props.location && 
@@ -193,7 +181,29 @@ import FriendsModal from './components/friendsModal'
           <View style={{marginLeft: 5}}>{this.renderOpeningHours(this.state.gym.opening_hours.weekday_text)}</View>
         </View>}
         {this.state.gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(this.state.gym.types)}</Text>}
-        </ScrollView> : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
+        </ScrollView> 
+          <View style={{flexDirection: 'row', backgroundColor: colors.bgColor, paddingVertical: 10}}>
+            <TouchableOpacity
+            style={{backgroundColor: colors.secondary, flex: 1, paddingVertical: 15, borderRadius: 5, marginLeft: 5, marginRight: 2}}
+            onPress={()=> {
+              this.props.createSession(this.state.gym)
+            }}>
+              <Text adjustsFontSizeToFit={true}
+              style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</Text>
+            </TouchableOpacity>
+            <View style={{borderRightWidth: 1, borderRightColor: 'transparent'}}/>
+            <TouchableOpacity
+            style={{backgroundColor: colors.secondary, flex: 1, paddingVertical: 15, borderRadius: 5, marginRight: 5, marginLeft: 2}}
+            onPress={()=> {
+              this.setState({friendsModalOpen: true})
+            }}>
+              <Text adjustsFontSizeToFit={true}
+              style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Private Session</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        
+        : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
         <Popup
           isVisible={this.state.popUpVisible}

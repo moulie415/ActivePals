@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native'
+import colors from '../constants/colors'
 
-export default styles = StyleSheet.create({
+export default StyleSheet.create({
   shadow: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -15,5 +16,5 @@ export default styles = StyleSheet.create({
     left:0,
     justifyContent: 'center',
     paddingLeft: 10
-  }
+  },
 })
