@@ -49,10 +49,9 @@ import GymSearch from './components/GymSearch'
   }
   constructor(props) {
     super(props)
-    this.nav = this.props.navigation
-    let sessions = Object.values(this.props.sessions)
-    let privateSessions = Object.values(this.props.privateSessions)
-    let combined = [...sessions, ...privateSessions]
+    const sessions = Object.values(this.props.sessions)
+    const privateSessions = Object.values(this.props.privateSessions)
+    const combined = [...sessions, ...privateSessions]
 
     this.state = {
       spinner: false,
@@ -63,7 +62,7 @@ import GymSearch from './components/GymSearch'
       sessions: this.sortByDistance(combined),
       refreshing: false,
       markers: this.markers(combined),
-      pointsOfInterest: [],
+      gymMarkers: [],
       gyms: [],
       selectedIndex: 0,
       popUpVisible: false,
@@ -73,13 +72,6 @@ import GymSearch from './components/GymSearch'
   }
 
   componentDidMount() {
-
-    firebase.auth().onAuthStateChanged( user => {
-      if (user) {
-        
-      }
-    })
-
 
     Permissions.check('location').then(response => {
       this.setState({spinner: true})
@@ -111,7 +103,15 @@ import GymSearch from './components/GymSearch'
     }
   }
 
-
+  handleRefresh() {
+    this.setState({refreshing: true, sessions: [], markers: [], gymMarkers: [], gyms: []})
+    Promise.all([
+      this.props.fetch(this.state.radius),
+      this.getPosition()
+    ]).then(() => {
+      this.setState({refreshing: false})
+    })
+  }
 
   sortByDateTime(sessions) {
     sessions.sort(function(a, b) {
@@ -195,7 +195,7 @@ import GymSearch from './components/GymSearch'
 
         >
         {this.state.markers}
-        {this.state.pointsOfInterest}
+        {this.state.gymMarkers}
         </MapView>}
         {GymSearch(this)}
 
@@ -618,11 +618,7 @@ import GymSearch from './components/GymSearch'
           {this.state.selectedIndex == 0 ? <FlatList
           style={{backgroundColor: '#9993'}}
           refreshing={this.state.refreshing}
-            onRefresh={()=> {
-            this.setState({refreshing: true})
-            this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
-            this.getPosition()
-          }}
+          onRefresh={() => this.handleRefresh()}
           ListEmptyComponent={<View style={{flex: 1, justifyContent: 'center', alignSelf: 'center'}}>
             <Text style={{color: colors.primary, textAlign: 'center', margin: 20}}>
             No sessions have been created yet, also please make sure you are connected to the internet
@@ -675,17 +671,14 @@ import GymSearch from './components/GymSearch'
                 this.setState({loadingGyms: false})
               })
             }}>
-              {!this.state.loadingGyms ? <Text style={{color: colors.secondary, textAlign: 'center', backgroundColor: '#fff', fontSize: 20, paddingVertical: 5}}>
+              {!this.state.loadingGyms  && !this.state.refreshing ? 
+              <Text style={{color: colors.secondary, textAlign: 'center', backgroundColor: '#fff', fontSize: 20, paddingVertical: 5}}>
               Load more gyms
               </Text> :
               <PulseIndicator color={colors.secondary} />
               }
             </TouchableOpacity>}
-            onRefresh={()=> {
-            this.setState({refreshing: true})
-            this.props.fetch(this.state.radius).then(()=> this.setState({refreshing: false}))
-            this.getPosition()
-          }}
+            onRefresh={() => this.handleRefresh()}
             style={{backgroundColor: '#9993'}}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
@@ -790,7 +783,7 @@ import GymSearch from './components/GymSearch'
   getPosition(getDirections = false, gym = false) {
     //to watch position:
     //this.watchID = navigator.geolocation.watchPosition((position) => {
-    navigator.geolocation.getCurrentPosition(
+    return navigator.geolocation.getCurrentPosition(
       (position) => {
         let lat = position.coords.latitude
         let lon = position.coords.longitude
@@ -803,7 +796,7 @@ import GymSearch from './components/GymSearch'
           showMap: true,
           spinner: false}, /*()=> getDirections && this.getDirections(gym)*/)
 
-          this.fetchPlaces(lat, lon)
+          return this.fetchPlaces(lat, lon)
           .then((results) => {
             this.gymMarkers(results)
           })
@@ -874,7 +867,7 @@ import GymSearch from './components/GymSearch'
           />
     })
     this.setState({
-      pointsOfInterest: [...this.state.pointsOfInterest, ...markers],
+      gymMarkers: [...this.state.gymMarkers, ...markers],
       gyms: [...this.state.gyms, ...results]
     })
   }
