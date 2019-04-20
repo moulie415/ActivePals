@@ -48,12 +48,6 @@ import Text from './constants/Text'
   }
 
   componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.user = user
-      } else {
-      }
-    })
     this.listenForFriends()
     this.listenForState()
 
@@ -205,8 +199,20 @@ import Text from './constants/Text'
       renderItem={({item}) => {
         if (item.status == 'outgoing') {
         return <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-            <View style={{flexDirection: 'row', height: 40, alignItems: 'center'}} >
-              <Text style={{marginHorizontal: 10}}>{item.username + ' request sent'}</Text>
+            <View style={{flexDirection: 'row', height: 40, alignItems: 'center', justifyContent: 'center'}} >
+              <Text style={{marginHorizontal: 10, flex: 1}}>{item.username + ' request sent'}</Text>
+              <TouchableOpacity style={{marginTop: Platform.OS == 'ios' ? -5 : 0}} onPress={()=> {
+                Alert.alert(
+                  'Cancel Pal request',
+                  'Are you sure?',
+                  [
+                    {text: 'Cancel', style: 'cancel'},
+                    {text: 'OK', onPress: () => this.remove(item.uid)},
+                  ],
+                )
+                }}>
+                <Icon name='ios-close' style={{color: 'red', fontSize: 50, paddingHorizontal: 10}}/>
+              </TouchableOpacity>
             </View>
           </View>
       }
@@ -330,7 +336,7 @@ const getStateVal = (state) => {
 }
 
 import { connect } from 'react-redux'
-import { navigateMessaging, navigateProfileView } from 'Anyone/js/actions/navigation'
+import { navigateMessaging, navigateProfileView } from './actions/navigation'
 import {
   fetchFriends,
   sendRequest,
@@ -339,9 +345,8 @@ import {
   removeFriend,
   addFriend,
   updateFriendState,
-} from 'Anyone/js/actions/friends'
-import { removeChat, addChat } from 'Anyone/js/actions/chats'
-import { fetchProfile } from 'Anyone/js/actions/profile'
+} from './actions/friends'
+import { removeChat, addChat } from './actions/chats'
 
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,

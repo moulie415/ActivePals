@@ -188,13 +188,6 @@ PODS:
     - React
   - rn-fetch-blob (0.10.6):
     - React/Core
-  - RNSound (0.10.9):
-    - React/Core
-    - RNSound/Core (= 0.10.9)
-  - RNSound/Core (0.10.9):
-    - React/Core
-  - RNVectorIcons (6.1.0):
-    - React
   - SDWebImage/Core (4.4.5)
   - SDWebImage/GIF (4.4.5):
     - FLAnimatedImage (~> 1.0)
@@ -240,8 +233,6 @@ DEPENDENCIES:
   - React/RCTWebSocket (from `../node_modules/react-native`)
   - ReactNativePermissions (from `../node_modules/react-native-permissions`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
-  - RNSound (from `../node_modules/react-native-sound`)
-  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga/yoga.podspec`)
 
 SPEC REPOS:
@@ -299,10 +290,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-permissions"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
-  RNSound:
-    :path: "../node_modules/react-native-sound"
-  RNVectorIcons:
-    :path: "../node_modules/react-native-vector-icons"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga/yoga.podspec"
 
@@ -345,12 +332,10 @@ SPEC CHECKSUMS:
   react-native-video: afdbf53bb44a700d1dcfc679790710469571d0f9
   ReactNativePermissions: a25615ebfd785b7a081dff3dec88bf191a7d7c42
   rn-fetch-blob: 766f85cabd2992300dfa1be2bc9e4e258abc6f04
-  RNSound: 53d2fc9c6589bd68daba530262b7560393def3ac
-  RNVectorIcons: ac7bf6bfeafaf3ad34552cdc6eed6fb8c4b7c940
   SDWebImage: ecc03494e973b93b80213649d32175f8d2d17d4d
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 0e0009ffb2544aeead64a1209f3d488d3849947b
 
-PODFILE CHECKSUM: 589927c05d604a396e6b7f5b7d782e3814a8b4ae
+PODFILE CHECKSUM: 6eb5c0cb2bd809ed7fd3096206b45adca09cedfc
 
 COCOAPODS: 1.6.1

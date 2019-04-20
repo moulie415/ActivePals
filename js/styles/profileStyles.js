@@ -17,7 +17,8 @@ export default StyleSheet.create({
     marginRight: 20,
     paddingLeft: 10,
     height: 40,
-    alignItems: 'center'
+    alignItems: 'center',
+    borderRadius: 5
   },
   logout: {
     backgroundColor: colors.secondary,

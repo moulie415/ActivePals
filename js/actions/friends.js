@@ -119,12 +119,12 @@ export const addFriend = (uid) => {
 export const sendRequest = (friendUid) => {
 	return (dispatch, getState) => {
 		const uid = getState().profile.profile.uid
-		let promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("outgoing")
-		let promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("incoming")
+		const promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("outgoing")
+		const promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("incoming")
 		return Promise.all([promise1, promise2]).then(() => {
-				let date = new Date().toString()
-				let ref = firebase.database().ref('notifications').push()
-				let key = ref.key
+				const date = new Date().toString()
+				const ref = firebase.database().ref('notifications').push()
+				const key = ref.key
 				ref.set({date, uid, type: 'buddyRequest'})
 					.then(()=> firebase.database().ref('userNotifications/' + friendUid).child(key).set(true))
 					.then(() => upUnreadCount(friendUid))
@@ -134,16 +134,14 @@ export const sendRequest = (friendUid) => {
 
 
 export const acceptRequest = (uid, friendUid) => {
-	return (dispatch) => {
-		let promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("connected")
-		let promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("connected")
-		return Promise.all([promise1, promise2])
-	}
+	const promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("connected")
+	const promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("connected")
+	return Promise.all([promise1, promise2])
 }
 
 export const deleteFriend = (uid) => {
 	return (dispatch, getState) => {
-		let you = getState().profile.profile.uid
+		const you = getState().profile.profile.uid
 		//handle most the deletion server side using cloud function
 		dispatch(removeFriend(uid))
 		return firebase.database().ref('users/' + you + '/friends').child(uid).remove()
