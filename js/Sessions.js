@@ -253,7 +253,7 @@ import GymSearch from './components/GymSearch'
                   this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
               </Text>
               <TouchableOpacity onPress={()=> {
-                this.getPosition(true)
+                this.getPosition()
                 const { lat, lng } = this.state.selectedSession.location.position
                 let options = {
                   latitude: lat,
@@ -298,7 +298,7 @@ import GymSearch from './components/GymSearch'
                 </Text>
               </View>
               <TouchableOpacity onPress={()=> {
-                this.getPosition(true, true)
+                this.getPosition()
                 const { lat, lng } = this.state.selectedLocation.geometry.location
                 const place_id = this.state.selectedLocation.place_id
 
@@ -780,7 +780,7 @@ import GymSearch from './components/GymSearch'
     })
   }
 
-  getPosition(getDirections = false, gym = false) {
+  getPosition() {
     //to watch position:
     //this.watchID = navigator.geolocation.watchPosition((position) => {
     return navigator.geolocation.getCurrentPosition(
@@ -794,7 +794,8 @@ import GymSearch from './components/GymSearch'
           yourLocation: position.coords,
           error: null,
           showMap: true,
-          spinner: false}, /*()=> getDirections && this.getDirections(gym)*/)
+          spinner: false
+        })
 
           return this.fetchPlaces(lat, lon)
           .then((results) => {

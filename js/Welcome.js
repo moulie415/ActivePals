@@ -78,11 +78,11 @@ class Welcome extends Component {
                 <Icon name="md-chatboxes" style={{color: '#fff', fontSize: 50}} />
               </View>
               <View style={styles.slide3}>
-              <FbFriendsModal
+              {profile.fb_login && <FbFriendsModal
                 style={{zIndex: 999}}
                 isOpen={this.state.fbModalOpen} 
                 onClosed={() => this.setState({fbModalOpen: false}, ()=> this.nav())}
-                />
+                />}
                 <Text style={styles.text}>Make sure to set a username so your pals can add you</Text>
                 <TextInput
                   value={this.state.username}

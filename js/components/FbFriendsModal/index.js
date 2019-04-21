@@ -74,27 +74,29 @@ class FbFriendsModal extends Component {
 
   renderFriendsSelection() {
     let friends = []
-    Object.values(this.state.fbFriends).forEach(friend => {
-      let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
-      if (!this.props.friends[friend.uid]) {
-        friends.push(
+    if (this.state.fbFriends) {
+      Object.values(this.state.fbFriends).forEach(friend => {
+        const selected = this.state.selectedFriends.some(uid => uid == friend.uid)
+        if (!this.props.friends[friend.uid]) {
+          friends.push(
             <TouchableOpacity key={friend.uid} disabled={!friend.username} onPress={()=> this.onFriendPress(friend.uid)}>
-            <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
-              <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
-                  <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0}}/>}
-                  <Text style={{marginHorizontal: 10}}>
-                  {(friend.username || 'No username set') + " " + (friend.first_name ? ("(" + friend.first_name + " " + (friend.last_name || "") + ")") : "")}</Text>
-                  {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
+              <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
+                    <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0}}/>}
+                    <Text style={{marginHorizontal: 10}}>
+                    {(friend.username || 'No username set') + " " + (friend.first_name ? ("(" + friend.first_name + " " + (friend.last_name || "") + ")") : "")}</Text>
+                    {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
+                  </View>
                 </View>
               </View>
-            </View>
             </TouchableOpacity>
             )
-      }
+          }
+        })
+    }
   
-    })
     return friends.length > 0 ?  
     <ScrollView style={{backgroundColor: '#d6d6d6'}}>{friends}</ScrollView> :  
     <View style={{backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
@@ -118,8 +120,8 @@ import { connect } from 'react-redux'
 import { sendRequest } from '../../actions/friends';
 
 const mapStateToProps = ({ friends, profile }) => ({
-    friends: friends.friends,
-    profile: profile.profile
+  friends: friends.friends,
+  profile: profile.profile
 })
 
 const mapDispatchToProps = dispatch => ({
