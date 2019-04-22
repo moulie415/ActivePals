@@ -134,9 +134,11 @@ export const sendRequest = (friendUid) => {
 
 
 export const acceptRequest = (uid, friendUid) => {
-	const promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("connected")
-	const promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("connected")
-	return Promise.all([promise1, promise2])
+	return (dispatch) => {
+		const promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("connected")
+		const promise2 = firebase.database().ref('users/' + friendUid + '/friends').child(uid).set("connected")
+		return Promise.all([promise1, promise2])
+	}
 }
 
 export const deleteFriend = (uid) => {
