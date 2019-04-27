@@ -721,7 +721,7 @@ export const fetchUsers = (uids) => {
 						resolve({...profile.val()})
 					})
 			})
-		}))
+			}))
 		})
 		return Promise.all(promises)
 }

@@ -79,14 +79,14 @@ class FbFriendsModal extends Component {
         const selected = this.state.selectedFriends.some(uid => uid == friend.uid)
         if (!this.props.friends[friend.uid]) {
           friends.push(
-            <TouchableOpacity key={friend.uid} disabled={!friend.username} onPress={()=> this.onFriendPress(friend.uid)}>
+            <TouchableOpacity key={friend.uid || friend.id} onPress={()=> this.onFriendPress(friend)}>
               <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
                     <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0}}/>}
                     <Text style={{marginHorizontal: 10}}>
-                    {(friend.username || 'No username set') + " " + (friend.first_name ? ("(" + friend.first_name + " " + (friend.last_name || "") + ")") : "")}</Text>
+                    {this.getNameString(friend)}</Text>
                     {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
                   </View>
                 </View>
@@ -96,7 +96,7 @@ class FbFriendsModal extends Component {
           }
         })
     }
-  
+
     return friends.length > 0 ?  
     <ScrollView style={{backgroundColor: '#d6d6d6'}}>{friends}</ScrollView> :  
     <View style={{backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
@@ -105,14 +105,42 @@ class FbFriendsModal extends Component {
     </View>
   }
 
-  onFriendPress(uid) {
-    if (this.state.selectedFriends.some(friend => friend == uid)) {
-      let friends = this.state.selectedFriends.filter(friend => friend != uid)
-      this.setState({selectedFriends: friends})
+  getNameString(friend) {
+    let string = ''
+    if (friend.username) {
+      string += friend.username
+      if (friend.first_name) {
+        string += " (" + friend.first_name
+        if (friend.last_name) {
+          string += " " + friend.last_name + ")"
+        }
+        else string += ")"
+      }
     }
     else {
-      this.setState({selectedFriends: [...this.state.selectedFriends, uid]})
+      string += 'No username set '
+      if (friend.name) {
+        string += `(${friend.name})`
+      }
     }
+    return string
+  }
+
+  onFriendPress(friend) {
+    if (friend.username) {
+      const uid = friend.uid
+      if (this.state.selectedFriends.some(friend => friend == uid)) {
+        let friends = this.state.selectedFriends.filter(friend => friend != uid)
+        this.setState({selectedFriends: friends})
+      }
+      else {
+        this.setState({selectedFriends: [...this.state.selectedFriends, uid]})
+      }
+    }
+    else {
+      Alert.alert("Sorry", "Please ask your friend to set their username before adding them as a pal")
+    }
+    
   }
 }
 

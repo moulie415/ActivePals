@@ -153,15 +153,22 @@ export const deleteFriend = (uid) => {
 }
 
 export const getFbFriends = (token) => {
+		const noUsernames = []
     return fetch('https://graph.facebook.com/v2.8/me?fields=friends&access_token=' + token)
       .then(response => response.json())
       .then(async json => {
 				if (json.friends && json.friends.data) {
-					const uids = await Promise.all(json.friends.data.map(friend => {
+					let uids = await Promise.all(json.friends.data.map(friend => {
 						return firebase.database().ref('fbusers').child(friend.id).once('value')
-							.then(snapshot => snapshot.val())
+							.then(snapshot => {
+								if (snapshot.val()) {
+									return snapshot.val()
+							 	}
+							 	else noUsernames.push(friend)
+							})
 					}))
-					return fetchUsers(uids)
+					uids = uids.filter(uid => uid != undefined)
+					return fetchUsers(uids).then(users => [...users, ...noUsernames])
 				}
 			})
 }
