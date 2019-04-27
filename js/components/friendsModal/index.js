@@ -61,7 +61,7 @@ class FriendsModal extends Component {
     const friends = []
     Object.values(this.props.friends).forEach((friend, index) => {
       let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
-          if (friend.state == 'status') {
+          if (friend.status == 'connected') {
           friends.push(<TouchableOpacity key={index} onPress={()=> this.onFriendPress(friend.uid)}>
             <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
               <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
