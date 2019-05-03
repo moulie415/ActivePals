@@ -116,6 +116,20 @@ export const store = createStore(
 
 export const persistor = persistStore(store)
 
+export const handleNotification = (notification) => {
+  const { dispatch, getState } = store
+  const {  type } = notification.data
+  if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'buddyRequest') {
+    dispatch(newNotification(notification.data))
+    dispatch(updateLastMessage(notification.data))
+    showLocalNotification(notification.data)
+  }
+  if (type == 'rep' || type == 'comment' || type == 'buddyRequest') {
+    const count = getState().profile.profile.unreadCount || 0
+    dispatch(setNotificationCount(count+1))
+  }
+}
+
 
 class FitLink extends React.Component {
   componentDidMount() {
@@ -150,30 +164,22 @@ class FitLink extends React.Component {
       firebase.notifications().android.createChannel(channel)
     })
 
-    this.messageListener = firebase.messaging().onMessage((notification) => {
-      const { dispatch, getState } = store
-      const {  type, sessionId, sessionTitle, chatId, uid, username, postId } = notification.data
-      if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'buddyRequest') {
-        dispatch(newNotification(notification.data))
-        dispatch(updateLastMessage(notification.data))
-        showLocalNotification(notification.data)
-      }
-      if (type == 'rep' || type == 'comment' || type == 'buddyRequest') {
-        let count = getState().profile.profile.unreadCount || 0
-        dispatch(setNotificationCount(count+1))
-      }
+    
+
+    this.messageListener = firebase.messaging().onMessage(notification => {
+      handleNotification(notification)
     })
 
-    this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification) => {
+    this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed(notification => {
       // Process your notification as required
       // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
       console.log(notification)
     })
-    this.notificationListener = firebase.notifications().onNotification((notification) => {
+    this.notificationListener = firebase.notifications().onNotification(notification => {
       // Process your notification as required
-      console.log(notification)
+      handleNotification(notification)
     })
-    this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
+    this.notificationOpenedListener = firebase.notifications().onNotificationOpened(notificationOpen => {
       // Get the action triggered by the notification being opened
       const action = notificationOpen.action
       // Get information about the notification that was opened
