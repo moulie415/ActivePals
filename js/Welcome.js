@@ -119,6 +119,7 @@ class Welcome extends Component {
                       firebase.database().ref('users/' + profile.uid).child('username').set(this.state.username)
                     ])
                       .then(() => {
+                        this.props.onSave()
                         if (profile.fb_login) {
                           Alert.alert(
                             'Success',
@@ -182,12 +183,13 @@ Welcome.propTypes = {
   navigation: PropTypes.any,
   goBack: PropTypes.func,
   goHome: PropTypes.func,
+  onSave: PropTypes.func
 }
 
 
 import { connect } from 'react-redux'
 import { navigateBack, navigateHome } from 'Anyone/js/actions/navigation'
-import { setHasViewedWelcome } from './actions/profile'
+import { setHasViewedWelcome, fetchProfile } from './actions/profile'
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile
@@ -196,7 +198,8 @@ const mapStateToProps = ({ profile }) => ({
 const mapDispatchToProps = dispatch => ({
  goHome: ()=> dispatch(navigateHome()),
  goBack: ()=> dispatch(navigateBack()),
- viewedWelcome: ()=> dispatch(setHasViewedWelcome())
+ viewedWelcome: ()=> dispatch(setHasViewedWelcome()),
+ onSave: ()=> dispatch(fetchProfile())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Welcome)

@@ -4,7 +4,6 @@ import {
   View
  } from "react-native"
 import {
-  Button,
   Input,
   Container,
   Item,
@@ -17,6 +16,7 @@ import colors from './constants/colors'
 import TouchableOpacity from './constants/TouchableOpacityLockable.js'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
+import sStyles from './styles/settingsStyles'
 
 
  class SignUp extends Component {
@@ -37,18 +37,6 @@ import { PulseIndicator } from 'react-native-indicators'
     }
   }
 
-  componentDidMount() {
-
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.user = user
-    // User is signed in.
-  } else {
-    // No user is signed in.
-  }
-})
-  }
-
   render () {
     return (
     <Container style={styles.container}>
@@ -56,7 +44,10 @@ import { PulseIndicator } from 'react-native-indicators'
       hasBack={true}
       title={'Sign up'}
       />
-      {this.state.spinner && <PulseIndicator color={colors.secondary}/>}
+      {this.state.spinner && 
+      <View style={sStyles.spinner}>
+        <PulseIndicator color={colors.secondary}/>
+      </View>}
       <View style={{justifyContent: 'center', flex: 1}}>
       <Item style={styles.inputGrp}>
       <Icon name="person" style={{color: "#fff"}} />

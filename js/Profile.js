@@ -60,12 +60,7 @@ import globalStyles from './styles/globalStyles'
 
 
   componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-      }
-    })
     this.listenForUserChanges(firebase.database().ref('users/' + this.profile.uid))
-
   }
 
   listenForUserChanges(ref) {
@@ -303,7 +298,7 @@ import globalStyles from './styles/globalStyles'
     else return null
   }
 
-updateUser(initial, profile) {
+async updateUser(initial, profile) {
   if (!this.hasChanged()) {
     Alert.alert("No changes")
   }
@@ -313,68 +308,48 @@ updateUser(initial, profile) {
     }
     else {
       this.setState({spinner: true})
-      if (this.state.initialAvatar != this.state.avatar) {
-        this.uploadImage(this.state.avatar).then((url)=> {
-          this.setState({initialAvatar: url, avatar: url})
-          if (this.state.initialBackdrop != this.state.backdrop) {
-            this.uploadImage(this.state.backdrop, true).then((url)=> {
-              this.setState({initialBackdrop: url, backdrop: url})
-              profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
-            })
-            .catch(e => {
-              this.setState({spinner: false})
-              Alert.alert('Error', e.message)
-            })
-
-          }
-          else profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
-        })
-        .catch(e => {
+      await this.checkImages()
+      delete profile.avatar
+      firebase.database().ref('users/' + this.profile.uid).set({...profile})
+      .then(()=> {
+        initial.username && firebase.database().ref('usernames').child(initial.username).remove()
+        firebase.database().ref('usernames').child(profile.username).set(profile.uid)
+        .then(() => {
+          Alert.alert('Success', 'Profile saved')
+          this.props.onSave()
           this.setState({spinner: false})
-          Alert.alert('Error', e.message)
         })
-      }
-      else if (this.state.initialBackdrop != this.state.backdrop) {
-        this.uploadImage(this.state.backdrop, true).then((url)=> {
-          this.setState({initialBackdrop: url, backdrop: url})
-          firebase.database().ref('users/' + this.profile.uid).child('backdrop').set(url)
-          profile.username ? this.checkUsername(initial, profile) : Alert.alert('Success', 'Profile saved')
-        })
-        .catch(e => {
-          this.setState({spinner: false})
-          Alert.alert('Error', e.message)
-        })
-
-      }
-      else {
-        this.checkUsername(initial, profile)
-      }
+      })
+      .catch(e => {
+        Alert.alert('Error', 'That username may have already been taken')
+        this.setState({spinner: false})
+      })
     }
   }
 }
 
-checkUsername(initial, profile){
-  delete profile.avatar
-  firebase.database().ref('users/' + this.profile.uid).set({...profile})
-  .then(()=> {
-    initial.username && firebase.database().ref('usernames').child(initial.username).remove()
-    firebase.database().ref('usernames').child(profile.username).set(profile.uid)
-    .then(() => {
-      Alert.alert('Success', 'Profile saved')
-      this.setState({spinner: false})
-    })
-  })
-  .catch(e => {
-    Alert.alert('Error', 'That username may have already been taken')
-    this.setState({spinner: false})
-  })
-}
 
 hasChanged() {
   return !((JSON.stringify(this.state.initialProfile) === JSON.stringify(this.state.profile)
     && (this.state.initialAvatar == this.state.avatar)
     && (this.state.backdrop == this.state.initialBackdrop)))
 }
+
+async checkImages() {
+  try {
+    if (this.state.initialAvatar != this.state.avatar) {
+      const url = await this.uploadImage(this.state.avatar)
+      this.setState({initialAvatar: url, avatar: url})
+    }
+    if (this.state.initialBackdrop != this.state.backdrop) {
+      const url = await this.uploadImage(this.state.backdrop, true)
+      this.setState({initialBackdrop: url, backdrop: url})
+    }
+  } catch(e) {
+    Alert.alert('Error', e.message)
+  }
+}
+
 
 selectAvatar(backdrop = false) {
   var options = {
@@ -441,8 +416,6 @@ uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
   })
 }
 
-
-
   logout() {
     Alert.alert(
       'Log out',
@@ -477,9 +450,6 @@ uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
           Alert.alert('Error', e.message)
           this.setState({spinner: false})
         })
-        
-        
-
       }},
       ])
   }
@@ -498,8 +468,8 @@ const levels = ['Beginner', 'Intermediate', 'Advanced']
 
 
 import { connect } from 'react-redux'
-import { navigateLogin, navigateSettings } from 'Anyone/js/actions/navigation'
-import { fetchProfile, setLoggedOut } from 'Anyone/js/actions/profile'
+import { navigateLogin, navigateSettings } from './actions/navigation'
+import { fetchProfile, setLoggedOut } from './actions/profile'
 import { navigateGym } from "./actions/navigation";
 
 const mapStateToProps = ({ profile }) => ({

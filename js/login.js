@@ -3,13 +3,9 @@ import {
   Alert,
   View,
   ImageBackground,
-  Image
  } from "react-native"
 import {
-  Button,
   Input,
-  Container,
-  Content,
   Item,
   Icon,
 } from 'native-base'
@@ -179,9 +175,9 @@ import Config from 'react-native-config'
           this.props.onLogin()
        }
        else {
+        this.setState({spinner: false})
         Alert.alert('Sorry', 'You must first verify your email using the link we sent you before logging in')
        }
-       console.log('Logged In!')
       })
         //Navigate to the Home page
       } catch (error) {
