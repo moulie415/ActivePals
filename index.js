@@ -1,27 +1,22 @@
 
 import React from "react"
-import { AppRegistry, Platform, Alert, AppState, YellowBox, ImageBackground, View } from 'react-native'
-import { StackNavigator } from "react-navigation"
-import { TabNavigator } from "react-navigation"
+import { AppRegistry, YellowBox } from 'react-native'
 //import * as firebase from "firebase"
 import firebase from 'react-native-firebase' //above is web api
-import { Root, Spinner } from 'native-base'
-import colors from 'Anyone/js/constants/colors'
-import color from 'color'
-import { isIphoneX } from 'react-native-iphone-x-helper'
+import { Root } from 'native-base'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/lib/integration/react'
 import { persistStore } from 'redux-persist'
 import { createStore, applyMiddleware, compose } from 'redux'
 import reducer from 'Anyone/js/reducers/'
 import thunk from 'redux-thunk'
+
 //import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import App from 'Anyone/js/App'
 import { navigateMessaging, navigateMessagingSession, navigateFriends, navigatePostView } from 'Anyone/js/actions/navigation'
 import { newNotification, updateLastMessage } from 'Anyone/js/actions/chats'
 import GeoFire from 'geofire'
 import bgMessaging from './js/bgMessaging'
-import styles from 'Anyone/js/styles/loginStyles'
 
 import {
   createReactNavigationReduxMiddleware,
@@ -68,7 +63,7 @@ const navigateFromNotif = (notif) => {
       dispatch(navigateMessaging(chatId, username, uid))
       break
     case 'sessionMessage':
-      let session = {key: sessionId, title: sessionTitle, private: (notif.private == "privateSessions")}
+      const session = {key: sessionId, title: sessionTitle, private: (notif.private == "privateSessions")}
       dispatch(navigateMessagingSession(session))
       break
     case 'gymMessage':

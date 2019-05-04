@@ -28,7 +28,6 @@ import { getType, getResource } from './constants/utils'
 import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
 import RNFetchBlob from 'rn-fetch-blob'
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import {Image as SlowImage } from 'react-native'
 import { formatDateTime } from './constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
@@ -253,7 +252,6 @@ import GymSearch from './components/GymSearch'
                   this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
               </Text>
               <TouchableOpacity onPress={()=> {
-                this.getPosition()
                 const { lat, lng } = this.state.selectedSession.location.position
                 let options = {
                   latitude: lat,
@@ -298,7 +296,6 @@ import GymSearch from './components/GymSearch'
                 </Text>
               </View>
               <TouchableOpacity onPress={()=> {
-                this.getPosition()
                 const { lat, lng } = this.state.selectedLocation.geometry.location
                 const place_id = this.state.selectedLocation.place_id
 
@@ -775,7 +772,7 @@ import GymSearch from './components/GymSearch'
         this.getPosition()
       }
       else {
-        Alert.alert('Sorry', 'The app does not have access to your location some functionality may not work as a result')
+        Alert.alert('Sorry', 'The app does not have access to your location, some functionality may not work as a result')
       }
     })
   }
