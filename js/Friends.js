@@ -165,7 +165,7 @@ import Text from './constants/Text'
             this.refs.modal.close()
           }}
           style={[styles.button, {backgroundColor: 'red'}]}>
-            <Text style={{color: '#fff', fontSize: 20}}>Cancel</Text>
+            <Text style={{color: '#fff'}}>Cancel</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={(mutex)=> {
@@ -173,7 +173,7 @@ import Text from './constants/Text'
             this.sendRequest(this.username)
           }}
           style={styles.button}>
-            <Text style={{color: '#fff', fontSize: 20}}>Submit</Text>
+            <Text style={{color: '#fff'}}>Submit</Text>
           </TouchableOpacity>
           
           </View>

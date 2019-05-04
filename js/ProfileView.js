@@ -169,7 +169,7 @@ import globalStyles from "./styles/globalStyles"
         </View>
 
           {this.state.isFriend && <TouchableOpacity
-          style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 30}}
+          style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 30, borderRadius: 5}}
           onPress={()=> {
             Alert.alert(
               'Remove pal',
