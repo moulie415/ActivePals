@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-  Alert
+  Alert,
 } from 'react-native'
 import {
   Icon,
@@ -102,7 +102,7 @@ class Welcome extends Component {
                   />
 
                 <TouchableOpacity 
-                style={{backgroundColor: colors.secondary, padding: 10}}
+                style={{backgroundColor: colors.secondary, padding: 10, borderRadius: 5}}
                 onPress={()=> {
                   if (this.state.username && this.state.username == profile.username) {
                     this.nav()
@@ -119,6 +119,8 @@ class Welcome extends Component {
                       firebase.database().ref('users/' + profile.uid).child('username').set(this.state.username)
                     ])
                       .then(() => {
+                        /*we need to make sure the username is saved locally 
+                        which is why this calls fetchProfile which saves the username*/
                         this.props.onSave()
                         if (profile.fb_login) {
                           Alert.alert(
@@ -176,6 +178,7 @@ class Welcome extends Component {
       })}</View>
     }
 }
+
 
 Welcome.propTypes = {
   viewedWelcome: PropTypes.func,

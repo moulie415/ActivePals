@@ -11,6 +11,8 @@ import {
 	View,
 	Alert,
 	TextInput,
+	PermissionsAndroid,
+  Platform
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
@@ -119,33 +121,42 @@ class SessionDetail extends Component {
 							<Text style={{marginRight: 5}}>Add to calendar</Text>
 							<Switch 
 							value={this.state.addToCalendar}
-							onValueChange={(val)=> {
+							onValueChange={async (val)=> {
 								this.setState({addToCalendar: val})
-								
-								if (val) {
-									RNCalendarEvents.authorizeEventStore().then(result => {
-										if (result == 'authorized') {
-											RNCalendarEvents.findCalendars().then(calendars => {
-  												let validList = calendars.filter(calendar => calendar.allowsModifications)
-												if (validList && validList.length > 0) {
-													this.setState({calendarId: validList[0].id})
-												}
-												else {
-													Alert.alert("Sorry", "You don't have any calendars that allow modification")
-													this.setState({addToCalendar: false})
-												}
-											})
+								try {
+									if (val) {
+										let hasPermission = false
+										if (Platform.OS == 'android') {
+											hasPermission = await checkForCalendarPermissionAndroid()
+										}
+										else {
+											const result = await RNCalendarEvents.authorizeEventStore()
+											hasPermission = (result == 'authorized') 
+										}
+										if (hasPermission) {
+											const calendars = await RNCalendarEvents.findCalendars()
+											const validList = calendars.filter(calendar => calendar.allowsModifications)
+											if (validList && validList.length > 0) {
+												this.setState({calendarId: validList[0].id})
+											}
+											else {
+												Alert.alert("Sorry", "You don't have any calendars that allow modification")
+												this.setState({addToCalendar: false})
+											}
 										}
 										else {
 											this.setState({addToCalendar: false})
 										}
-									})
-									.catch(e => {
-										Alert.alert('Error', e.message)
+									}
+									else {
 										this.setState({addToCalendar: false})
-									})
+									}
+
+								} catch(e) {
+									Alert.alert('Error', e.message)
+									this.setState({addToCalendar: false})
 								}
-								}}
+							}}
 							/>
 							</View>
 
@@ -349,6 +360,21 @@ class SessionDetail extends Component {
 		return regex.test(postcode)
 	}
 
+}
+
+const checkForCalendarPermissionAndroid = async () => {
+  try {
+    const hasWritePermission = await PermissionsAndroid.request(
+			PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR,
+		)
+		const hasReadPermission = await PermissionsAndroid.request(
+			PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
+		)
+		return (hasReadPermission && hasWritePermission)
+  } catch(e) {
+    Alert.alert('Error', e.message)
+    return false
+  }
 }
 
 import { connect } from 'react-redux'

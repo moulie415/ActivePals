@@ -316,6 +316,8 @@ async updateUser(initial, profile) {
         firebase.database().ref('usernames').child(profile.username).set(profile.uid)
         .then(() => {
           Alert.alert('Success', 'Profile saved')
+          /*we need to make sure the username is saved locally 
+          which is why this calls fetchProfile which saves the username*/
           this.props.onSave()
           this.setState({spinner: false})
         })

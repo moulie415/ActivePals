@@ -253,7 +253,7 @@ import GymSearch from './components/GymSearch'
               </Text>
               <TouchableOpacity onPress={()=> {
                 const { lat, lng } = this.state.selectedSession.location.position
-                let options = {
+                const options = {
                   latitude: lat,
                   longitude: lng,
                   cancelText: 'Cancel',
@@ -299,7 +299,7 @@ import GymSearch from './components/GymSearch'
                 const { lat, lng } = this.state.selectedLocation.geometry.location
                 const place_id = this.state.selectedLocation.place_id
 
-                let options = {
+                const options = {
                   latitude: lat,
                   longitude: lng,
                   cancelText: 'Cancel',

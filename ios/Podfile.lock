@@ -177,7 +177,7 @@ PODS:
     - React
   - react-native-image-picker (0.27.2):
     - React
-  - react-native-image-resizer (1.0.0):
+  - react-native-image-resizer (1.0.1):
     - React
   - react-native-maps (0.21.0):
     - React
@@ -218,8 +218,6 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
-  - ReactNativePermissions (1.0.6):
-    - React
   - rn-fetch-blob (0.10.6):
     - React/Core
   - SDWebImage/Core (4.4.5)
@@ -265,7 +263,6 @@ DEPENDENCIES:
   - React/RCTText (from `../node_modules/react-native`)
   - React/RCTVibration (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
-  - ReactNativePermissions (from `../node_modules/react-native-permissions`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga/yoga.podspec`)
 
@@ -324,8 +321,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-splash-screen"
   react-native-video:
     :path: "../node_modules/react-native-video/react-native-video.podspec"
-  ReactNativePermissions:
-    :path: "../node_modules/react-native-permissions"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
   yoga:
@@ -368,16 +363,15 @@ SPEC CHECKSUMS:
   react-native-geocoder: 757427682892bb256f3b3745858cc90eba148a8e
   react-native-google-maps: 68a831730110823d3dadfea0e133f0f4426cd213
   react-native-image-picker: e47cbaf230af8902316e4d69dc83f959bde45e23
-  react-native-image-resizer: aa1600566fd336a044daf9273dcec5033c1d41ca
+  react-native-image-resizer: ecae22b577b0425cd7803eb8145243038dd4b6bd
   react-native-maps: fb06a43ce6884256097eec1dd69d23957b71df88
   react-native-splash-screen: cc626c801178f24382f898ea0b4c55384429b9c0
   react-native-video: afdbf53bb44a700d1dcfc679790710469571d0f9
-  ReactNativePermissions: a25615ebfd785b7a081dff3dec88bf191a7d7c42
   rn-fetch-blob: 766f85cabd2992300dfa1be2bc9e4e258abc6f04
   SDWebImage: ecc03494e973b93b80213649d32175f8d2d17d4d
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 0e0009ffb2544aeead64a1209f3d488d3849947b
 
-PODFILE CHECKSUM: 6d32a34c2c3720183db761665e9dc334a21d9c84
+PODFILE CHECKSUM: 7dc042df4de928a6109e0cfb8d302dcd61bda060
 
 COCOAPODS: 1.6.1
