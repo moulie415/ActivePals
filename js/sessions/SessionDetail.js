@@ -341,7 +341,7 @@ class SessionDetail extends Component {
 						location: this.state.formattedAddress,
 						notes: this.details,
 						description: this.details
-					  }) 
+					}) 
 				}
 			})
 			.catch(err => {

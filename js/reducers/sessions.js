@@ -5,6 +5,7 @@ import {
 	UPDATE_PRIVATE_SESSIONS,
 	SET_SESSION,
 	SET_PRIVATE_SESSION,
+	SET_PLACES
 } from 'Anyone/js/actions/sessions'
 
 import {
@@ -14,6 +15,7 @@ import {
 const initialState = {
 	sessions: {},
 	privateSessions: {},
+	places: {}
 }
 
 export default function(state = initialState, action) {
@@ -52,6 +54,12 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				privateSessions: {...state.privateSessions, [action.session.key]: action.session},
+			}
+		}
+		case SET_PLACES: {
+			return {
+				...state,
+				places: {...state.places, ...action.places}
 			}
 		}
 		case SET_LOGGED_OUT: {

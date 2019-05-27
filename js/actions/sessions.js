@@ -2,12 +2,14 @@ import firebase from 'react-native-firebase'
 import { removeSessionChat, addSessionChat } from 'Anyone/js/actions/chats'
 import { geofire }  from 'Anyone/index'
 import {fetchUsers, updateUsers } from './home'
+import str from '../constants/strings'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
 export const UPDATE_PRIVATE_SESSIONS = 'UPDATE_PRIVATE_SESSIONS'
 export const SET_PRIVATE_SESSIONS = 'SET_PRIVATE_SESSIONS'
 export const SET_PRIVATE_SESSION = 'SET_PRIVATE_SESSION'
 export const SET_SESSION = 'SET_SESSION'
+export const SET_PLACES = 'SET_PLACES'
 
 const setSessions = (sessions) => ({
 	type: SET_SESSIONS,
@@ -37,6 +39,11 @@ const setSession = (session) => ({
 const setPrivateSession = (session) => ({
 	type: SET_PRIVATE_SESSION,
 	session,
+})
+
+export const setPlaces = (places) => ({
+	type: SET_PLACES,
+	places
 })
 
 export const fetchSessions = (radius = 10, update = false) => {
@@ -240,4 +247,36 @@ export const addUser = (key, isPrivate) => {
 		session.users = {...session.users, [uid]: true}
 		isPrivate ? dispatch(setPrivateSession(session)) : dispatch(setSession(session))
 	}
+}
+
+export const fetchPhotoPaths = () => {
+	return (dispatch, getState) => {
+		let obj = getState().sessions.places
+		const paths = Object.values(obj).map(place => fetchPhotoPath(place))
+		Promise.all(paths).then(places => {
+			places.forEach(place => {
+				obj[place.place_id] = place
+			})
+			dispatch(setPlaces(obj))
+		})
+	}
+}
+
+
+const fetchPhotoPath = (result) => {
+  return new Promise(resolve => {
+    if (result.photos && result.photos[0].photo_reference) {
+      const url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
+			const fullUrl = `${url}${result.photos[0].photo_reference}&key=${str.googleApiKey}`
+			fetch(fullUrl)
+			.then(response => {
+					resolve ({...result, photo: response.url})
+			})
+      .catch(e => {
+        console.log(e)
+        resolve(result)
+      })
+    }
+    else resolve(result)
+  })
 }

@@ -58,13 +58,13 @@ export const showLocalNotification = (notif) => {
 const navigateFromNotif = (notif) => {
   const { dispatch } = store
   const {  type, sessionId, sessionTitle, chatId, uid, username, postId, gymId } = notif
+  if (type == 'sessionMessage') {
+    const session = {key: sessionId, title: sessionTitle, private: (notif.private == "privateSessions")}
+    dispatch(navigateMessagingSession(session))
+  }
   switch(type) {
     case 'message':
       dispatch(navigateMessaging(chatId, username, uid))
-      break
-    case 'sessionMessage':
-      const session = {key: sessionId, title: sessionTitle, private: (notif.private == "privateSessions")}
-      dispatch(navigateMessagingSession(session))
       break
     case 'gymMessage':
       dispatch(navigateGymMessaging(gymId))

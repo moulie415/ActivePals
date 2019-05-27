@@ -57,16 +57,15 @@ import GymSearch from './components/GymSearch'
       showMap: true,
       switch: false,
       radius: 10,
-      //sessions: this.sortByDateTime(Object.values(this.props.sessions)),
       sessions: this.sortByDistance(combined),
       refreshing: false,
       markers: this.markers(combined),
       gymMarkers: [],
-      gyms: [],
       selectedIndex: 0,
       popUpVisible: false,
       loadMore: true,
       loadingGyms: false,
+      selectedLocation: {}
     }
   }
 
@@ -137,6 +136,7 @@ import GymSearch from './components/GymSearch'
 
 
   render () {
+    const { vicinity, name, geometry, place_id, photo, rating, }  = this.state.selectedLocation
     //switch for list view and map view
     //action sheet when pressing
     return (
@@ -201,7 +201,7 @@ import GymSearch from './components/GymSearch'
         <View style={{flexDirection: 'row', height: 60, backgroundColor: colors.bgColor}}>
           <TouchableOpacity style={styles.button}
           onPress={()=> {
-            this.setState({selectedLocation: null})
+            this.setState({selectedLocation: {}})
             this.props.onContinue()
           }}>
             <Text adjustsFontSizeToFit={true}
@@ -211,7 +211,7 @@ import GymSearch from './components/GymSearch'
           <TouchableOpacity style={styles.button}
           onPress={()=> {
             if (Object.keys(this.props.friends).length > 0) {
-              this.setState({selectedLocation: null, friendsModalOpen: true})
+              this.setState({selectedLocation: {}, friendsModalOpen: true})
             }
             else {
               Alert.alert("Sorry", "You must have at least one pal to create a private session")
@@ -247,12 +247,12 @@ import GymSearch from './components/GymSearch'
             
             <View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center',justifyContent: 'space-between'}}>
               <Text style={{flex: 1}}>
-                <Text style={{color: '#000'}}>{this.state.selectedSession.location.formattedAddress}</Text>
+                <Text style={{color: '#000'}}>{location && location.formattedAddress}</Text>
                 <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
                   this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
               </Text>
               <TouchableOpacity onPress={()=> {
-                const { lat, lng } = this.state.selectedSession.location.position
+                const { lat, lng } = location && location.position
                 const options = {
                   latitude: lat,
                   longitude: lng,
@@ -284,20 +284,19 @@ import GymSearch from './components/GymSearch'
           position={'center'} 
           ref={"locationModal"} 
           onClosed={()=> this.setState({loadedGymImage: false})}>
-          {this.state.selectedLocation && <View>
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
-          {this.state.selectedLocation.name}</Text>
+          <View>
+          <Text  style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          {name}</Text>
           <View style={{margin: 10}}>
             <View style={{flexDirection: 'row', marginTop: 5, justifyContent: 'space-between'}}>
               <View style={{flex: 1}}>
                 <Text>
-                  <Text>{this.state.selectedLocation.vicinity}</Text>
+                  <Text>{vicinity}</Text>
                   <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
                 </Text>
               </View>
               <TouchableOpacity onPress={()=> {
-                const { lat, lng } = this.state.selectedLocation.geometry.location
-                const place_id = this.state.selectedLocation.place_id
+                const { lat, lng } = geometry && geometry.location
 
                 const options = {
                   latitude: lat,
@@ -314,15 +313,15 @@ import GymSearch from './components/GymSearch'
               </TouchableOpacity>
               
             </View>
-            {this.state.selectedLocation.rating && <Text style={{marginTop: 5}}>{'Google rating: '}
-                      <Text style={{color: colors.secondary}}>{this.state.selectedLocation.rating}</Text>
+            {rating && <Text style={{marginTop: 5}}>{'Google rating: '}
+                      <Text style={{color: colors.secondary}}>{rating}</Text>
                       </Text>}
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
               <TouchableOpacity 
                   onPress={() => {
-                    this.props.onOpenGymChat(this.state.selectedLocation.place_id)
+                    this.props.onOpenGymChat(place_id)
                   }}
                   style={{justifyContent: 'center', marginRight: 20}}>
                   <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
@@ -360,7 +359,7 @@ import GymSearch from './components/GymSearch'
                 <Text style={{color: '#fff'}}>Join Gym</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                onPress={()=> this.props.viewGym(this.state.selectedLocation.place_id)}
+                onPress={()=> this.props.viewGym(place_id)}
                 style={{
                   backgroundColor: colors.secondary,
                   padding: 5,
@@ -376,14 +375,10 @@ import GymSearch from './components/GymSearch'
                 <Icon name={'md-information-circle'} style={{color: '#fff'}}/>
                 </TouchableOpacity>
               </View>}
-            {this.state.locationPhoto ?
-            this.state.loadedGymImage ? <Image 
+            {photo && <Image 
               style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} 
              resizeMode={'contain'} 
-             source={{uri: this.state.locationPhoto}}/> : 
-             <View style={{alignItems: 'center', justifyContent: 'center', height: 200}}>
-              <PulseIndicator color={colors.secondary} />
-              </View> : null}
+             source={{uri: photo}}/>}
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
               <TouchableOpacity
               onPress={()=> {
@@ -402,7 +397,7 @@ import GymSearch from './components/GymSearch'
               </TouchableOpacity>
               </View>
             </View>
-            </View>}
+            </View>
         </Modal>
         <Modal style={styles.modal} position={'center'} ref={"filterModal"} >
             <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
@@ -655,16 +650,18 @@ import GymSearch from './components/GymSearch'
             </TouchableOpacity>
           )}
       /> : <FlatList 
-            data={this.state.gyms}
+            data={Object.values(this.props.places)}
             refreshing={this.state.refreshing}
-            ListFooterComponent={this.state.gyms && this.state.loadMore &&
+            ListFooterComponent={Object.values(this.props.places).length > 0 && this.state.loadMore &&
             <TouchableOpacity 
             disabled={this.state.loadingGyms}
             onPress={() => {
               this.setState({loadingGyms: true})
               const { latitude, longitude } = this.state.yourLocation
               this.fetchPlaces(latitude, longitude, true).then(results => {
-                this.gymMarkers(results)
+                this.props.setPlaces(mapIdsToPlaces(results))
+                this.props.fetchPhotoPaths()
+                this.gymMarkers(Object.values(this.props.places))
                 this.setState({loadingGyms: false})
               })
             }}>
@@ -682,20 +679,15 @@ import GymSearch from './components/GymSearch'
               const { lat, lng } = item.geometry.location
               return <TouchableOpacity onPress={() => {
                 this.setState({selectedLocation: item, latitude: lat, longitude: lng},
-                    ()=> {
-                      //this.refs.locationModal.open()
-                      fetchPhotoPath(item).then(path => {
-                          this.setState({locationPhoto: path, loadedGymImage: true}, ()=> this.refs.locationModal.open())
-                      })
-                    })
+                    ()=> this.refs.locationModal.open())
             }}>
               <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
                 <View style={{flexDirection: 'row'}} >
-
+                  {item.photo ? <Image source={{uri: item.photo}} style={{height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10}}/> : 
+                  <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>}
                     <View style={{flex: 1}}>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
-                        <Text style={{color: '#999', flex: 1, textAlign: 'right'}}>{' (' +  this.getDistance(item, true) + ' km away)'}</Text>
                       </View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
@@ -703,12 +695,10 @@ import GymSearch from './components/GymSearch'
                           this.setState({longitude: lng, latitude: lat, switch: true})
                         }}
                         style={{flex: 1}}>
-                          <Text style={{color: colors.secondary, textAlign: 'right'}}>View on map</Text>
+                          <Text style={{color: colors.secondary, textAlign: 'right', fontWeight: 'bold', fontSize: 15}}>View on map</Text>
                         </TouchableOpacity>
                       </View>
-                      {item.rating && <Text>{'Google rating: '}
-                      <Text style={{color: colors.secondary}}>{item.rating}</Text>
-                      </Text>}
+                      <Text style={{color: '#999'}}>{' (' +  this.getDistance(item, true) + ' km away)'}</Text>
                   </View>
                 </View>
               </View>
@@ -796,6 +786,8 @@ import GymSearch from './components/GymSearch'
 
           return this.fetchPlaces(lat, lon)
           .then((results) => {
+            this.props.setPlaces(mapIdsToPlaces(results))
+            this.props.fetchPhotoPaths()
             this.gymMarkers(results)
           })
 
@@ -855,18 +847,12 @@ import GymSearch from './components/GymSearch'
               onPress={(event) => {
               event.stopPropagation()
               this.setState({selectedLocation: result, latitude: lat, longitude: lng},
-                ()=> {
-                  //this.refs.locationModal.open()
-                  fetchPhotoPath(result).then(path => {
-                    this.setState({locationPhoto: path, loadedGymImage: true}, ()=> this.refs.locationModal.open() )
-                  })
-                })
+                ()=> this.refs.locationModal.open())
               }}
           />
     })
     this.setState({
       gymMarkers: [...this.state.gymMarkers, ...markers],
-      gyms: [...this.state.gyms, ...results]
     })
   }
 
@@ -918,12 +904,15 @@ getDistance(item, gym = false) {
     let lat2
     let lon2
     if (gym) {
-      lat2 = item.geometry.location.lat
-      lon2 = item.geometry.location.lng
+      if (item.geometry) {
+        lat2 = item.geometry.location.lat
+        lon2 = item.geometry.location.lng
+      }
+      else return 'N/A'
     }
     else {
-      lat2 = item.location.position.lat
-      lon2 = item.location.position.lng
+        lat2 = item.location.position.lat
+        lon2 = item.location.position.lng
     }
     let R = 6371
     let dLat = deg2rad(lat2 - lat1)
@@ -937,7 +926,7 @@ getDistance(item, gym = false) {
     let d = R * c
     return d.toFixed(2)
   }
-  else return 'unknown'
+  else return 'N/A'
 }
 
 }
@@ -978,6 +967,14 @@ export const renderTags = (tags) => {
   return string
 }
 
+const mapIdsToPlaces = (places) => {
+  const obj = {}
+  places.forEach(place => {
+    obj[place.place_id] = place
+  })
+  return obj
+}
+
 
 
 import { connect } from 'react-redux'
@@ -989,9 +986,16 @@ import {
   navigateGymMessaging,
   navigateSessionDetail
 } from './actions/navigation'
-import { fetchSessionChats, addSessionChat } from 'Anyone/js/actions/chats'
-import { fetchSessions, fetchPrivateSessions, removeSession, addUser } from 'Anyone/js/actions/sessions'
-import { removeGym, joinGym, setLocation } from 'Anyone/js/actions/profile'
+import { fetchSessionChats, addSessionChat } from './actions/chats'
+import {
+  fetchSessions,
+  fetchPrivateSessions,
+  removeSession,
+  addUser,
+  setPlaces,
+  fetchPhotoPaths
+} from './actions/sessions'
+import { removeGym, joinGym, setLocation } from './actions/profile'
 
 const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => ({
   friends: friends.friends,
@@ -1000,7 +1004,8 @@ const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => (
   chats: chats.sessionChats,
   sessions: sessions.sessions,
   privateSessions: sessions.privateSessions,
-  users: sharedInfo.users
+  users: sharedInfo.users,
+  places: sessions.places
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -1020,6 +1025,9 @@ const mapDispatchToProps = dispatch => ({
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
   setLocation: (location) => dispatch(setLocation(location)),
   test: () => dispatch(navigateTestScreen()),
+  setPlaces: (places) => dispatch(setPlaces(places)),
+  fetchPhotoPaths: () => dispatch(fetchPhotoPaths())
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)
