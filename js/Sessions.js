@@ -27,7 +27,6 @@ import Modal from 'react-native-modalbox'
 import { getType, getResource } from './constants/utils'
 import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
-import RNFetchBlob from 'rn-fetch-blob'
 import {Image as SlowImage } from 'react-native'
 import { formatDateTime } from './constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
@@ -60,7 +59,6 @@ import GymSearch from './components/GymSearch'
       sessions: this.sortByDistance(combined),
       refreshing: false,
       markers: this.markers(combined),
-      gymMarkers: [],
       selectedIndex: 0,
       popUpVisible: false,
       loadMore: true,
@@ -102,7 +100,7 @@ import GymSearch from './components/GymSearch'
   }
 
   handleRefresh() {
-    this.setState({refreshing: true, sessions: [], markers: [], gymMarkers: [], gyms: []})
+    this.setState({refreshing: true, sessions: [], markers: [], gyms: []})
     Promise.all([
       this.props.fetch(this.state.radius),
       this.getPosition()
@@ -194,7 +192,7 @@ import GymSearch from './components/GymSearch'
 
         >
         {this.state.markers}
-        {this.state.gymMarkers}
+        {this.gymMarkers(Object.values(this.props.places))}
         </MapView>}
         {GymSearch(this)}
 
@@ -661,7 +659,6 @@ import GymSearch from './components/GymSearch'
               this.fetchPlaces(latitude, longitude, true).then(results => {
                 this.props.setPlaces(mapIdsToPlaces(results))
                 this.props.fetchPhotoPaths()
-                this.gymMarkers(Object.values(this.props.places))
                 this.setState({loadingGyms: false})
               })
             }}>
@@ -788,7 +785,6 @@ import GymSearch from './components/GymSearch'
           .then((results) => {
             this.props.setPlaces(mapIdsToPlaces(results))
             this.props.fetchPhotoPaths()
-            this.gymMarkers(results)
           })
 
       },
@@ -834,7 +830,7 @@ import GymSearch from './components/GymSearch'
   }
 
   gymMarkers(results) {
-    const markers = results.map((result) => {
+    return results.map((result) => {
       const lat = result.geometry.location.lat
       const lng = result.geometry.location.lng
       return <MapView.Marker
@@ -850,9 +846,6 @@ import GymSearch from './components/GymSearch'
                 ()=> this.refs.locationModal.open())
               }}
           />
-    })
-    this.setState({
-      gymMarkers: [...this.state.gymMarkers, ...markers],
     })
   }
 
@@ -933,27 +926,6 @@ getDistance(item, gym = false) {
 
 export function deg2rad(deg) {
   return deg * (Math.PI / 180)
-}
-
-
-export const fetchPhotoPath = (result) => {
-  return new Promise(resolve => {
-    if (result.photos && result.photos[0].photo_reference) {
-      let url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
-      let fullUrl = `${url}${result.photos[0].photo_reference}&key=${str.googleApiKey}`
-      RNFetchBlob.config({fileCache : true, appendExt : 'jpg'})
-      .fetch('GET', fullUrl).then(image => {
-        let path = Platform.OS == 'android' ? 'file://' + image.data : image.data
-        resolve(path)
-      })
-      .catch(e => {
-        console.log(e)
-        resolve(false)
-      })
-    }
-    else resolve(false)
-
-  })
 }
 
 export const renderTags = (tags) => {
