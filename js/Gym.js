@@ -4,7 +4,6 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView
 } from "react-native"
 import {
   Container,
@@ -17,13 +16,14 @@ import str from './constants/strings'
 import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
 import { Image as SlowImage } from 'react-native'
-import { fetchPhotoPath, renderTags, deg2rad  } from './Sessions'
+import { deg2rad  } from './Sessions'
 import Hyperlink from 'react-native-hyperlink'
 import Header from './header/header'
 import StarRating from 'react-native-star-rating'
 import { showLocation, Popup } from 'react-native-map-link'
 import globalStyles from './styles/globalStyles'
 import FriendsModal from './components/friendsModal'
+
 
 
 
@@ -38,11 +38,8 @@ import FriendsModal from './components/friendsModal'
     this.params = this.props.navigation.state.params
     this.id = this.params.id
     
-    fetchGym(this.id).then(gym => {
-        this.setState({gym: gym.result, loaded: true})
-        fetchPhotoPath(gym.result).then(path => {
-            this.setState({photo: path})
-        })
+    this.props.fetchGym(this.id).then(gym => {
+        this.setState({ loaded: true})
     })
     .catch(e => {
         this.props.goBack()
@@ -61,6 +58,7 @@ import FriendsModal from './components/friendsModal'
   }
 
   render () {
+    const gym = this.props.places[this.id]
     return (
     <Container>
     <Header 
@@ -68,10 +66,10 @@ import FriendsModal from './components/friendsModal'
      title={'Gym'}
       />
         <View style={{alignItems: 'center', marginBottom: 10}}>
-        {this.state.photo ?
+        {gym.photo ?
       <Image style={{height: 150, width: '100%'}}
           resizeMode='cover'
-          source={{uri: this.state.photo}} /> :
+          source={{uri: gym.photo}} /> :
           <View style={{height: 150, width: '100%', backgroundColor: colors.primaryLighter, justifyContent: 'center'}}/>}
           <View style={globalStyles.shadow}>
           <SlowImage 
@@ -88,13 +86,13 @@ import FriendsModal from './components/friendsModal'
           </View>
         {this.state.loaded ? <View style={{flex: 1}}>
         <ScrollView>
-            <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{this.state.gym.name}</Text>
-            {this.props.gym && this.props.gym.place_id == this.id ? 
+            <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{gym.name}</Text>
+            {this.props.gym && gym.place_id == this.id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row', margin: 10}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
               <TouchableOpacity 
                   onPress={() => {
-                    this.props.onOpenGymChat(this.state.gym.place_id)
+                    this.props.onOpenGymChat(gym.place_id)
                   }}
                   style={{justifyContent: 'center', marginRight: 20, borderRadius: 5}}>
                   <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
@@ -123,11 +121,11 @@ import FriendsModal from './components/friendsModal'
                         'This will leave your current Gym?',
                         [
                             {text: 'Cancel', style: 'cancel'},
-                            {text: 'Yes', onPress: () => this.props.join(this.state.gym)}
+                            {text: 'Yes', onPress: () => this.props.join(gym)}
                         ]
                     )
                     }
-                    else this.props.join(this.state.gym)
+                    else this.props.join(gym)
                     
                     }}
                 style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginVertical: 10, borderRadius: 5}}>
@@ -135,12 +133,12 @@ import FriendsModal from './components/friendsModal'
                 </TouchableOpacity>
               </View>}
             <View style={{flexDirection: 'row'}}>
-                {this.state.gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5, flex: 1}}>{'Vicinity: '}
-                <Text style={{color: colors.secondary}}>{this.state.gym.vicinity}</Text>{this.props.location && 
-                <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.gym) + ' km away)'}</Text>}</Text>}
+                {gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5, flex: 1}}>{'Vicinity: '}
+                <Text style={{color: colors.secondary}}>{gym.vicinity}</Text>{this.props.location && 
+                <Text style={{color: '#999'}}>{' (' + this.getDistance(gym) + ' km away)'}</Text>}</Text>}
                 <TouchableOpacity onPress={()=> {
-                const { lat, lng } = this.state.gym.geometry.location
-                const place_id = this.state.gym.place_id
+                const { lat, lng } = gym.geometry.location
+                const place_id = gym.place_id
 
                 let options = {
                   latitude: lat,
@@ -156,10 +154,10 @@ import FriendsModal from './components/friendsModal'
                 <Text style={{color: '#fff'}}>Get directions</Text>
                 </TouchableOpacity>
             </View>
-            {this.state.gym.website && <Hyperlink linkDefault={true}>
+            {gym.website && <Hyperlink linkDefault={true}>
             <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
-        <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{this.state.gym.website}</Text></Text></Hyperlink>}
-        {this.state.gym.rating && <View style={{flexDirection: 'row', marginVertical: 5}}>
+        <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{gym.website}</Text></Text></Hyperlink>}
+        {gym.rating && <View style={{flexDirection: 'row', marginVertical: 5}}>
               <Text style={{marginLeft: 10, color: '#999'}}>Google rating: </Text>
             <StarRating
             disabled={true}
@@ -168,25 +166,25 @@ import FriendsModal from './components/friendsModal'
             maxStars={5}
             starSize={20}
             halfStarEnabled={true}
-            rating={this.state.gym.rating}
-            />{this.state.gym.user_ratings_total && 
-            <Text>{`from ${this.state.gym.user_ratings_total} ${this.state.gym.user_ratings_total > 1? 'ratings' : 'rating'}`}</Text>}</View>}
-        {this.state.gym.formatted_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Phone number: '}
-        <Text style={{color: colors.secondary}}>{this.state.gym.formatted_phone_number}</Text></Text>}
-        {this.state.gym.international_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Intl phone number: '}
-        <Text style={{color: colors.secondary}}>{this.state.gym.international_phone_number}</Text></Text>}
-        {this.state.gym.opening_hours && this.state.gym.opening_hours.weekday_text && 
+            rating={gym.rating}
+            />{gym.user_ratings_total && 
+            <Text>{`from ${gym.user_ratings_total} ${gym.user_ratings_total > 1? 'ratings' : 'rating'}`}</Text>}</View>}
+        {gym.formatted_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Phone number: '}
+        <Text style={{color: colors.secondary}}>{gym.formatted_phone_number}</Text></Text>}
+        {gym.international_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Intl phone number: '}
+        <Text style={{color: colors.secondary}}>{gym.international_phone_number}</Text></Text>}
+        {gym.opening_hours && gym.opening_hours.weekday_text && 
         <View style={{marginHorizontal: 10, marginTop: 10}}>
           <Text style={{color: '#999'}}>Opening Hours:</Text>
-          <View style={{marginLeft: 5}}>{this.renderOpeningHours(this.state.gym.opening_hours.weekday_text)}</View>
+          <View style={{marginLeft: 5}}>{this.renderOpeningHours(gym.opening_hours.weekday_text)}</View>
         </View>}
-        {this.state.gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(this.state.gym.types)}</Text>}
+        {gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(gym.types)}</Text>}
         </ScrollView> 
           <View style={{flexDirection: 'row', backgroundColor: colors.bgColor, paddingVertical: 10}}>
             <TouchableOpacity
             style={{backgroundColor: colors.secondary, flex: 1, paddingVertical: 15, borderRadius: 5, marginLeft: 5, marginRight: 2}}
             onPress={()=> {
-              this.props.createSession(this.state.gym)
+              this.props.createSession(gym)
             }}>
               <Text adjustsFontSizeToFit={true}
               style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</Text>
@@ -218,13 +216,14 @@ import FriendsModal from './components/friendsModal'
             cancelButtonText: {color: colors.secondary},
           }}
           />
-          <FriendsModal location={this.state.gym} 
+          <FriendsModal location={gym} 
           onClosed={()=> this.setState({friendsModalOpen: false})}
           isOpen={this.state.friendsModalOpen} />
     </Container>
   )
   }
   getDistance(item) {
+    if (item.geometry) {
       let lat1 = this.props.location.lat
       let lon1 =  this.props.location.lon
       let lat2 = item.geometry.location.lat
@@ -240,6 +239,8 @@ import FriendsModal from './components/friendsModal'
       let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
       let d = R * c
       return d.toFixed(2)
+    }
+    else return 'N/A'
   }
 
   renderOpeningHours(hours) {
@@ -251,25 +252,31 @@ import FriendsModal from './components/friendsModal'
 
 }
 
-const fetchGym = (id) => {
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${str.googleApiKey}`
-    return fetch(url).then(response => {
-      return response.json()
-    })
-  }
+export const renderTags = (tags) => {
+  let string = ""
+  tags.forEach((tag, index, array) => {
+    if (index === array.length - 1){
+      string += tag
+    }
+    else string += tag + ", "
+  })
+  return string
+}
 
 
 import { connect } from 'react-redux'
 import { navigateBack, navigateGymMessaging, navigateSessionDetail } from './actions/navigation'
 import { removeGym, joinGym } from './actions/profile'
+import { fetchGym } from './actions/sessions'
 
 
-const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
+const mapStateToProps = ({ friends, sharedInfo, profile, sessions }) => ({
   friends: friends.friends,
   users: sharedInfo.users,
   profile: profile.profile,
   gym: profile.gym,
-  location: profile.location
+  location: profile.location,
+  places: sessions.places
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -277,7 +284,8 @@ const mapDispatchToProps = dispatch => ({
   join: (location) => dispatch(joinGym(location)),
   removeGym: () => dispatch(removeGym()),
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
-  createSession: (location) => dispatch(navigateSessionDetail(null,location))
+  createSession: (location) => dispatch(navigateSessionDetail(null,location)),
+  fetchGym: (id) => dispatch(fetchGym(id))
  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Gym)

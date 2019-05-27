@@ -9,7 +9,7 @@ export const SET_HAS_VIEWED_WELCOME = 'SET_HAS_VIEWED_WELCOME'
 import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat } from './chats'
 import { fetchPosts } from './home'
-import { fetchSessions, fetchPrivateSessions } from './sessions'
+import { fetchSessions, fetchPhotoPath } from './sessions'
 import { navigateLogin, navigateHome, navigateWelcome } from './navigation'
 
 
@@ -71,7 +71,9 @@ export const fetchProfile = () => {
 const fetchGym = (profile, dispatch) => {
 	if (profile.gym) {
 		firebase.database().ref('gyms/' + profile.gym).once('value', gym => {
-			dispatch(setGym(gym.val()))
+			fetchPhotoPath(gym.val()).then(gym => {
+				dispatch(setGym(gym))
+			})
 		})
 	}
 }

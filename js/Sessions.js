@@ -7,7 +7,6 @@ import {
   ScrollView,
   Linking,
   Slider,
-  Platform,
 } from "react-native"
 import {
   Container,
@@ -577,7 +576,8 @@ import GymSearch from './components/GymSearch'
               {gym && this.state.selectedIndex == 1 && 
               <View style={{padding: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: colors.secondary}}>
                 <View style={{flexDirection: 'row'}} >
-
+                {gym.photo ? <Image source={{uri: gym.photo}} style={{height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10}}/> : 
+                  <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>}
                     <View style={{flex: 1}}>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                     <View>
@@ -831,21 +831,23 @@ import GymSearch from './components/GymSearch'
 
   gymMarkers(results) {
     return results.map((result) => {
-      const lat = result.geometry.location.lat
-      const lng = result.geometry.location.lng
-      return <MapView.Marker
-              key={result.place_id}
-              coordinate={{
-                latitude: lat,
-                longitude: lng,
-              }}
-              pinColor={colors.secondary}
-              onPress={(event) => {
-              event.stopPropagation()
-              this.setState({selectedLocation: result, latitude: lat, longitude: lng},
-                ()=> this.refs.locationModal.open())
-              }}
-          />
+      if (result.geometry) {
+        const lat = result.geometry.location.lat
+        const lng = result.geometry.location.lng
+        return <MapView.Marker
+                key={result.place_id}
+                coordinate={{
+                  latitude: lat,
+                  longitude: lng,
+                }}
+                pinColor={colors.secondary}
+                onPress={(event) => {
+                event.stopPropagation()
+                this.setState({selectedLocation: result, latitude: lat, longitude: lng},
+                  ()=> this.refs.locationModal.open())
+                }}
+            />
+      }
     })
   }
 
@@ -928,16 +930,6 @@ export function deg2rad(deg) {
   return deg * (Math.PI / 180)
 }
 
-export const renderTags = (tags) => {
-  let string = ""
-  tags.forEach((tag, index, array) => {
-    if (index === array.length - 1){
-      string += tag
-    }
-    else string += tag + ", "
-  })
-  return string
-}
 
 const mapIdsToPlaces = (places) => {
   const obj = {}

@@ -10,6 +10,7 @@ export const SET_PRIVATE_SESSIONS = 'SET_PRIVATE_SESSIONS'
 export const SET_PRIVATE_SESSION = 'SET_PRIVATE_SESSION'
 export const SET_SESSION = 'SET_SESSION'
 export const SET_PLACES = 'SET_PLACES'
+export const SET_PLACE = 'SET_PLACE'
 
 const setSessions = (sessions) => ({
 	type: SET_SESSIONS,
@@ -44,6 +45,11 @@ const setPrivateSession = (session) => ({
 export const setPlaces = (places) => ({
 	type: SET_PLACES,
 	places
+})
+
+export const setPlace = (place) => ({
+	type: SET_PLACE,
+	place
 })
 
 export const fetchSessions = (radius = 10, update = false) => {
@@ -262,8 +268,19 @@ export const fetchPhotoPaths = () => {
 	}
 }
 
+export const fetchGym = (id) => {
+	return dispatch => {
+		const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${str.googleApiKey}`
+    return fetch(url).then(response => response.json())
+			.then(json => fetchPhotoPath(json.result))
+			.then(gym => {
+				dispatch(setPlace(gym))
+			})
+	}
+	
+}
 
-const fetchPhotoPath = (result) => {
+export const fetchPhotoPath = (result) => {
   return new Promise(resolve => {
     if (result.photos && result.photos[0].photo_reference) {
       const url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='

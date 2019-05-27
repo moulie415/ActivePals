@@ -129,7 +129,7 @@ export const handleNotification = (notification) => {
 class FitLink extends React.Component {
   componentDidMount() {
     //ignore setting a timer warnings
-    YellowBox.ignoreWarnings(['Setting a timer', 'Require cycle:'])
+    YellowBox.ignoreWarnings(['Setting a timer', 'Require cycle:', 'Received data was not a string, or was not a recognised encoding'])
     const channels = []
     channels.push(new firebase.notifications.Android.Channel('REQUEST', 'Pal requests', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for pal requests')
