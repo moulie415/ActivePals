@@ -27,7 +27,7 @@ export const setLoggedOut = () => ({
 	type: SET_LOGGED_OUT,
 })
 
-const setGym = (gym) => ({
+export const setGym = (gym) => ({
 	type: SET_GYM,
 	gym,
 })

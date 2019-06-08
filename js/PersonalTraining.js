@@ -8,7 +8,7 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import {
     Container
 } from 'native-base'
-import TouchableOpacity from './constants/TouchableOpacityLockable'
+import TouchableOpacity from './components/TouchableOpacityLockable'
 import Header from './header/header'
 
 class PersonalTraining extends Component {

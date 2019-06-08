@@ -20,7 +20,7 @@ import styles from "./styles";
 import colors from '../constants/colors'
 import Collapsible from "react-native-collapsible";
 import {Image as SlowImage } from 'react-native'
-import TouchableOpacity from '../constants/TouchableOpacityLockable'
+import TouchableOpacity from '../components/TouchableOpacityLockable'
 import str from '../constants/strings'
 import firebase from 'react-native-firebase'
 

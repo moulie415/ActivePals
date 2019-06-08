@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Modal from 'react-native-modalbox'
 import styles from './styles'
-import  TouchableOpacity from '../../constants/TouchableOpacityLockable'
+import  TouchableOpacity from '../../components/TouchableOpacityLockable'
 import {
   View,
   ScrollView,

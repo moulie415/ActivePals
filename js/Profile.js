@@ -15,7 +15,7 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import  styles  from './styles/profileStyles'
 import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
-import TouchableOpacity from './constants/TouchableOpacityLockable'
+import TouchableOpacity from './components/TouchableOpacityLockable'
 import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')
 import ImageResizer from 'react-native-image-resizer'

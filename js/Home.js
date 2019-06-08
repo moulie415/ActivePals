@@ -19,7 +19,7 @@ import {
 import { PulseIndicator } from 'react-native-indicators'
 import firebase from 'react-native-firebase'
 import colors from './constants/colors'
-import TouchableOpacity from './constants/TouchableOpacityLockable'
+import TouchableOpacity from './components/TouchableOpacityLockable'
 import  styles  from './styles/homeStyles'
 import sStyles from './styles/settingsStyles'
 import cStyles from './comments/styles'

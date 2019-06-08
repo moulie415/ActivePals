@@ -14,7 +14,7 @@ import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
 import Image from "react-native-fast-image"
 import styles from "./styles/notificationsStyles"
 import Swipeout from 'react-native-swipeout'
-import TouchableOpacity from './constants/TouchableOpacityLockable'
+import TouchableOpacity from './components/TouchableOpacityLockable'
 import colors from './constants/colors'
 import { getSimplifiedTime } from './constants/utils'
 import Header from './header/header'

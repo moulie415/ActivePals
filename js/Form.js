@@ -8,7 +8,7 @@ import {
     Alert
 } from 'react-native'
 import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
-import TouchableOpacity from './constants/TouchableOpacityLockable'
+import TouchableOpacity from './components/TouchableOpacityLockable'
 
 import styles from './styles/formStyles'
 import colors from './constants/colors'

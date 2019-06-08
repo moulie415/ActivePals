@@ -2,6 +2,7 @@ import firebase from 'react-native-firebase'
 import { removeSessionChat, addSessionChat } from 'Anyone/js/actions/chats'
 import { geofire }  from 'Anyone/index'
 import {fetchUsers, updateUsers } from './home'
+import { setGym } from './profile'
 import str from '../constants/strings'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
@@ -11,11 +12,6 @@ export const SET_PRIVATE_SESSION = 'SET_PRIVATE_SESSION'
 export const SET_SESSION = 'SET_SESSION'
 export const SET_PLACES = 'SET_PLACES'
 export const SET_PLACE = 'SET_PLACE'
-
-const setSessions = (sessions) => ({
-	type: SET_SESSIONS,
-	sessions,
-})
 
 const setPrivateSessions = (sessions) => ({
 	type: SET_PRIVATE_SESSIONS,
@@ -269,12 +265,16 @@ export const fetchPhotoPaths = () => {
 }
 
 export const fetchGym = (id) => {
-	return dispatch => {
+	return (dispatch, getState) => {
 		const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${str.googleApiKey}`
     return fetch(url).then(response => response.json())
 			.then(json => fetchPhotoPath(json.result))
 			.then(gym => {
 				dispatch(setPlace(gym))
+				const yourGym = getState().profile.gym
+				if (yourGym && yourGym.place_id == gym.place_id) {
+					dispatch(setGym(gym))
+				}
 			})
 	}
 	
