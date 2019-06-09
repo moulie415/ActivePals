@@ -297,3 +297,39 @@ export const fetchPhotoPath = (result) => {
     else resolve(result)
   })
 }
+
+export const fetchPlaces = (lat, lon, token) => {
+	return dispatch => {
+		return new Promise(resolve => {
+			const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+			const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${str.googleApiKey}`
+	
+				if (token) {
+					fetch(fullUrl +  `&pagetoken=${token}`)
+					.then(response => response.json())
+					.then(json => {
+						dispatch(setPlaces(mapIdsToPlaces(json.results)))
+						dispatch(fetchPhotoPaths())
+						resolve({token: json.next_page_token})
+					})
+				}
+			else {
+				fetch(fullUrl).then(response => response.json())
+				.then(json => {
+					dispatch(setPlaces(mapIdsToPlaces(json.results)))
+					dispatch(fetchPhotoPaths())
+					resolve({token: json.next_page_token})
+				})
+			}
+		})
+	}
+	
+}
+
+const mapIdsToPlaces = (places) => {
+  const obj = {}
+  places.forEach(place => {
+    obj[place.place_id] = place
+  })
+  return obj
+}

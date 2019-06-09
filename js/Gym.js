@@ -10,7 +10,7 @@ import {
   Icon,
 } from 'native-base'
 import { PulseIndicator } from 'react-native-indicators'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import Image from 'react-native-fast-image'
 import str from './constants/strings'
 import hStyles from './styles/homeStyles'

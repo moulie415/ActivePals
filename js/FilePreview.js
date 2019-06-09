@@ -22,7 +22,7 @@ import TouchableOpacity from 'Anyone/js/components/TouchableOpacityLockable'
 import { getMentionsList } from './constants/utils'
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'
-import Text from './constants/Text'
+import Text from './components/Text'
 import { PulseIndicator } from 'react-native-indicators'
 
 

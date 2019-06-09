@@ -10,7 +10,7 @@ import {
   Icon,
 } from "native-base"
 import { Image as SlowImage } from 'react-native'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import Image from "react-native-fast-image"
 import styles from "./styles/notificationsStyles"
 import Swipeout from 'react-native-swipeout'

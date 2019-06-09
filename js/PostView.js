@@ -16,7 +16,7 @@ import {
 } from 'react-native'
 import FIcon from "react-native-vector-icons/FontAwesome"
 import cStyles from './comments/styles'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import firebase from 'react-native-firebase'
 import colors from './constants/colors'
 import TouchableOpacity from './components/TouchableOpacityLockable'

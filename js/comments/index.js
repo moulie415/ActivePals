@@ -17,7 +17,7 @@ import {
 import Image from 'react-native-fast-image'
 import {Icon as IIcon} from 'native-base'
 
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import PropTypes from "prop-types";
 import Icon from "react-native-vector-icons/FontAwesome"
 import styles from "./styles";

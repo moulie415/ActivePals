@@ -11,7 +11,7 @@ import {
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import Image from 'react-native-fast-image'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import  styles  from './styles/profileStyles'
 import hStyles from './styles/homeStyles'
 import colors from './constants/colors'

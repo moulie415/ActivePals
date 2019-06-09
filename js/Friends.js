@@ -22,7 +22,7 @@ import { arraysEqual, getStateColor } from './constants/utils'
 import Header from './header/header'
 import Image from 'react-native-fast-image'
 import FbFriendsModal from './components/FbFriendsModal'
-import Text from './constants/Text'
+import Text from './components/Text'
 
  class Friends extends Component {
   static navigationOptions = {

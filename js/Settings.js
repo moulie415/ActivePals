@@ -14,7 +14,7 @@ import firebase from 'react-native-firebase'
 import VersionNumber from 'react-native-version-number'
 import colors from './constants/colors'
 import  styles  from './styles/settingsStyles'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
 

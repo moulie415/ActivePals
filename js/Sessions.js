@@ -17,7 +17,7 @@ import {
 import { PulseIndicator } from 'react-native-indicators'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import Permissions from 'react-native-permissions'
 import styles from './styles/sessionStyles'
 import colors from './constants/colors'
@@ -650,16 +650,14 @@ import GymSearch from './components/GymSearch'
       /> : <FlatList 
             data={Object.values(this.props.places)}
             refreshing={this.state.refreshing}
-            ListFooterComponent={Object.values(this.props.places).length > 0 && this.state.loadMore &&
+            ListFooterComponent={Object.values(this.props.places).length > 0 && this.state.token &&
             <TouchableOpacity 
             disabled={this.state.loadingGyms}
             onPress={() => {
               this.setState({loadingGyms: true})
               const { latitude, longitude } = this.state.yourLocation
-              this.fetchPlaces(latitude, longitude, true).then(results => {
-                this.props.setPlaces(mapIdsToPlaces(results))
-                this.props.fetchPhotoPaths()
-                this.setState({loadingGyms: false})
+              this.props.fetchPlaces(latitude, longitude, this.state.token).then(({token}) => {
+                this.setState({loadingGyms: false, token})
               })
             }}>
               {!this.state.loadingGyms  && !this.state.refreshing ? 
@@ -671,7 +669,7 @@ import GymSearch from './components/GymSearch'
             </TouchableOpacity>}
             onRefresh={() => this.handleRefresh()}
             style={{backgroundColor: '#9993'}}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.place_id}
             renderItem={({ item, index }) => {
               const { lat, lng } = item.geometry.location
               return <TouchableOpacity onPress={() => {
@@ -781,10 +779,9 @@ import GymSearch from './components/GymSearch'
           spinner: false
         })
 
-          return this.fetchPlaces(lat, lon)
-          .then((results) => {
-            this.props.setPlaces(mapIdsToPlaces(results))
-            this.props.fetchPhotoPaths()
+          return this.props.fetchPlaces(lat, lon, this.state.token)
+          .then(({token}) => {
+            this.setState({token})
           })
 
       },
@@ -794,39 +791,6 @@ import GymSearch from './components/GymSearch'
       },
       { enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
     )
-  }
-
-  fetchPlaces(lat, lon, loadMore) {
-    return new Promise(resolve => {
-      const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
-      const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${str.googleApiKey}`
-
-      if (loadMore) {
-        if (this.state.token) {
-          fetch(fullUrl +  `&pagetoken=${this.state.token}`)
-          .then(response => response.json())
-          .then(json => {
-            resolve(json.results)
-            if (json.next_page_token) {
-              this.setState({token: json.next_page_token})
-            }
-            else {
-              this.setState({loadMore: false})
-            }
-          })
-        }
-        else {
-          this.setState({loadMore: false})
-        }
-      }
-      else {
-        fetch(fullUrl).then(response => response.json())
-        .then(json => {
-          resolve(json.results)
-          this.setState({token: json.next_page_token})
-        })
-      }
-    })
   }
 
   gymMarkers(results) {
@@ -930,17 +894,6 @@ export function deg2rad(deg) {
   return deg * (Math.PI / 180)
 }
 
-
-const mapIdsToPlaces = (places) => {
-  const obj = {}
-  places.forEach(place => {
-    obj[place.place_id] = place
-  })
-  return obj
-}
-
-
-
 import { connect } from 'react-redux'
 import {
   navigateMessagingSession,
@@ -957,7 +910,8 @@ import {
   removeSession,
   addUser,
   setPlaces,
-  fetchPhotoPaths
+  fetchPhotoPaths,
+  fetchPlaces
 } from './actions/sessions'
 import { removeGym, joinGym, setLocation } from './actions/profile'
 
@@ -990,8 +944,8 @@ const mapDispatchToProps = dispatch => ({
   setLocation: (location) => dispatch(setLocation(location)),
   test: () => dispatch(navigateTestScreen()),
   setPlaces: (places) => dispatch(setPlaces(places)),
-  fetchPhotoPaths: () => dispatch(fetchPhotoPaths())
-
+  fetchPhotoPaths: () => dispatch(fetchPhotoPaths()),
+  fetchPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)

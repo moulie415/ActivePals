@@ -11,7 +11,7 @@ import {
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import  styles  from './styles/signUpStyles'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import colors from './constants/colors'
 import TouchableOpacity from './components/TouchableOpacityLockable.js'
 import Header from './header/header'

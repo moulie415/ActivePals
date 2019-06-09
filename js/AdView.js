@@ -10,7 +10,7 @@ import {
       View,
       Platform
   } from 'react-native'
-  import Text from './constants/Text'
+  import Text from './components/Text'
   class AdComponent extends Component {
     render() {
       return (

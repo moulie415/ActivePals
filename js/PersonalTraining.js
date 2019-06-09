@@ -4,7 +4,7 @@ import {
     Platform,
     View
 } from 'react-native'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import {
     Container
 } from 'native-base'

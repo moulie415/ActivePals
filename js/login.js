@@ -18,7 +18,7 @@ const FBSDK = require('react-native-fbsdk')
 const { LoginManager, AccessToken } = FBSDK
 const background = require('Anyone/assets/images/Running-background.jpg')
 import colors from 'Anyone/js/constants/colors'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import SplashScreen from 'react-native-splash-screen'
 import RNFetchBlob from 'rn-fetch-blob'
 import TouchableOpacity from './components/TouchableOpacityLockable'

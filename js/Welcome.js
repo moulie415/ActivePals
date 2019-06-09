@@ -13,7 +13,7 @@ import {
 import Swiper from 'react-native-swiper'
 import styles from './styles/welcomeStyles'
 import colors from './constants/colors'
-import Text from './constants/Text'
+import Text from './components/Text'
 import str from './constants/strings'
 import { getResource, types } from './constants/utils'
 import firebase from 'react-native-firebase'

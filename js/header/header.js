@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { ImageBackground, TouchableOpacity, View } from "react-native"
 import Image from "react-native-fast-image"
-import Text from '../constants/Text'
+import Text from '../components/Text'
 import { Icon, Header } from "native-base"
 import { TabBarBottom, SafeAreaView } from "react-navigation"
 import colors from '../constants/colors'

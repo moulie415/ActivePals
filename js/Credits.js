@@ -8,7 +8,7 @@ import {
     Container,
     Content
 } from 'native-base'
-import Text from './constants/Text'
+import Text from './components/Text'
 import { getResource , getType} from './constants/utils'
 import Hyperlink from 'react-native-hyperlink'
 import colors from './constants/colors'

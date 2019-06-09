@@ -13,7 +13,7 @@ import { Icon } from 'native-base'
 import colors from '../../constants/colors'
 import { getFbFriends } from '../../actions/friends'
 import { PulseIndicator } from 'react-native-indicators'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 
 class FbFriendsModal extends Component {
 

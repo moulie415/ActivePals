@@ -7,7 +7,7 @@ import {
     KeyboardAvoidingView,
     Alert
 } from 'react-native'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import TouchableOpacity from './components/TouchableOpacityLockable'
 
 import styles from './styles/formStyles'

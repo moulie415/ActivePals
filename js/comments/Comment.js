@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 import Image from 'react-native-fast-image'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import PropTypes from "prop-types";
 import TimeAgo from "react-native-timeago";
 import Icon from "react-native-vector-icons/FontAwesome";

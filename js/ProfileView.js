@@ -12,7 +12,7 @@ import {
   Icon,
 } from 'native-base'
 import firebase from 'react-native-firebase'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import Image from 'react-native-fast-image'
 import  styles  from './styles/profileStyles'
 import str from './constants/strings'

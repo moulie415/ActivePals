@@ -11,7 +11,7 @@ import {
 import Image from 'react-native-fast-image'
 import { Icon } from 'native-base'
 import colors from '../../constants/colors'
-import Text, { globalTextStyle } from 'Anyone/js/constants/Text'
+import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import PropTypes from 'prop-types'
 
 class FriendsModal extends Component {
