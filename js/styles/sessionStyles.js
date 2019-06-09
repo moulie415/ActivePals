@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native"
 import colors from 'Anyone/js/constants/colors'
+import styles from "../components/friendsModal/styles";
 
 export default  StyleSheet.create({
   spinner: {
@@ -30,6 +31,8 @@ export default  StyleSheet.create({
   modal: {
     height: 400,
     width: '90%',
+    borderRadius: 10,
+    paddingVertical: 10,
   },
   modalText: {
     color: "black",
@@ -48,6 +51,21 @@ export default  StyleSheet.create({
   },
   date: {
     fontFamily: 'Avenir',
+  },
+  sessionFilterTitle: {
+    fontSize: 20,
+    textAlign: 'center',
+    paddingBottom: 10,
+    color: '#000',
+    fontWeight: 'bold'
+  },
+  sessionFilterContainer: {
+    flex: 1,
+    padding: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#999',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#999'
   }
 
 })

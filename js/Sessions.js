@@ -17,7 +17,7 @@ import {
 import { PulseIndicator } from 'react-native-indicators'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
-import Text, { globalTextStyle } from 'Anyone/js/components/Text'
+import Text, { globalTextStyle } from './components/Text'
 import Permissions from 'react-native-permissions'
 import styles from './styles/sessionStyles'
 import colors from './constants/colors'
@@ -33,6 +33,7 @@ import { showLocation, Popup } from 'react-native-map-link'
 import Header from './header/header'
 import FriendsModal from './components/friendsModal'
 import GymSearch from './components/GymSearch'
+import { CheckBox } from 'react-native-elements'
 
  class Sessions extends Component {
 
@@ -60,7 +61,8 @@ import GymSearch from './components/GymSearch'
       markers: this.markers(combined),
       selectedIndex: 0,
       popUpVisible: false,
-      loadMore: true,
+      pilates: true,
+      yoga: true,
       loadingGyms: false,
       selectedLocation: {}
     }
@@ -193,7 +195,7 @@ import GymSearch from './components/GymSearch'
         {this.state.markers}
         {this.gymMarkers(Object.values(this.props.places))}
         </MapView>}
-        {GymSearch(this)}
+        <GymSearch parent={this} onOpen={() => this.refs.locationModal.open()} />
 
         <View style={{flexDirection: 'row', height: 60, backgroundColor: colors.bgColor}}>
           <TouchableOpacity style={styles.button}
@@ -280,9 +282,9 @@ import GymSearch from './components/GymSearch'
           style={[styles.modal, {height: null}]} 
           position={'center'} 
           ref={"locationModal"} 
-          onClosed={()=> this.setState({loadedGymImage: false})}>
+          >
           <View>
-          <Text  style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          <Text  style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
           {name}</Text>
           <View style={{margin: 10}}>
             <View style={{flexDirection: 'row', marginTop: 5, justifyContent: 'space-between'}}>
@@ -396,11 +398,19 @@ import GymSearch from './components/GymSearch'
             </View>
             </View>
         </Modal>
-        <Modal style={styles.modal} position={'center'} ref={"filterModal"} >
-            <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
-          Filters</Text>
-          <View style={{margin: 10, flex: 1}}>
-            <View style={{ flex: 1}}>
+        <Modal onOpened={() => this.setState({initialRadius: this.state.radius})} 
+        onClosed={() => {
+          if (this.state.radius != this.state.initialRadius) {
+            this.setState({refreshing: true})
+                this.props.fetch(this.state.radius, true).then(() => this.setState({refreshing: false}))
+          }
+        }}
+        style={styles.modal}
+      position={'center'} ref={"filterModal"} >
+          <View style={{ flex: 1, borderRadius: 5}}>
+          <Text style={styles.sessionFilterTitle}>
+          Sessions</Text>
+            <View style={styles.sessionFilterContainer}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={{marginRight: 5, fontSize: 12}}>{"Search radius* " + this.state.radius + " km"}</Text>
                 <Slider
@@ -414,20 +424,39 @@ import GymSearch from './components/GymSearch'
                   onValueChange={(val)=> this.setState({radius: val})}
                 />
               </View>
+              <View style={{flex: 1, justifyContent: 'flex-end'}}>
+              <Text style={{fontSize: 12, textAlign: 'right', margin: 10}}>*Public only (private sessions should always be visible)</Text>
+              </View>
             </View>
-              <Text style={{fontSize: 12, textAlign: 'right'}}>*Public only (private sessions should always be visible)</Text>
           </View>
-            <View style={{backgroundColor: colors.primary}}>
+          <View style={{flex: 1}}>
+            <Text style={{
+              fontSize: 20,
+              textAlign: 'center',
+              padding: 10,
+              color: '#000',
+              fontWeight: 'bold'
+              }}>
+              Gyms</Text>
               <TouchableOpacity
-              onPress={()=> {
-                this.setState({refreshing: true})
-                this.props.fetch(this.state.radius, true).then(() => this.setState({refreshing: false}))
-                this.refs.filterModal.close()
-              }}
-              style={{padding: 5}}>
-                <Text style={{color: '#fff', backgroundColor: colors.secondary, alignSelf: 'center', padding: 5, paddingHorizontal: 10}}>Apply</Text>
+              onPress={() => this.setState({yoga: !this.state.yoga})}
+              style={{flexDirection: 'row', alignItems: 'center', borderTopWidth: 0.5, borderTopColor: '#999'}}>
+                <CheckBox
+                checked={this.state.yoga}
+                onPress={() => this.setState({yoga: !this.state.yoga})}
+                />
+                <Text style={{marginLeft: -10}}>Show Yoga</Text>
               </TouchableOpacity>
-            </View>
+              <TouchableOpacity
+              onPress={() => this.setState({pilates: !this.state.pilates})}
+              style={{flexDirection: 'row', alignItems: 'center'}}>
+                <CheckBox
+                checked={this.state.pilates}
+                onPress={() => this.setState({pilates: !this.state.pilates})}
+                />
+                <Text style={{marginLeft: -10}}>Show Pilates</Text>
+              </TouchableOpacity>
+          </View>
         </Modal>
         <Popup
           isVisible={this.state.popUpVisible}
@@ -672,32 +701,34 @@ import GymSearch from './components/GymSearch'
             keyExtractor={(item) => item.place_id}
             renderItem={({ item, index }) => {
               const { lat, lng } = item.geometry.location
-              return <TouchableOpacity onPress={() => {
-                this.setState({selectedLocation: item, latitude: lat, longitude: lng},
-                    ()=> this.refs.locationModal.open())
-            }}>
-              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
-                <View style={{flexDirection: 'row'}} >
-                  {item.photo ? <Image source={{uri: item.photo}} style={{height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10}}/> : 
-                  <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>}
-                    <View style={{flex: 1}}>
-                      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
-                      </View>
-                      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
-                        <TouchableOpacity onPress={()=>{
-                          this.setState({longitude: lng, latitude: lat, switch: true})
-                        }}
-                        style={{flex: 1}}>
-                          <Text style={{color: colors.secondary, textAlign: 'right', fontWeight: 'bold', fontSize: 15}}>View on map</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <Text style={{color: '#999'}}>{' (' +  this.getDistance(item, true) + ' km away)'}</Text>
+              if (this.gymFilter(item)) {
+                return <TouchableOpacity onPress={() => {
+                  this.setState({selectedLocation: item, latitude: lat, longitude: lng},
+                      ()=> this.refs.locationModal.open())
+                  }}>
+                <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
+                  <View style={{flexDirection: 'row'}} >
+                    {item.photo ? <Image source={{uri: item.photo}} style={{height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10}}/> : 
+                    <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>}
+                      <View style={{flex: 1}}>
+                        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                          <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
+                        </View>
+                        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                          <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
+                          <TouchableOpacity onPress={()=>{
+                            this.setState({longitude: lng, latitude: lat, switch: true})
+                          }}
+                          style={{flex: 1}}>
+                            <Text style={{color: colors.secondary, textAlign: 'right', fontWeight: 'bold', fontSize: 15}}>View on map</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <Text style={{color: '#999'}}>{' (' +  this.getDistance(item, true) + ' km away)'}</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+              }
           }}
 
 
@@ -888,6 +919,11 @@ getDistance(item, gym = false) {
   else return 'N/A'
 }
 
+gymFilter(gym) {
+  return !(!this.state.pilates && gym.name.toLowerCase().includes('pilates')) &&
+  !(!this.state.yoga && gym.name.toLowerCase().includes('yoga'))
+}
+
 }
 
 export function deg2rad(deg) {
@@ -911,6 +947,7 @@ import {
   addUser,
   setPlaces,
   fetchPhotoPaths,
+  fetchPhotoPath,
   fetchPlaces
 } from './actions/sessions'
 import { removeGym, joinGym, setLocation } from './actions/profile'
@@ -930,15 +967,15 @@ const mapDispatchToProps = dispatch => ({
   join: (location) => dispatch(joinGym(location)),
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   removeGym: () => dispatch(removeGym()),
-  getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
+  getChats: (sessions, uid) => dispatch(fetchSessionChats(sessions, uid)),
   onJoin: (session, isPrivate) => {
     dispatch(addUser(session, isPrivate))
     return dispatch(addSessionChat(session, isPrivate))
   },
   remove: (key, type) => dispatch(removeSession(key, type)),
-  onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))},
+  onOpenChat: (session) => dispatch(navigateMessagingSession(session)),
   onContinue: (buddies, location) => dispatch(navigateSessionDetail(buddies, location)),
-  fetch: (radius, update = false) => {return Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())])},
+  fetch: (radius, update = false) => Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())]),
   viewGym: (id) => dispatch(navigateGym(id)),
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
   setLocation: (location) => dispatch(setLocation(location)),
