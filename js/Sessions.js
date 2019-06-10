@@ -34,6 +34,7 @@ import Header from './header/header'
 import FriendsModal from './components/friendsModal'
 import GymSearch from './components/GymSearch'
 import { CheckBox } from 'react-native-elements'
+import Button from './components/Button'
 
  class Sessions extends Component {
 
@@ -262,7 +263,7 @@ import { CheckBox } from 'react-native-elements'
                   this.setState({popUpVisible: true, options})
                 }}
               style={{backgroundColor: colors.secondary, padding: 10, borderRadius: 5}}>
-                <Text style={{color: '#fff'}}>Get directions</Text>
+                <Text style={{color: '#fff'}}>Directions</Text>
               </TouchableOpacity>
             
             </View>
@@ -308,7 +309,7 @@ import { CheckBox } from 'react-native-elements'
                   this.setState({popUpVisible: true, options})
                 }}
               style={{backgroundColor: colors.secondary, padding: 10, borderRadius: 5, height: 40}}>
-                <Text style={{color: '#fff'}}>Get directions</Text>
+                <Text style={{color: '#fff'}}>Directions</Text>
               </TouchableOpacity>
               
             </View>
@@ -328,7 +329,7 @@ import { CheckBox } from 'react-native-elements'
               <TouchableOpacity 
               onPress={() => {
                 Alert.alert(
-                      'Leave Gym',
+                      'Leave',
                       'Are you sure?',
                       [
                           {text: 'Cancel', style: 'cancel'},
@@ -337,14 +338,14 @@ import { CheckBox } from 'react-native-elements'
                   )
                 }}
               style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red', borderRadius: 5}}>
-              <Text style={{color: '#fff'}}>Leave Gym</Text>
+              <Text style={{color: '#fff'}}>Leave</Text>
               </TouchableOpacity></View> :
               <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 5}}>
-                <TouchableOpacity
+                <Button
                 onPress={()=> {
                   if (this.props.gym) {
                         Alert.alert(
-                        'Join Gym',
+                        'Join',
                         'This will leave your current Gym?',
                         [
                             {text: 'Cancel', style: 'cancel'},
@@ -354,9 +355,9 @@ import { CheckBox } from 'react-native-elements'
                     }
                     else this.props.join(this.state.selectedLocation)
                   }}
-                style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginBottom: 10, borderRadius: 5}}>
-                <Text style={{color: '#fff'}}>Join Gym</Text>
-                </TouchableOpacity>
+                style={{paddingHorizontal: 15, alignSelf: 'center', marginBottom: 10}}
+                text={'Join'}
+                />
                 <TouchableOpacity
                 onPress={()=> this.props.viewGym(place_id)}
                 style={{

@@ -100,7 +100,7 @@ import FriendsModal from './components/friendsModal'
               <TouchableOpacity 
               onPress={() => {
                   Alert.alert(
-                      'Leave Gym',
+                      'Leave',
                       'Are you sure?',
                       [
                           {text: 'Cancel', style: 'cancel'},
@@ -110,14 +110,14 @@ import FriendsModal from './components/friendsModal'
                   
                   }}
               style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red', borderRadius: 5}}>
-              <Text style={{color: '#fff'}}>Leave Gym</Text>
+              <Text style={{color: '#fff'}}>Leave</Text>
               </TouchableOpacity></View> :
               <View style={{margin: 10}}>
                 <TouchableOpacity
                 onPress={()=> {
                     if (this.props.gym) {
                         Alert.alert(
-                        'Join Gym',
+                        'Join',
                         'This will leave your current Gym?',
                         [
                             {text: 'Cancel', style: 'cancel'},
@@ -129,7 +129,7 @@ import FriendsModal from './components/friendsModal'
                     
                     }}
                 style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginVertical: 10, borderRadius: 5}}>
-                <Text style={{color: '#fff'}}>Join Gym</Text>
+                <Text style={{color: '#fff'}}>Join</Text>
                 </TouchableOpacity>
               </View>}
             <View style={{flexDirection: 'row'}}>
@@ -151,7 +151,7 @@ import FriendsModal from './components/friendsModal'
                   this.setState({popUpVisible: true, options})
                 }}
                 style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5, height: 40}}>
-                <Text style={{color: '#fff'}}>Get directions</Text>
+                <Text style={{color: '#fff'}}>Directions</Text>
                 </TouchableOpacity>
             </View>
             {gym.website && <Hyperlink linkDefault={true}>
