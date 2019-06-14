@@ -21,12 +21,13 @@ export default styles = StyleSheet.create({
   },
   inputGrp: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    paddingLeft: 10,
+    backgroundColor: '#0005',
     marginBottom: 20,
     borderWidth: 0,
     borderColor: 'transparent',
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
+    paddingLeft: 10,
+    borderRadius: 5,
   },
 })

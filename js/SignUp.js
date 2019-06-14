@@ -1,7 +1,8 @@
 import React, { Component } from "react"
 import {
   Alert,
-  View
+  View,
+  ImageBackground
  } from "react-native"
 import {
   Input,
@@ -11,12 +12,12 @@ import {
 } from 'native-base'
 import firebase from 'react-native-firebase'
 import  styles  from './styles/signUpStyles'
-import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import colors from './constants/colors'
-import TouchableOpacity from './components/TouchableOpacityLockable.js'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
 import sStyles from './styles/settingsStyles'
+const background = require('Anyone/assets/images/Running-background.jpg')
+import Button from './components/Button'
 
 
  class SignUp extends Component {
@@ -39,7 +40,7 @@ import sStyles from './styles/settingsStyles'
 
   render () {
     return (
-    <Container style={styles.container}>
+    <ImageBackground style={styles.container} source={background}>
       <Header 
       hasBack={true}
       title={'Sign up'}
@@ -93,8 +94,8 @@ import sStyles from './styles/settingsStyles'
         style={styles.input}
         />
         </Item>
-        <TouchableOpacity 
-        style={{backgroundColor: colors.secondary, padding: 10, paddingHorizontal: 20, alignSelf: 'center', borderRadius: 5}}
+        <Button 
+        style={{paddingHorizontal: 20, alignSelf: 'center'}}
         onPress={() => {
           if (this.pass == this.confirm) {
             this.setState({spinner: true})
@@ -120,11 +121,11 @@ import sStyles from './styles/settingsStyles'
             this.setState({spinner: false})
           }
         }}
-        >
-        <Text style={{color: '#fff'}}>Sign up</Text>
-        </TouchableOpacity>
+        text='Sign up'
+        />
+
         </View>
-    </Container>
+    </ImageBackground>
   )
   }
 

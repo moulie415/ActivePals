@@ -26,6 +26,7 @@ import str from './constants/strings'
 import SpinnerButton from 'react-native-spinner-button'
 import { PulseIndicator } from 'react-native-indicators'
 import Config from 'react-native-config'
+import Button from './components/Button'
 
 
  class Login extends Component {
@@ -99,7 +100,8 @@ import Config from 'react-native-config'
         </TouchableOpacity>
         </Item>
         <View style={{flexDirection: 'row', marginVertical: 10}}>
-      <TouchableOpacity primary
+      <Button
+        text="Login"
         onPress={(mutex) => {
           mutex.lockFor(1000)
           if (this.username && this.pass) {
@@ -109,15 +111,11 @@ import Config from 'react-native-config'
           else Alert.alert("Sorry", "Please enter both your email and your password")
         }}
         style={[{marginRight: 10}, styles.button]}
-        >
-        <Text style={{color: '#fff'}}>Login</Text>
-        </TouchableOpacity>
-      <TouchableOpacity primary
-        onPress={() => this.props.navigation.navigate("SignUp")}
-        style={styles.button}
-        >
-        <Text style={{color: '#fff'}}>Sign Up</Text>
-        </TouchableOpacity>
+        />
+        <Button
+          style={styles.button}
+          onPress={()=> this.props.navigation.navigate("SignUp")}
+          text="Sign Up" />
         </View>
         <View>
           <SpinnerButton
@@ -126,16 +124,7 @@ import Config from 'react-native-config'
           }}
           isLoading={this.state.facebookLoading}
           spinnerType={str.spinner}
-          buttonStyle={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginVertical: 10,
-            backgroundColor: "#3b5998",
-            width: 250,
-            flexDirection: 'row',
-            paddingVertical: 8,
-            borderRadius: 5
-          }}>
+          buttonStyle={[{backgroundColor: "#3b5998"}, styles.spinnerButton]}>
             <Icon style={{color: '#fff', marginRight: 10}} name="logo-facebook"/>
             <Text style={{color: '#fff'}}>Login with Facebook</Text>
           </SpinnerButton>
@@ -146,16 +135,7 @@ import Config from 'react-native-config'
             this.setState({googleLoading: true})
             this.gLogin()
           }}
-          buttonStyle={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginVertical: 10,
-              backgroundColor: "#ea4335",
-              width: 250,
-              flexDirection: 'row',
-              paddingVertical: 8,
-              borderRadius: 5
-          }}>
+          buttonStyle={[{backgroundColor: "#ea4335"}, styles.spinnerButton]}>
             <Icon style={{marginLeft: -15, color: '#fff', marginRight: 10}} name="logo-google"/>
             <Text style={{ color: '#fff'}}>Login with Google</Text>
           </SpinnerButton>

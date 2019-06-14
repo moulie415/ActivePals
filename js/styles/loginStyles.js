@@ -34,11 +34,22 @@ export default StyleSheet.create({
     borderRadius: 3,
 
   },
-  button: {
-    backgroundColor: colors.secondary,
-    width: 100, justifyContent: 'center',
+  spinnerButton: {
     alignItems: 'center',
-    padding: 10,
-    borderRadius: 5
+    justifyContent: 'center',
+    marginVertical: 10,
+    width: 250,
+    flexDirection: 'row',
+    paddingVertical: 8,
+    borderRadius: 5,
+    elevation:4,
+    shadowOffset: { width: 5, height: 5 },
+    shadowColor: "grey",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+  },
+  button: {
+    width: 100,
+    alignItems: 'center',
   },
 })
