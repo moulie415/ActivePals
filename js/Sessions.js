@@ -284,10 +284,23 @@ import Button from './components/Button'
           ref={"locationModal"} 
           >
           <View>
-          <Text  style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
-          {name}</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap'}}>
+            <Text  style={{fontSize: 20, padding: 10, color: '#000'}}>
+            {name}</Text>
+            <TouchableOpacity
+                  style={{
+                    elevation:4,
+                    shadowOffset: { width: 5, height: 5 },
+                    shadowColor: "grey",
+                    shadowOpacity: 0.5,
+                    shadowRadius: 10
+                  }}
+                  onPress={()=> this.props.viewGym(place_id)}>
+              <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
+            </TouchableOpacity>
+          </View>
           <View style={{margin: 10}}>
-            <View style={{flexDirection: 'row', marginVertical: 5, justifyContent: 'space-between'}}>
+            <View style={{flexDirection: 'row', marginVertical: 10, justifyContent: 'space-between'}}>
               <View style={{flex: 1}}>
                 <Text>
                   <Text>{vicinity}</Text>
@@ -307,6 +320,7 @@ import Button from './components/Button'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
+                style={{marginLeft: 10, alignSelf: 'flex-start'}}
                 text="Directions"/>
               
             </View>
@@ -320,7 +334,7 @@ import Button from './components/Button'
                   style={{justifyContent: 'center', marginRight: 20}}>
                   <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <Button
               onPress={() => {
                 Alert.alert(
                       'Leave',
@@ -331,10 +345,10 @@ import Button from './components/Button'
                       ]
                   )
                 }}
-              style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red', borderRadius: 5}}>
-              <Text style={{color: '#fff'}}>Leave</Text>
-              </TouchableOpacity></View> :
-              <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 5}}>
+              text="Leave"
+              color='red'
+              style={{alignSelf: 'center', marginBottom: 5}}/>
+              </View> :
                 <Button
                 onPress={()=> {
                   if (this.props.gym) {
@@ -351,19 +365,7 @@ import Button from './components/Button'
                   }}
                 style={{paddingHorizontal: 15, alignSelf: 'center', marginBottom: 10}}
                 text={'Join'}
-                />
-                <TouchableOpacity
-                style={{
-                  elevation:4,
-                  shadowOffset: { width: 5, height: 5 },
-                  shadowColor: "grey",
-                  shadowOpacity: 0.5,
-                  shadowRadius: 10
-                }}
-                onPress={()=> this.props.viewGym(place_id)}>
-                <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
-                </TouchableOpacity>
-              </View>}
+                />}
             {photo && <Image 
               style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} 
              resizeMode={'contain'} 
@@ -432,19 +434,25 @@ import Button from './components/Button'
               onPress={() => this.setState({yoga: !this.state.yoga})}
               style={{flexDirection: 'row', alignItems: 'center', borderTopWidth: 0.5, borderTopColor: '#999'}}>
                 <CheckBox
+                containerStyle={{backgroundColor: 'transparent', width: 45, borderWidth: 0}}
+                checkedColor={colors.secondary}
+                uncheckedColor={colors.secondary}
                 checked={this.state.yoga}
                 onPress={() => this.setState({yoga: !this.state.yoga})}
                 />
-                <Text style={{marginLeft: -10}}>Show Yoga</Text>
+                <Text>Show Yoga</Text>
               </TouchableOpacity>
               <TouchableOpacity
               onPress={() => this.setState({pilates: !this.state.pilates})}
               style={{flexDirection: 'row', alignItems: 'center'}}>
                 <CheckBox
+                containerStyle={{backgroundColor: 'transparent', width: 45, borderWidth: 0}}
+                checkedColor={colors.secondary}
+                uncheckedColor={colors.secondary}
                 checked={this.state.pilates}
                 onPress={() => this.setState({pilates: !this.state.pilates})}
                 />
-                <Text style={{marginLeft: -10}}>Show Pilates</Text>
+                <Text>Show Pilates</Text>
               </TouchableOpacity>
           </View>
         </Modal>
