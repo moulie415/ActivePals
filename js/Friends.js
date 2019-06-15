@@ -23,6 +23,7 @@ import Header from './header/header'
 import Image from 'react-native-fast-image'
 import FbFriendsModal from './components/FbFriendsModal'
 import Text from './components/Text'
+import Button from './components/Button'
 
  class Friends extends Component {
   static navigationOptions = {
@@ -148,7 +149,7 @@ import Text from './components/Text'
       style={styles.modal}
       position={"center"}
       ref={"modal"} >
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
           Send pal request</Text>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <TextInput
@@ -160,21 +161,18 @@ import Text from './components/Text'
             />
           </View>
 
-          <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-          <TouchableOpacity onPress={()=> {
+          <View style={{flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10}}>
+          <Button onPress={()=> {
             this.refs.modal.close()
           }}
-          style={[styles.button, {backgroundColor: 'red'}]}>
-            <Text style={{color: '#fff'}}>Cancel</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={(mutex)=> {
+          text='Cancel'
+          color='red'/>
+      
+          <Button onPress={(mutex)=> {
             mutex.lockFor(1000)
             this.sendRequest(this.username)
           }}
-          style={styles.button}>
-            <Text style={{color: '#fff'}}>Submit</Text>
-          </TouchableOpacity>
+          text='Submit'/>
           
           </View>
         </Modal>

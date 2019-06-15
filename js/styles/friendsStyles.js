@@ -5,6 +5,7 @@ export default styles = StyleSheet.create({
   modal: {
     height: 200,
     width: '90%',
+    borderRadius: 10,
   },
   modalText: {
     color: "black",

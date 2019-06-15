@@ -14,6 +14,7 @@ import colors from '../../constants/colors'
 import { getFbFriends } from '../../actions/friends'
 import { PulseIndicator } from 'react-native-indicators'
 import Text, { globalTextStyle } from 'Anyone/js/components/Text'
+import Button from '../Button'
 
 class FbFriendsModal extends Component {
 
@@ -38,15 +39,14 @@ class FbFriendsModal extends Component {
           isOpen={this.props.isOpen} 
           style={styles.modal} 
           position={"center"} >
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
           Select Facebook friends</Text>
           {this.state.loading ? <PulseIndicator color={colors.secondary}/> :this.renderFriendsSelection()}
-          <View style={{backgroundColor: colors.primary, flexDirection: 'row', justifyContent: 'space-evenly'}}>
-            <TouchableOpacity onPress={() => this.refs.fbModal.close()}
-            style={[styles.button, {backgroundColor: 'red'}]}>
-              <Text style={{color: '#fff'}}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=> {
+          <View style={{flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: 10}}>
+            <Button onPress={() => this.refs.fbModal.close()}
+            color='red'
+            text='Cancel' />
+            <Button onPress={()=> {
               const length = this.state.selectedFriends.length
               if (length > 0) {
                 Promise.all(this.state.selectedFriends.map(friend => {
@@ -62,11 +62,8 @@ class FbFriendsModal extends Component {
                 Alert.alert("Sorry", "Please select at least one friend")
               }
             }}
-            style={styles.button}>
-              <Text style={{color: '#fff'}}>
-              Send pal requests
-              </Text>
-            </TouchableOpacity>
+            text='Send requests'
+            />
           </View>
         </Modal>
   }
@@ -75,12 +72,12 @@ class FbFriendsModal extends Component {
   renderFriendsSelection() {
     let friends = []
     if (this.state.fbFriends) {
-      Object.values(this.state.fbFriends).forEach(friend => {
+      Object.values(this.state.fbFriends).forEach((friend, index) => {
         const selected = this.state.selectedFriends.some(uid => uid == friend.uid)
         if (!this.props.friends[friend.uid]) {
           friends.push(
             <TouchableOpacity key={friend.uid || friend.id} onPress={()=> this.onFriendPress(friend)}>
-              <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
+              <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5, marginTop: index == 0 && 0.5}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
