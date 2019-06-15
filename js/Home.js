@@ -147,7 +147,14 @@ sortByDate(array) {
           borderBottomWidth: 0.5,
           borderColor: '#999',
         }}>
-        <TouchableOpacity onPress={()=> this.props.goToProfile()}>
+        <TouchableOpacity onPress={()=> this.props.goToProfile()}
+        style={{
+          elevation:4,
+          shadowOffset: { width: 5, height: 5 },
+          shadowColor: "grey",
+          shadowOpacity: 0.5,
+          shadowRadius: 10
+          }}>
           {this.props.profile && this.props.profile.avatar ?
             <Image source={{uri: this.props.profile.avatar}} 
             style={{height: 50, width: 50, borderRadius: 25}}/>
@@ -189,7 +196,18 @@ sortByDate(array) {
                   )
               }
             }}>
-              <Icon name="md-image" style={{color: colors.secondary, fontSize: 40, marginRight: 10}} />
+              <Icon name="ios-attach"
+              style={{
+                color: colors.secondary,
+                fontSize: 40,
+                marginLeft: 5,
+                marginRight: 10,
+                // elevation:4,
+                // shadowOffset: { width: 5, height: 5 },
+                // shadowColor: "grey",
+                // shadowOpacity: 0.5,
+                // shadowRadius: 10,
+                }} />
             </TouchableOpacity>
             <TouchableOpacity onPress={(mutex) => {
               mutex.lockFor(1000)
@@ -223,7 +241,17 @@ sortByDate(array) {
                 //alert no status
               }
             }}>
-              <FIcon name="chevron-circle-right" style={{color: colors.secondary, fontSize: 40}}/>
+              <Icon name="md-return-right" 
+              style={{
+                color: colors.secondary,
+                fontSize: 40,
+                paddingTop: 5
+                // elevation:4,
+                // shadowOffset: { width: 5, height: 5 },
+                // shadowColor: "grey",
+                // shadowOpacity: 0.5,
+                // shadowRadius: 10,
+                }}/>
             </TouchableOpacity>
         </View>
         

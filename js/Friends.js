@@ -143,12 +143,12 @@ import Button from './components/Button'
             {"You don't have any pals yet, also please make sure you are connected to the internet"}
           </Text></View>}
 
-      <Modal 
-      backButtonClose={true}
-      backdropPressToClose={false}
-      style={styles.modal}
-      position={"center"}
-      ref={"modal"} >
+      <Modal
+        backButtonClose={true}
+        backdropPressToClose={false}
+        style={styles.modal}
+        position={"center"}
+        ref={"modal"}>
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
           Send pal request</Text>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>

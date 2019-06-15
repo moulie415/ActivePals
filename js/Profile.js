@@ -23,6 +23,7 @@ import RNPickerSelect from 'react-native-picker-select'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
 import globalStyles from './styles/globalStyles'
+import Button from './components/Button'
 
 
  class Profile extends Component {
@@ -278,11 +279,10 @@ import globalStyles from './styles/globalStyles'
           </View>
          
 
-      <TouchableOpacity
-        style={styles.logout}
-        onPress={()=> this.logout()}>
-        <Text style={{color: '#fff'}} >Log out</Text>
-      </TouchableOpacity>
+      <Button
+      style={styles.logout}
+        text='Log out'
+        onPress={()=> this.logout()}/>
         {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
         </ScrollView>
 
@@ -473,6 +473,7 @@ import { connect } from 'react-redux'
 import { navigateLogin, navigateSettings } from './actions/navigation'
 import { fetchProfile, setLoggedOut } from './actions/profile'
 import { navigateGym } from "./actions/navigation";
+import signUpStyles from "./styles/signUpStyles";
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile,

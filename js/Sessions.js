@@ -288,13 +288,6 @@ import Button from './components/Button'
             <Text  style={{fontSize: 20, padding: 10, color: '#000'}}>
             {name}</Text>
             <TouchableOpacity
-                  style={{
-                    elevation:4,
-                    shadowOffset: { width: 5, height: 5 },
-                    shadowColor: "grey",
-                    shadowOpacity: 0.5,
-                    shadowRadius: 10
-                  }}
                   onPress={()=> this.props.viewGym(place_id)}>
               <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
             </TouchableOpacity>
@@ -616,19 +609,16 @@ import Button from './components/Button'
                       onPress={() => {
                           this.props.onOpenGymChat(gym.place_id)
                       }}
-                      style={{justifyContent: 'center', marginRight: 20}}>
+                      style={{
+                        justifyContent: 'center',
+                        marginRight: 20
+                        }}>
                         <Icon name='md-chatboxes' style={{color: colors.secondary}}/>
                       </TouchableOpacity>
                       <TouchableOpacity 
                       onPress={() => {
                         this.props.viewGym(gym.place_id)
-                      }}
-                      style={{
-                        elevation:4,
-                        shadowOffset: { width: 5, height: 5 },
-                        shadowColor: "grey",
-                        shadowOpacity: 0.5,
-                        shadowRadius: 10,}}>
+                      }}>
                         <Icon name='md-information-circle' style={{color: colors.secondary}}/>
                       </TouchableOpacity>
                       </View>

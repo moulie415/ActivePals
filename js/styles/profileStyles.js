@@ -21,11 +21,7 @@ export default StyleSheet.create({
     borderRadius: 5
   },
   logout: {
-    backgroundColor: colors.secondary,
     margin: 20,
     alignSelf: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5
   }
 })
