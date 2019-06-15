@@ -5,9 +5,9 @@ import styles from './styles'
 import PropTypes from 'prop-types'
 import TouchableOpacity from '../TouchableOpacityLockable'
 
-const AppButton = ({color, textColor, onPress, text, style}) => {
+const AppButton = ({color, textColor, onPress, text, style, textStyle}) => {
   return <TouchableOpacity onPress={onPress} style={[styles.button, style, {backgroundColor: color || colors.secondary}]}>
-    <Text style={[styles.text, {color: textColor || '#fff'}]}>{text}</Text>
+    <Text style={[styles.text, {color: textColor || '#fff'}, textStyle]}>{text}</Text>
   </TouchableOpacity>
 }
 

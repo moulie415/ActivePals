@@ -7,6 +7,7 @@ import {
   ScrollView,
   Linking,
   Slider,
+  StyleSheet
 } from "react-native"
 import {
   Container,
@@ -199,16 +200,15 @@ import Button from './components/Button'
         <GymSearch parent={this} onOpen={() => this.refs.locationModal.open()} />
 
         <View style={{flexDirection: 'row', height: 60, backgroundColor: colors.bgColor}}>
-          <TouchableOpacity style={styles.button}
+          <Button style={styles.button}
           onPress={()=> {
             this.setState({selectedLocation: {}})
             this.props.onContinue()
-          }}>
-            <Text adjustsFontSizeToFit={true}
-            style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</Text>
-          </TouchableOpacity>
+          }}
+          text='Create Session'
+          textStyle={{textAlign: 'center', fontSize: 15, textAlignVertical: 'center'}}/>
           <View style={{borderRightWidth: 1, borderRightColor: colors.bgColor}}/>
-          <TouchableOpacity style={styles.button}
+          <Button style={styles.button}
           onPress={()=> {
             if (Object.keys(this.props.friends).length > 0) {
               this.setState({selectedLocation: {}, friendsModalOpen: true})
@@ -216,10 +216,9 @@ import Button from './components/Button'
             else {
               Alert.alert("Sorry", "You must have at least one pal to create a private session")
             }
-          }}>
-            <Text adjustsFontSizeToFit={true}
-            style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Private Session</Text>
-          </TouchableOpacity>
+          }}
+          text='Create Private Session'
+            textStyle={{textAlign: 'center', fontSize: 15, textAlignVertical: 'center'}}/>
         </View>
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedSession && <View style={{flex: 1}}>
@@ -251,7 +250,7 @@ import Button from './components/Button'
                 <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
                   this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
               </Text>
-              <TouchableOpacity onPress={()=> {
+              <Button onPress={()=> {
                 const { lat, lng } = location && location.position
                 const options = {
                   latitude: lat,
@@ -262,9 +261,9 @@ import Button from './components/Button'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
-              style={{backgroundColor: colors.secondary, padding: 10, borderRadius: 5}}>
-                <Text style={{color: '#fff'}}>Directions</Text>
-              </TouchableOpacity>
+                text='Directions'
+              />
+  
             
             </View>
             </ScrollView>
@@ -288,14 +287,14 @@ import Button from './components/Button'
           <Text  style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
           {name}</Text>
           <View style={{margin: 10}}>
-            <View style={{flexDirection: 'row', marginTop: 5, justifyContent: 'space-between'}}>
+            <View style={{flexDirection: 'row', marginVertical: 5, justifyContent: 'space-between'}}>
               <View style={{flex: 1}}>
                 <Text>
                   <Text>{vicinity}</Text>
                   <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
                 </Text>
               </View>
-              <TouchableOpacity onPress={()=> {
+              <Button onPress={()=> {
                 const { lat, lng } = geometry && geometry.location
 
                 const options = {
@@ -308,14 +307,9 @@ import Button from './components/Button'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
-              style={{backgroundColor: colors.secondary, padding: 10, borderRadius: 5, height: 40}}>
-                <Text style={{color: '#fff'}}>Directions</Text>
-              </TouchableOpacity>
+                text="Directions"/>
               
             </View>
-            {rating && <Text style={{marginTop: 5}}>{'Google rating: '}
-                      <Text style={{color: colors.secondary}}>{rating}</Text>
-                      </Text>}
             {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
@@ -359,20 +353,15 @@ import Button from './components/Button'
                 text={'Join'}
                 />
                 <TouchableOpacity
-                onPress={()=> this.props.viewGym(place_id)}
                 style={{
-                  backgroundColor: colors.secondary,
-                  padding: 5,
-                  paddingHorizontal: 8,
-                  alignSelf: 'center',
-                  alignItems: 'center',
-                  marginBottom: 10,
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  borderRadius: 5,
-                  }}>
-                <Text style={{color: '#fff', marginRight: 10}}>View info</Text>
-                <Icon name={'md-information-circle'} style={{color: '#fff'}}/>
+                  elevation:4,
+                  shadowOffset: { width: 5, height: 5 },
+                  shadowColor: "grey",
+                  shadowOpacity: 0.5,
+                  shadowRadius: 10
+                }}
+                onPress={()=> this.props.viewGym(place_id)}>
+                <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
                 </TouchableOpacity>
               </View>}
             {photo && <Image 
@@ -380,21 +369,21 @@ import Button from './components/Button'
              resizeMode={'contain'} 
              source={{uri: photo}}/>}
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
-              <TouchableOpacity
+              <Button
+              text="Create Session"
               onPress={()=> {
                 this.props.onContinue(null, this.state.selectedLocation)
               }}
-              style={{backgroundColor: colors.secondary, padding: 10, flex: 1, marginRight: 10, borderRadius: 5}}>
-                <Text style={{color: '#fff', textAlign: 'center'}}>Create Session</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              style={{flex: 1, marginRight: 10, alignItems: 'center'}}/>
+
+              <Button
               onPress={()=> {
                 this.refs.locationModal.close()
                 this.setState({friendsModalOpen: true})
               }}
-              style={{backgroundColor: colors.secondary, padding: 10, flex: 1, borderRadius: 5}}>
-                <Text style={{color: '#fff', textAlign: 'center'}}>Create Private Session</Text>
-              </TouchableOpacity>
+              text="Create Private Session"
+              style={{flex: 1, alignItems: 'center'}}/>
+     
               </View>
             </View>
             </View>
@@ -626,7 +615,12 @@ import Button from './components/Button'
                       onPress={() => {
                         this.props.viewGym(gym.place_id)
                       }}
-                      style={{justifyContent: 'center'}}>
+                      style={{
+                        elevation:4,
+                        shadowOffset: { width: 5, height: 5 },
+                        shadowColor: "grey",
+                        shadowOpacity: 0.5,
+                        shadowRadius: 10,}}>
                         <Icon name='md-information-circle' style={{color: colors.secondary}}/>
                       </TouchableOpacity>
                       </View>

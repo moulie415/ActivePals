@@ -66,7 +66,7 @@ import FriendsModal from './components/friendsModal'
      title={'Gym'}
       />
         <View style={{alignItems: 'center', marginBottom: 10}}>
-        {gym.photo ?
+        {gym && gym.photo ?
       <Image style={{height: 150, width: '100%'}}
           resizeMode='cover'
           source={{uri: gym.photo}} /> :
