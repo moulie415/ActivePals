@@ -25,7 +25,18 @@ import RNCalendarEvents from 'react-native-calendar-events'
 import { types, getType } from '../constants/utils'
 import Header from '../header/header'
 import MapModal from '../components/MapModal'
+import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button'
 import Button from '../components/Button'
+
+ const genderProps = [
+	{label: 'Unspecified', value: 'Unspecified'},
+  {label: 'Male', value: 'Male'},
+	{label: 'Female', value: 'Female' },
+]
+
+const typeProps = types.map(type =>  {
+return {	label: type, value: type }
+})
 
 
 class SessionDetail extends Component {
@@ -165,14 +176,13 @@ class SessionDetail extends Component {
 
 					<View style={{flex: 2, borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
 						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Location</Text>
-						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+						<View style={{flexDirection: 'row', alignItems: 'center'}}>
 							<TextInput
 							onChangeText={postcode => this.postcode = postcode}
-							style={{padding: 5, borderWidth: 0.5, borderColor: '#999', margin: 10, flex: 1}}
+							style={{padding: 10, borderWidth: 0.5, borderColor: '#999', margin: 10, flex: 1}}
 							underlineColorAndroid='transparent'
 							placeholder='Enter postcode'/>
-							<View style={{flex: 1, alignItems: 'center'}}>
-							<Button onPress={()=> {
+							<TouchableOpacity onPress={()=> {
 								if (this.postcode) {
 									if (this.validatePostcode(this.postcode)) {
 										this.setLocation(this.postcode)
@@ -181,9 +191,15 @@ class SessionDetail extends Component {
 										Alert.alert("Error", "Postcode is invalid")
 									}
 								}
-							}}
-							text='Submit'/>
-							</View>
+							}}>
+							<Icon name="md-return-right" 
+              style={{
+                color: colors.secondary,
+                fontSize: 40,
+                paddingTop: 5,
+								marginHorizontal: 20
+                }}/>
+							</TouchableOpacity>
 						</View>
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
 							<TouchableOpacity onPress={()=> this.setLocationAsPosition()}>
@@ -195,53 +211,39 @@ class SessionDetail extends Component {
 						</View>
 						<Text style={{alignSelf: 'center', margin: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
 					</View>
-					<View style={{flexDirection: 'row'}}>
-					<TouchableOpacity
-					style={styles.gender}
-					onPress={()=> {
-						const options = ['Unspecified', 'Male', 'Female', 'Cancel']
-						ActionSheet.show(
-						{
-							options,
-							cancelButtonIndex: 3,
-							title: "Gender?"
-						},
-						buttonIndex => {
-							if (buttonIndex != options.length) {
-								this.setState({gender: options[buttonIndex]})
-							}
-						}
-						)
-					}}>
-						<Text style={{fontSize: 15, margin: 10, color: '#fff'}}>{'Gender: ' + this.state.gender}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-					style={[styles.gender, {flexDirection: 'row', alignItems: 'center'}]}
-					onPress={()=> {
-						ActionSheet.show(
-						{
-							options: [...types, 'Cancel'],
-							cancelButtonIndex: types.length,
-							title: "Type"
-						},
-						buttonIndex => {
-							if (buttonIndex != types.length) {
-								this.setState({type: types[buttonIndex]})
-							}
-						}
-						)
-					}}>
-						<Text style={{fontSize: 15, margin: 10, color: '#fff'}}>{'Type: ' + this.state.type}</Text>
-						{getType(this.state.type, 20, '#fff')}
-					</TouchableOpacity>
+					<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Gender</Text>
+					<RadioForm
+					formHorizontal={true}
+          radio_props={genderProps}
+          initial={0}
+					style={{padding: 10, borderBottomWidth: 0.5, borderColor: '#999'}}
+					buttonColor={colors.secondary}
+					selectedButtonColor={colors.secondary}
+					labelStyle={{marginRight: 20}}
+          onPress={(value) => {this.setState({gender: value})}}
+        	/>
+					<View style={{flexDirection: 'row', alignItems: 'center'}}>
+						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Type</Text>
+						{getType(this.state.type, 20)}
 					</View>
-					<TouchableOpacity style={styles.createButton}
+					<RadioForm
+					formHorizontal={true}
+          radio_props={typeProps}
+          initial={0}
+					style={{padding: 10, borderBottomWidth: 0.5, borderColor: '#999', flexWrap: true}}
+					buttonColor={colors.secondary}
+					selectedButtonColor={colors.secondary}
+					labelStyle={{marginRight: 20}}
+          onPress={(value) => {this.setState({type: value})}}
+        	/>
+					<Button
+					style={{alignSelf: 'center', marginTop: 10}}
+					textStyle={{fontSize: 20}}
 					onPress={(mutex)=> {
 						mutex.lockFor(1000)
 						this.createSession()
-					}}>
-						<Text style={{color: '#fff', fontSize: 20}}>Create Session</Text>
-					</TouchableOpacity>
+					}}
+					text="Create Session"/>
 				</Content>
 
 				<MapModal

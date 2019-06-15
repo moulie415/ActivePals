@@ -13,15 +13,6 @@ export default  StyleSheet.create({
   	fontSize: 15,
   	flex: 1,
   	textAlign: 'center'
-  },
-  createButton: {
-  	flex: 1,
-  	alignSelf: 'center',
-  	borderRadius: 0,
-  	padding: 10,
-  	backgroundColor: colors.secondary,
-		marginBottom: 10,
-		borderRadius: 5
   }
 
 })
