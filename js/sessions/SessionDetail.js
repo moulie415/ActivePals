@@ -89,7 +89,6 @@ class SessionDetail extends Component {
 				<Content>
 						<TextInput
 						style={{padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10, height: 50}}
-						textAlignVertical={'top'}
 						underlineColorAndroid='transparent'
 						onChangeText={title => this.title = title}
 						placeholder='Title'/>
@@ -104,6 +103,7 @@ class SessionDetail extends Component {
 					<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginBottom: 10}}>
 					<DatePicker
 						date={this.state.date}
+						style={{width: '50%'}}
 						placeholder={"Select date and time"}
 						mode={'datetime'}
 						androidMode={'spinner'}
@@ -230,14 +230,14 @@ class SessionDetail extends Component {
 					formHorizontal={true}
           radio_props={typeProps}
           initial={0}
-					style={{padding: 10, borderBottomWidth: 0.5, borderColor: '#999', flexWrap: true}}
+					style={{padding: 10, borderBottomWidth: 0.5, borderColor: '#999', flexWrap: 'wrap'}}
 					buttonColor={colors.secondary}
 					selectedButtonColor={colors.secondary}
 					labelStyle={{marginRight: 20}}
           onPress={(value) => {this.setState({type: value})}}
         	/>
 					<Button
-					style={{alignSelf: 'center', marginTop: 10}}
+					style={{alignSelf: 'center', marginVertical: 20}}
 					textStyle={{fontSize: 20}}
 					onPress={(mutex)=> {
 						mutex.lockFor(1000)
