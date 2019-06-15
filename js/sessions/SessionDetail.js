@@ -24,6 +24,8 @@ import TouchableOpacity from 'Anyone/js/components/TouchableOpacityLockable'
 import RNCalendarEvents from 'react-native-calendar-events'
 import { types, getType } from '../constants/utils'
 import Header from '../header/header'
+import MapModal from '../components/MapModal'
+import Button from '../components/Button'
 
 
 class SessionDetail extends Component {
@@ -169,7 +171,8 @@ class SessionDetail extends Component {
 							style={{padding: 5, borderWidth: 0.5, borderColor: '#999', margin: 10, flex: 1}}
 							underlineColorAndroid='transparent'
 							placeholder='Enter postcode'/>
-							<TouchableOpacity onPress={()=> {
+							<View style={{flex: 1, alignItems: 'center'}}>
+							<Button onPress={()=> {
 								if (this.postcode) {
 									if (this.validatePostcode(this.postcode)) {
 										this.setLocation(this.postcode)
@@ -179,13 +182,15 @@ class SessionDetail extends Component {
 									}
 								}
 							}}
-							style={{flex: 1}}>
-							<Text style={{color: colors.secondary, fontSize: 20, margin: 10, textAlign: 'center'}}>Submit</Text>
-							</TouchableOpacity>
+							text='Submit'/>
+							</View>
 						</View>
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
 							<TouchableOpacity onPress={()=> this.setLocationAsPosition()}>
 								<Text style={{color: colors.secondary, fontSize: 20, margin: 10}}>Use my location</Text>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={()=> this.setState({mapOpen: true})}>
+								<Text style={{color: colors.secondary, fontSize: 20, margin: 10, textAlign: 'center'}}>Select from map</Text>
 							</TouchableOpacity>
 						</View>
 						<Text style={{alignSelf: 'center', margin: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
@@ -239,7 +244,16 @@ class SessionDetail extends Component {
 					</TouchableOpacity>
 				</Content>
 
-
+				<MapModal
+				isOpen={this.state.mapOpen}
+				onClosed={() => this.setState({mapOpen: false})} 
+				handlePress={(event) => {
+					this.setState({mapOpen: false})
+					const lat = event.nativeEvent.coordinate.latitude
+        	const lng = event.nativeEvent.coordinate.longitude
+					this.setLocation({lat, lng}, true)
+				}}
+				/>
 			</Container>
 			)
 	}
@@ -271,7 +285,7 @@ class SessionDetail extends Component {
 	setLocationAsPosition() {
 		navigator.geolocation.getCurrentPosition(
 			(position) => {
-				let coords = {lat: position.coords.latitude, lng: position.coords.longitude }
+				const coords = {lat: position.coords.latitude, lng: position.coords.longitude }
 				this.setLocation(coords, true)
 			},
 			(error) => {

@@ -7,7 +7,6 @@ import {
   ScrollView,
   Linking,
   Slider,
-  StyleSheet
 } from "react-native"
 import {
   Container,
@@ -546,9 +545,9 @@ import Button from './components/Button'
 
 
   handlePress(event) {
-    let lat = event.nativeEvent.coordinate.latitude
-    let lng = event.nativeEvent.coordinate.longitude
-    let location = {geometry: {location: {lat, lng}}}
+    const lat = event.nativeEvent.coordinate.latitude
+    const lng = event.nativeEvent.coordinate.longitude
+    const location = {geometry: {location: {lat, lng}}}
     this.setState({selectedLocation: location, latitude: lat, longitude: lng})
     ActionSheet.show(
               {
