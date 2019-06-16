@@ -23,9 +23,7 @@ import StarRating from 'react-native-star-rating'
 import { showLocation, Popup } from 'react-native-map-link'
 import globalStyles from './styles/globalStyles'
 import FriendsModal from './components/friendsModal'
-
-
-
+import Button from './components/Button'
 
  class Gym extends Component {
   static navigationOptions = {
@@ -87,7 +85,7 @@ import FriendsModal from './components/friendsModal'
         {this.state.loaded ? <View style={{flex: 1}}>
         <ScrollView>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{gym.name}</Text>
-            {this.props.gym && gym.place_id == this.id ? 
+            {this.props.gym && this.props.gym.place_id == this.id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row', margin: 10}}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
               <TouchableOpacity 
@@ -97,7 +95,7 @@ import FriendsModal from './components/friendsModal'
                   style={{justifyContent: 'center', marginRight: 20, borderRadius: 5}}>
                   <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <Button
               onPress={() => {
                   Alert.alert(
                       'Leave',
@@ -107,13 +105,12 @@ import FriendsModal from './components/friendsModal'
                           {text: 'Yes', onPress: () => this.props.removeGym(), style: 'destructive'}
                       ]
                   )
-                  
                   }}
-              style={{padding: 5, paddingVertical: 10, alignSelf: 'center', marginBottom: 5, backgroundColor: 'red', borderRadius: 5}}>
-              <Text style={{color: '#fff'}}>Leave</Text>
-              </TouchableOpacity></View> :
+                style={{alignSelf: 'flex-start'}}
+                text="Leave"
+                color='red'/></View> :
               <View style={{margin: 10}}>
-                <TouchableOpacity
+                <Button
                 onPress={()=> {
                     if (this.props.gym) {
                         Alert.alert(
@@ -128,19 +125,19 @@ import FriendsModal from './components/friendsModal'
                     else this.props.join(gym)
                     
                     }}
-                style={{backgroundColor: colors.secondary, padding: 10, alignSelf: 'center', marginVertical: 10, borderRadius: 5}}>
-                <Text style={{color: '#fff'}}>Join</Text>
-                </TouchableOpacity>
+                    style={{alignSelf: 'center'}}
+                  text='Join'
+                  />
               </View>}
             <View style={{flexDirection: 'row'}}>
                 {gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5, flex: 1}}>{'Vicinity: '}
                 <Text style={{color: colors.secondary}}>{gym.vicinity}</Text>{this.props.location && 
                 <Text style={{color: '#999'}}>{' (' + this.getDistance(gym) + ' km away)'}</Text>}</Text>}
-                <TouchableOpacity onPress={()=> {
+                <Button onPress={()=> {
                 const { lat, lng } = gym.geometry.location
                 const place_id = gym.place_id
 
-                let options = {
+                const options = {
                   latitude: lat,
                   longitude: lng,
                   cancelText: 'Cancel',
@@ -150,9 +147,9 @@ import FriendsModal from './components/friendsModal'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
-                style={{backgroundColor: colors.secondary, padding: 5, paddingVertical: 10, marginHorizontal: 5, borderRadius: 5, height: 40}}>
-                <Text style={{color: '#fff'}}>Directions</Text>
-                </TouchableOpacity>
+                style={{marginLeft: 20, marginRight: 10, alignSelf: 'flex-start'}}
+                text='Directions'
+                />
             </View>
             {gym.website && <Hyperlink linkDefault={true}>
             <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
@@ -181,23 +178,25 @@ import FriendsModal from './components/friendsModal'
         {gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(gym.types)}</Text>}
         </ScrollView> 
           <View style={{flexDirection: 'row', backgroundColor: colors.bgColor, paddingVertical: 10}}>
-            <TouchableOpacity
-            style={{backgroundColor: colors.secondary, flex: 1, paddingVertical: 15, borderRadius: 5, marginLeft: 5, marginRight: 2}}
+            <Button
+            style={{flex: 1, marginLeft: 5, marginRight: 2, paddingVertical: 15}}
+            text='Create Session'
+            textStyle={{textAlign: 'center'}}
             onPress={()=> {
               this.props.createSession(gym)
-            }}>
-              <Text adjustsFontSizeToFit={true}
-              style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</Text>
-            </TouchableOpacity>
+            }}/>
+              {/* <Text adjustsFontSizeToFit={true}
+              style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</Text> */}
             <View style={{borderRightWidth: 1, borderRightColor: 'transparent'}}/>
-            <TouchableOpacity
-            style={{backgroundColor: colors.secondary, flex: 1, paddingVertical: 15, borderRadius: 5, marginRight: 5, marginLeft: 2}}
+            <Button
+            style={{flex: 1, marginRight: 5, marginLeft: 2, paddingVertical: 15}}
+            textStyle={{textAlign: 'center'}}
+            text='Create Private Session'
             onPress={()=> {
               this.setState({friendsModalOpen: true})
-            }}>
-              <Text adjustsFontSizeToFit={true}
-              style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Private Session</Text>
-            </TouchableOpacity>
+            }}/>
+              {/* <Text adjustsFontSizeToFit={true}
+              style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Private Session</Text> */}
           </View>
         </View>
         

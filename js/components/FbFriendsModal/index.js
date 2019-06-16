@@ -77,7 +77,7 @@ class FbFriendsModal extends Component {
         if (!this.props.friends[friend.uid]) {
           friends.push(
             <TouchableOpacity key={friend.uid || friend.id} onPress={()=> this.onFriendPress(friend)}>
-              <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5, marginTop: index == 0 && 0.5}}>
+              <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5, marginTop: index == 0 ? 0.5 : 0}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :

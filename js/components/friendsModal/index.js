@@ -13,6 +13,7 @@ import { Icon } from 'native-base'
 import colors from '../../constants/colors'
 import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import PropTypes from 'prop-types'
+import Button from '../Button'
 
 class FriendsModal extends Component {
 
@@ -30,15 +31,16 @@ class FriendsModal extends Component {
           isOpen={this.props.isOpen} 
           style={styles.modal} 
           position={"center"} >
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
           Select Pals</Text>
             {this.renderFriendsSelection()}
-          <View style={{backgroundColor: colors.primary, flexDirection: 'row', justifyContent: 'space-evenly'}}>
-            <TouchableOpacity onPress={() => this.refs.friendsModal.close()}
-            style={[styles.button, {backgroundColor: 'red'}]}>
-              <Text style={{color: '#fff'}}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=> {
+          <View style={{marginVertical: 10, flexDirection: 'row', justifyContent: 'space-evenly'}}>
+            <Button onPress={() => this.props.onClosed()}
+            color='red'
+            text='Cancel'
+            />
+  
+            <Button onPress={()=> {
               const length = this.state.selectedFriends.length
               if (length > 0) {
                 this.props.onContinue(this.state.selectedFriends, this.props.location)
@@ -47,11 +49,7 @@ class FriendsModal extends Component {
                 Alert.alert("Sorry", "Please select at least one friend")
               }
             }}
-            style={styles.button}>
-              <Text style={{color: '#fff'}}>
-              Continue
-              </Text>
-            </TouchableOpacity>
+            text='Continue'/>
           </View>
         </Modal>
   }
@@ -63,7 +61,7 @@ class FriendsModal extends Component {
       let selected = this.state.selectedFriends.some(uid => uid == friend.uid)
           if (friend.status == 'connected') {
           friends.push(<TouchableOpacity key={index} onPress={()=> this.onFriendPress(friend.uid)}>
-            <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5}}>
+            <View style={{backgroundColor: '#fff', paddingVertical: 15, paddingHorizontal: 10, marginBottom: 0.5, marginTop: index == 0 ? 0.5 : 0}}>
               <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
@@ -100,7 +98,8 @@ FriendsModal.propTypes = {
   friends: PropTypes.any,
   location: PropTypes.any,
   onContinue: PropTypes.func,
-
+  onClosed: PropTypes.func,
+  isOpen: PropTypes.bool
 }
 
 import { connect } from 'react-redux'
