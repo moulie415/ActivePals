@@ -221,13 +221,18 @@ import Button from './components/Button'
         </View>
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedSession && <View style={{flex: 1}}>
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, backgroundColor: colors.primary, color: '#fff'}}>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
           {this.state.selectedSession.title}</Text>
           <ScrollView style={{margin: 10}}>
           <View style={{flexDirection: 'row'}}>
-          <View style={{flexDirection: 'row', flex: 1}}>
-            <Text style={{color: '#000'}}>Host: </Text>
-            {this.fetchHost(this.state.selectedSession.host)}
+          <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between'}}>
+            <Text style={{color: '#000'}}>Host: {this.fetchHost(this.state.selectedSession.host)}</Text>
+            {this.state.selectedSession.users[this.props.profile.uid] && <TouchableOpacity
+              onPress={()=> {
+                this.props.onOpenChat(this.state.selectedSession)
+              }}>
+            <Icon name='md-chatboxes' style={{color: colors.secondary}}/>
+          </TouchableOpacity>}
             </View>
             {this.state.selectedSession.private && <View style={{flex: 1, alignItems: 'flex-end', flexDirection: 'row', justifyContent: 'flex-end'}}>
             <Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/>
@@ -245,12 +250,12 @@ import Button from './components/Button'
             
             <View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center',justifyContent: 'space-between'}}>
               <Text style={{flex: 1}}>
-                <Text style={{color: '#000'}}>{location && location.formattedAddress}</Text>
+                <Text style={{color: '#000'}}>{this.state.selectedSession.location.formattedAddress}</Text>
                 <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
                   this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
               </Text>
               <Button onPress={()=> {
-                const { lat, lng } = location && location.position
+                const { lat, lng } = this.state.selectedSession.location.position
                 const options = {
                   latitude: lat,
                   longitude: lng,
@@ -260,6 +265,7 @@ import Button from './components/Button'
                   }
                   this.setState({popUpVisible: true, options})
                 }}
+                style={{marginLeft: 10}}
                 text='Directions'
               />
   
@@ -470,8 +476,7 @@ import Button from './components/Button'
     if (session.users[uid]){
       if (session.host.uid == uid) {
         return (
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <TouchableOpacity
+          <Button
           onPress={()=> {
             Alert.alert(
               "Delete session",
@@ -484,46 +489,31 @@ import Button from './components/Button'
               },
               style: 'destructive'}
               ],
-
-              )
-
+            )
           }}
-          style={{backgroundColor: 'red', padding: 10, width: '40%', borderRadius: 5}}>
-            <Text style={{color: '#fff', textAlign: 'center'}}>Delete session</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-          onPress={()=> {
-            this.props.onOpenChat(session)
-          }}
-          style={{backgroundColor: colors.secondary, padding: 10, width: '40%', borderRadius: 5}}>
-            <Text style={{color: '#fff', textAlign: 'center'}}>Open chat</Text>
-          </TouchableOpacity>
-          </View>
+          style={{alignSelf: 'center'}}
+          color='red'
+          text="Delete"
+          />
           )
       }
       else return (
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <TouchableOpacity
+          <Button
+          color='red'
+          text="Leave"
+          style={{alignSelf: 'center'}}
           onPress={()=> {
             this.props.remove(session.key, session.private)
             this.refs.modal.close()
           }}
-          style={{backgroundColor: 'red', padding: 10, width: '40%'}}>
-            <Text style={{color: '#fff', textAlign: 'center'}}>Leave session</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-          onPress={()=> {
-            this.props.onOpenChat(session)
-          }}
-          style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
-            <Text style={{color: '#fff', textAlign: 'center'}}>Open chat</Text>
-          </TouchableOpacity>
-          </View>
+          />
         )
     }
     else {
       return (
-          <TouchableOpacity
+          <Button
+          text="Join"
+          style={{alignSelf: 'center'}}
           onPress={()=> {
             firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
             .then(() => {
@@ -533,15 +523,10 @@ import Button from './components/Button'
             this.refs.modal.close()
             Alert.alert('Session joined', 'You should now see this session in your session chats')
           }}
-          style={{backgroundColor: colors.primary, padding: 10, width: '40%'}}>
-            <Text style={{color: '#fff', textAlign: 'center'}}>Join session</Text>
-          </TouchableOpacity>
+          />
         )
-
     }
   }
-
-
 
 
   handlePress(event) {
@@ -630,8 +615,9 @@ import Button from './components/Button'
           style={{backgroundColor: '#9993'}}
           refreshing={this.state.refreshing}
           onRefresh={() => this.handleRefresh()}
-          ListEmptyComponent={<View style={{flex: 1, justifyContent: 'center', alignSelf: 'center'}}>
-            <Text style={{color: colors.primary, textAlign: 'center', margin: 20}}>
+          contentContainerStyle={[{flexGrow: 1}, this.state.sessions.length > 0 ? null : { justifyContent: 'center'}]}
+          ListEmptyComponent={<View>
+            <Text style={{color: colors.primary, textAlign: 'center', marginHorizontal: 20}}>
             No sessions have been created yet, also please make sure you are connected to the internet
           </Text></View>}
           data={this.state.sessions}
