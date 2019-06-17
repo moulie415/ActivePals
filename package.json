@@ -23,7 +23,7 @@
     "react-native-emoji-input": "^1.1.8",
     "react-native-event-listeners": "^1.0.3",
     "react-native-fast-image": "^5.2.1",
-    "react-native-fbads": "^6.0.2",
+    "react-native-fbads": "^6.1.0",
     "react-native-fbsdk": "^0.8.0",
     "react-native-firebase": "^5.4.3",
     "react-native-geocoder": "^0.5.0",
