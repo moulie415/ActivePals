@@ -10,6 +10,7 @@ import {
 } from 'native-base'
 import TouchableOpacity from './components/TouchableOpacityLockable'
 import Header from './header/header'
+import Button from './components/Button'
 
 class PersonalTraining extends Component {
     
@@ -28,17 +29,17 @@ class PersonalTraining extends Component {
     render() {
         return <Container style={{backgroundColor: colors.bgColor}}>
         <Header title={'Personal Training'}/>
-        {!this.props.profile.trainer && <View>
+        <Text style={{padding: 10}}>Features coming soon</Text>
+        {/* {!this.props.profile.trainer && <View>
         <Text style={{color: colors.secondary, margin: 20, textAlign: 'center'}}>
         Are you a personal trainer? Why not get verified on our platform?
         </Text>
-            <TouchableOpacity 
-            style={{backgroundColor: colors.secondary, alignSelf: 'center', padding: 10, borderRadius: 5}}
+            <Button
+            text="Get verified"
             onPress={()=> {
                 this.props.navigateVerification()
-            }}>
-                <Text style={{color: '#fff'}}>Get verified</Text>
-            </TouchableOpacity></View>}
+            }}/>
+            </View>} */}
         </Container>
     }
 }

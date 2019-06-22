@@ -1,21 +1,20 @@
 PODS:
-  - Bolts (1.9.0):
-    - Bolts/AppLinks (= 1.9.0)
-    - Bolts/Tasks (= 1.9.0)
-  - Bolts/AppLinks (1.9.0):
-    - Bolts/Tasks
-  - Bolts/Tasks (1.9.0)
   - Crashlytics (3.12.0):
     - Fabric (~> 1.9.0)
-  - DVAssetLoaderDelegate (0.3.2)
+  - DVAssetLoaderDelegate (0.3.3)
   - Fabric (1.9.0)
-  - FBAudienceNetwork (5.2.0)
-  - FBSDKCoreKit (4.40.0):
-    - Bolts (~> 1.9)
-  - FBSDKLoginKit (4.40.0):
-    - FBSDKCoreKit
-  - FBSDKShareKit (4.40.0):
-    - FBSDKCoreKit
+  - FBAudienceNetwork (5.4.0):
+    - FBSDKCoreKit/Basics
+  - FBSDKCoreKit (5.0.2):
+    - FBSDKCoreKit/Basics (= 5.0.2)
+    - FBSDKCoreKit/Core (= 5.0.2)
+  - FBSDKCoreKit/Basics (5.0.2)
+  - FBSDKCoreKit/Core (5.0.2):
+    - FBSDKCoreKit/Basics
+  - FBSDKLoginKit (5.0.2):
+    - FBSDKCoreKit (~> 5.0)
+  - FBSDKShareKit (5.0.2):
+    - FBSDKCoreKit (~> 5.0)
   - Firebase/Auth (5.15.0):
     - Firebase/CoreOnly
     - FirebaseAuth (= 5.2.0)
@@ -87,7 +86,7 @@ PODS:
     - GoogleMaps
   - Google-Maps-iOS-Utils/QuadTree (2.1.0):
     - GoogleMaps
-  - Google-Mobile-Ads-SDK (7.40.0)
+  - Google-Mobile-Ads-SDK (7.41.0)
   - GoogleAppMeasurement (5.4.0):
     - GoogleUtilities/AppDelegateSwizzler (~> 5.2)
     - GoogleUtilities/MethodSwizzler (~> 5.2)
@@ -103,64 +102,64 @@ PODS:
     - "GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)"
     - "GoogleToolboxForMac/NSString+URLArguments (~> 2.1)"
     - GTMSessionFetcher/Core (~> 1.1)
-  - GoogleToolboxForMac/DebugUtils (2.2.0):
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-  - GoogleToolboxForMac/Defines (2.2.0)
-  - "GoogleToolboxForMac/NSDictionary+URLArguments (2.2.0)":
-    - GoogleToolboxForMac/DebugUtils (= 2.2.0)
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-    - "GoogleToolboxForMac/NSString+URLArguments (= 2.2.0)"
-  - "GoogleToolboxForMac/NSString+URLArguments (2.2.0)"
-  - GoogleUtilities/AppDelegateSwizzler (5.5.0):
+  - GoogleToolboxForMac/DebugUtils (2.2.1):
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+  - GoogleToolboxForMac/Defines (2.2.1)
+  - "GoogleToolboxForMac/NSDictionary+URLArguments (2.2.1)":
+    - GoogleToolboxForMac/DebugUtils (= 2.2.1)
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+    - "GoogleToolboxForMac/NSString+URLArguments (= 2.2.1)"
+  - "GoogleToolboxForMac/NSString+URLArguments (2.2.1)"
+  - GoogleUtilities/AppDelegateSwizzler (5.8.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (5.5.0)
-  - GoogleUtilities/Logger (5.5.0):
+  - GoogleUtilities/Environment (5.8.0)
+  - GoogleUtilities/Logger (5.8.0):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (5.5.0):
+  - GoogleUtilities/MethodSwizzler (5.8.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (5.5.0):
+  - GoogleUtilities/Network (5.8.0):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (5.5.0)"
-  - GoogleUtilities/Reachability (5.5.0):
+  - "GoogleUtilities/NSData+zlib (5.8.0)"
+  - GoogleUtilities/Reachability (5.8.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (5.5.0):
+  - GoogleUtilities/UserDefaults (5.8.0):
     - GoogleUtilities/Logger
-  - GTMSessionFetcher/Core (1.2.1)
+  - GTMSessionFetcher/Core (1.2.2)
   - leveldb-library (1.20)
-  - libwebp (0.6.1):
-    - libwebp/core (= 0.6.1)
-    - libwebp/dec (= 0.6.1)
-    - libwebp/demux (= 0.6.1)
-    - libwebp/dsp (= 0.6.1)
-    - libwebp/enc (= 0.6.1)
-    - libwebp/mux (= 0.6.1)
-    - libwebp/utils (= 0.6.1)
-    - libwebp/webp (= 0.6.1)
-  - libwebp/core (0.6.1):
+  - libwebp (1.0.2):
+    - libwebp/core (= 1.0.2)
+    - libwebp/dec (= 1.0.2)
+    - libwebp/demux (= 1.0.2)
+    - libwebp/dsp (= 1.0.2)
+    - libwebp/enc (= 1.0.2)
+    - libwebp/mux (= 1.0.2)
+    - libwebp/utils (= 1.0.2)
+    - libwebp/webp (= 1.0.2)
+  - libwebp/core (1.0.2):
     - libwebp/webp
-  - libwebp/dec (0.6.1):
+  - libwebp/dec (1.0.2):
     - libwebp/core
-  - libwebp/demux (0.6.1):
+  - libwebp/demux (1.0.2):
     - libwebp/core
-  - libwebp/dsp (0.6.1):
+  - libwebp/dsp (1.0.2):
     - libwebp/core
-  - libwebp/enc (0.6.1):
+  - libwebp/enc (1.0.2):
     - libwebp/core
-  - libwebp/mux (0.6.1):
+  - libwebp/mux (1.0.2):
     - libwebp/core
-  - libwebp/utils (0.6.1):
+  - libwebp/utils (1.0.2):
     - libwebp/core
-  - libwebp/webp (0.6.1)
+  - libwebp/webp (1.0.2)
   - nanopb (0.3.901):
     - nanopb/decode (= 0.3.901)
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
-  - Protobuf (3.7.0)
+  - Protobuf (3.8.0)
   - React (0.58.5):
     - React/Core (= 0.58.5)
   - react-native-fast-image (5.2.1):
@@ -169,6 +168,20 @@ PODS:
     - SDWebImage/Core
     - SDWebImage/GIF
     - SDWebImage/WebP
+  - react-native-fbsdk (0.10.1):
+    - React
+    - react-native-fbsdk/Core (= 0.10.1)
+    - react-native-fbsdk/Login (= 0.10.1)
+    - react-native-fbsdk/Share (= 0.10.1)
+  - react-native-fbsdk/Core (0.10.1):
+    - FBSDKCoreKit (~> 5.0.0)
+    - React
+  - react-native-fbsdk/Login (0.10.1):
+    - FBSDKLoginKit (~> 5.0.0)
+    - React
+  - react-native-fbsdk/Share (0.10.1):
+    - FBSDKShareKit (~> 5.0.0)
+    - React
   - react-native-geocoder (0.5.0):
     - React
   - react-native-google-maps (0.21.0):
@@ -220,12 +233,12 @@ PODS:
     - React/RCTBlob
   - rn-fetch-blob (0.10.6):
     - React/Core
-  - SDWebImage/Core (4.4.5)
-  - SDWebImage/GIF (4.4.5):
+  - SDWebImage/Core (4.4.7)
+  - SDWebImage/GIF (4.4.7):
     - FLAnimatedImage (~> 1.0)
     - SDWebImage/Core
-  - SDWebImage/WebP (4.4.5):
-    - libwebp (~> 0.5)
+  - SDWebImage/WebP (4.4.7):
+    - libwebp (< 2.0, >= 0.5)
     - SDWebImage/Core
   - SPTPersistentCache (1.1.0)
   - yoga (0.58.5.React)
@@ -234,6 +247,7 @@ DEPENDENCIES:
   - Crashlytics (~> 3.12.0)
   - Fabric (= 1.9.0)
   - FBAudienceNetwork
+  - FBSDKCoreKit
   - FBSDKLoginKit
   - FBSDKShareKit
   - Firebase/Auth (= 5.15.0)
@@ -245,6 +259,7 @@ DEPENDENCIES:
   - GoogleMaps
   - GoogleSignIn (~> 4.4.0)
   - react-native-fast-image (from `../node_modules/react-native-fast-image`)
+  - react-native-fbsdk (from `../node_modules/react-native-fbsdk`)
   - react-native-geocoder (from `../node_modules/react-native-geocoder`)
   - react-native-google-maps (from `../node_modules/react-native-maps`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
@@ -268,7 +283,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - Bolts
     - Crashlytics
     - DVAssetLoaderDelegate
     - Fabric
@@ -307,6 +321,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   react-native-fast-image:
     :path: "../node_modules/react-native-fast-image"
+  react-native-fbsdk:
+    :path: "../node_modules/react-native-fbsdk"
   react-native-geocoder:
     :path: "../node_modules/react-native-geocoder"
   react-native-google-maps:
@@ -327,14 +343,13 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga/yoga.podspec"
 
 SPEC CHECKSUMS:
-  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Crashlytics: 07fb167b1694128c1c9a5a5cc319b0e9c3ca0933
-  DVAssetLoaderDelegate: 38a24530292bf77900fdfdf635434f7f9b49486d
+  DVAssetLoaderDelegate: 0caec20e4e08b8560b691131539e9180024d4bce
   Fabric: f988e33c97f08930a413e08123064d2e5f68d655
-  FBAudienceNetwork: 43eadf7ab00fe58a66ca52171de324e25a0a4a1c
-  FBSDKCoreKit: ae214474b25033399c131dc81d258e412582a2ba
-  FBSDKLoginKit: 7a1e411d46acc8834588eca437daf34de42e1d52
-  FBSDKShareKit: 0e45916f4150da485928ae2a17ca021950b194f5
+  FBAudienceNetwork: c1514860ed6d9ba9f97350f3fbb3ac49556f5e43
+  FBSDKCoreKit: 3e41c402eb64ea7799c71833ff9e5690f27b9c42
+  FBSDKLoginKit: a88f36da648e4c5d60eb261c63eac067abb97130
+  FBSDKShareKit: 8695bbb97c18a381bbf2851a3f24f95a59121b82
   Firebase: 8bb9268bff82374f2cbaaabb143e725743c316ae
   FirebaseAnalytics: c06f9d70577d79074214700a71fd5d39de5550fb
   FirebaseAnalyticsInterop: efbe45c8385ec626e29f9525e5ebd38520dfb6c1
@@ -347,19 +362,20 @@ SPEC CHECKSUMS:
   FirebaseStorage: 3d22c041370593e639fba013d1eb698a8dae2881
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   Google-Maps-iOS-Utils: c32891ff472eaaa1fca032beedafa1a013af7875
-  Google-Mobile-Ads-SDK: 9d1c38a83febea769470aa514a9c7954e2d1483d
+  Google-Mobile-Ads-SDK: 101ce89b94fdf60ec64ba7b6e9b9d812dc765936
   GoogleAppMeasurement: 98b71f5e04142793729a5ef23e5b96651ff4b70f
   GoogleMaps: c087b8e5dfe87ca6ebf59adb9b4894a4146bec4f
   GoogleSignIn: 7ff245e1a7b26d379099d3243a562f5747e23d39
-  GoogleToolboxForMac: ff31605b7d66400dcec09bed5861689aebadda4d
-  GoogleUtilities: 6481e6318c5fcabaaa8513ef8120f329055d7c10
-  GTMSessionFetcher: 32aeca0aa144acea523e1c8e053089dec2cb98ca
+  GoogleToolboxForMac: b3553629623a3b1bff17f555e736cd5a6d95ad55
+  GoogleUtilities: 04fce34bcd5620c1ee76fb79172105c74a4df335
+  GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
-  libwebp: 0f01098c6c17175391af621b2f14150f3ca16e16
+  libwebp: b068a3bd7c45f7460f6715be7bed1a18fd5d6b48
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
-  Protobuf: 7a877b7f3e5964e3fce995e2eb323dbc6831bb5a
+  Protobuf: 3f617b9a6e73605565086864c9bc26b2bf2dd5a3
   React: 6cd5e6fcc3b6a52d2fb27a638f622139da710dff
   react-native-fast-image: df6296b6b5e7e7921ea2f43e0be1cd33ce027081
+  react-native-fbsdk: 38ee580e77319d03f8ed0bf4a020cbfd70dc4d2d
   react-native-geocoder: 757427682892bb256f3b3745858cc90eba148a8e
   react-native-google-maps: 68a831730110823d3dadfea0e133f0f4426cd213
   react-native-image-picker: e47cbaf230af8902316e4d69dc83f959bde45e23
@@ -368,10 +384,10 @@ SPEC CHECKSUMS:
   react-native-splash-screen: cc626c801178f24382f898ea0b4c55384429b9c0
   react-native-video: afdbf53bb44a700d1dcfc679790710469571d0f9
   rn-fetch-blob: 766f85cabd2992300dfa1be2bc9e4e258abc6f04
-  SDWebImage: ecc03494e973b93b80213649d32175f8d2d17d4d
+  SDWebImage: c10d14a8883ebd89664f02a422006f66a85c0c5d
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 0e0009ffb2544aeead64a1209f3d488d3849947b
 
-PODFILE CHECKSUM: 7dc042df4de928a6109e0cfb8d302dcd61bda060
+PODFILE CHECKSUM: 207f4c33928fa2996975b7c6f3c1f61837636383
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.7.2

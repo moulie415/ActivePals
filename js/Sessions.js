@@ -230,7 +230,7 @@ import Button from './components/Button'
             <Icon name='md-chatboxes' style={{color: colors.secondary}}/>
           </TouchableOpacity>}
             </View>
-            {this.state.selectedSession.private && <View style={{flex: 1, alignItems: 'flex-end', flexDirection: 'row', justifyContent: 'flex-end'}}>
+            {this.state.selectedSession.private && <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
             <Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/>
             <Text>PRIVATE</Text>
             </View>}
@@ -616,7 +616,7 @@ import Button from './components/Button'
           contentContainerStyle={[{flexGrow: 1}, this.state.sessions.length > 0 ? null : { justifyContent: 'center'}]}
           ListEmptyComponent={<View>
             <Text style={{color: colors.primary, textAlign: 'center', marginHorizontal: 20}}>
-            No sessions have been created yet, also please make sure you are connected to the internet
+            No sessions near you have been created yet, also please make sure you are connected to the internet
           </Text></View>}
           data={this.state.sessions}
           keyExtractor={(item) => item.key}

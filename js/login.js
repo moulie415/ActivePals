@@ -168,7 +168,7 @@ import Button from './components/Button'
 
     fbLogin() {
       this.setState({facebookLoading: true})
-      LoginManager.logInWithReadPermissions(['public_profile', 'email', 'user_friends'])
+      LoginManager.logInWithPermissions(['public_profile', 'email', 'user_friends'])
       .then((result) => this._handleCallBack(result),
         function(error) {
           alert('Login fail with error: ' + error)

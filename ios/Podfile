@@ -40,13 +40,15 @@ target 'Anyone' do
   pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
 
   pod 'rn-fetch-blob', :path => '../node_modules/rn-fetch-blob'
-  pod 'FBSDKShareKit'
+ pod 'react-native-fbsdk', :path => '../node_modules/react-native-fbsdk'
+  pod 'FBAudienceNetwork'
+  pod 'FBSDKCoreKit'
   pod 'FBSDKLoginKit'
+  pod 'FBSDKShareKit'
 
   pod 'react-native-fast-image', :path => '../node_modules/react-native-fast-image'
 
   pod 'Google-Mobile-Ads-SDK'
-  pod 'FBAudienceNetwork'
 
 
 

@@ -209,7 +209,8 @@ class SessionDetail extends Component {
 								<Text style={{color: colors.secondary, fontSize: 20, margin: 10, textAlign: 'center'}}>Select from map</Text>
 							</TouchableOpacity>
 						</View>
-						<Text style={{alignSelf: 'center', margin: 10, fontSize: 15}}>{"Selected location: " + this.state.formattedAddress}</Text>
+						<Text style={{alignSelf: 'center', margin: 10, fontSize: 15}}>
+						{`Selected location:  ${this.state.gym ? this.state.gym.name : this.state.formattedAddress}`}</Text>
 					</View>
 					<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Gender</Text>
 					<RadioForm
@@ -249,11 +250,9 @@ class SessionDetail extends Component {
 				<MapModal
 				isOpen={this.state.mapOpen}
 				onClosed={() => this.setState({mapOpen: false})} 
-				handlePress={(event) => {
+				handlePress={(location) => {
 					this.setState({mapOpen: false})
-					const lat = event.nativeEvent.coordinate.latitude
-        	const lng = event.nativeEvent.coordinate.longitude
-					this.setLocation({lat, lng}, true)
+					this.setLocation(location, true)
 				}}
 				/>
 			</Container>
@@ -265,7 +264,7 @@ class SessionDetail extends Component {
 			if (usingPosition) {
 				await Geocoder.geocodePosition(location).then(res => {
 					this.location = {...res[0]}
-					this.setState({formattedAddress: res[0].formattedAddress})
+					this.setState({formattedAddress: res[0].formattedAddress, gym: location.gym})
 
 				})
 				.catch(err => Alert.alert('Error', "Invalid location"))
@@ -273,7 +272,7 @@ class SessionDetail extends Component {
 			else {
 				await Geocoder.geocodeAddress(location).then(res => {
 					this.location = {...res[0]}
-					this.setState({formattedAddress: res[0].formattedAddress})
+					this.setState({formattedAddress: res[0].formattedAddress, gym: location.gym})
 
 				})
 				.catch(err => Alert.alert('Error', "Invalid location"))
@@ -301,6 +300,7 @@ class SessionDetail extends Component {
 		if (this.location && this.title && this.details && this.state.date) {
 			let session = {
 				location: this.location,
+				gym: this.state.gym,
 				title: this.title,
 				details: this.details,
 				gender: this.state.gender,
