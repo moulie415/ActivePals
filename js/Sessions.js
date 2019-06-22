@@ -5,7 +5,6 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
-  Linking,
   Slider,
 } from "react-native"
 import {
@@ -27,7 +26,7 @@ import { getType, getResource } from './constants/utils'
 import str from './constants/strings'
 import Hyperlink from 'react-native-hyperlink'
 import {Image as SlowImage } from 'react-native'
-import { formatDateTime } from './constants/utils'
+import { formatDateTime, getDistance } from './constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
 import { showLocation, Popup } from 'react-native-map-link'
 import Header from './header/header'
@@ -131,9 +130,6 @@ import Button from './components/Button'
     })
     return sessions
   }
-
-
-
 
   render () {
     const { vicinity, name, geometry, place_id, photo, rating, }  = this.state.selectedLocation
@@ -252,7 +248,7 @@ import Button from './components/Button'
               <Text style={{flex: 1}}>
                 <Text style={{color: '#000'}}>{this.state.selectedSession.location.formattedAddress}</Text>
                 <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
-                  this.getDistance(this.state.selectedSession)) + ' km away)'}</Text>
+                  getDistance(this.state.selectedSession, this.state.yourLocation)) + ' km away)'}</Text>
               </Text>
               <Button onPress={()=> {
                 const { lat, lng } = this.state.selectedSession.location.position
@@ -302,7 +298,7 @@ import Button from './components/Button'
               <View style={{flex: 1}}>
                 <Text>
                   <Text>{vicinity}</Text>
-                  <Text style={{color: '#999'}}>{' (' + this.getDistance(this.state.selectedLocation, true) + ' km away)'}</Text>
+                  <Text style={{color: '#999'}}>{' (' + getDistance(this.state.selectedLocation, this.state.yourLocation, true) + ' km away)'}</Text>
                 </Text>
               </View>
               <Button onPress={()=> {
@@ -390,9 +386,11 @@ import Button from './components/Button'
         </Modal>
         <Modal onOpened={() => this.setState({initialRadius: this.state.radius})} 
         onClosed={() => {
+          
           if (this.state.radius != this.state.initialRadius) {
+
             this.setState({refreshing: true})
-                this.props.fetch(this.state.radius, true).then(() => this.setState({refreshing: false}))
+            this.props.fetch(this.state.radius, true).then(() => this.setState({refreshing: false}))
           }
         }}
         style={styles.modal}
@@ -633,7 +631,7 @@ import Button from './components/Button'
                     <View style={{flex: 1}}>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 3}} numberOfLines={1}><Text  style={styles.title}>{item.title}</Text>
-                        <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : this.getDistance(item)) + ' km away)'}</Text></Text>
+                        <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : getDistance(item, this.state.yourLocation)) + ' km away)'}</Text></Text>
                         <Text numberOfLines={1} style={{fontSize: 13, color: '#000', flex: 2, textAlign: 'right'}}>{"gender: " + item.gender}</Text>
                       </View>
                       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -646,7 +644,7 @@ import Button from './components/Button'
                           this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat, switch: true})
                         }}
                         style={{flex: 1}}>
-                          <Text style={{color: colors.secondary, textAlign: 'right'}}>View on map</Text>
+                          <Text style={{color: colors.secondary, textAlign: 'right', fontWeight: 'bold', fontSize: 15}}>View on map</Text>
                         </TouchableOpacity>
                       </View>
                   </View>
@@ -701,7 +699,7 @@ import Button from './components/Button'
                             <Text style={{color: colors.secondary, textAlign: 'right', fontWeight: 'bold', fontSize: 15}}>View on map</Text>
                           </TouchableOpacity>
                         </View>
-                        <Text style={{color: '#999'}}>{' (' +  this.getDistance(item, true) + ' km away)'}</Text>
+                        <Text style={{color: '#999'}}>{' (' +  getDistance(item, this.state.yourLocation, true) + ' km away)'}</Text>
                     </View>
                   </View>
                 </View>
@@ -824,30 +822,6 @@ import Button from './components/Button'
     })
   }
 
-
-
-  getDirections(gym) {
-    if (this.state.yourLocation) {
-      let lat2, lng2
-      const lat1 = this.state.yourLocation.latitude
-      const lng1 = this.state.yourLocation.longitude
-      if (gym) {
-        lat2  = this.state.selectedLocation.geometry.location.lat
-        lng2 = this.state.selectedLocation.geometry.location.lng
-      }
-      else {
-        lat2 = this.state.selectedSession.location.position.lat
-        lng2 = this.state.selectedSession.location.position.lng
-      }
-      let url = `https://www.google.com/maps/dir/?api=1&origin=${lat1},${lng1}&destination=${lat2},${lng2}`
-      Linking.openURL(url).catch(err => console.error('An error occurred', err))
-    }
-    else {
-      Alert.alert('No location found',
-        'You may need to change your settings to allow Fit Link to access your location')
-    }
-  }
-
   fetchHost(host) {
     if (host.uid == this.props.profile.uid) {
       return <Text style={{fontWeight: 'bold'}}>You</Text>
@@ -865,47 +839,13 @@ import Button from './components/Button'
     else return <Text>N/A</Text>
   }
 
-getDistance(item, gym = false) {
-  if (this.state.yourLocation) {
-    let lat1 = this.state.yourLocation.latitude
-    let lon1 =  this.state.yourLocation.longitude
-    let lat2
-    let lon2
-    if (gym) {
-      if (item.geometry) {
-        lat2 = item.geometry.location.lat
-        lon2 = item.geometry.location.lng
-      }
-      else return 'N/A'
-    }
-    else {
-        lat2 = item.location.position.lat
-        lon2 = item.location.position.lng
-    }
-    let R = 6371
-    let dLat = deg2rad(lat2 - lat1)
-    let dLon = deg2rad(lon2 - lon1)
-    let a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2)
 
-    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    let d = R * c
-    return d.toFixed(2)
-  }
-  else return 'N/A'
-}
 
 gymFilter(gym) {
   return !(!this.state.pilates && gym.name.toLowerCase().includes('pilates')) &&
   !(!this.state.yoga && gym.name.toLowerCase().includes('yoga'))
 }
 
-}
-
-export function deg2rad(deg) {
-  return deg * (Math.PI / 180)
 }
 
 import { connect } from 'react-redux'

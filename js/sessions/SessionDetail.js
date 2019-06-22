@@ -68,7 +68,7 @@ class SessionDetail extends Component {
 	}
 
 	componentDidMount() {
-		if (this.location) {
+		if (this.location && this.location.geometry) {
 			let coords = {lat: this.location.geometry.location.lat, lng: this.location.geometry.location.lng}
 			this.setLocation(coords, true)
 		}

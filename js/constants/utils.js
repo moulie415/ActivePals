@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import {
   Image,
-  Platform
+  Platform,
+  Linking,
+  Alert
 } from 'react-native'
 
 import {
-  Icon,
   Card
 } from 'native-base'
 import str from './strings'
@@ -277,4 +278,62 @@ export function getSimplifiedTime(createdAt) {
         case 'offline':
           return 'red'
       }
+    }
+
+    export const getDirections = (gym, yourLocation, selectedLocation, selectedSession) => {
+      if (yourLocation) {
+        let lat2, lng2
+        const lat1 = yourLocation.latitude
+        const lng1 = yourLocation.longitude
+        if (gym) {
+          lat2  = selectedLocation.geometry.location.lat
+          lng2 = selectedLocation.geometry.location.lng
+        }
+        else {
+          lat2 = selectedSession.location.position.lat
+          lng2 = selectedSession.location.position.lng
+        }
+        let url = `https://www.google.com/maps/dir/?api=1&origin=${lat1},${lng1}&destination=${lat2},${lng2}`
+        Linking.openURL(url).catch(err => console.error('An error occurred', err))
+      }
+      else {
+        Alert.alert('No location found',
+          'You may need to change your settings to allow Fit Link to access your location')
+      }
+    }
+
+    export const getDistance = (item, yourLocation, gym = false) =>  {
+      if (yourLocation) {
+        let lat1 = yourLocation.latitude
+        let lon1 =  yourLocation.longitude
+        let lat2
+        let lon2
+        if (gym) {
+          if (item.geometry) {
+            lat2 = item.geometry.location.lat
+            lon2 = item.geometry.location.lng
+          }
+          else return 'N/A'
+        }
+        else {
+            lat2 = item.location.position.lat
+            lon2 = item.location.position.lng
+        }
+        let R = 6371
+        let dLat = deg2rad(lat2 - lat1)
+        let dLon = deg2rad(lon2 - lon1)
+        let a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    
+        let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        let d = R * c
+        return d.toFixed(2)
+      }
+      else return 'N/A'
+    }
+
+    export function deg2rad(deg) {
+      return deg * (Math.PI / 180)
     }
