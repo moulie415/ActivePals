@@ -222,12 +222,12 @@ import Button from './components/Button'
           <ScrollView style={{margin: 10}}>
           <View style={{flexDirection: 'row'}}>
           <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between'}}>
-            <Text style={{color: '#000'}}>Host: {this.fetchHost(this.state.selectedSession.host)}</Text>
+            <Text style={{color: '#999'}}>Host: <Text style={{color: '#000'}}>{this.fetchHost(this.state.selectedSession.host)}</Text></Text>
             {this.state.selectedSession.users[this.props.profile.uid] && <TouchableOpacity
               onPress={()=> {
                 this.props.onOpenChat(this.state.selectedSession)
               }}>
-            <Icon name='md-chatboxes' style={{color: colors.secondary}}/>
+            <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10}}/>
           </TouchableOpacity>}
             </View>
             {this.state.selectedSession.private && <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
@@ -238,7 +238,7 @@ import Button from './components/Button'
           <Hyperlink
           linkStyle={{color: colors.secondary}}
           linkDefault={ true }>
-            <Text style={{marginVertical: 5, color: '#000'}}>{this.state.selectedSession.details}</Text>
+            <Text style={{marginVertical: 5, color: '#999'}}>Details: <Text style={{color: '#000'}}>{this.state.selectedSession.details}</Text></Text>
           </Hyperlink>
           <Text style={{marginVertical: 5, color: '#000'}}>{(formatDateTime(this.state.selectedSession.dateTime))
             + " for " + (this.state.selectedSession.duration) + " " +
@@ -264,9 +264,12 @@ import Button from './components/Button'
                 style={{marginLeft: 10}}
                 text='Directions'
               />
-  
-            
+
             </View>
+            {this.state.selectedSession.gym && <TouchableOpacity
+                  onPress={()=> this.props.viewGym(this.state.selectedSession.gym.place_id)}>
+              <Text style={{color: '#999', marginVertical: 10}}>Gym: <Text style={{color: colors.secondary, fontWeight: 'bold'}}>{this.state.selectedSession.gym.name}</Text></Text>
+            </TouchableOpacity>}
             </ScrollView>
              {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>
              {this.fetchButtons(this.state.selectedSession, this.props.profile.uid)}

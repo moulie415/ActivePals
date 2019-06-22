@@ -69,7 +69,11 @@ class SessionDetail extends Component {
 
 	componentDidMount() {
 		if (this.location && this.location.geometry) {
-			let coords = {lat: this.location.geometry.location.lat, lng: this.location.geometry.location.lng}
+			const coords = {
+				lat: this.location.geometry.location.lat,
+				lng: this.location.geometry.location.lng,
+				gym: this.location.place_id ? this.location: null
+			}
 			this.setLocation(coords, true)
 		}
 		firebase.auth().onAuthStateChanged( user => {

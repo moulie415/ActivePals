@@ -69,7 +69,6 @@ PODS:
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 5.1)
     - GTMSessionFetcher/Core (~> 1.1)
-  - FLAnimatedImage (1.0.12)
   - Google-Maps-iOS-Utils (2.1.0):
     - Google-Maps-iOS-Utils/Clustering (= 2.1.0)
     - Google-Maps-iOS-Utils/Geometry (= 2.1.0)
@@ -130,30 +129,6 @@ PODS:
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (1.2.2)
   - leveldb-library (1.20)
-  - libwebp (1.0.2):
-    - libwebp/core (= 1.0.2)
-    - libwebp/dec (= 1.0.2)
-    - libwebp/demux (= 1.0.2)
-    - libwebp/dsp (= 1.0.2)
-    - libwebp/enc (= 1.0.2)
-    - libwebp/mux (= 1.0.2)
-    - libwebp/utils (= 1.0.2)
-    - libwebp/webp (= 1.0.2)
-  - libwebp/core (1.0.2):
-    - libwebp/webp
-  - libwebp/dec (1.0.2):
-    - libwebp/core
-  - libwebp/demux (1.0.2):
-    - libwebp/core
-  - libwebp/dsp (1.0.2):
-    - libwebp/core
-  - libwebp/enc (1.0.2):
-    - libwebp/core
-  - libwebp/mux (1.0.2):
-    - libwebp/core
-  - libwebp/utils (1.0.2):
-    - libwebp/core
-  - libwebp/webp (1.0.2)
   - nanopb (0.3.901):
     - nanopb/decode (= 0.3.901)
     - nanopb/encode (= 0.3.901)
@@ -162,12 +137,9 @@ PODS:
   - Protobuf (3.8.0)
   - React (0.58.5):
     - React/Core (= 0.58.5)
-  - react-native-fast-image (5.2.1):
-    - FLAnimatedImage
+  - react-native-fast-image (6.0.3):
     - React
-    - SDWebImage/Core
-    - SDWebImage/GIF
-    - SDWebImage/WebP
+    - SDWebImage (~> 5.0)
   - react-native-fbsdk (0.10.1):
     - React
     - react-native-fbsdk/Core (= 0.10.1)
@@ -233,13 +205,9 @@ PODS:
     - React/RCTBlob
   - rn-fetch-blob (0.10.6):
     - React/Core
-  - SDWebImage/Core (4.4.7)
-  - SDWebImage/GIF (4.4.7):
-    - FLAnimatedImage (~> 1.0)
-    - SDWebImage/Core
-  - SDWebImage/WebP (4.4.7):
-    - libwebp (< 2.0, >= 0.5)
-    - SDWebImage/Core
+  - SDWebImage (5.0.6):
+    - SDWebImage/Core (= 5.0.6)
+  - SDWebImage/Core (5.0.6)
   - SPTPersistentCache (1.1.0)
   - yoga (0.58.5.React)
 
@@ -300,7 +268,6 @@ SPEC REPOS:
     - FirebaseInstanceID
     - FirebaseMessaging
     - FirebaseStorage
-    - FLAnimatedImage
     - Google-Maps-iOS-Utils
     - Google-Mobile-Ads-SDK
     - GoogleAppMeasurement
@@ -310,7 +277,6 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMSessionFetcher
     - leveldb-library
-    - libwebp
     - nanopb
     - Protobuf
     - SDWebImage
@@ -360,7 +326,6 @@ SPEC CHECKSUMS:
   FirebaseInstanceID: e2fa4cb35ef5558c200f7f0ad8a53e212215f93e
   FirebaseMessaging: b412996f6a09337d232bb3a6676ce4d1f353d024
   FirebaseStorage: 3d22c041370593e639fba013d1eb698a8dae2881
-  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   Google-Maps-iOS-Utils: c32891ff472eaaa1fca032beedafa1a013af7875
   Google-Mobile-Ads-SDK: 101ce89b94fdf60ec64ba7b6e9b9d812dc765936
   GoogleAppMeasurement: 98b71f5e04142793729a5ef23e5b96651ff4b70f
@@ -370,11 +335,10 @@ SPEC CHECKSUMS:
   GoogleUtilities: 04fce34bcd5620c1ee76fb79172105c74a4df335
   GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
-  libwebp: b068a3bd7c45f7460f6715be7bed1a18fd5d6b48
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   Protobuf: 3f617b9a6e73605565086864c9bc26b2bf2dd5a3
   React: 6cd5e6fcc3b6a52d2fb27a638f622139da710dff
-  react-native-fast-image: df6296b6b5e7e7921ea2f43e0be1cd33ce027081
+  react-native-fast-image: 3390cc968d598f0c6b5c710df138f4b653a87231
   react-native-fbsdk: 38ee580e77319d03f8ed0bf4a020cbfd70dc4d2d
   react-native-geocoder: 757427682892bb256f3b3745858cc90eba148a8e
   react-native-google-maps: 68a831730110823d3dadfea0e133f0f4426cd213
@@ -384,7 +348,7 @@ SPEC CHECKSUMS:
   react-native-splash-screen: cc626c801178f24382f898ea0b4c55384429b9c0
   react-native-video: afdbf53bb44a700d1dcfc679790710469571d0f9
   rn-fetch-blob: 766f85cabd2992300dfa1be2bc9e4e258abc6f04
-  SDWebImage: c10d14a8883ebd89664f02a422006f66a85c0c5d
+  SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 0e0009ffb2544aeead64a1209f3d488d3849947b
 
