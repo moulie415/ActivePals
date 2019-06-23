@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Slider,
+  Platform
 } from "react-native"
 import {
   Container,
@@ -721,6 +722,7 @@ import Button from './components/Button'
       const lat = session.location.position.lat
       return <MapView.Marker
           key={"s" + index.toString()}
+          image={Platform.select({android: getResource(session.type)})}
           coordinate={{
             latitude: lat,
             longitude: lng,

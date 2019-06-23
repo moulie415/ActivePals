@@ -471,20 +471,6 @@
 			remoteGlobalIDString = A21509A6082F6EA29D871EA72DAADCED;
 			remoteInfo = "react-native-fbsdk";
 		};
-		0AA22CE322BEE56600D5E50D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FAA5F2D71B90788C908800A94534AA92;
-			remoteInfo = FLAnimatedImage;
-		};
-		0AA22CE522BEE56600D5E50D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5E4674603A5D5B9215FFA0F8E69F8B71;
-			remoteInfo = libwebp;
-		};
 		0AB380AF20098A3A00BCD283 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */;
@@ -1036,13 +1022,11 @@
 				0A3E956E2113C8FB00BCD60F /* libFirebaseDatabase.a */,
 				0A3E95702113C8FB00BCD60F /* libFirebaseMessaging.a */,
 				0A7CEE8E2118B2AF00F09932 /* libFirebaseStorage.a */,
-				0AA22CE422BEE56600D5E50D /* libFLAnimatedImage.a */,
 				0A1F21A0210A908F00896D4A /* libGoogle-Maps-iOS-Utils.a */,
 				0A1F211F210A8E1800896D4A /* libGoogleToolboxForMac.a */,
 				0A8E1F6F227E19890087827C /* libGoogleUtilities.a */,
 				0A7CEE902118B2AF00F09932 /* libGTMSessionFetcher.a */,
 				0A3E95722113C8FB00BCD60F /* libleveldb-library.a */,
-				0AA22CE622BEE56600D5E50D /* liblibwebp.a */,
 				0A988CAC210E2795006C6974 /* libnanopb.a */,
 				0A1F2121210A8E1800896D4A /* libPods-Anyone.a */,
 				0A19E24620376D230036DFF2 /* libProtobuf.a */,
@@ -1970,20 +1954,6 @@
 			fileType = archive.ar;
 			path = "libreact-native-fbsdk.a";
 			remoteRef = 0AA22B6E22BE93B000D5E50D /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		0AA22CE422BEE56600D5E50D /* libFLAnimatedImage.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libFLAnimatedImage.a;
-			remoteRef = 0AA22CE322BEE56600D5E50D /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		0AA22CE622BEE56600D5E50D /* liblibwebp.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = liblibwebp.a;
-			remoteRef = 0AA22CE522BEE56600D5E50D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0AB380B020098A3A00BCD283 /* libRCTBlob-tvOS.a */ = {

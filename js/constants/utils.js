@@ -5,7 +5,6 @@ import {
   Linking,
   Alert
 } from 'react-native'
-
 import {
   Card
 } from 'native-base'
