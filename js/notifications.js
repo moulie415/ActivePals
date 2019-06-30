@@ -95,7 +95,7 @@ class Notifications extends Component {
             if (item.postId) {
               this.props.viewPost(item.postId)
             }
-            else if (item.type == 'buddyRequest') {
+            else if (item.type == 'friendRequest') {
               this.props.goToFriends()
             }
           }}>
@@ -150,7 +150,7 @@ class Notifications extends Component {
         return user + ' repped your comment'
       case 'comment':
         return user + ' commented on your post'
-      case 'buddyRequest':
+      case 'friendRequest':
         return user + ' sent you a pal request'
       case 'commentMention':
         return user + ' mentioned you in a comment'
@@ -164,7 +164,7 @@ class Notifications extends Component {
     switch(item.type) {
       case 'comment':
         return <Icon name={'md-chatboxes'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
-      case 'buddyRequest':
+      case 'friendRequest':
         return <Icon name={'md-people'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
       case 'postMention':
       case 'commentMention':

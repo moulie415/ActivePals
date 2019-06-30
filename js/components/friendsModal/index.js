@@ -111,7 +111,7 @@ const mapStateToProps = ({ friends, profile }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  onContinue: (buddies, location) => dispatch(navigateSessionDetail(buddies, location)),
+  onContinue: (friends, location) => dispatch(navigateSessionDetail(friends, location)),
 })
 
 

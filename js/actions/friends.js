@@ -125,7 +125,7 @@ export const sendRequest = (friendUid) => {
 				const date = new Date().toString()
 				const ref = firebase.database().ref('notifications').push()
 				const key = ref.key
-				ref.set({date, uid, type: 'buddyRequest'})
+				ref.set({date, uid, type: 'friendRequest'})
 					.then(()=> firebase.database().ref('userNotifications/' + friendUid).child(key).set(true))
 					.then(() => upUnreadCount(friendUid))
 			})

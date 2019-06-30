@@ -424,34 +424,19 @@ uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
       'Are you sure?',
       [
       {text: 'Cancel', onPress: () => console.log('Cancel logout'), style: 'cancel'},
-      {text: 'OK', onPress: () => {
-        this.setState({spinner: true})
-        firebase.database().ref('users/' + this.props.profile.uid).child('state').remove().then(() => {
-          firebase.messaging().deleteToken().then(() => {
-            firebase.auth().signOut().then(() => {
-              this.props.onLogoutPress()
-              this.setState({spinner: false})
-            })
-            .catch(e => {
-              this.setState({spinner: false})
-              if (e.code == 'auth/no-current-user') {
-                this.props.onLogoutPress()
-              }
-              else {
-                Alert.alert(e.toString())
-              }
-            })
-          })
-          .catch(e => {
-            Alert.alert('Error', e.message)
-            this.setState({spinner: false})
-          })
-          
-        })
-        .catch(e => {
-          Alert.alert('Error', e.message)
+      {text: 'OK', onPress: async () => {
+        try {
+          this.setState({spinner: true})
+          await firebase.database().ref('users/' + this.props.profile.uid).child('state').remove()
+          await firebase.messaging().deleteToken()
+          await firebase.auth().signOut()
           this.setState({spinner: false})
-        })
+          this.props.onLogoutPress()
+        }
+        catch(e) {
+          Alert('Error', e.message)
+          this.props.onLogoutPress()
+        }
       }},
       ])
   }

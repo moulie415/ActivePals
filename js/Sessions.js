@@ -897,7 +897,7 @@ const mapDispatchToProps = dispatch => ({
   },
   remove: (key, type) => dispatch(removeSession(key, type)),
   onOpenChat: (session) => dispatch(navigateMessagingSession(session)),
-  onContinue: (buddies, location) => dispatch(navigateSessionDetail(buddies, location)),
+  onContinue: (friends, location) => dispatch(navigateSessionDetail(friends, location)),
   fetch: (radius, update = false) => Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())]),
   viewGym: (id) => dispatch(navigateGym(id)),
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),

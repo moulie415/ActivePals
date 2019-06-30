@@ -69,7 +69,7 @@ const navigateFromNotif = (notif) => {
     case 'gymMessage':
       dispatch(navigateGymMessaging(gymId))
       break
-    case 'buddyRequest':
+    case 'friendRequest':
       dispatch(navigateFriends())
       break
     case 'rep':
@@ -114,12 +114,12 @@ export const persistor = persistStore(store)
 export const handleNotification = (notification) => {
   const { dispatch, getState } = store
   const {  type } = notification.data
-  if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'buddyRequest') {
+  if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'friendRequest') {
     dispatch(newNotification(notification.data))
     dispatch(updateLastMessage(notification.data))
     showLocalNotification(notification.data)
   }
-  if (type == 'rep' || type == 'comment' || type == 'buddyRequest') {
+  if (type == 'rep' || type == 'comment' || type == 'friendRequest') {
     const count = getState().profile.profile.unreadCount || 0
     dispatch(setNotificationCount(count+1))
   }
@@ -136,7 +136,7 @@ class FitLink extends React.Component {
         .setSound('notif.wav'))
 
     channels.push(new firebase.notifications.Android.Channel('DIRECT_MESSAGES', 'Direct messages', firebase.notifications.Android.Importance.Max)
-        .setDescription('Channel for direct messages from buddies')
+        .setDescription('Channel for direct messages from pals')
         .setSound('notif.wav'))
 
     channels.push(new firebase.notifications.Android.Channel('SESSION_MESSAGES', 'Session messages', firebase.notifications.Android.Importance.Max)

@@ -53,7 +53,7 @@ class SessionDetail extends Component {
 	constructor(props) {
 		super(props)
 		this.params = this.props.navigation.state.params
-		this.buddies = this.params.buddies
+		this.friends = this.params.friends
 		this.location = this.params.location
 
 		this.state = {
@@ -314,9 +314,9 @@ class SessionDetail extends Component {
 				duration: this.state.duration,
 				users: {},
 			}
-			if (this.buddies) {
+			if (this.friends) {
 				session.private = true
-				this.buddies.forEach(uid => {
+				this.friends.forEach(uid => {
 					session.users[uid] = true
 				})
 			}
@@ -329,9 +329,9 @@ class SessionDetail extends Component {
 			ref.set(session).then(()=> {
 				Alert.alert('Success','Session created')
 				this.props.goSessions()
-				if (this.buddies) {
-					this.buddies.forEach(buddy => {
-						firebase.database().ref('users/' + buddy + '/sessions').child(key).set(val)
+				if (this.friends) {
+					this.friends.forEach(friend => {
+						firebase.database().ref('users/' + friend + '/sessions').child(key).set(val)
 					})
 				}
 				firebase.database().ref(type + '/' + key + '/users').child(this.user.uid).set(true)
