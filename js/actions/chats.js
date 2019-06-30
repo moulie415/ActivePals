@@ -12,7 +12,7 @@ export const UPDATE_SESSION_CHAT = 'UPDATE_SESSION_CHAT'
 export const SET_GYM_CHAT = 'SET_GYM_CHAT'
 export const SET_MESSAGE = 'SET_MESSAGE'
 export const RESET_MESSAGE = 'RESET_MESSAGE'
-
+export const SET_UNREAD_COUNT = 'SET_UNREAD_COUNT'
 
 const setSessionChats = (sessionChats) => ({
 	type: SET_SESSION_CHATS,
@@ -65,7 +65,7 @@ export const newNotification = (notif) => ({
 })
 
 export const resetNotification = () => ({
-       type: RESET_NOTIFICATION,
+  type: RESET_NOTIFICATION,
 })
 
 export const setMessage = (url, text) => ({
@@ -78,14 +78,23 @@ export const resetMessage = () => ({
 	type: RESET_MESSAGE
 })
 
+export const setUnreadCount = ({id, count}) => ({
+	type: SET_UNREAD_COUNT,
+	id,
+	count
+})
 
-export const updateLastMessage = (notif) => {
-	return (dispatch, getState) => {
+
+export const updateLastMessage = (notif, shouldUpdateCount) => {
+	return (dispatch) => {
 		if (notif.type == 'message') {
 			return firebase.database().ref('chats').child(notif.chatId).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
 						dispatch(updateChat(notif.uid, Object.values(lastMessage.val())[0]))
+						if (shouldUpdateCount) {
+							dispatch(getUnreadCount(notif.uid))
+						}
 					}
 				})
 		}
@@ -94,13 +103,32 @@ export const updateLastMessage = (notif) => {
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
 						dispatch(updateSessionChat(notif.sessionId, Object.values(lastMessage.val())[0]))
+						if (shouldUpdateCount) {
+							dispatch(getUnreadCount(notif.sessionId))
+						}
 					}
 				})
 
 		}
 		else if (notif.type == 'gymMessage') {
 			dispatch(fetchGymChat(notif.gymId))
+			if (shouldUpdateCount) {
+				dispatch(getUnreadCount(notif.gymId))
+			}
 		}
+	}
+}
+
+export const getUnreadCount = (id) => {
+	return (dispatch, getState) => {
+		const uid = getState().profile.profile.uid
+		const ref = firebase.database().ref('unreadCount/' + uid).child(id)
+		ref.once('value', snapshot => {
+			let count = 0
+			count =  snapshot.val() ? snapshot.val() + 1 : 1
+			ref.set(count)
+			dispatch(setUnreadCount({count, id}))
+		})
 	}
 }
 

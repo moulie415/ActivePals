@@ -25,14 +25,14 @@ import {
 import { setNotificationCount } from "./js/actions/home"
 import { navigateGymMessaging } from "./js/actions/navigation"
 
-let firebaseRef = firebase.database().ref('locations')
+const firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
 
 export const showLocalNotification = (notif) => {
   if (notif.custom_notification) {
-    let user = firebase.auth().currentUser
+    const user = firebase.auth().currentUser
     if (notif.uid != user.uid) {
-      let custom = JSON.parse(notif.custom_notification)
+      const custom = JSON.parse(notif.custom_notification)
       const notification = new firebase.notifications.Notification()
         .setTitle(custom.title)
         .setBody(custom.body)
@@ -116,13 +116,26 @@ export const handleNotification = (notification) => {
   const {  type } = notification.data
   if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'friendRequest') {
     dispatch(newNotification(notification.data))
-    dispatch(updateLastMessage(notification.data))
+    dispatch(updateLastMessage(notification.data, shouldNavigate(notification)))
     showLocalNotification(notification.data)
   }
   if (type == 'rep' || type == 'comment' || type == 'friendRequest') {
     const count = getState().profile.profile.unreadCount || 0
     dispatch(setNotificationCount(count+1))
   }
+}
+
+const shouldNavigate = (notification) => {
+  const nav = store.getState().nav
+  const routes = nav.routes
+  let route = {}
+  if (routes) {
+    route = routes[nav.index]
+  }
+  return  (!route.params || 
+    (route.params.chatId && route.params.chatId != notification.data.chatId ||
+     route.params.session && route.params.session.key != notification.data.sessionId ||
+     route.params.gymId && route.params.gymId != notification.data.gymId)) 
 }
 
 
@@ -179,18 +192,9 @@ class FitLink extends React.Component {
       const action = notificationOpen.action
       // Get information about the notification that was opened
       const notification = notificationOpen.notification
-      let nav = store.getState().nav
-      let routes = nav.routes
-      let route = {}
-      if (routes) {
-        route = routes[nav.index]
+      if (shouldNavigate(notification)) {
+        navigateFromNotif(notification.data)
       }
-      if (!route.params || 
-        (route.params.chatId && route.params.chatId != notification.data.chatId ||
-         route.params.session && route.params.session.key != notification.data.sessionId ||
-         route.params.gymId && route.params.gymId != notification.data.gymId)) {
-          navigateFromNotif(notification.data)
-         }
      
     })
 

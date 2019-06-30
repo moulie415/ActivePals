@@ -10,17 +10,19 @@ import {
 	UPDATE_SESSION_CHAT,
 	SET_GYM_CHAT,
 	SET_MESSAGE,
-	RESET_MESSAGE
-} from 'Anyone/js/actions/chats'
+	RESET_MESSAGE,
+	SET_UNREAD_COUNT
+} from '../actions/chats'
 
 import {
 	SET_LOGGED_OUT
-} from 'Anyone/js/actions/profile'
+} from '../actions/profile'
 
 const initialState = {
 	sessionChats: {},
 	chats: {},
 	messageSessions: {},
+	unreadCount: {}
 }
 
 export default function(state = initialState, action) {
@@ -84,6 +86,11 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				message: null
+			}
+		case SET_UNREAD_COUNT:
+			return {
+				...state,
+				unreadCount: {...state.unreadCount, [action.id]: action.count}
 			}
         case SET_LOGGED_OUT: {
 			return initialState

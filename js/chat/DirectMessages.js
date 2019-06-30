@@ -1,29 +1,23 @@
 import React, { Component } from "react"
 import {
-  StyleSheet,
-  Alert,
   View,
   TouchableOpacity,
-  ScrollView,
   FlatList
 } from "react-native"
 import Image from 'react-native-fast-image'
-import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
+import { Text, Container, Icon } from 'native-base'
 import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import {getSimplifiedTime } from '../constants/utils'
+import ChatTabBarIcon from '../components/ChatTabBarIcon'
+import ChatTabLabel from '../components/ChatTabLabel'
 //import  styles  from './styles/loginStyles'
 
  class DirectMessages extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Pals',
-    tabBarIcon: ({ tintColor }) => (
-      <Icon
-        name='md-chatboxes'
-        style={{ color: tintColor }}
-      />
-    ),
+    tabBarLabel: ({tintColor}) => <ChatTabLabel type='Pals' color={tintColor}/>,
+    tabBarIcon: ({ tintColor }) => <ChatTabBarIcon color={tintColor} />,
   }
 
   constructor(props) {

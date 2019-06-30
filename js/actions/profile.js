@@ -80,7 +80,7 @@ const fetchGym = (profile, dispatch) => {
 
 export const doSetup = (profile) => {
 	return (dispatch, getState) => {
-		let uid = profile.uid
+		const uid = profile.uid
 		setupPresence(uid)
 		firebase.messaging().getToken()
             .then(fcmToken => {
@@ -91,7 +91,7 @@ export const doSetup = (profile) => {
                     console.log('no token')
                 }
             })
-		let friends = profile.friends
+		const friends = profile.friends
 		if (getState().nav.index == 0) {
 			if (getState().profile.hasViewedWelcome) {
 				dispatch(navigateHome())

@@ -1,27 +1,24 @@
 import React, { Component } from "react"
 import {
   View,
-  ScrollView,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  Platform
 } from 'react-native'
-import { Button, Text, Input, Container, Content,  Item, Icon } from 'native-base'
+import { Text, Container } from 'native-base'
 import firebase from 'react-native-firebase'
 import { getType, getSimplifiedTime } from 'Anyone/js/constants/utils'
 import colors from 'Anyone/js/constants/colors'
+import ChatTabBarIcon from '../components/ChatTabBarIcon'
+import ChatTabLabel from '../components/ChatTabLabel'
 
 //import  styles  from './styles/loginStyles'
 
  class SessionChats extends Component {
   static navigationOptions = {
     header: null,
-    tabBarLabel: 'Sessions',
-    tabBarIcon: ({ tintColor }) => (
-      <Icon
-        name='md-chatboxes'
-        style={{ color: tintColor }}
-      />
-    ),
+    tabBarLabel: ({tintColor}) => <ChatTabLabel type='Sessions' color={tintColor}/>,
+    tabBarIcon: ({ tintColor }) => <ChatTabBarIcon  color={tintColor} />,
   }
 
   constructor(props) {

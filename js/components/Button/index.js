@@ -11,12 +11,13 @@ const AppButton = ({color, textColor, onPress, text, style, textStyle}) => {
   </TouchableOpacity>
 }
 
-AppButton.propsTypes = {
+AppButton.propTypes = {
   color: PropTypes.string,
   textColor: PropTypes.string,
   onPress: PropTypes.func,
   text: PropTypes.string,
-  style: PropTypes.any
+  style: PropTypes.any,
+  textStyle: PropTypes.any
 }
 
 
