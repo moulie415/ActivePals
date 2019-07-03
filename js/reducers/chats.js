@@ -22,7 +22,8 @@ const initialState = {
 	sessionChats: {},
 	chats: {},
 	messageSessions: {},
-	unreadCount: {}
+	unreadCount: {},
+	gymChat: {}
 }
 
 export default function(state = initialState, action) {
