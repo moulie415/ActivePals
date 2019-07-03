@@ -113,22 +113,24 @@ export const getUnreadCount = () => {
 	return (dispatch, getState) => {
 		const uid = getState().profile.profile.uid
 		firebase.database().ref('unreadCount').child(uid).on('value', snapshot => {
-			Object.keys(snapshot.val()).forEach(id => {
-				const count = snapshot.val()[id]
-				const nav = getState().nav
-  			const routes = nav.routes
-  			let route = {}
-  			if (routes) {
-    			route = routes[nav.index]
-				}
-			
-				if ((count !== 0) && (!route.params || 
-				(route.params.chatId && route.params.chatId != id ||
-				 route.params.session && route.params.session.key != id ||
-				 route.params.gymId && route.params.gymId != id))) {
-					dispatch(setUnreadCount({id, count}))
-				}
-			})
+			if (snapshot.val()) {
+				Object.keys(snapshot.val()).forEach(id => {
+					const count = snapshot.val()[id]
+					const nav = getState().nav
+					const routes = nav.routes
+					let route = {}
+					if (routes) {
+						route = routes[nav.index]
+					}
+				
+					if ((count !== 0) && (!route.params || 
+					(route.params.chatId && route.params.chatId != id ||
+					route.params.session && route.params.session.key != id ||
+					route.params.gymId && route.params.gymId != id))) {
+						dispatch(setUnreadCount({id, count}))
+					}
+				})
+		}
 		})
 			
 	}
