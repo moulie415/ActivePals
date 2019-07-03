@@ -11,6 +11,7 @@ import colors from 'Anyone/js/constants/colors'
 import {getSimplifiedTime } from '../constants/utils'
 import ChatTabBarIcon from '../components/ChatTabBarIcon'
 import ChatTabLabel from '../components/ChatTabLabel'
+import ChatRowCount from '../components/ChatRowCount'
 //import  styles  from './styles/loginStyles'
 
  class DirectMessages extends Component {
@@ -96,7 +97,7 @@ import ChatTabLabel from '../components/ChatTabLabel'
           }}>
             <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
             {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
-                  <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
+                  <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary}}/>}
               <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
                 <Text>{friend.username}</Text>
                 {!!item.lastMessage.text && <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>}
@@ -105,6 +106,7 @@ import ChatTabLabel from '../components/ChatTabLabel'
               </View>
                {item.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text></View>}
+                <ChatRowCount id={item.uid}/>
             </View>
           </TouchableOpacity>
         }

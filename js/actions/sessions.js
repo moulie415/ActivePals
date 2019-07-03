@@ -48,11 +48,11 @@ export const setPlace = (place) => ({
 	place
 })
 
-export const fetchSessions = (radius = 10, update = false) => {
+export const fetchSessions = (radius = 10) => {
 	return (dispatch, getState) => {
 		const uid = getState().profile.profile.uid
 		const userFetches = []
-		return firebase.database().ref('users/' + uid).child('sessions').on('value', snapshot => {
+		firebase.database().ref('users/' + uid).child('sessions').on('value', snapshot => {
 
 			if (snapshot.val()) {
 				const promises = []
@@ -61,7 +61,7 @@ export const fetchSessions = (radius = 10, update = false) => {
 						promises.push(firebase.database().ref('sessions').child(key).once('value'))
 					}
 				})
-				return Promise.all(promises).then(sessions => {
+				Promise.all(promises).then(sessions => {
 					const obj = {}
 					sessions.forEach(session => {
 						let host = checkHost(session.val().host, getState())
@@ -73,76 +73,77 @@ export const fetchSessions = (radius = 10, update = false) => {
 					})
 					dispatch(updateSessions(obj))
 					checkUserFetches(userFetches)
-
-					return new Promise((resolve) => {
-						navigator.geolocation.getCurrentPosition(
-							(position) => {
-								const lat = position.coords.latitude
-								const lon = position.coords.longitude
-								const geoQuery = geofire.query({
-									center: [lat, lon],
-									radius: radius,
-								})
-
-								const onReadyRegistration = geoQuery.on("ready",() => {
-									console.log("GeoQuery has loaded and fired all other events for initial data")
-									resolve()
-								})
-
-								const onKeyEnteredRegistration = geoQuery.on("key_entered", (key, location, distance) => {
-									console.log(key + " entered query at " + location + " (" + distance + " km from center)")
-									firebase.database().ref('sessions/' + key).once('value', snapshot => {
-										if (snapshot.val()) {
-											const duration = snapshot.val().duration * 60 * 60 * 1000
-											const time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
-											const current = new Date().getTime()
-											if (time + duration > current) {
-												const inProgress = time < current
-												firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
-													dispatch(setSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
-												})
-											}
-											else {
-												//validate time serverside before deleting session in case clients time is wrong
-												firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
-												.then(()=> {
-													firebase.database().ref('timestamp').once('value', timestamp => {
-														if (timestamp.val() > time + duration) {
-															dispatch(removeSession(key, snapshot.val().private))
-															firebase.database().ref('sessions/' + key).remove()
-															firebase.database().ref('sessionChats').child(key).remove()
-															dispatch(removeSessionChat(key))
-															geofire.remove(key)
-														}
-													})
-												})
-											}
-										}
-									})
-								})
-
-								const onKeyExitedRegistration = geoQuery.on("key_exited", (key, location, distance) => {
-									console.log(key + " exited query to " + location + " (" + distance + " km from center)")
-									dispatch(removeSession(key, false, true))
-								})
-
-								const onKeyMovedRegistration = geoQuery.on("key_moved", (key, location, distance) => {
-									console.log(key + " moved within query to " + location + " (" + distance + " km from center)")
-								})
-
-							},
-							(error) => {
-
-							},
-						{ enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
-						)
 					})
-				})
-			}
-		})
+				}
+			})
+
+			return new Promise(resolve => {
+				navigator.geolocation.getCurrentPosition(
+					(position) => {
+						const lat = position.coords.latitude
+						const lon = position.coords.longitude
+						const geoQuery = geofire.query({
+							center: [lat, lon],
+							radius: radius,
+						})
+
+						const onReadyRegistration = geoQuery.on("ready",() => {
+							console.log("GeoQuery has loaded and fired all other events for initial data")
+							resolve()
+						})
+
+						const onKeyEnteredRegistration = geoQuery.on("key_entered", (key, location, distance) => {
+							console.log(key + " entered query at " + location + " (" + distance + " km from center)")
+							firebase.database().ref('sessions/' + key).once('value', snapshot => {
+								if (snapshot.val()) {
+									const duration = snapshot.val().duration * 60 * 60 * 1000
+									const time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
+									const current = new Date().getTime()
+									if (time + duration > current) {
+										const inProgress = time < current
+										firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
+											dispatch(setSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
+										})
+									}
+									else {
+										//validate time serverside before deleting session in case clients time is wrong
+										firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
+										.then(()=> {
+											firebase.database().ref('timestamp').once('value', timestamp => {
+												if (timestamp.val() > time + duration) {
+													dispatch(removeSession(key, snapshot.val().private))
+													firebase.database().ref('sessions/' + key).remove()
+													firebase.database().ref('sessionChats').child(key).remove()
+													dispatch(removeSessionChat(key))
+													geofire.remove(key)
+												}
+											})
+										})
+									}
+								}
+							})
+						})
+
+						const onKeyExitedRegistration = geoQuery.on("key_exited", (key, location, distance) => {
+							console.log(key + " exited query to " + location + " (" + distance + " km from center)")
+							dispatch(removeSession(key, false, true))
+						})
+
+						const onKeyMovedRegistration = geoQuery.on("key_moved", (key, location, distance) => {
+							console.log(key + " moved within query to " + location + " (" + distance + " km from center)")
+						})
+
+					},
+					(error) => {
+
+					},
+				{ enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
+				)
+			})
+				
+		}
 	}
 
-}
 
 export const fetchPrivateSessions = () =>  {
 	return (dispatch, getState) => {

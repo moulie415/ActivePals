@@ -3,7 +3,6 @@ import {
   View,
   TouchableOpacity,
   FlatList,
-  Platform
 } from 'react-native'
 import { Text, Container } from 'native-base'
 import firebase from 'react-native-firebase'
@@ -11,7 +10,7 @@ import { getType, getSimplifiedTime } from 'Anyone/js/constants/utils'
 import colors from 'Anyone/js/constants/colors'
 import ChatTabBarIcon from '../components/ChatTabBarIcon'
 import ChatTabLabel from '../components/ChatTabLabel'
-
+import ChatRowCount from '../components/ChatRowCount'
 //import  styles  from './styles/loginStyles'
 
  class SessionChats extends Component {
@@ -79,6 +78,7 @@ import ChatTabLabel from '../components/ChatTabLabel'
             </View>
             {item.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
               <Text style={{color: '#999'}}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text></View>}
+              <ChatRowCount id={item.key} />
           </View>
         </TouchableOpacity>
       }}

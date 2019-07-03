@@ -11,6 +11,7 @@ import { getType, getSimplifiedTime } from 'Anyone/js/constants/utils'
 import colors from 'Anyone/js/constants/colors'
 import ChatTabBarIcon from '../components/ChatTabBarIcon'
 import ChatTabLabel from '../components/ChatTabLabel'
+import ChatRowCount from '../components/ChatRowCount'
 
 //import  styles  from './styles/loginStyles'
 
@@ -74,12 +75,13 @@ import ChatTabLabel from '../components/ChatTabLabel'
             </View>
             { gymChat && gymChat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
               <Text style={{color: '#999'}}>{getSimplifiedTime(gymChat.lastMessage.createdAt)}</Text></View>}
+              <ChatRowCount id={gym.place_id} />
           </View>
         </TouchableOpacity>
       </ScrollView> :
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#9993'}}>
             <Text style={{color: colors.primary, textAlign: 'center', marginHorizontal: 20}}>
-            You haven't joined a Gym, please join a Gym if you want to participate in Gym chat
+            {"You haven't joined a Gym, please join a Gym if you want to participate in Gym chat"}
           </Text></View>}
     </Container>
   )

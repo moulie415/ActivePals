@@ -216,6 +216,7 @@ import Button from './components/Button'
           text='Create Private Session'
             textStyle={{textAlign: 'center', fontSize: 15, textAlignVertical: 'center'}}/>
         </View>
+
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedSession && <View style={{flex: 1}}>
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
@@ -223,7 +224,10 @@ import Button from './components/Button'
           <ScrollView style={{margin: 10}}>
           <View style={{flexDirection: 'row'}}>
           <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between'}}>
-            <Text style={{color: '#999'}}>Host: <Text style={{color: '#000'}}>{this.fetchHost(this.state.selectedSession.host)}</Text></Text>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{color: '#999'}}>Host: </Text>
+              {this.fetchHost(this.state.selectedSession.host)}
+            </View>
             {this.state.selectedSession.users[this.props.profile.uid] && <TouchableOpacity
               onPress={()=> {
                 this.props.onOpenChat(this.state.selectedSession)
@@ -276,8 +280,8 @@ import Button from './components/Button'
              {this.fetchButtons(this.state.selectedSession, this.props.profile.uid)}
              </View>}
             </View>}
-
         </Modal>
+
         <FriendsModal 
         location={this.state.selectedLocation} 
         onClosed={()=> this.setState({friendsModalOpen: false})}
@@ -394,7 +398,7 @@ import Button from './components/Button'
           if (this.state.radius != this.state.initialRadius) {
 
             this.setState({refreshing: true})
-            this.props.fetch(this.state.radius, true).then(() => this.setState({refreshing: false}))
+            this.props.fetch(this.state.radius).then(() => this.setState({refreshing: false}))
           }
         }}
         style={styles.modal}

@@ -39,7 +39,7 @@ export function renderAd(index) {
         testDevices={str.testDevices}
         onAdFailedToLoad={error => {
           console.log(error)
-          }}
+        }}
         />
         </Card>
     }
