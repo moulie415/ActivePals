@@ -7,7 +7,7 @@ export const REMOVE_GYM = 'REMOVE_GYM'
 export const SET_LOCATION = 'SET_LOCATION'
 export const SET_HAS_VIEWED_WELCOME = 'SET_HAS_VIEWED_WELCOME'
 import { fetchFriends } from './friends'
-import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat } from './chats'
+import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat, getUnreadCount } from './chats'
 import { fetchPosts } from './home'
 import { fetchSessions, fetchPhotoPath } from './sessions'
 import { navigateLogin, navigateHome, navigateWelcome } from './navigation'
@@ -108,18 +108,17 @@ export const doSetup = (profile) => {
 					profile.gym && dispatch(fetchGymChat(profile.gym)),
 					dispatch(fetchPosts(uid)),
 					dispatch(fetchSessions()),
+					dispatch(getUnreadCount())
 				])
 		})
-
-		
 
 	}
 }
 
 export const removeUser = () => {
-	return (dispatch, getState) => {
+	return (dispatch) => {
 		//let cloud function do all the heavy lifting of deleting user data
-		let user = firebase.auth().currentUser
+		const user = firebase.auth().currentUser
 		dispatch(setLoggedOut())
 		return user.delete().then(() => {
 			dispatch(navigateLogin())

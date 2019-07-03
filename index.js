@@ -116,7 +116,7 @@ export const handleNotification = (notification) => {
   const {  type } = notification.data
   if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'friendRequest') {
     dispatch(newNotification(notification.data))
-    dispatch(updateLastMessage(notification.data, shouldNavigate(notification)))
+    dispatch(updateLastMessage(notification.data))
     showLocalNotification(notification.data)
   }
   if (type == 'rep' || type == 'comment' || type == 'friendRequest') {

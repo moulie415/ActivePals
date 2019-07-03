@@ -23,6 +23,7 @@ import { calculateAge } from './constants/utils'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
 import globalStyles from "./styles/globalStyles"
+import Button from './components/Button'
 
 
  class ProfileView extends Component {
@@ -124,7 +125,7 @@ import globalStyles from "./styles/globalStyles"
             {last_name && <Text>{last_name}</Text>})</Text>}
         </Text>
         {!this.state.isFriend && 
-          <TouchableOpacity 
+          <Button 
           onPress={()=> {
             Alert.alert(
               'Send pal request',
@@ -142,9 +143,8 @@ import globalStyles from "./styles/globalStyles"
               ]
               )
           }}
-          style={{padding: 10, backgroundColor: colors.secondary, margin: 10, alignSelf: 'center'}}>
-          <Text style={{color: '#fff'}}>Send pal request</Text>
-          </TouchableOpacity>}
+          text="Send pal request"
+          style={{margin: 10, alignSelf: 'center'}}/>}
 
 
 
@@ -168,8 +168,10 @@ import globalStyles from "./styles/globalStyles"
         <Text style={{color: colors.secondary}}>{level || 'Unspecified'}</Text></Text>}
         </View>
 
-          {this.state.isFriend && <TouchableOpacity
-          style={{backgroundColor: 'red', padding: 10, alignSelf: 'center', marginBottom: 30, borderRadius: 5}}
+          {this.state.isFriend && <Button
+          color='red'
+          text="Remove pal"
+          style={{alignSelf: 'center', margin: 10}}
           onPress={()=> {
             Alert.alert(
               'Remove pal',
@@ -182,9 +184,7 @@ import globalStyles from "./styles/globalStyles"
               }, style: 'destructive'},
               ]
               )
-          }}>
-          <Text style={{color: '#fff'}}>Remove pal</Text>
-          </TouchableOpacity>}
+          }}/>}
         </View> : <View style={hStyles.spinner}><PulseIndicator color={colors.secondary} /></View>}
         {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
         <Modal onRequestClose={()=> null}

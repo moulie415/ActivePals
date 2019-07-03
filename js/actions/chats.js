@@ -85,16 +85,13 @@ export const setUnreadCount = ({id, count}) => ({
 })
 
 
-export const updateLastMessage = (notif, shouldUpdateCount) => {
+export const updateLastMessage = (notif) => {
 	return (dispatch) => {
 		if (notif.type == 'message') {
 			return firebase.database().ref('chats').child(notif.chatId).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
 						dispatch(updateChat(notif.uid, Object.values(lastMessage.val())[0]))
-						if (shouldUpdateCount) {
-							dispatch(getUnreadCount(notif.uid))
-						}
 					}
 				})
 		}
@@ -103,34 +100,50 @@ export const updateLastMessage = (notif, shouldUpdateCount) => {
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
 						dispatch(updateSessionChat(notif.sessionId, Object.values(lastMessage.val())[0]))
-						if (shouldUpdateCount) {
-							dispatch(getUnreadCount(notif.sessionId))
-						}
 					}
 				})
-
 		}
 		else if (notif.type == 'gymMessage') {
 			dispatch(fetchGymChat(notif.gymId))
-			if (shouldUpdateCount) {
-				dispatch(getUnreadCount(notif.gymId))
-			}
 		}
 	}
 }
 
-export const getUnreadCount = (id) => {
+export const getUnreadCount = () => {
 	return (dispatch, getState) => {
 		const uid = getState().profile.profile.uid
-		const ref = firebase.database().ref('unreadCount/' + uid).child(id)
-		ref.once('value', snapshot => {
-			let count = 0
-			count =  snapshot.val() ? snapshot.val() + 1 : 1
-			ref.set(count)
-			dispatch(setUnreadCount({count, id}))
+		firebase.database().ref('unreadCount').child(uid).on('value', snapshot => {
+			Object.keys(snapshot.val()).forEach(id => {
+				const count = snapshot.val()[id]
+				const nav = getState().nav
+  			const routes = nav.routes
+  			let route = {}
+  			if (routes) {
+    			route = routes[nav.index]
+				}
+			
+				if ((count !== 0) && (!route.params || 
+				(route.params.chatId && route.params.chatId != id ||
+				 route.params.session && route.params.session.key != id ||
+				 route.params.gymId && route.params.gymId != id))) {
+					dispatch(setUnreadCount({id, count}))
+				}
+			})
 		})
+			
 	}
 }
+
+export const resetUnreadCount = (id) => {
+	return (dispatch, getState) => {
+		const count = 0
+		const uid = getState().profile.profile.uid
+		firebase.database().ref('unreadCount/' + uid).child(id).set(count)
+		dispatch(setUnreadCount({id, count}))
+	}
+}
+
+
 
 
 

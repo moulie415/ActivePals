@@ -79,17 +79,9 @@ class Messaging extends React.Component {
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress())
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
-
     this.loadMessages()
-
-    if (!this.session && !this.gymId) {
-      firebase.database().ref('users/' + this.friendUid).child('FCMToken').once('value', snapshot => {
-        this.friendToken = snapshot.val()
-      })
-    }
-
     this.props.profile.avatar ? this.setState({avatar: this.props.profile.avatar}) : this.setState({avatar: ''})
-
+    this.props.resetUnreadCount(this.friendUid || this.sessionId || this.gymId)
   }
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress())
@@ -192,7 +184,7 @@ class Messaging extends React.Component {
         converted.push({...message, createdAt: message.createdAt.toString(), gymId: this.gymId, gymName: this.gymName})
       }
       else {
-        converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, FCMToken: this.friendToken, friendUid: this.friendUid})
+        converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, friendUid: this.friendUid})
       }
     })
 
@@ -411,7 +403,7 @@ import {
   navigateFilePreview,
   navigateBack
 } from 'Anyone/js/actions/navigation'
-import { sendRequest, acceptRequest } from 'Anyone/js/actions/friends'
+import { sendRequest, acceptRequest } from '../actions/friends'
 import {
   fetchChats,
   fetchSessionChats,
@@ -419,9 +411,10 @@ import {
   fetchSessionMessages,
   fetchGymMessages,
   resetNotification,
-  resetMessage
-} from 'Anyone/js/actions/chats'
-import { fetchGymChat } from "../actions/chats";
+  resetMessage,
+  fetchGymChat,
+  resetUnreadCount
+} from '../actions/chats'
 
 const fetchId = (params) => {
   if (params.session) {
@@ -461,7 +454,8 @@ const mapDispatchToProps = dispatch => ({
   goToGym: (gym) => dispatch(navigateGym(gym)),
   resetMessage: () => dispatch(resetMessage()),
   previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
-  goBack: () => dispatch(navigateBack())
+  goBack: () => dispatch(navigateBack()),
+  resetUnreadCount: (id) => dispatch(resetUnreadCount(id))
 
 })
 
