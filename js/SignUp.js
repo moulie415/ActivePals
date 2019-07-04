@@ -2,11 +2,11 @@ import React, { Component } from "react"
 import {
   Alert,
   View,
-  ImageBackground
+  ImageBackground,
+  KeyboardAvoidingView
  } from "react-native"
 import {
   Input,
-  Container,
   Item,
   Icon,
 } from 'native-base'
@@ -49,7 +49,7 @@ import Button from './components/Button'
       <View style={sStyles.spinner}>
         <PulseIndicator color={colors.secondary}/>
       </View>}
-      <View style={{justifyContent: 'center', flex: 1}}>
+      <KeyboardAvoidingView behavior="padding" style={{justifyContent: 'center', flex: 1}}>
       <Item style={styles.inputGrp}>
       <Icon name="person" style={{color: "#fff"}} />
         <Input
@@ -124,7 +124,7 @@ import Button from './components/Button'
         text='Sign up'
         />
 
-        </View>
+        </KeyboardAvoidingView>
     </ImageBackground>
   )
   }
