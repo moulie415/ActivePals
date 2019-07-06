@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Slider,
-  Platform
+  Platform,
 } from "react-native"
 import {
   Container,
@@ -35,6 +35,7 @@ import FriendsModal from './components/friendsModal'
 import GymSearch from './components/GymSearch'
 import { CheckBox } from 'react-native-elements'
 import Button from './components/Button'
+import { WebView } from 'react-native-webview'
 
  class Sessions extends Component {
 
@@ -726,7 +727,6 @@ import Button from './components/Button'
       const lat = session.location.position.lat
       return <MapView.Marker
           key={"s" + index.toString()}
-          image={Platform.select({android: getResource(session.type)})}
           coordinate={{
             latitude: lat,
             longitude: lng,

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import {
-  Image,
   Platform,
   Linking,
   Alert
@@ -14,6 +13,7 @@ import {
   AdMobBanner
 } from 'react-native-admob'
 import { AdSettings, NativeAdsManager  } from 'react-native-fbads'
+import Image from 'react-native-fast-image'
 
 const adsManager = new NativeAdsManager(str.nativePlacementId)
 

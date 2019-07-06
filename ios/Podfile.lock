@@ -137,9 +137,6 @@ PODS:
   - Protobuf (3.8.0)
   - React (0.58.5):
     - React/Core (= 0.58.5)
-  - react-native-fast-image (6.0.3):
-    - React
-    - SDWebImage (~> 5.0)
   - react-native-fbsdk (0.10.1):
     - React
     - react-native-fbsdk/Core (= 0.10.1)
@@ -175,6 +172,8 @@ PODS:
     - React
     - react-native-video/Video
     - SPTPersistentCache (~> 1.1.0)
+  - react-native-webview (5.12.1):
+    - React
   - React/Core (0.58.5):
     - yoga (= 0.58.5.React)
   - React/fishhook (0.58.5)
@@ -205,9 +204,6 @@ PODS:
     - React/RCTBlob
   - rn-fetch-blob (0.10.6):
     - React/Core
-  - SDWebImage (5.0.6):
-    - SDWebImage/Core (= 5.0.6)
-  - SDWebImage/Core (5.0.6)
   - SPTPersistentCache (1.1.0)
   - yoga (0.58.5.React)
 
@@ -226,7 +222,6 @@ DEPENDENCIES:
   - Google-Mobile-Ads-SDK
   - GoogleMaps
   - GoogleSignIn (~> 4.4.0)
-  - react-native-fast-image (from `../node_modules/react-native-fast-image`)
   - react-native-fbsdk (from `../node_modules/react-native-fbsdk`)
   - react-native-geocoder (from `../node_modules/react-native-geocoder`)
   - react-native-google-maps (from `../node_modules/react-native-maps`)
@@ -235,6 +230,7 @@ DEPENDENCIES:
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-video/VideoCaching (from `../node_modules/react-native-video/react-native-video.podspec`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React/Core (from `../node_modules/react-native`)
   - React/RCTActionSheet (from `../node_modules/react-native`)
   - React/RCTAnimation (from `../node_modules/react-native`)
@@ -279,14 +275,11 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - Protobuf
-    - SDWebImage
     - SPTPersistentCache
 
 EXTERNAL SOURCES:
   React:
     :path: "../node_modules/react-native"
-  react-native-fast-image:
-    :path: "../node_modules/react-native-fast-image"
   react-native-fbsdk:
     :path: "../node_modules/react-native-fbsdk"
   react-native-geocoder:
@@ -303,6 +296,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-splash-screen"
   react-native-video:
     :path: "../node_modules/react-native-video/react-native-video.podspec"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
   yoga:
@@ -338,7 +333,6 @@ SPEC CHECKSUMS:
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   Protobuf: 3f617b9a6e73605565086864c9bc26b2bf2dd5a3
   React: 6cd5e6fcc3b6a52d2fb27a638f622139da710dff
-  react-native-fast-image: 3390cc968d598f0c6b5c710df138f4b653a87231
   react-native-fbsdk: 38ee580e77319d03f8ed0bf4a020cbfd70dc4d2d
   react-native-geocoder: 757427682892bb256f3b3745858cc90eba148a8e
   react-native-google-maps: 68a831730110823d3dadfea0e133f0f4426cd213
@@ -347,11 +341,11 @@ SPEC CHECKSUMS:
   react-native-maps: fb06a43ce6884256097eec1dd69d23957b71df88
   react-native-splash-screen: cc626c801178f24382f898ea0b4c55384429b9c0
   react-native-video: afdbf53bb44a700d1dcfc679790710469571d0f9
+  react-native-webview: 21c396687cb983fadc6ccc0751cc74f554131f3f
   rn-fetch-blob: 766f85cabd2992300dfa1be2bc9e4e258abc6f04
-  SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 0e0009ffb2544aeead64a1209f3d488d3849947b
 
-PODFILE CHECKSUM: 207f4c33928fa2996975b7c6f3c1f61837636383
+PODFILE CHECKSUM: afe3cd3d9f1712bf41173033d0b28f44838b7e17
 
-COCOAPODS: 1.7.2
+COCOAPODS: 1.7.3
