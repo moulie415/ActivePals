@@ -22,6 +22,7 @@
     "react-native-collapsible": "^0.13.0",
     "react-native-config": "^0.11.7",
     "react-native-datepicker": "^1.7.2",
+    "react-native-dialog-input": "^1.0.7",
     "react-native-emoji-input": "^1.1.8",
     "react-native-event-listeners": "^1.0.3",
     "react-native-fast-image": "^5.4.2",

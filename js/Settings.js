@@ -18,7 +18,7 @@ import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
 import FbFriendsModal from './components/FbFriendsModal'
-
+import DialogInput from 'react-native-dialog-input'
 
  class Settings extends Component {
 
@@ -32,6 +32,7 @@ import FbFriendsModal from './components/FbFriendsModal'
     this.user = null
     this.state = {
       spinner: false,
+      showDialog: false,
     }
   }
 
@@ -94,27 +95,7 @@ import FbFriendsModal from './components/FbFriendsModal'
           </View>
           <TouchableOpacity
           style={{padding: 10, backgroundColor: '#fff'}}
-          onPress={()=> {
-            Alert.alert(
-              'Are you sure?',
-              'All profile data will be deleted.',
-              [
-              {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-              {text: 'OK', onPress: () => {
-                this.setState({spinner: true})
-                this.props.removeUser()
-                .then(() => {
-                  Alert.alert('Success', 'Account deleted')
-                this.setState({spinner: false})
-                })
-                .catch(e => {
-                  Alert.alert('Error', e.message)
-                  this.setState({spinner: false})
-                })
-              }},
-              ]
-              )
-          }}>
+          onPress={()=> this.setState({showDialog: true})}>
               <Text style={{color: 'red'}}>Delete account</Text>
           </TouchableOpacity>
       </Content>
@@ -125,6 +106,26 @@ import FbFriendsModal from './components/FbFriendsModal'
         isOpen={this.state.fbModalOpen} 
         onClosed={() => this.setState({fbModalOpen: false})}
         />
+        <DialogInput isDialogVisible={this.state.showDialog}
+            title={"Enter email to confirm"}
+            message={"All your data will be deleted."}
+            hintInput ={"Enter email"}
+            submitInput={ async (inputText) => {
+              if (inputText == this.props.profile.email) {
+                this.setState({spinner: true})
+                try {
+                  await this.props.removeUser()
+                  Alert.alert('Success', 'Account deleted')
+                  this.setState({spinner: false})
+                } catch(e) {
+                  Alert.alert('Error', e.message)
+                  this.setState({spinner: false})
+                }
+              }
+              else Alert.alert('Incorrect email')
+             }}
+            closeDialog={ () => this.setState({showDialog: false})}
+            />
     </Container>
   )
   }
