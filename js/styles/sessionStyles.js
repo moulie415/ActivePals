@@ -50,7 +50,7 @@ export default  StyleSheet.create({
     flex: 2
   },
   date: {
-    fontFamily: 'OpenSans',
+    fontFamily: 'Montserrat',
   },
   sessionFilterTitle: {
     fontSize: 20,

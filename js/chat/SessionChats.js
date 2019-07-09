@@ -4,7 +4,8 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native'
-import { Text, Container } from 'native-base'
+import { Container } from 'native-base'
+import Text from '../components/Text'
 import firebase from 'react-native-firebase'
 import { getType, getSimplifiedTime } from 'Anyone/js/constants/utils'
 import colors from 'Anyone/js/constants/colors'
@@ -73,7 +74,7 @@ import ChatRowCount from '../components/ChatRowCount'
           <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
             <View>{getType(item.type, 50)}</View>
             <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
-              <Text numberOfLines={1} >{item.title}</Text>
+              <Text style={{color: '#000'}} numberOfLines={1} >{item.title}</Text>
               {!!item.lastMessage.text && <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>}
             </View>
             {item.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>

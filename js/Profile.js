@@ -266,9 +266,11 @@ import Button from './components/Button'
           customStyles={{
             dateText: {
               color: '#fff',
+              fontFamily: 'Montserrat'
             },
             placeholderText: {
               color: '#fff',
+              fontFamily: 'Montserrat'
             },
             dateInput: {
               borderWidth: 0,

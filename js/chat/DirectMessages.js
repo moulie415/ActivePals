@@ -5,13 +5,14 @@ import {
   FlatList
 } from "react-native"
 import Image from 'react-native-fast-image'
-import { Text, Container, Icon } from 'native-base'
+import { Container, Icon } from 'native-base'
 import firebase from 'react-native-firebase'
 import colors from 'Anyone/js/constants/colors'
 import {getSimplifiedTime } from '../constants/utils'
 import ChatTabBarIcon from '../components/ChatTabBarIcon'
 import ChatTabLabel from '../components/ChatTabLabel'
 import ChatRowCount from '../components/ChatRowCount'
+import Text from '../components/Text'
 //import  styles  from './styles/loginStyles'
 
  class DirectMessages extends Component {
@@ -99,7 +100,7 @@ import ChatRowCount from '../components/ChatRowCount'
             {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
                   <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary}}/>}
               <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
-                <Text>{friend.username}</Text>
+                <Text style={{color: '#000'}} numberOfLines={1}>{friend.username}</Text>
                 {!!item.lastMessage.text && <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>}
                 {!item.lastMessage.text && item.lastMessage.image && <Text numberOfLines={1} style={{color: '#999', fontStyle: 'italic'}}>
                 {item.lastMessage.user._id == this.props.profile.uid ? 'you sent an image' : 'sent you an image'}</Text>}

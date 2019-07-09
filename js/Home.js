@@ -180,6 +180,7 @@ sortByDate(array) {
               marginHorizontal: 10,
               height: 40,
               padding: 5,
+              fontFamily: 'Montserrat'
               }}/>
             <TouchableOpacity onPress={()=> {
               if (username) {

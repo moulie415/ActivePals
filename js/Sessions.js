@@ -581,7 +581,7 @@ import { WebView } from 'react-native-webview'
             }}
             tabsContainerStyle={{marginHorizontal:8, marginVertical: 5}}
             tabStyle={{borderColor:colors.secondary}}
-            tabTextStyle={{color:colors.secondary}}
+            tabTextStyle={{color:colors.secondary, fontFamily: 'Montserrat'}}
             activeTabStyle={{backgroundColor:colors.secondary}}
             />
               {gym && this.state.selectedIndex == 1 && 

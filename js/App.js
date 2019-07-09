@@ -49,7 +49,7 @@ const chats = TabNavigator({
     showLabel: true,
     labelStyle: {
       fontSize: 15,
-      fontFamily: 'OpenSans',
+      fontFamily: 'Montserrat',
     },
     activeTintColor: '#fff',
     inactiveTintColor: colors.secondary,

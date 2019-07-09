@@ -15,8 +15,8 @@ class MapModal extends Component {
     super(props)
     this.state = {
       text: 'Select location on map',
-      latitude: this.props.location.lat,
-      longitude: this.props.location.lon
+      latitude: this.props.location && this.props.location.lat,
+      longitude: this.props.location && this.props.location.lon
     }
   }
 

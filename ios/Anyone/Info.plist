@@ -149,6 +149,12 @@
 		<string>OpenSans_semi_bold_italic.ttf</string>
 		<string>OpenSans_semi_bold.ttf</string>
 		<string>OpenSans.ttf</string>
+		<string>Montserrat.ttf</string>
+		<string>Fontisto.ttf</string>
+		<string>Montserrat_bold.ttf</string>
+		<string>Montserrat_italic.ttf</string>
+		<string>Montserrat_semi_bold.ttf</string>
+		<string>Montserrat_thin.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

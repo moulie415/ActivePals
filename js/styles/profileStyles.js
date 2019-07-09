@@ -4,7 +4,7 @@ import colors from 'Anyone/js/constants/colors'
 export default StyleSheet.create({
   input: {
     color: '#fff',
-    fontFamily: 'OpenSans'
+    fontFamily: 'Montserrat'
   },
   inputGrp: {
     flexDirection: 'row',
