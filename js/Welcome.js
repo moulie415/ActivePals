@@ -125,7 +125,7 @@ class Welcome extends Component {
                         if (profile.fb_login) {
                           Alert.alert(
                             'Success',
-                            'Username saved, do you want to find Facebook friends who are already using the app? You can do this later on the Pals screen',
+                            'Username saved, do you want to find Facebook friends who are already using the app? You can do this later in the Settings screen',
                             [
                               {
                               text: 'No thanks',

@@ -17,6 +17,7 @@ import  styles  from './styles/settingsStyles'
 import Text, { globalTextStyle } from 'Anyone/js/components/Text'
 import Header from './header/header'
 import { PulseIndicator } from 'react-native-indicators'
+import FbFriendsModal from './components/FbFriendsModal'
 
 
  class Settings extends Component {
@@ -79,6 +80,14 @@ import { PulseIndicator } from 'react-native-indicators'
           <Text>Credits</Text>
           <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
         </TouchableOpacity>
+        {this.props.profile.fb_login && <TouchableOpacity
+        onPress={()=> {
+            this.props.profile.username? this.setState({fbModalOpen: true}) : Alert.alert("Please set a username before trying to add a pal")
+        }}
+        style={styles.contact}>
+          <Text>Import Facebook friends</Text>
+          <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
+        </TouchableOpacity>}
           <View style={styles.contact}>
               <Text >Version no: </Text>
               <Text style={{color: colors.primary, fontWeight: 'bold'}}>{VersionNumber.appVersion}</Text>
@@ -112,6 +121,10 @@ import { PulseIndicator } from 'react-native-indicators'
      {this.state.spinner && <View style={styles.spinner}>
       <PulseIndicator color={colors.secondary}/>
       </View>}
+      <FbFriendsModal 
+        isOpen={this.state.fbModalOpen} 
+        onClosed={() => this.setState({fbModalOpen: false})}
+        />
     </Container>
   )
   }
@@ -125,10 +138,11 @@ import {
   navigateCredits
 } from './actions/navigation'
 import { removeUser } from 'Anyone/js/actions/profile'
-//import {  } from 'Anyone/js/actions/chats'
 
-// const mapStateToProps = ({ friends, profile, chats }) => ({
-// })
+const mapStateToProps = ({ profile }) => ({
+  profile: profile.profile
+})
+
 
 const mapDispatchToProps = dispatch => ({
   goBack: ()=> dispatch(navigateBack()),
@@ -138,4 +152,4 @@ const mapDispatchToProps = dispatch => ({
 
 })
 
-export default connect(null, mapDispatchToProps)(Settings)
+export default connect(mapStateToProps, mapDispatchToProps)(Settings)

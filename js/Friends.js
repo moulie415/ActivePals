@@ -21,7 +21,6 @@ import globalStyles from './styles/globalStyles'
 import { arraysEqual, getStateColor } from './constants/utils'
 import Header from './header/header'
 import Image from 'react-native-fast-image'
-import FbFriendsModal from './components/FbFriendsModal'
 import Text from './components/Text'
 import Button from './components/Button'
 
@@ -51,7 +50,6 @@ import Button from './components/Button'
   componentDidMount() {
     this.listenForFriends()
     this.listenForState()
-
   }
 
   listenForFriends() {
@@ -115,16 +113,6 @@ import Button from './components/Button'
     return (
     <Container>
       <Header 
-        left={this.props.profile.fb_login && <TouchableOpacity 
-        style = {globalStyles.headerLeft}
-        onPress={() => {
-          firebase.database().ref('users/' + this.uid).child('username')
-          .once('value', snapshot => {
-            snapshot.val()? this.setState({fbModalOpen: true}) : Alert.alert("Please set a username before trying to add a pal")
-          })
-        }}>
-          <Icon name='logo-facebook' style={{color: '#fff', padding: 5}}/>
-        </TouchableOpacity>}
         title={'Pals'}
         right={<TouchableOpacity onPress={() => {
         firebase.database().ref('users/' + this.uid).child('username')
@@ -176,11 +164,6 @@ import Button from './components/Button'
           
           </View>
         </Modal>
-
-        <FbFriendsModal 
-        isOpen={this.state.fbModalOpen} 
-        onClosed={() => this.setState({fbModalOpen: false})}
-        />
         </Content>
     </Container>
   )
