@@ -52,9 +52,8 @@ target 'Anyone' do
 
   pod 'react-native-video/VideoCaching', :path => '../node_modules/react-native-video/react-native-video.podspec'
 
-
-
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
 
 end
 post_install do |installer|

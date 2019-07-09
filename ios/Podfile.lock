@@ -165,9 +165,9 @@ PODS:
     - React
   - react-native-splash-screen (3.0.9):
     - React
-  - react-native-video/Video (4.3.1):
+  - react-native-video/Video (4.4.3):
     - React
-  - react-native-video/VideoCaching (4.3.1):
+  - react-native-video/VideoCaching (4.4.3):
     - DVAssetLoaderDelegate (~> 0.3.1)
     - React
     - react-native-video/Video
@@ -340,12 +340,12 @@ SPEC CHECKSUMS:
   react-native-image-resizer: ecae22b577b0425cd7803eb8145243038dd4b6bd
   react-native-maps: fb06a43ce6884256097eec1dd69d23957b71df88
   react-native-splash-screen: cc626c801178f24382f898ea0b4c55384429b9c0
-  react-native-video: afdbf53bb44a700d1dcfc679790710469571d0f9
+  react-native-video: bd7ca482cd4f3dac31c9bc93a6fe8573db433319
   react-native-webview: 21c396687cb983fadc6ccc0751cc74f554131f3f
   rn-fetch-blob: 766f85cabd2992300dfa1be2bc9e4e258abc6f04
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 0e0009ffb2544aeead64a1209f3d488d3849947b
 
-PODFILE CHECKSUM: afe3cd3d9f1712bf41173033d0b28f44838b7e17
+PODFILE CHECKSUM: 603a959472cdf0f6991451e93c8e9c3a909baf1d
 
 COCOAPODS: 1.7.3

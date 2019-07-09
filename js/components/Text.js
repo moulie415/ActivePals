@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, StyleSheet } from 'react-native'
 
 export const globalTextStyle = StyleSheet.create({
-    app: { fontFamily:'Avenir' }
+    app: { fontFamily:'OpenSans' }
 })
 
 const AppText = ({style, ...props}) => {
