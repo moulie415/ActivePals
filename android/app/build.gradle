@@ -203,12 +203,12 @@ dependencies {
         exclude group: 'com.google.android.gms', module: 'play-services-base'
         exclude group: 'com.google.android.gms', module: 'play-services-maps'
     }
-    implementation 'com.google.android.gms:play-services-maps:16.1.0'
-    implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.facebook.android:facebook-android-sdk:5.0.3'
     implementation 'com.google.android.exoplayer:exoplayer:2.9.3'
 
 
-    implementation 'com.facebook.android:facebook-login:4.36.0'
+    implementation 'com.facebook.android:facebook-login:5.0.3'
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -219,13 +219,13 @@ dependencies {
     }
 
     implementation "com.google.android.gms:play-services-base:17.0.0"
-    implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'com.google.firebase:firebase-messaging:19.0.0'
-    implementation "com.google.firebase:firebase-database:17.0.0"
-    implementation "com.google.firebase:firebase-config:17.0.0"
-    implementation "com.google.firebase:firebase-auth:17.0.0"
-    implementation "com.google.firebase:firebase-storage:17.0.0"
-    implementation "com.google.firebase:firebase-iid:19.0.0"
+    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation "com.google.firebase:firebase-database:18.0.0"
+    implementation "com.google.firebase:firebase-config:18.0.0"
+    implementation "com.google.firebase:firebase-auth:18.0.0"
+    implementation "com.google.firebase:firebase-storage:18.0.0"
+    implementation "com.google.firebase:firebase-iid:19.0.1"
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
 
 }

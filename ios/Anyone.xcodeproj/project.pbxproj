@@ -14,6 +14,8 @@
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
 		00E356F31AD99517003FC87E /* AnyoneTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* AnyoneTests.m */; };
 		0A03A8E622D1658E005A2609 /* libFastImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A03A88422D16578005A2609 /* libFastImage.a */; };
+		0A0A4FE822DA370E00CC692E /* libreact-native-google-maps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A88FFBB201D6E19004A17CD /* libreact-native-google-maps.a */; };
+		0A0A502222DA374200CC692E /* libreact-native-maps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A88FFBD201D6E19004A17CD /* libreact-native-maps.a */; };
 		0A124604229C2D0B009E7319 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		0A12E3EB218F402F009424C7 /* libRNCalendarEvents.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A12E3E2218F401E009424C7 /* libRNCalendarEvents.a */; };
 		0A19E30B203771B50036DFF2 /* libreact-native-geocoder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A19E24A20376D230036DFF2 /* libreact-native-geocoder.a */; };
@@ -154,6 +156,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 8DF63376066E2275FF26820B3A512A9B;
 			remoteInfo = "react-native-webview";
+		};
+		0A0A502722DA379E00CC692E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A0A502322DA379E00CC692E /* AirMaps.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 11FA5C511C4A1296003AC2EE;
+			remoteInfo = AirMaps;
 		};
 		0A12E3E1218F401E009424C7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -561,13 +570,6 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNVideoProcessing;
 		};
-		0AE2876622D5543A00C6DECE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FD751C4D229EB44C002BE1F4;
-			remoteInfo = "FastImage-tvOS";
-		};
 		2DF0FFDE2056DD460020B375 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
@@ -750,6 +752,7 @@
 		00E356F21AD99517003FC87E /* AnyoneTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnyoneTests.m; sourceTree = "<group>"; };
 		04F0C2F1BC35493C93FCB800 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		0A03A87D22D16578005A2609 /* FastImage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FastImage.xcodeproj; path = "../../../fuell/AIR/node_modules/react-native-fast-image/ios/FastImage.xcodeproj"; sourceTree = "<group>"; };
+		0A0A502322DA379E00CC692E /* AirMaps.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AirMaps.xcodeproj; path = "../../../fuell/AIR/node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; };
 		0A12E395218F401E009424C7 /* RNCalendarEvents.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCalendarEvents.xcodeproj; path = "../node_modules/react-native-calendar-events/RNCalendarEvents.xcodeproj"; sourceTree = "<group>"; };
 		0A19E27120376D310036DFF2 /* Anyone.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Anyone.entitlements; path = Anyone/Anyone.entitlements; sourceTree = "<group>"; };
 		0A1FA0E321C08115002DE30F /* rep.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = rep.wav; path = ../android/app/src/main/res/raw/rep.wav; sourceTree = "<group>"; };
@@ -859,6 +862,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A0A502222DA374200CC692E /* libreact-native-maps.a in Frameworks */,
+				0A0A4FE822DA370E00CC692E /* libreact-native-google-maps.a in Frameworks */,
 				0A03A8E622D1658E005A2609 /* libFastImage.a in Frameworks */,
 				0A124604229C2D0B009E7319 /* libRCTBlob.a in Frameworks */,
 				0AF2FD14227F12DD0092B371 /* libReactNativePermissions.a in Frameworks */,
@@ -979,6 +984,14 @@
 			isa = PBXGroup;
 			children = (
 				0A03A88422D16578005A2609 /* libFastImage.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0A0A502422DA379E00CC692E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A0A502822DA379E00CC692E /* libAirMaps.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1142,7 +1155,6 @@
 			isa = PBXGroup;
 			children = (
 				0AD46BC82157C683000E6B9C /* libFastImage.a */,
-				0AE2876722D5543A00C6DECE /* libFastImage-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1252,6 +1264,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				0A0A502322DA379E00CC692E /* AirMaps.xcodeproj */,
 				0A03A87D22D16578005A2609 /* FastImage.xcodeproj */,
 				0A4F4E1E223D9DD900CA3039 /* ReactNativeConfig.xcodeproj */,
 				0A396BA321C1D90D00ABE181 /* RNSound.xcodeproj */,
@@ -1536,6 +1549,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = 0A0A502422DA379E00CC692E /* Products */;
+					ProjectRef = 0A0A502322DA379E00CC692E /* AirMaps.xcodeproj */;
+				},
+				{
 					ProductGroup = 0AD46BC32157C682000E6B9C /* Products */;
 					ProjectRef = 0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */;
 				},
@@ -1714,6 +1731,13 @@
 			fileType = archive.ar;
 			path = "libreact-native-webview.a";
 			remoteRef = 0A03A8AE22D16578005A2609 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A0A502822DA379E00CC692E /* libAirMaps.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libAirMaps.a;
+			remoteRef = 0A0A502722DA379E00CC692E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A12E3E2218F401E009424C7 /* libRNCalendarEvents.a */ = {
@@ -2113,13 +2137,6 @@
 			fileType = archive.ar;
 			path = libRNVideoProcessing.a;
 			remoteRef = 0AE2869F22D53DB200C6DECE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		0AE2876722D5543A00C6DECE /* libFastImage-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libFastImage-tvOS.a";
-			remoteRef = 0AE2876622D5543A00C6DECE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		2DF0FFDF2056DD460020B375 /* libjsinspector.a */ = {

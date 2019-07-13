@@ -19,11 +19,11 @@ target 'Anyone' do
 	]
 
 	pod 'react-native-maps', path: rn_maps_path
-	pod 'Firebase/Core', '5.15.0'
-	pod 'Firebase/Messaging', '5.15.0'
-	pod 'Firebase/Database', '5.15.0'
-	pod 'Firebase/Auth', '5.15.0'
-	pod 'Firebase/Storage', '5.15.0'
+	pod 'Firebase/Core', '6.3.0'
+	pod 'Firebase/Messaging', '6.3.0'
+	pod 'Firebase/Database', '6.3.0'
+	pod 'Firebase/Auth', '6.3.0'
+	pod 'Firebase/Storage', '6.3.0'
 
 	pod 'GoogleMaps'
 	pod 'react-native-google-maps', path: rn_maps_path  
