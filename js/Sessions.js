@@ -376,19 +376,20 @@ import { WebView } from 'react-native-webview'
             <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
               <Button
               text="Create Session"
+              textStyle={{fontSize: 13}}
               onPress={()=> {
                 this.props.onContinue(null, this.state.selectedLocation)
               }}
-              style={{flex: 1, marginRight: 10, alignItems: 'center'}}/>
+              style={{flex: 1, marginRight: 10, alignItems: 'center', paddingVertical: 15}}/>
 
               <Button
               onPress={()=> {
                 this.refs.locationModal.close()
                 this.setState({friendsModalOpen: true})
               }}
+              textStyle={{fontSize: 13}}
               text="Create Private Session"
-              style={{flex: 1, alignItems: 'center'}}/>
-     
+              style={{flex: 1, alignItems: 'center', paddingVertical: 15}}/>
               </View>
             </View>
             </View>
