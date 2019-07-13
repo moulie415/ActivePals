@@ -164,6 +164,13 @@
 			remoteGlobalIDString = 11FA5C511C4A1296003AC2EE;
 			remoteInfo = AirMaps;
 		};
+		0A0A511B22DA588600CC692E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2DA0D814DFCB860D31D7BCD63D795858;
+			remoteInfo = FirebaseInstanceID;
+		};
 		0A12E3E1218F401E009424C7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0A12E395218F401E009424C7 /* RNCalendarEvents.xcodeproj */;
@@ -1085,6 +1092,7 @@
 				0A7CEE8C2118B2AF00F09932 /* libFirebaseAuth.a */,
 				0A3E956C2113C8FB00BCD60F /* libFirebaseCore.a */,
 				0A3E956E2113C8FB00BCD60F /* libFirebaseDatabase.a */,
+				0A0A511C22DA588600CC692E /* libFirebaseInstanceID.a */,
 				0A3E95702113C8FB00BCD60F /* libFirebaseMessaging.a */,
 				0A7CEE8E2118B2AF00F09932 /* libFirebaseStorage.a */,
 				0A1F21A0210A908F00896D4A /* libGoogle-Maps-iOS-Utils.a */,
@@ -1738,6 +1746,13 @@
 			fileType = archive.ar;
 			path = libAirMaps.a;
 			remoteRef = 0A0A502722DA379E00CC692E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A0A511C22DA588600CC692E /* libFirebaseInstanceID.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFirebaseInstanceID.a;
+			remoteRef = 0A0A511B22DA588600CC692E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A12E3E2218F401E009424C7 /* libRNCalendarEvents.a */ = {
@@ -2617,7 +2632,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 27RJG57PEM;
 				ENV_FILE = .env.dev;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2663,7 +2678,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 27RJG57PEM;
 				ENV_FILE = .env.prod;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
