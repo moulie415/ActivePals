@@ -109,9 +109,8 @@ export const updateLastMessage = (notif) => {
 	}
 }
 
-export const getUnreadCount = () => {
+export const getUnreadCount = (uid) => {
 	return (dispatch, getState) => {
-		const uid = getState().profile.profile.uid
 		firebase.database().ref('unreadCount').child(uid).on('value', snapshot => {
 			if (snapshot.val()) {
 				Object.keys(snapshot.val()).forEach(id => {
@@ -124,10 +123,13 @@ export const getUnreadCount = () => {
 					}
 				
 					if ((count !== 0) && (!route.params || 
-					(route.params.chatId && route.params.chatId != id ||
+					(route.params.friendUid && route.params.friendUid != id ||
 					route.params.session && route.params.session.key != id ||
 					route.params.gymId && route.params.gymId != id))) {
 						dispatch(setUnreadCount({id, count}))
+					}
+					else if (count !== 0) {
+						dispatch(resetUnreadCount(id))
 					}
 				})
 		}

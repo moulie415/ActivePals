@@ -81,7 +81,11 @@ class Messaging extends React.Component {
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
     this.loadMessages()
     this.props.profile.avatar ? this.setState({avatar: this.props.profile.avatar}) : this.setState({avatar: ''})
-    this.props.resetUnreadCount(this.friendUid || this.sessionId || this.gymId)
+    const id = this.friendUid || this.sessionId || this.gymId
+    const unreadCount = this.props.unreadCount[id]
+    if (unreadCount && unreadCount > 0) {
+      this.props.resetUnreadCount(id)
+    }
   }
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress())
@@ -436,6 +440,7 @@ const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
   gymChat: chats.gymChat,
   messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)],
   notif: chats.notif,
+  unreadCount: chats.unreadCount
 })
 
 const mapDispatchToProps = dispatch => ({

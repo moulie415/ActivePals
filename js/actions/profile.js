@@ -108,7 +108,7 @@ export const doSetup = (profile) => {
 					profile.gym && dispatch(fetchGymChat(profile.gym)),
 					dispatch(fetchPosts(uid)),
 					dispatch(fetchSessions()),
-					dispatch(getUnreadCount())
+					dispatch(getUnreadCount(uid))
 				])
 		})
 
