@@ -226,10 +226,11 @@ class FitLink extends React.Component {
 
     this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(fcmToken => {
       // Process your token as required
-      let user = firebase.auth().currentUser
+      const user = firebase.auth().currentUser
       if (user) {
         firebase.database().ref('users/' + user.uid).child('FCMToken').set(fcmToken)
       }
+      else console.warn('no user to set token on')
     })
   }
 

@@ -79,18 +79,21 @@ const fetchGym = (profile, dispatch) => {
 }
 
 export const doSetup = (profile) => {
-	return (dispatch, getState) => {
+	return async (dispatch, getState) => {
 		const uid = profile.uid
 		setupPresence(uid)
-		firebase.messaging().getToken()
-            .then(fcmToken => {
-                if (fcmToken) {
-                    firebase.database().ref('users/' + uid).child('FCMToken').set(fcmToken)
-                    console.log('fcm token: ' + fcmToken)
-                } else {
-                    console.log('no token')
-                }
-            })
+		try {
+		const fcmToken = await firebase.messaging().getToken()
+			if (fcmToken) {
+				firebase.database().ref('users/' + uid).child('FCMToken').set(fcmToken)
+				console.log('fcm token: ' + fcmToken)
+			} 
+			else {
+				console.warn('no token')
+			}
+		} catch(e) {
+			console.warn(e)
+		}
 		const friends = profile.friends
 		if (getState().nav.index == 0) {
 			if (getState().profile.hasViewedWelcome) {
@@ -101,15 +104,13 @@ export const doSetup = (profile) => {
 			}
 		}
 		dispatch(setHasLoggedIn(true))
+		dispatch(getUnreadCount(uid))
 		return dispatch(fetchFriends(friends)).then(() => {
-			return Promise.all([
-					profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid)),
-					profile.chats && dispatch(fetchChats(profile.chats)),
-					profile.gym && dispatch(fetchGymChat(profile.gym)),
-					dispatch(fetchPosts(uid)),
-					dispatch(fetchSessions()),
-					dispatch(getUnreadCount(uid))
-				])
+				profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid))
+				profile.chats && dispatch(fetchChats(profile.chats))
+				profile.gym && dispatch(fetchGymChat(profile.gym))
+				dispatch(fetchPosts(uid))
+				dispatch(fetchSessions())
 		})
 
 	}
