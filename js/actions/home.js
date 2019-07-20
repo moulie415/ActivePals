@@ -167,13 +167,32 @@ export const fetchPosts = (uid, amount = 30, endAt) => {
 				if (snapshot.val()) {
 					Object.keys(snapshot.val()).forEach(post => {
 						promises.push(firebase.database().ref('posts/' + post).once('value'))
-						firebase.database().ref('posts/' + post).on('child_changed', child => {
+						const ref = firebase.database().ref('posts/' + post)
+						ref.on('child_changed', child => {
 								if (child.key == 'repCount') {
-									let obj = getState().home.feed[post]
+									const obj = getState().home.feed[post]
 									obj.repCount = child.val()
 									dispatch(setPost(obj))
 								}
+								else if (child.key == 'commentCount') {
+									const obj = getState().home.feed[post]
+									obj.commentCount = child.val()
+									dispatch(setPost(obj))
+								}
 						})
+						ref.on('child_added', child => {
+							if (child.key == 'repCount') {
+								const obj = getState().home.feed[post]
+								obj.repCount = child.val()
+								dispatch(setPost(obj))
+							}
+							else if (child.key == 'commentCount') {
+								const obj = getState().home.feed[post]
+								obj.commentCount = child.val()
+								dispatch(setPost(obj))
+							}
+
+					})
 					})
 					Promise.all(promises).then(posts => {
 						let feed = {}
@@ -356,9 +375,9 @@ export const fetchComments = (key, limit = 10) => {
         }
         Promise.all(promises).then(comments => {
           let commentsArray = []
-		  let commentReps = []
+		  		let commentReps = []
           comments.forEach((comment, index) => {
-			obj = comment.val()
+					const obj = comment.val()
             if (comment.val().uid == uid) {
               obj.user = getState().profile.profile
             } else if (getState().friends.friends[obj.uid]){
