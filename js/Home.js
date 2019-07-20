@@ -45,12 +45,12 @@ import {
   reportedExtractor,
   getSimplifiedTime,
   getMentionsList,
-  renderAd
 } from './constants/utils'
 import str from './constants/strings'
 import ParsedText from 'react-native-parsed-text'
 import Video from 'react-native-video'
 import RNFetchBlob from 'rn-fetch-blob'
+import AdView from './AdView'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -487,7 +487,7 @@ sortByDate(array) {
         refreshing={this.state.refreshing}
         renderItem = {({ item, index }) => {
             return (<View>
-              {renderAd(index)}
+              <AdView index={index}/>
               <Card>
                 {this.renderFeedItem(item)}
               </Card>

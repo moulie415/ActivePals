@@ -1,51 +1,10 @@
 import React, { Component } from 'react'
 import {
-  Platform,
   Linking,
   Alert
 } from 'react-native'
-import {
-  Card
-} from 'native-base'
 import str from './strings'
-import NativeAdView from '../AdView'
-import {
-  AdMobBanner
-} from 'react-native-admob'
-import { AdSettings, NativeAdsManager  } from 'react-native-fbads'
 import Image from 'react-native-fast-image'
-
-const adsManager = new NativeAdsManager(str.nativePlacementId)
-
-
-// AdSettings.clearTestDevices()
-// AdSettings.setLogLevel('none')
-// AdSettings.addTestDevice(AdSettings.currentDeviceHash)
-
-
-
-export function renderAd(index) {
-  if (index > 0 && index % 4 == 0) {
-    if (Platform.OS == 'android' && (index % 8 == 0)) {
-        return <Card>
-            <NativeAdView adsManager={adsManager} />
-        </Card>
-    }
-    else {
-      return <Card style={{padding: 10}}><AdMobBanner
-        adSize="largeBanner"
-        style={{alignSelf: 'center'}}
-        adUnitID={str.admobBanner}
-        testDevices={str.testDevices}
-        onAdFailedToLoad={error => {
-          console.log(error)
-        }}
-        />
-        </Card>
-    }
-  }
-  else return null
-}
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming']
 
