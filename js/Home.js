@@ -487,10 +487,10 @@ sortByDate(array) {
         refreshing={this.state.refreshing}
         renderItem = {({ item, index }) => {
             return (<View>
+              {renderAd(index)}
               <Card>
                 {this.renderFeedItem(item)}
               </Card>
-              {renderAd(index)}
               </View>
               )}
         }
