@@ -171,25 +171,33 @@ export const fetchPosts = (uid, amount = 30, endAt) => {
 						ref.on('child_changed', child => {
 								if (child.key == 'repCount') {
 									const obj = getState().home.feed[post]
-									obj.repCount = child.val()
-									dispatch(setPost(obj))
+									if (obj) {
+										obj.repCount = child.val()
+										dispatch(setPost(obj))
+									}
 								}
 								else if (child.key == 'commentCount') {
 									const obj = getState().home.feed[post]
-									obj.commentCount = child.val()
-									dispatch(setPost(obj))
+									if (obj) {
+										obj.commentCount = child.val()
+										dispatch(setPost(obj))
+									}
 								}
 						})
 						ref.on('child_added', child => {
 							if (child.key == 'repCount') {
 								const obj = getState().home.feed[post]
-								obj.repCount = child.val()
-								dispatch(setPost(obj))
+								if (obj) {
+									obj.repCount = child.val()
+									dispatch(setPost(obj))
+								}
 							}
 							else if (child.key == 'commentCount') {
 								const obj = getState().home.feed[post]
-								obj.commentCount = child.val()
-								dispatch(setPost(obj))
+								if (obj) {
+									obj.commentCount = child.val()
+									dispatch(setPost(obj))
+								}
 							}
 
 					})
