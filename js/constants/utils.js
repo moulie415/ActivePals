@@ -51,23 +51,23 @@ export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming']
 
 export function getType(type, size, tintColor) {
 	if (type == 'Cycling') {
-		return <Image style={{width: size, height: size, tintColor}}
+		return <Image tintColor={tintColor} style={{width: size, height: size}}
 		source={require('Anyone/assets/images/bicycle.png')} />
 	}
 	else if (type == 'Custom') {
-		return <Image style={{width: size, height: size, tintColor}}
+		return <Image tintColor={tintColor} style={{width: size, height: size}}
 		source={require('Anyone/assets/images/custom.png')} />
 	}
 	else if (type == 'Gym') {
-		return <Image style={{width: size, height: size, tintColor}}
+		return <Image tintColor={tintColor} style={{width: size, height: size}}
 		source={require('Anyone/assets/images/dumbbell.png')} />
 	}
 	else if (type == 'Running') {
-		return <Image style={{width: size, height: size, tintColor}}
+		return <Image tintColor={tintColor} style={{width: size, height: size}}
 		source={require('Anyone/assets/images/running.png')} />
 	}
 	else if (type == 'Swimming') {
-		return <Image style={{width: size, height: size, tintColor}}
+		return <Image tintColor={tintColor} style={{width: size, height: size}}
 		source={require('Anyone/assets/images/swim.png')} />
 	}
 }

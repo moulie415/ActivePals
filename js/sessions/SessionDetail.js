@@ -142,15 +142,8 @@ class SessionDetail extends Component {
 								this.setState({addToCalendar: val})
 								try {
 									if (val) {
-										let hasPermission = false
-										if (Platform.OS == 'android') {
-											hasPermission = await checkForCalendarPermissionAndroid()
-										}
-										else {
-											const result = await RNCalendarEvents.authorizeEventStore()
-											hasPermission = (result == 'authorized') 
-										}
-										if (hasPermission) {
+										const result = await RNCalendarEvents.authorizeEventStore()
+										if (result == 'authorized') {
 											const calendars = await RNCalendarEvents.findCalendars()
 											const validList = calendars.filter(calendar => calendar.allowsModifications)
 											if (validList && validList.length > 0) {
@@ -380,21 +373,6 @@ class SessionDetail extends Component {
 		return regex.test(postcode)
 	}
 
-}
-
-const checkForCalendarPermissionAndroid = async () => {
-  try {
-    const hasWritePermission = await PermissionsAndroid.request(
-			PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR,
-		)
-		const hasReadPermission = await PermissionsAndroid.request(
-			PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
-		)
-		return (hasReadPermission && hasWritePermission)
-  } catch(e) {
-    Alert.alert('Error', e.message)
-    return false
-  }
 }
 
 import { connect } from 'react-redux'
