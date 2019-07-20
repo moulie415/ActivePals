@@ -12,6 +12,7 @@ export const SET_PRIVATE_SESSION = 'SET_PRIVATE_SESSION'
 export const SET_SESSION = 'SET_SESSION'
 export const SET_PLACES = 'SET_PLACES'
 export const SET_PLACE = 'SET_PLACE'
+export const SET_RADIUS = 'SET_RADIUS'
 
 const setPrivateSessions = (sessions) => ({
 	type: SET_PRIVATE_SESSIONS,
@@ -48,8 +49,15 @@ export const setPlace = (place) => ({
 	place
 })
 
-export const fetchSessions = (radius = 10) => {
+export const setRadius = (radius) => ({
+	type: SET_RADIUS,
+	radius
+})
+
+export const fetchSessions = () => {
 	return (dispatch, getState) => {
+		dispatch(updateSessions([]))
+		const radius = getState().sessions.radius
 		const uid = getState().profile.profile.uid
 		const userFetches = []
 		firebase.database().ref('users/' + uid).child('sessions').on('value', snapshot => {

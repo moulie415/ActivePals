@@ -6,7 +6,8 @@ import {
 	SET_SESSION,
 	SET_PRIVATE_SESSION,
 	SET_PLACES,
-	SET_PLACE
+	SET_PLACE,
+	SET_RADIUS
 } from 'Anyone/js/actions/sessions'
 
 import {
@@ -16,7 +17,8 @@ import {
 const initialState = {
 	sessions: {},
 	privateSessions: {},
-	places: {}
+	places: {},
+	radius: 10,
 }
 
 export default function(state = initialState, action) {
@@ -67,6 +69,12 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				places: {...state.places, [action.place.place_id]: action.place}
+			}
+		}
+		case SET_RADIUS: {
+			return {
+				...state,
+				radius: action.radius,
 			}
 		}
 		case SET_LOGGED_OUT: {

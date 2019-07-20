@@ -321,6 +321,7 @@ class SessionDetail extends Component {
 			let key = ref.key
 			ref.set(session).then(()=> {
 				Alert.alert('Success','Session created')
+				this.props.fetchSessions()
 				this.props.goSessions()
 				if (this.friends) {
 					this.friends.forEach(friend => {
@@ -379,6 +380,7 @@ import { connect } from 'react-redux'
 import {  navigateSessions } from 'Anyone/js/actions/navigation'
 import { addSessionChat } from 'Anyone/js/actions/chats'
 import { addPost } from 'Anyone/js/actions/home'
+import { fetchSessions } from '../actions/sessions'
 
 // const mapStateToProps = ({ home, settings }) => ({
 // })
@@ -386,7 +388,8 @@ import { addPost } from 'Anyone/js/actions/home'
 const mapDispatchToProps = dispatch => ({
 	onCreate: (session, isPrivate) => dispatch(addSessionChat(session, isPrivate)),
 	goSessions: ()=> dispatch(navigateSessions()),
-	createPost: (post)=> dispatch(addPost(post))
+	createPost: (post)=> dispatch(addPost(post)),
+	fetchSessions: () => dispatch(fetchSessions())
 })
 
 export default connect(null, mapDispatchToProps)(SessionDetail)

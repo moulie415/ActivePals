@@ -57,7 +57,7 @@ import { WebView } from 'react-native-webview'
       spinner: false,
       showMap: true,
       switch: false,
-      radius: 10,
+      radius: this.props.radius,
       sessions: this.sortByDistance(combined),
       refreshing: false,
       markers: this.markers(combined),
@@ -394,13 +394,12 @@ import { WebView } from 'react-native-webview'
             </View>
             </View>
         </Modal>
-        <Modal onOpened={() => this.setState({initialRadius: this.state.radius})} 
+        <Modal
         onClosed={() => {
-          
-          if (this.state.radius != this.state.initialRadius) {
-
+          if (this.state.radius != this.props.radius) {
             this.setState({refreshing: true})
-            this.props.fetch(this.state.radius).then(() => this.setState({refreshing: false}))
+            this.props.setRadius(this.state.radius)
+            this.props.fetch().then(() => this.setState({refreshing: false}))
           }
         }}
         style={styles.modal}
@@ -875,8 +874,8 @@ import {
   addUser,
   setPlaces,
   fetchPhotoPaths,
-  fetchPhotoPath,
-  fetchPlaces
+  fetchPlaces,
+  setRadius
 } from './actions/sessions'
 import { removeGym, joinGym, setLocation } from './actions/profile'
 
@@ -888,7 +887,8 @@ const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => (
   sessions: sessions.sessions,
   privateSessions: sessions.privateSessions,
   users: sharedInfo.users,
-  places: sessions.places
+  places: sessions.places,
+  radius: sessions.radius,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -903,14 +903,15 @@ const mapDispatchToProps = dispatch => ({
   remove: (key, type) => dispatch(removeSession(key, type)),
   onOpenChat: (session) => dispatch(navigateMessagingSession(session)),
   onContinue: (friends, location) => dispatch(navigateSessionDetail(friends, location)),
-  fetch: (radius, update = false) => Promise.all([dispatch(fetchSessions(radius, update)), dispatch(fetchPrivateSessions())]),
+  fetch: () => Promise.all([dispatch(fetchSessions()), dispatch(fetchPrivateSessions())]),
   viewGym: (id) => dispatch(navigateGym(id)),
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
   setLocation: (location) => dispatch(setLocation(location)),
   test: () => dispatch(navigateTestScreen()),
   setPlaces: (places) => dispatch(setPlaces(places)),
   fetchPhotoPaths: () => dispatch(fetchPhotoPaths()),
-  fetchPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token))
+  fetchPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
+  setRadius: (radius) => dispatch(setRadius(radius))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)
