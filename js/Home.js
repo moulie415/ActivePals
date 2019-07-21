@@ -51,6 +51,7 @@ import ParsedText from 'react-native-parsed-text'
 import Video from 'react-native-video'
 import RNFetchBlob from 'rn-fetch-blob'
 import AdView from './AdView'
+import Share from 'react-native-share'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
@@ -669,17 +670,29 @@ sortByDate(array) {
 
   }
 
-  repsAndComments(item, addPadding = false) {
-   return(<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+  repsAndComments(item) {
+   return(<View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+    {item.type != 'video' && <TouchableOpacity 
+    onPress={async () => {
+      const options = {
+        message: 'test'
+      }
+      const res = await Share.open(options)
+    }}
+
+    style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
+      <Icon style={{color: colors.postIcon}} name='md-share'/>
+      {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
+    </TouchableOpacity>}
     <TouchableOpacity
       onPress={(mutex) => {
         mutex.lockFor(1000)
         this.props.onRepPost(item)
       }}
-      style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
+      style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
       <SlowImage source={item.rep ? weightUp : weightDown}
-      style={{width: 25, height: 25, marginRight: 10, tintColor: item.rep ? colors.secondary : '#616770'}}/>
-      <Text style={{color: item.rep ? colors.secondary : '#616770'}}>Rep</Text>
+      style={{width: 25, height: 25, tintColor: item.rep ? colors.secondary : colors.postIcon}}/>
+      {/* <Text style={{color: item.rep ? colors.secondary : colors.postIcon, marginLeft: 10}}>Rep</Text> */}
     </TouchableOpacity>
     <TouchableOpacity
     onPress={() => {
@@ -687,9 +700,9 @@ sortByDate(array) {
       this.setState({focusCommentInput: true, postId: item.key})
       this.props.getComments(item.key)
     }}
-    style={{flexDirection: 'row', paddingHorizontal: 50, alignItems: 'center'}}>
-      <Icon name='md-chatboxes' style={{marginRight: 10, color: '#616770'}}/>
-      <Text style={{color: '#616770'}}>Comment</Text>
+    style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
+      <Icon name='md-chatboxes' style={{color: colors.postIcon}}/>
+      {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Comment</Text> */}
     </TouchableOpacity>
    </View>)
   }
