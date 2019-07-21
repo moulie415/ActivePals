@@ -13,7 +13,7 @@ import thunk from 'redux-thunk'
 
 //import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import App from 'Anyone/js/App'
-import { navigateMessaging, navigateMessagingSession, navigateFriends, navigatePostView } from 'Anyone/js/actions/navigation'
+import { navigateMessaging, navigateMessagingSession, navigateFriends, navigatePostView } from './js/actions/navigation'
 import { newNotification, updateLastMessage } from 'Anyone/js/actions/chats'
 import GeoFire from 'geofire'
 import bgMessaging from './js/bgMessaging'

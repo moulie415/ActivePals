@@ -48,7 +48,7 @@ export const setHasViewedWelcome = () => ({
 
 export const fetchProfile = () => {
 	return (dispatch) => {
-		let user = firebase.auth().currentUser
+		const user = firebase.auth().currentUser
 		return new Promise(resolve => {
 			firebase.database().ref('users/' + user.uid).once('value', snapshot => {
 				firebase.storage().ref('images/' + user.uid ).child('avatar').getDownloadURL()

@@ -178,7 +178,7 @@ class Messaging extends React.Component {
 
   onSend(messages = []) {
     //make messages database friendly
-    let converted = []
+    const converted = []
     messages.forEach(message => {
       if (this.session) {
         let type = this.session.private ? 'privateSessions' : 'sessions'
@@ -200,7 +200,7 @@ class Messaging extends React.Component {
     }
 
     ref.push(...converted)
-    .then(() => {
+    .then(async () => {
       this.setState(previousState => ({
       messages: GiftedChat.append(Object.values(previousState.messages), messages),
       }))
@@ -213,6 +213,9 @@ class Messaging extends React.Component {
         this.props.getGymChat(this.gymId)
       }
       else {
+        if (!this.props.profile.chats) {
+          await this.props.fetchProfile()
+        }
         this.props.getChats(this.props.profile.chats)
       }
       
@@ -419,6 +422,7 @@ import {
   fetchGymChat,
   resetUnreadCount
 } from '../actions/chats'
+import { fetchProfile } from '../actions/profile'
 
 const fetchId = (params) => {
   if (params.session) {
@@ -444,12 +448,12 @@ const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getChats: (chats) => {return dispatch(fetchChats(chats))},
-  getSessionChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
+  getChats: (chats) => dispatch(fetchChats(chats)),
+  getSessionChats: (sessions, uid) => dispatch(fetchSessionChats(sessions, uid)),
   getGymChat: (gym) => dispatch(fetchGymChat(gym)),
-  onRequest: (friendUid)=> {return dispatch(sendRequest(friendUid))},
-  onAccept: (uid, friendUid)=> {return dispatch(acceptRequest(uid, friendUid))},
-  onOpenChat: (chatId, friendUsername, friendUid)=> {return dispatch(navigateMessaging(chatId, friendUsername, friendUid))},
+  onRequest: (friendUid)=> dispatch(sendRequest(friendUid)),
+  onAccept: (uid, friendUid)=> dispatch(acceptRequest(uid, friendUid)),
+  onOpenChat: (chatId, friendUsername, friendUid)=> dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   getMessages: (id, amount, uid, endAt) => dispatch(fetchMessages(id, amount, uid, endAt)),
   getSessionMessages: (id, amount, isPrivate, endAt) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
   getGymMessages: (id, amount, endAt) => dispatch(fetchGymMessages(id, amount, endAt)),
@@ -460,7 +464,8 @@ const mapDispatchToProps = dispatch => ({
   resetMessage: () => dispatch(resetMessage()),
   previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   goBack: () => dispatch(navigateBack()),
-  resetUnreadCount: (id) => dispatch(resetUnreadCount(id))
+  resetUnreadCount: (id) => dispatch(resetUnreadCount(id)),
+  fetchProfile: () => dispatch(fetchProfile())
 
 })
 

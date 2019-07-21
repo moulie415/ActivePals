@@ -151,15 +151,12 @@ export const resetUnreadCount = (id) => {
 
 
 
-export const fetchChats = (chats = null) => {
-	return (dispatch, getState) => {
-		if (!chats) {
-			chats = getState().chats.chats
-		}
-		let chatList = []
+export const fetchChats = (chats) => {
+	return  dispatch => {
+		const chatList = []
 		Object.keys(chats).forEach(chat => {
-			let val = chats[chat]
-			let promise = new Promise(function(resolve, reject) {
+			const val = chats[chat]
+			const promise = new Promise(function(resolve, reject) {
 				firebase.database().ref('chats').child(val).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					let message = {text: 'new chat created'}
@@ -172,7 +169,7 @@ export const fetchChats = (chats = null) => {
 			chatList.push(promise)
 		})
 		return Promise.all(chatList).then(chats => {
-			let obj = chats.reduce(function(acc, cur, i) {
+			const obj = chats.reduce(function(acc, cur, i) {
 				acc[cur.uid] = cur
 				return acc
 			}, {})
@@ -199,9 +196,9 @@ export const addChat = (chat) => {
 
 export const removeChat = (uid) => {
 	return (dispatch, getState) => {
-		let chats = getState().chats.chats
-		let chatArr = Object.values(chats).filter(chat => chat.uid != uid)
-		let obj = chatArr.reduce(function(acc, cur, i) {
+		const chats = getState().chats.chats
+		const chatArr = Object.values(chats).filter(chat => chat.uid != uid)
+		const obj = chatArr.reduce(function(acc, cur, i) {
 			acc[cur.uid] = cur
 			return acc
 		}, {})
@@ -211,10 +208,10 @@ export const removeChat = (uid) => {
 
 export const fetchSessionChats = (sessions, uid) => {
 	return (dispatch) => {
-		let chatList = []
+		const chatList = []
 		Object.keys(sessions).forEach(session => {
-			let type = sessions[session] == 'private' ? 'privateSessions' : 'sessions'
-			let promise = new Promise(function(resolve, reject) {
+			const type = sessions[session] == 'private' ? 'privateSessions' : 'sessions'
+			let promise = new Promise(function(resolve) {
 				firebase.database().ref(type + '/' + session).once('value', snapshot => {
 					if (snapshot.val()) {
 						firebase.database().ref('sessionChats/' + session).orderByKey().limitToLast(1)
@@ -249,7 +246,7 @@ export const fetchSessionChats = (sessions, uid) => {
 
 export const addSessionChat = (session, isPrivate = false) => {
 	return (dispatch) => {
-		let type = isPrivate ? 'privateSessions' : 'sessions'
+		const type = isPrivate ? 'privateSessions' : 'sessions'
 		return new Promise(resolve => {
 			firebase.database().ref(type + '/' + session).once('value', snapshot => {
 				firebase.database().ref('sessionChats/' + session).orderByKey().limitToLast(1)

@@ -1,31 +1,31 @@
 import React from "react"
 import {
-    AdIconView,
-    MediaView,
-    AdChoicesView,
-    TriggerableView,
-    withNativeAd,
-    AdSettings,
-    NativeAdsManager
-  } from 'react-native-fbads'
-  import {
-      View,
-  } from 'react-native'
-  import Text from './components/Text'
-  import PropTypes from 'prop-types'
-  import { Card } from 'native-base'
-  import {
-    AdMobBanner
-  } from 'react-native-admob'
-  import str from './constants/strings'
-  // AdSettings.clearTestDevices()
+  AdIconView,
+  MediaView,
+  AdChoicesView,
+  TriggerableView,
+  withNativeAd,
+  AdSettings,
+  NativeAdsManager
+} from 'react-native-fbads'
+import {
+    View,
+} from 'react-native'
+import Text from './components/Text'
+import PropTypes from 'prop-types'
+import { Card } from 'native-base'
+import {
+  AdMobBanner
+} from 'react-native-admob'
+import str from './constants/strings'
+// AdSettings.clearTestDevices()
 // AdSettings.setLogLevel('none')
 // AdSettings.addTestDevice(AdSettings.currentDeviceHash)
 
   const fbAd = ({nativeAd}) => {
     return <View style={{padding: 10, margin: 5}}>
       <AdChoicesView/>
-      <TriggerableView>
+      <TriggerableView> 
         <Text style={{
           color: '#999',
           fontStyle: 'italic',
