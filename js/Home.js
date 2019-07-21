@@ -673,13 +673,9 @@ sortByDate(array) {
   repsAndComments(item) {
    return(<View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
     {item.type != 'video' && <TouchableOpacity 
-    onPress={async () => {
-      const options = {
-        message: 'test'
-      }
-      const res = await Share.open(options)
+    onPress={ () => {
+      this.sharePost(item)
     }}
-
     style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
       <Icon style={{color: colors.postIcon}} name='md-share'/>
       {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
@@ -886,6 +882,35 @@ processVideo(uri) {
     }
     >{text}
     </ParsedText>
+  }
+
+  async sharePost(item) {
+    this.setState({spinner: true})
+      const username = this.props.profile.username
+      const options = {
+        message: `${username} shared a post from ActivePals:\n ${item.text? '"' + item.text + '"' : ''}`,
+        title: `Share ${item.type}?`
+      }
+      if (item.type == 'photo') {
+        try {
+          const resp = await RNFetchBlob.config({ fileCache: false }).fetch('GET', item.url)
+          const base64 = await resp.base64()
+          const dataUrl = `data:image/jpeg;base64,${base64}`
+          options.url = dataUrl
+        } catch(e) {
+          Alert.alert('Error', 'There was a problem sharing the photo')
+          this.setState({spinner: false})
+          return
+        }
+      }
+      try {
+        await Share.open(options)
+        Alert.alert('Success', 'Post Shared')
+        this.setState({spinner: false})
+      } catch(e) {
+        this.setState({spinner: false})
+        console.log(e)
+      }
   }
 
   handleUsernamePress(name) {
