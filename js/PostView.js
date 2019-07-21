@@ -96,7 +96,7 @@ class PostView extends Component {
             this.state.post ? <KeyboardAvoidingView
             contentContainerStyle={{flex: 1}}
             style={{flex: 1}}
-            behavior='position'>
+            behavior={this.state.post && this.state.post.type == 'status'? 'padding' : 'position'}>
                 <Header 
                 hasBack={true}
                 />
