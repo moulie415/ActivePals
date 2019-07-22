@@ -24,6 +24,7 @@ import {
 } from 'react-navigation-redux-helpers'
 import { setNotificationCount } from "./js/actions/home"
 import { navigateGymMessaging } from "./js/actions/navigation"
+import { fetchProfile, doSetup } from "./js/actions/profile"
 
 const firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
@@ -140,7 +141,7 @@ const shouldNavigate = (notification) => {
 
 
 class FitLink extends React.Component {
-  componentDidMount() {
+  async componentDidMount() {
     //ignore setting a timer warnings
     YellowBox.ignoreWarnings(['Setting a timer', 'Require cycle:', 'Received data was not a string, or was not a recognised encoding'])
     const channels = []
@@ -232,6 +233,14 @@ class FitLink extends React.Component {
       }
       else console.warn('no user to set token on')
     })
+
+    if (firebase.auth().currentUser) {
+      const profile = await store.dispatch(fetchProfile())
+      store.dispatch(doSetup(profile))
+    }
+    else {
+      //perhaps navigate login here if current screen isnt login
+    }
   }
 
   componentWillUnmount() {
