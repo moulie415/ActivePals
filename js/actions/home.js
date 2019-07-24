@@ -74,10 +74,10 @@ export const setNotificationCount = (count) => ({
 
 export const addPost = (item) => {
 	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
-		let uids = Object.keys(getState().friends.friends)
-		let ref = firebase.database().ref('posts').push()
-		let key = ref.key
+		const uid = getState().profile.profile.uid
+		const uids = Object.keys(getState().friends.friends)
+		const ref = firebase.database().ref('posts').push()
+		const key = ref.key
 		return ref.set(item).then(() => {
 			uids.forEach(friend => {
 				firebase.database().ref('userPosts/' + friend).child(key).set(uid)
@@ -93,23 +93,23 @@ export const addPost = (item) => {
 
 const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 	return (dispatch, getState) => {
-		let friends = Object.values(getState().friends.friends)
-		let users = Object.values(getState().sharedInfo.users)
-		let combined = [...friends, ...users]
+		const friends = Object.values(getState().friends.friends)
+		const users = Object.values(getState().sharedInfo.users)
+		const combined = [...friends, ...users]
 		if (item.text) {
-			let split = item.text.split(" ")
-			let mentions = []
+			const split = item.text.split(" ")
+			const mentions = []
 			split.forEach(word => {
 				if (!mentions.includes(word)) {
-					let mention = word.match(str.mentionRegex)
+					const mention = word.match(str.mentionRegex)
 					if (mention) {
 						mentions.push(word)
-						let username = mention.input.substring(1)
-						let friend = combined.find(friend => friend.username == username)
+						const username = mention.input.substring(1)
+						const friend = combined.find(friend => friend.username == username)
 						if (friend && friend.uid != postUid && friend.uid != item.uid) {
 							//add notification for user
-							let id = key + item.uid + 'mention'
-							let type = commentMention ? 'commentMention' : 'postMention'
+							const id = key + item.uid + 'mention'
+							const type = commentMention ? 'commentMention' : 'postMention'
 							firebase.database().ref('userNotifications/' + friend.uid).child(id).once('value', snapshot => {
 								if (!snapshot.val()) {
 									firebase.database().ref('notifications').child(id).set({date: item.createdAt, uid: item.uid, postId: key, type})
@@ -325,8 +325,8 @@ export const repPost = (item) => {
 
 export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 	return (dispatch, getState) => {
-		let ref = firebase.database().ref('comments').push()
-		let key = ref.key
+		const ref = firebase.database().ref('comments').push()
+		const key = ref.key
 		return firebase.database().ref('comments/' + key).set({uid, postId, text, created_at, parentCommentId, key}).then(() => {
 			return firebase.database().ref('posts/' + postId).child('commentCount').once('value', snapshot => {
 				let count
@@ -335,7 +335,7 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 					count += 1
 				}
 				else count = 1
-				let user = getState().profile.profile
+				const user = getState().profile.profile
 
 				
 				//add notification for user
@@ -345,7 +345,7 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 					}
 					if (snapshot.val() && snapshot.val() != user.uid) {
 						
-						let date  = created_at
+						const date  = created_at
 						firebase.database().ref('notifications').child(key + user.uid).set({date, uid: user.uid, postId, type: 'comment'})
 							.then(()=> firebase.database().ref('userNotifications/' + snapshot.val()).child(key + user.uid).set(true))
 							.then(() => upUnreadCount(snapshot.val()))
@@ -660,16 +660,15 @@ export const fetchCommentRepsUsers = (comment, limit = 10) => {
 
 const sortComments = (comments) => {
 		comments.sort(function(a,b){
-		  return new Date(b.created_at) - new Date(a.created_at)
+			return new Date(b.created_at) - new Date(a.created_at)
 		})
 		return comments
-	  
 }
 
 export const getNotifications = (limit = 10) => {
 	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
-		let refs = []
+		const uid = getState().profile.profile.uid
+		const refs = []
 		return firebase.database().ref('userNotifications').child(uid).limitToLast(limit).once('value', snapshot => {
 			if (snapshot.val()) {
 				Object.keys(snapshot.val()).forEach(key => {

@@ -12,7 +12,6 @@ import {
 import {
 	SET_LOGGED_OUT,
 } from 'Anyone/js/actions/profile'
-import { ActionSheet } from 'native-base'
 
 const initialState = {
 	feed: {},

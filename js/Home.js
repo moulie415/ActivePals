@@ -973,7 +973,7 @@ const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
 const mapDispatchToProps = dispatch => ({
   goToProfile: () => dispatch(navigateProfile()),
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
-  postStatus: (status) => {return dispatch(addPost(status))},
+  postStatus: (status) => dispatch(addPost(status)),
   onRepPost: (item) => dispatch(repPost(item)),
   previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),

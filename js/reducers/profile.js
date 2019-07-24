@@ -42,9 +42,6 @@ export default function(state = initialState, action) {
 				gym: null
 			}
 		case SET_NOTIFICATION_COUNT:
-			if (Platform.OS == 'ios') {
-				PushNotificationIOS.setApplicationIconBadgeNumber(action.count)
-			}
 			return {
 				...state,
 				profile: {...state.profile, unreadCount: action.count }

@@ -120,7 +120,11 @@ export const handleNotification = (notification) => {
     dispatch(updateLastMessage(notification.data))
     showLocalNotification(notification.data)
   }
-  if (type == 'rep' || type == 'comment' || type == 'friendRequest') {
+  if (type == 'rep' ||
+  type == 'comment' ||
+  type == 'friendRequest' ||
+  type == 'commentMention' ||
+  type == 'postMention') {
     const count = getState().profile.profile.unreadCount || 0
     dispatch(setNotificationCount(count+1))
   }

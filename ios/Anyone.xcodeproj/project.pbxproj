@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -190,6 +191,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 65AC38A37A1DC4C7A1CC472E41192FC0;
 			remoteInfo = "react-native-geocoder";
+		};
+		0A1D4F7122E8D18000A43B7F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 484E6781D8E6CE2FB8F6C8D7C9578D97;
+			remoteInfo = RNShare;
 		};
 		0A1F210A210A8CC900896D4A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1112,6 +1120,7 @@
 				0A1FA0AA21C08115002DE30F /* libreact-native-video.a */,
 				0A03A8AF22D16578005A2609 /* libreact-native-webview.a */,
 				0A988CAE210E2795006C6974 /* librn-fetch-blob.a */,
+				0A1D4F7222E8D18000A43B7F /* libRNShare.a */,
 				0A1FA0AE21C08115002DE30F /* libSPTPersistentCache.a */,
 				0A88FFC1201D6E19004A17CD /* libyoga.a */,
 			);
@@ -1773,6 +1782,13 @@
 			fileType = archive.ar;
 			path = "libreact-native-geocoder.a";
 			remoteRef = 0A19E24920376D230036DFF2 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A1D4F7222E8D18000A43B7F /* libRNShare.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNShare.a;
+			remoteRef = 0A1D4F7122E8D18000A43B7F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A1F211F210A8E1800896D4A /* libGoogleToolboxForMac.a */ = {
