@@ -24,6 +24,8 @@ import Comments from './comments'
 import sStyles from './styles/settingsStyles'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import ParsedText from 'react-native-parsed-text'
+import RNFetchBlob from 'rn-fetch-blob'
+import Share from 'react-native-share'
 import {
     extractCreatedTime,
     extractUsername,
@@ -355,31 +357,38 @@ class PostView extends Component {
         return (
         <View style={{flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
           <View style={{flex: 1, marginVertical: 10, flexDirection: 'row', alignItems: 'center'}}>
-            {!!item.commentCount && item.commentCount > 0 && 
-            <View 
-            style={{flex: 1}}
-           >
+          {item.type != 'video' && <TouchableOpacity 
+              onPress={ () => {
+                this.sharePost(item)
+              }}
+              style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
+                <Icon style={{color: colors.postIcon}} name='md-share'/>
+                {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
+              </TouchableOpacity>}
+            {!!item.commentCount && item.commentCount > 0 && <View style={{flex: 1}}>
             <Text style={{color: '#999', textAlign: 'center'}}>
             {`${item.commentCount} ${item.commentCount > 1 ? ' comments' : ' comment'}`}</Text></View>}
-            {!!item.repCount && item.repCount > 0 && <View 
-            style={{flex: 1}}
-           >
-           <TouchableOpacity onPress={() => {
-             this.props.getRepUsers(item.key, this.state.userFetchAmount)
-            this.setState({likesModalVisible: true})
-           }}>
-            <Text style={{color: '#999', textAlign: 'center'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}
-            </Text></TouchableOpacity></View>}
-            <TouchableOpacity
-             onPress={(mutex) => {
-               mutex.lockFor(1000)
-              this.props.onRepPost(item)
-            }}
-             style={{flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-             <SlowImage source={item.rep ? weightUp : weightDown}
-            style={{width: 25, height: 25, marginRight: 10, tintColor: item.rep ? colors.secondary : '#616770'}}/>
-            <Text style={{color: item.rep ? colors.secondary : '#616770'}}>Rep</Text>
-            </TouchableOpacity>
+            
+            <View style={{flexDirection: 'row', flex: 1,  alignItems: 'center'}}>
+              <TouchableOpacity
+              onPress={(mutex) => {
+                mutex.lockFor(1000)
+                this.props.onRepPost(item)
+              }}
+              >
+              <SlowImage source={item.rep ? weightUp : weightDown}
+              style={{width: 25, height: 25, tintColor: item.rep ? colors.secondary : '#616770'}}/>
+              </TouchableOpacity>
+              {!!item.repCount && item.repCount > 0 && <View 
+              style={{flex: 1}}
+            >
+            <TouchableOpacity onPress={() => {
+              this.props.getRepUsers(item.key, this.state.userFetchAmount)
+              this.setState({likesModalVisible: true})
+            }}>
+              <Text style={{color: '#999', textAlign: 'center'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}
+              </Text></TouchableOpacity></View>}
+            </View>
             </View>
           </View>
           )
@@ -499,6 +508,35 @@ class PostView extends Component {
      }
      else return 'N/A'
    }
+
+   async sharePost(item) {
+    this.setState({spinner: true})
+      const username = this.props.profile.username
+      const options = {
+        message: `${username} shared a post from ActivePals:\n ${item.text? '"' + item.text + '"' : ''}`,
+        title: `Share ${item.type}?`
+      }
+      if (item.type == 'photo') {
+        try {
+          const resp = await RNFetchBlob.config({ fileCache: false }).fetch('GET', item.url)
+          const base64 = await resp.base64()
+          const dataUrl = `data:image/jpeg;base64,${base64}`
+          options.url = dataUrl
+        } catch(e) {
+          Alert.alert('Error', 'There was a problem sharing the photo')
+          this.setState({spinner: false})
+          return
+        }
+      }
+      try {
+        await Share.open(options)
+        Alert.alert('Success', 'Post Shared')
+        this.setState({spinner: false})
+      } catch(e) {
+        this.setState({spinner: false})
+        console.log(e)
+      }
+  }
 }
 
 PostView.propTypes = {
