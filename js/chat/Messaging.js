@@ -115,7 +115,7 @@ class Messaging extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.message) {
-      let message = {
+      const message = {
         _id: guid(),
         createdAt: new Date(),
         text: nextProps.message.text,
@@ -149,20 +149,12 @@ class Messaging extends React.Component {
           sessionId,
           avatar,
           createdAt,
-          custom_notification,
           gymId,
           image
          } = nextProps.notif
         if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage') {
-          let message
-          let date = new Date(createdAt)
-          if (custom_notification) {
-            let custom = JSON.parse(custom_notification)
-            message = {createdAt: date, _id, text: custom.body, user: {_id: uid, name: username, avatar}, image}
-          }
-          else {
-            message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}, image}
-          }
+          const date = new Date(createdAt)
+          const message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}, image}
           if ((type == 'message' && this.friendUid == uid) ||
             (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid) ||
             (type == 'gymMessage' && this.gymId == gymId && this.uid != uid)) {
@@ -181,7 +173,7 @@ class Messaging extends React.Component {
     const converted = []
     messages.forEach(message => {
       if (this.session) {
-        let type = this.session.private ? 'privateSessions' : 'sessions'
+        const type = this.session.private ? 'privateSessions' : 'sessions'
         converted.push({...message, createdAt: message.createdAt.toString(), sessionTitle: this.sessionTitle, sessionId: this.sessionId, type})
       }
       else if (this.gymId) {

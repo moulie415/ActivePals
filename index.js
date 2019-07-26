@@ -30,29 +30,26 @@ const firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
 
 export const showLocalNotification = (notif) => {
-  if (notif.custom_notification) {
     const user = firebase.auth().currentUser
     if (notif.uid != user.uid) {
-      const custom = JSON.parse(notif.custom_notification)
       const notification = new firebase.notifications.Notification()
-        .setTitle(custom.title)
-        .setBody(custom.body)
+        .setTitle(notif.title)
+        .setBody(notif.body)
         .setData(notif)
         .setSound('notif.wav')
         .android.setSmallIcon('ic_notification')
         .android.setAutoCancel(true)
         .android.setGroupSummary(true)
-        .android.setGroup(custom.group)
+        .android.setGroup(notif.group)
         .android.setPriority(firebase.notifications.Android.Priority.Max)
-        .android.setChannelId(custom.channel)
+        .android.setChannelId(notif.channel)
         //.android.setGroupAlertBehaviour(firebase.notifications.Android.GroupAlert.Children)
-        .setNotificationId(custom.group)
+        .setNotificationId(notif.group)
       
         firebase.notifications()
           .displayNotification(notification)
           .catch(err => console.error(err))
     }
-  }
 
 }
 
@@ -114,11 +111,11 @@ export const persistor = persistStore(store)
 
 export const handleNotification = (notification) => {
   const { dispatch, getState } = store
-  const {  type } = notification.data
+  const { type } = notification
   if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'friendRequest') {
-    dispatch(newNotification(notification.data))
-    dispatch(updateLastMessage(notification.data))
-    showLocalNotification(notification.data)
+    dispatch(newNotification(notification))
+    dispatch(updateLastMessage(notification))
+    showLocalNotification(notification)
   }
   if (type == 'rep' ||
   type == 'comment' ||
@@ -138,9 +135,9 @@ const shouldNavigate = (notification) => {
     route = routes[nav.index]
   }
   return  (!route.params || 
-    (route.params.chatId && route.params.chatId != notification.data.chatId ||
-     route.params.session && route.params.session.key != notification.data.sessionId ||
-     route.params.gymId && route.params.gymId != notification.data.gymId)) 
+    (route.params.chatId && route.params.chatId != notification.chatId ||
+     route.params.session && route.params.session.key != notification.sessionId ||
+     route.params.gymId && route.params.gymId != notification.gymId)) 
 }
 
 
@@ -180,7 +177,7 @@ class FitLink extends React.Component {
     
 
     this.messageListener = firebase.messaging().onMessage(notification => {
-      handleNotification(notification)
+      handleNotification(notification.data)
     })
 
     this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed(notification => {
@@ -190,7 +187,7 @@ class FitLink extends React.Component {
     })
     this.notificationListener = firebase.notifications().onNotification(notification => {
       // Process your notification as required
-      handleNotification(notification)
+      handleNotification(notification.data)
     })
     this.notificationOpenedListener = firebase.notifications().onNotificationOpened(notificationOpen => {
       // Get the action triggered by the notification being opened
