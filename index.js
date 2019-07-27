@@ -194,7 +194,7 @@ class FitLink extends React.Component {
       const action = notificationOpen.action
       // Get information about the notification that was opened
       const notification = notificationOpen.notification
-      if (shouldNavigate(notification)) {
+      if (shouldNavigate(notification.data)) {
         navigateFromNotif(notification.data)
       }
      

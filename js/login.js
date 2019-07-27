@@ -214,6 +214,7 @@ import Button from './components/Button'
                    console.log(e)
                    _this.createUser(uid,json,token).then(() => {
                     _this.props.onLogin()
+                    this.setState({facebookLoading: false})
                   })
                 })
              }
