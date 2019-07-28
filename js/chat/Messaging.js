@@ -17,6 +17,7 @@ import firebase from 'react-native-firebase'
 import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
 import colors from 'Anyone/js/constants/colors'
 import sStyles from 'Anyone/js/styles/sessionStyles'
+import globalStyles from '../styles/globalStyles'
 import Header from '../header/header'
 import { isIphoneX } from 'react-native-iphone-x-helper'
 import { guid } from '../constants/utils'
@@ -272,8 +273,13 @@ class Messaging extends React.Component {
             <Bubble {...props}
             wrapperStyle={{
               right: {
-                backgroundColor: colors.secondary
+                backgroundColor: colors.secondary,
+                ...globalStyles.bubbleShadow
+              },
+              left: {
+                ...globalStyles.bubbleShadow
               }
+              
             }}/>
             )}}
           renderMessageText={(props)=> { return (
