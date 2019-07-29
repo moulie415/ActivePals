@@ -13,8 +13,8 @@ import colors from 'Anyone/js/constants/colors'
 import ChatTabBarIcon from '../components/ChatTabBarIcon'
 import ChatTabLabel from '../components/ChatTabLabel'
 import ChatRowCount from '../components/ChatRowCount'
-
-//import  styles  from './styles/loginStyles'
+import Image from 'react-native-fast-image'
+import styles from '../styles/chatStyles'
 
  class GymChat extends Component {
   static navigationOptions = {
@@ -68,14 +68,14 @@ import ChatRowCount from '../components/ChatRowCount'
         onPress={()=> {
             this.props.onOpenChat(gym.place_id)
         }}>
-          <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, flexDirection: 'row', alignItems: 'center'}}>
-            <View>{getType('Gym', 50)}</View>
+          <View style={styles.chatRowContainer}>
+            {gym && gym.photo ? <Image source={{uri: gym.photo}} style={styles.gymAvatar}/>  : <View>{getType('Gym', 50)}</View>}
             <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
               <Text style={{color: '#000'}} numberOfLines={1}>{gym.name}</Text>
               { gymChat && gymChat.lastMessage && !!gymChat.lastMessage.text && 
               <Text numberOfLines={1} style={{color: '#999'}}>{gymChat.lastMessage.text}</Text>}
             </View>
-            { gymChat && gymChat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
+            { gymChat && gymChat.lastMessage && gymChat.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
               <Text style={{color: '#999'}}>{getSimplifiedTime(gymChat.lastMessage.createdAt)}</Text></View>}
               <ChatRowCount id={gym.place_id} />
           </View>

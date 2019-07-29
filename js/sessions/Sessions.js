@@ -223,7 +223,6 @@ import { WebView } from 'react-native-webview'
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
           {this.state.selectedSession.title}</Text>
           <ScrollView style={{margin: 10}}>
-          <View style={{flexDirection: 'row'}}>
           <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between'}}>
             <View style={{flexDirection: 'row'}}>
               <Text style={{color: '#999'}}>Host: </Text>
@@ -233,14 +232,13 @@ import { WebView } from 'react-native-webview'
               onPress={()=> {
                 this.props.onOpenChat(this.state.selectedSession)
               }}>
-            <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10}}/>
+            <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10, marginTop: -5}}/>
           </TouchableOpacity>}
-            </View>
-            {this.state.selectedSession.private && <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
-            <Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/>
-            <Text>PRIVATE</Text>
+          {this.state.selectedSession.private && <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5, color: '#999'}}/>
+            <Text style={{color: '#999'}}>PRIVATE</Text>
             </View>}
-          </View>
+            </View>
           <Hyperlink
           linkStyle={{color: colors.secondary}}
           linkDefault={ true }>
@@ -646,7 +644,7 @@ import { WebView } from 'react-native-webview'
                       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                       <Text style={[styles.date, {color: item.inProgress ? colors.secondary : "#999"}]} >
                       {item.inProgress? "In progress" : formatDateTime(item.dateTime)}</Text>
-                      {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5}}/></View>}</View>
+                      {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5, color: '#999'}}/></View>}</View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                         <TouchableOpacity onPress={()=>{
