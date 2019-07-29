@@ -17,6 +17,7 @@ import { navigateMessaging, navigateMessagingSession, navigateFriends, navigateP
 import { newNotification, updateLastMessage } from 'Anyone/js/actions/chats'
 import GeoFire from 'geofire'
 import bgMessaging from './js/bgMessaging'
+import str from './js/constants/strings'
 
 import {
   createReactNavigationReduxMiddleware,
@@ -27,7 +28,7 @@ import { navigateGymMessaging } from "./js/actions/navigation"
 import { fetchProfile, doSetup } from "./js/actions/profile"
 import Sound from 'react-native-sound'
 
-const notifSound = new Sound('notif.wav', Sound.MAIN_BUNDLE, (error) => {
+const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, (error) => {
   if (error) {
     console.warn('failed to load the sound', error);
     return;
@@ -44,7 +45,7 @@ export const showLocalNotification = (notif) => {
           .setTitle(notif.title)
           .setBody(notif.body)
           .setData(notif)
-          .setSound('notif.wav')
+          .setSound(str.notifSound)
           .android.setSmallIcon('ic_notification')
           .android.setAutoCancel(true)
           .android.setGroupSummary(true)
@@ -249,7 +250,7 @@ class FitLink extends React.Component {
       if (user) {
         firebase.database().ref('users/' + user.uid).child('FCMToken').set(fcmToken)
       }
-      else console.warn('no user to set token on')
+      else console.log('no user to set token on')
     })
 
     if (firebase.auth().currentUser) {

@@ -141,7 +141,7 @@ class Messaging extends React.Component {
     if (nextProps.notif) {
       this.props.resetNotif()
       //ignore inital fetch when component mounts
-      if (this.listenForNotif) {
+      //if (this.listenForNotif) {
         const { 
           type,
           uid,
@@ -160,14 +160,17 @@ class Messaging extends React.Component {
           if ((type == 'message' && this.friendUid == uid) ||
             (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid) ||
             (type == 'gymMessage' && this.gymId == gymId && this.uid != uid)) {
-            this.setState(previousState => ({
-              messages: GiftedChat.append(Object.values(previousState.messages), message),
-            }))
+              //check if its a dupe
+            if (!Object.values(this.state.messages).some(msg => msg._id == message._id)) {
+              this.setState(previousState => ({
+                  messages: GiftedChat.append(Object.values(previousState.messages), message)
+              }))
+          }
         }
       }
-    }
+    //}
   }
-  this.listenForNotif = true
+  // this.listenForNotif = true
 }
 
   onSend(messages = []) {

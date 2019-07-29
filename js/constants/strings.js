@@ -14,7 +14,8 @@ const str = {
     testDevices: ['4108B2196ADDE2FE584AEA026D0FE41E', '4C574D0CCA89BFCA10B89A2D9103E9CC'],
     admobBanner: Platform.OS == 'ios' ? "ca-app-pub-7885763333661292/3772507757" : "ca-app-pub-7885763333661292/5551535421", 
     mentionRegex: /^(?!.*\bRT\b)(?:.+\s)?@\w+/i,
-    spinner: 'PulseIndicator'
+    spinner: 'PulseIndicator',
+    notifSound: 'notif.wav'
 }
 
 export default str
