@@ -1,6 +1,6 @@
 
 import React from "react"
-import { AppRegistry, YellowBox } from 'react-native'
+import { AppRegistry, YellowBox, AppState } from 'react-native'
 //import * as firebase from "firebase"
 import firebase from 'react-native-firebase' //above is web api
 import { Root } from 'native-base'
@@ -25,6 +25,13 @@ import {
 import { setNotificationCount } from "./js/actions/home"
 import { navigateGymMessaging } from "./js/actions/navigation"
 import { fetchProfile, doSetup } from "./js/actions/profile"
+import Sound from 'react-native-sound'
+
+const notifSound = new Sound('notif.wav', Sound.MAIN_BUNDLE, (error) => {
+  if (error) {
+    console.warn('failed to load the sound', error);
+    return;
+}})
 
 const firebaseRef = firebase.database().ref('locations')
 export const geofire = new GeoFire(firebaseRef)
@@ -32,23 +39,28 @@ export const geofire = new GeoFire(firebaseRef)
 export const showLocalNotification = (notif) => {
     const user = firebase.auth().currentUser
     if (notif.uid != user.uid) {
-      const notification = new firebase.notifications.Notification()
-        .setTitle(notif.title)
-        .setBody(notif.body)
-        .setData(notif)
-        .setSound('notif.wav')
-        .android.setSmallIcon('ic_notification')
-        .android.setAutoCancel(true)
-        .android.setGroupSummary(true)
-        .android.setGroup(notif.group)
-        .android.setPriority(firebase.notifications.Android.Priority.Max)
-        .android.setChannelId(notif.channel)
-        //.android.setGroupAlertBehaviour(firebase.notifications.Android.GroupAlert.Children)
-        .setNotificationId(notif.group)
-      
-        firebase.notifications()
-          .displayNotification(notification)
-          .catch(err => console.error(err))
+      if (shouldNavigate(notif)) {
+        const notification = new firebase.notifications.Notification()
+          .setTitle(notif.title)
+          .setBody(notif.body)
+          .setData(notif)
+          .setSound('notif.wav')
+          .android.setSmallIcon('ic_notification')
+          .android.setAutoCancel(true)
+          .android.setGroupSummary(true)
+          .android.setGroup(notif.group)
+          .android.setPriority(firebase.notifications.Android.Priority.Max)
+          .android.setChannelId(notif.channel)
+          //.android.setGroupAlertBehaviour(firebase.notifications.Android.GroupAlert.Children)
+          .setNotificationId(notif.group)
+        
+          firebase.notifications()
+            .displayNotification(notification)
+            .catch(err => console.error(err))
+      }
+      else {
+        notifSound.play()
+      }
     }
 
 }
@@ -194,9 +206,13 @@ class FitLink extends React.Component {
       const action = notificationOpen.action
       // Get information about the notification that was opened
       const notification = notificationOpen.notification
+
+      const state = AppState.currentState
+      if (state != 'active') {
+        handleNotification(notification.data, false)
+      }
       if (shouldNavigate(notification.data)) {
         navigateFromNotif(notification.data)
-        handleNotification(notification.data, false)
       }
      
     })
