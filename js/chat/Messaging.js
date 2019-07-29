@@ -115,6 +115,7 @@ class Messaging extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    //message it populated when an attachment is sent 
     if (nextProps.message) {
       const message = {
         _id: guid(),
@@ -195,21 +196,18 @@ class Messaging extends React.Component {
     ref.push(...converted)
     .then(async () => {
       this.setState(previousState => ({
-      messages: GiftedChat.append(Object.values(previousState.messages), messages),
+        messages: GiftedChat.append(Object.values(previousState.messages), messages),
       }))
 
 
       if (this.session) {
-        this.props.getSessionChats(this.props.profile.sessions, this.sessionId)
+        this.props.updateLastMessage({...converted[0], type: 'sessionMessage'})
       }
       else if (this.gymId) {
-        this.props.getGymChat(this.gymId)
+        this.props.updateLastMessage({...converted[0], type: 'gymMessage'})
       }
       else {
-        if (!this.props.profile.chats) {
-          await this.props.fetchProfile()
-        }
-        this.props.getChats(this.props.profile.chats)
+        this.props.updateLastMessage({...converted[0], type: 'message'})
       }
       
     })
@@ -410,15 +408,13 @@ import {
 } from 'Anyone/js/actions/navigation'
 import { sendRequest, acceptRequest } from '../actions/friends'
 import {
-  fetchChats,
-  fetchSessionChats,
   fetchMessages,
   fetchSessionMessages,
   fetchGymMessages,
   resetNotification,
   resetMessage,
-  fetchGymChat,
-  resetUnreadCount
+  resetUnreadCount,
+  updateLastMessage
 } from '../actions/chats'
 import { fetchProfile } from '../actions/profile'
 
@@ -446,9 +442,7 @@ const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getChats: (chats) => dispatch(fetchChats(chats)),
-  getSessionChats: (sessions, uid) => dispatch(fetchSessionChats(sessions, uid)),
-  getGymChat: (gym) => dispatch(fetchGymChat(gym)),
+  updateLastMessage: (message) => dispatch(updateLastMessage(message)),
   onRequest: (friendUid)=> dispatch(sendRequest(friendUid)),
   onAccept: (uid, friendUid)=> dispatch(acceptRequest(uid, friendUid)),
   onOpenChat: (chatId, friendUsername, friendUid)=> dispatch(navigateMessaging(chatId, friendUsername, friendUid)),

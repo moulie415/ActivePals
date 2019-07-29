@@ -7,7 +7,7 @@ import {
 import Login from './login'
 import SignUp from './SignUp'
 import Home from './Home'
-import Sessions from './Sessions'
+import Sessions from './sessions/Sessions'
 import Friends from './Friends'
 import Profile from './Profile'
 import ProfileView from './ProfileView'

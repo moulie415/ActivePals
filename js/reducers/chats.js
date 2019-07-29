@@ -51,12 +51,26 @@ export default function(state = initialState, action) {
 		case UPDATE_CHAT:
 			return {
 				...state,
-				chats: {...state.chats, [action.id]: {...state.chats[action.id], lastMessage: action.lastMessage}}
+				chats: {...state.chats,[action.id]: {...state.chats[action.id],lastMessage: action.lastMessage}},
+				messageSessions: {
+					...state.messageSessions,
+					[action.lastMessage.chatId]: {
+						...state.messageSessions[action.lastMessage.chatId],
+						[action.lastMessage.key]: action.lastMessage
+					}
+				}
 			}
 		case UPDATE_SESSION_CHAT:
 			return {
 				...state,
-				sessionChats: {...state.sessionChats, [action.key]: {...state.sessionChats[action.key], lastMessage: action.lastMessage}}
+				sessionChats: {...state.sessionChats, [action.key]: {...state.sessionChats[action.key], lastMessage: action.lastMessage}},
+				messageSessions: {
+					...state.messageSessions,
+					[action.lastMessage.sessionId]: {
+						...state.messageSessions[action.lastMessage.sessionId],
+						[action.lastMessage.key]: action.lastMessage
+					}
+				}
 			}
 		case SET_MESSAGE_SESSION:
 			return {
@@ -69,14 +83,21 @@ export default function(state = initialState, action) {
 				notif: action.notif,
 			}
 		case RESET_NOTIFICATION:
-             return {
-                ...state,
-                notif: null,
+      return {
+        ...state,
+        notif: null,
 			}
 		case SET_GYM_CHAT:
 			return {
 				...state,
-				gymChat: action.chat
+				gymChat: action.chat,
+				messageSessions: {
+					...state.messageSessions,
+					[action.chat.key]: {
+						...state.messageSessions[action.chat.key],
+						[action.chat.lastMessage.key]: action.chat.lastMessage
+					}
+				}
 			}
 		case SET_MESSAGE:
 			return {

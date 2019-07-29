@@ -109,13 +109,13 @@ export const store = createStore(
 
 export const persistor = persistStore(store)
 
-export const handleNotification = (notification) => {
+export const handleNotification = (notification, showLocal = true) => {
   const { dispatch, getState } = store
   const { type } = notification
   if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'friendRequest') {
     dispatch(newNotification(notification))
     dispatch(updateLastMessage(notification))
-    showLocalNotification(notification)
+    showLocal && showLocalNotification(notification)
   }
   if (type == 'rep' ||
   type == 'comment' ||
@@ -196,6 +196,7 @@ class FitLink extends React.Component {
       const notification = notificationOpen.notification
       if (shouldNavigate(notification.data)) {
         navigateFromNotif(notification.data)
+        handleNotification(notification.data, false)
       }
      
     })

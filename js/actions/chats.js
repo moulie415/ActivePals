@@ -91,7 +91,10 @@ export const updateLastMessage = (notif) => {
 			return firebase.database().ref('chats').child(notif.chatId).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
-						dispatch(updateChat(notif.uid, Object.values(lastMessage.val())[0]))
+						const key =  Object.keys(lastMessage.val())[0]
+						const message = lastMessage.val()[key]
+						const createdAt = new Date(message.createdAt)
+						dispatch(updateChat(notif.uid || notif.friendUid, {...message, key, createdAt}))
 					}
 				})
 		}
@@ -99,7 +102,10 @@ export const updateLastMessage = (notif) => {
 			return firebase.database().ref('sessionChats').child(notif.sessionId).orderByKey().limitToLast(1)
 				.once('value', lastMessage => {
 					if (lastMessage.val()) {
-						dispatch(updateSessionChat(notif.sessionId, Object.values(lastMessage.val())[0]))
+						const key =  Object.keys(lastMessage.val())[0]
+						const message = lastMessage.val()[key]
+						const createdAt = new Date(message.createdAt)
+						dispatch(updateSessionChat(notif.sessionId, {...message, key, createdAt}))
 					}
 				})
 		}
@@ -147,10 +153,6 @@ export const resetUnreadCount = (id) => {
 	}
 }
 
-
-
-
-
 export const fetchChats = (chats) => {
 	return  dispatch => {
 		const chatList = []
@@ -161,7 +163,8 @@ export const fetchChats = (chats) => {
 				.once('value', lastMessage => {
 					let message = {text: 'new chat created'}
 					if (lastMessage.val()) {
-						message = Object.values(lastMessage.val())[0]
+						const key =  Object.keys(lastMessage.val())[0]
+						message = {...lastMessage.val()[key], key}
 					}
 					resolve({uid: chat, chatId: val, lastMessage: message})
 				})
@@ -186,7 +189,8 @@ export const addChat = (chat) => {
 		.once('value', lastMessage => {
 			let message = {text: 'new chat created'}
 			if (lastMessage.val()) {
-				message = Object.values(lastMessage.val())[0]
+				const key =  Object.keys(lastMessage.val())[0]
+				 message = {...lastMessage.val()[key], key}
 			}
 			dispatch(addToChats(uid, {uid, chatId, lastMessage: message}))
 			dispatch(fetchProfile())
@@ -218,7 +222,8 @@ export const fetchSessionChats = (sessions, uid) => {
 						.once('value', lastMessage => {
 							let message = {text: "new session chat created"}
 							if (lastMessage.val()) {
-								message = Object.values(lastMessage.val())[0]
+								const key =  Object.keys(lastMessage.val())[0]
+								message = {...lastMessage.val()[key], key}
 							}
 							resolve({...snapshot.val(), key: session, lastMessage: message})
 						})
@@ -349,12 +354,14 @@ export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
 }
 
 export const fetchGymChat = (gym) => {
-	return (dispatch, getState) => {
+	return (dispatch) => {
 		return firebase.database().ref('gymChats').child(gym).orderByKey().limitToLast(1)
 		.once('value', lastMessage => {
 			if (lastMessage.val()) {
-				message = Object.values(lastMessage.val())[0]
-				let chat = {lastMessage: message, key: gym}
+				const key =  Object.keys(lastMessage.val())[0]
+				const message = lastMessage.val()[key]
+				const createdAt = new Date(message.createdAt)
+				const chat = {lastMessage: {...message, createdAt, key}, key: gym}
 				dispatch(setGymChat(chat))
 			}
 			else {
