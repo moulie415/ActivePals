@@ -32,7 +32,7 @@ import Comments from './comments'
 import FIcon from "react-native-vector-icons/FontAwesome"
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'
-import Header from './header/header'
+import Header from './components/Header/header'
 import {
   extractCreatedTime,
   extractUsername,

@@ -30,7 +30,7 @@ import {Image as SlowImage } from 'react-native'
 import { formatDateTime, getDistance } from '../constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
 import { showLocation, Popup } from 'react-native-map-link'
-import Header from '../header/header'
+import Header from '../components/Header/header'
 import FriendsModal from '../components/friendsModal'
 import GymSearch from '../components/GymSearch'
 import { CheckBox } from 'react-native-elements'
@@ -220,8 +220,14 @@ import { WebView } from 'react-native-webview'
 
         <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
         {this.state.selectedSession && <View style={{flex: 1}}>
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
-          {this.state.selectedSession.title}</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap'}}>
+            <Text style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
+            {this.state.selectedSession.title}</Text>
+            <TouchableOpacity
+                onPress={()=> this.props.viewSession(this.state.selectedSession.key)}>
+              <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
+            </TouchableOpacity>
+          </View>
           <ScrollView style={{margin: 10}}>
           <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between'}}>
             <View style={{flexDirection: 'row'}}>
@@ -862,7 +868,8 @@ import {
   navigateProfileView,
   navigateGym,
   navigateGymMessaging,
-  navigateSessionDetail
+  navigateSessionDetail,
+  navigateSessionInfo
 } from '../actions/navigation'
 import { fetchSessionChats, addSessionChat } from '../actions/chats'
 import {
@@ -909,7 +916,8 @@ const mapDispatchToProps = dispatch => ({
   setPlaces: (places) => dispatch(setPlaces(places)),
   fetchPhotoPaths: () => dispatch(fetchPhotoPaths()),
   fetchPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
-  setRadius: (radius) => dispatch(setRadius(radius))
+  setRadius: (radius) => dispatch(setRadius(radius)),
+  viewSession: (sessionId) => dispatch(navigateSessionInfo(sessionId))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)

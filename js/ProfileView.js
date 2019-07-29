@@ -20,7 +20,7 @@ import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import { calculateAge } from './constants/utils'
-import Header from './header/header'
+import Header from './components/Header/header'
 import { PulseIndicator } from 'react-native-indicators'
 import globalStyles from "./styles/globalStyles"
 import Button from './components/Button'

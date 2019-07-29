@@ -8,6 +8,7 @@ import Login from './login'
 import SignUp from './SignUp'
 import Home from './Home'
 import Sessions from './sessions/Sessions'
+import SessionInfo from './sessions/SessionInfo'
 import Friends from './Friends'
 import Profile from './Profile'
 import ProfileView from './ProfileView'
@@ -101,6 +102,7 @@ const tabs = TabNavigator({
 export const Stack = StackNavigator({
   Login : { screen: Login, navigationOptions: {header: null} },
   SessionDetail: { screen: SessionDetail, navigationOptions: {tabBarVisible: false} },
+  SessionInfo: {screen: SessionInfo, navigationOptions: {header: null}},
   SignUp: { screen: SignUp},
   MainNav: { screen: tabs},
   Messaging: {screen: Messaging},

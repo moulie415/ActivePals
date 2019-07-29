@@ -20,7 +20,7 @@ import DatePicker from 'react-native-datepicker'
 var ImagePicker = require('react-native-image-picker')
 import ImageResizer from 'react-native-image-resizer'
 import RNPickerSelect from 'react-native-picker-select'
-import Header from './header/header'
+import Header from './components/Header/header'
 import { PulseIndicator } from 'react-native-indicators'
 import globalStyles from './styles/globalStyles'
 import Button from './components/Button'

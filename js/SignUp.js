@@ -13,7 +13,7 @@ import {
 import firebase from 'react-native-firebase'
 import  styles  from './styles/signUpStyles'
 import colors from './constants/colors'
-import Header from './header/header'
+import Header from './components/Header/header'
 import { PulseIndicator } from 'react-native-indicators'
 import sStyles from './styles/settingsStyles'
 const background = require('Anyone/assets/images/Running-background.jpg')

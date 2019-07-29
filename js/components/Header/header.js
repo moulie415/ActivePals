@@ -1,15 +1,15 @@
 import React, { Component } from "react"
 import { ImageBackground, TouchableOpacity, View } from "react-native"
 import Image from "react-native-fast-image"
-import Text from '../components/Text'
+import Text from '../Text'
 import { Icon, Header } from "native-base"
 import { TabBarBottom, SafeAreaView } from "react-navigation"
-import colors from '../constants/colors'
+import colors from '../../constants/colors'
 
-import globalStyles from '../styles/globalStyles'
+import globalStyles from '../../styles/globalStyles'
 
 import { connect } from 'react-redux'
-import { navigateBack } from '../actions/navigation'
+import { navigateBack } from '../../actions/navigation'
 
 const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, style, fitTitle, backgroundColor, left }) => {
 	return <Header

@@ -17,7 +17,7 @@ import Swipeout from 'react-native-swipeout'
 import TouchableOpacity from './components/TouchableOpacityLockable'
 import colors from './constants/colors'
 import { getSimplifiedTime } from './constants/utils'
-import Header from './header/header'
+import Header from './components/Header/header'
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 import { PulseIndicator } from 'react-native-indicators'
 

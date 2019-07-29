@@ -41,7 +41,7 @@ import {
   import styles from './styles/postViewStyles'
   import Image from 'react-native-fast-image'
   import {Image as SlowImage} from 'react-native'
-  import Header from './header/header'
+  import Header from './components/Header/header'
   import str from './constants/strings'
   import Video from 'react-native-video'
   import hStyles from './styles/homeStyles'

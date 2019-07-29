@@ -9,7 +9,7 @@ import {
     Container
 } from 'native-base'
 import TouchableOpacity from './components/TouchableOpacityLockable'
-import Header from './header/header'
+import Header from './components/Header/header'
 import Button from './components/Button'
 
 class PersonalTraining extends Component {

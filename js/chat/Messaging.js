@@ -18,7 +18,7 @@ import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-cha
 import colors from 'Anyone/js/constants/colors'
 import sStyles from 'Anyone/js/styles/sessionStyles'
 import globalStyles from '../styles/globalStyles'
-import Header from '../header/header'
+import Header from '../components/Header/header'
 import { isIphoneX } from 'react-native-iphone-x-helper'
 import { guid } from '../constants/utils'
 import ImagePicker from 'react-native-image-picker'
@@ -224,6 +224,11 @@ class Messaging extends React.Component {
         <Icon name='md-information-circle' style={{color: '#fff'}}/>
       </TouchableOpacity>
     }
+    else if (this.sessionId) {
+      return <TouchableOpacity onPress={()=> this.props.viewSession(this.sessionId)}>
+        <Icon name='md-information-circle' style={{color: '#fff'}}/>
+      </TouchableOpacity>
+    }
     else return null
   }
 
@@ -407,8 +412,9 @@ import {
   navigateProfileView,
   navigateGym,
   navigateFilePreview,
-  navigateBack
-} from 'Anyone/js/actions/navigation'
+  navigateBack,
+  navigateSessionInfo
+} from '../actions/navigation'
 import { sendRequest, acceptRequest } from '../actions/friends'
 import {
   fetchMessages,
@@ -460,8 +466,8 @@ const mapDispatchToProps = dispatch => ({
   previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   goBack: () => dispatch(navigateBack()),
   resetUnreadCount: (id) => dispatch(resetUnreadCount(id)),
-  fetchProfile: () => dispatch(fetchProfile())
-
+  fetchProfile: () => dispatch(fetchProfile()),
+  viewSession: (sessionId) => dispatch(navigateSessionInfo(sessionId))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messaging)

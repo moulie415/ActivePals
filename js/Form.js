@@ -12,7 +12,7 @@ import TouchableOpacity from './components/TouchableOpacityLockable'
 
 import styles from './styles/formStyles'
 import colors from './constants/colors'
-import Header from './header/header'
+import Header from './components/Header/header'
 
 class Form extends Component {
 
