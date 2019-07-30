@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native"
 import colors from 'Anyone/js/constants/colors'
-import styles from "../components/friendsModal/styles";
 
 export default  StyleSheet.create({
   spinner: {
@@ -66,6 +65,13 @@ export default  StyleSheet.create({
     borderTopColor: '#999',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#999'
+  },
+  infoRowContainer: {
+    padding: 10,
+    borderTopColor: '#999',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'center',
+    marginVertical: 5
   }
 
 })

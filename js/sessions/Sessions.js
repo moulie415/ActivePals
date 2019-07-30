@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Slider,
-  Platform,
 } from "react-native"
 import {
   Container,
@@ -35,7 +34,6 @@ import FriendsModal from '../components/friendsModal'
 import GymSearch from '../components/GymSearch'
 import { CheckBox } from 'react-native-elements'
 import Button from '../components/Button'
-import { WebView } from 'react-native-webview'
 
  class Sessions extends Component {
 
