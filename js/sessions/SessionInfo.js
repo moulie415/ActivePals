@@ -17,7 +17,8 @@ import { getType, formatDateTime } from '../constants/utils'
 import Image from 'react-native-fast-image'
 import globalStyles from '../styles/globalStyles'
 import styles from '../styles/sessionStyles'
-import Collapsible from 'react-native-collapsible-header'
+import Button from '../components/Button'
+import { Popup } from 'react-native-map-link'
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -64,19 +65,40 @@ class SessionInfo extends Component {
           </View>
         </View>
       <View style={{backgroundColor: '#fff', ...globalStyles.bubbleShadow}}>
-        <View style={{padding: 10, justifyContent: 'center', marginVertical: 5}}>
+        <View style={{padding: 10, justifyContent: 'center'}}>
           {this.renderInfoHeader('Details')}
           <Text style={{color: '#999'}}>{this.state.session.details}</Text>
         </View>
-        <View style={styles.infoRowContainer}>
-          {this.renderInfoHeader('Date')}
-          <Text style={{color: '#999'}}>{(formatDateTime(this.state.session.dateTime))
+        <View style={[styles.infoRowContainer, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
+          <View>
+            {this.renderInfoHeader('Date')}
+            <Text style={{color: '#999'}}>{(formatDateTime(this.state.session.dateTime))
               + " for " + (this.state.session.duration) + " " +
               (this.state.session.duration > 1 ? 'hours' : 'hour') }</Text>
+          </View>
+          <View style={{marginRight: 20}}>
+            {this.renderInfoHeader('Gender')}
+            <Text style={{color: '#999'}}>{this.state.session.gender}</Text>
+          </View>
         </View>
-        <View style={styles.infoRowContainer}>
+        <View style={[styles.infoRowContainer, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
+        <View>
           {this.renderInfoHeader('Location')}
           <Text style={{color: '#999'}}>{this.state.session.location.formattedAddress}</Text>
+        </View>
+        {this.props.location && <Button onPress={()=> {
+          const { lat, lng } = this.state.session.location.position
+          const options = {
+            latitude: lat,
+            longitude: lng,
+            cancelText: 'Cancel',
+            sourceLatitude: this.props.location.latitude,  
+            sourceLongitude: this.props.location.longitude,  
+            }
+            this.setState({popUpVisible: true, options})
+          }}
+          text='Directions'
+        />}
         </View>
         <TouchableOpacity 
         onPress={() => {
@@ -96,10 +118,23 @@ class SessionInfo extends Component {
             {this.state.host.avatar ? <Image source={{uri: this.state.host.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
             <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
           </View>
-          </TouchableOpacity>
-          </View>
+        </TouchableOpacity>
+      </View>
       </View> : 
       <PulseIndicator color={colors.secondary} />}
+      <Popup
+          isVisible={this.state.popUpVisible}
+          onCancelPressed={() => this.setState({ popUpVisible: false })}
+          onAppPressed={() => this.setState({ popUpVisible: false })}
+          onBackButtonPressed={() => this.setState({ popUpVisible: false })}
+          modalProps={{ 
+              animationIn: 'slideInUp'
+          }}
+          options={this.state.options}
+          style={{
+            cancelButtonText: {color: colors.secondary},
+          }}
+          />
     </Container>
   }
 
@@ -117,7 +152,8 @@ import {
 const mapStateToProps = ({ profile, sharedInfo, friends }) => ({
   profile: profile.profile,
   users: sharedInfo.users,
-  friends: friends.friends
+  friends: friends.friends,
+  location: profile.location
 })
 
 const mapDispatchToProps = dispatch => ({

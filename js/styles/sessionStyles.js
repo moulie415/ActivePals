@@ -71,7 +71,7 @@ export default  StyleSheet.create({
     borderTopColor: '#999',
     borderTopWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
-    marginVertical: 5
+    // marginVertical: 5
   },
   hostRow: {
     flexDirection: 'row',
