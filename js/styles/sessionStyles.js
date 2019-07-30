@@ -72,6 +72,11 @@ export default  StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
     marginVertical: 5
+  },
+  hostRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
   }
 
 })

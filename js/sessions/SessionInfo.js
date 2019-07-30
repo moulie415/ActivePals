@@ -17,6 +17,7 @@ import { getType, formatDateTime } from '../constants/utils'
 import Image from 'react-native-fast-image'
 import globalStyles from '../styles/globalStyles'
 import styles from '../styles/sessionStyles'
+import Collapsible from 'react-native-collapsible-header'
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -56,8 +57,11 @@ class SessionInfo extends Component {
     />
       {this.state.session ? 
       <View>
-        <View style={{alignItems: 'center', marginVertical: 15}}>
-          {getType(this.state.session.type, 50)}
+        <View style={{marginBottom: 10}}>
+          <View style={{height: 150, backgroundColor: colors.primaryLighter}}/>
+          <View style={{backgroundColor: '#fff', alignSelf: 'center', marginTop: -40, ...globalStyles.shadow}}>
+            {getType(this.state.session.type, 80)}
+          </View>
         </View>
       <View style={{backgroundColor: '#fff', ...globalStyles.bubbleShadow}}>
         <View style={{padding: 10, justifyContent: 'center', marginVertical: 5}}>
@@ -81,15 +85,17 @@ class SessionInfo extends Component {
               }
               else this.props.viewProfile(this.state.host.uid)
             }}
-        style={[styles.infoRowContainer, {flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center'}]}>
-          {this.renderInfoHeader('Host')}
-          {this.state.host && <View
+        style={[styles.infoRowContainer, styles.hostRow]}>
+          <View style={{marginRight: 10}}>
+            {this.renderInfoHeader('Host')}
+            <Text style={{color: '#999'}}>{this.state.host.username}</Text>
+          </View>
+            <View
             style={{flexDirection: 'row', alignItems: 'center', marginVertical: 5}}
             >
-            {this.state.host.avatar? <Image source={{uri: this.state.host.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-              <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
-              <Text style={{marginHorizontal: 10}}>{this.state.host.username}</Text>
-          </View>}
+            {this.state.host.avatar ? <Image source={{uri: this.state.host.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
+            <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
+          </View>
           </TouchableOpacity>
           </View>
       </View> : 
