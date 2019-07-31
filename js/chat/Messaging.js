@@ -225,7 +225,7 @@ class Messaging extends React.Component {
       </TouchableOpacity>
     }
     else if (this.sessionId) {
-      return <TouchableOpacity onPress={()=> this.props.viewSession(this.sessionId)}>
+      return <TouchableOpacity onPress={()=> this.props.viewSession(this.sessionId, this.session.private)}>
         <Icon name='md-information-circle' style={{color: '#fff'}}/>
       </TouchableOpacity>
     }
@@ -467,7 +467,7 @@ const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
   resetUnreadCount: (id) => dispatch(resetUnreadCount(id)),
   fetchProfile: () => dispatch(fetchProfile()),
-  viewSession: (sessionId) => dispatch(navigateSessionInfo(sessionId))
+  viewSession: (sessionId, isPrivate) => dispatch(navigateSessionInfo(sessionId, isPrivate))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messaging)

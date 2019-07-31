@@ -50,6 +50,7 @@ export default  StyleSheet.create({
   },
   date: {
     fontFamily: 'Montserrat',
+    paddingVertical: 5,
   },
   sessionFilterTitle: {
     fontSize: 20,
@@ -71,7 +72,11 @@ export default  StyleSheet.create({
     borderTopColor: '#999',
     borderTopWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
-    // marginVertical: 5
+  },
+  rowSpaceBetween: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   hostRow: {
     flexDirection: 'row',

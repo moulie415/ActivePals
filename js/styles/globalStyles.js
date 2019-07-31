@@ -23,5 +23,12 @@ export default StyleSheet.create({
     shadowOpacity: 0.7,
     shadowRadius: 4,
     elevation: 4,
-  }
+  },
+  sectionShadow: {
+    shadowColor: '#999',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.7,
+    shadowRadius: 4,
+    elevation: 4,
+  },
 })

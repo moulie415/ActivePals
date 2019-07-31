@@ -313,7 +313,6 @@ export const fetchGym = (id) => {
 				}
 			})
 	}
-	
 }
 
 export const fetchPhotoPath = (result) => {

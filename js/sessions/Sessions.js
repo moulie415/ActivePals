@@ -34,6 +34,7 @@ import FriendsModal from '../components/friendsModal'
 import GymSearch from '../components/GymSearch'
 import { CheckBox } from 'react-native-elements'
 import Button from '../components/Button'
+import PrivateIcon from '../components/PrivateIcon'
 
  class Sessions extends Component {
 
@@ -222,12 +223,12 @@ import Button from '../components/Button'
             <Text style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
             {this.state.selectedSession.title}</Text>
             <TouchableOpacity
-                onPress={()=> this.props.viewSession(this.state.selectedSession.key)}>
+                onPress={()=> this.props.viewSession(this.state.selectedSession.key, this.state.selectedSession.private)}>
               <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
             </TouchableOpacity>
           </View>
           <ScrollView style={{margin: 10}}>
-          <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between'}}>
+          <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between', alignItems: 'center'}}>
             <View style={{flexDirection: 'row'}}>
               <Text style={{color: '#999'}}>Host: </Text>
               {this.fetchHost(this.state.selectedSession.host)}
@@ -236,12 +237,9 @@ import Button from '../components/Button'
               onPress={()=> {
                 this.props.onOpenChat(this.state.selectedSession)
               }}>
-            <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10, marginTop: -5}}/>
+            <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10}}/>
           </TouchableOpacity>}
-          {this.state.selectedSession.private && <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5, color: '#999'}}/>
-            <Text style={{color: '#999'}}>PRIVATE</Text>
-            </View>}
+          {this.state.selectedSession.private && <PrivateIcon />}
             </View>
           <Hyperlink
           linkStyle={{color: colors.secondary}}
@@ -643,12 +641,11 @@ import Button from '../components/Button'
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 3}} numberOfLines={1}><Text  style={styles.title}>{item.title}</Text>
                         <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : getDistance(item, this.state.yourLocation)) + ' km away)'}</Text></Text>
-                        <Text numberOfLines={1} style={{fontSize: 13, color: '#000', flex: 2, textAlign: 'right'}}>{"gender: " + item.gender}</Text>
                       </View>
-                      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                       <Text style={[styles.date, {color: item.inProgress ? colors.secondary : "#999"}]} >
                       {item.inProgress? "In progress" : formatDateTime(item.dateTime)}</Text>
-                      {item.private && <View style={{flexDirection: 'row'}}><Icon name='ios-lock' style={{fontSize: 20, paddingHorizontal: 5, color: '#999'}}/></View>}</View>
+                      {item.private && <PrivateIcon size={25}/>}</View>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                         <TouchableOpacity onPress={()=>{
@@ -915,7 +912,7 @@ const mapDispatchToProps = dispatch => ({
   fetchPhotoPaths: () => dispatch(fetchPhotoPaths()),
   fetchPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
   setRadius: (radius) => dispatch(setRadius(radius)),
-  viewSession: (sessionId) => dispatch(navigateSessionInfo(sessionId))
+  viewSession: (sessionId, isPrivate) => dispatch(navigateSessionInfo(sessionId, isPrivate))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions)
