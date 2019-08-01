@@ -78,7 +78,7 @@ export default  StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between'
   },
-  hostRow: {
+  userRow: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center'

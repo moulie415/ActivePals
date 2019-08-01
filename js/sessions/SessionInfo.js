@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import {
   View,
   TouchableOpacity,
-  Platform
+  Platform,
+  Alert
 } from 'react-native'
 import {
   Container,
@@ -60,21 +61,20 @@ class SessionInfo extends Component {
 
     fetchUsers(unFetched)
     //TODO: set users afterwards
-    let gym
     if (session.val().gym) {
       const id = session.val().gym.place_id
-      if (this.props.places[id]) {
-        gym = this.props.places[id]
-      }
-      else {
-        await this.props.fetchGym(id)
-        gym = this.props.places[id]
+      if (!this.props.places[id]) {
+        this.props.fetchGym(id)
       }
     }
-    this.setState({session: session.val(), host, gym, users})
+    this.setState({session: session.val(), host, users})
   }
 
   render() {
+    let gym
+    if (this.state.session && this.state.session.gym) {
+      gym = this.props.places[this.state.session.gym.place_id]
+    }
     return <Container style={{flex: 1, backgroundColor: '#9993'}}>
     <Header 
     hasBack={true}
@@ -83,23 +83,23 @@ class SessionInfo extends Component {
       {this.state.session ? 
       <View>
         <View style={{marginBottom: 20}}>
-          {this.state.gym && this.state.gym.photo ?
+          {gym && gym.photo ?
             <Image style={{height: 150, width: '100%'}}
           resizeMode='cover'
-          source={{uri: this.state.gym.photo}} />
+          source={{uri: gym.photo}} />
           : <View style={{height: 150, backgroundColor: colors.primaryLighter}}/>}
           <View style={{backgroundColor: '#fff', alignSelf: 'center', marginTop: -40, ...globalStyles.shadow}}>
             {getType(this.state.session.type, 80)}
           </View>
         </View>
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow}}>
-        <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-          <View>
+        <TouchableOpacity onPress={()=> Alert.alert('Details', this.state.session.details)} style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
+          <View style={{flex: 4}}>
             {this.renderInfoHeader('Details')}
-            <Text style={{color: '#999'}}>{this.state.session.details}</Text>
+            <Text numberOfLines={1} style={{color: '#999'}}>{this.state.session.details}</Text>
           </View>
-          {this.isPrivate && <PrivateIcon />}
-        </View>
+          {this.isPrivate && <PrivateIcon style={{flex: 1}}/>}
+        </TouchableOpacity>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
           <View>
             {this.renderInfoHeader('Date')}
@@ -113,11 +113,12 @@ class SessionInfo extends Component {
           </View>
         </View>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-        <View>
+        <View style={{flex: 3}}>
           {this.renderInfoHeader('Location')}
-          <Text style={{color: '#999'}}>{this.state.session.location.formattedAddress}</Text>
+          <Text numberOfLines={1} style={{color: '#999'}}>{this.state.session.location.formattedAddress}</Text>
         </View>
-        {this.props.location && <Button onPress={()=> {
+        {this.props.location && <View style={{flex: 1}}>
+        <Button onPress={()=> {
           const { lat, lng } = this.state.session.location.position
           const options = {
             latitude: lat,
@@ -129,31 +130,26 @@ class SessionInfo extends Component {
             this.setState({popUpVisible: true, options})
           }}
           text='Directions'
-        />}
+        /></View>}
         </View>
-        {this.state.gym && <TouchableOpacity 
-        onPress={() => this.props.viewGym(this.state.gym.place_id)}
-        style={[styles.infoRowContainer, styles.hostRow]}>
+        {gym && <TouchableOpacity 
+        onPress={() => this.props.viewGym(gym.place_id)}
+        style={[styles.infoRowContainer, styles.userRow]}>
         <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}>
-            {this.state.gym.photo ? <Image source={{uri: this.state.gym.photo}}
+            {gym.photo ? <Image source={{uri: gym.photo}}
             style={{height: 40, width: 40, borderRadius: 25}}/> :
             getType('gym', 40)
             }
           </View>
           <View >
             {this.renderInfoHeader('Gym')}
-            <Text style={{color: '#999'}}>{this.state.gym.name}</Text>
+            <Text style={{color: '#999'}}>{gym.name}</Text>
           </View>
             
         </TouchableOpacity>}
         <TouchableOpacity 
-        onPress={() => {
-              if (this.state.host.uid == this.props.profile.uid) {
-                this.props.goToProfile()
-              }
-              else this.props.viewProfile(this.state.host.uid)
-            }}
-        style={[styles.infoRowContainer, styles.hostRow]}>
+        onPress={() => this.handleUserPress(this.state.host.uid)}
+        style={[styles.infoRowContainer, styles.userRow]}>
          <View
             style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}
             >
@@ -167,7 +163,7 @@ class SessionInfo extends Component {
         </TouchableOpacity>
       </View>
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20}}>
-        <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
+        <View style={[styles.rowSpaceBetween, {padding: 5, paddingHorizontal: 10}]}>
           {this.renderInfoHeader('Users')}
           {(!this.isPrivate || this.props.profile.uid == this.state.host.uid)  && <TouchableOpacity>
             <Icon style={{color: colors.secondary, fontSize: 40, marginRight: 10}} name="add"/>
@@ -199,22 +195,24 @@ class SessionInfo extends Component {
 
   renderUsers() {
    return this.state.users.map(user => {
-     const userItem = this.props.friends[user] || this.props.users[user]
+     let userItem = this.props.friends[user] || this.props.users[user]
+     if (user == this.props.profile.uid) userItem = this.props.profile
      if (userItem) {
-      return <TouchableOpacity key={user}> 
+      return <TouchableOpacity onPress={()=> this.handleUserPress(user)} style={[styles.infoRowContainer, styles.userRow]} key={user}> 
         {userItem.avatar ? <Image source={{uri: userItem.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
            <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
-      </TouchableOpacity>
-     }
-     else if (user == this.props.profile.uid) {
-       const you = this.props.profile
-      return <TouchableOpacity key={user}> 
-        {you.avatar ? <Image source={{uri: you.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-           <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
+           <Text style={{marginLeft: 10}}>{userItem.username}</Text>
       </TouchableOpacity>
      }
      else return null
     })
+  }
+
+  handleUserPress(uid) {
+    if (uid == this.props.profile.uid) {
+      this.props.goToProfile()
+    }
+    else this.props.viewProfile(uid)
   }
 
 }
