@@ -33,25 +33,14 @@ class SessionInfo extends Component {
       session: null
     }
   }
-  async componentDidMount() {
+  componentDidMount() {
+    this.getSession()
+  }
+
+  async getSession() {
     const ref = this.isPrivate ? 'privateSessions' : 'sessions'
     const session = await firebase.database().ref(ref).child(this.sessionId).once('value')
-    let host
-    const sessionHost = session.val().host
-    if (sessionHost == this.props.profile.uid) {
-      host = this.props.profile
-    }
-    else if (this.props.friends[sessionHost]) {
-      host = this.props.friends[sessionHost]
-    }
-    else if (this.props.users[sessionHost]) {
-      host = this.props.users[sessionHost]
-    }
-    else {
-      const user = await firebase.database().ref('users').child(sessionHost)
-      host = user.val()
-    }
-
+    
     const users = Object.keys(session.val().users)
     const unFetched = []
     users.forEach(user => {
@@ -68,7 +57,7 @@ class SessionInfo extends Component {
         this.props.fetchGym(id)
       }
     }
-    this.setState({session: session.val(), host, users})
+    this.setState({session: session.val(), users})
   }
 
   render() {
@@ -76,6 +65,20 @@ class SessionInfo extends Component {
     if (this.state.session && this.state.session.gym) {
       gym = this.props.places[this.state.session.gym.place_id]
     }
+    let host
+    if (this.state.session && this.state.session.host) {
+      const hostId = this.state.session.host
+      if (hostId == this.props.profile.uid) {
+        host = this.props.profile
+      }
+      else if (this.props.friends[hostId]) {
+        host = this.props.friends[hostId]
+      }
+      else if (this.props.users[hostId]) {
+        host = this.props.users[hostId]
+      }
+    }
+
     return <Container style={{flex: 1, backgroundColor: '#9993'}}>
     <Header 
     hasBack={true}
@@ -148,25 +151,25 @@ class SessionInfo extends Component {
           </View>
             
         </TouchableOpacity>}
-        <TouchableOpacity 
-        onPress={() => this.handleUserPress(this.state.host.uid)}
+        {host && <TouchableOpacity 
+        onPress={() => this.handleUserPress(host.uid)}
         style={[styles.infoRowContainer, styles.userRow]}>
          <View
             style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}
             >
-            {this.state.host.avatar ? <Image source={{uri: this.state.host.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
+            {host.avatar ? <Image source={{uri: host.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
             <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
           </View>
           <View style={{marginRight: 10}}>
             {this.renderInfoHeader('Host')}
-            <Text style={{color: '#999'}}>{this.state.host.username}</Text>
+            <Text style={{color: '#999'}}>{host.username}</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </View>
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20}}>
         <View style={[styles.rowSpaceBetween, {padding: 5, paddingHorizontal: 10}]}>
           {this.renderInfoHeader('Users')}
-          {(!this.isPrivate || this.props.profile.uid == this.state.host.uid)  && 
+          {(!this.isPrivate || (host && this.props.profile.uid == host.uid))  && 
           <TouchableOpacity onPress={()=> this.setState({friendsModalOpen: true})}>
             <Icon style={{color: colors.secondary, fontSize: 40, marginRight: 10}} name="add"/>
           </TouchableOpacity>}
@@ -191,7 +194,20 @@ class SessionInfo extends Component {
           <FriendsModal 
           title="Add Pals to Session"
           onClosed={()=> this.setState({friendsModalOpen: false})}
-          onContinue={(friends) => console.log(friends)}
+          onContinue={async (friends) => {
+            const invites = []
+            friends.forEach(friend => {
+              if (!this.state.users.some(user => friend == user)) {
+                invites.push(
+                  firebase.database().ref('users/' + friend + '/sessions').child(this.sessionId).set(true),
+                  firebase.database().ref('sessions/' + this.sessionId + '/users').child(friend).set(true)
+                )
+              }
+            })
+            await Promise.all(invites)
+            Alert.alert('Success', friends.length > 1  ? 'Pals' : 'Pal' + ' added')
+            this.getSession()
+          }}
           isOpen={this.state.friendsModalOpen}/>
     </Container>
   }
