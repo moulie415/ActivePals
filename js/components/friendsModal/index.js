@@ -32,7 +32,7 @@ class FriendsModal extends Component {
           style={styles.modal} 
           position={"center"} >
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
-          Select Pals</Text>
+          {this.props.title || 'Select Pals'}</Text>
             {this.renderFriendsSelection()}
           <View style={{marginVertical: 10, flexDirection: 'row', justifyContent: 'space-evenly'}}>
             <Button onPress={() => this.props.onClosed()}
@@ -43,7 +43,7 @@ class FriendsModal extends Component {
             <Button onPress={()=> {
               const length = this.state.selectedFriends.length
               if (length > 0) {
-                this.props.onContinue(this.state.selectedFriends, this.props.location)
+                this.props.onContinue(this.state.selectedFriends)
               }
               else {
                 Alert.alert("Sorry", "Please select at least one friend")
@@ -85,7 +85,7 @@ class FriendsModal extends Component {
 
   onFriendPress(uid) {
     if (this.state.selectedFriends.some(friend => friend == uid)) {
-      let friends = this.state.selectedFriends.filter(friend => friend != uid)
+      const friends = this.state.selectedFriends.filter(friend => friend != uid)
       this.setState({selectedFriends: friends})
     }
     else {
@@ -96,25 +96,18 @@ class FriendsModal extends Component {
 
 FriendsModal.propTypes = {
   friends: PropTypes.any,
-  location: PropTypes.any,
   onContinue: PropTypes.func,
   onClosed: PropTypes.func,
-  isOpen: PropTypes.bool
+  isOpen: PropTypes.bool,
+  title: PropTypes.string
 }
 
 import { connect } from 'react-redux'
-import { navigateSessionDetail } from '../../actions/navigation'
 
 const mapStateToProps = ({ friends, profile }) => ({
     friends: friends.friends,
     profile: profile.profile
 })
 
-const mapDispatchToProps = dispatch => ({
-  onContinue: (friends, location) => dispatch(navigateSessionDetail(friends, location)),
-})
-
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(FriendsModal)
+export default connect(mapStateToProps)(FriendsModal)
 

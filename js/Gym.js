@@ -215,8 +215,9 @@ import Button from './components/Button'
             cancelButtonText: {color: colors.secondary},
           }}
           />
-          <FriendsModal location={gym} 
+          <FriendsModal
           onClosed={()=> this.setState({friendsModalOpen: false})}
+          onContinue={(friends)=> this.props.navigateSessionDetail(friends, gym)}
           isOpen={this.state.friendsModalOpen} />
     </Container>
   )
@@ -284,7 +285,8 @@ const mapDispatchToProps = dispatch => ({
   removeGym: () => dispatch(removeGym()),
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
   createSession: (location) => dispatch(navigateSessionDetail(null,location)),
-  fetchGym: (id) => dispatch(fetchGym(id))
+  fetchGym: (id) => dispatch(fetchGym(id)),
+  navigateSessionDetail: (friends, location) => dispatch(navigateSessionDetail(friends,location))
  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Gym)

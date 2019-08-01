@@ -21,6 +21,7 @@ import styles from '../styles/sessionStyles'
 import Button from '../components/Button'
 import { Popup } from 'react-native-map-link'
 import PrivateIcon from '../components/PrivateIcon'
+import FriendsModal from '../components/friendsModal'
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -165,7 +166,8 @@ class SessionInfo extends Component {
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20}}>
         <View style={[styles.rowSpaceBetween, {padding: 5, paddingHorizontal: 10}]}>
           {this.renderInfoHeader('Users')}
-          {(!this.isPrivate || this.props.profile.uid == this.state.host.uid)  && <TouchableOpacity>
+          {(!this.isPrivate || this.props.profile.uid == this.state.host.uid)  && 
+          <TouchableOpacity onPress={()=> this.setState({friendsModalOpen: true})}>
             <Icon style={{color: colors.secondary, fontSize: 40, marginRight: 10}} name="add"/>
           </TouchableOpacity>}
         </View>
@@ -186,6 +188,11 @@ class SessionInfo extends Component {
             cancelButtonText: {color: colors.secondary},
           }}
           />
+          <FriendsModal 
+          title="Add Pals to Session"
+          onClosed={()=> this.setState({friendsModalOpen: false})}
+          onContinue={(friends) => console.log(friends)}
+          isOpen={this.state.friendsModalOpen}/>
     </Container>
   }
 
@@ -224,7 +231,7 @@ import {
   navigateProfile,
 } from '../actions/navigation'
 import { fetchGym } from '../actions/sessions'
-import { fetchUsers } from '../actions/home';
+import { fetchUsers } from '../actions/home'
 
 const mapStateToProps = ({ profile, sharedInfo, friends, sessions }) => ({
   profile: profile.profile,

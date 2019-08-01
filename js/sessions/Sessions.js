@@ -284,10 +284,9 @@ import PrivateIcon from '../components/PrivateIcon'
         </Modal>
 
         <FriendsModal 
-        location={this.state.selectedLocation} 
         onClosed={()=> this.setState({friendsModalOpen: false})}
+        onContinue={(friends) => this.props.onContinue(friends, this.state.selectedLocation)}
         isOpen={this.state.friendsModalOpen}/>
-        
         <Modal
           style={[styles.modal, {height: null}]} 
           position={'center'} 
