@@ -3,10 +3,10 @@ import {
   View,
   TouchableOpacity,
   Platform,
-  Alert
+  Alert,
+  ScrollView
 } from 'react-native'
 import {
-  Container,
   Icon
 } from 'native-base'
 import Header from '../components/Header/header'
@@ -79,7 +79,7 @@ class SessionInfo extends Component {
       }
     }
 
-    return <Container style={{flex: 1, backgroundColor: '#9993'}}>
+    return <ScrollView style={{flex: 1, backgroundColor: '#9993'}}>
     <Header 
     hasBack={true}
     title={this.state.session ? this.state.session.title : ''}
@@ -169,6 +169,7 @@ class SessionInfo extends Component {
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20}}>
         <View style={[styles.rowSpaceBetween, {padding: 5, paddingHorizontal: 10}]}>
           {this.renderInfoHeader('Users')}
+          {this.state.session && host && this.getButton(host)}
           {(!this.isPrivate || (host && this.props.profile.uid == host.uid))  && 
           <TouchableOpacity onPress={()=> this.setState({friendsModalOpen: true})}>
             <Icon style={{color: colors.secondary, fontSize: 40, marginRight: 10}} name="add"/>
@@ -209,7 +210,7 @@ class SessionInfo extends Component {
             this.getSession()
           }}
           isOpen={this.state.friendsModalOpen}/>
-    </Container>
+    </ScrollView>
   }
 
   renderInfoHeader(text) {
@@ -238,6 +239,63 @@ class SessionInfo extends Component {
     else this.props.viewProfile(uid)
   }
 
+  getButton(host) {
+    const you = this.props.profile.uid
+    if (this.state.users[you]){
+      if (host.uid == you) {
+        return (
+          <Button
+          onPress={()=> {
+            Alert.alert(
+              "Delete session",
+              "Are you sure?",
+              [
+              {text: 'cancel', style: 'cancel'},
+              {text: 'Yes', onPress: ()=> {
+                this.props.remove(this.sessionId, this.state.session.private)
+                this.props.goBack()
+              },
+              style: 'destructive'}
+              ],
+            )
+          }}
+          style={{alignSelf: 'center'}}
+          color='red'
+          text="Delete"
+          />
+          )
+      }
+      else return (
+          <Button
+          color='red'
+          text="Leave"
+          style={{alignSelf: 'center'}}
+          onPress={()=> {
+            this.props.remove(this.sessionId, this.state.session.private)
+            this.props.goBack()
+          }}
+          />
+        )
+    }
+    else {
+      return (
+          <Button
+          text="Join"
+          style={{alignSelf: 'center'}}
+          onPress={()=> {
+            firebase.database().ref('users/' + you + '/sessions').child(this.sessionId).set(true)
+            .then(() => {
+              this.props.onJoin(this.sessionid, this.state.session.private)
+            })
+            firebase.database().ref('sessions/' + this.sessionId + '/users').child(you).set(true)
+            Alert.alert('Session joined', 'You should now see this session in your session chats')
+            this.props.goBack()
+          }}
+          />
+        )
+    }
+  }
+
 }
 
 import { connect } from 'react-redux'
@@ -245,8 +303,9 @@ import {
   navigateProfileView,
   navigateGym,
   navigateProfile,
+  navigateBack
 } from '../actions/navigation'
-import { fetchGym } from '../actions/sessions'
+import { fetchGym, removeSession } from '../actions/sessions'
 import { fetchUsers } from '../actions/home'
 
 const mapStateToProps = ({ profile, sharedInfo, friends, sessions }) => ({
@@ -262,6 +321,8 @@ const mapDispatchToProps = dispatch => ({
   fetchGym: (id) => dispatch(fetchGym(id)),
   viewGym: (id) => dispatch(navigateGym(id)),
   goToProfile: () => dispatch(navigateProfile()),
+  goBack: ()=> dispatch(navigateBack()),
+  remove: (key, type) => dispatch(removeSession(key, type))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo)

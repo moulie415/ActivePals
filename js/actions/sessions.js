@@ -242,10 +242,10 @@ const checkUserFetches = (userFetches, dispatch) => {
 
 export const removeSession = (key, isPrivate, force = false) => {
 	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
-		let sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions
-		let session = sessions[key]
-		let type = isPrivate ? 'privateSessions' : 'sessions'
+		const uid = getState().profile.profile.uid
+		const sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions
+		const session = sessions[key]
+		const type = isPrivate ? 'privateSessions' : 'sessions'
 		if (session && session.host.uid == uid) {
 			firebase.database().ref(type + '/' + key).remove()
 			Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(key).remove())
