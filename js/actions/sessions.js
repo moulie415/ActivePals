@@ -225,7 +225,7 @@ export const fetchSession = (id) => {
 		const current = new Date().getTime()
 		const inProgress = (time + duration > current && time < current)
 		const host = await firebase.database().ref('users/' + session.val().host).once('value')
-		dispatch(setSession({...session.val(), key: session.key, inProgress, distance, host}))
+		dispatch(setSession({...session.val(), key: session.key, inProgress, distance, host: host.val()}))
 	}
 }
 
@@ -237,7 +237,7 @@ export const fetchPrivateSession = (id) => {
 		const current = new Date().getTime()
 		const inProgress = (time + duration > current && time < current)
 		const host = await firebase.database().ref('users/' + session.val().host).once('value')
-		dispatch(setPrivateSession({...session.val(), key: session.key, inProgress, host}))
+		dispatch(setPrivateSession({...session.val(), key: session.key, inProgress, host: host.val()}))
 	}
 }
 
