@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native"
 import colors from 'Anyone/js/constants/colors'
 
-export default  StyleSheet.create({
+export default StyleSheet.create({
   spinner: {
     position: 'absolute',
     left: 0,

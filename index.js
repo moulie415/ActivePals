@@ -47,6 +47,7 @@ export const showLocalNotification = (notif) => {
           .setData(notif)
           .setSound(str.notifSound)
           .android.setSmallIcon('ic_notification')
+          // .android.setLargeIcon('ic_notification_large')
           .android.setAutoCancel(true)
           .android.setGroupSummary(true)
           .android.setGroup(notif.group)

@@ -209,6 +209,38 @@ export const fetchPrivateSessions = () =>  {
 	}
 }
 
+//TODO: add fetch users, gym and host to fetchSession/fetchPrivateSession
+
+export const fetchSession = (id) => {
+	return async (dispatch, getState) => {
+		let distance
+		//check if session exists and use existing distance value
+		const currentSession = getState().sessions.sessions[id]
+		if (currentSession) {
+			distance = currentSession.distance
+		}
+		const session = await firebase.database().ref('sessions').child(id).once('value')
+		const duration = session.val().duration * 60 * 60 * 1000
+		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
+		const current = new Date().getTime()
+		const inProgress = (time + duration > current && time < current)
+		const host = await firebase.database().ref('users/' + session.val().host).once('value')
+		dispatch(setSession({...session.val(), key: session.key, inProgress, distance, host}))
+	}
+}
+
+export const fetchPrivateSession = (id) => {
+	return async dispatch => {
+		const session = await firebase.database().ref('privateSessions').child(id).once('value')
+		const duration = session.val().duration * 60 * 60 * 1000
+		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
+		const current = new Date().getTime()
+		const inProgress = (time + duration > current && time < current)
+		const host = await firebase.database().ref('users/' + session.val().host).once('value')
+		dispatch(setPrivateSession({...session.val(), key: session.key, inProgress, host}))
+	}
+}
+
 const checkHost = (host, state) => {
 	const uid = state.profile.profile.uid
 	if (host == uid) {

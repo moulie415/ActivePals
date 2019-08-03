@@ -30,62 +30,38 @@ class SessionInfo extends Component {
     this.sessionId = this.params.sessionId
     this.isPrivate  = this.params.isPrivate
     this.state = {
-      session: null
+      popUpVisible: false
     }
   }
   componentDidMount() {
     this.getSession()
   }
 
-  async getSession() {
-    const ref = this.isPrivate ? 'privateSessions' : 'sessions'
-    const session = await firebase.database().ref(ref).child(this.sessionId).once('value')
-    
-    const users = Object.keys(session.val().users)
-    const unFetched = []
-    users.forEach(user => {
-      if (!this.props.friends[user] || !this.props.users[user]) {
-        unFetched.push(user)
-      }
-    })
-
-    fetchUsers(unFetched)
-    //TODO: set users afterwards
-    if (session.val().gym) {
-      const id = session.val().gym.place_id
-      if (!this.props.places[id]) {
-        this.props.fetchGym(id)
-      }
-    }
-    this.setState({session: session.val(), users})
+  getSession() {
+    this.isPrivate ? this.props.fetchPrivateSession(this.sessionId) : this.props.fetchSession(this.sessionId)
   }
 
   render() {
-    let gym
-    if (this.state.session && this.state.session.gym) {
-      gym = this.props.places[this.state.session.gym.place_id]
+    const session = this.props.sessions[this.sessionId] || this.props.privateSessions[this.sessionId]
+    let host 
+    if (session.host.uid == this.props.profile.uid) {
+      host = this.props.profile
     }
-    let host
-    if (this.state.session && this.state.session.host) {
-      const hostId = this.state.session.host
-      if (hostId == this.props.profile.uid) {
-        host = this.props.profile
-      }
-      else if (this.props.friends[hostId]) {
-        host = this.props.friends[hostId]
-      }
-      else if (this.props.users[hostId]) {
-        host = this.props.users[hostId]
-      }
+    else {
+      host = this.props.friends[session.host.uid] || this.props.users[session.host.uid]
+    }
+    
+    let gym
+    if (session && session.gym) {
+      gym = this.props.places[session.gym.place_id]
     }
 
     return <ScrollView style={{flex: 1, backgroundColor: '#9993'}}>
     <Header 
     hasBack={true}
-    title={this.state.session ? this.state.session.title : ''}
+    title={session.title}
     />
-      {this.state.session ? 
-      <View>
+      {session ? <View>
         <View style={{marginBottom: 20}}>
           {gym && gym.photo ?
             <Image style={{height: 150, width: '100%'}}
@@ -93,37 +69,40 @@ class SessionInfo extends Component {
           source={{uri: gym.photo}} />
           : <View style={{height: 150, backgroundColor: colors.primaryLighter}}/>}
           <View style={{backgroundColor: '#fff', alignSelf: 'center', marginTop: -40, ...globalStyles.shadow}}>
-            {getType(this.state.session.type, 80)}
+            {getType(session.type, 80)}
           </View>
         </View>
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow}}>
-        <TouchableOpacity onPress={()=> Alert.alert('Details', this.state.session.details)} style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
+        <View style={styles.infoRowContainer}>
+        {session && host && this.getButton(host, session)}
+        </View>
+        <TouchableOpacity onPress={()=> Alert.alert('Details', session.details)} style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
           <View style={{flex: 4}}>
             {this.renderInfoHeader('Details')}
-            <Text numberOfLines={1} style={{color: '#999'}}>{this.state.session.details}</Text>
+            <Text numberOfLines={1} style={{color: '#999'}}>{session.details}</Text>
           </View>
           {this.isPrivate && <PrivateIcon style={{flex: 1}}/>}
         </TouchableOpacity>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
           <View>
             {this.renderInfoHeader('Date')}
-            <Text style={{color: '#999'}}>{(formatDateTime(this.state.session.dateTime))
-              + " for " + (this.state.session.duration) + " " +
-              (this.state.session.duration > 1 ? 'hours' : 'hour') }</Text>
+            <Text style={{color: '#999'}}>{(formatDateTime(session.dateTime))
+              + " for " + (session.duration) + " " +
+              (session.duration > 1 ? 'hours' : 'hour') }</Text>
           </View>
           <View style={{marginRight: 20}}>
             {this.renderInfoHeader('Gender')}
-            <Text style={{color: '#999'}}>{this.state.session.gender}</Text>
+            <Text style={{color: '#999'}}>{session.gender}</Text>
           </View>
         </View>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
         <View style={{flex: 3}}>
           {this.renderInfoHeader('Location')}
-          <Text numberOfLines={1} style={{color: '#999'}}>{this.state.session.location.formattedAddress}</Text>
+          <Text numberOfLines={1} style={{color: '#999'}}>{session.location.formattedAddress}</Text>
         </View>
         {this.props.location && <View style={{flex: 1}}>
         <Button onPress={()=> {
-          const { lat, lng } = this.state.session.location.position
+          const { lat, lng } = session.location.position
           const options = {
             latitude: lat,
             longitude: lng,
@@ -169,16 +148,15 @@ class SessionInfo extends Component {
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20}}>
         <View style={[styles.rowSpaceBetween, {padding: 5, paddingHorizontal: 10}]}>
           {this.renderInfoHeader('Users')}
-          {this.state.session && host && this.getButton(host)}
+          
           {(!this.isPrivate || (host && this.props.profile.uid == host.uid))  && 
           <TouchableOpacity onPress={()=> this.setState({friendsModalOpen: true})}>
             <Icon style={{color: colors.secondary, fontSize: 40, marginRight: 10}} name="add"/>
           </TouchableOpacity>}
         </View>
-        {this.state.session && this.renderUsers()}
-      </View>
-      </View> : 
-      <PulseIndicator color={colors.secondary} />}
+        {session && this.renderUsers(session.users)}
+      </View>  
+      </View> : <PulseIndicator color={colors.secondary} />}
       <Popup
           isVisible={this.state.popUpVisible}
           onCancelPressed={() => this.setState({ popUpVisible: false })}
@@ -198,7 +176,7 @@ class SessionInfo extends Component {
           onContinue={async (friends) => {
             const invites = []
             friends.forEach(friend => {
-              if (!this.state.users.some(user => friend == user)) {
+              if (!session.users.some(user => friend == user)) {
                 invites.push(
                   firebase.database().ref('users/' + friend + '/sessions').child(this.sessionId).set(true),
                   firebase.database().ref('sessions/' + this.sessionId + '/users').child(friend).set(true)
@@ -217,8 +195,8 @@ class SessionInfo extends Component {
     return <Text style={{fontSize: 18}}>{text}</Text>
   }
 
-  renderUsers() {
-   return this.state.users.map(user => {
+  renderUsers(users) {
+   return Object.keys(users).map(user => {
      let userItem = this.props.friends[user] || this.props.users[user]
      if (user == this.props.profile.uid) userItem = this.props.profile
      if (userItem) {
@@ -239,9 +217,9 @@ class SessionInfo extends Component {
     else this.props.viewProfile(uid)
   }
 
-  getButton(host) {
+  getButton(host, session) {
     const you = this.props.profile.uid
-    if (this.state.users[you]){
+    if (session.users[you]){
       if (host.uid == you) {
         return (
           <Button
@@ -252,7 +230,7 @@ class SessionInfo extends Component {
               [
               {text: 'cancel', style: 'cancel'},
               {text: 'Yes', onPress: ()=> {
-                this.props.remove(this.sessionId, this.state.session.private)
+                this.props.remove(this.sessionId, session.private)
                 this.props.goBack()
               },
               style: 'destructive'}
@@ -271,7 +249,7 @@ class SessionInfo extends Component {
           text="Leave"
           style={{alignSelf: 'center'}}
           onPress={()=> {
-            this.props.remove(this.sessionId, this.state.session.private)
+            this.props.remove(this.sessionId, session.private)
             this.props.goBack()
           }}
           />
@@ -285,7 +263,7 @@ class SessionInfo extends Component {
           onPress={()=> {
             firebase.database().ref('users/' + you + '/sessions').child(this.sessionId).set(true)
             .then(() => {
-              this.props.onJoin(this.sessionid, this.state.session.private)
+              this.props.onJoin(this.sessionid, session.private)
             })
             firebase.database().ref('sessions/' + this.sessionId + '/users').child(you).set(true)
             Alert.alert('Session joined', 'You should now see this session in your session chats')
@@ -305,15 +283,23 @@ import {
   navigateProfile,
   navigateBack
 } from '../actions/navigation'
-import { fetchGym, removeSession } from '../actions/sessions'
-import { fetchUsers } from '../actions/home'
+import {
+  fetchGym,
+  removeSession,
+  addUser,
+  addSessionChat,
+  fetchSession,
+  fetchPrivateSession
+} from '../actions/sessions'
 
 const mapStateToProps = ({ profile, sharedInfo, friends, sessions }) => ({
   profile: profile.profile,
   users: sharedInfo.users,
   friends: friends.friends,
   location: profile.location,
-  places: sessions.places
+  places: sessions.places,
+  sessions: sessions.sessions,
+  privateSessions: sessions.privateSessions
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -322,7 +308,13 @@ const mapDispatchToProps = dispatch => ({
   viewGym: (id) => dispatch(navigateGym(id)),
   goToProfile: () => dispatch(navigateProfile()),
   goBack: ()=> dispatch(navigateBack()),
-  remove: (key, type) => dispatch(removeSession(key, type))
+  remove: (key, type) => dispatch(removeSession(key, type)),
+  onJoin: (session, isPrivate) => {
+    dispatch(addUser(session, isPrivate))
+    return dispatch(addSessionChat(session, isPrivate))
+  },
+  fetchSession: (id) => dispatch(fetchSession(id)),
+  fetchPrivateSession: (id) => dispatch(fetchPrivateSession(id))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo)

@@ -4,7 +4,6 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  ScrollView,
   Slider,
 } from "react-native"
 import {
@@ -24,7 +23,6 @@ import MapView  from 'react-native-maps'
 import Modal from 'react-native-modalbox'
 import { getType, getResource } from '../constants/utils'
 import str from '../constants/strings'
-import Hyperlink from 'react-native-hyperlink'
 import {Image as SlowImage } from 'react-native'
 import { formatDateTime, getDistance } from '../constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
@@ -216,72 +214,6 @@ import PrivateIcon from '../components/PrivateIcon'
           text='Create Private Session'
             textStyle={{textAlign: 'center', fontSize: 15, textAlignVertical: 'center'}}/>
         </View>
-
-        <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
-        {this.state.selectedSession && <View style={{flex: 1}}>
-          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap'}}>
-            <Text style={{fontSize: 20, textAlign: 'center', padding: 10, color: '#000'}}>
-            {this.state.selectedSession.title}</Text>
-            <TouchableOpacity
-                onPress={()=> this.props.viewSession(this.state.selectedSession.key, this.state.selectedSession.private)}>
-              <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
-            </TouchableOpacity>
-          </View>
-          <ScrollView style={{margin: 10}}>
-          <View style={{flexDirection: 'row', flex: 1, justifyContent: 'space-between', alignItems: 'center'}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={{color: '#999'}}>Host: </Text>
-              {this.fetchHost(this.state.selectedSession.host)}
-            </View>
-            {this.state.selectedSession.users[this.props.profile.uid] && <TouchableOpacity
-              onPress={()=> {
-                this.props.onOpenChat(this.state.selectedSession)
-              }}>
-            <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10}}/>
-          </TouchableOpacity>}
-          {this.state.selectedSession.private && <PrivateIcon />}
-            </View>
-          <Hyperlink
-          linkStyle={{color: colors.secondary}}
-          linkDefault={ true }>
-            <Text style={{marginVertical: 5, color: '#999'}}>Details: <Text style={{color: '#000'}}>{this.state.selectedSession.details}</Text></Text>
-          </Hyperlink>
-          <Text style={{marginVertical: 5, color: '#000'}}>{(formatDateTime(this.state.selectedSession.dateTime))
-            + " for " + (this.state.selectedSession.duration) + " " +
-            (this.state.selectedSession.duration > 1 ? 'hours' : 'hour') }</Text>
-            
-            <View style={{flexDirection: 'row', marginVertical: 5, alignItems: 'center',justifyContent: 'space-between'}}>
-              <Text style={{flex: 1}}>
-                <Text style={{color: '#000'}}>{this.state.selectedSession.location.formattedAddress}</Text>
-                <Text style={{color: '#999'}}>{' (' + (this.state.selectedSession.distance ? this.state.selectedSession.distance.toFixed(2) :
-                  getDistance(this.state.selectedSession, this.state.yourLocation)) + ' km away)'}</Text>
-              </Text>
-              <Button onPress={()=> {
-                const { lat, lng } = this.state.selectedSession.location.position
-                const options = {
-                  latitude: lat,
-                  longitude: lng,
-                  cancelText: 'Cancel',
-                  sourceLatitude: this.state.yourLocation.latitude,  
-                  sourceLongitude: this.state.yourLocation.longitude,  
-                  }
-                  this.setState({popUpVisible: true, options})
-                }}
-                style={{marginLeft: 10}}
-                text='Directions'
-              />
-
-            </View>
-            {this.state.selectedSession.gym && <TouchableOpacity
-                  onPress={()=> this.props.viewGym(this.state.selectedSession.gym.place_id)}>
-              <Text style={{color: '#999', marginVertical: 10}}>Gym: <Text style={{color: colors.secondary, fontWeight: 'bold'}}>{this.state.selectedSession.gym.name}</Text></Text>
-            </TouchableOpacity>}
-            </ScrollView>
-             {<View style={{justifyContent: 'flex-end', flex: 1, margin: 10}}>
-             {this.fetchButtons(this.state.selectedSession, this.props.profile.uid)}
-             </View>}
-            </View>}
-        </Modal>
 
         <FriendsModal 
         onClosed={()=> this.setState({friendsModalOpen: false})}
@@ -478,62 +410,6 @@ import PrivateIcon from '../components/PrivateIcon'
       )
   }
 
-  fetchButtons(session, uid) {
-    if (session.users[uid]){
-      if (session.host.uid == uid) {
-        return (
-          <Button
-          onPress={()=> {
-            Alert.alert(
-              "Delete session",
-              "Are you sure?",
-              [
-              {text: 'cancel', style: 'cancel'},
-              {text: 'Yes', onPress: ()=> {
-                this.props.remove(session.key, session.private)
-                this.refs.modal.close()
-              },
-              style: 'destructive'}
-              ],
-            )
-          }}
-          style={{alignSelf: 'center'}}
-          color='red'
-          text="Delete"
-          />
-          )
-      }
-      else return (
-          <Button
-          color='red'
-          text="Leave"
-          style={{alignSelf: 'center'}}
-          onPress={()=> {
-            this.props.remove(session.key, session.private)
-            this.refs.modal.close()
-          }}
-          />
-        )
-    }
-    else {
-      return (
-          <Button
-          text="Join"
-          style={{alignSelf: 'center'}}
-          onPress={()=> {
-            firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
-            .then(() => {
-              this.props.onJoin(session.key, session.private)
-            })
-            firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
-            this.refs.modal.close()
-            Alert.alert('Session joined', 'You should now see this session in your session chats')
-          }}
-          />
-        )
-    }
-  }
-
 
   handlePress(event) {
     const lat = event.nativeEvent.coordinate.latitude
@@ -630,7 +506,8 @@ import PrivateIcon from '../components/PrivateIcon'
           keyExtractor={(item) => item.key}
           renderItem={({ item, index }) => (
             <TouchableOpacity onPress={() => {
-                this.setState({selectedSession: item}, ()=> this.refs.modal.open())
+                // this.setState({selectedSession: item}, ()=> this.refs.modal.open())
+                this.props.viewSession(item.key, item.private)
             }}>
               <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
                 <View style={{flexDirection: 'row'}} >
@@ -731,7 +608,8 @@ import PrivateIcon from '../components/PrivateIcon'
           }}
           onPress={(event) => {
             event.stopPropagation()
-            this.setState({selectedSession: session, latitude: lat, longitude: lng}, ()=> this.refs.modal.open())
+            this.setState({selectedSession: session, latitude: lat, longitude: lng}, 
+            ()=> /*this.refs.modal.open()*/ this.props.viewSession(session, session.private))
           }}
         >
         {getType(session.type, 40)}
@@ -829,24 +707,6 @@ import PrivateIcon from '../components/PrivateIcon'
     })
   }
 
-  fetchHost(host) {
-    if (host.uid == this.props.profile.uid) {
-      return <Text style={{fontWeight: 'bold'}}>You</Text>
-    }
-    else if (host.username) {
-      return <TouchableOpacity onPress={()=> this.props.viewProfile(host.uid)}>
-              <Text style={{color: colors.secondary}}>{host.username}</Text>
-            </TouchableOpacity>
-    }
-    else if (this.props.users[host.uid]) {
-      return <TouchableOpacity onPress={()=> this.props.viewProfile(host.uid)}>
-              <Text style={{color: colors.secondary}}>{this.props.users[host.uid].username}</Text>
-            </TouchableOpacity>
-    }
-    else return <Text>N/A</Text>
-  }
-
-
 
 gymFilter(gym) {
   return !(!this.state.pilates && gym.name.toLowerCase().includes('pilates')) &&
@@ -865,12 +725,11 @@ import {
   navigateSessionDetail,
   navigateSessionInfo
 } from '../actions/navigation'
-import { fetchSessionChats, addSessionChat } from '../actions/chats'
+import { fetchSessionChats } from '../actions/chats'
 import {
   fetchSessions,
   fetchPrivateSessions,
   removeSession,
-  addUser,
   setPlaces,
   fetchPhotoPaths,
   fetchPlaces,
@@ -895,10 +754,6 @@ const mapDispatchToProps = dispatch => ({
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   removeGym: () => dispatch(removeGym()),
   getChats: (sessions, uid) => dispatch(fetchSessionChats(sessions, uid)),
-  onJoin: (session, isPrivate) => {
-    dispatch(addUser(session, isPrivate))
-    return dispatch(addSessionChat(session, isPrivate))
-  },
   remove: (key, type) => dispatch(removeSession(key, type)),
   onOpenChat: (session) => dispatch(navigateMessagingSession(session)),
   onContinue: (friends, location) => dispatch(navigateSessionDetail(friends, location)),
