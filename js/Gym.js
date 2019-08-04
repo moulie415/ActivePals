@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  Linking
 } from "react-native"
 import {
   Container,
@@ -134,8 +135,9 @@ import styles from './styles/gymStyles'
             <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
               <View>
                 {this.renderInfoHeader('Location')}
-                  {gym.vicinity && <Text style={{color: '#999'}}>{gym.vicinity}</Text>}
-                  {this.props.location && <Text style={{color: '#999'}}>{' (' + this.getDistance(gym) + ' km away)'}</Text>}
+                  {gym.vicinity && <Text numberOfLines={1} style={{color: '#999'}}>
+                    {`${gym.vicinity} ${this.props.location ? '(' + this.getDistance(gym) + ' km away)' : ''}`}
+                  </Text>}
                 </View>
                 <Button onPress={()=> {
                 const { lat, lng } = gym.geometry.location
@@ -155,25 +157,38 @@ import styles from './styles/gymStyles'
                 text='Directions'
                 />
             </View>
-            {gym.website && <Hyperlink linkDefault={true}>
-            <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Website: '}
-        <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{gym.website}</Text></Text></Hyperlink>}
-        {gym.rating && <View style={{flexDirection: 'row', marginVertical: 5}}>
-              <Text style={{marginLeft: 10, color: '#999'}}>Google rating: </Text>
-            <StarRating
-            disabled={true}
-            containerStyle={{alignSelf: 'center', marginHorizontal: 5}}
-            fullStarColor={colors.secondary}
-            maxStars={5}
-            starSize={20}
-            halfStarEnabled={true}
-            rating={gym.rating}
-            />{gym.user_ratings_total && 
-            <Text>{`from ${gym.user_ratings_total} ${gym.user_ratings_total > 1? 'ratings' : 'rating'}`}</Text>}</View>}
-        {gym.formatted_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Phone number: '}
-        <Text style={{color: colors.secondary}}>{gym.formatted_phone_number}</Text></Text>}
-        {gym.international_phone_number && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5}}>{'Intl phone number: '}
-        <Text style={{color: colors.secondary}}>{gym.international_phone_number}</Text></Text>}
+            {gym.website && <TouchableOpacity onPress={()=> {
+              Linking.openURL(gym.website).catch(e => Alert.alert('Error', e.message))
+              }}
+            style={styles.infoRowContainer}>
+            {this.renderInfoHeader('Website')}
+              <Hyperlink linkDefault={true}>
+                <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{gym.website}</Text>
+              </Hyperlink>
+            </TouchableOpacity>}
+            {gym.rating && <View style={styles.infoRowContainer}>
+              {this.renderInfoHeader('Google rating')}
+              <Text style={{color: '#999'}}>
+              <Text>{gym.rating}</Text>
+              {gym.user_ratings_total && 
+            <Text>{` from ${gym.user_ratings_total} ${gym.user_ratings_total > 1? 'ratings' : 'rating'}`}</Text>}
+              </Text>
+          </View>}
+          <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
+          {gym.formatted_phone_number && <TouchableOpacity onPress={() => {
+            Linking.openURL(`tel:${gym.formatted_phone_number}`).catch(e => Alert.alert('Error', e.message))
+          }}>
+            {this.renderInfoHeader('Phone number')}
+            <Text style={{color: '#999'}}>{gym.formatted_phone_number}</Text>
+          </TouchableOpacity>}
+          {gym.international_phone_number && <TouchableOpacity onPress={() => {
+            Linking.openURL(`tel:${gym.international_phone_number}`).catch(e => Alert.alert('Error', e.message))
+          }}>
+            {this.renderInfoHeader('Intl phone number')}
+            <Text style={{color: '#999'}}>{gym.international_phone_number}</Text>
+          </TouchableOpacity>} 
+          </View>
+
         {gym.opening_hours && gym.opening_hours.weekday_text && 
         <View style={{marginHorizontal: 10, marginTop: 10}}>
           <Text style={{color: '#999'}}>Opening Hours:</Text>
@@ -191,7 +206,7 @@ import styles from './styles/gymStyles'
               this.props.createSession(gym)
             }}/>
               {/* <Text adjustsFontSizeToFit={true}
-              style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</Text> */}
+              style={{textAlign: 'center', color: '#fff', fontSize: 15, textAlignVertical: 'center'}}>Create Session</{'> */}
             <View style={{borderRightWidth: 1, borderRightColor: 'transparent'}}/>
             <Button
             style={{flex: 1, marginRight: 5, marginLeft: 2, paddingVertical: 15}}
