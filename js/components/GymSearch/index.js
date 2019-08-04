@@ -40,7 +40,7 @@ const GooglePlacesInput = ({parent, onOpen}) => {
                     latitude: lat,
                     longitude: lng,
                     },
-                    ()=> onOpen())
+                    ()=> onOpen(gym.place_id))
                 }}
                 />
               parent.setState({
@@ -50,7 +50,7 @@ const GooglePlacesInput = ({parent, onOpen}) => {
                 markers: [...parent.state.markers, marker],
                 spinner: false,
                 },
-              ()=> onOpen())
+              ()=> onOpen(gym.place_id))
           })
           
         }

@@ -63,6 +63,8 @@ import Button from './components/Button'
     hasBack={true}
      title={'Gym'}
       />
+      {this.state.loaded ? <View style={{flex: 1}}>
+        <ScrollView>
         <View style={{alignItems: 'center', marginBottom: 10}}>
         {gym && gym.photo ?
       <Image style={{height: 150, width: '100%'}}
@@ -82,8 +84,7 @@ import Button from './components/Button'
             source={require('Anyone/assets/images/dumbbell.png')}/>
             </View>
           </View>
-        {this.state.loaded ? <View style={{flex: 1}}>
-        <ScrollView>
+        
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{gym.name}</Text>
             {this.props.gym && this.props.gym.place_id == this.id ? 
               <View style={{justifyContent: 'space-between', flexDirection: 'row', margin: 10}}>

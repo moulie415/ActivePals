@@ -209,7 +209,7 @@ export const fetchPrivateSessions = () =>  {
 	}
 }
 
-//TODO: add fetch users, gym and host to fetchSession/fetchPrivateSession
+//TODO: add fetch users,(add dispatch to fetchUsers add set users in same function) fetchSession/fetchPrivateSession
 
 export const fetchSession = (id) => {
 	return async (dispatch, getState) => {
@@ -219,7 +219,11 @@ export const fetchSession = (id) => {
 		if (currentSession) {
 			distance = currentSession.distance
 		}
+
 		const session = await firebase.database().ref('sessions').child(id).once('value')
+		if (session.val().gym) {
+			dispatch(fetchGym(session.val().gym.place_id))
+		}
 		const duration = session.val().duration * 60 * 60 * 1000
 		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
 		const current = new Date().getTime()
@@ -232,6 +236,9 @@ export const fetchSession = (id) => {
 export const fetchPrivateSession = (id) => {
 	return async dispatch => {
 		const session = await firebase.database().ref('privateSessions').child(id).once('value')
+		if (session.val().gym) {
+			dispatch(fetchGym(session.val().gym.place_id))
+		}
 		const duration = session.val().duration * 60 * 60 * 1000
 		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
 		const current = new Date().getTime()

@@ -131,7 +131,6 @@ import PrivateIcon from '../components/PrivateIcon'
   }
 
   render () {
-    const { vicinity, name, geometry, place_id, photo, rating, }  = this.state.selectedLocation
     //switch for list view and map view
     //action sheet when pressing
     return (
@@ -191,7 +190,7 @@ import PrivateIcon from '../components/PrivateIcon'
         {this.state.markers}
         {this.gymMarkers(Object.values(this.props.places))}
         </MapView>}
-        <GymSearch parent={this} onOpen={() => this.refs.locationModal.open()} />
+        <GymSearch parent={this} onOpen={(id) => this.props.viewGym(id)} />
 
         <View style={{flexDirection: 'row', height: 60, backgroundColor: colors.bgColor}}>
           <Button style={styles.button}
@@ -219,112 +218,7 @@ import PrivateIcon from '../components/PrivateIcon'
         onClosed={()=> this.setState({friendsModalOpen: false})}
         onContinue={(friends) => this.props.onContinue(friends, this.state.selectedLocation)}
         isOpen={this.state.friendsModalOpen}/>
-        <Modal
-          style={[styles.modal, {height: null}]} 
-          position={'center'} 
-          ref={"locationModal"} 
-          >
-          <View>
-          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap'}}>
-            <Text  style={{fontSize: 20, padding: 10, color: '#000'}}>
-            {name}</Text>
-            <TouchableOpacity
-                  onPress={()=> this.props.viewGym(place_id)}>
-              <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
-            </TouchableOpacity>
-          </View>
-          <View style={{margin: 10}}>
-            <View style={{flexDirection: 'row', marginVertical: 10, justifyContent: 'space-between'}}>
-              <View style={{flex: 1}}>
-                <Text>
-                  <Text>{vicinity}</Text>
-                  <Text style={{color: '#999'}}>{' (' + getDistance(this.state.selectedLocation, this.state.yourLocation, true) + ' km away)'}</Text>
-                </Text>
-              </View>
-              <Button onPress={()=> {
-                const { lat, lng } = geometry && geometry.location
-
-                const options = {
-                  latitude: lat,
-                  longitude: lng,
-                  cancelText: 'Cancel',
-                  sourceLatitude: this.state.yourLocation.latitude,  
-                  sourceLongitude: this.state.yourLocation.longitude,  
-                  googlePlaceId: place_id, 
-                  }
-                  this.setState({popUpVisible: true, options})
-                }}
-                style={{marginLeft: 10, alignSelf: 'flex-start'}}
-                text="Directions"/>
-              
-            </View>
-            {this.props.gym && this.props.gym.place_id == this.state.selectedLocation.place_id ? 
-              <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
-              <TouchableOpacity 
-                  onPress={() => {
-                    this.props.onOpenGymChat(place_id)
-                  }}
-                  style={{justifyContent: 'center', marginRight: 20}}>
-                  <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
-              </TouchableOpacity>
-              <Button
-              onPress={() => {
-                Alert.alert(
-                      'Leave',
-                      'Are you sure?',
-                      [
-                          {text: 'Cancel', style: 'cancel'},
-                          {text: 'Yes', onPress: () => this.props.removeGym(), style: 'destructive'}
-                      ]
-                  )
-                }}
-              text="Leave"
-              color='red'
-              style={{alignSelf: 'center', marginBottom: 5}}/>
-              </View> :
-                <Button
-                onPress={()=> {
-                  if (this.props.gym) {
-                        Alert.alert(
-                        'Join',
-                        'This will leave your current Gym?',
-                        [
-                            {text: 'Cancel', style: 'cancel'},
-                            {text: 'Yes', onPress: () => this.props.join(this.state.selectedLocation)}
-                        ]
-                    )
-                    }
-                    else this.props.join(this.state.selectedLocation)
-                  }}
-                style={{paddingHorizontal: 15, alignSelf: 'center', marginBottom: 10}}
-                text={'Join'}
-                />}
-            {photo && <Image 
-              style={{height: 200, width: '90%', alignSelf: 'center', marginVertical: 10}} 
-             resizeMode={'contain'} 
-             source={{uri: photo}}/>}
-            <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
-              <Button
-              text="Create Session"
-              textStyle={{fontSize: 13}}
-              onPress={()=> {
-                this.props.onContinue(null, this.state.selectedLocation)
-              }}
-              style={{flex: 1, marginRight: 10, alignItems: 'center', paddingVertical: 15}}/>
-
-              <Button
-              onPress={()=> {
-                this.refs.locationModal.close()
-                this.setState({friendsModalOpen: true})
-              }}
-              textStyle={{fontSize: 13}}
-              text="Create Private Session"
-              style={{flex: 1, alignItems: 'center', paddingVertical: 15}}/>
-              </View>
-            </View>
-            </View>
-        </Modal>
+        
         <Modal
         onClosed={() => {
           if (this.state.radius != this.props.radius) {
@@ -564,7 +458,7 @@ import PrivateIcon from '../components/PrivateIcon'
               if (this.gymFilter(item)) {
                 return <TouchableOpacity onPress={() => {
                   this.setState({selectedLocation: item, latitude: lat, longitude: lng},
-                      ()=> this.refs.locationModal.open())
+                      ()=> this.props.viewGym(item.place_id))
                   }}>
                 <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
                   <View style={{flexDirection: 'row'}} >
@@ -700,7 +594,7 @@ import PrivateIcon from '../components/PrivateIcon'
                 onPress={(event) => {
                 event.stopPropagation()
                 this.setState({selectedLocation: result, latitude: lat, longitude: lng},
-                  ()=> this.refs.locationModal.open())
+                  ()=> this.props.viewGym(result.place_id))
                 }}
             />
       }
