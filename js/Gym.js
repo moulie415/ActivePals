@@ -190,11 +190,18 @@ import styles from './styles/gymStyles'
           </View>
 
         {gym.opening_hours && gym.opening_hours.weekday_text && 
-        <View style={{marginHorizontal: 10, marginTop: 10}}>
-          <Text style={{color: '#999'}}>Opening Hours:</Text>
-          <View style={{marginLeft: 5}}>{this.renderOpeningHours(gym.opening_hours.weekday_text)}</View>
+        <TouchableOpacity
+        onPress={()=> Alert.alert('Opening hours', gym.opening_hours.weekday_text.join('\n'))} 
+        style={styles.infoRowContainer}>
+          {this.renderInfoHeader('Opening hours')}
+          <Text style={{color: '#999'}}>{'Touch to see opening hours'}</Text>
+        </TouchableOpacity>}
+
+        {gym && gym.users && <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20}}>
+          {this.renderInfoHeader('Users')}
+          {this.renderUsers(gym.users)}
         </View>}
-        {gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(gym.types)}</Text>}
+
         </View>
         </ScrollView> 
           <View style={{flexDirection: 'row', backgroundColor: colors.bgColor, paddingVertical: 10}}>
@@ -263,14 +270,13 @@ import styles from './styles/gymStyles'
     else return 'N/A'
   }
 
-  renderOpeningHours(hours) {
-    return hours.map(hour => {
-      return <Text key={hour} style={{marginVertical: 5, color: colors.secondary}}>{hour}</Text>
-    })
-  }
 
   renderInfoHeader(text) {
     return <Text style={{fontSize: 18}}>{text}</Text>
+  }
+
+  renderUsers(users) {
+    return null
   }
 
 
