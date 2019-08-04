@@ -25,7 +25,7 @@ const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, fitTit
 					<Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
 				</TouchableOpacity>		
 					)}
-				<Text adjustsFontSizeToFit={fitTitle} style={{color: 'white', fontWeight:'bold', fontSize: 17}}>{title}</Text>
+				<Text adjustsFontSizeToFit={fitTitle} style={{color: 'white', fontWeight:'bold', fontSize: 17, marginHorizontal: 30, textAlign: 'center'}}>{title}</Text>
 				{ right &&
 					<View style = {{position:'absolute', top:8, bottom:0, right:0, justifyContent: 'center', paddingRight: 10}}>
 						{right}

@@ -7,7 +7,8 @@ import {
   ScrollView
 } from 'react-native'
 import {
-  Icon
+  Icon,
+  Container
 } from 'native-base'
 import Header from '../components/Header/header'
 import firebase from 'react-native-firebase'
@@ -43,8 +44,8 @@ class SessionInfo extends Component {
 
   render() {
     const session = this.props.sessions[this.sessionId] || this.props.privateSessions[this.sessionId]
-    let host 
-    if (session.host.uid == this.props.profile.uid) {
+    let host
+    if (session && session.host.uid == this.props.profile.uid) {
       host = this.props.profile
     }
     else {
@@ -56,11 +57,12 @@ class SessionInfo extends Component {
       gym = this.props.places[session.gym.place_id]
     }
 
-    return <ScrollView style={{flex: 1, backgroundColor: '#9993'}}>
+    return <Container>
     <Header 
     hasBack={true}
     title={session.title}
     />
+    <ScrollView style={{backgroundColor: '#9993'}}>
       {session ? <View>
         <View style={{marginBottom: 20}}>
           {gym && gym.photo ?
@@ -189,6 +191,7 @@ class SessionInfo extends Component {
           }}
           isOpen={this.state.friendsModalOpen}/>
     </ScrollView>
+    </Container>
   }
 
   renderInfoHeader(text) {

@@ -24,6 +24,7 @@ import { Popup } from 'react-native-map-link'
 import globalStyles from './styles/globalStyles'
 import FriendsModal from './components/friendsModal'
 import Button from './components/Button'
+import styles from './styles/gymStyles'
 
  class Gym extends Component {
   static navigationOptions = {
@@ -61,11 +62,11 @@ import Button from './components/Button'
     <Container>
     <Header 
     hasBack={true}
-     title={'Gym'}
+     title={gym && gym.name}
       />
       {this.state.loaded ? <View style={{flex: 1}}>
-        <ScrollView>
-        <View style={{alignItems: 'center', marginBottom: 10}}>
+        <ScrollView style={{backgroundColor: '#9993'}}>
+        <View style={{alignItems: 'center', marginBottom: 20}}>
         {gym && gym.photo ?
       <Image style={{height: 150, width: '100%'}}
           resizeMode='cover'
@@ -84,10 +85,10 @@ import Button from './components/Button'
             source={require('Anyone/assets/images/dumbbell.png')}/>
             </View>
           </View>
-        
-            <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{gym.name}</Text>
+          
+          <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow}}>
             {this.props.gym && this.props.gym.place_id == this.id ? 
-              <View style={{justifyContent: 'space-between', flexDirection: 'row', margin: 10}}>
+              <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
               <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
               <TouchableOpacity 
                   onPress={() => {
@@ -110,7 +111,7 @@ import Button from './components/Button'
                 style={{alignSelf: 'flex-start'}}
                 text="Leave"
                 color='red'/></View> :
-              <View style={{margin: 10}}>
+              <View style={styles.infoRowContainer}>
                 <Button
                 onPress={()=> {
                     if (this.props.gym) {
@@ -130,10 +131,12 @@ import Button from './components/Button'
                   text='Join'
                   />
               </View>}
-            <View style={{flexDirection: 'row'}}>
-                {gym.vicinity && <Text style={{color: '#999', marginLeft: 10, marginVertical: 5, flex: 1}}>{'Vicinity: '}
-                <Text style={{color: colors.secondary}}>{gym.vicinity}</Text>{this.props.location && 
-                <Text style={{color: '#999'}}>{' (' + this.getDistance(gym) + ' km away)'}</Text>}</Text>}
+            <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
+              <View>
+                {this.renderInfoHeader('Location')}
+                  {gym.vicinity && <Text style={{color: '#999'}}>{gym.vicinity}</Text>}
+                  {this.props.location && <Text style={{color: '#999'}}>{' (' + this.getDistance(gym) + ' km away)'}</Text>}
+                </View>
                 <Button onPress={()=> {
                 const { lat, lng } = gym.geometry.location
                 const place_id = gym.place_id
@@ -177,6 +180,7 @@ import Button from './components/Button'
           <View style={{marginLeft: 5}}>{this.renderOpeningHours(gym.opening_hours.weekday_text)}</View>
         </View>}
         {gym.types && <Text style={{fontSize: 12, color: '#999', marginVertical: 5, marginLeft: 10}}>{"Tags: " + renderTags(gym.types)}</Text>}
+        </View>
         </ScrollView> 
           <View style={{flexDirection: 'row', backgroundColor: colors.bgColor, paddingVertical: 10}}>
             <Button
@@ -248,6 +252,10 @@ import Button from './components/Button'
     return hours.map(hour => {
       return <Text key={hour} style={{marginVertical: 5, color: colors.secondary}}>{hour}</Text>
     })
+  }
+
+  renderInfoHeader(text) {
+    return <Text style={{fontSize: 18}}>{text}</Text>
   }
 
 
