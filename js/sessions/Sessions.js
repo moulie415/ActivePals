@@ -400,7 +400,6 @@ import PrivateIcon from '../components/PrivateIcon'
           keyExtractor={(item) => item.key}
           renderItem={({ item, index }) => (
             <TouchableOpacity onPress={() => {
-                // this.setState({selectedSession: item}, ()=> this.refs.modal.open())
                 this.props.viewSession(item.key, item.private)
             }}>
               <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
@@ -502,8 +501,17 @@ import PrivateIcon from '../components/PrivateIcon'
           }}
           onPress={(event) => {
             event.stopPropagation()
-            this.setState({selectedSession: session, latitude: lat, longitude: lng}, 
-            ()=> /*this.refs.modal.open()*/ this.props.viewSession(session, session.private))
+            this.setState({latitude: lat, longitude: lng}, 
+            ()=> {
+              Alert.alert(
+              `View session ${session.title}?`,
+              '',
+              [
+                {text: 'Cancel', style: 'cancel'},
+                {text: 'OK', onPress: () => this.props.viewSession(session.key, session.private)},
+              ]
+              )
+            })
           }}
         >
         {getType(session.type, 40)}
@@ -594,7 +602,16 @@ import PrivateIcon from '../components/PrivateIcon'
                 onPress={(event) => {
                 event.stopPropagation()
                 this.setState({selectedLocation: result, latitude: lat, longitude: lng},
-                  ()=> this.props.viewGym(result.place_id))
+                  ()=> {
+                    Alert.alert(
+                      `View gym ${result.name}?`,
+                      '',
+                      [
+                        {text: 'Cancel', style: 'cancel'},
+                        {text: 'OK', onPress: () => this.props.viewGym(result.place_id)},
+                      ]
+                      )
+                  })
                 }}
             />
       }
