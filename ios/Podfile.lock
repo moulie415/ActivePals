@@ -139,8 +139,8 @@ PODS:
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
   - Protobuf (3.9.0)
-  - React (0.58.5):
-    - React/Core (= 0.58.5)
+  - React (0.59.8):
+    - React/Core (= 0.59.8)
   - react-native-fbsdk (0.10.1):
     - React
     - react-native-fbsdk/Core (= 0.10.1)
@@ -169,49 +169,51 @@ PODS:
     - React
   - react-native-splash-screen (3.0.9):
     - React
-  - react-native-video/Video (4.4.3):
+  - react-native-video/Video (4.4.4):
     - React
-  - react-native-video/VideoCaching (4.4.3):
+  - react-native-video/VideoCaching (4.4.4):
     - DVAssetLoaderDelegate (~> 0.3.1)
     - React
     - react-native-video/Video
     - SPTPersistentCache (~> 1.1.0)
   - react-native-webview (5.12.1):
     - React
-  - React/Core (0.58.5):
-    - yoga (= 0.58.5.React)
-  - React/fishhook (0.58.5)
-  - React/RCTActionSheet (0.58.5):
+  - React/Core (0.59.8):
+    - yoga (= 0.59.8.React)
+  - React/fishhook (0.59.8)
+  - React/RCTActionSheet (0.59.8):
     - React/Core
-  - React/RCTAnimation (0.58.5):
+  - React/RCTAnimation (0.59.8):
     - React/Core
-  - React/RCTBlob (0.58.5):
+  - React/RCTBlob (0.59.8):
     - React/Core
-  - React/RCTGeolocation (0.58.5):
+  - React/RCTGeolocation (0.59.8):
     - React/Core
-  - React/RCTImage (0.58.5):
+  - React/RCTImage (0.59.8):
     - React/Core
     - React/RCTNetwork
-  - React/RCTLinkingIOS (0.58.5):
+  - React/RCTLinkingIOS (0.59.8):
     - React/Core
-  - React/RCTNetwork (0.58.5):
+  - React/RCTNetwork (0.59.8):
     - React/Core
-  - React/RCTSettings (0.58.5):
+  - React/RCTSettings (0.59.8):
     - React/Core
-  - React/RCTText (0.58.5):
+  - React/RCTText (0.59.8):
     - React/Core
-  - React/RCTVibration (0.58.5):
+  - React/RCTVibration (0.59.8):
     - React/Core
-  - React/RCTWebSocket (0.58.5):
+  - React/RCTWebSocket (0.59.8):
     - React/Core
     - React/fishhook
     - React/RCTBlob
   - rn-fetch-blob (0.10.6):
     - React/Core
+  - RNCAsyncStorage (1.6.1):
+    - React
   - RNShare (1.2.1):
     - React
   - SPTPersistentCache (1.1.0)
-  - yoga (0.58.5.React)
+  - yoga (0.59.8.React)
 
 DEPENDENCIES:
   - Crashlytics (~> 3.12.0)
@@ -249,6 +251,7 @@ DEPENDENCIES:
   - React/RCTVibration (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - RNShare (from `../node_modules/react-native-share`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga/yoga.podspec`)
 
@@ -307,6 +310,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-webview"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-community/async-storage"
   RNShare:
     :path: "../node_modules/react-native-share"
   yoga:
@@ -341,7 +346,7 @@ SPEC CHECKSUMS:
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   Protobuf: 1097ca58584c8d9be81bfbf2c5ff5975648dd87a
-  React: 6cd5e6fcc3b6a52d2fb27a638f622139da710dff
+  React: 76e6aa2b87d05eb6cccb6926d72685c9a07df152
   react-native-fbsdk: 38ee580e77319d03f8ed0bf4a020cbfd70dc4d2d
   react-native-geocoder: 757427682892bb256f3b3745858cc90eba148a8e
   react-native-google-maps: 88d750ad441b19c24885f20d43a55ecac25939b5
@@ -349,13 +354,14 @@ SPEC CHECKSUMS:
   react-native-image-resizer: ecae22b577b0425cd7803eb8145243038dd4b6bd
   react-native-maps: 190c02ca533fddac5bb49cf17bdece3644612107
   react-native-splash-screen: cc626c801178f24382f898ea0b4c55384429b9c0
-  react-native-video: bd7ca482cd4f3dac31c9bc93a6fe8573db433319
+  react-native-video: 25d5aebb3c9d7cdefe7a909306c7ab40be4a892c
   react-native-webview: 21c396687cb983fadc6ccc0751cc74f554131f3f
   rn-fetch-blob: 766f85cabd2992300dfa1be2bc9e4e258abc6f04
+  RNCAsyncStorage: 621bad7a889b5bf1583a52547f2dcd3a4d1ff15e
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
-  yoga: 0e0009ffb2544aeead64a1209f3d488d3849947b
+  yoga: 92b2102c3d373d1a790db4ab761d2b0ffc634f64
 
-PODFILE CHECKSUM: 3b85de2c3d7deeb9596eedbcddfa8f4660fb07d7
+PODFILE CHECKSUM: d14b9898f1938cec7b9d6f7669fe239418fc8511
 
 COCOAPODS: 1.7.4

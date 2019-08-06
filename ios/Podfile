@@ -57,6 +57,8 @@ target 'Anyone' do
 
   pod 'RNShare', :path => '../node_modules/react-native-share'
 
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
+
 end
 post_install do |installer|
   installer.pods_project.targets.each do |target|

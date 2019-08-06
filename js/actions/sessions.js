@@ -382,17 +382,27 @@ export const fetchPlaces = (lat, lon, token) => {
 					fetch(fullUrl +  `&pagetoken=${token}`)
 					.then(response => response.json())
 					.then(json => {
-						dispatch(setPlaces(mapIdsToPlaces(json.results)))
-						dispatch(fetchPhotoPaths())
-						resolve({token: json.next_page_token})
+						if (json.error_message) {
+							throw(json.error_message)
+						}
+						else {
+							dispatch(setPlaces(mapIdsToPlaces(json.results)))
+							dispatch(fetchPhotoPaths())
+							resolve({token: json.next_page_token})
+						}
 					})
 				}
 			else {
 				fetch(fullUrl).then(response => response.json())
 				.then(json => {
-					dispatch(setPlaces(mapIdsToPlaces(json.results)))
-					dispatch(fetchPhotoPaths())
-					resolve({token: json.next_page_token})
+					if (json.error_message) {
+						throw(json.error_message)
+					}
+					else {
+						dispatch(setPlaces(mapIdsToPlaces(json.results)))
+						dispatch(fetchPhotoPaths())
+						resolve({token: json.next_page_token})
+					}
 				})
 			}
 		})
