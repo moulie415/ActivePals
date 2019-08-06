@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import {
   View,
   TouchableOpacity,
-  Platform,
   Alert,
   ScrollView
 } from 'react-native'
@@ -11,7 +10,6 @@ import {
   Container
 } from 'native-base'
 import Header from '../components/Header/header'
-import firebase from 'react-native-firebase'
 import Text from '../components/Text'
 import colors from '../constants/colors'
 import { PulseIndicator } from 'react-native-indicators'
@@ -134,12 +132,12 @@ class SessionInfo extends Component {
         </TouchableOpacity>}
         {host && <TouchableOpacity 
         onPress={() => this.handleUserPress(host.uid)}
-        style={[styles.infoRowContainer, styles.userRow]}>
+        style={[styles.infoRowContainer, styles.userRow, { paddingVertical: host.avatar ? 10 : 5}]}>
          <View
             style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}
             >
             {host.avatar ? <Image source={{uri: host.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-            <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
+            <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary}}/>}
           </View>
           <View style={{marginRight: 10}}>
             {this.renderInfoHeader('Host')}
@@ -177,12 +175,10 @@ class SessionInfo extends Component {
           onClosed={()=> this.setState({friendsModalOpen: false})}
           onContinue={async (friends) => {
             const invites = []
+  
             friends.forEach(friend => {
-              if (!session.users.some(user => friend == user)) {
-                invites.push(
-                  firebase.database().ref('users/' + friend + '/sessions').child(this.sessionId).set(true),
-                  firebase.database().ref('sessions/' + this.sessionId + '/users').child(friend).set(true)
-                )
+              if (!Object.values(session.users).some(user => friend == user)) {
+                invites.push(this.props.addUser(session.key, session.private, friend))
               }
             })
             await Promise.all(invites)
@@ -203,9 +199,12 @@ class SessionInfo extends Component {
      let userItem = this.props.friends[user] || this.props.users[user]
      if (user == this.props.profile.uid) userItem = this.props.profile
      if (userItem) {
-      return <TouchableOpacity onPress={()=> this.handleUserPress(user)} style={[styles.infoRowContainer, styles.userRow]} key={user}> 
+      return <TouchableOpacity
+      onPress={()=> this.handleUserPress(user)}
+      style={[styles.infoRowContainer, styles.userRow, { paddingVertical: userItem.avatar ? 10 : 5}]}
+      key={user}> 
         {userItem.avatar ? <Image source={{uri: userItem.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-           <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
+           <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary}}/>}
            <Text style={{marginLeft: 10}}>{userItem.username}</Text>
       </TouchableOpacity>
      }
@@ -263,14 +262,13 @@ class SessionInfo extends Component {
           <Button
           text="Join"
           style={{alignSelf: 'center'}}
-          onPress={()=> {
-            firebase.database().ref('users/' + you + '/sessions').child(this.sessionId).set(true)
-            .then(() => {
-              this.props.onJoin(this.sessionid, session.private)
-            })
-            firebase.database().ref('sessions/' + this.sessionId + '/users').child(you).set(true)
-            Alert.alert('Session joined', 'You should now see this session in your session chats')
-            this.props.goBack()
+          onPress={async ()=> {
+            try {
+              await this.props.addUser(this.sessionid, session.private, this.props.profile.uid)
+              Alert.alert('Session joined', 'You should now see this session in your session chats')
+            } catch(e) {
+              Alert.alert('Error', e.message)
+            }
           }}
           />
         )
@@ -290,10 +288,12 @@ import {
   fetchGym,
   removeSession,
   addUser,
-  addSessionChat,
   fetchSession,
   fetchPrivateSession
 } from '../actions/sessions'
+import {
+  addSessionChat
+} from '../actions/chats'
 
 const mapStateToProps = ({ profile, sharedInfo, friends, sessions }) => ({
   profile: profile.profile,
@@ -312,8 +312,8 @@ const mapDispatchToProps = dispatch => ({
   goToProfile: () => dispatch(navigateProfile()),
   goBack: ()=> dispatch(navigateBack()),
   remove: (key, type) => dispatch(removeSession(key, type)),
-  onJoin: (session, isPrivate) => {
-    dispatch(addUser(session, isPrivate))
+  addUser: (session, isPrivate, uid) => {
+    dispatch(addUser(session, isPrivate, uid))
     return dispatch(addSessionChat(session, isPrivate))
   },
   fetchSession: (id) => dispatch(fetchSession(id)),

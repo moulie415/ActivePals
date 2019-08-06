@@ -1,7 +1,7 @@
 import firebase from 'react-native-firebase'
 import { removeSessionChat, addSessionChat } from 'Anyone/js/actions/chats'
 import { geofire }  from 'Anyone/index'
-import {fetchUsers, updateUsers } from './home'
+import { fetchUsers, updateUsers } from './home'
 import { setGym } from './profile'
 import str from '../constants/strings'
 export const SET_SESSIONS = 'SET_SESSIONS'
@@ -80,7 +80,7 @@ export const fetchSessions = () => {
 						obj[session.key] = {...session.val(), host, key: session.key}
 					})
 					dispatch(updateSessions(obj))
-					checkUserFetches(userFetches)
+					dispatch(checkUserFetches(userFetches))
 					})
 				}
 			})
@@ -202,7 +202,7 @@ export const fetchPrivateSessions = () =>  {
 						return acc
 					}, {})
 					dispatch(setPrivateSessions(obj))
-					checkUserFetches(userFetches, dispatch)
+					dispatch(checkUserFetches(userFetches))
 				})
 			}
 		})
@@ -265,17 +265,19 @@ const checkHost = (host, state) => {
 	return host
 }
 
-const checkUserFetches = (userFetches, dispatch) => {
-	if (userFetches.length > 0) {
-		fetchUsers(userFetches).then(users => {
-			const sharedUsers = {}
-			users.forEach(user => {
-				if (user.uid) {
-					sharedUsers[user.uid] = user
-				}
+const checkUserFetches = (userFetches) => {
+	return dispatch => {
+		if (userFetches.length > 0) {
+			fetchUsers(userFetches).then(users => {
+				const sharedUsers = {}
+				users.forEach(user => {
+					if (user.uid) {
+						sharedUsers[user.uid] = user
+					}
+				})
+				dispatch(updateUsers(sharedUsers))
 			})
-			dispatch(updateUsers(sharedUsers))
-		})
+		}
 	}
 }
 
@@ -316,11 +318,13 @@ export const removeSession = (key, isPrivate, force = false) => {
 		}
 	}
 
-export const addUser = (key, isPrivate) => {
-	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
-		let sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions
-		let session = sessions[key]
+export const addUser = (key, isPrivate, uid) => {
+	return async (dispatch, getState) => {
+		const type = isPrivate ? 'privateSessions/' : 'sessions/'
+		await firebase.database().ref('users/' + uid + '/sessions').child(key).set(isPrivate ? 'private' : true)
+		await firebase.database().ref(type + key + '/users').child(uid).set(true)
+		const sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions
+		const session = sessions[key]
 		session.users = {...session.users, [uid]: true}
 		isPrivate ? dispatch(setPrivateSession(session)) : dispatch(setSession(session))
 	}

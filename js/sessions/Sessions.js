@@ -4,7 +4,6 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  Slider,
 } from "react-native"
 import {
   Container,
@@ -12,6 +11,7 @@ import {
   Switch,
   ActionSheet,
 } from 'native-base'
+import Slider from '@react-native-community/slider'
 import { PulseIndicator } from 'react-native-indicators'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'

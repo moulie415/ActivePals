@@ -133,12 +133,12 @@ import styles from './styles/gymStyles'
                   />
               </View>}
             <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-              <View>
+              <View style={{flex: 4}}>
                 {this.renderInfoHeader('Location')}
                   {gym.vicinity && <Text numberOfLines={1} style={{color: '#999'}}>
                     {`${gym.vicinity} ${this.props.location ? '(' + this.getDistance(gym) + ' km away)' : ''}`}
                   </Text>}
-                </View>
+              </View>
                 <Button onPress={()=> {
                 const { lat, lng } = gym.geometry.location
                 const place_id = gym.place_id
@@ -163,7 +163,7 @@ import styles from './styles/gymStyles'
             style={styles.infoRowContainer}>
             {this.renderInfoHeader('Website')}
               <Hyperlink linkDefault={true}>
-                <Text style={{color: colors.secondary, textDecorationLine: 'underline'}}>{gym.website}</Text>
+                <Text numberOfLines={1} style={{color: colors.secondary, textDecorationLine: 'underline'}}>{gym.website}</Text>
               </Hyperlink>
             </TouchableOpacity>}
             {gym.rating && <View style={styles.infoRowContainer}>
