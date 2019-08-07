@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import str from './strings'
 import Image from 'react-native-fast-image'
+import RNCalendarEvents from 'react-native-calendar-events'
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming']
 
@@ -294,4 +295,20 @@ export function getSimplifiedTime(createdAt) {
 
     export function deg2rad(deg) {
       return deg * (Math.PI / 180)
+    }
+
+    export const addSessionToCalendar = async (calendarId, session) => {
+      const date = new Date(session.dateTime.replace(/-/g, '/'))
+      const startDate =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds())
+      const endDate = new Date(startDate)
+      endDate.setHours(endDate.getHours() + session.duration)
+      return await RNCalendarEvents.saveEvent(session.title, {
+        calendarId,
+        startDate: new Date(startDate).toISOString(),
+        endDate: endDate.toISOString(),
+        location: session.formattedAddress,
+        notes: session.details,
+        description: session.details
+			})
     }

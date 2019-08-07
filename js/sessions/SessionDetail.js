@@ -24,6 +24,7 @@ import Header from '../components/Header/header'
 import MapModal from '../components/MapModal'
 import RadioForm from 'react-native-simple-radio-button'
 import Button from '../components/Button'
+import { addSessionToCalendar } from '../constants/utils'
 
  const genderProps = [
 	{label: 'Unspecified', value: 'Unspecified'},
@@ -290,9 +291,9 @@ class SessionDetail extends Component {
 		)
 	}
 
-	createSession() {
+	async createSession() {
 		if (this.location && this.title && this.details && this.state.date) {
-			let session = {
+			const session = {
 				location: this.location,
 				gym: this.state.gym,
 				title: this.title,
@@ -312,52 +313,40 @@ class SessionDetail extends Component {
 			}
 			session.users[this.user.uid] = true
 
-			let type = session.private ? "privateSessions" : "sessions"
-			let val = session.private ? "private" : true
-			let ref = firebase.database().ref(type).push()
-			let key = ref.key
-			ref.set(session).then(()=> {
-				Alert.alert('Success','Session created')
-				this.props.fetchSessions()
-				this.props.goSessions()
-				if (this.friends) {
-					this.friends.forEach(friend => {
-						firebase.database().ref('users/' + friend + '/sessions').child(key).set(val)
-					})
-				}
-				firebase.database().ref(type + '/' + key + '/users').child(this.user.uid).set(true)
-				firebase.database().ref('users/' + this.user.uid + '/sessions').child(key).set(val)
-				let coords = this.location.position
-				if (type == 'sessions') {
-					geofire.set(key , [coords.lat, coords.lng])
-				}
-				let systemMessage = {
-					_id: 1,
-					text: 'Beginning of chat',
-					createdAt: new Date().toString(),
-					system: true,
-				}
-				firebase.database().ref('sessionChats/' + key).push(systemMessage)
-				this.props.onCreate(key, session.private)
-				if (this.state.addToCalendar) {
-					const date = new Date(this.state.date.replace(/-/g, '/'))
-					const startDate =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-					date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds())
-					const endDate = new Date(startDate)
-					endDate.setHours(endDate.getHours()+this.state.duration)
-					RNCalendarEvents.saveEvent(this.title, {
-						calendarId: this.state.calendarId,
-						startDate: new Date(startDate).toISOString(),
-						endDate: endDate.toISOString(),
-						location: this.state.formattedAddress,
-						notes: this.details,
-						description: this.details
-					}) 
-				}
-			})
-			.catch(err => {
-				Alert.alert('Error', err.message)
-			})
+			try {
+				const type = session.private ? "privateSessions" : "sessions"
+				const val = session.private ? "private" : true
+				const ref = firebase.database().ref(type).push()
+				const key = ref.key
+				await ref.set(session)
+					Alert.alert('Success','Session created')
+					this.props.fetchSessions()
+					this.props.goSessions()
+					if (this.friends) {
+						this.friends.forEach(friend => {
+							firebase.database().ref('users/' + friend + '/sessions').child(key).set(val)
+						})
+					}
+					firebase.database().ref(type + '/' + key + '/users').child(this.user.uid).set(true)
+					firebase.database().ref('users/' + this.user.uid + '/sessions').child(key).set(val)
+					const coords = this.location.position
+					if (type == 'sessions') {
+						geofire.set(key , [coords.lat, coords.lng])
+					}
+					const systemMessage = {
+						_id: 1,
+						text: 'Beginning of chat',
+						createdAt: new Date().toString(),
+						system: true,
+					}
+					firebase.database().ref('sessionChats/' + key).push(systemMessage)
+					this.props.onCreate(key, session.private)
+					if (this.state.addToCalendar) {
+						await addSessionToCalendar(this.state.calendarId, session)
+					}
+			} catch(e) {
+				Alert.alert('Error', e.message)
+			}
 		}
 		else {
 			Alert.alert('Error', 'Please enter all the necessary fields')

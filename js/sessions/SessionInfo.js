@@ -22,6 +22,7 @@ import { Popup } from 'react-native-map-link'
 import PrivateIcon from '../components/PrivateIcon'
 import FriendsModal from '../components/friendsModal'
 import RNCalendarEvents from 'react-native-calendar-events'
+import { addSessionToCalendar } from '../constants/utils'
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -109,19 +110,7 @@ class SessionInfo extends Component {
 											const validList = calendars.filter(calendar => calendar.allowsModifications)
 											if (validList && validList.length > 0) {
 												const calendarId = validList[0].id
-                        const date = new Date(session.dateTime.replace(/-/g, '/'))
-                        const startDate =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-                        date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds())
-                        const endDate = new Date(startDate)
-                        endDate.setHours(endDate.getHours() + session.duration)
-                        await RNCalendarEvents.saveEvent(session.title, {
-                          calendarId: calendarId,
-                          startDate: new Date(startDate).toISOString(),
-                          endDate: endDate.toISOString(),
-                          location: session.formattedAddress,
-                          notes: session.details,
-                          description: session.details
-					              })
+                        await addSessionToCalendar(calendarId, session)
                         Alert.alert('Success', session.title + ' saved to calendar')
 											}
 											else {
