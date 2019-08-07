@@ -78,7 +78,7 @@ const tabs = TabNavigator({
 	Profile: {screen: Profile},
 }, {
   tabBarPosition: 'bottom',
-  animationEnabled: true,
+  animationEnabled: false,
   navigationOptions: {
       gesturesEnabled: false,
     },
