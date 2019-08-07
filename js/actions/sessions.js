@@ -61,7 +61,6 @@ export const fetchSessions = () => {
 		const uid = getState().profile.profile.uid
 		const userFetches = []
 		firebase.database().ref('users/' + uid).child('sessions').on('value', snapshot => {
-
 			if (snapshot.val()) {
 				const promises = []
 				Object.keys(snapshot.val()).forEach(key => {
@@ -83,6 +82,10 @@ export const fetchSessions = () => {
 					dispatch(checkUserFetches(userFetches))
 					})
 				}
+				else {
+						dispatch(removeSession(snapshot.key, false))
+				}
+
 			})
 
 			return new Promise(resolve => {
@@ -205,11 +208,12 @@ export const fetchPrivateSessions = () =>  {
 					dispatch(checkUserFetches(userFetches))
 				})
 			}
+			else {
+				dispatch(removeSession(snapshot.key, true))
+			}
 		})
 	}
 }
-
-//TODO: add fetch users,(add dispatch to fetchUsers add set users in same function) fetchSession/fetchPrivateSession
 
 export const fetchSession = (id) => {
 	return async (dispatch, getState) => {
@@ -224,6 +228,12 @@ export const fetchSession = (id) => {
 		if (session.val().gym) {
 			dispatch(fetchGym(session.val().gym.place_id))
 		}
+		if (session.val().users) {
+			const	unfetched = Object.keys(session.val().users).filter(user => {
+				return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
+			})
+			dispatch(checkUserFetches(unfetched))
+		}
 		const duration = session.val().duration * 60 * 60 * 1000
 		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
 		const current = new Date().getTime()
@@ -234,10 +244,16 @@ export const fetchSession = (id) => {
 }
 
 export const fetchPrivateSession = (id) => {
-	return async dispatch => {
+	return async (dispatch, getState) => {
 		const session = await firebase.database().ref('privateSessions').child(id).once('value')
 		if (session.val().gym) {
 			dispatch(fetchGym(session.val().gym.place_id))
+		}
+		if (session.val().users) {
+			const	unfetched = Object.keys(session.val().users).filter(user => {
+				return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
+			})
+			dispatch(checkUserFetches(unfetched))
 		}
 		const duration = session.val().duration * 60 * 60 * 1000
 		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
@@ -348,8 +364,17 @@ export const fetchGym = (id) => {
 		const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${str.googleApiKey}`
     return fetch(url).then(response => response.json())
 			.then(json => fetchPhotoPath(json.result))
-			.then(gym => {
-				dispatch(setPlace(gym))
+			.then(async gym => {
+				const users = await firebase.database().ref('gyms/' + id + '/users').once('value')
+				if (users && users.val()) {
+					gym.users = users.val()
+					const	unfetched = Object.keys(users.val()).filter(user => {
+						return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
+					})
+					dispatch(checkUserFetches(unfetched))
+				}
+
+ 				dispatch(setPlace(gym))
 				const yourGym = getState().profile.gym
 				if (yourGym && yourGym.place_id == gym.place_id) {
 					dispatch(setGym(gym))
@@ -411,7 +436,6 @@ export const fetchPlaces = (lat, lon, token) => {
 			}
 		})
 	}
-	
 }
 
 const mapIdsToPlaces = (places) => {

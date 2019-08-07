@@ -20,7 +20,6 @@ import { Image as SlowImage } from 'react-native'
 import { deg2rad  } from './constants/utils'
 import Hyperlink from 'react-native-hyperlink'
 import Header from './components/Header/header'
-import StarRating from 'react-native-star-rating'
 import { Popup } from 'react-native-map-link'
 import globalStyles from './styles/globalStyles'
 import FriendsModal from './components/friendsModal'
@@ -38,9 +37,7 @@ import styles from './styles/gymStyles'
     this.params = this.props.navigation.state.params
     this.id = this.params.id
     
-    this.props.fetchGym(this.id).then(gym => {
-        this.setState({ loaded: true})
-    })
+    this.props.fetchGym(this.id)
     .catch(e => {
         this.props.goBack()
         Alert.alert('Error', e.message)
@@ -51,7 +48,6 @@ import styles from './styles/gymStyles'
       isFriend: false,
       profile: {},
       showImage: false,
-      loaded: false,
       popUpVisible: false
       //avatar: this.props.friends[this.uid] ? this.props.friends[this.uid].avatar : null
     }
@@ -65,7 +61,7 @@ import styles from './styles/gymStyles'
     hasBack={true}
      title={gym && gym.name}
       />
-      {this.state.loaded ? <View style={{flex: 1}}>
+      {gym ? <View style={{flex: 1}}>
         <ScrollView style={{backgroundColor: '#9993'}}>
         <View style={{alignItems: 'center', marginBottom: 20}}>
         {gym && gym.photo ?
@@ -197,12 +193,13 @@ import styles from './styles/gymStyles'
           <Text style={{color: '#999'}}>{'Touch to see opening hours'}</Text>
         </TouchableOpacity>}
 
+        </View>
         {gym && gym.users && <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20}}>
+        <View style={[styles.rowSpaceBetween, {padding: 10}]}>
           {this.renderInfoHeader('Users')}
+        </View>
           {this.renderUsers(gym.users)}
         </View>}
-
-        </View>
         </ScrollView> 
           <View style={{flexDirection: 'row', backgroundColor: colors.bgColor, paddingVertical: 10}}>
             <Button
@@ -276,8 +273,30 @@ import styles from './styles/gymStyles'
   }
 
   renderUsers(users) {
-    return null
+    return Object.keys(users).map(user => {
+      let userItem = this.props.friends[user] || this.props.users[user]
+      if (user == this.props.profile.uid) userItem = this.props.profile
+      if (userItem) {
+       return <TouchableOpacity
+       onPress={()=> this.handleUserPress(user)}
+       style={[styles.infoRowContainer, styles.userRow, { paddingVertical: userItem.avatar ? 10 : 5}]}
+       key={user}> 
+         {userItem.avatar ? <Image source={{uri: userItem.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
+            <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary}}/>}
+            <Text style={{marginLeft: 10}}>{userItem.username}</Text>
+       </TouchableOpacity>
+      }
+      else return null
+     })
   }
+
+  handleUserPress(uid) {
+    if (uid == this.props.profile.uid) {
+      this.props.goToProfile()
+    }
+    else this.props.viewProfile(uid)
+  }
+
 
 
 }
@@ -295,7 +314,13 @@ export const renderTags = (tags) => {
 
 
 import { connect } from 'react-redux'
-import { navigateBack, navigateGymMessaging, navigateSessionDetail } from './actions/navigation'
+import {
+  navigateBack,
+  navigateGymMessaging,
+  navigateSessionDetail,
+  navigateProfileView,
+  navigateProfile
+} from './actions/navigation'
 import { removeGym, joinGym } from './actions/profile'
 import { fetchGym } from './actions/sessions'
 
@@ -316,7 +341,9 @@ const mapDispatchToProps = dispatch => ({
   onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
   createSession: (location) => dispatch(navigateSessionDetail(null,location)),
   fetchGym: (id) => dispatch(fetchGym(id)),
-  navigateSessionDetail: (friends, location) => dispatch(navigateSessionDetail(friends,location))
+  navigateSessionDetail: (friends, location) => dispatch(navigateSessionDetail(friends,location)),
+  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
+  goToProfile: () => dispatch(navigateProfile()),
  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Gym)

@@ -35,10 +35,6 @@ class SessionInfo extends Component {
     }
   }
   componentDidMount() {
-    this.getSession()
-  }
-
-  getSession() {
     this.isPrivate ? this.props.fetchPrivateSession(this.sessionId) : this.props.fetchSession(this.sessionId)
   }
 
@@ -70,7 +66,7 @@ class SessionInfo extends Component {
           resizeMode='cover'
           source={{uri: gym.photo}} />
           : <View style={{height: 150, backgroundColor: colors.primaryLighter}}/>}
-          <View style={{backgroundColor: '#fff', alignSelf: 'center', marginTop: -40, ...globalStyles.shadow}}>
+          <View style={{backgroundColor: '#fff', alignSelf: 'center', marginTop: -40, ...globalStyles.shadow, padding: 5}}>
             {getType(session.type, 80)}
           </View>
         </View>
@@ -213,8 +209,8 @@ class SessionInfo extends Component {
               }
             })
             await Promise.all(invites)
-            Alert.alert('Success', friends.length > 1  ? 'Pals' : 'Pal' + ' added')
-            this.getSession()
+            Alert.alert('Success', (friends.length > 1  ? 'Pals' : 'Pal') + ' added')
+            this.setState({friendsModalOpen: false})
           }}
           isOpen={this.state.friendsModalOpen}/>
     </ScrollView>
