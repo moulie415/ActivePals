@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import {
 	Container,
-	ActionSheet,
 	Icon,
 	Content,
 	Switch
@@ -11,8 +10,6 @@ import {
 	View,
 	Alert,
 	TextInput,
-	PermissionsAndroid,
-  Platform
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
@@ -25,7 +22,7 @@ import RNCalendarEvents from 'react-native-calendar-events'
 import { types, getType } from '../constants/utils'
 import Header from '../components/Header/header'
 import MapModal from '../components/MapModal'
-import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button'
+import RadioForm from 'react-native-simple-radio-button'
 import Button from '../components/Button'
 
  const genderProps = [
@@ -343,10 +340,10 @@ class SessionDetail extends Component {
 				firebase.database().ref('sessionChats/' + key).push(systemMessage)
 				this.props.onCreate(key, session.private)
 				if (this.state.addToCalendar) {
-					let date = new Date(this.state.date.replace(/-/g, '/'))
-					let  startDate =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+					const date = new Date(this.state.date.replace(/-/g, '/'))
+					const startDate =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
 					date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds())
-					let endDate = new Date(startDate)
+					const endDate = new Date(startDate)
 					endDate.setHours(endDate.getHours()+this.state.duration)
 					RNCalendarEvents.saveEvent(this.title, {
 						calendarId: this.state.calendarId,

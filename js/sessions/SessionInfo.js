@@ -21,6 +21,7 @@ import Button from '../components/Button'
 import { Popup } from 'react-native-map-link'
 import PrivateIcon from '../components/PrivateIcon'
 import FriendsModal from '../components/friendsModal'
+import RNCalendarEvents from 'react-native-calendar-events'
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -46,7 +47,7 @@ class SessionInfo extends Component {
     if (session && session.host.uid == this.props.profile.uid) {
       host = this.props.profile
     }
-    else {
+    else if (session && session.host){
       host = this.props.friends[session.host.uid] || this.props.users[session.host.uid]
     }
     
@@ -58,7 +59,7 @@ class SessionInfo extends Component {
     return <Container>
     <Header 
     hasBack={true}
-    title={session.title}
+    title={session ? session.title : ''}
     />
     <ScrollView style={{backgroundColor: '#9993'}}>
       {session ? <View>
@@ -77,23 +78,64 @@ class SessionInfo extends Component {
         {session && host && this.getButton(host, session)}
         </View>
         <TouchableOpacity onPress={()=> Alert.alert('Details', session.details)} style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-          <View style={{flex: 4}}>
+          <View >
             {this.renderInfoHeader('Details')}
             <Text numberOfLines={1} style={{color: '#999'}}>{session.details}</Text>
           </View>
-          {this.isPrivate && <PrivateIcon style={{flex: 1}}/>}
+          {this.isPrivate && <PrivateIcon/>}
+          <View>
+            {this.renderInfoHeader('Gender')}
+            <Text style={{color: '#999'}}>{session.gender}</Text>
+            </View>
         </TouchableOpacity>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
           <View>
             {this.renderInfoHeader('Date')}
-            <Text style={{color: '#999'}}>{(formatDateTime(session.dateTime))
+            <Text numberOfLines={1} style={{color: '#999'}}>{(formatDateTime(session.dateTime))
               + " for " + (session.duration) + " " +
               (session.duration > 1 ? 'hours' : 'hour') }</Text>
           </View>
-          <View style={{marginRight: 20}}>
-            {this.renderInfoHeader('Gender')}
-            <Text style={{color: '#999'}}>{session.gender}</Text>
-          </View>
+          <Button onPress={() => {
+            Alert.alert(
+              `Add ${session.title} to calendar?`,
+              '',
+              [
+                {text: 'Cancel', style: 'cancel'},
+                {text: 'Yes', onPress: async ()=> {
+                  try {
+                    const result = await RNCalendarEvents.authorizeEventStore()
+										if (result == 'authorized') {
+											const calendars = await RNCalendarEvents.findCalendars()
+											const validList = calendars.filter(calendar => calendar.allowsModifications)
+											if (validList && validList.length > 0) {
+												const calendarId = validList[0].id
+                        const date = new Date(session.dateTime.replace(/-/g, '/'))
+                        const startDate =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+                        date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds())
+                        const endDate = new Date(startDate)
+                        endDate.setHours(endDate.getHours() + session.duration)
+                        await RNCalendarEvents.saveEvent(session.title, {
+                          calendarId: calendarId,
+                          startDate: new Date(startDate).toISOString(),
+                          endDate: endDate.toISOString(),
+                          location: session.formattedAddress,
+                          notes: session.details,
+                          description: session.details
+					              })
+                        Alert.alert('Success', session.title + ' saved to calendar')
+											}
+											else {
+												Alert.alert("Sorry", "You don't have any calendars that allow modification")
+											}
+										}
+                  } catch(e) {
+                    Alert.alert('Error', e.message)
+                  }
+                }}
+              ]
+            )
+          }}
+          text='Add to calendar'/>
         </View>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
         <View style={{flex: 3}}>
