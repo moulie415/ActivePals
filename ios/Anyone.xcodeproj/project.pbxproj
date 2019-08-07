@@ -549,6 +549,13 @@
 			remoteGlobalIDString = D2AFD333211B138E00580DF0;
 			remoteInfo = ReactNativeAdsFacebook;
 		};
+		0AC0589022FB73AB00452763 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5737DDB4BC95AD399B3206838AB97095;
+			remoteInfo = RNCAsyncStorage;
+		};
 		0AD46BC72157C683000E6B9C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0AD46BC22157C682000E6B9C /* FastImage.xcodeproj */;
@@ -1120,6 +1127,7 @@
 				0A1FA0AA21C08115002DE30F /* libreact-native-video.a */,
 				0A03A8AF22D16578005A2609 /* libreact-native-webview.a */,
 				0A988CAE210E2795006C6974 /* librn-fetch-blob.a */,
+				0AC0589122FB73AB00452763 /* libRNCAsyncStorage.a */,
 				0A1D4F7222E8D18000A43B7F /* libRNShare.a */,
 				0A1FA0AE21C08115002DE30F /* libSPTPersistentCache.a */,
 				0A88FFC1201D6E19004A17CD /* libyoga.a */,
@@ -2132,6 +2140,13 @@
 			fileType = archive.ar;
 			path = libReactNativeAdsFacebook.a;
 			remoteRef = 0ABF96E221A98D1100D9EE84 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0AC0589122FB73AB00452763 /* libRNCAsyncStorage.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNCAsyncStorage.a;
+			remoteRef = 0AC0589022FB73AB00452763 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0AD46BC82157C683000E6B9C /* libFastImage.a */ = {

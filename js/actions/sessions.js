@@ -1,5 +1,5 @@
 import firebase from 'react-native-firebase'
-import { removeSessionChat, addSessionChat } from 'Anyone/js/actions/chats'
+import { removeSessionChat, addSessionChat } from '../actions/chats'
 import { geofire }  from 'Anyone/index'
 import { fetchUsers, updateUsers } from './home'
 import { setGym } from './profile'
