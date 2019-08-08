@@ -131,8 +131,7 @@ class Messaging extends React.Component {
       this.onSend([message])
       this.props.resetMessage()
     }
-    if (nextProps.messageSession && !this.fetched) {
-      this.fetched = true
+    if (nextProps.messageSession) {
       this.setState({messages: nextProps.messageSession, spinner: false})
       if (nextProps.messageSession && Object.values(nextProps.messageSession).some(message => message._id == 1)) {
         this.setState({showLoadEarlier: false})
@@ -161,9 +160,10 @@ class Messaging extends React.Component {
             (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid) ||
             (type == 'gymMessage' && this.gymId == gymId && this.uid != uid)) {
               //check if its a dupe
-            if (!Object.values(this.state.messages).some(msg => msg._id == message._id)) {
+              const messages = this.state.messages ? Object.values(this.state.messages) : []
+            if (!messages.some(msg => msg._id == message._id)) {
               this.setState(previousState => ({
-                  messages: GiftedChat.append(Object.values(previousState.messages), message)
+                  messages: GiftedChat.append(previousState.messages ? Object.values(previousState.messages) : [], message)
               }))
           }
         }
