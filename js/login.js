@@ -308,7 +308,7 @@ import Button from './components/Button'
             .catch(e => {
               console.log(e)
               this.setState({googleLoading: false})
-              if (e.code != 12501) {
+              if (e.code != 12501 && e.code != -5) {
                 Alert.alert('Error', "Code: " + e.code)
               }
             })
