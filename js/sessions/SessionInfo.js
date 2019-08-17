@@ -121,11 +121,11 @@ class SessionInfo extends Component {
           text='Add to calendar'/>
         </View>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-        <View style={{flex: 3}}>
+        <View style={{flex: 5}}>
           {this.renderInfoHeader('Location')}
           <Text numberOfLines={1} style={{color: '#999'}}>{session.location.formattedAddress}</Text>
         </View>
-        {this.props.location && <View style={{flex: 1}}>
+        {this.props.location && <View style={{flex: 2}}>
         <Button onPress={()=> {
           const { lat, lng } = session.location.position
           const options = {

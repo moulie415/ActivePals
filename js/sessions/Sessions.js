@@ -406,7 +406,7 @@ import PrivateIcon from '../components/PrivateIcon'
                 <View style={{flexDirection: 'row'}} >
 
                   <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
-                    <View style={{flex: 1}}>
+                    <View style={{flex: 5}}>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 3}} numberOfLines={1}><Text  style={styles.title}>{item.title}</Text>
                         <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : getDistance(item, this.state.yourLocation)) + ' km away)'}</Text></Text>
@@ -415,16 +415,16 @@ import PrivateIcon from '../components/PrivateIcon'
                       <Text style={[styles.date, {color: item.inProgress ? colors.secondary : "#999"}]} >
                       {item.inProgress? "In progress" : formatDateTime(item.dateTime)}</Text>
                       {item.private && <PrivateIcon size={25}/>}</View>
-                      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.location.formattedAddress}</Text>
-                        <TouchableOpacity onPress={()=>{
-                          this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat, switch: true})
-                        }}
-                        style={{flex: 1}}>
-                          <Text style={{color: colors.secondary, textAlign: 'right', fontWeight: 'bold', fontSize: 15}}>View on map</Text>
-                        </TouchableOpacity>
-                      </View>
+                      <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.location.formattedAddress}</Text>
                   </View>
+                  <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
+                    <TouchableOpacity onPress={()=>{
+                      this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat, switch: true})
+                    }}>
+                      <Icon name="pin" style={{color: colors.secondary, fontSize: 40}}/>
+                    </TouchableOpacity>
+                  </View>
+
                 </View>
               </View>
             </TouchableOpacity>
