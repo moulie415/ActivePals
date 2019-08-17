@@ -71,9 +71,7 @@ class SessionInfo extends Component {
           </View>
         </View>
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow}}>
-        <View style={styles.infoRowContainer}>
-        {session && host && this.getButton(host, session)}
-        </View>
+        {session && host && this.getButtons(host, session)}
         <TouchableOpacity onPress={()=> Alert.alert('Details', session.details)} style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
           <View >
             {this.renderInfoHeader('Details')}
@@ -197,7 +195,8 @@ class SessionInfo extends Component {
             cancelButtonText: {color: colors.secondary},
           }}
           />
-          <FriendsModal 
+    </ScrollView>
+    <FriendsModal 
           title="Add Pals to Session"
           onClosed={()=> this.setState({friendsModalOpen: false})}
           onContinue={async (friends) => {
@@ -213,7 +212,6 @@ class SessionInfo extends Component {
             this.setState({friendsModalOpen: false})
           }}
           isOpen={this.state.friendsModalOpen}/>
-    </ScrollView>
     </Container>
   }
 
@@ -246,33 +244,45 @@ class SessionInfo extends Component {
     else this.props.viewProfile(uid)
   }
 
-  getButton(host, session) {
+chatButton(session) {
+  return <Button  text="Chat" onPress={()=> this.props.openSessionChat(session)}/>
+//   return <TouchableOpacity
+//     onPress={()=> this.props.openSessionChat(session)}>
+//   <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10}}/>
+// </TouchableOpacity>
+}
+
+  getButtons(host, session) {
     const you = this.props.profile.uid
     if (session.users[you]){
       if (host.uid == you) {
         return (
-          <Button
-          onPress={()=> {
-            Alert.alert(
-              "Delete session",
-              "Are you sure?",
-              [
-              {text: 'cancel', style: 'cancel'},
-              {text: 'Yes', onPress: ()=> {
-                this.props.remove(this.sessionId, session.private)
-                this.props.goBack()
-              },
-              style: 'destructive'}
-              ],
-            )
-          }}
-          style={{alignSelf: 'center'}}
-          color='red'
-          text="Delete"
-          />
+          <View style={styles.infoRowSpaceEvenly}>
+            <Button
+            onPress={()=> {
+              Alert.alert(
+                "Delete session",
+                "Are you sure?",
+                [
+                {text: 'cancel', style: 'cancel'},
+                {text: 'Yes', onPress: ()=> {
+                  this.props.remove(this.sessionId, session.private)
+                  this.props.goBack()
+                },
+                style: 'destructive'}
+                ],
+              )
+            }}
+            style={{alignSelf: 'center'}}
+            color='red'
+            text="Delete"
+            />
+            {this.chatButton(session)}
+          </View>
           )
       }
       else return (
+        <View style={styles.infoRowSpaceEvenly}>
           <Button
           color='red'
           text="Leave"
@@ -282,10 +292,13 @@ class SessionInfo extends Component {
             this.props.goBack()
           }}
           />
+          {this.chatButton(session)}
+          </View>
         )
     }
     else {
       return (
+        <View style={styles.infoRowSpaceEvenly}>
           <Button
           text="Join"
           style={{alignSelf: 'center'}}
@@ -298,7 +311,8 @@ class SessionInfo extends Component {
             }
           }}
           />
-        )
+        </View>
+      )
     }
   }
 
@@ -309,7 +323,8 @@ import {
   navigateProfileView,
   navigateGym,
   navigateProfile,
-  navigateBack
+  navigateBack,
+  navigateMessagingSession
 } from '../actions/navigation'
 import {
   fetchGym,
@@ -344,7 +359,8 @@ const mapDispatchToProps = dispatch => ({
     return dispatch(addSessionChat(session, isPrivate))
   },
   fetchSession: (id) => dispatch(fetchSession(id)),
-  fetchPrivateSession: (id) => dispatch(fetchPrivateSession(id))
+  fetchPrivateSession: (id) => dispatch(fetchPrivateSession(id)),
+  openSessionChat: (session) => dispatch(navigateMessagingSession(session))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo)

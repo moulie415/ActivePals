@@ -47,7 +47,7 @@ import {
   getMentionsList,
 } from './constants/utils'
 import str from './constants/strings'
-import ParsedText from 'react-native-parsed-text'
+import ParsedText from './components/ParsedText'
 import Video from 'react-native-video'
 import RNFetchBlob from 'rn-fetch-blob'
 import AdView from './AdView'
@@ -398,12 +398,7 @@ sortByDate(array) {
           animationType={"slide"}
           transparent={false}
           visible={this.state.likesModalVisible}
-          on
-          
-          
-          
-          
-          Close={() => this.setState({likesModalVisible: false, userFetchAmount: 10})}
+          onClose={() => this.setState({likesModalVisible: false, userFetchAmount: 10})}
         >
           <TouchableOpacity
             onPress={() => this.setState({likesModalVisible: false})}
@@ -462,7 +457,7 @@ sortByDate(array) {
         //   })
         // }}
         ListFooterComponent={()=> {
-          let initial = Object.values(feed).length
+          const initial = Object.values(feed).length
             if (initial > 29 && this.state.loadMore) {
             return <Card>
             <TouchableOpacity 
@@ -512,7 +507,7 @@ sortByDate(array) {
                 {this.getUsernameFormatted(item.uid)}
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              {this.getParsedText(item.text)}
+              <ParsedText text={item.text} />
             </View>
             </View>
             {this.repCommentCount(item)}
@@ -529,7 +524,7 @@ sortByDate(array) {
               {this.getUsernameFormatted(item.uid)}
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              {this.getParsedText(item.text)}
+              <ParsedText text={item.text} />
               </View>
             </View>
               <TouchableOpacity
@@ -560,7 +555,7 @@ sortByDate(array) {
               {this.getUsernameFormatted(item.uid)}
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              {this.getParsedText(item.text)}
+              <ParsedText text={item.text} />
               </View>
             </View>
             <TouchableWithoutFeedback onPress = {() => {
@@ -872,17 +867,19 @@ processVideo(uri) {
 
   }
 
-  getParsedText(text) {
-    return <ParsedText 
-    style={{color: '#000'}}
-    parse={
-      [
-        {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: this.handleUsernamePress.bind(this) }
-      ]
-    }
-    >{text}
-    </ParsedText>
-  }
+  // getParsedText(text) {
+  //   return <ParsedText 
+  //   style={{color: '#000'}}
+  //   parse={
+  //     [
+  //       {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: (test) => {
+  //         console.log(test)
+  //       } }
+  //     ]
+  //   }
+  //   >{text}
+  //   </ParsedText>
+  // }
 
   async sharePost(item) {
     this.setState({spinner: true})
@@ -911,32 +908,6 @@ processVideo(uri) {
         this.setState({spinner: false})
         console.log(e)
       }
-  }
-
-  handleUsernamePress(name) {
-    name = name.substring(1)
-    let friends = Object.values(this.props.friends)
-    let users = Object.values(this.props.users)
-    let combined = [...friends, ...users]
-    if (name == this.props.profile.username) {
-      this.props.goToProfile()
-    }
-    else {
-      let found = combined.find(friend => friend.username == name)
-      if (found) {
-        this.props.viewProfile(found.uid)
-      }
-      else {
-        firebase.database().ref('usernames').child(name).once('value', snapshot => {
-          if (snapshot.val()) {
-            this.props.viewProfile(snapshot.val())
-          }
-        })
-        .catch(e => console.log(e))
-      }
-      
-     
-    }
   }
 
 }
@@ -986,7 +957,6 @@ const mapDispatchToProps = dispatch => ({
   getProfile: () => dispatch(fetchProfile()),
   getFriends: () => dispatch(fetchFriends()),
   navigateFullScreenVideo: (uri) => dispatch(navigateFullScreenVideo(uri))
-
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

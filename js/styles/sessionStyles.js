@@ -78,6 +78,14 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between'
   },
+  infoRowSpaceEvenly: {
+    padding: 10,
+    borderTopColor: '#999',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'space-evenly',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   userRow: {
     flexDirection: 'row',
     justifyContent: 'flex-start',

@@ -34,7 +34,6 @@ import Button from './components/Button'
 
   constructor(props) {
     super(props)
-
     this.username = ""
     this.pass = ""
     this.state = {

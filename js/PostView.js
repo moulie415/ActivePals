@@ -23,7 +23,7 @@ import TouchableOpacity from './components/TouchableOpacityLockable'
 import Comments from './comments'
 import sStyles from './styles/settingsStyles'
 import ImageViewer from 'react-native-image-zoom-viewer'
-import ParsedText from 'react-native-parsed-text'
+import ParsedText from './components/ParsedText'
 import RNFetchBlob from 'rn-fetch-blob'
 import Share from 'react-native-share'
 import {
@@ -242,7 +242,7 @@ class PostView extends Component {
                   {this.getUsernameFormatted(item.uid)}
                   <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                {this.getParsedText(item.text)}
+                <ParsedText text={item.text} />
               </View>
               </View>
               
@@ -258,7 +258,7 @@ class PostView extends Component {
                 {this.getUsernameFormatted(item.uid)}
                   <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                {this.getParsedText(item.text)}
+                <ParsedText text={item.text} />
                 </View>
               </View>
               
@@ -287,7 +287,7 @@ class PostView extends Component {
           {this.getUsernameFormatted(item.uid)}
             <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
           </View>
-          {this.getParsedText(item.text)}
+          <ParsedText text={item.text} />
           </View>
         </View>
         <Video
@@ -460,43 +460,6 @@ class PostView extends Component {
       }
       else return null
   
-    }
-
-    getParsedText(text) {
-      return <ParsedText 
-      style={{color: '#000'}}
-      parse={
-        [
-          {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: this.handleUsernamePress.bind(this) }
-        ]
-      }
-      >{text}
-      </ParsedText>
-    }
-    handleUsernamePress(name) {
-      name = name.substring(1)
-      let friends = Object.values(this.props.friends)
-      let users = Object.values(this.props.users)
-      let combined = [...friends, ...users]
-      if (name == this.props.profile.username) {
-        this.props.goToProfile()
-      }
-      else {
-        let found = combined.find(friend => friend.username == name)
-        if (found) {
-          this.props.viewProfile(found.uid)
-        }
-        else {
-          firebase.database().ref('usernames').child(name).once('value', snapshot => {
-            if (snapshot.val()) {
-              this.props.viewProfile(snapshot.val())
-            }
-          })
-          .catch(e => console.log(e))
-        }
-        
-       
-      }
     }
 
     getUsername(uid) {
