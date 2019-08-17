@@ -463,21 +463,20 @@ import PrivateIcon from '../components/PrivateIcon'
                   <View style={{flexDirection: 'row'}} >
                     {item.photo ? <Image source={{uri: item.photo}} style={{height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10}}/> : 
                     <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>}
-                      <View style={{flex: 1}}>
+                      <View style={{flex: 5}}>
                         <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                           <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
                         </View>
-                        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                          <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
-                          <TouchableOpacity onPress={()=>{
-                            this.setState({longitude: lng, latitude: lat, switch: true})
-                          }}
-                          style={{flex: 1}}>
-                            <Text style={{color: colors.secondary, textAlign: 'right', fontWeight: 'bold', fontSize: 15}}>View on map</Text>
-                          </TouchableOpacity>
-                        </View>
+                        <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
                         <Text style={{color: '#999'}}>{' (' +  getDistance(item, this.state.yourLocation, true) + ' km away)'}</Text>
                     </View>
+                    <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
+                    <TouchableOpacity onPress={()=>{
+                      this.setState({longitude: lng, latitude: lat, switch: true})
+                    }}>
+                      <Icon name="pin" style={{color: colors.secondary, fontSize: 40}}/>
+                    </TouchableOpacity>
+                  </View>
                   </View>
                 </View>
               </TouchableOpacity>
