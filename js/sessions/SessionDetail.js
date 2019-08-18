@@ -25,6 +25,7 @@ import MapModal from '../components/MapModal'
 import RadioForm from 'react-native-simple-radio-button'
 import Button from '../components/Button'
 import { addSessionToCalendar } from '../constants/utils'
+import NumericInput from 'react-native-numeric-input'
 
  const genderProps = [
 	{label: 'Unspecified', value: 'Unspecified'},
@@ -59,8 +60,9 @@ class SessionDetail extends Component {
 			formattedAddress: 'none',
 			date: null,
 			duration: 1,
+			durationMinutes: 0,
 			addToCalendar: false,
-			type: 'Custom'
+			type: 'Custom',
 		}
 
 	}
@@ -102,7 +104,7 @@ class SessionDetail extends Component {
 					multiline={true}
 					underlineColorAndroid='transparent'
 					onChangeText={details => this.details = details}/>
-					<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginBottom: 10}}>
+					<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginBottom: 10, alignItems: 'center'}}>
 					<DatePicker
 						date={this.state.date}
 						style={{width: '50%'}}
@@ -116,21 +118,41 @@ class SessionDetail extends Component {
 						confirmBtnText={'Confirm'}
 						cancelBtnText={'Cancel'}
 						minDate={(new Date()).toISOString()}/>
-						<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-							<TouchableOpacity onPress={()=> {
-								this.state.duration > 1 && this.setState({duration: this.state.duration-=1})
-							}}>
-								<Icon name='arrow-dropdown-circle' style={{color: colors.secondary, fontSize: 40}}/>
-							</TouchableOpacity>
-							<Text style={{ width: 50, textAlign: 'center'}}>{this.state.duration + (this.state.duration > 1? ' hrs' :' hr')}</Text>
-							<TouchableOpacity onPress={()=> {
-								this.state.duration < 24 && this.setState({duration: this.state.duration+=1})
-							}}>
-								<Icon name='arrow-dropup-circle' style={{color: colors.secondary, fontSize: 40}}/>
-							</TouchableOpacity>
-							
-						</View>
-						
+
+					<NumericInput 
+            value={this.state.duration} 
+            onChange={duration => this.setState({duration})} 
+            onLimitReached={(isMax,msg) => console.log(isMax,msg)}
+            totalWidth={50} 
+            totalHeight={40} 
+            iconSize={25}
+            step={1}
+						type='up-down'
+            valueType='integer'
+            rounded 
+            textColor={colors.secondary}
+						maxValue={24}
+						minValue={0}
+            iconStyle={{ color: 'white' }} 
+						upDownButtonsBackgroundColor={colors.secondary}/>
+					<Text style={{color: '#999', width: 40, textAlign: 'center'}}>{this.state.duration == 1 ? 'hr' : 'hrs'}</Text>
+					<NumericInput 
+            value={this.state.durationMinutes} 
+            onChange={durationMinutes => this.setState({durationMinutes})} 
+            onLimitReached={(isMax,msg) => console.log(isMax,msg)}
+            totalWidth={50} 
+            totalHeight={40} 
+            iconSize={25}
+            step={1}
+						type='up-down'
+            valueType='integer'
+            rounded 
+            textColor={colors.secondary}
+						maxValue={59}
+						minValue={0}
+            iconStyle={{ color: 'white' }} 
+						upDownButtonsBackgroundColor={colors.secondary}/>
+					<Text style={{color: '#999', width: 40, textAlign: 'center'}}>{this.state.durationMinutes == 1 ? 'min' : 'mins'}</Text>
 					</View>
 					<View style={{flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10}}>
 							<Text style={{marginRight: 5}}>Add to calendar</Text>
@@ -303,6 +325,7 @@ class SessionDetail extends Component {
 				host: this.user.uid,
 				dateTime: this.state.date,
 				duration: this.state.duration,
+				durationMinutes: this.state.durationMinutes,
 				users: {},
 			}
 			if (this.friends) {
