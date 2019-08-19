@@ -107,8 +107,8 @@ class SessionDetail extends Component {
 					<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginBottom: 10, alignItems: 'center'}}>
 					<DatePicker
 						date={this.state.date}
-						style={{width: '50%'}}
-						placeholder={"Select date and time"}
+						style={{width: '40%'}}
+						placeholder={"Date and time"}
 						mode={'datetime'}
 						androidMode={'spinner'}
 						onDateChange={(date) => {
@@ -118,7 +118,7 @@ class SessionDetail extends Component {
 						confirmBtnText={'Confirm'}
 						cancelBtnText={'Cancel'}
 						minDate={(new Date()).toISOString()}/>
-
+					<Text style={{color: '#999', textAlign: 'center'}}>{'For'}</Text>
 					<NumericInput 
             value={this.state.duration} 
             onChange={duration => this.setState({duration})} 
