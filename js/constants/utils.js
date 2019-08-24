@@ -297,13 +297,14 @@ export function getSimplifiedTime(createdAt) {
       return deg * (Math.PI / 180)
     }
 
-    export const addSessionToCalendar = async (calendarId, session) => {
+    export const addSessionToCalendar = (calendarId, session) => {
       const date = new Date(session.dateTime.replace(/-/g, '/'))
       const startDate =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
       date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds())
       const endDate = new Date(startDate)
-      endDate.setHours(endDate.getHours() + session.duration)
-      return await RNCalendarEvents.saveEvent(session.title, {
+      const duration = session.duration + session.durationMinutes/60
+      endDate.setHours(endDate.getHours() + duration)
+      return RNCalendarEvents.saveEvent(session.title, {
         calendarId,
         startDate: new Date(startDate).toISOString(),
         endDate: endDate.toISOString(),
@@ -312,3 +313,21 @@ export function getSimplifiedTime(createdAt) {
         description: session.details
 			})
     }
+
+    export const calculateDuration = (data) => {
+      const minutes = data.durationMinutes/60
+      const hours = data.duration
+      return (minutes + hours)* 60 * 60 * 1000
+    }
+
+    export const durationString = (session) => {
+      const minutes = session.durationMinutes
+      const hours = session.duration
+      let string = ' for ' + hours
+      hours > 1 ? string += ' hrs ' : string += ' hr '
+      if (minutes) {
+        string += minutes
+        minutes > 1 ? string += ' mins' : ' min'
+      }
+      return string
+    } 

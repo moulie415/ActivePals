@@ -13,7 +13,12 @@ import Header from '../components/Header/header'
 import Text from '../components/Text'
 import colors from '../constants/colors'
 import { PulseIndicator } from 'react-native-indicators'
-import { getType, formatDateTime } from '../constants/utils'
+import {
+  getType,
+  formatDateTime,
+  addSessionToCalendar,
+  durationString
+} from '../constants/utils'
 import Image from 'react-native-fast-image'
 import globalStyles from '../styles/globalStyles'
 import styles from '../styles/sessionStyles'
@@ -22,7 +27,7 @@ import { Popup } from 'react-native-map-link'
 import PrivateIcon from '../components/PrivateIcon'
 import FriendsModal from '../components/friendsModal'
 import RNCalendarEvents from 'react-native-calendar-events'
-import { addSessionToCalendar } from '../constants/utils'
+
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -84,12 +89,12 @@ class SessionInfo extends Component {
             </View>
         </TouchableOpacity>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-          <View>
+          <TouchableOpacity style={{flex: 4}} 
+          onPress={() => Alert.alert('Date and duration', formatDateTime(session.dateTime) + durationString(session))} >
             {this.renderInfoHeader('Date')}
             <Text numberOfLines={1} style={{color: '#999'}}>{(formatDateTime(session.dateTime))
-              + " for " + (session.duration) + " " +
-              (session.duration > 1 ? 'hours' : 'hour') }</Text>
-          </View>
+              + durationString(session)}</Text>
+          </TouchableOpacity>
           <Button onPress={() => {
             Alert.alert(
               `Add ${session.title} to calendar?`,
@@ -121,10 +126,11 @@ class SessionInfo extends Component {
           text='Add to calendar'/>
         </View>
         <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-        <View style={{flex: 5}}>
+        <TouchableOpacity onPress={()=> Alert.alert('Location', session.location.formattedAddress)}
+        style={{flex: 5}}>
           {this.renderInfoHeader('Location')}
           <Text numberOfLines={1} style={{color: '#999'}}>{session.location.formattedAddress}</Text>
-        </View>
+        </TouchableOpacity>
         {this.props.location && <View style={{flex: 2}}>
         <Button onPress={()=> {
           const { lat, lng } = session.location.position
@@ -138,6 +144,7 @@ class SessionInfo extends Component {
             this.setState({popUpVisible: true, options})
           }}
           text='Directions'
+          style={{alignSelf: 'flex-end'}}
         /></View>}
         </View>
         {gym && <TouchableOpacity 

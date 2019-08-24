@@ -4,6 +4,7 @@ import { geofire }  from 'Anyone/index'
 import { fetchUsers, updateUsers } from './home'
 import { setGym } from './profile'
 import str from '../constants/strings'
+import  { calculateDuration } from '../constants/utils'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
 export const UPDATE_PRIVATE_SESSIONS = 'UPDATE_PRIVATE_SESSIONS'
@@ -107,7 +108,7 @@ export const fetchSessions = () => {
 							console.log(key + " entered query at " + location + " (" + distance + " km from center)")
 							firebase.database().ref('sessions/' + key).once('value', snapshot => {
 								if (snapshot.val()) {
-									const duration = snapshot.val().duration * 60 * 60 * 1000
+									const duration = calculateDuration(snapshot.val())
 									const time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
 									const current = new Date().getTime()
 									if (time + duration > current) {
@@ -171,7 +172,7 @@ export const fetchPrivateSessions = () =>  {
 				})
 				return Promise.all(promises).then(sessions => {
 					const privateSessions = sessions.map(session => {
-						const duration = session.val().duration * 60 * 60 * 1000
+						const duration = calculateDuration(session.val())
 						const time = new Date(session.val().dateTime.replace(/-/g, "/")).getTime()
 						const current = new Date().getTime()
 						if (time + duration > current) {
@@ -234,7 +235,7 @@ export const fetchSession = (id) => {
 			})
 			dispatch(checkUserFetches(unfetched))
 		}
-		const duration = session.val().duration * 60 * 60 * 1000
+		const duration = calculateDuration(session.val())
 		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
 		const current = new Date().getTime()
 		const inProgress = (time + duration > current && time < current)
@@ -255,7 +256,7 @@ export const fetchPrivateSession = (id) => {
 			})
 			dispatch(checkUserFetches(unfetched))
 		}
-		const duration = session.val().duration * 60 * 60 * 1000
+		const duration = calculateDuration(session.val())
 		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
 		const current = new Date().getTime()
 		const inProgress = (time + duration > current && time < current)

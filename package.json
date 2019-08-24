@@ -7,11 +7,12 @@
     "start-prod": "ENV=production ./envscript.sh && ENVFILE=.env.prod node node_modules/react-native/local-cli/cli.js start",
     "build-android-prod": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
     "android-beta": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && fastlane android beta",
-    "postinstall": "npx jetify && rm -r node_modules/react-native-gifted-chat/node_modules/react-native-video"
+    "postinstall": "npx jetify && rm -r node_modules/react-native-gifted-chat/node_modules/react-native-video",
+    "prestart": "rm -r node_modules/react-native-gifted-chat/node_modules/react-native-video"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.1",
-    "@react-native-community/slider": "^2.0.0",
+    "@react-native-community/slider": "^1.1.4",
     "geofire": "^4.1.2",
     "jetifier": "^1.6.3",
     "native-base": "^2.12.1",
