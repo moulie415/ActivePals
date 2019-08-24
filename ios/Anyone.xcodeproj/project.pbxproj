@@ -178,6 +178,13 @@
 			remoteGlobalIDString = BEC43C6A1C723089001221C6;
 			remoteInfo = RNCalendarEvents;
 		};
+		0A165CB72311C1EC00377BEA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2B17A71888AA28CEFEC37B72F2A68A91;
+			remoteInfo = "react-native-slider";
+		};
 		0A19E24520376D230036DFF2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
@@ -1123,6 +1130,7 @@
 				0A2FBE282061FD6100A42267 /* libreact-native-image-picker.a */,
 				0A2FBE2A2061FD6100A42267 /* libreact-native-image-resizer.a */,
 				0A88FFBD201D6E19004A17CD /* libreact-native-maps.a */,
+				0A165CB82311C1EC00377BEA /* libreact-native-slider.a */,
 				0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */,
 				0A1FA0AA21C08115002DE30F /* libreact-native-video.a */,
 				0A03A8AF22D16578005A2609 /* libreact-native-webview.a */,
@@ -1776,6 +1784,13 @@
 			fileType = archive.ar;
 			path = libRNCalendarEvents.a;
 			remoteRef = 0A12E3E1218F401E009424C7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0A165CB82311C1EC00377BEA /* libreact-native-slider.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libreact-native-slider.a";
+			remoteRef = 0A165CB72311C1EC00377BEA /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A19E24620376D230036DFF2 /* libProtobuf.a */ = {

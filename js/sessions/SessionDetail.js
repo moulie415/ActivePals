@@ -109,7 +109,6 @@ class SessionDetail extends Component {
 					<View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginBottom: 10, alignItems: 'center'}}>
 					<DatePicker
 						date={this.state.date}
-						style={{width: '40%'}}
 						placeholder={"Date and time"}
 						mode={'datetime'}
 						androidMode={'spinner'}
@@ -120,43 +119,7 @@ class SessionDetail extends Component {
 						confirmBtnText={'Confirm'}
 						cancelBtnText={'Cancel'}
 						minDate={(new Date()).toISOString()}/>
-					<Text style={{color: '#999', textAlign: 'center'}}>{'For'}</Text>
-					<NumericInput 
-            value={this.state.duration} 
-            onChange={duration => this.setState({duration})} 
-            onLimitReached={(isMax,msg) => console.log(isMax,msg)}
-            totalWidth={50} 
-            totalHeight={40} 
-            iconSize={25}
-            step={1}
-						type='up-down'
-            valueType='integer'
-            rounded 
-            textColor={colors.secondary}
-						maxValue={24}
-						minValue={0}
-            iconStyle={{ color: 'white' }} 
-						upDownButtonsBackgroundColor={colors.secondary}/>
-					<Text style={{color: '#999', width: 40, textAlign: 'center'}}>{this.state.duration == 1 ? 'hr' : 'hrs'}</Text>
-					<NumericInput 
-            value={this.state.durationMinutes} 
-            onChange={durationMinutes => this.setState({durationMinutes})} 
-            onLimitReached={(isMax,msg) => console.log(isMax,msg)}
-            totalWidth={50} 
-            totalHeight={40} 
-            iconSize={25}
-            step={1}
-						type='up-down'
-            valueType='integer'
-            rounded 
-            textColor={colors.secondary}
-						maxValue={59}
-						minValue={0}
-            iconStyle={{ color: 'white' }} 
-						upDownButtonsBackgroundColor={colors.secondary}/>
-					<Text style={{color: '#999', width: 40, textAlign: 'center'}}>{this.state.durationMinutes == 1 ? 'min' : 'mins'}</Text>
-					</View>
-					<View style={{flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10}}>
+						<View style={{flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10}}>
 							<Text style={{marginRight: 5}}>Add to calendar</Text>
 							<Switch 
 							value={this.state.addToCalendar}
@@ -191,6 +154,44 @@ class SessionDetail extends Component {
 							}}
 							/>
 							</View>
+					</View>
+					<View style={{flexDirection: 'row', marginHorizontal: 10, marginBottom: 10, alignItems: 'center'}}>
+						<Text style={{color: '#999', textAlign: 'center', width: 40}}>{'For'}</Text>
+						<NumericInput 
+							value={this.state.duration} 
+							onChange={duration => this.setState({duration})} 
+							onLimitReached={(isMax,msg) => console.log(isMax,msg)}
+							totalWidth={75} 
+							totalHeight={40} 
+							iconSize={40}
+							step={1}
+							valueType='integer'
+							rounded 
+							textColor={colors.secondary}
+							maxValue={24}
+							minValue={0}
+							iconStyle={{ color: 'white' }} 
+							leftButtonBackgroundColor={colors.secondary}
+							rightButtonBackgroundColor={colors.secondary}/>
+						<Text style={{color: '#999', width: 40, textAlign: 'center'}}>{this.state.duration == 1 ? 'hr' : 'hrs'}</Text>
+						<NumericInput 
+							value={this.state.durationMinutes} 
+							onChange={durationMinutes => this.setState({durationMinutes})} 
+							onLimitReached={(isMax,msg) => console.log(isMax,msg)}
+							totalWidth={75} 
+							totalHeight={40} 
+							iconSize={40}
+							step={1}
+							valueType='integer'
+							rounded 
+							textColor={colors.secondary}
+							maxValue={59}
+							minValue={0}
+							iconStyle={{ color: 'white' }} 
+							leftButtonBackgroundColor={colors.secondary}
+							rightButtonBackgroundColor={colors.secondary}/>
+						<Text style={{color: '#999', width: 40, textAlign: 'center'}}>{this.state.durationMinutes == 1 ? 'min' : 'mins'}</Text>
+					</View>
 
 					<View style={{flex: 2, borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
 						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Location</Text>
