@@ -4,6 +4,7 @@ import MapView  from 'react-native-maps'
 import colors from '../../constants/colors'
 import str from '../../constants/strings'
 import { fetchPhotoPath } from '../../actions/sessions'
+import styles from './styles'
 import {
   Alert
 } from 'react-native'
@@ -18,10 +19,8 @@ const GooglePlacesInput = ({parent, onOpen}) => {
       returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
       listViewDisplayed='auto'    // true/false/undefined
       fetchDetails={true}
-      renderDescription={row => {
-      return row.description
-      }} // custom description render
-      onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+      renderDescription={row => row.description} // custom description render
+      onPress={(data, details) => { // 'details' is provided when fetchDetails = true
         parent.setState({spinner: true})
         const { lat, lng } = details.geometry.location
         if (details && details.types && details.types.includes("gym")) {
@@ -59,33 +58,14 @@ const GooglePlacesInput = ({parent, onOpen}) => {
           parent.setState({latitude: location.lat, longitude: location.lng})
         }
       }}
-      
       getDefaultValue={() => ''}
-      
       query={{
         // available options: https://developers.google.com/places/web-service/autocomplete
         key: str.googleApiKey,
         language: 'en', // language of the results
         types: 'establishment' // default: 'geocode'
       }}
-      
-      styles={{
-        textInputContainer: {
-          width: '100%',
-        },
-        container: {
-          position: 'absolute',
-          width: '100%',
-          backgroundColor: '#fff'
-        },
-        description: {
-          fontWeight: 'bold'
-        },
-        predefinedPlacesDescription: {
-          color: '#1faadb'
-        }
-      }}
-      
+      styles={styles}
       //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
       //currentLocationLabel="Current location"
       nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
@@ -97,10 +77,8 @@ const GooglePlacesInput = ({parent, onOpen}) => {
         rankby: 'distance',
         types: 'gym',
       }}
-
       //filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
       //predefinedPlaces={[homePlace, workPlace]}
-
       debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
       //renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
       //renderRightButton={() => <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 30, alignSelf: 'center', marginRight: 10}}/>}

@@ -11,7 +11,7 @@ import {
 	Alert,
 	TextInput,
 } from 'react-native'
-import styles from '../styles/sessionDetailStyles'
+import styles, {locationSearch} from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
 import firebase from 'react-native-firebase'
 import { geofire }  from 'Anyone/index'
@@ -25,7 +25,9 @@ import MapModal from '../components/MapModal'
 import RadioForm from 'react-native-simple-radio-button'
 import Button from '../components/Button'
 import { addSessionToCalendar } from '../constants/utils'
+import str from '../constants/strings'
 import NumericInput from 'react-native-numeric-input'
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
  const genderProps = [
 	{label: 'Unspecified', value: 'Unspecified'},
@@ -190,11 +192,46 @@ class SessionDetail extends Component {
 							/>
 							</View>
 
-
 					<View style={{flex: 2, borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
 						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Location</Text>
-						<View style={{flexDirection: 'row', alignItems: 'center'}}>
-							<TextInput
+						
+						<GooglePlacesAutocomplete
+							ref={(instance) => { this.GooglePlacesRef = instance }}
+							placeholder='Search...'
+							minLength={2}
+							autoFocus={false}
+							fetchDetails={true}
+							listViewDisplayed='auto'
+							returnKeyType={'search'}
+							onPress={(data, details) => {
+								this.GooglePlacesRef.setAddressText("")
+								const location = {}
+								try {
+									details.address_components.forEach(component => {
+										if (component.types[0] == 'postal_code') {
+											location.postcode = Object.values(component)[0]
+										}
+									})
+									if (location.postcode) {
+										if (details.types && details.types.includes('gym')) {
+											location.gym = details
+										}
+										this.setLocation(location)
+									}
+									else throw Error('Could not find postcode of location')
+
+								} catch(e) {
+									Alert.alert('Error', e.message)
+								}
+							}}
+							styles={locationSearch}
+							query={{key: str.googleApiKey, language: 'en', types: 'establishment'}}
+							debounce={200}
+							nearbyPlacesAPI='GooglePlacesSearch'
+							GooglePlacesSearchQuery={{rankby: 'distance',types: 'gym'}}
+							/>
+						{/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
+						 <TextInput
 							onChangeText={postcode => this.postcode = postcode}
 							style={{padding: 10, borderWidth: 0.5, borderColor: '#999', margin: 10, flex: 1}}
 							underlineColorAndroid='transparent'
@@ -208,7 +245,7 @@ class SessionDetail extends Component {
 										Alert.alert("Error", "Postcode is invalid")
 									}
 								}
-							}}>
+							}}> 
 							<Icon name="md-return-right" 
               style={{
                 color: colors.secondary,
@@ -217,14 +254,10 @@ class SessionDetail extends Component {
 								marginHorizontal: 20
                 }}/>
 							</TouchableOpacity>
-						</View>
+						</View> */}
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-							<TouchableOpacity onPress={()=> this.setLocationAsPosition()}>
-								<Text style={{color: colors.secondary, fontSize: 20, margin: 10}}>Use my location</Text>
-							</TouchableOpacity>
-							<TouchableOpacity onPress={()=> this.setState({mapOpen: true})}>
-								<Text style={{color: colors.secondary, fontSize: 20, margin: 10, textAlign: 'center'}}>Select from map</Text>
-							</TouchableOpacity>
+						<Button style={{margin: 10}} onPress={()=> this.setLocationAsPosition()} text="Use my location" />
+						<Button style={{margin: 10}} onPress={()=> this.setState({mapOpen: true})} text="Select from map"/>
 						</View>
 						<Text style={{alignSelf: 'center', margin: 10, fontSize: 15}}>
 						{`Selected location:  ${this.state.gym ? this.state.gym.name : this.state.formattedAddress}`}</Text>
@@ -279,6 +312,7 @@ class SessionDetail extends Component {
 	async setLocation(location, usingPosition = false) {
 		try {
 			if (usingPosition) {
+				console.log('location', location)
 				await Geocoder.geocodePosition(location).then(res => {
 					this.location = {...res[0]}
 					this.setState({formattedAddress: res[0].formattedAddress, gym: location.gym})
@@ -287,7 +321,7 @@ class SessionDetail extends Component {
 				.catch(err => Alert.alert('Error', "Invalid location"))
 			}
 			else {
-				await Geocoder.geocodeAddress(location).then(res => {
+				await Geocoder.geocodeAddress(location.postcode).then(res => {
 					this.location = {...res[0]}
 					this.setState({formattedAddress: res[0].formattedAddress, gym: location.gym})
 

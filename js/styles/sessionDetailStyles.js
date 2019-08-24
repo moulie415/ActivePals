@@ -13,6 +13,17 @@ export default  StyleSheet.create({
   	fontSize: 15,
   	flex: 1,
   	textAlign: 'center'
-  }
+	}
+})
 
+export const locationSearch = StyleSheet.create({
+		textInputContainer: {
+			backgroundColor: 'transparent',
+			marginHorizontal: 10,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: '#999',
+		},
+		description: {
+			fontWeight: 'bold'
+		},
 })
