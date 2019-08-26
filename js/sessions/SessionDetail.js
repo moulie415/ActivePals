@@ -10,24 +10,23 @@ import {
 	View,
 	Alert,
 	TextInput,
+	TouchableOpacity
 } from 'react-native'
-import styles, {locationSearch} from '../styles/sessionDetailStyles'
+import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
 import firebase from 'react-native-firebase'
 import { geofire }  from 'Anyone/index'
 import DatePicker from 'react-native-datepicker'
 import colors from 'Anyone/js/constants/colors'
-import TouchableOpacity from 'Anyone/js/components/TouchableOpacityLockable'
 import RNCalendarEvents from 'react-native-calendar-events'
 import { types, getType } from '../constants/utils'
 import Header from '../components/Header/header'
 import MapModal from '../components/MapModal'
+import LocationSearchModal from '../components/LocationSearchModal'
 import RadioForm from 'react-native-simple-radio-button'
 import Button from '../components/Button'
 import { addSessionToCalendar } from '../constants/utils'
-import str from '../constants/strings'
 import NumericInput from 'react-native-numeric-input'
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
  const genderProps = [
 	{label: 'Unspecified', value: 'Unspecified'},
@@ -195,67 +194,11 @@ class SessionDetail extends Component {
 
 					<View style={{flex: 2, borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
 						<Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>Location</Text>
-						
-						<GooglePlacesAutocomplete
-							ref={(instance) => { this.GooglePlacesRef = instance }}
-							placeholder='Search...'
-							minLength={2}
-							autoFocus={false}
-							fetchDetails={true}
-							listViewDisplayed='auto'
-							returnKeyType={'search'}
-							onPress={(data, details) => {
-								this.GooglePlacesRef.setAddressText("")
-								const location = {}
-								try {
-									details.address_components.forEach(component => {
-										if (component.types[0] == 'postal_code') {
-											location.postcode = Object.values(component)[0]
-										}
-									})
-									if (location.postcode) {
-										if (details.types && details.types.includes('gym')) {
-											location.gym = details
-										}
-										this.setLocation(location)
-									}
-									else throw Error('Could not find postcode of location')
-
-								} catch(e) {
-									Alert.alert('Error', e.message)
-								}
-							}}
-							styles={locationSearch}
-							query={{key: str.googleApiKey, language: 'en', types: 'establishment'}}
-							debounce={200}
-							nearbyPlacesAPI='GooglePlacesSearch'
-							GooglePlacesSearchQuery={{rankby: 'distance',types: 'gym'}}
-							/>
-						{/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
-						 <TextInput
-							onChangeText={postcode => this.postcode = postcode}
-							style={{padding: 10, borderWidth: 0.5, borderColor: '#999', margin: 10, flex: 1}}
-							underlineColorAndroid='transparent'
-							placeholder='Enter postcode'/>
-							<TouchableOpacity onPress={()=> {
-								if (this.postcode) {
-									if (this.validatePostcode(this.postcode)) {
-										this.setLocation(this.postcode)
-									}
-									else {
-										Alert.alert("Error", "Postcode is invalid")
-									}
-								}
-							}}> 
-							<Icon name="md-return-right" 
-              style={{
-                color: colors.secondary,
-                fontSize: 40,
-                paddingTop: 5,
-								marginHorizontal: 20
-                }}/>
+							<TouchableOpacity
+							style={{padding: 10, margin: 10, borderWidth: 0.5, borderColor: '#999'}}
+							onPress={()=> this.setState({searchOpen: true})}>
+								<Text style={{color: '#999'}}>Search...</Text>
 							</TouchableOpacity>
-						</View> */}
 						<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
 						<Button style={{margin: 10}} onPress={()=> this.setLocationAsPosition()} text="Use my location" />
 						<Button style={{margin: 10}} onPress={()=> this.setState({mapOpen: true})} text="Select from map"/>
@@ -306,6 +249,29 @@ class SessionDetail extends Component {
 					this.setLocation(location, true)
 				}}
 				/>
+				<LocationSearchModal
+					onPress={(details) => {
+						const location = {}
+						try {
+							details.address_components.forEach(component => {
+								if (component.types[0] == 'postal_code') {
+									location.postcode = Object.values(component)[0]
+								}
+							})
+							if (location.postcode) {
+								if (details.types && details.types.includes('gym')) {
+									location.gym = details
+								}
+								this.setLocation(location)
+								this.setState({searchOpen: false})
+							}
+							else throw Error('Could not find postcode of location')
+						} catch(e) {
+							Alert.alert('Error', e.message)
+						}
+					}}
+				onClosed={() => this.setState({searchOpen: false})}
+				isOpen={this.state.searchOpen}/>
 			</Container>
 			)
 	}

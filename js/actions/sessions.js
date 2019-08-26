@@ -67,6 +67,7 @@ export const fetchSessions = () => {
 				Object.keys(snapshot.val()).forEach(key => {
 					if (snapshot.val()[key] != 'private') {
 						promises.push(firebase.database().ref('sessions').child(key).once('value'))
+						dispatch(addSessionChat(key, false))
 					}
 				})
 				Promise.all(promises).then(sessions => {
