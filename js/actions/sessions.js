@@ -5,6 +5,7 @@ import { fetchUsers, updateUsers } from './home'
 import { setGym } from './profile'
 import str from '../constants/strings'
 import  { calculateDuration } from '../constants/utils'
+import { Alert } from 'react-native'
 export const SET_SESSIONS = 'SET_SESSIONS'
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS'
 export const UPDATE_PRIVATE_SESSIONS = 'UPDATE_PRIVATE_SESSIONS'
@@ -78,7 +79,21 @@ export const fetchSessions = () => {
 								host = {uid: session.val().host}
 								userFetches.push(session.val().host)
 							}
-						obj[session.key] = {...session.val(), host, key: session.key}
+							const duration = calculateDuration(session.val())
+							const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
+							const current = new Date().getTime()
+							if (time + duration < current) {
+								const action = session.val().host == uid ? 'delete' : 'leave'
+								Alert.alert(
+									`${session.val().title} has expired`,
+									`Do you want to ${action} the session?`,
+									[
+										{text: 'Cancel', style: 'cancel'},
+										{text: 'Yes', onPress: () => dispatch(removeSession(session.key, false)), style: 'destructive'}
+									]
+								)
+							}
+							obj[session.key] = {...session.val(), host, key: session.key}
 					})
 					dispatch(updateSessions(obj))
 					dispatch(checkUserFetches(userFetches))
@@ -116,21 +131,6 @@ export const fetchSessions = () => {
 										const inProgress = time < current
 										firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
 											dispatch(setSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
-										})
-									}
-									else {
-										//validate time serverside before deleting session in case clients time is wrong
-										firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
-										.then(()=> {
-											firebase.database().ref('timestamp').once('value', timestamp => {
-												if (timestamp.val() > time + duration) {
-													dispatch(removeSession(key, snapshot.val().private))
-													firebase.database().ref('sessions/' + key).remove()
-													firebase.database().ref('sessionChats').child(key).remove()
-													dispatch(removeSessionChat(key))
-													geofire.remove(key)
-												}
-											})
 										})
 									}
 								}
@@ -176,30 +176,26 @@ export const fetchPrivateSessions = () =>  {
 						const duration = calculateDuration(session.val())
 						const time = new Date(session.val().dateTime.replace(/-/g, "/")).getTime()
 						const current = new Date().getTime()
-						if (time + duration > current) {
-							const inProgress = time < current
-							let host = checkHost(session.val().host, getState())
-							if (!host) {
-								host = {uid: session.val().host}
-								userFetches.push(session.val().host)
-							}
-							return {...session.val(), key: session.key, inProgress, host}
-							//this.props.onJoin(session.key, true)
+						if (time + duration < current) {
+							const action = session.val().host == uid ? 'delete' : 'leave'
+								Alert.alert(
+									`${session.val().title} has expired`,
+									`Do you want to ${action} the session?`,
+									[
+										{text: 'Cancel', style: 'cancel'},
+										{text: 'Yes', onPress: () => dispatch(removeSession(session.key, false)), style: 'destructive'}
+									]
+								)
 						}
-						else {
-							//validate time serverside before deleting session in case clients time is wrong
-							firebase.database().ref('timestamp').set(firebase.database.ServerValue.TIMESTAMP)
-							.then(()=> {
-								firebase.database().ref('timestamp').once('value', snapshot => {
-									if (snapshot.val() > time + duration) {
-										dispatch(removeSession(session.key, true))
-										firebase.database().ref('privateSessions' + '/' + session.key).remove()
-										firebase.database().ref('sessionChats').child(session.key).remove()
-									}
-								})
-							})
+						const inProgress = time < current
+						let host = checkHost(session.val().host, getState())
+						if (!host) {
+							host = {uid: session.val().host}
+							userFetches.push(session.val().host)
 						}
+						return {...session.val(), key: session.key, inProgress, host}
 					})
+
 					const obj = privateSessions.reduce(function(acc, cur, i) {
 						if (cur) {
 							acc[cur.key] = cur
@@ -309,7 +305,9 @@ export const removeSession = (key, isPrivate, force = false) => {
 			firebase.database().ref(type + '/' + key).remove()
 			Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(key).remove())
 			firebase.database().ref('sessionChats').child(key).remove()
-			geofire.remove(key)
+			if (!isPrivate) {
+				geofire.remove(key)
+			}
 		}
 		else {
 			firebase.database().ref('users/' + uid + '/sessions').child(key).remove()

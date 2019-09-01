@@ -315,7 +315,7 @@ export function getSimplifiedTime(createdAt) {
     }
 
     export const calculateDuration = (data) => {
-      const minutes = data.durationMinutes/60
+      const minutes = data.durationMinutes/60 || 0
       const hours = data.duration
       return (minutes + hours)* 60 * 60 * 1000
     }

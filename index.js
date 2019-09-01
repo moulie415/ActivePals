@@ -253,14 +253,6 @@ class FitLink extends React.Component {
       }
       else console.log('no user to set token on')
     })
-
-    if (firebase.auth().currentUser) {
-      const profile = await store.dispatch(fetchProfile())
-      store.dispatch(doSetup(profile))
-    }
-    else {
-      //perhaps navigate login here if current screen isnt login
-    }
   }
 
   componentWillUnmount() {

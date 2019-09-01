@@ -3,6 +3,7 @@ import {
   Alert,
   View,
   ImageBackground,
+  Platform
  } from "react-native"
 import {
   Input,
@@ -39,26 +40,28 @@ import Button from './components/Button'
     this.state = {
       user: null,
       spinner: false,
-      secure: true
+      secure: true,
+      secondAuthChange: false,
     }
-    const navigation = props.navigation
   }
 
   componentDidMount() {
     SplashScreen.hide()
     firebase.auth().onAuthStateChanged(user => {
-      if (user && user.emailVerified && !this.state.waitForData) {
-        this.setState({spinner: true})
-        firebase.auth().fetchSignInMethodsForEmail(user.email).then(providers => {
-        this.setState({spinner: false})
-          if (providers.length > 0) {
-            this.props.onLogin()
-          }
-          else if (this.props.nav.index > 0) { 
-              this.props.logout()
-            }
-        })
-        .catch(e => console.log(e))
+      if (user && (user.emailVerified || (user.providerData && user.providerData.length > 0)) 
+      && !this.state.waitForData) {
+        /*ios onAuthStateChanged gets called twice so we want to account
+        for this so that we don't have unnecessary calls*/
+        if (this.state.secondAuthChange || Platform.OS != 'ios') {
+          this.setState({spinner: false})
+          this.props.onLogin()
+        }
+        else {
+          this.setState({secondAuthChange: true})
+        }
+      }
+      else if (this.props.loggedIn) {
+        this.props.logout()
       }
     })
   }
@@ -348,8 +351,8 @@ import Button from './components/Button'
 
 
 import { connect } from 'react-redux'
-import { navigateLogin, navigateHome } from 'Anyone/js/actions/navigation'
-import { doSetup, fetchProfile, setHasLoggedIn, setLoggedOut } from 'Anyone/js/actions/profile'
+import { navigateLogin, navigateHome } from './actions/navigation'
+import { doSetup, fetchProfile, setHasLoggedIn, setLoggedOut } from './actions/profile'
 
 const mapStateToProps = ({ home, settings, profile, nav }) => ({
   loggedIn: profile.loggedIn,
