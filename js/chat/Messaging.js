@@ -23,6 +23,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
 import { guid } from '../constants/utils'
 import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
+import str from '../constants/strings'
 //import EmojiInput from 'react-native-emoji-input'
 import { PulseIndicator } from 'react-native-indicators'
 
@@ -314,6 +315,33 @@ class Messaging extends React.Component {
               </TouchableOpacity>*/}
               </View>
             }}
+            parsePatterns={(linkStyle) => [
+              { pattern: str.mentionRegex, style: linkStyle, onPress: async (mention) => {
+                const name = mention.substring(1)
+                const combined = [
+                  ...Object.values(this.props.friends),
+                  ...Object.values(this.props.users)]
+                if (name == this.props.profile.username) {
+                  this.props.navigateProfile()
+                }
+                else {
+                  const found = combined.find(friend => friend.username == name)
+                  if (found) {
+                    this.props.viewProfile(found.uid)
+                  }
+                  else {
+                    try {
+                      const snapshot = await firebase.database().ref('usernames').child(name).once('value')
+                      if (snapshot.val()) {
+                        this.props.viewProfile(snapshot.val())
+                      }
+                    } catch(e) {
+                      console.warn(e.message)
+                    }
+                  }
+                }
+              } },
+             ]}
           />
           {/*this.state.showEmojiKeyboard &&  <EmojiInput
             enableSearch={Platform.OS == 'android'}
@@ -437,8 +465,9 @@ const fetchId = (params) => {
   else return params.chatId
 }
 
-const mapStateToProps = ({ friends, profile, chats }, ownProps) => ({
+const mapStateToProps = ({ friends, profile, chats, sharedInfo }, ownProps) => ({
   friends: friends.friends,
+  users: sharedInfo.users,
   profile: profile.profile,
   gym: profile.gym,
   sessionChats: chats.sessionChats,

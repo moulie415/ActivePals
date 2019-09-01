@@ -7,8 +7,9 @@
     "start-prod": "ENV=production ./envscript.sh && ENVFILE=.env.prod node node_modules/react-native/local-cli/cli.js start",
     "build-android-prod": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
     "android-beta": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && fastlane android beta",
-    "postinstall": "npx jetify && rm -r node_modules/react-native-gifted-chat/node_modules/react-native-video",
-    "prestart": "rm -r node_modules/react-native-gifted-chat/node_modules/react-native-video"
+    "postinstall": "npx jetify && npm run remove-uneeded",
+    "prestart": "npm run remove-uneeded",
+    "remove-uneeded": "rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-parsed-text && rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-video"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.1",

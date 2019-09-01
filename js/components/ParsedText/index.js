@@ -5,30 +5,32 @@ import colors from '../../constants/colors'
 import PropTypes from 'prop-types'
 import firebase from 'react-native-firebase'
 
-const CustomParsedText = ({text, friends, users, profile, goToProfile, viewProfile}) => {
+const CustomParsedText = ({text, friends, users, profile, goToProfile, viewProfile, disableOnPress, color}) => {
   return <ParsedText 
-    style={{color: '#000'}}
+    style={{color: color || '#000'}}
     parse={
       [
         {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: async (mention) => {
-          const name = mention.substring(1)
-          const combined = [...Object.values(friends), ...Object.values(users)]
-          if (name == profile.username) {
-            goToProfile()
-          }
-          else {
-            const found = combined.find(friend => friend.username == name)
-            if (found) {
-              viewProfile(found.uid)
+          if (!disableOnPress) {
+            const name = mention.substring(1)
+            const combined = [...Object.values(friends), ...Object.values(users)]
+            if (name == profile.username) {
+              goToProfile()
             }
             else {
-              try {
-                const snapshot = await firebase.database().ref('usernames').child(name).once('value')
-                if (snapshot.val()) {
-                  viewProfile(snapshot.val())
+              const found = combined.find(friend => friend.username == name)
+              if (found) {
+                viewProfile(found.uid)
+              }
+              else {
+                try {
+                  const snapshot = await firebase.database().ref('usernames').child(name).once('value')
+                  if (snapshot.val()) {
+                    viewProfile(snapshot.val())
+                  }
+                } catch(e) {
+                  console.warn(e.message)
                 }
-              } catch(e) {
-                console.warn(e.message)
               }
             }
           }
@@ -45,7 +47,9 @@ CustomParsedText.propTypes = {
   friends: PropTypes.any,
   users: PropTypes.any,
   goToProfile: PropTypes.func,
-  viewProfile: PropTypes.func
+  viewProfile: PropTypes.func,
+  disableOnPress: PropTypes.bool,
+  color: PropTypes.string,
 }
 
 import { connect } from 'react-redux'
