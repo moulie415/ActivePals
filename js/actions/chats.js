@@ -13,6 +13,7 @@ export const SET_GYM_CHAT = 'SET_GYM_CHAT'
 export const SET_MESSAGE = 'SET_MESSAGE'
 export const RESET_MESSAGE = 'RESET_MESSAGE'
 export const SET_UNREAD_COUNT = 'SET_UNREAD_COUNT'
+export const MUTE_CHAT = 'MUTE_CHAT'
 
 const setSessionChats = (sessionChats) => ({
 	type: SET_SESSION_CHATS,
@@ -36,6 +37,7 @@ const addToChats = (uid, chat) => ({
 	chat,
 })
 
+
 const setMessageSession = (id, messages) => ({
 	type: SET_MESSAGE_SESSION,
 	id,
@@ -52,6 +54,12 @@ const updateSessionChat = (key, lastMessage) => ({
 	type: UPDATE_SESSION_CHAT,
 	key,
 	lastMessage,
+})
+
+const setMute = (id, mute) => ({
+	type: MUTE_CHAT,
+	id,
+	mute
 })
 
 export const setGymChat = (chat) => ({
@@ -83,6 +91,8 @@ export const setUnreadCount = ({id, count}) => ({
 	id,
 	count
 })
+
+
 
 
 export const updateLastMessage = (notif) => {
@@ -408,5 +418,13 @@ export const fetchGymMessages = (id, amount, endAt) => {
 				})
 			})
 		})
+	}
+}
+
+export const muteChat = (id, mute) => {
+	return (dispatch, getState) => {
+		const uid = getState().profile.profile.uid
+		dispatch(setMute(id, mute))
+		firebase.database().ref('muted/' + uid).child(id).set(mute)
 	}
 }

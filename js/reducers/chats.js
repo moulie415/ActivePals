@@ -11,7 +11,8 @@ import {
 	SET_GYM_CHAT,
 	SET_MESSAGE,
 	RESET_MESSAGE,
-	SET_UNREAD_COUNT
+	SET_UNREAD_COUNT,
+	MUTE_CHAT
 } from '../actions/chats'
 
 import {
@@ -23,7 +24,8 @@ const initialState = {
 	chats: {},
 	messageSessions: {},
 	unreadCount: {},
-	gymChat: {}
+	gymChat: {},
+	muted: {}
 }
 
 export default function(state = initialState, action) {
@@ -114,7 +116,12 @@ export default function(state = initialState, action) {
 				...state,
 				unreadCount: {...state.unreadCount, [action.id]: action.count}
 			}
-        case SET_LOGGED_OUT: {
+		case MUTE_CHAT:
+				return {
+					...state,
+					muted: {...state.muted, [action.id]: action.mute}
+		}
+    case SET_LOGGED_OUT: {
 			return initialState
 		}
 		default:

@@ -10,7 +10,8 @@ import {
 	View,
 	Alert,
 	TextInput,
-	TouchableOpacity
+	TouchableOpacity,
+	Platform
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
@@ -121,6 +122,8 @@ class SessionDetail extends Component {
 						<View style={{flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10}}>
 							<Text style={{marginRight: 5}}>Add to calendar</Text>
 							<Switch 
+							trackColor={{true: colors.secondary}}
+    					thumbColor={Platform.select({android: this.state.addToCalendar ? colors.secondary : '#fff'})}
 							value={this.state.addToCalendar}
 							onValueChange={async (val)=> {
 								this.setState({addToCalendar: val})

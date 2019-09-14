@@ -3,7 +3,9 @@ import {
   View,
   TouchableOpacity,
   Alert,
-  ScrollView
+  ScrollView,
+  Switch,
+  Platform
 } from 'react-native'
 import {
   Icon,
@@ -253,10 +255,17 @@ class SessionInfo extends Component {
 
 chatButton(session) {
   return <Button  text="Chat" onPress={()=> this.props.openSessionChat(session)}/>
-//   return <TouchableOpacity
-//     onPress={()=> this.props.openSessionChat(session)}>
-//   <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10}}/>
-// </TouchableOpacity>
+}
+
+muteButton() {
+  return <View style={{flexDirection: 'row', alignItems: 'center'}}>
+    <Text>Mute </Text>
+    <Switch
+    trackColor={{true: colors.secondary}}
+    thumbColor={Platform.select({android: this.props.muted[this.sessionId] ? colors.secondary : '#fff'})}
+    value={this.props.muted[this.sessionId]}
+    onValueChange={(val) => this.props.muteChat(this.sessionId, val)} />
+    </View>
 }
 
   getButtons(host, session) {
@@ -285,6 +294,7 @@ chatButton(session) {
             text="Delete"
             />
             {this.chatButton(session)}
+            {this.muteButton()}
           </View>
           )
       }
@@ -300,6 +310,7 @@ chatButton(session) {
           }}
           />
           {this.chatButton(session)}
+          {this.muteButton()}
           </View>
         )
     }
@@ -341,17 +352,19 @@ import {
   fetchPrivateSession
 } from '../actions/sessions'
 import {
-  addSessionChat
+  addSessionChat,
+  muteChat
 } from '../actions/chats'
 
-const mapStateToProps = ({ profile, sharedInfo, friends, sessions }) => ({
+const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => ({
   profile: profile.profile,
   users: sharedInfo.users,
   friends: friends.friends,
   location: profile.location,
   places: sessions.places,
   sessions: sessions.sessions,
-  privateSessions: sessions.privateSessions
+  privateSessions: sessions.privateSessions,
+  muted: chats.muted
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -367,7 +380,8 @@ const mapDispatchToProps = dispatch => ({
   },
   fetchSession: (id) => dispatch(fetchSession(id)),
   fetchPrivateSession: (id) => dispatch(fetchPrivateSession(id)),
-  openSessionChat: (session) => dispatch(navigateMessagingSession(session))
+  openSessionChat: (session) => dispatch(navigateMessagingSession(session)),
+  muteChat: (id, mute) => dispatch(muteChat(id, mute))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo)

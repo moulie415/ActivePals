@@ -4,7 +4,9 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Linking
+  Linking,
+  Switch,
+  Platform
 } from "react-native"
 import {
   Container,
@@ -85,15 +87,7 @@ import styles from './styles/gymStyles'
           
           <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow}}>
             {this.props.gym && this.props.gym.place_id == this.id ? 
-              <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-              <Text style={{fontWeight: 'bold', color: colors.secondary, alignSelf: 'center'}}>Your active gym</Text>
-              <TouchableOpacity 
-                  onPress={() => {
-                    this.props.onOpenGymChat(gym.place_id)
-                  }}
-                  style={{justifyContent: 'center', marginRight: 20, borderRadius: 5}}>
-                  <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
-              </TouchableOpacity>
+              <View style={[styles.infoRowContainer, styles.infoRowSpaceEvenly]}>
               <Button
               onPress={() => {
                   Alert.alert(
@@ -107,7 +101,23 @@ import styles from './styles/gymStyles'
                   }}
                 style={{alignSelf: 'flex-start'}}
                 text="Leave"
-                color='red'/></View> :
+                color='red'/>
+              <Button
+                text="Chat"
+                  onPress={() => {
+                    this.props.onOpenGymChat(gym.place_id)
+                  }}
+                  style={{justifyContent: 'center', borderRadius: 5}} />
+              
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text>Mute </Text>
+                  <Switch
+                  trackColor={{true: colors.secondary}}
+                  thumbColor={Platform.select({android: this.props.muted[this.id] ? colors.secondary : '#fff'})}
+                  value={this.props.muted[this.id]}
+                  onValueChange={(val) => this.props.muteChat(this.id, val)} />
+                  </View>
+                </View> :
               <View style={styles.infoRowContainer}>
                 <Button
                 onPress={()=> {
@@ -323,15 +333,17 @@ import {
 } from './actions/navigation'
 import { removeGym, joinGym } from './actions/profile'
 import { fetchGym } from './actions/sessions'
+import { muteChat } from './actions/chats'
 
 
-const mapStateToProps = ({ friends, sharedInfo, profile, sessions }) => ({
+const mapStateToProps = ({ friends, sharedInfo, profile, sessions, chats }) => ({
   friends: friends.friends,
   users: sharedInfo.users,
   profile: profile.profile,
   gym: profile.gym,
   location: profile.location,
-  places: sessions.places
+  places: sessions.places,
+  muted: chats.muted
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -344,6 +356,7 @@ const mapDispatchToProps = dispatch => ({
   navigateSessionDetail: (friends, location) => dispatch(navigateSessionDetail(friends,location)),
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   goToProfile: () => dispatch(navigateProfile()),
+  muteChat: (id, mute) => dispatch(muteChat(id, mute))
  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Gym)

@@ -4,6 +4,7 @@ import {
   View,
   FlatList,
   TouchableOpacity,
+  Platform
 } from "react-native"
 import {
   Container,
@@ -148,7 +149,11 @@ import PrivateIcon from '../components/PrivateIcon'
           title={'Sessions'}
            right={<View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
             <Text style={{color: '#fff'}}>Map: </Text>
-            <Switch value={this.state.switch} onValueChange={(val)=> {
+            <Switch
+            trackColor={{true: colors.secondary}}
+    				thumbColor={Platform.select({android: this.state.switch ? colors.secondary : '#fff'})}
+            value={this.state.switch}
+            onValueChange={(val)=> {
               if (val) {
                 if (this.state.latitude && this.state.longitude) {
                   this.setState({switch: val})
