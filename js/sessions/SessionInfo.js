@@ -294,7 +294,7 @@ muteButton() {
             text="Delete"
             />
             {this.chatButton(session)}
-            {this.muteButton()}
+            {/* {this.muteButton()} */}
           </View>
           )
       }
@@ -310,7 +310,7 @@ muteButton() {
           }}
           />
           {this.chatButton(session)}
-          {this.muteButton()}
+          {/* {this.muteButton()} */}
           </View>
         )
     }

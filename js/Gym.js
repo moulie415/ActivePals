@@ -109,14 +109,14 @@ import styles from './styles/gymStyles'
                   }}
                   style={{justifyContent: 'center', borderRadius: 5}} />
               
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text>Mute </Text>
                   <Switch
                   trackColor={{true: colors.secondary}}
                   thumbColor={Platform.select({android: this.props.muted[this.id] ? colors.secondary : '#fff'})}
                   value={this.props.muted[this.id]}
                   onValueChange={(val) => this.props.muteChat(this.id, val)} />
-                  </View>
+                  </View> */}
                 </View> :
               <View style={styles.infoRowContainer}>
                 <Button
