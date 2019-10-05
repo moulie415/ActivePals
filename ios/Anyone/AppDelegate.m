@@ -16,7 +16,7 @@
 #import <Firebase.h>
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
-#import "SplashScreen.h"
+#import "RNSplashScreen.h"
 #import "ReactNativeConfig.h"
 @import GoogleMaps;
 
@@ -53,7 +53,7 @@
   
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
-  [SplashScreen show];
+  [RNSplashScreen show];
   return YES;
 }
 

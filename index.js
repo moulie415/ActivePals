@@ -25,7 +25,6 @@ import {
 } from 'react-navigation-redux-helpers'
 import { setNotificationCount } from "./js/actions/home"
 import { navigateGymMessaging } from "./js/actions/navigation"
-import { fetchProfile, doSetup } from "./js/actions/profile"
 import Sound from 'react-native-sound'
 
 const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, (error) => {
