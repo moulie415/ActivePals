@@ -13,7 +13,7 @@ import thunk from 'redux-thunk'
 
 //import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType} from 'react-native-fcm'
 import App from 'Anyone/js/App'
-import { navigateMessaging, navigateMessagingSession, navigateFriends, navigatePostView } from './js/actions/navigation'
+import { navigateMessaging, navigateMessagingSession, navigateFriends, navigatePostView, navigateSessionInfo } from './js/actions/navigation'
 import { newNotification, updateLastMessage } from 'Anyone/js/actions/chats'
 import GeoFire from 'geofire'
 import bgMessaging from './js/bgMessaging'
@@ -68,7 +68,7 @@ export const showLocalNotification = (notif) => {
 
 const navigateFromNotif = (notif) => {
   const { dispatch } = store
-  const {  type, sessionId, sessionTitle, chatId, uid, username, postId, gymId } = notif
+  const {  type, sessionId, sessionTitle, chatId, uid, username, postId, gymId, isPrivate } = notif
   if (type == 'sessionMessage') {
     const session = {key: sessionId, title: sessionTitle, private: (notif.private == "privateSessions")}
     dispatch(navigateMessagingSession(session))
@@ -88,6 +88,9 @@ const navigateFromNotif = (notif) => {
       break
     case 'comment':
       dispatch(navigatePostView(postId))
+      break
+    case 'addedToSession':
+      dispatch(navigateSessionInfo(sessionId, !!isPrivate))
       break
   }
 }
@@ -125,7 +128,8 @@ export const persistor = persistStore(store)
 export const handleNotification = (notification, showLocal = true) => {
   const { dispatch, getState } = store
   const { type } = notification
-  if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage' || type == 'friendRequest') {
+  const localTypes = ['message', 'sessionMessage', 'gymMessage', 'friendRequest', 'addedToSession']
+  if (localTypes.includes(type)) {
     dispatch(newNotification(notification))
     dispatch(updateLastMessage(notification))
     showLocal && showLocalNotification(notification)
@@ -161,27 +165,31 @@ class FitLink extends React.Component {
     const channels = []
     channels.push(new firebase.notifications.Android.Channel('REQUEST', 'Pal requests', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for pal requests')
-        .setSound('notif.wav'))
+        .setSound(str.notifSound))
 
     channels.push(new firebase.notifications.Android.Channel('DIRECT_MESSAGES', 'Direct messages', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for direct messages from pals')
-        .setSound('notif.wav'))
+        .setSound(str.notifSound))
 
     channels.push(new firebase.notifications.Android.Channel('SESSION_MESSAGES', 'Session messages', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for session messages')
-        .setSound('notif.wav'))
+        .setSound(str.notifSound))
 
     channels.push(new firebase.notifications.Android.Channel('GYM_MESSAGES', 'Gym messages', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for gym messages')
-        .setSound('notif.wav'))
+        .setSound(str.notifSound))
 
     channels.push(new firebase.notifications.Android.Channel('COMMENT', 'Comment', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for comments on posts')
-        .setSound('notif.wav'))
+        .setSound(str.notifSound))
     
     channels.push(new firebase.notifications.Android.Channel('REP', 'Rep', firebase.notifications.Android.Importance.Max)
         .setDescription('Channel for reps')
-        .setSound('notif.wav'))
+        .setSound(str.notifSound))
+
+    channels.push(new firebase.notifications.Android.Channel('ADDED_TO_SESSION', 'Added to session', firebase.notifications.Android.Importance.Max)
+        .setDescription('Channel for when you get added to a session')
+        .setSound(str.notifSound))
    
     channels.forEach(channel => {
       firebase.notifications().android.createChannel(channel)
