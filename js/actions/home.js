@@ -97,14 +97,10 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 		const users = Object.values(getState().sharedInfo.users)
 		const combined = [...friends, ...users]
 		if (item.text) {
-			const split = item.text.split(" ")
-			const mentions = []
-			split.forEach(word => {
-				if (!mentions.includes(word)) {
-					const mention = word.match(str.mentionRegex)
-					if (mention) {
-						mentions.push(word)
-						const username = mention.input.substring(1)
+			const mentions = item.text.match(str.mentionRegex)
+			if (mentions) {
+				mentions.forEach(mention => {
+						const username = mention.substring(1)
 						const friend = combined.find(friend => friend.username == username)
 						if (friend && friend.uid != postUid && friend.uid != item.uid) {
 							//add notification for user
@@ -118,10 +114,8 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 								}
 							})
 						}
-
-					}
-				}
-			})
+				})
+			}
 		}
 	}
 }
