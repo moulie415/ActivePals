@@ -187,7 +187,7 @@ export const fetchPrivateSessions = () =>  {
 									]
 								)
 						}
-						const inProgress = time < current
+						const inProgress = (time + duration > current && time < current)
 						let host = checkHost(session.val().host, getState())
 						if (!host) {
 							host = {uid: session.val().host}
