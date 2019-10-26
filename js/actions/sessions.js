@@ -15,6 +15,7 @@ export const SET_SESSION = 'SET_SESSION'
 export const SET_PLACES = 'SET_PLACES'
 export const SET_PLACE = 'SET_PLACE'
 export const SET_RADIUS = 'SET_RADIUS'
+export const SET_IGNORED = 'SET_IGNORED'
 
 const setPrivateSessions = (sessions) => ({
 	type: SET_PRIVATE_SESSIONS,
@@ -56,6 +57,11 @@ export const setRadius = (radius) => ({
 	radius
 })
 
+export const setIgnored = (session) => ({
+	type: SET_IGNORED,
+	session
+})
+
 export const fetchSessions = () => {
 	return (dispatch, getState) => {
 		dispatch(updateSessions([]))
@@ -83,15 +89,7 @@ export const fetchSessions = () => {
 							const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
 							const current = new Date().getTime()
 							if (time + duration < current) {
-								const action = session.val().host == uid ? 'delete' : 'leave'
-								Alert.alert(
-									`${session.val().title} has expired`,
-									`Do you want to ${action} the session?`,
-									[
-										{text: 'Cancel', style: 'cancel'},
-										{text: 'Yes', onPress: () => dispatch(removeSession(session.key, false)), style: 'destructive'}
-									]
-								)
+								dispatch(expirationAlert(session, false))
 							}
 							obj[session.key] = {...session.val(), host, key: session.key}
 					})
@@ -177,15 +175,7 @@ export const fetchPrivateSessions = () =>  {
 						const time = new Date(session.val().dateTime.replace(/-/g, "/")).getTime()
 						const current = new Date().getTime()
 						if (time + duration < current) {
-							const action = session.val().host == uid ? 'delete' : 'leave'
-								Alert.alert(
-									`${session.val().title} has expired`,
-									`Do you want to ${action} the session?`,
-									[
-										{text: 'Cancel', style: 'cancel'},
-										{text: 'Yes', onPress: () => dispatch(removeSession(session.key, false)), style: 'destructive'}
-									]
-								)
+							dispatch(expirationAlert(session, true))
 						}
 						const inProgress = (time + duration > current && time < current)
 						let host = checkHost(session.val().host, getState())
@@ -259,6 +249,25 @@ export const fetchPrivateSession = (id) => {
 		const inProgress = (time + duration > current && time < current)
 		const host = await firebase.database().ref('users/' + session.val().host).once('value')
 		dispatch(setPrivateSession({...session.val(), key: session.key, inProgress, host: host.val()}))
+	}
+}
+
+const expirationAlert = (session, isPrivate) => {
+	return (dispatch, getState) => {
+		const ignore = getState().sessions.ignored[session.key]
+		if (!ignore) {
+			const uid = getState().profile.profile.uid
+			const action = session.val().host == uid ? 'delete' : 'leave'
+			Alert.alert(
+				`${session.val().title} has expired`,
+				`Do you want to ${action} the session?`,
+				[
+					{text: "Don't ask me again", onPress: () => dispatch(setIgnored(session.key)) },
+					{text: 'Yes', onPress: () => dispatch(removeSession(session.key, isPrivate)), style: 'destructive'},
+					{text: 'Cancel', style: 'cancel'}
+				]
+			)
+		}
 	}
 }
 

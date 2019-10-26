@@ -7,18 +7,20 @@ import {
 	SET_PRIVATE_SESSION,
 	SET_PLACES,
 	SET_PLACE,
-	SET_RADIUS
-} from 'Anyone/js/actions/sessions'
+	SET_RADIUS,
+	SET_IGNORED
+} from '../actions/sessions'
 
 import {
 	SET_LOGGED_OUT,
-} from 'Anyone/js/actions/profile'
+} from '../actions/profile'
 
 const initialState = {
 	sessions: {},
 	privateSessions: {},
 	places: {},
 	radius: 10,
+	ignored: {}
 }
 
 export default function(state = initialState, action) {
@@ -75,6 +77,12 @@ export default function(state = initialState, action) {
 			return {
 				...state,
 				radius: action.radius,
+			}
+		}
+		case SET_IGNORED: {
+			return {
+				...state,
+				ignored: {...state.ignored, [action.session]: true}
 			}
 		}
 		case SET_LOGGED_OUT: {

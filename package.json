@@ -6,7 +6,8 @@
     "start": "ENV=development ./envscript.sh && ENVFILE=.env.dev node node_modules/react-native/local-cli/cli.js start",
     "start-prod": "ENV=production ./envscript.sh && ENVFILE=.env.prod node node_modules/react-native/local-cli/cli.js start",
     "build-android-prod": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
-    "android-beta": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && fastlane android beta",
+    "firebase-android": "npm run build-android-prod && ./firebase-android.sh",
+    "firebase-ios": "ENV=production ENVFILE=.env.prod ./envscript.sh && ./firebase-ios.sh", 
     "postinstall": "npx jetify && npm run remove-uneeded",
     "prestart": "npm run remove-uneeded",
     "remove-uneeded": "rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-parsed-text && rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-video"

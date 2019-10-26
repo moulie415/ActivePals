@@ -1,0 +1,1 @@
+After a fresh npm install RNGoogleSignin will be broken for ios so you need to find the module in xcode under Libraries and under Build Settings search for "Compile Sources As" and set to Objective-C++
