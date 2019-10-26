@@ -487,8 +487,6 @@ import PrivateIcon from '../components/PrivateIcon'
               </TouchableOpacity>
               }
           }}
-
-
       />}
       </View>
     }

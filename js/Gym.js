@@ -175,7 +175,7 @@ import styles from './styles/gymStyles'
             {gym.rating && <View style={styles.infoRowContainer}>
               {this.renderInfoHeader('Google rating')}
               <Text style={{color: '#999'}}>
-              <Text>{gym.rating}</Text>
+              <Text>{gym.rating.toFixed(2)}</Text>
               {gym.user_ratings_total && 
             <Text>{` from ${gym.user_ratings_total} ${gym.user_ratings_total > 1? 'ratings' : 'rating'}`}</Text>}
               </Text>
@@ -306,8 +306,6 @@ import styles from './styles/gymStyles'
     }
     else this.props.viewProfile(uid)
   }
-
-
 
 }
 
