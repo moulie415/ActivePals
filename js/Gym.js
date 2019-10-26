@@ -62,7 +62,10 @@ import styles from './styles/gymStyles'
       yourLat = this.props.location.lat
       yourLon = this.props.location.lon
     }
-    const locationString = `${gym.vicinity} ${this.props.location ? '(' + getDistance(gym, yourLat, yourLon, true) + ' km away)' : ''}`
+    let locationString
+    if (gym) {
+      locationString = `${gym.vicinity} ${this.props.location ? '(' + getDistance(gym, yourLat, yourLon, true) + ' km away)' : ''}`
+    }
     return (
     <Container>
     <Header 
