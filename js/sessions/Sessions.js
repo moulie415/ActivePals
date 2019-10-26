@@ -131,6 +131,18 @@ import PrivateIcon from '../components/PrivateIcon'
     return sessions
   }
 
+  sortPlacesByDistance(places) {
+    if (this.props.location) {
+      const { lat, lon }  = this.props.location
+      return  places.sort((a,b) => {
+        const distance1 = getDistance(a, lat, lon,  true)
+        const distance2 = getDistance(b, lat, lon, true)
+        return distance1 - distance2
+      })
+    }
+    else return places
+  }
+
   render () {
     //switch for list view and map view
     //action sheet when pressing
@@ -340,11 +352,15 @@ import PrivateIcon from '../components/PrivateIcon'
   }
 
   renderLists() {
-    let gym, lat, lng
+    let gym, yourLat, yourLon
       if (this.props.gym && this.props.gym.geometry) {
         gym = this.props.gym
         lat = gym.geometry.location.lat
         lng = gym.geometry.location.lng
+      }
+      if (this.props.location) {
+        yourLat = this.props.location.lat
+        yourLon = this.props.location.lon
       }
           return <View style={{flex: 1, marginTop: 45}}>
           <SegmentedControlTab
@@ -414,7 +430,7 @@ import PrivateIcon from '../components/PrivateIcon'
                     <View style={{flex: 5}}>
                       <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
                         <Text style={{flex: 3}} numberOfLines={1}><Text  style={styles.title}>{item.title}</Text>
-                        <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : getDistance(item, this.state.yourLocation)) + ' km away)'}</Text></Text>
+                        <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : getDistance(item, yourLat, yourLon)) + ' km away)'}</Text></Text>
                       </View>
                       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                       <Text style={[styles.date, {color: item.inProgress ? colors.secondary : "#999"}]} >
@@ -435,15 +451,14 @@ import PrivateIcon from '../components/PrivateIcon'
             </TouchableOpacity>
           )}
       /> : <FlatList 
-            data={Object.values(this.props.places)}
+            data={this.sortPlacesByDistance(Object.values(this.props.places))}
             refreshing={this.state.refreshing}
             ListFooterComponent={Object.values(this.props.places).length > 0 && this.state.token &&
             <TouchableOpacity 
             disabled={this.state.loadingGyms}
             onPress={() => {
               this.setState({loadingGyms: true})
-              const { latitude, longitude } = this.state.yourLocation
-              this.props.fetchPlaces(latitude, longitude, this.state.token).then(({token}) => {
+              this.props.fetchPlaces(lat, lon, this.state.token).then(({token}) => {
                 this.setState({loadingGyms: false, token})
               })
             }}>
@@ -473,7 +488,7 @@ import PrivateIcon from '../components/PrivateIcon'
                           <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
                         </View>
                         <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
-                        <Text style={{color: '#999'}}>{' (' +  getDistance(item, this.state.yourLocation, true) + ' km away)'}</Text>
+                        <Text style={{color: '#999'}}>{' (' +  getDistance(item, yourLat, yourLon, true) + ' km away)'}</Text>
                     </View>
                     <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
                     <TouchableOpacity onPress={()=>{
@@ -569,7 +584,6 @@ import PrivateIcon from '../components/PrivateIcon'
         this.setState({
           latitude: lat,
           longitude: lon,
-          yourLocation: position.coords,
           error: null,
           showMap: true,
           spinner: false
@@ -660,6 +674,7 @@ const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => (
   users: sharedInfo.users,
   places: sessions.places,
   radius: sessions.radius,
+  location: profile.location,
 })
 
 const mapDispatchToProps = dispatch => ({

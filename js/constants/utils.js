@@ -261,10 +261,8 @@ export function getSimplifiedTime(createdAt) {
       }
     }
 
-    export const getDistance = (item, yourLocation, gym = false) =>  {
-      if (yourLocation) {
-        let lat1 = yourLocation.latitude
-        let lon1 =  yourLocation.longitude
+    export const getDistance = (item, lat1, lon1, gym = false) =>  {
+      if (lat1 && lon1) {
         let lat2
         let lon2
         if (gym) {

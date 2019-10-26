@@ -45,7 +45,7 @@ const GymModal = (
             <View style={{flex: 1}}>
               <Text>
                 <Text>{vicinity}</Text>
-                <Text style={{color: '#999'}}>{' (' + getDistance(gym, location, true) + ' km away)'}</Text>
+                <Text style={{color: '#999'}}>{' (' + getDistance(gym, location.lat, location.lon, true) + ' km away)'}</Text>
               </Text>
             </View>
             <Button onPress={()=> {

@@ -19,7 +19,7 @@ import str from './constants/strings'
 import hStyles from './styles/homeStyles'
 import colors from './constants/colors'
 import { Image as SlowImage } from 'react-native'
-import { deg2rad  } from './constants/utils'
+import { deg2rad, getDistance  } from './constants/utils'
 import Hyperlink from 'react-native-hyperlink'
 import Header from './components/Header/header'
 import { Popup } from 'react-native-map-link'
@@ -57,6 +57,12 @@ import styles from './styles/gymStyles'
 
   render () {
     const gym = this.props.places[this.id]
+    let yourLat, yourLon
+    if (this.props.location) {
+      yourLat = this.props.location.lat
+      yourLon = this.props.location.lon
+    }
+    const locationString = `${gym.vicinity} ${this.props.location ? '(' + getDistance(gym, yourLat, yourLon, true) + ' km away)' : ''}`
     return (
     <Container>
     <Header 
@@ -141,9 +147,11 @@ import styles from './styles/gymStyles'
             <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
               <View style={{flex: 4}}>
                 {this.renderInfoHeader('Location')}
-                  {gym.vicinity && <Text numberOfLines={1} style={{color: '#999'}}>
-                    {`${gym.vicinity} ${this.props.location ? '(' + this.getDistance(gym) + ' km away)' : ''}`}
-                  </Text>}
+                  {gym.vicinity && <TouchableOpacity onPress={()=> Alert.alert(gym.name, locationString)}>
+                  <Text numberOfLines={1} style={{color: '#999'}}>
+                    {locationString}
+                  </Text>
+                  </TouchableOpacity>}
               </View>
                 <Button onPress={()=> {
                 const { lat, lng } = gym.geometry.location
@@ -256,27 +264,6 @@ import styles from './styles/gymStyles'
     </Container>
   )
   }
-  getDistance(item) {
-    if (item.geometry) {
-      let lat1 = this.props.location.lat
-      let lon1 =  this.props.location.lon
-      let lat2 = item.geometry.location.lat
-      let lon2 = item.geometry.location.lng
-      let R = 6371
-      let dLat = deg2rad(lat2 - lat1)
-      let dLon = deg2rad(lon2 - lon1)
-      let a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2)
-  
-      let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-      let d = R * c
-      return d.toFixed(2)
-    }
-    else return 'N/A'
-  }
-
 
   renderInfoHeader(text) {
     return <Text style={{fontSize: 18}}>{text}</Text>
