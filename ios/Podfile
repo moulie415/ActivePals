@@ -61,6 +61,9 @@ target 'Anyone' do
 
   pod 'react-native-slider', :path => '../node_modules/@react-native-community/slider'
 
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+
 end
 post_install do |installer|
   installer.pods_project.targets.each do |target|

@@ -6,6 +6,7 @@ export const SET_GYM = 'SET_GYM'
 export const REMOVE_GYM = 'REMOVE_GYM'
 export const SET_LOCATION = 'SET_LOCATION'
 export const SET_HAS_VIEWED_WELCOME = 'SET_HAS_VIEWED_WELCOME'
+export const SET_ENV_VARS = 'SET_ENV_VARS'
 import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat, getUnreadCount } from './chats'
 import { fetchPosts } from './home'
@@ -16,6 +17,11 @@ import { navigateLogin, navigateHome, navigateWelcome } from './navigation'
 const setProfile = (profile) => ({
 	type: SET_PROFILE,
 	profile,
+})
+
+const setEnvVars = (vars) => ({
+	type: SET_ENV_VARS,
+	vars
 })
 
 export const setHasLoggedIn = (loggedIn) => ({
@@ -47,19 +53,22 @@ export const setHasViewedWelcome = () => ({
 
 
 export const fetchProfile = () => {
-	return (dispatch) => {
+	return async (dispatch) => {
 		const user = firebase.auth().currentUser
+		const envVars = await firebase.database().ref('ENV_VARS').once('value')
+		const { GOOGLE_API_KEY } = envVars.val() 
+		dispatch(setEnvVars(envVars.val()))
 		return new Promise(resolve => {
 			firebase.database().ref('users/' + user.uid).once('value', snapshot => {
 				firebase.storage().ref('images/' + user.uid ).child('avatar').getDownloadURL()
 				.then(url => {
 					dispatch(setProfile({...snapshot.val(), avatar: url}))
-					fetchGym(snapshot.val(), dispatch)
+					fetchGym(snapshot.val(), dispatch, GOOGLE_API_KEY)
 					resolve({...snapshot.val(), avatar: url})
 				})
 				.catch(e => {
 					dispatch(setProfile(snapshot.val()))
-					fetchGym(snapshot.val(), dispatch)
+					fetchGym(snapshot.val(), dispatch, GOOGLE_API_KEY)
 					resolve(snapshot.val())
 				})
 			})
@@ -67,10 +76,10 @@ export const fetchProfile = () => {
 	}
 }
 
-const fetchGym = (profile, dispatch) => {
+const fetchGym = (profile, dispatch, apiKey) => {
 	if (profile.gym) {
 		firebase.database().ref('gyms/' + profile.gym).once('value', gym => {
-			fetchPhotoPath(gym.val()).then(gym => {
+			fetchPhotoPath(gym.val(), apiKey).then(gym => {
 				dispatch(setGym(gym))
 			})
 		})
@@ -82,7 +91,7 @@ export const doSetup = (profile) => {
 		const uid = profile.uid
 		setupPresence(uid)
 		try {
-		const fcmToken = await firebase.messaging().getToken()
+			const fcmToken = await firebase.messaging().getToken()
 			if (fcmToken) {
 				firebase.database().ref('users/' + uid).child('FCMToken').set(fcmToken)
 				console.log('fcm token: ' + fcmToken)

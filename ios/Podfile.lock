@@ -218,6 +218,8 @@ PODS:
     - React
   - RNShare (1.2.1):
     - React
+  - RNVectorIcons (6.6.0):
+    - React
   - SPTPersistentCache (1.1.0)
   - yoga (0.59.9.React)
 
@@ -260,10 +262,11 @@ DEPENDENCIES:
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - RNShare (from `../node_modules/react-native-share`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga/yoga.podspec`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - Crashlytics
     - DVAssetLoaderDelegate
     - Fabric
@@ -323,6 +326,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/async-storage"
   RNShare:
     :path: "../node_modules/react-native-share"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga/yoga.podspec"
 
@@ -369,9 +374,10 @@ SPEC CHECKSUMS:
   rn-fetch-blob: 766f85cabd2992300dfa1be2bc9e4e258abc6f04
   RNCAsyncStorage: 621bad7a889b5bf1583a52547f2dcd3a4d1ff15e
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
+  RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 03ff42a6f223fb88deeaed60249020d80c3091ee
 
-PODFILE CHECKSUM: f7eeb2b7dc60558ea68958c77a0233f0ee3fec75
+PODFILE CHECKSUM: ee969eac822a361f7788685cb2f9778958c947d1
 
-COCOAPODS: 1.7.4
+COCOAPODS: 1.8.4

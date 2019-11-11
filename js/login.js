@@ -261,11 +261,13 @@ import Button from './components/Button'
     })
   }
 
-  gLogin() {
+  async gLogin() {
     this.setState({waitForData: true})
+    const iosClientId = await firebase.database().ref('ENV_VARS').child('GOOGLE_IOS_ID').once('value')
+    const webClientId = await firebase.database().ref('ENV_VARS').child('GOOGLE_WEB_ID').once('value')
     GoogleSignin.configure({
-      iosClientId: Config.GOOGLE_IOS_ID,
-      webClientId: Config.GOOGLE_WEB_ID
+      iosClientId: iosClientId.val(),
+      webClientId: webClientId.val()
     }).then(() => {
       GoogleSignin.hasPlayServices({ autoResolve: true })
         .then(() => {
@@ -352,9 +354,9 @@ import Button from './components/Button'
 
 import { connect } from 'react-redux'
 import { navigateLogin, navigateHome } from './actions/navigation'
-import { doSetup, fetchProfile, setHasLoggedIn, setLoggedOut } from './actions/profile'
+import { doSetup, fetchProfile, setLoggedOut } from './actions/profile'
 
-const mapStateToProps = ({ home, settings, profile, nav }) => ({
+const mapStateToProps = ({ profile, nav, sharedInfo }) => ({
   loggedIn: profile.loggedIn,
   nav,
 })
@@ -368,7 +370,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(navigateLogin())
     dispatch(setLoggedOut())
   },
-  goHome: ()=> dispatch(navigateHome())
+  goHome: ()=> dispatch(navigateHome()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login)
