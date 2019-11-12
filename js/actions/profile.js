@@ -56,19 +56,20 @@ export const fetchProfile = () => {
 	return async (dispatch) => {
 		const user = firebase.auth().currentUser
 		const envVars = await firebase.database().ref('ENV_VARS').once('value')
-		const { GOOGLE_API_KEY } = envVars.val() 
+		const { GOOGLE_API_KEY } = envVars.val()
+		process.env.GOOGLE_API_KEY = GOOGLE_API_KEY
 		dispatch(setEnvVars(envVars.val()))
 		return new Promise(resolve => {
 			firebase.database().ref('users/' + user.uid).once('value', snapshot => {
 				firebase.storage().ref('images/' + user.uid ).child('avatar').getDownloadURL()
 				.then(url => {
 					dispatch(setProfile({...snapshot.val(), avatar: url}))
-					fetchGym(snapshot.val(), dispatch, GOOGLE_API_KEY)
+					fetchGym(snapshot.val(), dispatch)
 					resolve({...snapshot.val(), avatar: url})
 				})
 				.catch(e => {
 					dispatch(setProfile(snapshot.val()))
-					fetchGym(snapshot.val(), dispatch, GOOGLE_API_KEY)
+					fetchGym(snapshot.val(), dispatch)
 					resolve(snapshot.val())
 				})
 			})
@@ -76,10 +77,10 @@ export const fetchProfile = () => {
 	}
 }
 
-const fetchGym = (profile, dispatch, apiKey) => {
+const fetchGym = (profile, dispatch) => {
 	if (profile.gym) {
 		firebase.database().ref('gyms/' + profile.gym).once('value', gym => {
-			fetchPhotoPath(gym.val(), apiKey).then(gym => {
+			fetchPhotoPath(gym.val()).then(gym => {
 				dispatch(setGym(gym))
 			})
 		})
