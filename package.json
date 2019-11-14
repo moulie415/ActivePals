@@ -87,6 +87,11 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^12.12.7",
+    "@types/react": "^16.9.11",
+    "@types/react-native": "^0.60.22",
+    "@types/react-navigation": "^3.4.0",
+    "@types/whatwg-fetch": "0.0.33",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-promise": "^4.0.1",
