@@ -473,6 +473,11 @@ class Home extends Component {
             return (<View>
               <AdView index={index}/>
               <Card style={{marginBottom: 10}}>
+                <TouchableOpacity
+                  onPress={()=> this.props.viewPost(item.key)}
+                  style={{alignSelf: 'flex-end'}}
+                >
+                </TouchableOpacity>
                 {this.renderFeedItem(item)}
               </Card>
               </View>
@@ -505,7 +510,7 @@ class Home extends Component {
     case 'photo':
       return (
           <View>
-          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0}}>
+          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10}}>
             {this.fetchAvatar(item.uid)}
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -536,7 +541,7 @@ class Home extends Component {
       case 'video':
               return (
                 <View>
-                <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, paddingBottom: 0, zIndex: 2}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, zIndex: 2}}>
             {this.fetchAvatar(item.uid)}
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -907,7 +912,8 @@ import {
   navigateProfileView,
   navigateFilePreview,
   navigateNotifications,
-  navigateFullScreenVideo
+  navigateFullScreenVideo,
+  navigatePostView
 } from '../actions/navigation'
 import { 
   addPost,
@@ -931,6 +937,7 @@ const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
+  viewPost: (id) => dispatch(navigatePostView(id)),
   goToProfile: () => dispatch(navigateProfile()),
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   postStatus: (status) => dispatch(addPost(status)),

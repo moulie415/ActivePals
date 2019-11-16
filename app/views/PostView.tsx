@@ -358,16 +358,16 @@ class PostView extends Component {
         <View style={{flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
           <View style={{flex: 1, marginVertical: 10, flexDirection: 'row', alignItems: 'center'}}>
           {item.type != 'video' && <TouchableOpacity 
-              onPress={ () => {
-                this.sharePost(item)
-              }}
+              onPress={() => this.sharePost(item)}
               style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
                 <Icon size={25} style={{color: colors.postIcon}} name='md-share'/>
                 {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
               </TouchableOpacity>}
-            {!!item.commentCount && item.commentCount > 0 && <View style={{flex: 1}}>
-            <Text style={{color: '#999', textAlign: 'center'}}>
-            {`${item.commentCount} ${item.commentCount > 1 ? ' comments' : ' comment'}`}</Text></View>}
+            <View style={{flex: 1}}>
+              <Text style={{color: '#999', textAlign: 'center'}}>
+                {`${item.commentCount || 0} ${item.commentCount === 1 ? ' comment' : ' comments'}`}
+              </Text>
+            </View>
             
             <View style={{flexDirection: 'row', flex: 1,  alignItems: 'center'}}>
               <TouchableOpacity
@@ -379,15 +379,16 @@ class PostView extends Component {
               <SlowImage source={item.rep ? weightUp : weightDown}
               style={{width: 25, height: 25, tintColor: item.rep ? colors.secondary : '#616770'}}/>
               </TouchableOpacity>
-              {!!item.repCount && item.repCount > 0 && <View 
-              style={{flex: 1}}
-            >
-            <TouchableOpacity onPress={() => {
-              this.props.getRepUsers(item.key, this.state.userFetchAmount)
-              this.setState({likesModalVisible: true})
-            }}>
-              <Text style={{color: '#999', textAlign: 'center'}}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}
-              </Text></TouchableOpacity></View>}
+               <View style={{flex: 1}}>
+                  <TouchableOpacity onPress={() => {
+                    this.props.getRepUsers(item.key, this.state.userFetchAmount)
+                    this.setState({likesModalVisible: true})
+                  }}>
+                    <Text style={{color: '#999', textAlign: 'center'}}>
+                      {`${item.repCount || 0} ${item.repCount === 1 ? ' rep' : ' reps'}`}
+                    </Text>
+                  </TouchableOpacity>
+              </View>
             </View>
             </View>
           </View>
