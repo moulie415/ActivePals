@@ -340,8 +340,8 @@ class PostView extends Component {
                   }
                 }}>
                 <Icon name='md-expand'
+                size={30}
              style={{
-               fontSize: 30,
                backgroundColor: 'transparent',
                color: '#fff'
                }}/>
@@ -362,7 +362,7 @@ class PostView extends Component {
                 this.sharePost(item)
               }}
               style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
-                <Icon style={{color: colors.postIcon}} name='md-share'/>
+                <Icon size={25} style={{color: colors.postIcon}} name='md-share'/>
                 {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
               </TouchableOpacity>}
             {!!item.commentCount && item.commentCount > 0 && <View style={{flex: 1}}>
