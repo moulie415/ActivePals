@@ -4,12 +4,9 @@ import {
   View,
   TextInput,
   Platform,
-  FlatList
+  FlatList,
+  ScrollView
 } from "react-native"
-import {
-  Container,
-  Content,
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import TouchableOpacity from '../components/TouchableOpacityLockable'
 import firebase from 'react-native-firebase'
@@ -112,7 +109,7 @@ import Button from '../components/Button'
 
   render () {
     return (
-    <Container>
+    <>
       <Header 
         title={'Pals'}
         right={<TouchableOpacity onPress={() => {
@@ -124,7 +121,7 @@ import Button from '../components/Button'
             <Icon name='md-add' size={25} style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>}
       />
-      <Content contentContainerStyle={{flex: 1}}>
+      <ScrollView contentContainerStyle={{flex: 1}}>
       {Object.values(this.props.friends).length > 0 ?
       this.renderFriends() :
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
@@ -165,8 +162,8 @@ import Button from '../components/Button'
           
           </View>
         </Modal>
-        </Content>
-    </Container>
+        </ScrollView>
+    </>
   )
   }
 

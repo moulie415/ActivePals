@@ -9,11 +9,8 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   Platform,
+  ScrollView,
 } from "react-native"
-import { 
-  Container,
-  Content
-} from 'native-base'
 import Card from '../components/Card'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { PulseIndicator } from 'react-native-indicators'
@@ -113,7 +110,7 @@ class Home extends Component {
     const { uid, username, users, unreadCount } = this.props.profile
     let combined = { ...this.props.users, ...this.props.friends}
     return (
-    <Container>
+    <>
       <Header 
         title={'Feed'}
         right={<TouchableOpacity onPress={()=> {
@@ -248,7 +245,7 @@ class Home extends Component {
             </TouchableOpacity>
         </View>
         
-      <Content contentContainerStyle={{backgroundColor: '#9993', flex: 1, paddingTop: 10}}>
+      <ScrollView contentContainerStyle={{backgroundColor: '#9993', flex: 1, paddingTop: 10}}>
             {this.state.mentionList && 
             <View style={styles.mentionList}>
             <FlatList 
@@ -275,7 +272,7 @@ class Home extends Component {
               }}
             /></View>}
         {this.props.friends && this.props.profile && this.renderFeed()}
-      </Content>
+      </ScrollView>
       {this.state.spinner && <View style={sStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
       <Modal onRequestClose={()=> null}
           visible={this.state.showImage} transparent={true}>
@@ -423,7 +420,7 @@ class Home extends Component {
         </Modal>
   
         
-    </Container>
+    </>
   )
   }
 

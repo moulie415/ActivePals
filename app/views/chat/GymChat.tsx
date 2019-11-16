@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   RefreshControl
 } from 'react-native'
-import { Container } from 'native-base'
 import Text from '../../components/Text'
 import { getType, getSimplifiedTime } from '../../constants/utils'
 import colors from '../../constants/colors'
@@ -33,7 +32,7 @@ import styles from '../../styles/chatStyles'
     const gym = this.props.gym
     const gymChat = this.props.gymChat
     return (
-    <Container>
+    <>
     {this.props.gym ?
       <ScrollView 
       refreshControl={
@@ -69,7 +68,7 @@ import styles from '../../styles/chatStyles'
             <Text style={{color: colors.primary, textAlign: 'center', marginHorizontal: 20}}>
             {"You haven't joined a Gym, please join a Gym if you want to participate in Gym chat"}
           </Text></View>}
-    </Container>
+    </>
   )
   }
 

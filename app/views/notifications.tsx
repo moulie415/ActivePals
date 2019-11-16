@@ -5,9 +5,6 @@ import {
   Alert,
   FlatList
 } from "react-native"
-import {
-  Container
-} from "native-base"
 import Icon from 'react-native-vector-icons/Ionicons'
 import { Image as SlowImage } from 'react-native'
 import Text, { globalTextStyle } from '../components/Text'
@@ -59,7 +56,7 @@ class Notifications extends Component {
   }
 
   render() {
-    return <Container style={{backgroundColor: '#9993'}}>
+    return <View style={{backgroundColor: '#9993'}}>
       <Header 
         hasBack={true}
         title={'Notifications'}
@@ -71,7 +68,7 @@ class Notifications extends Component {
       : <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text style={{textAlign: 'center', color: '#999', fontSize: 20}}>No notifications yet</Text></View> 
          }
-    </Container>
+    </View>
   }
 
   renderNotifications() {
@@ -105,7 +102,7 @@ class Notifications extends Component {
                 <Text style={{color: '#000', fontSize: 15}}>{this.getNotificationString(item)}</Text>
                 <Text style={{color: '#999', fontSize: 12}}>{getSimplifiedTime(new Date(item.date))}</Text>
               </View>
-                <Icon name='ios-arrow-forward' style={{color: '#999', textAlign: 'right', marginRight: 10, flex: 1}}/>
+                <Icon size={25} name='ios-arrow-forward' style={{color: '#999', textAlign: 'right', marginRight: 10, flex: 1}}/>
             </View>
           </TouchableOpacity>
         </Swipeout>

@@ -5,7 +5,6 @@ import {
   FlatList
 } from "react-native"
 import Image from 'react-native-fast-image'
-import { Container } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import colors from '../../constants/colors'
@@ -67,14 +66,14 @@ import Text from '../../components/Text'
 
   render () {
     return (
-    <Container>
+    <>
     {Object.values(this.props.chats).length > 0?
       this.renderChats() :
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20, backgroundColor: colors.bgColor}}>
             <Text style={{color: colors.primary, textAlign: 'center'}}>
             {"You haven't started any chats yet, also please make sure you are connected to the internet"}
           </Text></View>}
-    </Container>
+    </>
   )
   }
 

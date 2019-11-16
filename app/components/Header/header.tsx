@@ -1,7 +1,6 @@
 import React, { Component } from "react"
-import { TouchableOpacity, View } from "react-native"
+import { TouchableOpacity, View, StatusBar, SafeAreaView } from "react-native"
 import Text from '../Text'
-import { Header } from "native-base"
 import Icon from 'react-native-vector-icons/Ionicons'
 import { TabBarBottom } from "react-navigation"
 import colors from '../../constants/colors'
@@ -12,28 +11,29 @@ import globalStyles from '../../styles/globalStyles'
 import { connect } from 'react-redux'
 import { navigateBack } from '../../actions/navigation'
 
+
 const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, fitTitle, backgroundColor, left }) => {
-	return <Header
-			style = {{backgroundColor: backgroundColor || colors.primary, borderBottomWidth:0, alignItems:'stretch', elevation: 0}}
-			androidStatusBarColor={colors.primary}
-		>
-			<View style = {{flex:1, alignItems: 'center', justifyContent: 'center'}}>
-				{left || ((hasBack || customBackPress) &&
-						<TouchableOpacity 
-							style = {globalStyles.headerLeft}
-							onPress = {customBackPress? () => customBackPress(onBackPress) : onBackPress}
-						>
-					<Icon name='ios-arrow-back' size={25} style={{color: '#fff', padding: 5}} />
-				</TouchableOpacity>		
-					)}
-				<Text adjustsFontSizeToFit={fitTitle} style={{color: 'white', fontWeight:'bold', fontSize: 17, marginHorizontal: 30, textAlign: 'center'}}>{title}</Text>
-				{ right &&
-					<View style = {{position:'absolute', top:8, bottom:0, right:0, justifyContent: 'center', paddingRight: 10}}>
-						{right}
-					</View>
-				}
-			</View>
-		</Header>
+	return <>
+			<StatusBar backgroundColor={backgroundColor || colors.primary}/>
+			<SafeAreaView style={{backgroundColor:  backgroundColor || colors.primary, height: 90}}>
+				<View style = {{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+					{left || ((hasBack || customBackPress) &&
+							<TouchableOpacity 
+								style = {globalStyles.headerLeft}
+								onPress = {customBackPress? () => customBackPress(onBackPress) : onBackPress}
+							>
+						<Icon name='ios-arrow-back' size={25} style={{color: '#fff', padding: 5}} />
+					</TouchableOpacity>		
+						)}
+					<Text adjustsFontSizeToFit={fitTitle} style={{color: 'white', fontWeight:'bold', fontSize: 17, marginHorizontal: 30, textAlign: 'center'}}>{title}</Text>
+					{ right &&
+						<View style = {{position:'absolute', top:8, bottom:0, right:0, justifyContent: 'center', paddingRight: 10}}>
+							{right}
+						</View>
+					}
+				</View>
+			</SafeAreaView>
+		</>
 }
 
 AppHeader.propTypes = {

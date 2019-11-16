@@ -2,12 +2,9 @@ import React, { Component } from "react"
 import Header from '../components/Header/header'
 import {
     View,
-    Image
+    Image,
+    ScrollView
 } from 'react-native'
-import {
-    Container,
-    Content
-} from 'native-base'
 import Text from '../components/Text'
 import { getResource , getType} from '../constants/utils'
 import Hyperlink from 'react-native-hyperlink'
@@ -18,12 +15,12 @@ import colors from '../constants/colors'
 class Credits extends Component {
 
     render() {
-        return <Container>
+        return <>
             <Header 
                 hasBack={true}
                 title={'Credits'}
             />
-            <Content>
+            <ScrollView>
                 <Hyperlink
                 linkDefault={true}
                 linkStyle={ { color: colors.secondary } }
@@ -81,8 +78,8 @@ class Credits extends Component {
                     </View>
                 </Hyperlink>
 
-            </Content>
-        </Container>
+            </ScrollView>
+        </>
     }
 }
 

@@ -7,10 +7,7 @@ import {
   BackHandler,
   Keyboard
 } from "react-native"
-import {
-  Container,
-  Icon,
-} from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import Text, { globalTextStyle } from '../../components/Text'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
@@ -236,7 +233,7 @@ class Messaging extends React.Component {
   render() {
     const { navigation } = this.props
     return (
-      <Container style={{flex: 1, backgroundColor: '#9993'}}>
+      <View style={{flex: 1, backgroundColor: '#9993'}}>
       <Header 
       hasBack={true}
       title={this.friendUsername || this.sessionTitle || this.gymName}
@@ -352,7 +349,7 @@ class Messaging extends React.Component {
         {this.state.spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
           <PulseIndicator color={colors.secondary}/>
         </View>}
-      </Container>
+      </View>
     )
   }
 

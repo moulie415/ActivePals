@@ -7,9 +7,6 @@ import {
   Switch,
   Platform
 } from 'react-native'
-import {
-  Container
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Header from '../components/Header/header'
 import Text from '../components/Text'
@@ -60,7 +57,7 @@ class SessionInfo extends Component {
       gym = this.props.places[session.gym.place_id]
     }
 
-    return <Container>
+    return <>
     <Header 
     hasBack={true}
     title={session ? session.title : ''}
@@ -221,7 +218,7 @@ class SessionInfo extends Component {
             this.setState({friendsModalOpen: false})
           }}
           isOpen={this.state.friendsModalOpen}/>
-    </Container>
+    </>
   }
 
   renderInfoHeader(text) {

@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native'
-import { Container } from 'native-base'
 import Text from '../../components/Text'
 import firebase from 'react-native-firebase'
 import { getType, getSimplifiedTime } from '../../constants/utils'
@@ -33,7 +32,7 @@ import ChatRowCount from '../../components/ChatRowCount'
 
   render () {
     return (
-    <Container>
+    <>
     {Object.values(this.props.chats).length > 0 && 
     Object.values(this.props.chats)[0].type ?
         this.renderChats() :
@@ -41,7 +40,7 @@ import ChatRowCount from '../../components/ChatRowCount'
             <Text style={{color: colors.primary, textAlign: 'center', marginHorizontal: 20}}>
             You haven't joined any sessions yet, join a session to start a session chat also please make sure you are connected to the internet
           </Text></View>}
-    </Container>
+    </>
   )
   }
 

@@ -6,7 +6,6 @@ import {
 } from "react-native"
 import {
   Input,
-  Container,
 } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
@@ -85,7 +84,7 @@ import Button from '../components/Button'
   render () {
     const { gym } = this.props
     return (
-    <Container>
+    <>
     
     <Header 
         left={this.hasChanged() && <TouchableOpacity
@@ -290,7 +289,7 @@ import Button from '../components/Button'
         {this.state.spinner && <View style={hStyles.spinner}><PulseIndicator color={colors.secondary}/></View>}
         </ScrollView>
 
-    </Container>
+    </>
   )
   }
 

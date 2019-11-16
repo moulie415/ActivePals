@@ -4,11 +4,10 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  Platform
+  Platform,
+  Switch
 } from "react-native"
 import {
-  Container,
-  Switch,
   ActionSheet,
 } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -147,8 +146,7 @@ import PrivateIcon from '../components/PrivateIcon'
     //switch for list view and map view
     //action sheet when pressing
     return (
-      <Container>
-
+      <>
       {this.state.spinner && <PulseIndicator color={colors.secondary} style={styles.spinner} />}
         <Header 
           left={<TouchableOpacity
@@ -317,7 +315,7 @@ import PrivateIcon from '../components/PrivateIcon'
           }}
           />
         </View>
-      </Container>
+      </>
       )
   }
 

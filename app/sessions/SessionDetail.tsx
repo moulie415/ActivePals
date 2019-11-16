@@ -1,9 +1,4 @@
 import React, { Component } from "react"
-import {
-	Container,
-	Content,
-	Switch
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import {
 	Text,
@@ -11,7 +6,9 @@ import {
 	Alert,
 	TextInput,
 	TouchableOpacity,
-	Platform
+	Platform,
+	Switch,
+	ScrollView
 } from 'react-native'
 import styles from '../styles/sessionDetailStyles'
 import Geocoder from 'react-native-geocoder'
@@ -89,11 +86,11 @@ class SessionDetail extends Component {
 
 	render() {
 		return (
-			<Container style={{ flex: 1}}>
+			<>
 			<Header title={'Enter details'} 
 				hasBack={true}
 			/>
-				<Content>
+				<ScrollView style={{flex: 1}}>
 						<TextInput
 						style={{padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10, height: 50}}
 						underlineColorAndroid='transparent'
@@ -243,7 +240,7 @@ class SessionDetail extends Component {
 						this.createSession()
 					}}
 					text="Create Session"/>
-				</Content>
+				</ScrollView>
 
 				<MapModal
 				isOpen={this.state.mapOpen}
@@ -276,7 +273,7 @@ class SessionDetail extends Component {
 					}}
 				onClosed={() => this.setState({searchOpen: false})}
 				isOpen={this.state.searchOpen}/>
-			</Container>
+			</>
 			)
 	}
 

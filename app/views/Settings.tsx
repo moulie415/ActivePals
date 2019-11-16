@@ -3,13 +3,9 @@ import {
   View,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native"
-import {
-  Container,
-  Content,
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
-import firebase from 'react-native-firebase'
 import VersionNumber from 'react-native-version-number'
 import colors from '../constants/colors'
 import  styles  from '../styles/settingsStyles'
@@ -36,12 +32,12 @@ import DialogInput from 'react-native-dialog-input'
 
   render () {
     return (
-    <Container style={styles.container}>
+    <View style={styles.container}>
       <Header 
       hasBack={true}
        title={'Settings'}
         />
-      <Content>
+      <ScrollView>
         <TouchableOpacity
         onPress={()=> {
           Alert.alert('coming soon')
@@ -84,7 +80,7 @@ import DialogInput from 'react-native-dialog-input'
           onPress={()=> this.setState({showDialog: true})}>
               <Text style={{color: 'red'}}>Delete account</Text>
           </TouchableOpacity>
-      </Content>
+      </ScrollView>
      {this.state.spinner && <View style={styles.spinner}>
       <PulseIndicator color={colors.secondary}/>
       </View>}
@@ -112,7 +108,7 @@ import DialogInput from 'react-native-dialog-input'
              }}
             closeDialog={ () => this.setState({showDialog: false})}
             />
-    </Container>
+    </View>
   )
   }
 }

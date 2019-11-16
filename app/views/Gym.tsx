@@ -8,9 +8,6 @@ import {
   Switch,
   Platform
 } from "react-native"
-import {
-  Container
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { PulseIndicator } from 'react-native-indicators'
 import Text, { globalTextStyle } from '../components/Text'
@@ -67,7 +64,7 @@ import styles from '../styles/gymStyles'
       locationString = `${gym.vicinity} ${this.props.location ? '(' + getDistance(gym, yourLat, yourLon, true) + ' km away)' : ''}`
     }
     return (
-    <Container>
+    <>
     <Header 
     hasBack={true}
      title={gym && gym.name}
@@ -264,7 +261,7 @@ import styles from '../styles/gymStyles'
           onClosed={()=> this.setState({friendsModalOpen: false})}
           onContinue={(friends)=> this.props.navigateSessionDetail(friends, gym)}
           isOpen={this.state.friendsModalOpen} />
-    </Container>
+    </>
   )
   }
 

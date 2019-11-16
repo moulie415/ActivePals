@@ -5,9 +5,6 @@ import {
     View
 } from 'react-native'
 import Text, { globalTextStyle } from '../components/Text'
-import {
-    Container
-} from 'native-base'
 import TouchableOpacity from '../components/TouchableOpacityLockable'
 import Header from '../components/Header/header'
 import Button from '../components/Button'
@@ -27,7 +24,7 @@ class PersonalTraining extends Component {
     }
 
     render() {
-        return <Container style={{backgroundColor: colors.bgColor}}>
+        return <View style={{backgroundColor: colors.bgColor}}>
         <Header title={'Personal Training'}/>
         <Text style={{padding: 10}}>Features coming soon</Text>
         {/* {!this.props.profile.trainer && <View>
@@ -40,7 +37,7 @@ class PersonalTraining extends Component {
                 this.props.navigateVerification()
             }}/>
             </View>} */}
-        </Container>
+        </View>
     }
 }
 

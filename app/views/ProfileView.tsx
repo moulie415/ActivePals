@@ -7,9 +7,6 @@ import {
   Modal,
   SafeAreaView
 } from "react-native"
-import {
-  Container,
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from '../components/Text'
@@ -84,7 +81,7 @@ import Button from '../components/Button'
   render () {
     const {  username, first_name, last_name, birthday, email, uid, accountType, activity, level} = this.state.profile
     return (
-    <Container>
+    <>
       <Header 
       hasBack={true}
       title={username || 'Profile'}
@@ -209,7 +206,7 @@ import Button from '../components/Button'
           imageUrls={this.state.selectedImage}
             />
       </Modal>
-    </Container>
+    </>
   )
   }
 
