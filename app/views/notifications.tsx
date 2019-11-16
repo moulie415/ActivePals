@@ -160,9 +160,9 @@ class Notifications extends Component {
     let friend = this.props.friends[item.uid] || this.props.users[item.uid]
     switch(item.type) {
       case 'comment':
-        return <Icon name={'md-chatboxes'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
+        return <Icon size={25} name={'md-chatboxes'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
       case 'friendRequest':
-        return <Icon name={'md-people'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
+        return <Icon size={25} name={'md-people'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
       case 'postMention':
       case 'commentMention':
         if (friend) {
@@ -170,10 +170,10 @@ class Notifications extends Component {
             return <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15, marginRight: 15}}/> 
           }
           else {
-            return <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary, marginRight: 15}}/>
+            return <Icon size={35} name='md-contact' style={{color: colors.primary, marginRight: 15}}/>
           }
         } 
-        else return <Icon name={'md-chatboxes'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
+        else return <Icon size={25} name={'md-chatboxes'} style={{color: colors.secondary, marginRight: 15, marginLeft: 5}}/>
       default:
         return <SlowImage source={weightUp} style={{width: 25, height: 25, marginRight: 15, tintColor: colors.secondary}}/>
 

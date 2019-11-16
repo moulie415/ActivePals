@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "ENV=development ./envscript.sh && ENVFILE=.env.dev node node_modules/react-native/local-cli/cli.js start",
-    "start-prod": "ENV=production ./envscript.sh && ENVFILE=.env.prod node node_modules/react-native/local-cli/cli.js start",
+    "start-prod": "ENV=production ./envscript.sh && npm run prestart && ENVFILE=.env.prod node node_modules/react-native/local-cli/cli.js start",
     "build-android-prod": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
     "firebase-android": "npm run build-android-prod && ./firebase-android.sh",
     "firebase-ios": "ENV=production ENVFILE=.env.prod ./envscript.sh && ./firebase-ios.sh",
