@@ -21,10 +21,12 @@ export default StyleSheet.create({
   input: {
     color: '#fff',
     fontFamily: 'Montserrat',
+    flex: 1,
   },
   inputGrp: {
     flexDirection: 'row',
     backgroundColor: '#0005',
+    alignItems: 'center',
     marginBottom: 20,
     borderWidth: 0,
     borderColor: 'transparent',
@@ -32,6 +34,7 @@ export default StyleSheet.create({
     marginRight: 20,
     paddingLeft: 10,
     borderRadius: 3,
+    height: 50
 
   },
   spinnerButton: {
@@ -52,4 +55,8 @@ export default StyleSheet.create({
     width: 100,
     alignItems: 'center',
   },
+  icon: {
+    marginRight: 10,
+    color: '#fff'
+  }
 })

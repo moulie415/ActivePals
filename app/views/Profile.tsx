@@ -3,10 +3,8 @@ import {
   Alert,
   View,
   ScrollView,
+  TextInput
 } from "react-native"
-import {
-  Input,
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import Image from 'react-native-fast-image'
@@ -157,7 +155,7 @@ import Button from '../components/Button'
       </View>
       <View style={styles.inputGrp}>
         <Text style={{alignSelf: 'center'}}>Username: </Text>
-            <Input
+            <TextInput
             value={this.state.profile && this.state.profile.username}
             onChangeText={username => this.setState({profile: {...this.state.profile, username}})}
             placeholderTextColor="#fff"
@@ -168,7 +166,7 @@ import Button from '../components/Button'
           </View>
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>First name: </Text>
-            <Input
+            <TextInput
             value={this.state.profile && this.state.profile.first_name}
             onChangeText={name => this.setState({profile: {...this.state.profile, first_name: name}})}
             placeholderTextColor="#fff"
@@ -179,7 +177,7 @@ import Button from '../components/Button'
           </View>
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Last name: </Text>
-            <Input
+            <TextInput
             value={this.state.profile && this.state.profile.last_name}
             onChangeText={name => this.setState({profile: {...this.state.profile, last_name: name}})}
             placeholderTextColor="#fff"

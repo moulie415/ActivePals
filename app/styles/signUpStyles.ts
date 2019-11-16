@@ -30,5 +30,11 @@ export default StyleSheet.create({
     marginRight: 20,
     paddingLeft: 10,
     borderRadius: 5,
+    height: 50,
+    alignItems: 'center'
   },
+  icon: {
+    marginRight: 10,
+    color: '#fff'
+  }
 })

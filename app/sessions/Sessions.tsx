@@ -7,9 +7,6 @@ import {
   Platform,
   Switch
 } from "react-native"
-import {
-  ActionSheet,
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Slider from '@react-native-community/slider'
 import { PulseIndicator } from 'react-native-indicators'
@@ -33,6 +30,7 @@ import GymSearch from '../components/GymSearch'
 import { CheckBox } from 'react-native-elements'
 import Button from '../components/Button'
 import PrivateIcon from '../components/PrivateIcon'
+import ActionSheet from 'react-native-actionsheet'
 
  class Sessions extends Component {
 
@@ -315,6 +313,25 @@ import PrivateIcon from '../components/PrivateIcon'
           }}
           />
         </View>
+        <ActionSheet
+          ref={ref => this.ActionSheet = ref}
+          title='Create session at location?'
+          options={['Create session', 'Create private session', 'Cancel']}
+          cancelButtonIndex={2}
+          onPress={(index) => { 
+                if (index == 0) {
+                  this.props.onContinue(null, this.state.selectedLocation)
+                }
+                else if (index == 1) {
+                  if (Object.values(this.props.friends).length > 0) {
+                    this.setState({friendsModalOpen: true})
+                  }
+                  else {
+                    Alert.alert('Sorry', 'You must have at least one pal to create a private session')
+                  }
+              }
+           }}
+        />
       </>
       )
   }
@@ -325,28 +342,29 @@ import PrivateIcon from '../components/PrivateIcon'
     const lng = event.nativeEvent.coordinate.longitude
     const location = {geometry: {location: {lat, lng}}}
     this.setState({selectedLocation: location, latitude: lat, longitude: lng})
-    ActionSheet.show(
-              {
-                options: ['Create session', 'Create private session', 'Cancel'],
-                cancelButtonIndex: 2,
-                //destructiveButtonIndex: DESTRUCTIVE_INDEX,
-                title: 'Create session at location?'
-              },
-              buttonIndex => {
-                //this.setState({ clicked: BUTTONS[buttonIndex] });
-                if (buttonIndex == 0) {
-                  this.props.onContinue(null, this.state.selectedLocation)
-                }
-                else if (buttonIndex == 1) {
-                  if (Object.values(this.props.friends).length > 0) {
-                    this.setState({friendsModalOpen: true})
-                  }
-                  else {
-                    Alert.alert('Sorry', 'You must have at least one pal to create a private session')
-                  }
-                }
-              }
-            )
+    this.ActionSheet.show()
+    // ActionSheet.show(
+    //           {
+    //             options: ['Create session', 'Create private session', 'Cancel'],
+    //             cancelButtonIndex: 2,
+    //             //destructiveButtonIndex: DESTRUCTIVE_INDEX,
+    //             title: 'Create session at location?'
+    //           },
+    //           buttonIndex => {
+    //             //this.setState({ clicked: BUTTONS[buttonIndex] });
+    //             if (buttonIndex == 0) {
+    //               this.props.onContinue(null, this.state.selectedLocation)
+    //             }
+    //             else if (buttonIndex == 1) {
+    //               if (Object.values(this.props.friends).length > 0) {
+    //                 this.setState({friendsModalOpen: true})
+    //               }
+    //               else {
+    //                 Alert.alert('Sorry', 'You must have at least one pal to create a private session')
+    //               }
+    //             }
+    //           }
+    //         )
   }
 
   renderLists() {

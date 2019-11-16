@@ -3,12 +3,9 @@ import {
   Alert,
   View,
   ImageBackground,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  TextInput
  } from "react-native"
-import {
-  Input,
-  Item,
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import  styles  from '../styles/signUpStyles'
@@ -50,9 +47,9 @@ import Button from '../components/Button'
         <PulseIndicator color={colors.secondary}/>
       </View>}
       <KeyboardAvoidingView behavior="padding" style={{justifyContent: 'center', flex: 1}}>
-      <Item style={styles.inputGrp}>
+      <View style={styles.inputGrp}>
       <Icon size={25} name="ios-person" style={{color: "#fff", marginRight: 5}} />
-        <Input
+        <TextInput
         placeholder="Username"
         onChangeText={u => this.username = u}
         placeholderTextColor="#FFF"
@@ -61,10 +58,10 @@ import Button from '../components/Button'
         autoCorrect={false}
         keyboardType={'email-address'}
         />
-        </Item>
-      <Item style={styles.inputGrp}>
-      <Icon size={25} name="md-mail" style={{color: "#fff", marginRight: 5}} />
-        <Input
+        </View>
+      <View style={styles.inputGrp}>
+      <Icon size={25} name="md-mail" style={styles.icon} />
+        <TextInput
         placeholder="Email"
         onChangeText={e => this.email = e}
         placeholderTextColor="#FFF"
@@ -73,27 +70,27 @@ import Button from '../components/Button'
         autoCorrect={false}
         keyboardType={'email-address'}
         />
-        </Item>
-      <Item style={styles.inputGrp}>
-      <Icon size={25} name="md-unlock" style={{color: "#fff", marginRight: 5}} />
-      <Input
+        </View>
+      <View style={styles.inputGrp}>
+      <Icon size={25} name="md-unlock" style={styles.icon} />
+      <TextInput
         placeholder="Password"
         secureTextEntry={true}
         placeholderTextColor="#FFF"
         onChangeText={p => this.pass = p}
         style={styles.input}
         />
-        </Item>
-      <Item style={styles.inputGrp}>
-      <Icon size={25} name="md-unlock" style={{color: "#fff", marginRight: 5}} />
-      <Input
+        </View>
+      <View style={styles.inputGrp}>
+      <Icon size={25} name="md-unlock" style={styles.icon} />
+      <TextInput
         placeholder="Confirm Password"
         secureTextEntry={true}
         placeholderTextColor="#FFF"
         onChangeText={p => this.confirm = p}
         style={styles.input}
         />
-        </Item>
+        </View>
         <Button 
         style={{paddingHorizontal: 20, alignSelf: 'center'}}
         onPress={() => {

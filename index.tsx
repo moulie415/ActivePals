@@ -3,7 +3,6 @@ import React from "react"
 import { AppRegistry, YellowBox, AppState } from 'react-native'
 //import * as firebase from "firebase"
 import firebase from 'react-native-firebase' //above is web api
-import { Root } from 'native-base'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/lib/integration/react'
 import { persistStore } from 'redux-persist'
@@ -273,11 +272,9 @@ class FitLink extends React.Component {
 
   render () {
     return <PersistGate persistor={persistor} >
-      <Root>
         <Provider store={store}>
           <App/>
         </Provider>
-      </Root>
       </PersistGate>
   }
 }

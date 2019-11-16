@@ -3,12 +3,9 @@ import {
   Alert,
   View,
   ImageBackground,
-  Platform
+  Platform,
+  TextInput
  } from "react-native"
-import {
-  Input,
-  Item
-} from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import  styles  from '../styles/loginStyles'
@@ -75,9 +72,9 @@ import Button from '../components/Button'
       <View style={{marginBottom: 40}}>
         <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>{str.appName}</Text>
       </View>
-      <Item style={styles.inputGrp}>
-      <Icon size={25} name="md-mail" style={{color: '#fff', marginRight: 5}} />
-        <Input
+      <View style={styles.inputGrp}>
+      <Icon size={25} name="md-mail" style={styles.icon} />
+        <TextInput
         placeholder="Email"
         onChangeText={u => this.username = u}
         placeholderTextColor={'#fff'}
@@ -87,10 +84,10 @@ import Button from '../components/Button'
         //value={this.state.username}
         keyboardType={'email-address'}
         />
-        </Item>
-      <Item style={styles.inputGrp}>
-      <Icon size={25} name="md-unlock" style={{color: '#fff', marginRight: 5}}/>
-      <Input
+        </View>
+      <View style={styles.inputGrp}>
+      <Icon size={25} name="md-unlock" style={styles.icon}/>
+      <TextInput
         placeholder="Password"
         secureTextEntry={this.state.secure}
         placeholderTextColor={'#fff'}
@@ -98,9 +95,9 @@ import Button from '../components/Button'
         style={styles.input}
         />
         <TouchableOpacity onPress={()=> this.setState({secure: !this.state.secure})}>
-          <Icon size={30} name={this.state.secure ? "ios-eye" : "ios-eye-off"} style={{color: '#fff', marginRight: 10}} />
+          <Icon size={30} name={this.state.secure ? "ios-eye" : "ios-eye-off"} style={styles.icon} />
         </TouchableOpacity>
-        </Item>
+        </View>
         <View style={{flexDirection: 'row', marginVertical: 10}}>
       <Button
         text="Login"
