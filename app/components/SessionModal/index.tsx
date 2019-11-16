@@ -6,7 +6,7 @@ import {
   ScrollView,
   Alert
 } from 'react-native'
-import { Icon } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import Text from '../Text'
 import Hyperlink from 'react-native-hyperlink'
 import colors from '../../constants/colors'
@@ -39,7 +39,7 @@ const SessionModal = ({
       {session.title}</Text>
       <TouchableOpacity
           onPress={()=> viewSession(session.key, session.private)}>
-        <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
+        <Icon size={40} name={'md-information-circle'} style={{color: colors.secondary}}/>
       </TouchableOpacity>
     </View>
     <ScrollView style={{margin: 10}}>
@@ -52,7 +52,7 @@ const SessionModal = ({
         onPress={()=> {
           openChat(session)
         }}>
-      <Icon name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10}}/>
+      <Icon size={25} name='md-chatboxes' style={{color: colors.secondary, paddingHorizontal: 10}}/>
     </TouchableOpacity>}
     {session.private && <PrivateIcon />}
       </View>

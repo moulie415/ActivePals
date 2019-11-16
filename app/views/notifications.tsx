@@ -6,9 +6,9 @@ import {
   FlatList
 } from "react-native"
 import {
-  Container,
-  Icon,
+  Container
 } from "native-base"
+import Icon from 'react-native-vector-icons/Ionicons'
 import { Image as SlowImage } from 'react-native'
 import Text, { globalTextStyle } from '../components/Text'
 import Image from "react-native-fast-image"
@@ -28,8 +28,8 @@ class Notifications extends Component {
     header: null,
   }
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       close: false,
       spinner: true,

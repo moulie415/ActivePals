@@ -7,9 +7,9 @@ import {
  } from "react-native"
 import {
   Input,
-  Item,
-  Icon,
+  Item
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import  styles  from '../styles/loginStyles'
 import sStyles from '../styles/settingsStyles'
@@ -76,7 +76,7 @@ import Button from '../components/Button'
         <Text style={{color: colors.secondary, fontSize: 40, textAlign: 'center', fontWeight: 'bold'}}>{str.appName}</Text>
       </View>
       <Item style={styles.inputGrp}>
-      <Icon name="md-mail" style={{color: '#fff'}} />
+      <Icon size={25} name="md-mail" style={{color: '#fff', marginRight: 5}} />
         <Input
         placeholder="Email"
         onChangeText={u => this.username = u}
@@ -89,7 +89,7 @@ import Button from '../components/Button'
         />
         </Item>
       <Item style={styles.inputGrp}>
-      <Icon name="md-unlock" style={{color: '#fff'}}/>
+      <Icon size={25} name="md-unlock" style={{color: '#fff', marginRight: 5}}/>
       <Input
         placeholder="Password"
         secureTextEntry={this.state.secure}
@@ -98,7 +98,7 @@ import Button from '../components/Button'
         style={styles.input}
         />
         <TouchableOpacity onPress={()=> this.setState({secure: !this.state.secure})}>
-          <Icon name={this.state.secure ? "ios-eye" : "ios-eye-off"} style={{color: '#fff', fontSize: 30}} />
+          <Icon size={30} name={this.state.secure ? "ios-eye" : "ios-eye-off"} style={{color: '#fff', marginRight: 10}} />
         </TouchableOpacity>
         </Item>
         <View style={{flexDirection: 'row', marginVertical: 10}}>
@@ -127,7 +127,7 @@ import Button from '../components/Button'
           isLoading={this.state.facebookLoading}
           spinnerType={str.spinner}
           buttonStyle={[{backgroundColor: "#3b5998"}, styles.spinnerButton]}>
-            <Icon style={{color: '#fff', marginRight: 10}} name="logo-facebook"/>
+            <Icon size={25} style={{color: '#fff', marginRight: 10}} name="logo-facebook"/>
             <Text style={{color: '#fff'}}>Login with Facebook</Text>
           </SpinnerButton>
           <SpinnerButton
@@ -138,7 +138,7 @@ import Button from '../components/Button'
             this.gLogin()
           }}
           buttonStyle={[{backgroundColor: "#ea4335"}, styles.spinnerButton]}>
-            <Icon style={{marginLeft: -15, color: '#fff', marginRight: 10}} name="logo-google"/>
+            <Icon size={25} style={{marginLeft: -15, color: '#fff', marginRight: 10}} name="logo-google"/>
             <Text style={{ color: '#fff'}}>Login with Google</Text>
           </SpinnerButton>
         </View>

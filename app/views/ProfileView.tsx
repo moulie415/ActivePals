@@ -9,8 +9,8 @@ import {
 } from "react-native"
 import {
   Container,
-  Icon,
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from '../components/Text'
 import Image from 'react-native-fast-image'
@@ -111,7 +111,8 @@ import Button from '../components/Button'
             <Image style={{height: 90, width: 90}} source={{uri: this.state.avatar}} />
           </TouchableOpacity>
           : <Icon name='md-contact'
-          style={{fontSize: 80, color: colors.primary, marginTop: -45, textAlign: 'center', backgroundColor: '#fff',
+          size={80}
+          style={{color: colors.primary, marginTop: -45, textAlign: 'center', backgroundColor: '#fff',
           marginBottom: 10, paddingHorizontal: 10, paddingTop: Platform.OS == 'ios' ? 5 : 0, borderWidth: 1, borderColor: colors.secondary}}/>}
 
       </View>

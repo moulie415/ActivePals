@@ -9,7 +9,7 @@ import {
   ScrollView
 } from 'react-native'
 import Image from 'react-native-fast-image'
-import { Icon } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import colors from '../../constants/colors'
 import Text, { globalTextStyle } from '../../components/Text'
 import PropTypes from 'prop-types'
@@ -65,9 +65,9 @@ class FriendsModal extends Component {
               <View style={{flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between'}} >
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 {friend.avatar ? <Image source={{uri: friend.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/> :
-                  <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0}}/>}
+                  <Icon name='md-contact' size={35} style={{color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0}}/>}
                   <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
-                  {selected && <Icon name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
+                  {selected && <Icon size={25} name='ios-checkmark-circle' style={{color: colors.primary, textAlign: 'right', flex: 1}} />}
                 </View>
               </View>
             </View>

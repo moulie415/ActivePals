@@ -8,9 +8,9 @@ import {
   Platform
 } from 'react-native'
 import {
-  Icon,
   Container
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import Header from '../components/Header/header'
 import Text from '../components/Text'
 import colors from '../constants/colors'
@@ -171,7 +171,7 @@ class SessionInfo extends Component {
             style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}
             >
             {host.avatar ? <Image source={{uri: host.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-            <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary}}/>}
+            <Icon size={50} name='md-contact'  style={{color: colors.primary}}/>}
           </View>
           <View style={{marginRight: 10}}>
             {this.renderInfoHeader('Host')}
@@ -185,7 +185,7 @@ class SessionInfo extends Component {
           
           {(!this.isPrivate || (host && this.props.profile.uid == host.uid))  && 
           <TouchableOpacity onPress={()=> this.setState({friendsModalOpen: true})}>
-            <Icon style={{color: colors.secondary, fontSize: 40, marginRight: 10}} name="add"/>
+            <Icon size={40} style={{color: colors.secondary, marginRight: 10}} name="add"/>
           </TouchableOpacity>}
         </View>
         {session && this.renderUsers(session.users)}
@@ -238,7 +238,7 @@ class SessionInfo extends Component {
       style={[styles.infoRowContainer, styles.userRow, { paddingVertical: userItem.avatar ? 10 : 5}]}
       key={user}> 
         {userItem.avatar ? <Image source={{uri: userItem.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-           <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary}}/>}
+           <Icon size={50} name='md-contact'  style={{color: colors.primary}}/>}
            <Text style={{marginLeft: 10}}>{userItem.username}</Text>
       </TouchableOpacity>
      }

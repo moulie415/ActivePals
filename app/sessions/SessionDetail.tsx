@@ -1,10 +1,10 @@
 import React, { Component } from "react"
 import {
 	Container,
-	Icon,
 	Content,
 	Switch
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import {
 	Text,
 	View,
@@ -45,6 +45,7 @@ class SessionDetail extends Component {
 	header: null,
     tabBarIcon: ({ tintColor }) => (
       <Icon
+		size={25}
         name='md-home'
         style={{ color: tintColor }}
       />

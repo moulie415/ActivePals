@@ -7,9 +7,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native'
-import {
-  Icon,
-} from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import Swiper from 'react-native-swiper'
 import styles from '../styles/welcomeStyles'
 import colors from '../constants/colors'
@@ -59,7 +57,7 @@ class Welcome extends Component {
                 <Text style={styles.text}>Create and join sessions with people in your area</Text>
                 {this.renderImages()}
                 <Text style={styles.text}>Or create private sessions for you and your pals</Text>
-                <Icon name="ios-lock" style={{color: '#fff', fontSize: 50}} />
+                <Icon size={50} name="ios-lock" style={{color: '#fff'}} />
               </View>
               <View style={styles.slide2}>
               {this.skip()}

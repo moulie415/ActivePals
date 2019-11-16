@@ -7,8 +7,8 @@ import {
 import {
   Input,
   Container,
-  Icon,
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import Image from 'react-native-fast-image'
 import Text, { globalTextStyle } from '../components/Text'
@@ -33,6 +33,7 @@ import Button from '../components/Button'
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-person'
+        size={25}
         style={{ color: tintColor }}
       />
     ),
@@ -117,7 +118,7 @@ import Button from '../components/Button'
           resizeMode='cover'
           source={{uri: this.state.backdrop}} /> :
           <View style={{height: 150, backgroundColor: colors.primaryLighter, justifyContent: 'center'}}>
-            <Icon name='ios-add' style={{color: '#fff', textAlign: 'center'}}/>
+            <Icon name='ios-add' size={25} style={{color: '#fff', textAlign: 'center'}}/>
           </View>}
           </TouchableOpacity>
 
@@ -127,7 +128,7 @@ import Button from '../components/Button'
           style={{width:90, height: 90, alignSelf: 'center', borderWidth: 0.5, borderColor: '#fff'}} /> :
           <View
           style={{width: 80, height: 80, alignSelf: 'center', backgroundColor: colors.secondary, justifyContent: 'center'}}>
-            <Icon name='ios-add' style={{color: '#fff', textAlign: 'center'}}/>
+            <Icon name='ios-add' size={25} style={{color: '#fff', textAlign: 'center'}}/>
           </View>}
           </TouchableOpacity>
       </View>
@@ -148,6 +149,7 @@ import Button from '../components/Button'
           onPress={()=> this.props.goToSettings()}>
           <Text style={{color: colors.secondary, marginRight: 10}}>Settings</Text>
             <Icon
+            size={25}
             name='md-settings'
             style={{ color: colors.secondary}}
             />

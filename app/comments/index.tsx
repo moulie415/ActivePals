@@ -15,7 +15,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Image from 'react-native-fast-image'
-import {Icon as IIcon} from 'native-base'
+import IIcon from 'react-native-vector-icons/Ionicons'
 
 import Text, { globalTextStyle } from '../components/Text'
 import PropTypes from "prop-types";
@@ -261,7 +261,7 @@ export default class Comments extends PureComponent {
         key={like.user_id + ""}
       >
         <View style={[styles.likeContainer]}>
-          {like.image ? <Image style={[styles.likeImage]} source={{ uri: like.image }} /> : <IIcon name='md-contact'  style={{fontSize: 40, color: colors.primary, }} />}
+          {like.image ? <Image style={[styles.likeImage]} source={{ uri: like.image }} /> : <IIcon name='md-contact'size={40} style={{ color: colors.primary, }} />}
           <Text style={[styles.likeName]}>{like.name || like.username}</Text>
         </View>
       </TouchableOpacity>
@@ -451,7 +451,7 @@ export default class Comments extends PureComponent {
                 }}
                 style={{backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5}}>
                   {item.avatar ? <Image source={{uri: item.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/>
-            : <IIcon name='md-contact'  style={{fontSize: 35, color: colors.primary}}/>}
+            : <IIcon name='md-contact' size={35} style={{color: colors.primary}}/>}
                   <Text style={{marginLeft: 10}}>{item.username}</Text>
                 </TouchableOpacity>
                 }

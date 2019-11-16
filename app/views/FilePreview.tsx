@@ -9,9 +9,7 @@ import {
     Alert,
     FlatList
 } from 'react-native'
-import {
-    Icon,
-} from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import colors from '../constants/colors'
 import firebase from 'react-native-firebase'
 import { guid } from '../constants/utils'
@@ -95,16 +93,20 @@ class FilePreview extends Component {
                     <TouchableOpacity onPress={() => this.rejectPressed()}
                     style={{backgroundColor: colors.secondary, opacity: 0.8, padding: 10, paddingHorizontal: 15, borderRadius: 5}}>
                         <Icon
-                        name = {'md-close'}
-                        style={{color: '#fff', fontSize: 30}}/>
+                            size={30}
+                            name = {'md-close'}
+                            style={{color: '#fff'}}
+                        />
                     </TouchableOpacity>
                 </View>
                 <View style={{position: 'absolute', margin: 20, marginTop: 30, right: 0}}>
                     <TouchableOpacity onPress={() => this.acceptPressed()}
                     style={{backgroundColor: colors.secondary, opacity: 0.8, padding: 10,paddingHorizontal: 15, borderRadius: 5}}>
                         <Icon
-                        name ={'md-checkmark'}
-                        style={{color: '#fff', fontSize: 30}}/>
+                            size={30}
+                            name='md-checkmark'
+                            style={{color: '#fff'}}
+                        />
                     </TouchableOpacity>
                 </View>
                 {this.state.mentionList && !this.message && this.renderMentionList()}
@@ -153,8 +155,9 @@ class FilePreview extends Component {
         			<TouchableOpacity 
                     onPress={() => this.setState({paused: false})}>
             			{this.state.paused && <Icon
-            			name = {'md-play'}
-                        style={{color: '#fff', fontSize: 75, backgroundColor: 'transparent', opacity: 0.8}}
+                        name='md-play'
+                        size={75}
+                        style={{color: '#fff', backgroundColor: 'transparent', opacity: 0.8}}
                         />}
                     </TouchableOpacity>
                 </View>
@@ -162,16 +165,20 @@ class FilePreview extends Component {
                     <TouchableOpacity onPress={() => this.rejectPressed()}
                     style={{backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5}}>
                         <Icon
-                        name = {'md-close'}
-                        style={{color: '#fff', fontSize: 30}}/>
+                            size={30}
+                            name = {'md-close'}
+                            style={{color: '#fff'}}
+                        />
                     </TouchableOpacity>
                 </View>
                 <View style={{position: 'absolute', margin: 20, right: 0}}>
                     <TouchableOpacity onPress={() => {this.acceptPressed()}}
                     style={{backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5}}>
                         <Icon
-            			name ={'md-checkmark'}
-                        style={{color: '#fff', fontSize: 30}}/>
+                            size={30}
+                            name ={'md-checkmark'}
+                            style={{color: '#fff'}}
+                        />
                     </TouchableOpacity>
                 </View>
                 {this.state.mentionList && !this.message && this.renderMentionList()}
@@ -309,7 +316,7 @@ renderMentionList() {
         }}
         style={{backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5}}>
           {item.avatar ? <Image source={{uri: item.avatar}} style={{height: 30, width: 30, borderRadius: 15}}/>
-    : <Icon name='md-contact'  style={{fontSize: 35, color: colors.primary}}/>}
+    : <Icon name='md-contact' size={35} style={{color: colors.primary}}/>}
           <Text style={{marginLeft: 10}}>{item.username}</Text>
         </TouchableOpacity>
         }

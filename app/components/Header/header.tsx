@@ -1,7 +1,8 @@
 import React, { Component } from "react"
 import { TouchableOpacity, View } from "react-native"
 import Text from '../Text'
-import { Icon, Header } from "native-base"
+import { Header } from "native-base"
+import Icon from 'react-native-vector-icons/Ionicons'
 import { TabBarBottom } from "react-navigation"
 import colors from '../../constants/colors'
 import PropTypes from 'prop-types'
@@ -22,7 +23,7 @@ const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, fitTit
 							style = {globalStyles.headerLeft}
 							onPress = {customBackPress? () => customBackPress(onBackPress) : onBackPress}
 						>
-					<Icon name='arrow-back' style={{color: '#fff', padding: 5}} />
+					<Icon name='ios-arrow-back' size={25} style={{color: '#fff', padding: 5}} />
 				</TouchableOpacity>		
 					)}
 				<Text adjustsFontSizeToFit={fitTitle} style={{color: 'white', fontWeight:'bold', fontSize: 17, marginHorizontal: 30, textAlign: 'center'}}>{title}</Text>

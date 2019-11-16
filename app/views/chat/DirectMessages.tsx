@@ -5,7 +5,8 @@ import {
   FlatList
 } from "react-native"
 import Image from 'react-native-fast-image'
-import { Container, Icon } from 'native-base'
+import { Container } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import colors from '../../constants/colors'
 import {getSimplifiedTime } from '../../constants/utils'
@@ -98,7 +99,7 @@ import Text from '../../components/Text'
           }}>
             <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, paddingVertical: friend.avatar ? 10 : 5, flexDirection: 'row', alignItems: 'center'}}>
             {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
-                  <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
+                  <Icon size={60} name='md-contact'  style={{color: colors.primary}}/>}
               <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
                 <Text style={{color: '#000'}} numberOfLines={1}>{friend.username}</Text>
                 {!!item.lastMessage.text && <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>}

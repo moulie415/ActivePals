@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import {
-  StyleSheet,
   View,
   TouchableOpacity,
   Alert,
@@ -8,8 +7,8 @@ import {
 import {
   Container,
   Content,
-  Icon,
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import VersionNumber from 'react-native-version-number'
 import colors from '../constants/colors'
@@ -29,24 +28,11 @@ import DialogInput from 'react-native-dialog-input'
   constructor(props) {
     super(props)
 
-    this.user = null
     this.state = {
       spinner: false,
       showDialog: false,
     }
   }
-
-  componentDidMount() {
-
-  firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    this.user = user
-    // User is signed in.
-  } else {
-    // No user is signed in.
-  }
-})
-}
 
   render () {
     return (
@@ -63,7 +49,7 @@ import DialogInput from 'react-native-dialog-input'
         }}
         style={styles.contact}>
           <Text>Contact Support</Text>
-          <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
+          <Icon name="ios-arrow-forward" size={25} style={{color: colors.primary}}/>
         </TouchableOpacity>
         <TouchableOpacity
         onPress={()=> {
@@ -71,7 +57,7 @@ import DialogInput from 'react-native-dialog-input'
         }}
         style={styles.contact}>
           <Text>View Welcome Swiper</Text>
-          <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
+          <Icon name="ios-arrow-forward" size={25} style={{color: colors.primary}}/>
         </TouchableOpacity>
         <TouchableOpacity
         onPress={()=> {
@@ -79,7 +65,7 @@ import DialogInput from 'react-native-dialog-input'
         }}
         style={styles.contact}>
           <Text>Credits</Text>
-          <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
+          <Icon name="ios-arrow-forward" size={25} style={{color: colors.primary}}/>
         </TouchableOpacity>
         {this.props.profile.fb_login && <TouchableOpacity
         onPress={()=> {
@@ -87,7 +73,7 @@ import DialogInput from 'react-native-dialog-input'
         }}
         style={styles.contact}>
           <Text>Import Facebook friends</Text>
-          <Icon name="ios-arrow-forward" style={{color: colors.primary}}/>
+          <Icon name="ios-arrow-forward" size={25} style={{color: colors.primary}}/>
         </TouchableOpacity>}
           <View style={styles.contact}>
               <Text >Version no: </Text>

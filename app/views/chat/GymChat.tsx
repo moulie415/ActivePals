@@ -7,7 +7,6 @@ import {
 } from 'react-native'
 import { Container } from 'native-base'
 import Text from '../../components/Text'
-import firebase from 'react-native-firebase'
 import { getType, getSimplifiedTime } from '../../constants/utils'
 import colors from '../../constants/colors'
 import ChatTabBarIcon from '../../components/ChatTabBarIcon'
@@ -29,8 +28,6 @@ import styles from '../../styles/chatStyles'
       refreshing: false
     }
   }
-
-
 
   render () {
     const gym = this.props.gym

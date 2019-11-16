@@ -8,10 +8,10 @@ import {
 } from "react-native"
 import {
   Container,
-  Icon,
   Switch,
   ActionSheet,
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import Slider from '@react-native-community/slider'
 import { PulseIndicator } from 'react-native-indicators'
 import Image from 'react-native-fast-image'
@@ -394,13 +394,13 @@ import PrivateIcon from '../components/PrivateIcon'
                         justifyContent: 'center',
                         marginRight: 20
                         }}>
-                        <Icon name='md-chatboxes' style={{color: colors.secondary}}/>
+                        <Icon name='md-chatboxes' size={25} style={{color: colors.secondary}}/>
                       </TouchableOpacity>
                       <TouchableOpacity 
                       onPress={() => {
                         this.props.viewGym(gym.place_id)
                       }}>
-                        <Icon name='md-information-circle' style={{color: colors.secondary}}/>
+                        <Icon name='md-information-circle' size={25} style={{color: colors.secondary}}/>
                       </TouchableOpacity>
                       </View>
                     </View>
@@ -442,7 +442,7 @@ import PrivateIcon from '../components/PrivateIcon'
                     <TouchableOpacity onPress={()=>{
                       this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat, switch: true})
                     }}>
-                      <Icon name="pin" style={{color: colors.secondary, fontSize: 40}}/>
+                      <Icon name="ios-pin" size={40} style={{color: colors.secondary}}/>
                     </TouchableOpacity>
                   </View>
 
@@ -494,7 +494,7 @@ import PrivateIcon from '../components/PrivateIcon'
                     <TouchableOpacity onPress={()=>{
                       this.setState({longitude: lng, latitude: lat, switch: true})
                     }}>
-                      <Icon name="pin" style={{color: colors.secondary, fontSize: 40}}/>
+                      <Icon size={40} name="ios-pin" style={{color: colors.secondary}}/>
                     </TouchableOpacity>
                   </View>
                   </View>

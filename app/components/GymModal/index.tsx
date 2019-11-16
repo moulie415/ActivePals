@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Alert
 } from 'react-native'
-import { Icon } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import Text from '../Text'
 import colors from '../../constants/colors'
 import { getDistance } from '../../constants/utils'
@@ -37,7 +37,7 @@ const GymModal = (
           {name}</Text>
           <TouchableOpacity
                 onPress={()=> viewGym(place_id)}>
-            <Icon name={'md-information-circle'} style={{color: colors.secondary, fontSize: 40, }}/>
+            <Icon size={40} name={'md-information-circle'} style={{color: colors.secondary}}/>
           </TouchableOpacity>
         </View>
         <View style={{margin: 10}}>
@@ -73,7 +73,7 @@ const GymModal = (
                   onOpenGymChat(place_id)
                 }}
                 style={{justifyContent: 'center', marginRight: 20}}>
-                <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 40}}/>
+                <Icon size={40} name='md-chatboxes' style={{color: colors.secondary}}/>
             </TouchableOpacity>
             <Button
             onPress={() => {

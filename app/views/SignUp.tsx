@@ -8,8 +8,8 @@ import {
 import {
   Input,
   Item,
-  Icon,
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import firebase from 'react-native-firebase'
 import  styles  from '../styles/signUpStyles'
 import colors from '../constants/colors'
@@ -51,7 +51,7 @@ import Button from '../components/Button'
       </View>}
       <KeyboardAvoidingView behavior="padding" style={{justifyContent: 'center', flex: 1}}>
       <Item style={styles.inputGrp}>
-      <Icon name="person" style={{color: "#fff"}} />
+      <Icon size={25} name="ios-person" style={{color: "#fff", marginRight: 5}} />
         <Input
         placeholder="Username"
         onChangeText={u => this.username = u}
@@ -63,7 +63,7 @@ import Button from '../components/Button'
         />
         </Item>
       <Item style={styles.inputGrp}>
-      <Icon name="mail" style={{color: "#fff"}} />
+      <Icon size={25} name="md-mail" style={{color: "#fff", marginRight: 5}} />
         <Input
         placeholder="Email"
         onChangeText={e => this.email = e}
@@ -75,7 +75,7 @@ import Button from '../components/Button'
         />
         </Item>
       <Item style={styles.inputGrp}>
-      <Icon name="unlock" style={{color: "#fff"}} />
+      <Icon size={25} name="md-unlock" style={{color: "#fff", marginRight: 5}} />
       <Input
         placeholder="Password"
         secureTextEntry={true}
@@ -85,7 +85,7 @@ import Button from '../components/Button'
         />
         </Item>
       <Item style={styles.inputGrp}>
-      <Icon name="unlock" style={{color: "#fff"}} />
+      <Icon size={25} name="md-unlock" style={{color: "#fff", marginRight: 5}} />
       <Input
         placeholder="Confirm Password"
         secureTextEntry={true}

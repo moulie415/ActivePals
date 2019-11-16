@@ -1,7 +1,5 @@
 import React, { Component } from "react"
-import {
-    Icon,
-} from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import {
     View,
     Dimensions,
@@ -218,7 +216,7 @@ class PostView extends Component {
                   paddingVertical: 2,
                   borderRadius: 10,
                 }}>
-                  <Icon name={'ios-arrow-back'}  style={{color: '#fff', fontSize: 40}}/>
+                  <Icon size={40} name={'ios-arrow-back'}  style={{color: '#fff'}}/>
                 </View>
               </TouchableOpacity>)
           }}
@@ -316,8 +314,10 @@ class PostView extends Component {
             style={hStyles.playButtonContainer}>
           <TouchableOpacity 
                 onPress={() => this.setState({playing: true})}>
-                <Icon name = {'md-play'}
-                    style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
+                <Icon 
+                name='md-play'
+                size={50}
+                    style={{color: '#fff', backgroundColor: 'transparent', opacity: 0.8}}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity 
@@ -412,7 +412,7 @@ class PostView extends Component {
       else {
         return <TouchableOpacity
         onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
-        <Icon name='md-contact'  style={{fontSize: 45, color: colors.primary, marginRight: 10}}/>
+        <Icon name='md-contact'size={45} style={{color: colors.primary, marginRight: 10}}/>
       </TouchableOpacity>
       }
     }
@@ -438,7 +438,7 @@ class PostView extends Component {
           key={like.user_id + ""}
         >
           <View style={[cStyles.likeContainer]}>
-            {like.image ? <Image style={[cStyles.likeImage]} source={{ uri: like.image }} /> : <Icon name='md-contact'  style={{fontSize: 40, color: colors.primary, }} />}
+            {like.image ? <Image style={[cStyles.likeImage]} source={{ uri: like.image }} /> : <Icon name='md-contact' size={40} style={{color: colors.primary}} />}
             <Text style={[cStyles.likeName]}>{like.username}</Text>
           </View>
         </TouchableOpacity>

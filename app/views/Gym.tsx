@@ -9,9 +9,9 @@ import {
   Platform
 } from "react-native"
 import {
-  Container,
-  Icon,
+  Container
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import { PulseIndicator } from 'react-native-indicators'
 import Text, { globalTextStyle } from '../components/Text'
 import Image from 'react-native-fast-image'
@@ -282,7 +282,7 @@ import styles from '../styles/gymStyles'
        style={[styles.infoRowContainer, styles.userRow, { paddingVertical: userItem.avatar ? 10 : 5}]}
        key={user}> 
          {userItem.avatar ? <Image source={{uri: userItem.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-            <Icon name='md-contact'  style={{fontSize: 50, color: colors.primary}}/>}
+            <Icon size={50} name='md-contact'  style={{color: colors.primary}}/>}
             <Text style={{marginLeft: 10}}>{userItem.username}</Text>
        </TouchableOpacity>
       }

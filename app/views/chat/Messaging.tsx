@@ -222,12 +222,12 @@ class Messaging extends React.Component {
   getRightHandIcon() {
     if (this.gymId) {
       return <TouchableOpacity onPress={()=> this.props.goToGym(this.gymId)}>
-        <Icon name='md-information-circle' style={{color: '#fff'}}/>
+        <Icon size={25} name='md-information-circle' style={{color: '#fff'}}/>
       </TouchableOpacity>
     }
     else if (this.sessionId) {
       return <TouchableOpacity onPress={()=> this.props.viewSession(this.sessionId, this.session.private)}>
-        <Icon name='md-information-circle' style={{color: '#fff'}}/>
+        <Icon size={25} name='md-information-circle' style={{color: '#fff'}}/>
       </TouchableOpacity>
     }
     else return null
@@ -303,7 +303,7 @@ class Messaging extends React.Component {
               <TouchableOpacity
               onPress={()=> this.showPicker()}
               style={{marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 15, paddingRight: 10}}>
-                <Icon name="ios-attach" style={{color: colors.secondary}}/>
+                <Icon size={25} name="ios-attach" style={{color: colors.secondary}}/>
               </TouchableOpacity>
               {/*<TouchableOpacity 
               style={{padding: 5}}

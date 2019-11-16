@@ -6,18 +6,18 @@ import {
   TriggerableView,
   withNativeAd,
   AdSettings,
-  NativeAdsManager
+  NativeAdsManager,
 } from 'react-native-fbads'
 import {
     View,
 } from 'react-native'
 import Text from './Text'
 import PropTypes from 'prop-types'
-import { Card } from 'native-base'
 import {
   AdMobBanner
 } from 'react-native-admob'
 import str from '../constants/strings'
+import Card from "./Card"
 // AdSettings.clearTestDevices()
 // AdSettings.setLogLevel('none')
 // AdSettings.addTestDevice(AdSettings.currentDeviceHash)
@@ -57,13 +57,13 @@ import str from '../constants/strings'
     if (index > 0 && index % 4 == 0) {
       if (index % 8 == 0) {
         return (
-          <Card>
+          <Card style={{marginBottom: 10}}>
             <NativeAd adsManager={adsManager}/>
           </Card>
         )
       }
       else {
-        return <Card style={{padding: 10}}>
+        return <Card style={{padding: 10, marginBottom: 10}}>
           <AdMobBanner
           adSize="largeBanner"
           style={{alignSelf: 'center'}}

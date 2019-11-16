@@ -24,21 +24,11 @@ import ChatRowCount from '../../components/ChatRowCount'
   constructor(props) {
     super(props)
     this.nav = this.props.navigation
-    this.user = null
     this.state = {
       email: "",
       username: "",
       chats: Object.values(this.props.chats),
     }
-  }
-  componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.user = user
-        //let sessionsRef = firebase.database().ref('users/' + this.user.uid).child('sessions')
-      }
-    })
-
   }
 
   render () {

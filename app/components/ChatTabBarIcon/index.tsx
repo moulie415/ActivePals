@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { View } from 'react-native'
 import Text from '../Text'
-import { Icon } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import styles from './styles'
 
 
@@ -11,7 +11,7 @@ const ChatTabBarIcon = ({unreadCount, color}) => {
   Object.values(unreadCount).forEach(val => count += val)
   return (
     <View>
-      <Icon name='md-chatboxes' style={{ color }} />
+      <Icon name='md-chatboxes' size={25} style={{ color }} />
       {count > 0 && <View style={styles.active}>
 				<Text style={styles.unreadCount}>{count > 9 ? '9+' : count}</Text>
 			</View>}

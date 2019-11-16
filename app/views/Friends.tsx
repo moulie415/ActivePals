@@ -9,8 +9,8 @@ import {
 import {
   Container,
   Content,
-  Icon,
 } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 import TouchableOpacity from '../components/TouchableOpacityLockable'
 import firebase from 'react-native-firebase'
 import colors from '../constants/colors'
@@ -31,6 +31,7 @@ import Button from '../components/Button'
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-people'
+        size={25}
         style={{ color: tintColor }}
       />
     ),
@@ -120,7 +121,7 @@ import Button from '../components/Button'
             snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a pal")
           })
           }}>
-            <Icon name='md-add' style={{color: '#fff', padding: 5}} />
+            <Icon name='md-add' size={25} style={{color: '#fff', padding: 5}} />
           </TouchableOpacity>}
       />
       <Content contentContainerStyle={{flex: 1}}>
@@ -192,7 +193,7 @@ import Button from '../components/Button'
                   ],
                 )
                 }}>
-                <Icon name='ios-close' style={{color: 'red', fontSize: 50, paddingHorizontal: 10}}/>
+                <Icon name='ios-close' size={50} style={{color: 'red', paddingHorizontal: 10}}/>
               </TouchableOpacity>
             </View>
           </View>
@@ -203,10 +204,10 @@ import Button from '../components/Button'
               <Text style={{marginRight: 5, flex: 4}}>{item.username + ' has sent you a pal request'}</Text>
               <View style={{flexDirection: 'row', flex: 1}}>
                 <TouchableOpacity onPress={()=> this.accept(item.uid)}>
-                 <Icon name='ios-checkmark' style={{color: 'green', fontSize: 50, paddingHorizontal: 10, alignSelf: 'center'}}/>
+                 <Icon size={50} name='ios-checkmark' style={{color: 'green', paddingHorizontal: 10, alignSelf: 'center'}}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=> this.remove(item.uid)}>
-                  <Icon name='ios-close' style={{color: 'red', fontSize: 50, paddingHorizontal: 10, alignSelf: 'center'}}/>
+                  <Icon size={50} name='ios-close' style={{color: 'red', paddingHorizontal: 10, alignSelf: 'center'}}/>
                 </TouchableOpacity>
               </View>
             </View>
@@ -217,7 +218,7 @@ import Button from '../components/Button'
             <View style={{flexDirection: 'row', alignItems: 'center', height: 50, justifyContent: 'space-between'}} >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {item.avatar? <Image source={{uri: item.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
-                <Icon name='md-contact'  style={{fontSize: 65, color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
+                <Icon size={65} name='md-contact'  style={{color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
                 <Text style={{marginHorizontal: 10}}>{item.username}</Text>
               </View>
               <View style={{flexDirection: 'row'}}>
@@ -232,12 +233,12 @@ import Button from '../components/Button'
               <TouchableOpacity
                 onPress={()=> this.openChat(item.uid, item.username)}
                 style={{padding: 5, marginHorizontal: 5}}>
-                <Icon name='md-chatboxes' style={{color: colors.secondary, fontSize: 30}}/>
+                <Icon size={30} name='md-chatboxes' style={{color: colors.secondary}}/>
               </TouchableOpacity>
               <TouchableOpacity
               onPress={()=> this.props.viewProfile(item.uid)}
               style={{padding: 5, marginHorizontal: 5}}>
-                <Icon name='md-person' style={{color: colors.secondary, fontSize: 30}}/>
+                <Icon size={30} name='md-person' style={{color: colors.secondary}}/>
               </TouchableOpacity>
               </View>
             </View>

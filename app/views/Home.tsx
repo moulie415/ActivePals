@@ -8,14 +8,14 @@ import {
   SafeAreaView,
   Dimensions,
   TouchableWithoutFeedback,
-  Platform
+  Platform,
 } from "react-native"
 import { 
   Container,
-  Content,
-  Icon,
-  Card,
+  Content
 } from 'native-base'
+import Card from '../components/Card'
+import Icon from 'react-native-vector-icons/Ionicons'
 import { PulseIndicator } from 'react-native-indicators'
 import firebase from 'react-native-firebase'
 import colors from '../constants/colors'
@@ -60,7 +60,6 @@ const SCREEN_WIDTH = Dimensions.get('window').width
 const SCREEN_HEIGHT = Dimensions.get('window').height
 const MAX_VIDEO_SIZE = 30000000 //30mb
 
-
 class Home extends Component {
 
   static navigationOptions = {
@@ -69,6 +68,7 @@ class Home extends Component {
     tabBarIcon: ({ tintColor }) => (
       <Icon
         name='md-home'
+        size={25}
         style={{ color: tintColor }}
       />
     ),
@@ -92,7 +92,6 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    
     firebase.messaging().requestPermission()
       .then(() => {
        console.log("messaging permission granted")
@@ -100,23 +99,15 @@ class Home extends Component {
       .catch(error => {
         console.log("messaging permission denied")
       })
-      firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-        this.user = user
-         // User is signed in.
-        } else {
-        // No user is signed in.
-        }
-      })
 
-}
+  }
 
-sortByDate(array) {
-  array.sort(function(a,b){
-    return new Date(b.createdAt) - new Date(a.createdAt)
-  })
-  return array
-}
+  sortByDate(array) {
+    array.sort(function(a,b){
+      return new Date(b.createdAt) - new Date(a.createdAt)
+    })
+    return array
+  }
 
   render () {
     const { uid, username, users, unreadCount } = this.props.profile
@@ -130,7 +121,7 @@ sortByDate(array) {
           }}>
             {/*<Icon name='ios-notifications' style={{color: '#fff', marginRight: 10}}/>*/}
             <View style={{width: 30, alignItems: 'center'}}>
-              <Icon name='ios-notifications' style={{ color: '#fff', marginLeft: -10 }} />
+              <Icon name='ios-notifications' size={25} style={{ color: '#fff', marginLeft: -10 }} />
 			        {!!unreadCount && unreadCount > 0 && <View 
 				        style={styles.unreadBadge}>
 				          <Text numberOfLines={1} 
@@ -159,7 +150,7 @@ sortByDate(array) {
           {this.props.profile && this.props.profile.avatar ?
             <Image source={{uri: this.props.profile.avatar}} 
             style={{height: 50, width: 50, borderRadius: 25}}/>
-            : <Icon name='md-contact'  style={{fontSize: 60, color: colors.primary}}/>}
+            : <Icon name='md-contact' size={60} style={{color: colors.primary}}/>}
             </TouchableOpacity> 
             <TextInput 
             ref={(ref) => this.input = ref}
@@ -199,9 +190,9 @@ sortByDate(array) {
               }
             }}>
               <Icon name="ios-attach"
+              size={40}
               style={{
                 color: colors.secondary,
-                fontSize: 40,
                 marginLeft: 5,
                 marginRight: 10,
                 // elevation:4,
@@ -244,9 +235,9 @@ sortByDate(array) {
               }
             }}>
               <Icon name="md-return-right" 
+              size={40}
               style={{
                 color: colors.secondary,
-                fontSize: 40,
                 paddingTop: 5
                 // elevation:4,
                 // shadowOffset: { width: 5, height: 5 },
@@ -300,7 +291,7 @@ sortByDate(array) {
                   paddingVertical: 2,
                   borderRadius: 10,
                 }}>
-                  <Icon name={'ios-arrow-back'}  style={{color: '#fff', fontSize: 40}}/>
+                  <Icon name={'ios-arrow-back'} size={40}  style={{color: '#fff'}}/>
                 </View>
               </TouchableOpacity>)
           }}
@@ -322,7 +313,7 @@ sortByDate(array) {
           position={'center'}
           >
           <TouchableOpacity onPress={()=> this.refs.commentModal.close()}>
-            <Icon name={'ios-arrow-back'}  style={{color: '#000', fontSize: 30, padding: 10}}/>
+            <Icon name={'ios-arrow-back'} size={30} style={{color: '#000', padding: 10}}/>
            </TouchableOpacity>
             <Comments
           data={this.state.postId && this.props.feed[this.state.postId] && this.props.feed[this.state.postId].comments ? 
@@ -484,7 +475,7 @@ sortByDate(array) {
         renderItem = {({ item, index }) => {
             return (<View>
               <AdView index={index}/>
-              <Card>
+              <Card style={{marginBottom: 10}}>
                 {this.renderFeedItem(item)}
               </Card>
               </View>
@@ -590,8 +581,9 @@ sortByDate(array) {
         			<TouchableOpacity 
                     onPress={() => this.setState({playing: {[item.key]: true}})}>
             			<Icon
+                  size={50}
             			name = {'md-play'}
-                        style={{color: '#fff', fontSize: 50, backgroundColor: 'transparent', opacity: 0.8}}
+                        style={{color: '#fff', backgroundColor: 'transparent', opacity: 0.8}}
                         />
                     </TouchableOpacity>
                     <TouchableOpacity 
@@ -614,8 +606,8 @@ sortByDate(array) {
                       }
                     }}>
                     <Icon name='md-expand'
+                    size={30}
                  style={{
-                   fontSize: 30,
                    backgroundColor: 'transparent',
                    color: '#fff'
                    }}/>
@@ -672,7 +664,7 @@ sortByDate(array) {
       this.sharePost(item)
     }}
     style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
-      <Icon style={{color: colors.postIcon}} name='md-share'/>
+      <Icon size={25} style={{color: colors.postIcon}} name='md-share'/>
       {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
     </TouchableOpacity>}
     <TouchableOpacity
@@ -692,7 +684,7 @@ sortByDate(array) {
       this.props.getComments(item.key)
     }}
     style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
-      <Icon name='md-chatboxes' style={{color: colors.postIcon}}/>
+      <Icon name='md-chatboxes' size={25} style={{color: colors.postIcon}}/>
       {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Comment</Text> */}
     </TouchableOpacity>
    </View>)
