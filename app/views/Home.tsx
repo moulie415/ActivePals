@@ -493,16 +493,17 @@ class Home extends Component {
       case 'status':
         return (
           <View style={{padding: 10, margin: 5}}>
-          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+          <View style={{flexDirection: 'row',  flex: 1, marginBottom: 10}}>
             {this.fetchAvatar(item.uid)}
             <View style={{flex: 1}}>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                {this.getUsernameFormatted(item.uid)}
-                <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
-              </View>
-              <ParsedText text={item.text} />
+                {this.getUsernameFormatted(item.uid)}              
+              <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
             </View>
+            <TouchableOpacity>
+              <Icon name="ios-more" size={20}/>
+            </TouchableOpacity>
             </View>
+            <ParsedText text={item.text} />
             {this.repCommentCount(item)}
             {this.repsAndComments(item)}
           </View>
@@ -510,16 +511,17 @@ class Home extends Component {
     case 'photo':
       return (
           <View>
-          <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10}}>
-            {this.fetchAvatar(item.uid)}
-            <View style={{flex: 1}}>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              {this.getUsernameFormatted(item.uid)}
+            <View style={{flexDirection: 'row', flex: 1, padding: 10}}>
+              {this.fetchAvatar(item.uid)}
+              <View style={{flex: 1}}>
+                {this.getUsernameFormatted(item.uid)}
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              <ParsedText text={item.text} />
-              </View>
+              <TouchableOpacity>
+                <Icon name="ios-more" size={20}/>
+              </TouchableOpacity>
             </View>
+            <ParsedText text={item.text} />
               <TouchableOpacity
               activeOpacity={1}
               onPress={()=> {
@@ -541,16 +543,17 @@ class Home extends Component {
       case 'video':
               return (
                 <View>
-                <View style={{flexDirection: 'row', alignItems: 'center', flex: 1, padding: 10, zIndex: 2}}>
+                <View style={{flexDirection: 'row', flex: 1, padding: 10, zIndex: 2}}>
             {this.fetchAvatar(item.uid)}
             <View style={{flex: 1}}>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               {this.getUsernameFormatted(item.uid)}
-                <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
-              </View>
-              <ParsedText text={item.text} />
-              </View>
+              <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
             </View>
+            <TouchableOpacity>
+                <Icon name="ios-more" size={20}/>
+              </TouchableOpacity>
+            </View>
+            <ParsedText style={{marginVertical: 10}} text={item.text} />
             <TouchableWithoutFeedback onPress = {() => {
                   this.setState({playing: {[item.uid]: false}})
                 }}>
