@@ -500,7 +500,7 @@ class Home extends Component {
               <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
             </View>
             <TouchableOpacity>
-              <Icon name="ios-more" size={20}/>
+              <Icon style={{paddingHorizontal: 10}} name="ios-more" size={20}/>
             </TouchableOpacity>
             </View>
             <ParsedText text={item.text} />
@@ -518,7 +518,7 @@ class Home extends Component {
                 <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
               <TouchableOpacity>
-                <Icon name="ios-more" size={20}/>
+                <Icon style={{paddingHorizontal: 10}} name="ios-more" size={20}/>
               </TouchableOpacity>
             </View>
             <ParsedText text={item.text} />
@@ -550,7 +550,7 @@ class Home extends Component {
               <Text style={{color: '#999'}}>{getSimplifiedTime(item.createdAt)}</Text>
             </View>
             <TouchableOpacity>
-                <Icon name="ios-more" size={20}/>
+                <Icon style={{paddingHorizontal: 10}} name="ios-more" size={20}/>
               </TouchableOpacity>
             </View>
             <ParsedText style={{marginVertical: 10}} text={item.text} />

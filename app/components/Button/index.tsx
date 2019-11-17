@@ -1,25 +1,17 @@
 import colors from '../../constants/colors'
 import Text from '../Text'
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import styles from './styles'
-import PropTypes from 'prop-types'
-import TouchableOpacity from '../TouchableOpacityLockable'
+import { TouchableOpacity } from 'react-native'
+import ButtonProps from '../../types/components/Button'
 
-const AppButton = ({color, textColor, onPress, text, style, textStyle}) => {
-  return <TouchableOpacity onPress={onPress} style={[styles.button, style, {backgroundColor: color || colors.secondary}]}>
-    <Text style={[styles.text, {color: textColor || '#fff'}, textStyle]}>{text}</Text>
-  </TouchableOpacity>
+const AppButton: FunctionComponent<ButtonProps> = ({color, textColor, text, style, textStyle, ...rest}) => {
+  return <TouchableOpacity
+          style={[styles.button, style, {backgroundColor: color || colors.secondary}]}
+          {...rest}
+          >
+            <Text style={[styles.text, {color: textColor || '#fff'}, textStyle]}>{text}</Text>
+        </TouchableOpacity>
 }
-
-AppButton.propTypes = {
-  color: PropTypes.string,
-  textColor: PropTypes.string,
-  onPress: PropTypes.func,
-  text: PropTypes.string,
-  style: PropTypes.any,
-  textStyle: PropTypes.any
-}
-
-
 
 export default AppButton

@@ -26,12 +26,14 @@ export default class TouchableOpacityLockable extends Component {
         return <TouchableOpacity 
         {...this.props}
         onPress = { () => {
-            if (this.lockTimer && Date.now() - this.lockTimer.lockedAt >= this.lockTimer.lockFor) {
-                this.lock = false
-                this.lockTimer = undefined
-            }
-            if (!this.lock) {
-                this.props.onPress(this.mutex)
+            if (this.props.onPress) {
+                if (this.lockTimer && Date.now() - this.lockTimer.lockedAt >= this.lockTimer.lockFor) {
+                    this.lock = false
+                    this.lockTimer = undefined
+                }
+                if (!this.lock) {
+                    this.props.onPress(this.mutex)
+                }
             }
         }}>
             {this.props.children}

@@ -182,7 +182,7 @@ class SessionInfo extends Component {
           
           {(!this.isPrivate || (host && this.props.profile.uid == host.uid))  && 
           <TouchableOpacity onPress={()=> this.setState({friendsModalOpen: true})}>
-            <Icon size={40} style={{color: colors.secondary, marginRight: 10}} name="add"/>
+            <Icon size={40} style={{color: colors.secondary, marginRight: 10}} name="ios-add"/>
           </TouchableOpacity>}
         </View>
         {session && this.renderUsers(session.users)}

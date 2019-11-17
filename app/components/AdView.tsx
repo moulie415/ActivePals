@@ -1,4 +1,4 @@
-import React from "react"
+import React, { FunctionComponent } from "react"
 import {
   AdIconView,
   MediaView,
@@ -7,12 +7,12 @@ import {
   withNativeAd,
   AdSettings,
   NativeAdsManager,
+  NativeAd,
 } from 'react-native-fbads'
 import {
     View,
 } from 'react-native'
 import Text from './Text'
-import PropTypes from 'prop-types'
 import {
   AdMobBanner
 } from 'react-native-admob'
@@ -22,7 +22,7 @@ import Card from "./Card"
 // AdSettings.setLogLevel('none')
 // AdSettings.addTestDevice(AdSettings.currentDeviceHash)
 
-  const fbAd = ({nativeAd}) => {
+  const fbAd: FunctionComponent<{nativeAd: NativeAd}> = ({nativeAd}) => {
     return <View style={{padding: 10, margin: 5}}>
       <AdChoicesView/>
       <TriggerableView> 
@@ -45,20 +45,16 @@ import Card from "./Card"
       </View>
   }
 
-  fbAd.propTypes = {
-    nativeAd:  PropTypes.any,
-  }
-
-  const NativeAd = withNativeAd(fbAd)
+  const FbAd = withNativeAd(fbAd)
 
   const adsManager = new NativeAdsManager(str.nativePlacementId)
   
-  const AdComponent = ({index}) => {
+  const AdComponent: FunctionComponent<{index: number}> = ({index}) => {
     if (index > 0 && index % 4 == 0) {
       if (index % 8 == 0) {
         return (
           <Card style={{marginBottom: 10}}>
-            <NativeAd adsManager={adsManager}/>
+            <FbAd adsManager={adsManager} />
           </Card>
         )
       }
@@ -77,10 +73,6 @@ import Card from "./Card"
       }
     }
     else return null
-  }
-
-  AdComponent.propTypes = {
-    index: PropTypes.number.isRequired
   }
   
   export default AdComponent
