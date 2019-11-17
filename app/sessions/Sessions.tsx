@@ -31,6 +31,12 @@ import { CheckBox } from 'react-native-elements'
 import Button from '../components/Button'
 import PrivateIcon from '../components/PrivateIcon'
 import ActionSheet from 'react-native-actionsheet'
+import {
+  AdMobInterstitial,
+} from 'react-native-admob'
+
+AdMobInterstitial.setAdUnitID(str.admobInterstitial);
+AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
 
  class Sessions extends Component {
 
@@ -209,6 +215,7 @@ import ActionSheet from 'react-native-actionsheet'
           <Button style={styles.button}
           onPress={()=> {
             this.setState({selectedLocation: {}})
+            AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
             this.props.onContinue()
           }}
           text='Create Session'
@@ -229,7 +236,10 @@ import ActionSheet from 'react-native-actionsheet'
 
         <FriendsModal 
         onClosed={()=> this.setState({friendsModalOpen: false})}
-        onContinue={(friends) => this.props.onContinue(friends, this.state.selectedLocation)}
+        onContinue={(friends) => {
+          AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+          this.props.onContinue(friends, this.state.selectedLocation)
+        }}
         isOpen={this.state.friendsModalOpen}/>
         
         <Modal
@@ -320,6 +330,7 @@ import ActionSheet from 'react-native-actionsheet'
           cancelButtonIndex={2}
           onPress={(index) => { 
                 if (index == 0) {
+                  AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
                   this.props.onContinue(null, this.state.selectedLocation)
                 }
                 else if (index == 1) {
@@ -343,28 +354,6 @@ import ActionSheet from 'react-native-actionsheet'
     const location = {geometry: {location: {lat, lng}}}
     this.setState({selectedLocation: location, latitude: lat, longitude: lng})
     this.ActionSheet.show()
-    // ActionSheet.show(
-    //           {
-    //             options: ['Create session', 'Create private session', 'Cancel'],
-    //             cancelButtonIndex: 2,
-    //             //destructiveButtonIndex: DESTRUCTIVE_INDEX,
-    //             title: 'Create session at location?'
-    //           },
-    //           buttonIndex => {
-    //             //this.setState({ clicked: BUTTONS[buttonIndex] });
-    //             if (buttonIndex == 0) {
-    //               this.props.onContinue(null, this.state.selectedLocation)
-    //             }
-    //             else if (buttonIndex == 1) {
-    //               if (Object.values(this.props.friends).length > 0) {
-    //                 this.setState({friendsModalOpen: true})
-    //               }
-    //               else {
-    //                 Alert.alert('Sorry', 'You must have at least one pal to create a private session')
-    //               }
-    //             }
-    //           }
-    //         )
   }
 
   renderLists() {

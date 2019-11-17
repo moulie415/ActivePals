@@ -5,8 +5,9 @@ import styles from './styles'
 import { TouchableOpacity } from 'react-native'
 import ButtonProps from '../../types/components/Button'
 
-const AppButton: FunctionComponent<ButtonProps> = ({color, textColor, text, style, textStyle, ...rest}) => {
+const AppButton: FunctionComponent<ButtonProps> = ({color, textColor, text, style, textStyle, onPress, ...rest}) => {
   return <TouchableOpacity
+          onPress={onPress}
           style={[styles.button, style, {backgroundColor: color || colors.secondary}]}
           {...rest}
           >

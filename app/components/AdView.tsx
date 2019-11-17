@@ -21,6 +21,7 @@ import Card from "./Card"
 // AdSettings.clearTestDevices()
 // AdSettings.setLogLevel('none')
 // AdSettings.addTestDevice(AdSettings.currentDeviceHash)
+const adsManager = new NativeAdsManager(str.nativePlacementId)
 
   const fbAd: FunctionComponent<{nativeAd: NativeAd}> = ({nativeAd}) => {
     return <View style={{padding: 10, margin: 5}}>
@@ -45,20 +46,12 @@ import Card from "./Card"
       </View>
   }
 
+  //TODO: add fb ads back in
   const FbAd = withNativeAd(fbAd)
 
-  const adsManager = new NativeAdsManager(str.nativePlacementId)
   
   const AdComponent: FunctionComponent<{index: number}> = ({index}) => {
     if (index > 0 && index % 4 == 0) {
-      if (index % 8 == 0) {
-        return (
-          <Card style={{marginBottom: 10}}>
-            <FbAd adsManager={adsManager} />
-          </Card>
-        )
-      }
-      else {
         return <Card style={{padding: 10, marginBottom: 10}}>
           <AdMobBanner
           adSize="largeBanner"
@@ -70,7 +63,6 @@ import Card from "./Card"
           }}
           />
         </Card>
-      }
     }
     else return null
   }

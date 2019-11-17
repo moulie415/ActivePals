@@ -6,4 +6,5 @@ export default interface ButtonProps {
     text: string;
     style?: StyleProp<ViewStyle>;
     textStyle?: StyleProp<TextStyle>;
+    onPress?: () => void
 }

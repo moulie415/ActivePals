@@ -524,9 +524,7 @@ class Home extends Component {
             <ParsedText text={item.text} />
               <TouchableOpacity
               activeOpacity={1}
-              onPress={()=> {
-                this.setState({selectedImage: [{url: item.url}], showImage: true})
-              }}
+              onPress={()=> this.setState({selectedImage: [{url: item.url}], showImage: true})}
               style={{marginTop: 10, marginBottom: 10}}>
               <Image
               style={{width: '100%', height: 400}}

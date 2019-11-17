@@ -26,6 +26,7 @@
 		0A4320CF216FBDA000C79596 /* libRNVersionNumber.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A2FBFA22063056F00A42267 /* libRNVersionNumber.a */; };
 		0A4F4D51223D6B8200CA3039 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A4F4CDC223D6B8200CA3039 /* GoogleService-Info.plist */; };
 		0A4F4E27223D9E0300CA3039 /* libReactNativeConfig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4F4E24223D9DD900CA3039 /* libReactNativeConfig.a */; };
+		0A513B892381BDF200331ACC /* libReactNativeAdsFacebook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ABF96E321A98D1100D9EE84 /* libReactNativeAdsFacebook.a */; };
 		0A73102420F6780A00CCF377 /* Running-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0A730FE820F6780A00CCF377 /* Running-background.jpg */; };
 		0A7CE457218693AC00CEB53A /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A7CE4542186939B00CEB53A /* libRCTPushNotification.a */; };
 		0AA0DC442119107600200EDA /* libreact-native-splash-screen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A73110B20F6BF0000CCF377 /* libreact-native-splash-screen.a */; };
@@ -867,6 +868,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A513B892381BDF200331ACC /* libReactNativeAdsFacebook.a in Frameworks */,
 				0A0A502222DA374200CC692E /* libreact-native-maps.a in Frameworks */,
 				0A0A4FE822DA370E00CC692E /* libreact-native-google-maps.a in Frameworks */,
 				0A03A8E622D1658E005A2609 /* libFastImage.a in Frameworks */,
