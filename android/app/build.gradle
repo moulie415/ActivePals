@@ -214,7 +214,7 @@ dependencies {
 
     implementation 'com.facebook.android:facebook-login:5.0.3'
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     //implementation "com.android.support:appcompat-v7:27.1.1"
     implementation "com.facebook.react:react-native:0.59.8"  // From node_modules
@@ -222,14 +222,14 @@ dependencies {
         transitive = true
     }
 
-    implementation "com.google.android.gms:play-services-base:17.0.0"
-    implementation 'com.google.firebase:firebase-core:17.0.1'
-    implementation 'com.google.firebase:firebase-messaging:19.0.1'
-    implementation "com.google.firebase:firebase-database:18.0.1"
-    implementation "com.google.firebase:firebase-config:18.0.0"
-    implementation "com.google.firebase:firebase-auth:18.1.0"
-    implementation "com.google.firebase:firebase-storage:18.1.1"
-    implementation "com.google.firebase:firebase-iid:19.0.1"
+    implementation "com.google.android.gms:play-services-base:17.1.0"
+    implementation 'com.google.firebase:firebase-core:17.2.1'
+    implementation 'com.google.firebase:firebase-messaging:20.0.1'
+    implementation "com.google.firebase:firebase-database:19.2.0"
+    implementation "com.google.firebase:firebase-config:19.0.3"
+    implementation "com.google.firebase:firebase-auth:19.1.0"
+    implementation "com.google.firebase:firebase-storage:19.1.0"
+    implementation "com.google.firebase:firebase-iid:20.0.1"
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
 
 }
