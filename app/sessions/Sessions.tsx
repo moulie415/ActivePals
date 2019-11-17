@@ -161,7 +161,7 @@ AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
             <Text style={{color: '#fff'}}>Filters</Text>
           </TouchableOpacity>}
           title={'Sessions'}
-           right={<View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+           right={<View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{color: '#fff'}}>Map: </Text>
             <Switch
             trackColor={{true: colors.secondary}}
@@ -231,6 +231,7 @@ AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
             }
           }}
           text='Create Private Session'
+          
             textStyle={{textAlign: 'center', fontSize: 15, textAlignVertical: 'center'}}/>
         </View>
 

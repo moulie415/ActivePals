@@ -5,13 +5,27 @@ import styles from './styles'
 import { TouchableOpacity } from 'react-native'
 import ButtonProps from '../../types/components/Button'
 
-const AppButton: FunctionComponent<ButtonProps> = ({color, textColor, text, style, textStyle, onPress, ...rest}) => {
+const AppButton: FunctionComponent<ButtonProps> = ({
+  color,
+  textColor,
+  text,
+  style,
+  textStyle,
+  onPress,
+  adjustFontSizeToFit,
+  ...rest
+}) => {
   return <TouchableOpacity
           onPress={onPress}
           style={[styles.button, style, {backgroundColor: color || colors.secondary}]}
           {...rest}
           >
-            <Text style={[styles.text, {color: textColor || '#fff'}, textStyle]}>{text}</Text>
+            <Text
+              adjustFontSizeToFit={adjustFontSizeToFit}
+              style={[styles.text, {color: textColor || '#fff'}, textStyle]}
+            >
+              {text}
+            </Text>
         </TouchableOpacity>
 }
 
