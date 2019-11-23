@@ -5,7 +5,7 @@ import str from '../../constants/strings';
 import colors from '../../constants/colors';
 import firebase from 'react-native-firebase';
 
-const CustomParsedText: FunctionComponent = ({
+const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
   text,
   friends,
   users,
@@ -61,6 +61,7 @@ const CustomParsedText: FunctionComponent = ({
 
 import { connect } from 'react-redux';
 import { navigateProfileView, navigateProfile } from '../../actions/navigation';
+import ParsedTextProps from '../../types/components/ParsedText';
 
 const mapStateToProps = ({ profile, friends, sharedInfo }) => ({
   profile: profile.profile,

@@ -10,6 +10,7 @@ export default interface Profile {
     username: string;
     fb_login?: boolean;
     birthday?: string;
+    avatar?: string;
 }
 
 export enum AccountType {

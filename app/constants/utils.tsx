@@ -216,11 +216,11 @@ export function dayDiff(first, second, round = true) {
 }
 
 export function getSimplifiedTime(createdAt) {
-  let timeStamp = new Date(createdAt);
-
-  let now = new Date();
-  let today0 = new Date();
-  let yesterday0 = new Date(today0.setHours(0, 0, 0, 0));
+  const timeStamp = new Date(createdAt);
+  let dateString
+  const now = new Date();
+  const today0 = new Date();
+  const yesterday0 = new Date(today0.setHours(0, 0, 0, 0));
   yesterday0.setDate(today0.getDate() - 1);
 
   if (timeStamp < yesterday0) dateString = timeStamp.toDateString();

@@ -5,10 +5,10 @@ import Comment from '../../comments/Comment'
 
 export default interface PostViewProps {
     friends: { [key: string]: Profile };
-    users: { [key: string]: Profile },
+    users: { [key: string]: Profile };
     profile: Profile;
     navigation: NavigationScreenProps;
-    feed: any;
+    feed: { [key: string]: Post };
     viewProfile: (uid: string) => void;
     onRepPost: (item: Post) => void;
     goToProfile: () => void;
