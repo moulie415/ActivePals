@@ -12,7 +12,6 @@ import Image from 'react-native-fast-image'
 import Icon from 'react-native-vector-icons/Ionicons'
 import colors from '../../constants/colors'
 import Text, { globalTextStyle } from '../../components/Text'
-import PropTypes from 'prop-types'
 import Button from '../Button'
 
 class FriendsModal extends Component {
@@ -94,13 +93,6 @@ class FriendsModal extends Component {
   }
 }
 
-FriendsModal.propTypes = {
-  friends: PropTypes.any,
-  onContinue: PropTypes.func,
-  onClosed: PropTypes.func,
-  isOpen: PropTypes.bool,
-  title: PropTypes.string
-}
 
 import { connect } from 'react-redux'
 

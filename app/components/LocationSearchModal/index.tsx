@@ -1,12 +1,11 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import styles, { locationSearch } from './styles'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import Modal from 'react-native-modalbox'
 import str from '../../constants/strings'
-import PropTypes from 'prop-types'
 import Button from '../Button'
 
-const LocationSearch = ({isOpen, onPress, onClosed}) => {
+const LocationSearch: FunctionComponent = ({isOpen, onPress, onClosed}) => {
   return <Modal
   onClosed={onClosed}
   isOpen={isOpen} 
@@ -32,12 +31,6 @@ const LocationSearch = ({isOpen, onPress, onClosed}) => {
     />
     <Button text='Cancel' onPress={onClosed} style={{alignSelf: 'center', marginBottom: 10}} color="red"/>
   </Modal>
-}
-
-LocationSearch.propTypes = {
-  isOpen: PropTypes.bool,
-  onPress: PropTypes.func,
-  onClosed: PropTypes.func
 }
 
 

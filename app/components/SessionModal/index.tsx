@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import Modal from 'react-native-modalbox'
 import {
   View,
@@ -15,9 +15,9 @@ import { getDistance, formatDateTime } from '../../constants/utils'
 import Button from '../Button'
 import styles from './styles'
 import firebase from 'react-native-firebase'
-import PropTypes from 'prop-types'
+import SessionModalProps from '../../types/components/SessionModal'
 
-const SessionModal = ({
+const SessionModal: FunctionComponent<SessionModalProps> = ({
   session,
   disabled,
   profile,
@@ -170,23 +170,6 @@ const fetchHost = (host, uid, viewProfile, users) => {
           </TouchableOpacity>
   }
   else return <Text>N/A</Text>
-}
-
-
-SessionModal.propTypes = {
-  session: PropTypes.any,
-  disabled: PropTypes.bool,
-  profile: PropTypes.any,
-  viewSession: PropTypes.func,
-  viewGym: PropTypes.func,
-  location: PropTypes.any,
-  openChat: PropTypes.func,
-  viewDirections: PropTypes.func,
-  viewProfile: PropTypes.func,
-  join: PropTypes.func,
-  remove: PropTypes.func,
-  close: PropTypes.func,
-  users: PropTypes.any
 }
 
 export default SessionModal

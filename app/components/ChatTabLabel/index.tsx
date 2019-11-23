@@ -1,11 +1,10 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import React, { Component, FunctionComponent } from 'react'
 import { View, Platform } from 'react-native'
 import Text from '../Text'
 import styles from './styles'
 
 
-const ChatTabLabel = ({unreadCount, color, type, chats, sessionChats, gymChat}) => {
+const ChatTabLabel: FunctionComponent = ({unreadCount, color, type, chats, sessionChats, gymChat}) => {
   let count = 0
   const chatType = type.toLowerCase()
   Object.keys(unreadCount).forEach(key => {
@@ -38,14 +37,6 @@ const ChatTabLabel = ({unreadCount, color, type, chats, sessionChats, gymChat}) 
   )
 }
 
-ChatTabLabel.propTypes = {
-  unreadCount: PropTypes.any,
-  color: PropTypes.string,
-  type: PropTypes.string,
-  chats: PropTypes.any,
-  sessionChats: PropTypes.any,
-  gymChat: PropTypes.any
-}
 import { connect } from 'react-redux'
 
 const mapStateToProps = ({ chats }) => ({

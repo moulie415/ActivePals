@@ -15,26 +15,30 @@ import Text from '../components/Text'
 import str from '../constants/strings'
 import { getResource, types } from '../constants/utils'
 import firebase from 'react-native-firebase'
-import PropTypes from 'prop-types'
 import FbFriendsModal from '../components/FbFriendsModal'
 
 
-class Welcome extends Component {
+interface State {
+  username: string;
+  fbModalOpen: boolean;
+}
+
+class Welcome extends Component<WelcomeProps, State> {
+    
     constructor(props) {
         super(props)
-        this.params = this.props.navigation.state.params
-
         this.state = {
-          username: this.props.profile.username
-        }
-        
+          username: this.props.profile.username,
+          fbModalOpen: false
+        } 
     }
 
     componentDidMount() {
       this.props.viewedWelcome()
     }
-    render() {
 
+    render() {
+      const params = this.props.navigation.state.params
       const { profile } = this.props
         return (
             <Swiper
@@ -46,21 +50,21 @@ class Welcome extends Component {
             prevButton={<Text style={styles.buttonText}>‹</Text>}
             >
               <View style={styles.slide1}>
-                {this.skip()}
+                {this.skip(params)}
                 <Text style={styles.text}>{'Welcome \n to \n' + str.appName}</Text>
                 <Image 
                 style={{tintColor: '#fff', width: 100, height: 100}} 
                 source={require('Anyone/assets/images/logo.png')} />
               </View>
               <View style={styles.slide2}>
-              {this.skip()}
+              {this.skip(params)}
                 <Text style={styles.text}>Create and join sessions with people in your area</Text>
                 {this.renderImages()}
                 <Text style={styles.text}>Or create private sessions for you and your pals</Text>
                 <Icon size={50} name="ios-lock" style={{color: '#fff'}} />
               </View>
               <View style={styles.slide2}>
-              {this.skip()}
+              {this.skip(params)}
                 <Text style={styles.text}>Search for and join your local Gym</Text>
                 <Image
                   style={{tintColor: '#fff', height: 50, width: 50, marginHorizontal: 10}}
@@ -71,7 +75,7 @@ class Welcome extends Component {
                 style={{tintColor: '#fff', height: 50, width: 50, margin: 10}} />
               </View>
               <View style={styles.slide2}>
-              {this.skip()}
+              {this.skip(params)}
                 <Text style={styles.text}>Participate in chats with your pals, in sessions and with members of your gym!!</Text>
                 <Icon name="md-chatboxes" style={{color: '#fff', fontSize: 50}} />
               </View>
@@ -79,7 +83,7 @@ class Welcome extends Component {
               {profile.fb_login && <FbFriendsModal
                 style={{zIndex: 999}}
                 isOpen={this.state.fbModalOpen} 
-                onClosed={() => this.setState({fbModalOpen: false}, ()=> this.nav())}
+                onClosed={() => this.setState({fbModalOpen: false}, ()=> this.nav(params))}
                 />}
                 <Text style={styles.text}>Make sure to set a username so your pals can add you</Text>
                 <TextInput
@@ -103,7 +107,7 @@ class Welcome extends Component {
                 style={{backgroundColor: colors.secondary, padding: 10, borderRadius: 5}}
                 onPress={()=> {
                   if (this.state.username && this.state.username == profile.username) {
-                    this.nav()
+                    this.nav(params)
                   }
                   else if (!this.state.username) {
                     Alert.alert('Sorry', 'Please set a username before continuing')
@@ -127,7 +131,7 @@ class Welcome extends Component {
                             [
                               {
                               text: 'No thanks',
-                              onPress: () => this.nav(),
+                              onPress: () => this.nav(params),
                             },
                             {text: 'OK', onPress: () => this.setState({fbModalOpen: true})}
                             ],
@@ -135,7 +139,7 @@ class Welcome extends Component {
                             )
                         }
                         else {
-                          this.nav()
+                          this.nav(params)
                           Alert.alert('Success', 'Username saved')
                         }
                         
@@ -151,13 +155,13 @@ class Welcome extends Component {
             </Swiper>
           )
     }
-    nav() {
-      this.params && this.params.goBack ? this.props.goBack() : this.props.goHome()
+    nav(params) {
+      params && params.goBack ? this.props.goBack() : this.props.goHome()
     }
-    skip() {
+    skip(params) {
       return <SafeAreaView style={{padding: 10, position: 'absolute', top: 5, right: 10}}>
       <TouchableOpacity 
-      onPress={()=> this.nav()}
+      onPress={()=> this.nav(params)}
       >
       <Text style={{color: '#fff', fontSize: 20}}>Skip</Text>
       </TouchableOpacity>
@@ -178,19 +182,10 @@ class Welcome extends Component {
 }
 
 
-Welcome.propTypes = {
-  viewedWelcome: PropTypes.func,
-  profile: PropTypes.any,
-  navigation: PropTypes.any,
-  goBack: PropTypes.func,
-  goHome: PropTypes.func,
-  onSave: PropTypes.func
-}
-
-
 import { connect } from 'react-redux'
 import { navigateBack, navigateHome } from '../actions/navigation'
 import { setHasViewedWelcome, fetchProfile } from '../actions/profile'
+import WelcomeProps from '../types/views/Welcome';
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile

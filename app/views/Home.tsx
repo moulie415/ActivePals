@@ -490,7 +490,7 @@ class Home extends Component {
  
   renderFeedItem(item) {
     switch(item.type) {
-      case 'status':
+      case PostType.STATUS:
         return (
           <View style={{padding: 10, margin: 5}}>
           <View style={{flexDirection: 'row',  flex: 1, marginBottom: 10}}>
@@ -503,12 +503,14 @@ class Home extends Component {
               <Icon style={{paddingHorizontal: 10}} name="ios-more" size={20}/>
             </TouchableOpacity>
             </View>
-            <ParsedText text={item.text} />
+            <View style={{marginBottom: 5}}>
+              <ParsedText text={item.text} />
+            </View>
             {this.repCommentCount(item)}
             {this.repsAndComments(item)}
           </View>
           )
-    case 'photo':
+    case PostType.PHOTO:
       return (
           <View>
             <View style={{flexDirection: 'row', flex: 1, padding: 10}}>
@@ -521,8 +523,10 @@ class Home extends Component {
                 <Icon style={{paddingHorizontal: 10}} name="ios-more" size={20}/>
               </TouchableOpacity>
             </View>
-            <ParsedText text={item.text} />
-              <TouchableOpacity
+            <View style={{marginBottom: 5}}>
+              <ParsedText text={item.text} />
+            </View>
+            <TouchableOpacity
               activeOpacity={1}
               onPress={()=> this.setState({selectedImage: [{url: item.url}], showImage: true})}
               style={{marginTop: 10, marginBottom: 10}}>
@@ -538,7 +542,7 @@ class Home extends Component {
             </View>
           </View>
         )
-      case 'video':
+      case PostType.VIDEO:
               return (
                 <View>
                 <View style={{flexDirection: 'row', flex: 1, padding: 10, zIndex: 2}}>
@@ -929,6 +933,7 @@ import {
 import { isIphoneX } from "react-native-iphone-x-helper"
 import { fetchProfile } from "../actions/profile"
 import { fetchFriends } from "../actions/friends"
+import { PostType } from "../types/Post"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,

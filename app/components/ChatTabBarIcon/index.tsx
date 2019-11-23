@@ -1,32 +1,28 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { View } from 'react-native'
-import Text from '../Text'
-import Icon from 'react-native-vector-icons/Ionicons'
-import styles from './styles'
+import React, { FunctionComponent } from 'react';
+import { View } from 'react-native';
+import Text from '../Text';
+import Icon from 'react-native-vector-icons/Ionicons';
+import styles from './styles';
 
-
-const ChatTabBarIcon = ({unreadCount, color}) => {
-  let count = 0 
-  Object.values(unreadCount).forEach(val => count += val)
+const ChatTabBarIcon: FunctionComponent = ({ unreadCount, color }) => {
+  let count = 0;
+  Object.values(unreadCount).forEach(val => (count += val));
   return (
     <View>
-      <Icon name='md-chatboxes' size={25} style={{ color }} />
-      {count > 0 && <View style={styles.active}>
-				<Text style={styles.unreadCount}>{count > 9 ? '9+' : count}</Text>
-			</View>}
+      <Icon name="md-chatboxes" size={25} style={{ color }} />
+      {count > 0 && (
+        <View style={styles.active}>
+          <Text style={styles.unreadCount}>{count > 9 ? '9+' : count}</Text>
+        </View>
+      )}
     </View>
-  )
-}
+  );
+};
 
-ChatTabBarIcon.propTypes = {
-  unreadCount: PropTypes.any,
-  color: PropTypes.string
-}
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 const mapStateToProps = ({ chats }) => ({
-  unreadCount: chats.unreadCount
-})
+  unreadCount: chats.unreadCount,
+});
 
-export default connect(mapStateToProps)(ChatTabBarIcon)
+export default connect(mapStateToProps)(ChatTabBarIcon);

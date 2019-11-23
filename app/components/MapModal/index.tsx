@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import MapView  from 'react-native-maps'
 import Modal from 'react-native-modalbox'
 import styles from './styles'
-import PropTypes from 'prop-types'
 import Text from '../Text'
 import Button from '../Button'
 import Geocoder from 'react-native-geocoder'
@@ -92,16 +91,6 @@ class MapModal extends Component {
     </Modal>
   }
 }
-
-MapModal.propTypes = {
-  onClosed: PropTypes.func,
-  isOpen: PropTypes.bool,
-  location: PropTypes.any,
-  handlePress: PropTypes.func,
-  places: PropTypes.any,
-}
-
-
 
 import { connect } from 'react-redux'
 

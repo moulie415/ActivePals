@@ -18,7 +18,6 @@ import Image from 'react-native-fast-image'
 import IIcon from 'react-native-vector-icons/Ionicons'
 
 import Text, { globalTextStyle } from '../components/Text'
-import PropTypes from "prop-types";
 import Icon from "react-native-vector-icons/FontAwesome"
 import styles from "./styles";
 import Collapsible from "react-native-collapsible"
@@ -649,35 +648,3 @@ export default class Comments extends PureComponent {
   return null
 }
 }
-
-Comments.propTypes = {
-  data: PropTypes.array.isRequired,
-  viewingUserName: PropTypes.string,
-  initialDisplayCount: PropTypes.number,
-  editMinuteLimit: PropTypes.number,
-  usernameTapAction: PropTypes.func,
-  childPropName: PropTypes.string,
-  isChild: PropTypes.func,
-  keyExtractor: PropTypes.func.isRequired,
-  parentIdExtractor: PropTypes.func,
-  usernameExtractor: PropTypes.func.isRequired,
-  uidExtractor: PropTypes.func.isRequired,
-  editTimeExtractor: PropTypes.func.isRequired,
-  createdTimeExtractor: PropTypes.func.isRequired,
-  bodyExtractor: PropTypes.func.isRequired,
-  imageExtractor: PropTypes.func.isRequired,
-  likeExtractor: PropTypes.func,
-  reportedExtractor: PropTypes.func,
-  likesExtractor: PropTypes.func,
-  likeCountExtractor: PropTypes.func,
-  childrenCountExtractor: PropTypes.func,
-  replyAction: PropTypes.func,
-  saveAction: PropTypes.func.isRequired,
-  deleteAction: PropTypes.func,
-  editAction: PropTypes.func.isRequired,
-  reportAction: PropTypes.func,
-  likeAction: PropTypes.func,
-  likesTapAction: PropTypes.func,
-  paginateAction: PropTypes.func,
-  getCommentRepsUsers: PropTypes.func,
-};

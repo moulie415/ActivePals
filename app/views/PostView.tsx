@@ -15,7 +15,6 @@ import {
 import FIcon from "react-native-vector-icons/FontAwesome"
 import cStyles from '../comments/styles'
 import Text, { globalTextStyle } from '../components/Text'
-import firebase from 'react-native-firebase'
 import colors from '../constants/colors'
 import TouchableOpacity from '../components/TouchableOpacityLockable'
 import Comments from '../comments'
@@ -44,15 +43,22 @@ import {
   import Video from 'react-native-video'
   import hStyles from '../styles/homeStyles'
   import { PulseIndicator } from 'react-native-indicators'
-  import PropTypes from 'prop-types'
+  import PostViewProps from '../types/views/PostView'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')
 const weightDown = require('Anyone/assets/images/weightlifting_down.png')
 const SCREEN_HEIGHT = Dimensions.get('window').height
 
-
-
-class PostView extends Component {
+interface State {
+  comments: [];
+  likesModalVisible: boolean;
+  commentFetchAmount: number;
+  userFetchAmount: number;
+  showImage: boolean;
+  post?: Post;
+  playing?: boolean;
+}
+class PostView extends Component<PostViewProps, State> {
 
     static navigationOptions = {
         header: null,
@@ -65,7 +71,6 @@ class PostView extends Component {
 
         this.state = {
             comments: [],
-            //post: {},
             likesModalVisible: false,
             commentFetchAmount: 10,
             userFetchAmount: 10,
@@ -503,24 +508,6 @@ class PostView extends Component {
   }
 }
 
-PostView.propTypes = {
-  friends: PropTypes.any,
-  users: PropTypes.any,
-  profile: PropTypes.any,
-  navigation: PropTypes.any,
-  feed: PropTypes.any,
-  viewProfile: PropTypes.func,
-  goToProfile: PropTypes.func,
-  getRepUsers: PropTypes.func,
-  getPost: PropTypes.func,
-  getComments: PropTypes.func,
-  comment: PropTypes.func,
-  repComment: PropTypes.func,
-  navigateFullScreenVideo: PropTypes.func,
-  getCommentRepsUsers: PropTypes.func,
-}
-
-
 import {
   navigateBack,
   navigateProfile,
@@ -537,6 +524,7 @@ import {
     fetchPost,
     fetchRepUsers
 } from '../actions/home'
+import Post from "../types/Post"
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,

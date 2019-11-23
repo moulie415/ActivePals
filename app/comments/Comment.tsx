@@ -13,7 +13,6 @@ import {
 
 import Image from 'react-native-fast-image'
 import Text, { globalTextStyle } from '../components/Text'
-import PropTypes from "prop-types";
 import TimeAgo from "react-native-timeago";
 import Icon from "react-native-vector-icons/FontAwesome";
 import styles from "./styles";
@@ -254,23 +253,3 @@ export default class Comment extends PureComponent {
     .catch(e => console.log(e))
   }
 }
-
-Comment.propTypes = {
-  data: PropTypes.object,
-  body: PropTypes.string,
-  canEdit: PropTypes.bool,
-  child: PropTypes.bool,
-  editComment: PropTypes.func,
-  image: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  likeAction: PropTypes.func,
-  liked: PropTypes.bool,
-  likesNr: PropTypes.number,
-  likesTapAction: PropTypes.func,
-  replyAction: PropTypes.func,
-  deleteAction: PropTypes.func,
-  reportAction: PropTypes.func,
-  reported: PropTypes.bool,
-  updatedAt: PropTypes.string,
-  username: PropTypes.string,
-  usernameTapAction: PropTypes.func
-};

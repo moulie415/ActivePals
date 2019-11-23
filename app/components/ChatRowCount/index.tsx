@@ -1,11 +1,10 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { FunctionComponent } from 'react'
 import { View } from 'react-native'
 import Text from '../Text'
 import styles from './styles'
 
 
-const ChatRowCount = ({unreadCount, id}) => {
+const ChatRowCount: FunctionComponent = ({unreadCount, id}) => {
   const count = unreadCount[id]
   
   if (count && count > 0) {
@@ -18,10 +17,6 @@ const ChatRowCount = ({unreadCount, id}) => {
   else return null
 }
 
-ChatRowCount.propTypes = {
-  unreadCount: PropTypes.any,
-  id: PropTypes.string,
-}
 import { connect } from 'react-redux'
 
 const mapStateToProps = ({ chats }) => ({

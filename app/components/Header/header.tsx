@@ -1,10 +1,9 @@
-import React, { Component } from "react"
+import React, { Component, FunctionComponent } from "react"
 import { TouchableOpacity, View, StatusBar, SafeAreaView } from "react-native"
 import Text from '../Text'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { TabBarBottom } from "react-navigation"
 import colors from '../../constants/colors'
-import PropTypes from 'prop-types'
 
 import globalStyles from '../../styles/globalStyles'
 
@@ -12,7 +11,16 @@ import { connect } from 'react-redux'
 import { navigateBack } from '../../actions/navigation'
 
 
-const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, fitTitle, backgroundColor, left }) => {
+const AppHeader: FunctionComponent = ({
+	hasBack,
+	onBackPress,
+	customBackPress,
+	right,
+	title,
+	fitTitle,
+	backgroundColor,
+	left
+}) => {
 	return <>
 			<StatusBar backgroundColor={backgroundColor || colors.primary}/>
 			<SafeAreaView style={{backgroundColor:  backgroundColor || colors.primary, height: 90}}>
@@ -35,18 +43,6 @@ const AppHeader = ({ hasBack, onBackPress, customBackPress, right, title, fitTit
 			</SafeAreaView>
 		</>
 }
-
-AppHeader.propTypes = {
-	hasBack: PropTypes.bool,
-	onBackPress: PropTypes.func,
-	customBackPress: PropTypes.func,
-	right: PropTypes.any,
-	title: PropTypes.string,
-	fitTitle: PropTypes.bool,
-	backgroundColor: PropTypes.string,
-	left: PropTypes.any
-}
-
 
 // Connected Header
 
