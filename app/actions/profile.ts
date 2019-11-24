@@ -12,6 +12,7 @@ import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat, getUnreadCount
 import { fetchPosts } from './home'
 import { fetchSessions, fetchPhotoPath } from './sessions'
 import { navigateLogin, navigateHome, navigateWelcome } from './navigation'
+import { UserState } from '../types/Profile'
 
 
 const setProfile = (profile) => ({
@@ -193,7 +194,7 @@ export const joinGym = (location) => {
 	connectedRef.on('value', (snap) => {
 	if (snap.val() === true) {
 		ref.onDisconnect().remove()
-		ref.set(true)
+		ref.set(UserState.ONLINE)
 	}
 	})
   }

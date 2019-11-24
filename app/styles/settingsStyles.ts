@@ -8,7 +8,7 @@ export default StyleSheet.create({
 	contact: {
 		backgroundColor: '#fff',
 		padding: 10,
-		borderBottomWidth: 0.5,
+		borderBottomWidth: StyleSheet.hairlineWidth,
 		borderColor: "#999",
 		flexDirection: 'row',
 		justifyContent: 'space-between',

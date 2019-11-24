@@ -79,7 +79,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    entryFile: "index.js"
+    entryFile: "index.tsx"
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -111,8 +111,8 @@ android {
         applicationId "com.anyone"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "0.2.3"
+        versionCode 1
+        versionName "0.2.4"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -227,7 +227,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:20.0.1'
     implementation "com.google.firebase:firebase-database:19.2.0"
     implementation "com.google.firebase:firebase-config:19.0.3"
-    implementation "com.google.firebase:firebase-auth:19.1.0"
+    implementation "com.google.firebase:firebase-auth:19.2.0"
     implementation "com.google.firebase:firebase-storage:19.1.0"
     implementation "com.google.firebase:firebase-iid:20.0.1"
     implementation 'com.google.android.gms:play-services-auth:17.0.0'

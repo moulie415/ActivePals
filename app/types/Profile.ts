@@ -11,9 +11,17 @@ export default interface Profile {
     fb_login?: boolean;
     birthday?: string;
     avatar?: string;
+    friends?: { [key: string]: UserState };
+    chats?: { [key: string]: string };
 }
 
 export enum AccountType {
     STANDARD = 'standard',
     ADMIN = 'admin'
+}
+
+export enum UserState {
+    ONLINE = 'online',
+    AWAY = 'away',
+    OFFLINE = 'offline'
 }

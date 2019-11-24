@@ -73,15 +73,15 @@ import Button from '../components/Button'
       friends.forEach(friend => {
         firebase.database().ref('users/' + friend.uid).child('state').on('value', snapshot => {
           if (this.props.friends[friend.uid]) {
-            if (snapshot.val() && snapshot.val() == 'away' && this.props.friends[friend.uid].state != 'away') {
-                this.props.updateFriendState(friend.uid, 'away')
+            if (snapshot.val() && snapshot.val() == UserState.AWAY && this.props.friends[friend.uid].state != UserState.AWAY) {
+                this.props.updateFriendState(friend.uid, UserState.AWAY)
             }
-            else if (snapshot.val() && snapshot.val() != 'away' && this.props.friends[friend.uid].state != 'online') {
-              this.props.updateFriendState(friend.uid, 'online')
+            else if (snapshot.val() && snapshot.val() != UserState.AWAY && this.props.friends[friend.uid].state != UserState.ONLINE) {
+              this.props.updateFriendState(friend.uid, UserState.ONLINE)
             }
             else {
-              if (!snapshot.val() && this.props.friends[friend.uid].state != 'offline') {
-                this.props.updateFriendState(friend.uid, 'offline')
+              if (!snapshot.val() && this.props.friends[friend.uid].state != UserState.OFFLINE) {
+                this.props.updateFriendState(friend.uid, UserState.OFFLINE)
               }
             }
         }
@@ -305,9 +305,9 @@ import Button from '../components/Button'
 
 const getStateVal = (state) => {
   switch(state) {
-    case 'online':
+    case UserState.ONLINE:
       return 3
-    case 'away':
+    case UserState.AWAY:
       return 2
     default :
       return 1
@@ -326,6 +326,7 @@ import {
   updateFriendState,
 } from '../actions/friends'
 import { removeChat, addChat } from '../actions/chats'
+import { UserState } from "../types/Profile"
 
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,

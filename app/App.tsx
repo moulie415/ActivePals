@@ -35,6 +35,7 @@ import Form from './views/Form'
 import { connect } from 'react-redux'
 import { StackNavigator,  TabNavigator, addNavigationHelpers, NavigationActions } from "react-navigation"
 import { addListener } from '../index'
+import { UserState } from "./types/Profile"
 
 const chats = TabNavigator({
   SessionChats: {screen: SessionChats},
@@ -143,10 +144,10 @@ class App extends React.Component {
       let user = firebase.auth().currentUser
       if (user) {
         if (nextAppState == 'active') {
-          firebase.database().ref('users/' + user.uid).child('state').set(true)
+          firebase.database().ref('users/' + user.uid).child('state').set(UserState.ONLINE)
         }
         else {
-          firebase.database().ref('users/' + user.uid).child('state').set('away')
+          firebase.database().ref('users/' + user.uid).child('state').set(UserState.AWAY)
         }
       }
     }

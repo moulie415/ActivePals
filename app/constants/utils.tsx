@@ -4,6 +4,7 @@ import str from './strings';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
 import { SessionType } from '../types/Session';
+import { UserState } from '../types/Profile';
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming'];
 
@@ -239,13 +240,13 @@ export function getSimplifiedTime(createdAt) {
   return dateString;
 }
 
-export const getStateColor = state => {
+export const getStateColor = (state: UserState) => {
   switch (state) {
-    case 'online':
+    case UserState.ONLINE:
       return 'green';
-    case 'away':
+    case UserState.AWAY:
       return '#F9BD49';
-    case 'offline':
+    case UserState.OFFLINE:
       return 'red';
   }
 };
