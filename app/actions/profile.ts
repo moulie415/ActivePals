@@ -55,10 +55,10 @@ export const setHasViewedWelcome = () => ({
 export const fetchProfile = () => {
 	return async (dispatch) => {
 		const user = firebase.auth().currentUser
-		const envVars = await firebase.database().ref('ENV_VARS').once('value')
-		const { GOOGLE_API_KEY } = envVars.val()
+		const envVar = await firebase.database().ref('ENV_VARS').child('GOOGLE_API_KEY').once('value')
+		const GOOGLE_API_KEY = envVar.val()
 		process.env.GOOGLE_API_KEY = GOOGLE_API_KEY
-		dispatch(setEnvVars(envVars.val()))
+		//dispatch(setEnvVars(envVars.val()))
 		return new Promise(resolve => {
 			firebase.database().ref('users/' + user.uid).once('value', snapshot => {
 				firebase.storage().ref('images/' + user.uid ).child('avatar').getDownloadURL()
