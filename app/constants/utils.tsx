@@ -78,7 +78,7 @@ function s4() {
     .substring(1);
 }
 
-export function getResource(type) {
+export function getResource(type: SessionType) {
   if (SessionType.CYCLING) {
     return require('../../assets/images/bicycle.png');
   } else if (SessionType.CUSTOM) {

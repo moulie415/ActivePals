@@ -84,9 +84,9 @@ class SignUp extends Component {
           <Button
             style={{ paddingHorizontal: 20, alignSelf: 'center' }}
             onPress={() => {
-              if (this.pass == this.confirm) {
+              if (this.pass === this.confirm) {
                 this.setState({ spinner: true });
-                if (this.username) {
+                if (this.username && this.username.length > 5 && !str.whiteSpaceRegex.test(this.username)) {
                   firebase
                     .database()
                     .ref('/usernames/' + this.username)
@@ -100,7 +100,7 @@ class SignUp extends Component {
                       }
                     });
                 } else {
-                  Alert.alert('Sorry', 'Please choose a username');
+                  Alert.alert('Sorry', 'Username must be at least 5 characters long and cannot contain any spaces');
                   this.setState({ spinner: false });
                 }
               } else {
@@ -181,6 +181,7 @@ class SignUp extends Component {
 import { connect } from 'react-redux';
 import { navigateBack } from '../actions/navigation';
 import { AccountType } from '../types/Profile';
+import str from '../constants/strings';
 // const mapStateToProps = ({ home, settings, profile }) => ({
 // })
 

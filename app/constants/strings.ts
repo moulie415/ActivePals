@@ -14,6 +14,7 @@ const str = {
     admobBanner: Platform.select({ios: "ca-app-pub-7885763333661292/3772507757", android: "ca-app-pub-7885763333661292/5551535421"}),
     admobInterstitial: Platform.select({ios: 'ca-app-pub-7885763333661292/4553340952', android: 'ca-app-pub-7885763333661292/7008963965'}),
     mentionRegex: /\B\@([\w\-]+)/gim,
+    whiteSpaceRegex: /\s/,
     spinner: 'PulseIndicator',
     notifSound: 'notif.wav'
 }

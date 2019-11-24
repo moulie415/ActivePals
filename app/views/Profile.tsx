@@ -28,7 +28,6 @@ class Profile extends Component {
     super(props);
     this.profile = this.props.profile;
 
-    this.database = firebase.database().ref('users');
     firebase
       .storage()
       .ref('images/' + this.profile.uid)
@@ -315,8 +314,8 @@ class Profile extends Component {
     if (!this.hasChanged()) {
       Alert.alert('No changes');
     } else {
-      if (profile.username && profile.username.length < 5) {
-        Alert.alert('Sorry', 'Username must be at least 5 characters long');
+      if (!profile.username || profile.username.length < 5 || str.whiteSpaceRegex.test(profile.username)) {
+        Alert.alert('Sorry', 'Username must be at least 5 characters long and cannot contain any spaces');
       } else {
         this.setState({ spinner: true });
         await this.checkImages();
@@ -484,6 +483,7 @@ import { navigateLogin, navigateSettings } from '../actions/navigation';
 import { fetchProfile, setLoggedOut } from '../actions/profile';
 import { navigateGym } from '../actions/navigation';
 import signUpStyles from '../styles/signUpStyles';
+import str from '../constants/strings';
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile,

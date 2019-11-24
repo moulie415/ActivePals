@@ -18,7 +18,8 @@ export default StyleSheet.create({
   },
   input: {
     color: '#fff',
-    fontFamily: 'Montserrat'
+    fontFamily: 'Montserrat',
+    width: '100%'
   },
   inputGrp: {
     flexDirection: 'row',
