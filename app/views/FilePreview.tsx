@@ -7,7 +7,8 @@ import {
 	KeyboardAvoidingView,
 	Keyboard,
     Alert,
-    FlatList
+    FlatList,
+    TouchableOpacity
 } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import colors from '../constants/colors'
@@ -16,7 +17,6 @@ import { guid } from '../constants/utils'
 import sStyles from '../styles/settingsStyles'
 import styles from '../styles/homeStyles'
 import Video from 'react-native-video'
-import TouchableOpacity from '../components/TouchableOpacityLockable'
 import { getMentionsList } from '../constants/utils'
 import Image from 'react-native-fast-image'
 import {Image as SlowImage } from 'react-native'

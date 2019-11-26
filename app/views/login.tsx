@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, View, ImageBackground, Platform, TextInput } from 'react-native';
+import { Alert, View, ImageBackground, Platform, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
 import styles from '../styles/loginStyles';
@@ -13,7 +13,6 @@ import colors from '../constants/colors';
 import Text, { globalTextStyle } from '../components/Text';
 import SplashScreen from 'react-native-splash-screen';
 import RNFetchBlob from 'rn-fetch-blob';
-import TouchableOpacity from '../components/TouchableOpacityLockable';
 import str from '../constants/strings';
 import SpinnerButton from 'react-native-spinner-button';
 import { PulseIndicator } from 'react-native-indicators';
@@ -97,8 +96,7 @@ class Login extends Component {
         <View style={{ flexDirection: 'row', marginVertical: 10 }}>
           <Button
             text="Login"
-            onPress={mutex => {
-              mutex.lockFor(1000);
+            onPress={() => {
               if (this.username && this.pass) {
                 this.setState({ spinner: true, secure: true });
                 this.login(this.username, this.pass);

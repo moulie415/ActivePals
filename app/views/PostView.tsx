@@ -10,13 +10,13 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Platform,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback,
+    TouchableOpacity
 } from 'react-native'
 import FIcon from "react-native-vector-icons/FontAwesome"
 import cStyles from '../comments/styles'
 import Text, { globalTextStyle } from '../components/Text'
 import colors from '../constants/colors'
-import TouchableOpacity from '../components/TouchableOpacityLockable'
 import Comments from '../comments'
 import sStyles from '../styles/settingsStyles'
 import ImageViewer from 'react-native-image-zoom-viewer'
@@ -376,8 +376,7 @@ class PostView extends Component<PostViewProps, State> {
             
             <View style={{flexDirection: 'row', flex: 1,  alignItems: 'center'}}>
               <TouchableOpacity
-              onPress={(mutex) => {
-                mutex.lockFor(1000)
+              onPress={() => {
                 this.props.onRepPost(item)
               }}
               >

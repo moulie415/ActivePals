@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import Modal from 'react-native-modalbox'
 import styles from './styles'
-import  TouchableOpacity from '../../components/TouchableOpacityLockable'
 import {
   View,
   ScrollView,
   Platform,
-  Alert
+  Alert,
+  TouchableOpacity
 } from 'react-native'
 import Image from 'react-native-fast-image'
 import Icon from 'react-native-vector-icons/Ionicons'

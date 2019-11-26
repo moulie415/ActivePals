@@ -5,10 +5,10 @@ import {
   TextInput,
   Platform,
   FlatList,
-  ScrollView
+  ScrollView,
+  TouchableOpacity
 } from "react-native"
 import Icon from 'react-native-vector-icons/Ionicons'
-import TouchableOpacity from '../components/TouchableOpacityLockable'
 import firebase from 'react-native-firebase'
 import colors from '../constants/colors'
 import Modal from 'react-native-modalbox'
@@ -154,8 +154,7 @@ import Button from '../components/Button'
           text='Cancel'
           color='red'/>
       
-          <Button onPress={(mutex)=> {
-            mutex.lockFor(1000)
+          <Button onPress={()=> {
             this.sendRequest(this.username)
           }}
           text='Submit'/>

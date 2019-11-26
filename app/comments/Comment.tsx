@@ -8,7 +8,8 @@ import {
   ActivityIndicator,
   TouchableHighlight,
   Modal,
-  Alert
+  Alert,
+  TouchableOpacity
 } from "react-native";
 
 import Image from 'react-native-fast-image'
@@ -19,7 +20,6 @@ import styles from "./styles";
 import colors from '../constants/colors'
 import Collapsible from "react-native-collapsible";
 import {Image as SlowImage } from 'react-native'
-import TouchableOpacity from '../components/TouchableOpacityLockable'
 import str from '../constants/strings'
 import firebase from 'react-native-firebase'
 
@@ -150,8 +150,7 @@ export default class Comment extends PureComponent {
             {this.props.likeAction ? (
               <TouchableOpacity
                 style={styles.actionButton}
-                onPress={(mutex)=> {
-                  mutex.lockFor(1000)
+                onPress={()=> {
                   this.handleLike()
                   }}
               >

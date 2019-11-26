@@ -5,11 +5,10 @@ import {
     TextInput,
     Platform,
     KeyboardAvoidingView,
-    Alert
+    Alert,
+    TouchableOpacity
 } from 'react-native'
 import Text, { globalTextStyle } from '../components/Text'
-import TouchableOpacity from '../components/TouchableOpacityLockable'
-
 import styles from '../styles/formStyles'
 import colors from '../constants/colors'
 import Header from '../components/Header/header'

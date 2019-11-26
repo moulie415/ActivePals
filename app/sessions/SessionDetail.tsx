@@ -234,8 +234,7 @@ class SessionDetail extends Component {
           <Button
             style={{ alignSelf: 'center', marginVertical: 20 }}
             textStyle={{ fontSize: 20 }}
-            onPress={mutex => {
-              mutex.lockFor(1000);
+            onPress={() => {
               this.createSession();
             }}
             text="Create Session"

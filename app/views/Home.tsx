@@ -10,13 +10,13 @@ import {
   TouchableWithoutFeedback,
   Platform,
   ScrollView,
+  TouchableOpacity
 } from 'react-native';
 import Card from '../components/Card';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { PulseIndicator } from 'react-native-indicators';
 import firebase from 'react-native-firebase';
 import colors from '../constants/colors';
-import TouchableOpacity from '../components/TouchableOpacityLockable';
 import styles from '../styles/homeStyles';
 import sStyles from '../styles/settingsStyles';
 import cStyles from '../comments/styles';
@@ -70,7 +70,6 @@ interface State {
   playing: { [key: string]: boolean };
   status?: string;
   focusCommentInput?: boolean;
-
 }
 class Home extends Component<HomeProps, State> {
   static navigationOptions = {
@@ -109,10 +108,9 @@ class Home extends Component<HomeProps, State> {
   }
 
   sortByDate(array) {
-    array.sort(function(a, b) {
-      return new Date(b.createdAt) - new Date(a.createdAt);
+    return array.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-    return array;
   }
 
   render() {
@@ -223,8 +221,7 @@ class Home extends Component<HomeProps, State> {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={mutex => {
-              mutex.lockFor(1000);
+            onPress={() => {
               if (this.state.status) {
                 if (username) {
                   Alert.alert('Confirm', 'Submit post?', [
@@ -733,8 +730,7 @@ class Home extends Component<HomeProps, State> {
           </TouchableOpacity>
         )}
         <TouchableOpacity
-          onPress={mutex => {
-            mutex.lockFor(1000);
+          onPress={() => {
             this.props.onRepPost(item);
           }}
           style={{ flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center' }}

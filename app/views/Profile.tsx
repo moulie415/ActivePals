@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, View, ScrollView, TextInput } from 'react-native';
+import { Alert, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
 import Image from 'react-native-fast-image';
@@ -7,7 +7,6 @@ import Text, { globalTextStyle } from '../components/Text';
 import styles from '../styles/profileStyles';
 import hStyles from '../styles/homeStyles';
 import colors from '../constants/colors';
-import TouchableOpacity from '../components/TouchableOpacityLockable';
 import DatePicker from 'react-native-datepicker';
 var ImagePicker = require('react-native-image-picker');
 import ImageResizer from 'react-native-image-resizer';
@@ -91,8 +90,7 @@ class Profile extends Component {
           right={
             this.hasChanged() && (
               <TouchableOpacity
-                onPress={mutex => {
-                  mutex.lockFor(1000);
+                onPress={() => {
                   this.updateUser(this.state.initialProfile, this.state.profile);
                 }}
                 style={{ backgroundColor: 'transparent', elevation: 0 }}
