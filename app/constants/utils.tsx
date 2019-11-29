@@ -100,14 +100,6 @@ export function calculateAge(birthday) {
   return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
-export function extractCreatedTime(item) {
-  try {
-    return new Date(item.created_at).toISOString();
-  } catch (e) {
-    console.log(e);
-  }
-}
-
 export function extractUsername(c, uid) {
   try {
     //return c.user && c.user.username && c.user.username !== '' ? JSON.parse(c.user.username) : null
@@ -118,15 +110,6 @@ export function extractUsername(c, uid) {
   } catch (e) {
     console.log(e);
   }
-}
-
-export function extractBody(c) {
-  return c.text;
-  // try {
-  //   return c.body && c.body !== '' ? JSON.parse(c.body) : null
-  // } catch (e) {
-  //   console.log(e)
-  // }
 }
 
 export function likesExtractor(item, uid, viewProfile, goToProfile) {
@@ -143,38 +126,6 @@ export function likesExtractor(item, uid, viewProfile, goToProfile) {
       };
     });
   } else return null;
-}
-
-export function extractEditTime(item) {
-  try {
-    return item.updated_at || new Date(item.created_at).toISOString();
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-export function extractImage(c) {
-  try {
-    return c.user.avatar;
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-export function likeExtractor(item) {
-  return item.rep;
-}
-
-export function reportedExtractor(item) {
-  return item.reported;
-}
-
-export function extractChildrenCount(c) {
-  try {
-    return c.childrenCount || 0;
-  } catch (e) {
-    console.log(e);
-  }
 }
 
 export function formatDateTime(dateTime) {

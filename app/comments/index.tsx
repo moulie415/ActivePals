@@ -371,7 +371,7 @@ export default class Comments extends PureComponent {
                 onPress={() => {
                   this.props.saveAction(
                     this.replyCommentText,
-                    this.props.keyExtractor(item)
+                    this.props.parentIdExtractor(item)
                   );
                   this.replyCommentText = null;
                   this.textInputs[
@@ -416,7 +416,7 @@ export default class Comments extends PureComponent {
           />
           <TouchableOpacity
             onPress={() => {
-              this.props.saveAction(this.newCommentText, false);
+              this.props.saveAction(this.newCommentText, null);
               this.newCommentText = null;
               this.setState({text: null})
               this.inputMain.clear()

@@ -31,15 +31,8 @@ import Image from 'react-native-fast-image';
 import { Image as SlowImage } from 'react-native';
 import Header from '../components/Header/header';
 import {
-  extractCreatedTime,
   extractUsername,
-  extractBody,
   likesExtractor,
-  likeExtractor,
-  extractChildrenCount,
-  extractEditTime,
-  extractImage,
-  reportedExtractor,
   getSimplifiedTime,
   getMentionsList,
 } from '../constants/utils';
@@ -377,25 +370,27 @@ class Home extends Component<HomeProps, State> {
               }
             }}
             childPropName={'children'}
-            isChild={() => this.isCommentChild(item)}
+            isChild={comment => comment.parentCommentId}
+            parentIdExtractor={(comment) => comment.key}
             keyExtractor={item => item.comment_id}
             usernameExtractor={item => extractUsername(item, this.props.profile.uid)}
             uidExtractor={item => (item.user ? item.user.uid : null)}
-            editTimeExtractor={item => extractEditTime(item)}
-            createdTimeExtractor={item => extractCreatedTime(item)}
-            bodyExtractor={item => extractBody(item)}
-            imageExtractor={item => extractImage(item)}
-            likeExtractor={item => likeExtractor(item)}
-            reportedExtractor={item => reportedExtractor(item)}
+            editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
+            createdTimeExtractor={item => new Date(item.created_at).toISOString()}
+            bodyExtractor={item => item.text}
+            imageExtractor={item => item.user.avatar}
+            likeExtractor={item => item.rep}
+            reportedExtractor={item => item.reported}
             likesExtractor={item =>
               likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile)
             }
             likeCountExtractor={item => item.repCount}
-            childrenCountExtractor={item => extractChildrenCount(item)}
+            childrenCountExtractor={comment => comment.childrenCount}
             timestampExtractor={item => new Date(item.created_at).toISOString()}
-            // replyAction={offset => {
-            //   //this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
-            // }}
+            replyAction={offset => {
+              console.log('hello world')
+              //this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
+            }}
             saveAction={(text, parentCommentId) => {
               if (text) {
                 this.props
@@ -418,15 +413,15 @@ class Home extends Component<HomeProps, State> {
             likesTapAction={comment => {
               return this.props.getCommentRepsUsers(comment);
             }}
-            paginateAction={
-              this.props.feed[this.state.postId] &&
-              this.props.feed[this.state.postId].commentCount > this.state.commentFetchAmount
-                ? () => {
-                    this.setState({ commentFetchAmount: this.state.commentFetchAmount + 5 }, () => {
-                      this.props.getComments(this.state.postId, this.state.commentFetchAmount);
-                    });
-                  }
-                : null
+            paginateAction={true
+              // this.props.feed[this.state.postId] &&
+              // this.props.feed[this.state.postId].commentCount > this.state.commentFetchAmount
+              //   ? () => {
+              //       this.setState({ commentFetchAmount: this.state.commentFetchAmount + 5 }, () => {
+              //         this.props.getComments(this.state.postId, this.state.commentFetchAmount);
+              //       });
+              //     }
+              //   : null
             }
             getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
           />
@@ -1003,6 +998,7 @@ import { fetchProfile } from '../actions/profile';
 import { fetchFriends } from '../actions/friends';
 import { PostType } from '../types/Post';
 import HomeProps from '../types/views/Home';
+import Comment from '../comments/Comment';
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,
