@@ -122,7 +122,7 @@ export default class Comments extends PureComponent {
     if (!this.props.isChild(c)) {
       this.toggleExpand(c, true);
     } else {
-      this.focusOnReplyInput(this.props.parentIdExtractor(c));
+      this.focusOnReplyInput(this.props.keyExtractor(c));
     }
   }
 

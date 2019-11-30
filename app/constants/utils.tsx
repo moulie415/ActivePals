@@ -100,18 +100,6 @@ export function calculateAge(birthday) {
   return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
-export function extractUsername(c, uid) {
-  try {
-    //return c.user && c.user.username && c.user.username !== '' ? JSON.parse(c.user.username) : null
-    if (c.user.uid == uid) {
-      return 'You';
-    }
-    return c.user && c.user.username ? c.user.username : null;
-  } catch (e) {
-    console.log(e);
-  }
-}
-
 export function likesExtractor(item, uid, viewProfile, goToProfile) {
   if (item.likes) {
     return item.likes.map(like => {

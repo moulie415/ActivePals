@@ -161,10 +161,9 @@ export default class Comment extends PureComponent {
                       { color: this.props.liked ? "#4DB2DF" : '#999' }
                     ]}
                   >
-                    Rep{" "}
                   </Text>
                     <SlowImage source={this.props.liked ? weightUp : weightDown}  
-                    style={{width: 15, height: 15, tintColor: this.props.liked? colors.secondary : '#999'}}/>
+                    style={{width: 25, height: 25, tintColor: this.props.liked? colors.secondary : '#999'}}/>
                 </View>
               </TouchableOpacity>
             ) : null}

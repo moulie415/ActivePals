@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Children } from 'react';
 import {
   View,
   Alert,
@@ -31,7 +31,6 @@ import Image from 'react-native-fast-image';
 import { Image as SlowImage } from 'react-native';
 import Header from '../components/Header/header';
 import {
-  extractUsername,
   likesExtractor,
   getSimplifiedTime,
   getMentionsList,
@@ -373,12 +372,26 @@ class Home extends Component<HomeProps, State> {
             isChild={comment => comment.parentCommentId}
             parentIdExtractor={(comment) => comment.key}
             keyExtractor={item => item.comment_id}
-            usernameExtractor={item => extractUsername(item, this.props.profile.uid)}
+            usernameExtractor={item => {
+              if (item.uid === this.props.profile.uid) {
+                return 'You'
+              }
+              else {
+                return this.props.friends[item.uid].username || this.props.users[item.uid].username
+              }
+            }}
             uidExtractor={item => (item.user ? item.user.uid : null)}
             editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
             createdTimeExtractor={item => new Date(item.created_at).toISOString()}
             bodyExtractor={item => item.text}
-            imageExtractor={item => item.user.avatar}
+            imageExtractor={item => {
+              if (item.uid === this.props.profile.uid) {
+                return this.props.profile.avatar
+              }
+              else {
+                return this.props.friends[item.uid].avatar || this.props.users[item.uid].avatar
+              }
+            }}
             likeExtractor={item => item.rep}
             reportedExtractor={item => item.reported}
             likesExtractor={item =>
@@ -413,15 +426,15 @@ class Home extends Component<HomeProps, State> {
             likesTapAction={comment => {
               return this.props.getCommentRepsUsers(comment);
             }}
-            paginateAction={true
-              // this.props.feed[this.state.postId] &&
-              // this.props.feed[this.state.postId].commentCount > this.state.commentFetchAmount
-              //   ? () => {
-              //       this.setState({ commentFetchAmount: this.state.commentFetchAmount + 5 }, () => {
-              //         this.props.getComments(this.state.postId, this.state.commentFetchAmount);
-              //       });
-              //     }
-              //   : null
+            paginateAction={
+              this.props.feed[this.state.postId] &&
+              this.props.feed[this.state.postId].commentCount > this.state.commentFetchAmount
+                ? (fromCommentId, direction, parentCommentId) => {
+                    this.setState({ commentFetchAmount: this.state.commentFetchAmount + 5 }, () => {
+                      this.props.getComments(this.state.postId, this.state.commentFetchAmount);
+                    });
+                  }
+                : (fromCommentId, direction, parentCommentId) => Alert.alert(fromCommentId, direction)
             }
             getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
           />
