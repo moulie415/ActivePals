@@ -272,25 +272,26 @@ export default class Comments extends PureComponent {
    * */
   renderComment(c) {
     const item = c.item;
+    const childPropName = this.props.childPropName
     return (
       <View>
         {this.generateComment(item)}
         <View style={{ marginLeft: 40 }}>
-          {item.childrenCount && this.props.childPropName ? (
+          {item.childrenCount &&  item[childPropName] && item[childPropName][0] ? (
             <TouchableOpacity onPress={() => this.toggleExpand(item)}>
               <View style={styles.repliedSection}>
                 <Image
                   style={styles.repliedImg}
                   source={{
                     uri: this.props.imageExtractor(
-                      item[this.props.childPropName][0]
+                      item[childPropName][0]
                     )
                   }}
                 />
                 <Text style={styles.repliedUsername}>
                   {" "}
                   {this.props.usernameExtractor(
-                    item[this.props.childPropName][0]
+                    item[childPropName][0]
                   )}{" "}
                 </Text>
                 <Text style={styles.repliedText}>replied</Text>
@@ -312,7 +313,7 @@ export default class Comments extends PureComponent {
             {this.props.childrenCountExtractor(item) &&
             this.props.paginateAction ? (
               <View>
-                {this.props.childPropName &&
+                {/* {this.props.childPropName &&
                 this.props.childrenCountExtractor(item) >
                   item[this.props.childPropName].length ? (
                   <TouchableOpacity
@@ -328,14 +329,14 @@ export default class Comments extends PureComponent {
                       Show previous...
                     </Text>
                   </TouchableOpacity>
-                ) : null}
+                ) : null} */}
 
                 {this.renderChildren(
                   item[this.props.childPropName],
                   this.props.keyExtractor(item)
                 )}
 
-                {this.props.childrenCountExtractor(item) >
+                {item[this.props.childPropName] && this.props.childrenCountExtractor(item) >
                   item[this.props.childPropName].length &&
                 this.props.paginateAction ? (
                   <TouchableOpacity
@@ -380,9 +381,9 @@ export default class Comments extends PureComponent {
                   Keyboard.dismiss();
                 }}
               >
-                <Icon
+                <IIcon
                   style={styles.submit}
-                  name="chevron-right"
+                  name="md-return-right"
                   size={40}
                   color="#000"
                 />
@@ -423,9 +424,9 @@ export default class Comments extends PureComponent {
               Keyboard.dismiss()
             }}
           >
-            <Icon
+            <IIcon
               style={styles.submit}
-              name="chevron-right"
+              name="md-return-right"
               size={30}
               color="#000"
             />

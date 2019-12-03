@@ -12,6 +12,7 @@ import {
 import {
 	SET_LOGGED_OUT,
 } from '../actions/profile'
+import Comments from '../comments'
 
 const initialState = {
 	feed: {},
@@ -39,7 +40,7 @@ export default function(state = initialState, action) {
 		case SET_POST_COMMENTS: {
 			return {
 				...state,
-				feed: {...state.feed, [action.post]: {...state.feed[action.post], comments: action.comments, commentCount: getCommentCount(state.feed[action.post], action.incrementCount) }},
+				feed: {...state.feed, [action.post]: {...state.feed[action.post], comments: action.comments, commentCount: action.comments.length }},
 			}
 		}
 		case ADD_COMMENT: {

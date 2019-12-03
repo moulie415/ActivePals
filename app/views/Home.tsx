@@ -73,6 +73,7 @@ class Home extends Component<HomeProps, State> {
   constructor(props) {
     super(props);
     this.players = {};
+    this.scrollIndex = 0;
     this.state = {
       spinner: false,
       selectedImage: null,
@@ -261,7 +262,13 @@ class Home extends Component<HomeProps, State> {
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={{ backgroundColor: '#9993', flex: 1, paddingTop: 10 }}>
+        <ScrollView
+          contentContainerStyle={{ backgroundColor: '#9993', flex: 1, paddingTop: 10 }}
+          ref="scrollView"
+          onScroll={event => {
+            this.scrollIndex = event.nativeEvent.contentOffset.y;
+          }}
+        >
           {this.state.mentionList && (
             <View style={styles.mentionList}>
               <FlatList
@@ -401,16 +408,12 @@ class Home extends Component<HomeProps, State> {
             childrenCountExtractor={comment => comment.childrenCount}
             timestampExtractor={item => new Date(item.created_at).toISOString()}
             replyAction={offset => {
-              console.log('hello world')
-              //this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
+              this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
             }}
             saveAction={(text, parentCommentId) => {
               if (text) {
                 this.props
                   .comment(this.props.profile.uid, this.state.postId, text, new Date().toString(), parentCommentId)
-                  .then(() => {
-                    console.log('comment sent');
-                  })
                   .catch(e => Alert.alert('Error', e.message));
               }
             }}

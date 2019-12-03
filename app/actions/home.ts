@@ -10,6 +10,8 @@ export const ADD_COMMENT = 'ADD_COMMENT'
 export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS'
 export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
 import str from '../constants/strings'
+import Profile from '../types/Profile'
+import Comment from '../types/Comment'
 
 const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, (error) => {
 	if (error) {
@@ -35,29 +37,16 @@ const setPost = (post) => ({
 	post,
 })
 
-const setUser = (user) => ({
-	type: SET_USER,
-	user,
-})
-
 export const updateUsers = (users) => ({
 	type: UPDATE_USERS,
 	users,
 })
 
-const setPostComments = (post, comments, incrementCount) =>  ({
+const setPostComments = (post: string, comments: Comment[], incrementCount?: boolean) =>  ({
 	type: SET_POST_COMMENTS,
 	post,
 	comments,
 	incrementCount
-})
-
-
-const addComment = (post, comment, count) => ({
-	type: ADD_COMMENT,
-	post,
-	comment,
-	count
 })
 
 const setNotifications = (notifications) => ({
@@ -100,20 +89,20 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 			const mentions = item.text.match(str.mentionRegex)
 			if (mentions) {
 				mentions.forEach(mention => {
-						const username = mention.substring(1)
-						const friend = combined.find(friend => friend.username == username)
-						if (friend && friend.uid != postUid && friend.uid != item.uid) {
-							//add notification for user
-							const id = key + item.uid + 'mention'
-							const type = commentMention ? 'commentMention' : 'postMention'
-							firebase.database().ref('userNotifications/' + friend.uid).child(id).once('value', snapshot => {
-								if (!snapshot.val()) {
-									firebase.database().ref('notifications').child(id).set({date: item.createdAt, uid: item.uid, postId: key, type})
-										.then(()=> firebase.database().ref('userNotifications/' + friend.uid).child(id).set(true))
-										.then(() => upUnreadCount(friend.uid))
-								}
-							})
-						}
+					const username = mention.substring(1)
+					const friend = combined.find(friend => friend.username == username)
+					if (friend && friend.uid != postUid && friend.uid != item.uid) {
+						//add notification for user
+						const id = key + item.uid + 'mention'
+						const type = commentMention ? 'commentMention' : 'postMention'
+						firebase.database().ref('userNotifications/' + friend.uid).child(id).once('value', snapshot => {
+							if (!snapshot.val()) {
+								firebase.database().ref('notifications').child(id).set({date: item.createdAt, uid: item.uid, postId: key, type})
+									.then(()=> firebase.database().ref('userNotifications/' + friend.uid).child(id).set(true))
+									.then(() => upUnreadCount(friend.uid))
+							}
+						})
+					}
 				})
 			}
 		}
@@ -123,7 +112,7 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 export const fetchPost = (key) => {
 	return (dispatch, getState) => {
 		return new Promise(resolve => {
-			let uid = getState().profile.profile.uid
+			const uid = getState().profile.profile.uid
 			firebase.database().ref('posts').child(key).once('value', snapshot => {
 				let post = snapshot.val()
 				post.key = snapshot.key
@@ -378,40 +367,28 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 	}
 }
 
-export const fetchComments = (key, limit = 10) => {
+export const fetchComments = (key: string, limit = 10, endAt?: string) => {
   return async (dispatch, getState) => {
 	const userFetches = []
 	const uid = getState().profile.profile.uid
-    const snapshot = await firebase.database().ref("postComments").child(key).limitToLast(limit).once("value")
-	const promises = []
-	if (snapshot.val()) {
-		Object.keys(snapshot.val()).forEach(comment => {
-			promises.push(firebase.database().ref("comments").child(comment).once("value"))
-		})
-	}
-	const comments = await Promise.all(promises)
-	let commentsArray = []
-	const commentReps = []
-	const commentsWithReplies = []
 	const friends = getState().friends.friends
 	const users = getState().sharedInfo.users
-	comments.forEach((comment, index) => {
+	const ref = endAt ? firebase.database().ref('postComments').child(key).orderByKey().endAt(endAt) :
+	firebase.database().ref('postComments').child(key).orderByKey()
+	const snapshot = await ref.limitToLast(limit).once('value')
+	const comments = await Promise.all(Object.keys(snapshot.val()).map(comment => {
+		return firebase.database().ref("comments").child(comment).once("value")
+	}))
+	let commentsArray = []
+	const commentReps = []
+	comments.forEach(comment => {
 		const obj = comment.val()
-		if (!friends[obj.uid] && !users[obj.uid] && !userFetches.includes(obj.uid)) {
+		if (!friends[obj.uid] && !users[obj.uid] && !userFetches.includes(obj.uid) && obj.uid !== uid) {
 			userFetches.push(obj.uid)
 		}	
 		commentReps.push(firebase.database().ref("reps/" + obj.key).child(uid).once('value'))
-		if (obj.childrenCount) {
-			commentsWithReplies.push(obj.key)
-		}
 		commentsArray.push(obj)
 	})
-
-	const replies = await Promise.all(commentsWithReplies.map(comment => {
-		return firebase.database().ref('commentReplies').child(comment).limitToLast(1).once('value')
-	}))
-
-	const replyVals = replies.map(reply => Object.values(reply.val())[0])
 
 	const reps = await Promise.all(commentReps)
 	reps.forEach((rep, index) => {
@@ -421,37 +398,61 @@ export const fetchComments = (key, limit = 10) => {
 	})
 
 	commentsArray = sortComments(commentsArray)
+	const commentsWithReplies = []
 	commentsArray.forEach((comment, index) => {
 		comment.comment_id = index + 1
 		if (comment.childrenCount) {
-			comment.children = []
-			let comment_id = 1
-			replyVals.forEach((reply) => {
-				if (reply.parentCommentId === comment.key) {
-					comment.children.push({...reply, comment_id})
-					comment_id +=1
-				}
-			})
+			commentsWithReplies.push(comment)
 		}
 	})
-	if (userFetches.length > 0) {
-		const users = await fetchUsers(userFetches)
-		const sharedUsers = {}
-		users.forEach(user => {
-			if (user.uid) {
-				sharedUsers[user.uid] = user
-			}
-		})
-		dispatch(updateUsers(sharedUsers))
-	}
+	dispatch(fetchUsers(userFetches))
 	dispatch(setPostComments(key, commentsArray))
+	await Promise.all(commentsWithReplies.map(comment => dispatch(fetchReplies(comment))))
   }
 }
 
-export const repComment = (comment) => {
+export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
+	return async (dispatch, getState) => {
+		const key = comment.key
+		const uid = getState().profile.profile.uid
+		const friends = getState().friends.friends
+		const users = getState().sharedInfo.users
+		const postComments = getState().home.feed[comment.postId].comments
+		const filtered = postComments.filter(c => c.key !== key)
+		const userFetches = []
+		const ref = endAt ? firebase.database().ref('commentReplies').child(key).orderByKey().endAt(endAt) :
+		firebase.database().ref('commentReplies').child(key).orderByKey()
+		const snapshot = await ref.limitToLast(limit).once('value')
+		const children = comment.children || []
+		const replies = [...children, ...Object.values(snapshot.val())].map((reply: Comment, index) => {
+			if (!friends[reply.uid] && !users[reply.uid] && 
+				!userFetches.includes(reply.uid) && reply.uid !== uid) {
+				userFetches.push(reply.uid)
+			}
+			return { ...reply, comment_id: index + 1 }
+		})
+		const reps = await Promise.all(replies.map(reply => {
+			return firebase.database().ref("reps/" + reply.key).child(uid).once('value')
+		}))
+
+		const repliesWithReps = replies.map(reply => {
+			if (reps.some(rep => rep.val() && rep.val().parentCommentId === key)) {
+				return { ...reply, rep: true }
+			}
+			else return reply
+		})
+		comment.children = sortComments(repliesWithReps)
+
+		dispatch(setPostComments(comment.postId, [...filtered, comment]))
+		dispatch(fetchUsers(userFetches))
+	}
+}
+
+export const repComment = (comment: Comment) => {
 	return async (dispatch, getState) => {
 		repSound.play()
 		const uid = getState().profile.profile.uid
+		const parentCommentId = comment.parentCommentId
 		let rep = comment.rep ? false : uid
 		let date = new Date().toString()
 		if (comment.rep) {
@@ -466,32 +467,53 @@ export const repComment = (comment) => {
 			else comment.repCount = 1
 		}
 		let postComments = getState().home.feed[comment.postId].comments
-		postComments[comment.comment_id -1] = comment
+		if (parentCommentId) {
+			postComments = postComments.map(c => {
+				if (c.key === parentCommentId) {
+					return { ...c, children: c.children = c.children.map(c => {
+						 return c.key === comment.key ? comment : c
+					})}
+				}
+				else return c
+			})
+		}
+		else {
+			postComments = postComments.map(c => {
+				return (c.key === comment.key) ? comment : c
+			})
+		}
 		dispatch(setPostComments(comment.postId, postComments))
 		if (rep) {
 			await firebase.database().ref('reps/' + comment.key).child(uid).set({
 				date,
 				uid, 
 				post: comment.postId,
-				type: 'comment'
+				type: 'comment',
+				parentCommentId
 			})
-			const snapshot = await firebase.database().ref('comments/' + comment.key).child('repCount').once('value')
+			const ref = parentCommentId ? `commentReplies/${parentCommentId}/${comment.key}` :  'comments/' + comment.key
+			const snapshot = await firebase.database().ref(ref).child('repCount').once('value')
 			let count
 			if (snapshot.val()) {
 				count = snapshot.val()
 				count += 1
 			}
 			else count = 1
-			await firebase.database().ref('comments/' + comment.key).child('repCount').set(count)
+			await firebase.database().ref(ref).child('repCount').set(count)
 			await firebase.database().ref('userReps/' + uid).child(comment.key).set(rep)
-			if (uid != comment.uid) {
+			if (uid !== comment.uid) {
 				//add notification for user
 				const snapshot = await firebase.database().ref('userNotifications/' + comment.uid).child(comment.key + uid).once('value')
 				if (!snapshot.val()) {
-					await firebase.database().ref('notifications').child(comment.key + uid).set({date, uid, postId: comment.postId, type: 'commentRep'})
+					await firebase.database().ref('notifications').child(comment.key + uid).set({
+						date,
+						uid,
+						postId: comment.postId,
+						type: 'commentRep',
+						parentCommentId
+					})
 					await firebase.database().ref('userNotifications/' + comment.uid).child(comment.key + uid).set(true)
 					upUnreadCount(comment.uid)
-					
 				}
 			}
 		}
@@ -657,40 +679,37 @@ const sortComments = (comments) => {
 }
 
 export const getNotifications = (limit = 10) => {
-	return (dispatch, getState) => {
+	return async (dispatch, getState) => {
 		const uid = getState().profile.profile.uid
 		const refs = []
-		return firebase.database().ref('userNotifications').child(uid).limitToLast(limit).once('value', snapshot => {
-			if (snapshot.val()) {
-				Object.keys(snapshot.val()).forEach(key => {
-					refs.push(firebase.database().ref('notifications').child(key).once('value'))
-				})
-				return Promise.all(refs).then(notifications => {
-					let obj = {}
-					notifications.forEach(notification => {
-						obj[notification.key] = notification.val()
-						obj[notification.key].key = notification.key
-					})
-					dispatch(setNotifications(obj))
-				})
-			}
-		})
+		const snapshot = await firebase.database().ref('userNotifications').child(uid).limitToLast(limit).once('value')
+		if (snapshot.val()) {
+			Object.keys(snapshot.val()).forEach(key => {
+				refs.push(firebase.database().ref('notifications').child(key).once('value'))
+			})
+			const notifications = await Promise.all(refs)
+			let obj = {}
+			notifications.forEach(notification => {
+				obj[notification.key] = notification.val()
+				obj[notification.key].key = notification.key
+			})
+			dispatch(setNotifications(obj))
+		}
 	}
 }
 
-export const upUnreadCount = (uid) => {
-	return firebase.database().ref('users/' + uid).child('unreadCount').once('value', snapshot => {
-		let count = 1
-		if (snapshot.val()) {
-			count = snapshot.val() + 1
-		}
-		return firebase.database().ref('users/' + uid).child('unreadCount').set(count)
-	})
+export const upUnreadCount = async (uid) => {
+	const snapshot = await firebase.database().ref('users/' + uid).child('unreadCount').once('value')
+	let count = 1
+	if (snapshot.val()) {
+		count = snapshot.val() + 1
+	}
+	await firebase.database().ref('users/' + uid).child('unreadCount').set(count)
 }
 
 export const setNotificationsRead = () => {
 	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
+		const uid = getState().profile.profile.uid
 		dispatch(setNotificationCount(0))
 		return firebase.database().ref('users/' + uid).child('unreadCount').set(0)
 		
@@ -698,14 +717,13 @@ export const setNotificationsRead = () => {
 }
 
 export const deleteNotification = (key) => {
-	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
-		let notifs = getState().home.notifications
+	return async (dispatch, getState) => {
+		const uid = getState().profile.profile.uid
+		const notifs = getState().home.notifications
 		delete notifs[key]
 		dispatch(setNotifications(notifs))
-		let ref = firebase.database().ref('notifications').child(key).remove()
-		let ref1 = firebase.database().ref('userNotifications/' + uid).child(key).remove()
-		return Promise.all([ref, ref1])
+		await firebase.database().ref('notifications').child(key).remove()
+		await firebase.database().ref('userNotifications/' + uid).child(key).remove()
 	}
 }
 
@@ -718,27 +736,53 @@ export const fetchUser = (uid) => {
 					resolve({...profile.val(), avatar: url})
 				})
 				.catch(e => {
-					resolve({...profile.val()})
+					resolve(profile.val())
 				})
-		})
+			})
 		})
 		
 }
 
-export const fetchUsers = (uids) => {
-	const promises = []
-	uids.forEach(uid => {
-		promises.push(new Promise(resolve => {
-			firebase.database().ref('users/' + uid).once('value', profile => {
-				firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
-					.then(url => {
+// export const fetchUsers = (uids) => {
+// 	const promises = []
+// 	uids.forEach(uid => {
+// 		promises.push(new Promise(resolve => {
+// 			firebase.database().ref('users/' + uid).once('value', profile => {
+// 				firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
+// 					.then(url => {
+// 						resolve({...profile.val(), avatar: url})
+// 					})
+// 					.catch(e => {
+// 						resolve({...profile.val()})
+// 					})
+// 			})
+// 			}))
+// 		})
+// 		return Promise.all(promises)
+// }
+
+export const fetchUsers = (uids: string[]) => {
+	return async (dispatch) => {
+		if (uids.length > 0) {
+			const users: Profile[] = await Promise.all(uids.map(uid => {
+				return new Promise(async resolve => {
+					const profile = await firebase.database().ref('users/' + uid).once('value')
+					try {
+						const url = await firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
 						resolve({...profile.val(), avatar: url})
-					})
-					.catch(e => {
-						resolve({...profile.val()})
-					})
-			})
+					} catch(e) {
+						resolve(profile.val())
+					}
+				})
 			}))
-		})
-		return Promise.all(promises)
+			const sharedUsers = {}
+			users.forEach(user => {
+				if (user.uid) {
+					sharedUsers[user.uid] = user
+				}
+			})
+			dispatch(updateUsers(sharedUsers))
+			return sharedUsers
+		}
+	}
 }

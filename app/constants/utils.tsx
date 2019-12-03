@@ -157,7 +157,7 @@ export function dayDiff(first, second, round = true) {
 
 export function getSimplifiedTime(createdAt) {
   const timeStamp = new Date(createdAt);
-  let dateString
+  let dateString;
   const now = new Date();
   const today0 = new Date();
   const yesterday0 = new Date(today0.setHours(0, 0, 0, 0));

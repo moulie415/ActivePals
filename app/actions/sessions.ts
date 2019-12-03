@@ -94,7 +94,7 @@ export const fetchSessions = () => {
 							obj[session.key] = {...session.val(), host, key: session.key}
 					})
 					dispatch(updateSessions(obj))
-					dispatch(checkUserFetches(userFetches))
+					dispatch(fetchUsers(userFetches))
 					})
 				}
 				else {
@@ -193,7 +193,7 @@ export const fetchPrivateSessions = () =>  {
 						return acc
 					}, {})
 					dispatch(setPrivateSessions(obj))
-					dispatch(checkUserFetches(userFetches))
+					dispatch(fetchUsers(userFetches))
 				})
 			}
 			else {
@@ -220,7 +220,7 @@ export const fetchSession = (id) => {
 			const	unfetched = Object.keys(session.val().users).filter(user => {
 				return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
 			})
-			dispatch(checkUserFetches(unfetched))
+			dispatch(fetchUsers(unfetched))
 		}
 		const duration = calculateDuration(session.val())
 		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
@@ -241,7 +241,7 @@ export const fetchPrivateSession = (id) => {
 			const	unfetched = Object.keys(session.val().users).filter(user => {
 				return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
 			})
-			dispatch(checkUserFetches(unfetched))
+			dispatch(fetchUsers(unfetched))
 		}
 		const duration = calculateDuration(session.val())
 		const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime()
@@ -286,22 +286,6 @@ const checkHost = (host, state) => {
 		return false
 	}
 	return host
-}
-
-const checkUserFetches = (userFetches) => {
-	return dispatch => {
-		if (userFetches.length > 0) {
-			fetchUsers(userFetches).then(users => {
-				const sharedUsers = {}
-				users.forEach(user => {
-					if (user.uid) {
-						sharedUsers[user.uid] = user
-					}
-				})
-				dispatch(updateUsers(sharedUsers))
-			})
-		}
-	}
 }
 
 export const removeSession = (key, isPrivate, force = false) => {
@@ -380,7 +364,7 @@ export const fetchGym = (id) => {
 					const	unfetched = Object.keys(users.val()).filter(user => {
 						return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
 					})
-					dispatch(checkUserFetches(unfetched))
+					dispatch(fetchUsers(unfetched))
 				}
 
  				dispatch(setPlace(gym))
