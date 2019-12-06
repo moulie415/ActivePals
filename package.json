@@ -19,6 +19,7 @@
     "geofire": "^4.1.2",
     "jetifier": "^1.6.3",
     "npm": "^6.3.0",
+    "ramda": "^0.26.1",
     "react": "16.8.3",
     "react-native": "0.59.9",
     "react-native-actionsheet": "^2.4.2",

@@ -12,7 +12,7 @@ export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
 import str from '../constants/strings'
 import Profile from '../types/Profile'
 import Comment from '../types/Comment'
-import { dedupeComments } from '../constants/utils'
+import { dedupeComments, dedupeSortAndAddCommentIds, sortAndAddCommentIds, sortComments } from '../constants/utils'
 
 const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, (error) => {
 	if (error) {
@@ -381,7 +381,6 @@ export const fetchComments = (key: string, limit = 10, endAt?: string) => {
 		return firebase.database().ref("comments").child(comment).once("value")
 	}))
 
-	
 	let commentsArray = []
 	const commentReps = []
 	comments.forEach(comment => {
@@ -393,8 +392,6 @@ export const fetchComments = (key: string, limit = 10, endAt?: string) => {
 		commentsArray.push(obj)
 	})
 
-	
-
 	const reps = await Promise.all(commentReps)
 	reps.forEach((rep, index) => {
 		if (rep.val()) {
@@ -402,14 +399,16 @@ export const fetchComments = (key: string, limit = 10, endAt?: string) => {
 		}
 	})
 
-	commentsArray = sortComments(commentsArray)
 	const commentsWithReplies = []
-	commentsArray.forEach((comment, index) => {
-		comment.comment_id = index + 1
+	commentsArray.forEach(comment => {
 		if (comment.childrenCount) {
 			commentsWithReplies.push(comment)
 		}
 	})
+
+	const currentComments = getState().home.feed[key].comments || []
+
+	commentsArray = dedupeSortAndAddCommentIds([...commentsArray, ...currentComments])
 	dispatch(fetchUsers(userFetches))
 	dispatch(setPostComments(key, commentsArray))
 	await Promise.all(commentsWithReplies.map(comment => dispatch(fetchReplies(comment))))
@@ -422,40 +421,41 @@ export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
 		const uid = getState().profile.profile.uid
 		const friends = getState().friends.friends
 		const users = getState().sharedInfo.users
-		const postComments = getState().home.feed[comment.postId].comments
-		const filtered = postComments.filter(c => c.key !== key)
+		const currentComments = getState().home.feed[comment.postId].comments
+		const filtered = currentComments.filter(c => c.key !== key)
 		const userFetches = []
 		const ref = endAt ? firebase.database().ref('commentReplies').child(key).orderByKey().endAt(endAt) :
 		firebase.database().ref('commentReplies').child(key).orderByKey()
 		const snapshot = await ref.limitToLast(limit).once('value')
-		const children = comment.children || []
-		let replies = [...children, ...Object.values(snapshot.val())].map((reply: Comment, index) => {
-			if (!friends[reply.uid] && !users[reply.uid] && 
-				!userFetches.includes(reply.uid) && reply.uid !== uid) {
-				userFetches.push(reply.uid)
-			}
-			return { ...reply, comment_id: index + 1 }
-		})
+		const currentChildren = comment.children || []
 
-		replies = dedupeComments(replies)
+		const newReplies = Object.values(snapshot.val())
 
-		const reps = await Promise.all(replies.map(reply => {
+		const reps = await Promise.all(newReplies.map((reply: Comment) => {
 			return firebase.database().ref("reps/" + reply.key).child(uid).once('value')
 		}))
 
-		const repliesWithReps = replies.map(reply => {
+		const repliesWithReps = newReplies.map(reply => {
 			if (reps.some(rep => rep.val() && rep.val().parentCommentId === key)) {
 				return { ...reply, rep: true }
 			}
 			else return reply
 		})
 
+		const joined = [...currentChildren, ...repliesWithReps]
 		
-		comment.children = sortComments(repliesWithReps)
-		//delete extra reply
-		
+		comment.children = dedupeSortAndAddCommentIds(joined);
 
-		dispatch(setPostComments(comment.postId, [...filtered, comment]))
+		comment.children.forEach(c => {
+			if (!friends[c.uid] && !users[c.uid] && 
+			!userFetches.includes(c.uid) && c.uid !== uid) {
+				userFetches.push(c.uid)
+			}
+		})
+
+		const postComments = dedupeSortAndAddCommentIds([...filtered, comment])
+
+		dispatch(setPostComments(comment.postId, postComments))
 		dispatch(fetchUsers(userFetches))
 	}
 }
@@ -682,12 +682,6 @@ export const fetchCommentRepsUsers = (comment, limit = 10) => {
 			})
 		})
 	}
-}
-
-const sortComments = (comments) => {
-	return comments.sort((a,b) => {
-		return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-	})
 }
 
 export const getNotifications = (limit = 10) => {

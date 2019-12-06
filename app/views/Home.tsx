@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Alert,
@@ -808,12 +808,12 @@ class Home extends Component<HomeProps, State> {
   }
 
   showPicker() {
-    let videoOptions = {
+    const videoOptions: ImagePickerOptions = {
       mediaType: 'video',
       durationLimit: 30,
       videoQuality: Platform.OS == 'ios' ? 'medium' : 'low',
     };
-    let options = {
+    const options: ImagePickerOptions = {
       title: null,
       mediaType: 'photo',
       customButtons: [
@@ -938,20 +938,6 @@ class Home extends Component<HomeProps, State> {
     } else return null;
   }
 
-  // getParsedText(text) {
-  //   return <ParsedText
-  //   style={{color: '#000'}}
-  //   parse={
-  //     [
-  //       {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: (test) => {
-  //         console.log(test)
-  //       } }
-  //     ]
-  //   }
-  //   >{text}
-  //   </ParsedText>
-  // }
-
   async sharePost(item) {
     this.setState({ spinner: true });
     const username = this.props.profile.username;
@@ -1006,6 +992,7 @@ import { isIphoneX } from 'react-native-iphone-x-helper';
 import { fetchProfile } from '../actions/profile';
 import { fetchFriends } from '../actions/friends';
 import Comment from '../types/Comment';
+import ImagePickerOptions, { MediaType } from '../types/Shared';
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,
@@ -1023,7 +1010,7 @@ const mapDispatchToProps = dispatch => ({
   previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   comment: (uid, postId, text, created_at, parentCommentId) =>
     dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
-  getComments: (key, amount) => dispatch(fetchComments(key, amount)),
+  getComments: (key: string, amount: number, endAt?: string) => dispatch(fetchComments(key, amount, endAt)),
   repComment: comment => dispatch(repComment(comment)),
   getPosts: (uid, amount, endAt) => dispatch(fetchPosts(uid, amount, endAt)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),

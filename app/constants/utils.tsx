@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Linking, Alert } from 'react-native';
+import { Linking, Alert, DrawerLayoutAndroidComponent } from 'react-native';
 import str from './strings';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
 import { SessionType } from '../types/Session';
 import { UserState } from '../types/Profile';
 import Comment from '../types/Comment';
+import { pipe } from 'ramda';
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming'];
 
@@ -281,8 +282,26 @@ export const durationString = session => {
   return string;
 };
 
-
 export const dedupeComments = (comments: Comment[]) => {
-  return comments.filter((elem, index, self) => self.findIndex(
-    (t) => {return (t.created_at === elem.created_at && t.key === elem.key)}) === index)
-}
+  return comments.filter(
+    (elem, index, self) =>
+      self.findIndex(t => {
+        return t.created_at === elem.created_at && t.key === elem.key;
+      }) === index
+  );
+};
+
+export const sortComments = (comments: Comment[]) => {
+  return comments.sort((a, b) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+};
+
+export const addCommentIds = (comments: Comment[]) => {
+  return comments.map((comment, index) => {
+    return { ...comment, comment_id: index + 1 };
+  });
+};
+
+export const dedupeSortAndAddCommentIds = pipe(dedupeComments, sortComments, addCommentIds);
+export const sortAndAddCommentIds = pipe(sortComments, addCommentIds)
