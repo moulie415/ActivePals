@@ -1,7 +1,7 @@
 import Profile from '../Profile'
 import { NavigationScreenProps } from 'react-navigation'
 import Post from '../Post'
-import Comment from '../../comments/Comment'
+import Comment from '../../components/comments/Comment'
 
 export default interface PostViewProps {
     friends: { [key: string]: Profile };

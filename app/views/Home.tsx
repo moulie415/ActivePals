@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
   Platform,
   ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import Card from '../components/Card';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -19,28 +19,26 @@ import firebase from 'react-native-firebase';
 import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
 import sStyles from '../styles/settingsStyles';
-import cStyles from '../comments/styles';
+import cStyles from '../components/comments/styles';
 import Text, { globalTextStyle } from '../components/Text';
 import ImagePicker from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import ModalBox from 'react-native-modalbox';
-import Comments from '../comments';
+import Comments from '../components/comments';
 import FIcon from 'react-native-vector-icons/FontAwesome';
 import Image from 'react-native-fast-image';
 import { Image as SlowImage } from 'react-native';
 import Header from '../components/Header/header';
-import {
-  likesExtractor,
-  getSimplifiedTime,
-  getMentionsList,
-} from '../constants/utils';
+import { likesExtractor, getSimplifiedTime, getMentionsList } from '../constants/utils';
 import str from '../constants/strings';
 import ParsedText from '../components/ParsedText';
 import Video from 'react-native-video';
 import RNFetchBlob from 'rn-fetch-blob';
 import AdView from '../components/AdView';
 import Share from 'react-native-share';
+import { PostType } from '../types/Post';
+import HomeProps from '../types/views/Home';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
 const weightDown = require('../../assets/images/weightlifting_down.png');
@@ -53,7 +51,6 @@ interface State {
   spinner: boolean;
   selectedImage?: { url: string }[];
   showImage: boolean;
-  commentFetchAmount: number;
   userFetchAmount: number;
   refreshing: boolean;
   likesModalVisible: boolean;
@@ -78,7 +75,6 @@ class Home extends Component<HomeProps, State> {
       spinner: false,
       selectedImage: null,
       showImage: false,
-      commentFetchAmount: 10,
       userFetchAmount: 10,
       refreshing: false,
       likesModalVisible: false,
@@ -341,106 +337,102 @@ class Home extends Component<HomeProps, State> {
         <ModalBox
           style={{
             width: SCREEN_WIDTH - 20,
-            height: SCREEN_HEIGHT - 100,
-            marginTop: isIphoneX() ? 40 : 0,
+            height: SCREEN_HEIGHT - 150,
+            marginTop: Platform.select({ios: 10}),
             borderRadius: 5,
             padding: 5,
           }}
           swipeToClose={false}
-          onClosed={() => this.setState({ focusCommentInput: false, commentFetchAmount: 10 })}
+          onClosed={() => this.setState({ focusCommentInput: false })}
           ref={'commentModal'}
           backButtonClose={true}
           position={'center'}
         >
-          <TouchableOpacity onPress={() => this.refs.commentModal.close()}>
-            <Icon name={'ios-arrow-back'} size={30} style={{ color: '#000', padding: 10 }} />
-          </TouchableOpacity>
-          <Comments
-            data={
-              this.state.postId && this.props.feed[this.state.postId] && this.props.feed[this.state.postId].comments
-                ? this.props.feed[this.state.postId].comments
-                : []
-            }
-            viewingUserName={this.props.profile.username}
-            initialDisplayCount={10}
-            editMinuteLimit={900}
-            focusCommentInput={this.state.focusCommentInput}
-            childrenPerPage={5}
-            lastCommentUpdate={this.state.lastCommentUpdate}
-            users={Object.values(combined)}
-            usernameTapAction={(username, uid) => {
-              if (uid == this.props.profile.uid) {
-                this.props.goToProfile();
-              } else {
-                this.props.viewProfile(uid);
+            <TouchableOpacity onPress={() => this.refs.commentModal.close()}>
+              <Icon name={'ios-arrow-back'} size={30} style={{ color: '#000', padding: 10 }} />
+            </TouchableOpacity>
+            <Comments
+              data={
+                this.state.postId && this.props.feed[this.state.postId] && this.props.feed[this.state.postId].comments
+                  ? this.props.feed[this.state.postId].comments
+                  : []
               }
-            }}
-            childPropName={'children'}
-            isChild={comment => comment.parentCommentId}
-            parentIdExtractor={(comment) => comment.key}
-            keyExtractor={item => item.comment_id}
-            usernameExtractor={item => {
-              if (item.uid === this.props.profile.uid) {
-                return 'You'
+              viewingUserName={this.props.profile.username}
+              initialDisplayCount={10}
+              editMinuteLimit={900}
+              focusCommentInput={this.state.focusCommentInput}
+              childrenPerPage={5}
+              lastCommentUpdate={this.state.lastCommentUpdate}
+              users={Object.values(combined)}
+              usernameTapAction={(username, uid) => {
+                if (uid == this.props.profile.uid) {
+                  this.props.goToProfile();
+                } else {
+                  this.props.viewProfile(uid);
+                }
+              }}
+              childPropName={'children'}
+              isChild={comment => comment.parentCommentId}
+              parentIdExtractor={comment => comment.key}
+              keyExtractor={item => item.comment_id}
+              usernameExtractor={item => {
+                if (item.uid === this.props.profile.uid) {
+                  return 'You';
+                } else {
+                  return this.props.friends[item.uid].username || this.props.users[item.uid].username;
+                }
+              }}
+              uidExtractor={item => (item.user ? item.user.uid : null)}
+              editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
+              createdTimeExtractor={item => new Date(item.created_at).toISOString()}
+              bodyExtractor={item => item.text}
+              imageExtractor={item => {
+                if (item.uid === this.props.profile.uid) {
+                  return this.props.profile.avatar;
+                } else {
+                  return this.props.friends[item.uid].avatar || this.props.users[item.uid].avatar;
+                }
+              }}
+              likeExtractor={item => item.rep}
+              reportedExtractor={item => item.reported}
+              likesExtractor={item =>
+                likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile)
               }
-              else {
-                return this.props.friends[item.uid].username || this.props.users[item.uid].username
-              }
-            }}
-            uidExtractor={item => (item.user ? item.user.uid : null)}
-            editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
-            createdTimeExtractor={item => new Date(item.created_at).toISOString()}
-            bodyExtractor={item => item.text}
-            imageExtractor={item => {
-              if (item.uid === this.props.profile.uid) {
-                return this.props.profile.avatar
-              }
-              else {
-                return this.props.friends[item.uid].avatar || this.props.users[item.uid].avatar
-              }
-            }}
-            likeExtractor={item => item.rep}
-            reportedExtractor={item => item.reported}
-            likesExtractor={item =>
-              likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile)
-            }
-            likeCountExtractor={item => item.repCount}
-            childrenCountExtractor={comment => comment.childrenCount}
-            timestampExtractor={item => new Date(item.created_at).toISOString()}
-            replyAction={offset => {
-              this.refs.scrollView.scrollTo({x: null, y: this.scrollIndex + offset - 300, animated: true})
-            }}
-            saveAction={(text, parentCommentId) => {
-              if (text) {
-                this.props
-                  .comment(this.props.profile.uid, this.state.postId, text, new Date().toString(), parentCommentId)
-                  .catch(e => Alert.alert('Error', e.message));
-              }
-            }}
-            editAction={(text, comment) => {
-              console.log(text);
-            }}
-            reportAction={comment => {
-              console.log(comment);
-            }}
-            likeAction={comment => {
-              this.props.repComment(comment);
-            }}
-            likesTapAction={comment => {
-              return this.props.getCommentRepsUsers(comment);
-            }}
-            paginateAction={
-              this.props.feed[this.state.postId] &&
-              this.props.feed[this.state.postId].commentCount > this.state.commentFetchAmount
-                ? (fromCommentId, direction, parentCommentId) => {
-                    this.setState({ commentFetchAmount: this.state.commentFetchAmount + 5 }, () => {
-                      this.props.getComments(this.state.postId, this.state.commentFetchAmount);
-                    });
-                  }
-                : (fromCommentId, direction, parentCommentId) => Alert.alert(fromCommentId, direction)
-            }
-            getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
-          />
+              likeCountExtractor={item => item.repCount}
+              commentCount={this.props.feed[this.state.postId] ? this.props.feed[this.state.postId].commentCount : 0}
+              childrenCountExtractor={comment => comment.childrenCount}
+              timestampExtractor={item => new Date(item.created_at).toISOString()}
+              replyAction={offset => {
+                this.refs.scrollView.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
+              }}
+              saveAction={(text, parentCommentId) => {
+                if (text) {
+                  this.props
+                    .comment(this.props.profile.uid, this.state.postId, text, new Date().toString(), parentCommentId)
+                    .catch(e => Alert.alert('Error', e.message));
+                }
+              }}
+              editAction={(text, comment) => {
+                console.log(text);
+              }}
+              reportAction={comment => {
+                console.log(comment);
+              }}
+              likeAction={comment => {
+                this.props.repComment(comment);
+              }}
+              likesTapAction={comment => {
+                return this.props.getCommentRepsUsers(comment);
+              }}
+              paginateAction={(fromComment: Comment, direction: string, parentComment: Comment | undefined) => {
+                if (parentComment) {
+                  this.props.getReplies(parentComment, 10, fromComment.key);
+                } else {
+                  this.props.getComments(this.state.postId, 10, fromComment.key);
+                }
+              }}
+              getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
+            />
         </ModalBox>
         <Modal
           animationType={'slide'}
@@ -1008,13 +1000,12 @@ import {
   fetchPosts,
   fetchCommentRepsUsers,
   fetchRepUsers,
+  fetchReplies,
 } from '../actions/home';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { fetchProfile } from '../actions/profile';
 import { fetchFriends } from '../actions/friends';
-import { PostType } from '../types/Post';
-import HomeProps from '../types/views/Home';
-import Comment from '../comments/Comment';
+import Comment from '../types/Comment';
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,
@@ -1041,6 +1032,8 @@ const mapDispatchToProps = dispatch => ({
   getProfile: () => dispatch(fetchProfile()),
   getFriends: () => dispatch(fetchFriends()),
   navigateFullScreenVideo: uri => dispatch(navigateFullScreenVideo(uri)),
+  getReplies: (fromCommentId: Comment, limit: number, endAt?: string) =>
+    dispatch(fetchReplies(fromCommentId, limit, endAt)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

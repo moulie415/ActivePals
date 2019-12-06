@@ -14,10 +14,10 @@ import {
     TouchableOpacity
 } from 'react-native'
 import FIcon from "react-native-vector-icons/FontAwesome"
-import cStyles from '../comments/styles'
+import cStyles from '../components/comments/styles'
 import Text, { globalTextStyle } from '../components/Text'
 import colors from '../constants/colors'
-import Comments from '../comments'
+import Comments from '../components/comments'
 import sStyles from '../styles/settingsStyles'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import ParsedText from '../components/ParsedText'

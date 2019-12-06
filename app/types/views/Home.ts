@@ -1,6 +1,6 @@
 import Profile from '../Profile';
 import Post from '../Post';
-import Comment from '../../comments/Comment';
+import Comment from '../../components/comments/Comment';
 
 export default interface HomeProps {
   profile: Profile;

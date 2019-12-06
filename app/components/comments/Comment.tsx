@@ -13,14 +13,14 @@ import {
 } from "react-native";
 
 import Image from 'react-native-fast-image'
-import Text, { globalTextStyle } from '../components/Text'
+import Text, { globalTextStyle } from '../Text'
 import TimeAgo from "react-native-timeago";
 import Icon from "react-native-vector-icons/FontAwesome";
 import styles from "./styles";
-import colors from '../constants/colors'
+import colors from '../../constants/colors'
 import Collapsible from "react-native-collapsible";
 import {Image as SlowImage } from 'react-native'
-import str from '../constants/strings'
+import str from '../../constants/strings'
 import firebase from 'react-native-firebase'
 
 const weightUp = require('Anyone/assets/images/weightlifting_up.png')

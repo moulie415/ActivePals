@@ -12,6 +12,7 @@ export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
 import str from '../constants/strings'
 import Profile from '../types/Profile'
 import Comment from '../types/Comment'
+import { dedupeComments } from '../constants/utils'
 
 const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, (error) => {
 	if (error) {
@@ -379,6 +380,8 @@ export const fetchComments = (key: string, limit = 10, endAt?: string) => {
 	const comments = await Promise.all(Object.keys(snapshot.val()).map(comment => {
 		return firebase.database().ref("comments").child(comment).once("value")
 	}))
+
+	
 	let commentsArray = []
 	const commentReps = []
 	comments.forEach(comment => {
@@ -389,6 +392,8 @@ export const fetchComments = (key: string, limit = 10, endAt?: string) => {
 		commentReps.push(firebase.database().ref("reps/" + obj.key).child(uid).once('value'))
 		commentsArray.push(obj)
 	})
+
+	
 
 	const reps = await Promise.all(commentReps)
 	reps.forEach((rep, index) => {
@@ -424,13 +429,16 @@ export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
 		firebase.database().ref('commentReplies').child(key).orderByKey()
 		const snapshot = await ref.limitToLast(limit).once('value')
 		const children = comment.children || []
-		const replies = [...children, ...Object.values(snapshot.val())].map((reply: Comment, index) => {
+		let replies = [...children, ...Object.values(snapshot.val())].map((reply: Comment, index) => {
 			if (!friends[reply.uid] && !users[reply.uid] && 
 				!userFetches.includes(reply.uid) && reply.uid !== uid) {
 				userFetches.push(reply.uid)
 			}
 			return { ...reply, comment_id: index + 1 }
 		})
+
+		replies = dedupeComments(replies)
+
 		const reps = await Promise.all(replies.map(reply => {
 			return firebase.database().ref("reps/" + reply.key).child(uid).once('value')
 		}))
@@ -441,7 +449,11 @@ export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
 			}
 			else return reply
 		})
+
+		
 		comment.children = sortComments(repliesWithReps)
+		//delete extra reply
+		
 
 		dispatch(setPostComments(comment.postId, [...filtered, comment]))
 		dispatch(fetchUsers(userFetches))

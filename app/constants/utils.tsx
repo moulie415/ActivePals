@@ -5,6 +5,7 @@ import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
 import { SessionType } from '../types/Session';
 import { UserState } from '../types/Profile';
+import Comment from '../types/Comment';
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming'];
 
@@ -279,3 +280,9 @@ export const durationString = session => {
   }
   return string;
 };
+
+
+export const dedupeComments = (comments: Comment[]) => {
+  return comments.filter((elem, index, self) => self.findIndex(
+    (t) => {return (t.created_at === elem.created_at && t.key === elem.key)}) === index)
+}

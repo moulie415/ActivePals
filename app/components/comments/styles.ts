@@ -1,5 +1,5 @@
 import { StyleSheet, PixelRatio, Platform } from "react-native";
-import colors from '../constants/colors'
+import colors from '../../constants/colors'
 
 export default StyleSheet.create({
   commentContainer: {
