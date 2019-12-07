@@ -1,22 +1,54 @@
 import React, { FunctionComponent } from 'react';
 import ModalBox from 'react-native-modalbox';
-import { Platform, Dimensions } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View, SafeAreaView } from 'react-native';
+import IIcon from 'react-native-vector-icons/Ionicons';
+import RepsModalProps from '../../types/components/RepsModal';
+import { PulseIndicator } from 'react-native-indicators';
+import Image from 'react-native-fast-image';
+import styles from '../../styles/components/RepsModal';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_HEIGHT = Dimensions.get('window').height;
-
-const RepsModal: FunctionComponent = () => {
+const RepsModal: FunctionComponent<RepsModalProps> = ({ uids, isOpen, onClosed, profile, friends, users }) => {
   return (
-    <ModalBox
-      style={{
-        width: SCREEN_WIDTH/2,
-        height: SCREEN_HEIGHT/1.5,
-        marginTop: Platform.select({ ios: 10 }),
-        borderRadius: 5,
-        padding: 5,
-      }}
-    ></ModalBox>
+    <ModalBox isOpen={isOpen} onClosed={() => onClosed()} style={styles.container}>
+      <Text style={styles.likeHeader}>Users that repped the comment</Text>
+      <FlatList
+        keyExtractor={item => item}
+        renderItem={({ item }) => {
+          const uid = profile.uid;
+          const user = item === uid ? profile : friends[item] || users[item];
+
+          return user ? (
+            <TouchableOpacity
+              onPress={() => {
+                console.log('test');
+              }}
+              style={styles.likeButton}
+            >
+              <View style={styles.likeContainer}>
+                {user.avatar ? (
+                  <Image style={styles.likeImage} source={{ uri: user.avatar }} />
+                ) : (
+                  <IIcon name="md-contact" size={40} style={styles.defaultIcon} />
+                )}
+                <Text>{item === uid ? 'You' : user.username}</Text>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <PulseIndicator />
+          );
+        }}
+        data={uids}
+      />
+    </ModalBox>
   );
 };
 
-export default RepsModal
+import { connect } from 'react-redux';
+
+const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
+  friends: friends.friends,
+  users: sharedInfo.users,
+  profile: profile.profile,
+});
+
+export default connect(mapStateToProps, null)(RepsModal);

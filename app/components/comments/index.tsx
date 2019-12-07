@@ -25,6 +25,7 @@ import Comment from './Comment';
 import colors from '../../constants/colors';
 import { getMentionsList } from '../../constants/utils';
 import CommentsProps from '../../types/components/Comments';
+import RepsModal from '../RepsModal';
 
 const screen = Dimensions.get('screen');
 
@@ -527,15 +528,17 @@ export default class Comments extends PureComponent<CommentsProps> {
             <Text style={styles.likeHeader}>Users that repped the comment</Text>
           </SafeAreaView>
 
-          {this.state.likesModalVisible ? (
-            <FlatList
-              initialNumToRender="10"
-              ListFooterComponent={item => this.renderRepsFooter(item)}
-              keyExtractor={item => item.user_id + ''}
-              data={this.state.likesModalData}
-              renderItem={this.renderLike}
-            />
-          ) : null}
+          {this.state.likesModalVisible && (
+          //   <FlatList
+          //     initialNumToRender="10"
+          //     ListFooterComponent={item => this.renderRepsFooter(item)}
+          //     keyExtractor={item => item.user_id + ''}
+          //     data={this.state.likesModalData}
+          //     renderItem={this.renderLike}
+          //   />
+          // ) : null
+          <RepsModal users={this.state.likesModalData}/>
+          )}
         </Modal>
 
         <Modal

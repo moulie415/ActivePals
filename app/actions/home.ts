@@ -12,7 +12,7 @@ export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
 import str from '../constants/strings'
 import Profile from '../types/Profile'
 import Comment from '../types/Comment'
-import { dedupeComments, dedupeSortAndAddCommentIds, sortAndAddCommentIds, sortComments } from '../constants/utils'
+import { dedupeSortAndAddCommentIds, sortComments } from '../constants/utils'
 
 const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, (error) => {
 	if (error) {
@@ -546,141 +546,30 @@ export const repComment = (comment: Comment) => {
 
 export const fetchRepUsers = (postId, limit = 10) => {
 	return async (dispatch, getState) => {
-		let userFetches = []
-		return firebase.database().ref('reps').child(postId).limitToLast(limit).once('value', snapshot => {
-			let users = []
+		const snapshot = await firebase.database().ref('reps').child(postId).limitToLast(limit).once('value')
 			if (snapshot.val()) {
-				Object.keys(snapshot.val()).forEach(uid => {
-					let user = {}
-					let profile
-					if (uid == getState().profile.profile.uid) {
-						profile = getState().profile.profile
-						user.username = 'You'
-						user.image = profile.avatar
-						user.user_id = uid
-						users.push(user)
-					}
-					else if (getState().friends.friends[uid]) {
-						profile = getState().friends.friends[uid]
-						user.username = profile.username
-						user.image = profile.avatar
-						user.user_id = uid
-						users.push(user)
-					}
-					else {
-						if (getState().sharedInfo.users[uid]) {
-							profile = getState().sharedInfo.users[uid]
-							user.username = profile.username
-							user.image = profile.avatar
-							user.user_id = uid
-							users.push(user)
-						}
-						else {
-							if (!userFetches.includes(uid)) {
-								userFetches.push(uid)
-							}
-						}
-					}
-					
+				const uids =  Object.keys(snapshot.val())
+				const userFetches = uids.filter(uid => {
+					return uid !== getState().profile.profile.uid && !getState().friends.friends[uid] && ! getState().sharedInfo.users[uid]
 				})
+				dispatch(fetchUsers(userFetches))
+				return uids
 			}
-			let post = getState().home.feed[postId]
-			if (userFetches.length > 0) {
-				return fetchUsers(userFetches).then(fetched => {
-					let sharedUsers = {}
-					fetched.forEach(user => {
-						if (user.uid) {
-							sharedUsers[user.uid] = user
-							user.image = user.avatar
-							user.user_id = user.uid
-							users.push(user)
-						}
-					})
-					post.repUsers = users
-					dispatch(setPost(post))
-					dispatch(updateUsers(sharedUsers))
-
-				})
-			}
-			else {
-				post.repUsers = users
-				dispatch(setPost(post))
-			}
-		})
+		}
 	}
-}
-
-
 
 export const fetchCommentRepsUsers = (comment, limit = 10) => {
-	return (dispatch, getState) => {
-		let userFetches = []
-		const {key, postId, comment_id } = comment
-		return new Promise(resolve => {
-			firebase.database().ref('reps').child(key).limitToLast(limit).once('value', snapshot => {
-				let users = []
-				if (snapshot.val()) {
-					Object.keys(snapshot.val()).forEach(uid => {
-						let user = {}
-						let profile
-						if (uid == getState().profile.profile.uid) {
-							profile = getState().profile.profile
-							user.username = 'You'
-							user.image = profile.avatar
-							user.user_id = uid
-							users.push(user)
-						}
-						else if (getState().friends.friends[uid]) {
-							profile = getState().friends.friends[uid]
-							user.username = profile.username
-							user.image = profile.avatar
-							user.user_id = uid
-							users.push(user)
-						}
-						else {
-							if (getState().sharedInfo.users[uid]) {
-								profile = getState().sharedInfo.users[uid]
-								user.image = profile.avatar
-								user.user_id = uid
-								users.push(user)
-							}
-							else {
-								if (!userFetches.includes(uid)) {
-									userFetches.push(uid)
-								}
-							}
-						}
-						
-					})
-				}
-				
-				let postComments = getState().home.feed[postId].comments
-				if (userFetches.length > 0) {
-					fetchUsers(userFetches).then(fetched => {
-						let sharedUsers = {}
-						fetched.forEach(user => {
-							if (user.uid) {
-								sharedUsers[user.uid] = user
-								user.image = user.avatar
-								user.user_id = user.uid
-								users.push(user)
-							}
-						})
-						postComments[comment_id-1].likes = users
-						resolve(users)
-						dispatch(setPostComments(postId, postComments))
-						dispatch(updateUsers(sharedUsers))
-
-	
-					})
-				}
-				else {
-					postComments[comment_id-1].likes = users
-					resolve(users)
-					dispatch(setPostComments(postId, postComments))
-				}
+	return async (dispatch, getState) => {
+		const { key, postId, comment_id } = comment
+		const snapshot = await firebase.database().ref('reps').child(key).limitToLast(limit).once('value')
+		if (snapshot.val()) {
+			const uids =  Object.keys(snapshot.val())
+			const userFetches = uids.filter(uid => {
+				return uid !== getState().profile.profile.uid && !getState().friends.friends[uid] && ! getState().sharedInfo.users[uid]
 			})
-		})
+			dispatch(fetchUsers(userFetches))
+			return uids
+		}
 	}
 }
 
@@ -748,24 +637,6 @@ export const fetchUser = (uid) => {
 		})
 		
 }
-
-// export const fetchUsers = (uids) => {
-// 	const promises = []
-// 	uids.forEach(uid => {
-// 		promises.push(new Promise(resolve => {
-// 			firebase.database().ref('users/' + uid).once('value', profile => {
-// 				firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
-// 					.then(url => {
-// 						resolve({...profile.val(), avatar: url})
-// 					})
-// 					.catch(e => {
-// 						resolve({...profile.val()})
-// 					})
-// 			})
-// 			}))
-// 		})
-// 		return Promise.all(promises)
-// }
 
 export const fetchUsers = (uids: string[]) => {
 	return async (dispatch) => {
