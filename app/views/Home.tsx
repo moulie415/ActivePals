@@ -26,12 +26,10 @@ import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import ModalBox from 'react-native-modalbox';
 import Comments from '../components/comments';
-import FIcon from 'react-native-vector-icons/FontAwesome';
 import Image from 'react-native-fast-image';
 import { Image as SlowImage } from 'react-native';
 import Header from '../components/Header/header';
 import { likesExtractor, getSimplifiedTime, getMentionsList } from '../constants/utils';
-import str from '../constants/strings';
 import ParsedText from '../components/ParsedText';
 import Video from 'react-native-video';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -60,9 +58,13 @@ interface State {
   playing: { [key: string]: boolean };
   status?: string;
   focusCommentInput?: boolean;
-  repsUsers: string[];
+  postId: string;
+  repsId: string;
+  repCount: number;
 }
 class Home extends Component<HomeProps, State> {
+  players: object;
+  scrollIndex: number;
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Home',
@@ -83,7 +85,9 @@ class Home extends Component<HomeProps, State> {
       loadMore: true,
       paused: true,
       playing: {},
-      repsUsers: [],
+      postId: '',
+      repsId: '',
+      repCount: 0,
     };
   }
 
@@ -424,8 +428,9 @@ class Home extends Component<HomeProps, State> {
             likeAction={comment => {
               this.props.repComment(comment);
             }}
-            likesTapAction={comment => {
-              return this.props.getCommentRepsUsers(comment);
+            likesTapAction={(comment: Comment) => {
+              this.setState({ likesModalVisible: true, repsId: comment.key, repCount: comment.repCount });
+              this.props.getRepsUsers(comment.key)
             }}
             paginateAction={(fromComment: Comment, direction: string, parentComment: Comment | undefined) => {
               if (parentComment) {
@@ -440,7 +445,8 @@ class Home extends Component<HomeProps, State> {
         <RepsModal
           onClosed={() => this.setState({ likesModalVisible: false })}
           isOpen={this.state.likesModalVisible}
-          uids={this.state.repsUsers}
+          id={this.state.repsId}
+          repCount={this.state.repCount}
         />
       </>
     );
@@ -660,8 +666,8 @@ class Home extends Component<HomeProps, State> {
               <TouchableOpacity
                 style={{ flex: 1 }}
                 onPress={async () => {
-                  const users = await this.props.getRepUsers(item.key, this.state.userFetchAmount);
-                  this.setState({ repsUsers: users, likesModalVisible: true, postId: item.key });
+                  this.setState({ likesModalVisible: true, repsId: item.key, repCount: item.repCount });
+                  await this.props.getRepsUsers(item.key);
                 }}
               >
                 <Text style={{ color: '#999' }}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>
@@ -891,23 +897,6 @@ class Home extends Component<HomeProps, State> {
     );
   }
 
-  renderRepsFooter() {
-    if (this.props.feed[this.state.postId].repCount > this.state.userFetchAmount) {
-      return (
-        <TouchableOpacity
-          style={{ alignItems: 'center' }}
-          onPress={() => {
-            this.setState({ userFetchAmount: this.state.userFetchAmount + 5 }, () => {
-              this.props.getRepUsers(this.state.postId, this.state.userFetchAmount);
-            });
-          }}
-        >
-          <Text style={{ color: colors.secondary }}>Show more</Text>
-        </TouchableOpacity>
-      );
-    } else return null;
-  }
-
   async sharePost(item) {
     this.setState({ spinner: true });
     const username = this.props.profile.username;
@@ -955,7 +944,7 @@ import {
   repComment,
   fetchPosts,
   fetchCommentRepsUsers,
-  fetchRepUsers,
+  fetchRepsUsers,
   fetchReplies,
 } from '../actions/home';
 import { fetchProfile } from '../actions/profile';
@@ -979,11 +968,11 @@ const mapDispatchToProps = dispatch => ({
   previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   comment: (uid, postId, text, created_at, parentCommentId) =>
     dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
-  getComments: (key: string, amount: number, endAt?: string) => dispatch(fetchComments(key, amount, endAt)),
+  getComments: (key: string, amount?: number, endAt?: string) => dispatch(fetchComments(key, amount, endAt)),
   repComment: comment => dispatch(repComment(comment)),
   getPosts: (uid, amount, endAt) => dispatch(fetchPosts(uid, amount, endAt)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
-  getRepUsers: (postId, limit) => dispatch(fetchRepUsers(postId, limit)),
+  getRepsUsers: (postId: string, limit?: number) => dispatch(fetchRepsUsers(postId, limit)),
   onNotificationPress: () => dispatch(navigateNotifications()),
   getProfile: () => dispatch(fetchProfile()),
   getFriends: () => dispatch(fetchFriends()),

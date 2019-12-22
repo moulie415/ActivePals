@@ -2,11 +2,10 @@ import {
   ADD_POST,
   SET_FEED,
   SET_POST,
-  SET_REP_COUNT,
   SET_POST_COMMENTS,
   ADD_COMMENT,
   SET_NOTIFICATIONS,
-  REMOVE_NOTIFICATION,
+  SET_REPS_USERS,
 } from '../actions/home';
 
 import { SET_LOGGED_OUT } from '../actions/profile';
@@ -15,6 +14,7 @@ import Post from '../types/Post';
 const initialState = {
   feed: {},
   notifications: {},
+  repsUsers: {}
 };
 
 export default function(state = initialState, action) {
@@ -47,6 +47,18 @@ export default function(state = initialState, action) {
           },
         },
       };
+    }
+    case SET_REPS_USERS: {
+      return {
+        ...state,
+        repsUsers: {
+          ...state.repsUsers,
+          [action.key]: {
+            ...state.repsUsers[action.key],
+            ...action.users
+          }
+        }
+      }
     }
     case ADD_COMMENT: {
       return {

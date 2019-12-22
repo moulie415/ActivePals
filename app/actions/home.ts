@@ -9,6 +9,7 @@ export const SET_POST_COMMENTS = 'SET_POST_COMMENTS'
 export const ADD_COMMENT = 'ADD_COMMENT'
 export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS'
 export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
+export const SET_REPS_USERS = 'SET_REPS_USERS'
 import str from '../constants/strings'
 import Profile from '../types/Profile'
 import Comment from '../types/Comment'
@@ -55,10 +56,17 @@ const setNotifications = (notifications) => ({
 	notifications
 })
 
+const setRepsUsers = (key: string, users) => ({
+	type: SET_REPS_USERS,
+	key,
+	users
+})
+
 export const setNotificationCount = (count) => ({
 	type: SET_NOTIFICATION_COUNT,
 	count
 })
+
 
 
 
@@ -544,21 +552,22 @@ export const repComment = (comment: Comment) => {
 	}
 }
 
-export const fetchRepUsers = (postId, limit = 10) => {
+export const fetchRepsUsers = (postId: string, limit = 10, endAt?: string) => {
 	return async (dispatch, getState) => {
-		const snapshot = await firebase.database().ref('reps').child(postId).limitToLast(limit).once('value')
+		const ref = firebase.database().ref('reps').child(postId)
+		const snapshot = endAt ? await ref.limitToLast(limit).endAt(endAt).once('value') : await ref.limitToLast(limit).once('value')
 			if (snapshot.val()) {
 				const uids =  Object.keys(snapshot.val())
 				const userFetches = uids.filter(uid => {
 					return uid !== getState().profile.profile.uid && !getState().friends.friends[uid] && ! getState().sharedInfo.users[uid]
 				})
+				dispatch(setRepsUsers(postId, snapshot.val()))
 				dispatch(fetchUsers(userFetches))
-				return uids
 			}
 		}
 	}
 
-export const fetchCommentRepsUsers = (comment, limit = 10) => {
+export const fetchCommentRepsUsers = (comment: Comment, limit = 10) => {
 	return async (dispatch, getState) => {
 		const { key, postId, comment_id } = comment
 		const snapshot = await firebase.database().ref('reps').child(key).limitToLast(limit).once('value')

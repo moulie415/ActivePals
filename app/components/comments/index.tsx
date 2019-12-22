@@ -10,7 +10,6 @@ import {
   ActivityIndicator,
   Keyboard,
   TextInput,
-  TouchableHighlight,
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
@@ -149,10 +148,7 @@ export default class Comments extends PureComponent<CommentsProps> {
   }
 
   handleLikesTap(c) {
-    this.setLikesModalVisible(!this.state.likesModalVisible);
-    this.props.likesTapAction(c).then(() => {
-      this.setState({ likesModalData: this.props.likesExtractor(c), comment: c });
-    });
+    this.props.likesTapAction(c);
   }
 
   handleEditAction(c) {
@@ -528,7 +524,7 @@ export default class Comments extends PureComponent<CommentsProps> {
             <Text style={styles.likeHeader}>Users that repped the comment</Text>
           </SafeAreaView>
 
-          {this.state.likesModalVisible && (
+          {/*this.state.likesModalVisible && (
           //   <FlatList
           //     initialNumToRender="10"
           //     ListFooterComponent={item => this.renderRepsFooter(item)}
@@ -537,8 +533,8 @@ export default class Comments extends PureComponent<CommentsProps> {
           //     renderItem={this.renderLike}
           //   />
           // ) : null
-          <RepsModal users={this.state.likesModalData}/>
-          )}
+
+          )*/}
         </Modal>
 
         <Modal
@@ -588,29 +584,5 @@ export default class Comments extends PureComponent<CommentsProps> {
         </Modal>
       </View>
     );
-  }
-
-  renderRepsFooter() {
-    if (
-      this.state.likesModalData &&
-      this.state.comment &&
-      this.state.comment.repCount > this.state.likesModalData.length
-    ) {
-      return (
-        <TouchableOpacity
-          style={{ alignItems: 'center' }}
-          onPress={() => {
-            this.setState({ userFetchAmount: this.state.userFetchAmount += 5 }, () => {
-              this.props.getCommentRepsUsers(this.state.comment, this.state.userFetchAmount).then(users => {
-                this.setState({ likesModalData: users });
-              });
-            });
-          }}
-        >
-          <Text style={{ color: colors.secondary }}>Show more</Text>
-        </TouchableOpacity>
-      );
-    }
-    return null;
   }
 }

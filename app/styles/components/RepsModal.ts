@@ -1,8 +1,5 @@
-import { StyleSheet, Dimensions, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 import colors from '../../constants/colors';
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default StyleSheet.create({
   container: {
@@ -21,7 +18,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   likeContainer: {
-    padding: 10,
+    padding: 5,
     width: 200,
     justifyContent: 'space-around',
     alignItems: 'center',
