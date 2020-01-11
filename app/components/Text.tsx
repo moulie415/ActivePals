@@ -1,13 +1,12 @@
 import React, { FunctionComponent } from 'react'
-import { Text, StyleSheet } from 'react-native'
-import TextProps from '../types/components/Text'
+import { Text, StyleSheet, TextProperties } from 'react-native'
 
 export const globalTextStyle = StyleSheet.create({
     app: { fontFamily:'Montserrat' }
 })
 
-const AppText:FunctionComponent<TextProps> = ({style, adjustFontSizeToFit, ...rest}) => {
-    return <Text adjustsFontSizeToFit={adjustFontSizeToFit} style={[style, globalTextStyle.app]} {...rest}/>
+const AppText:FunctionComponent<TextProperties> = (props) => {
+    return <Text  style={[props.style, globalTextStyle.app]} {...props}/>
 }
 
 export default AppText

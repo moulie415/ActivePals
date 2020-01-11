@@ -41,7 +41,7 @@ export const removeFriend = (uid) => {
 
 
 
-export const fetchFriends = (uids) => {
+export const fetchFriends = (uids?) => {
 	return (dispatch, getState) => {
 		let friends = []
 		if (!uids) {

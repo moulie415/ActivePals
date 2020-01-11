@@ -1,3 +1,5 @@
+import Profile from "./Profile";
+
 export default interface Comment {
   created_at: string;
   key: string;
@@ -10,4 +12,7 @@ export default interface Comment {
   repCount?: number;
   rep?: boolean;
   comment_id: number;
+  updated_at?: string;
+  user: Profile;
+  reported?: boolean;
 }

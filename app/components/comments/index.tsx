@@ -493,49 +493,7 @@ export default class Comments extends PureComponent<CommentsProps> {
             <Text style={{ textAlign: 'center', color: colors.secondary }}>Show more</Text>
           </TouchableOpacity>
         ) : null}
-        <Modal
-          animationType={'slide'}
-          transparent={false}
-          visible={this.state.likesModalVisible}
-          onRequestClose={() => {
-            this.setLikesModalVisible(false);
-            this.setState({ userFetchAmount: 10 });
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              this.setLikesModalVisible(false);
-            }}
-            style={{
-              position: 'absolute',
-              width: 100,
-              zIndex: 9,
-              alignSelf: 'flex-end',
-              top: 10,
-            }}
-          >
-            <SafeAreaView>
-              <View style={{ position: 'relative', left: 50, top: 5 }}>
-                <Icon name={'times'} size={40} />
-              </View>
-            </SafeAreaView>
-          </TouchableOpacity>
-          <SafeAreaView>
-            <Text style={styles.likeHeader}>Users that repped the comment</Text>
-          </SafeAreaView>
-
-          {/*this.state.likesModalVisible && (
-          //   <FlatList
-          //     initialNumToRender="10"
-          //     ListFooterComponent={item => this.renderRepsFooter(item)}
-          //     keyExtractor={item => item.user_id + ''}
-          //     data={this.state.likesModalData}
-          //     renderItem={this.renderLike}
-          //   />
-          // ) : null
-
-          )*/}
-        </Modal>
+      
 
         <Modal
           animationType={'slide'}

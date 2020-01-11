@@ -7,5 +7,4 @@ export default interface ButtonProps {
     style?: StyleProp<ViewStyle>;
     textStyle?: StyleProp<TextStyle>;
     onPress?: () => void;
-    adjustFontSizeToFit?: boolean;
 }

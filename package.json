@@ -10,7 +10,8 @@
     "firebase-ios": "ENV=production ENVFILE=.env.prod ./envscript.sh && ./firebase-ios.sh",
     "postinstall": "npx jetify && npm run remove-uneeded",
     "prestart": "npm run remove-uneeded",
-    "remove-uneeded": "rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-parsed-text && rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-video"
+    "remove-uneeded": "rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-parsed-text && rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-video",
+    "test": "jest --coverage"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.1",
@@ -88,16 +89,26 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^24.0.25",
     "@types/node": "^12.12.7",
     "@types/react": "^16.9.11",
     "@types/react-native": "^0.60.22",
+    "@types/react-native-share": "^1.1.5",
     "@types/react-native-vector-icons": "^6.4.4",
     "@types/react-navigation": "^3.4.0",
     "@types/whatwg-fetch": "0.0.33",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.9.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
     "eslint": "^5.16.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.13.0",
-    "metro-react-native-babel-preset": "^0.52.0"
+    "handlebars": "^4.5.0",
+    "jest": "^24.9.0",
+    "metro-react-native-babel-preset": "^0.52.0",
+    "react-dom": "^16.12.0",
+    "ts-jest": "^24.3.0",
+    "typescript": "^3.7.4"
   }
 }

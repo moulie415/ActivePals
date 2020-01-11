@@ -12,7 +12,6 @@ const AppButton: FunctionComponent<ButtonProps> = ({
   style,
   textStyle,
   onPress,
-  adjustFontSizeToFit,
   ...rest
 }) => {
   return <TouchableOpacity
@@ -21,7 +20,6 @@ const AppButton: FunctionComponent<ButtonProps> = ({
           {...rest}
           >
             <Text
-              adjustFontSizeToFit={adjustFontSizeToFit}
               style={[styles.text, {color: textColor || '#fff'}, textStyle]}
             >
               {text}

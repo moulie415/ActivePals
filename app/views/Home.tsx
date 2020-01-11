@@ -32,10 +32,10 @@ import Header from '../components/Header/header';
 import { likesExtractor, getSimplifiedTime, getMentionsList } from '../constants/utils';
 import ParsedText from '../components/ParsedText';
 import Video from 'react-native-video';
-import RNFetchBlob from 'rn-fetch-blob';
+import RNFetchBlob, { RNFetchBlobStat } from 'rn-fetch-blob';
 import AdView from '../components/AdView';
-import Share from 'react-native-share';
-import { PostType } from '../types/Post';
+import Share, { Options } from 'react-native-share';
+import Post, { PostType } from '../types/Post';
 import HomeProps from '../types/views/Home';
 import RepsModal from '../components/RepsModal';
 
@@ -61,10 +61,13 @@ interface State {
   postId: string;
   repsId: string;
   repCount: number;
+  showCommentModal: boolean;
+  mentionList: Profile[]
 }
-class Home extends Component<HomeProps, State> {
+export class Home extends Component<HomeProps, State> {
   players: object;
   scrollIndex: number;
+  input: TextInput;
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Home',
@@ -88,6 +91,8 @@ class Home extends Component<HomeProps, State> {
       postId: '',
       repsId: '',
       repCount: 0,
+      showCommentModal: false,
+      mentionList: [],
     };
   }
 
@@ -103,14 +108,15 @@ class Home extends Component<HomeProps, State> {
       });
   }
 
-  sortByDate(array) {
+  sortByDate(array: Post[]) {
     return array.sort((a, b) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }
 
   render() {
-    const { uid, username, users, unreadCount } = this.props.profile;
+    const scrollRef = React.createRef<ScrollView>();
+    const { uid, username, unreadCount } = this.props.profile;
     let combined = { ...this.props.users, ...this.props.friends };
     return (
       <>
@@ -174,8 +180,8 @@ class Home extends Component<HomeProps, State> {
             autoCorrect={false}
             onChangeText={status => {
               this.setState({ status });
-              let friends = Object.values(this.props.friends);
-              let list = getMentionsList(status, friends);
+              const friends = Object.values(this.props.friends);
+              const list = getMentionsList(status, friends);
               list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
             }}
             placeholder="Post a status for your pals..."
@@ -267,7 +273,7 @@ class Home extends Component<HomeProps, State> {
 
         <ScrollView
           contentContainerStyle={{ backgroundColor: '#9993', flex: 1, paddingTop: 10 }}
-          ref="scrollView"
+          ref={scrollRef}
           onScroll={event => {
             this.scrollIndex = event.nativeEvent.contentOffset.y;
           }}
@@ -350,17 +356,17 @@ class Home extends Component<HomeProps, State> {
             padding: 5,
           }}
           swipeToClose={false}
-          onClosed={() => this.setState({ focusCommentInput: false })}
-          ref={'commentModal'}
+          isOpen={this.state.showCommentModal}
+          onClosed={() => this.setState({ focusCommentInput: false, showCommentModal: false })}
           backButtonClose={true}
           position={'center'}
         >
-          <TouchableOpacity onPress={() => this.refs.commentModal.close()}>
+          <TouchableOpacity onPress={() => this.setState({ showCommentModal: false })}>
             <Icon name={'ios-arrow-back'} size={30} style={{ color: '#000', padding: 10 }} />
           </TouchableOpacity>
           <Comments
             data={
-              this.state.postId && this.props.feed[this.state.postId] && this.props.feed[this.state.postId].comments
+              this.props.feed[this.state.postId]
                 ? this.props.feed[this.state.postId].comments
                 : []
             }
@@ -369,7 +375,7 @@ class Home extends Component<HomeProps, State> {
             editMinuteLimit={900}
             focusCommentInput={this.state.focusCommentInput}
             childrenPerPage={5}
-            lastCommentUpdate={this.state.lastCommentUpdate}
+            //lastCommentUpdate={this.state.lastCommentUpdate}
             users={Object.values(combined)}
             usernameTapAction={(username, uid) => {
               if (uid == this.props.profile.uid) {
@@ -410,13 +416,16 @@ class Home extends Component<HomeProps, State> {
             childrenCountExtractor={comment => comment.childrenCount}
             timestampExtractor={item => new Date(item.created_at).toISOString()}
             replyAction={offset => {
-              this.refs.scrollView.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
+              scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
             }}
-            saveAction={(text, parentCommentId) => {
+            saveAction={async (text, parentCommentId) => {
               if (text) {
-                this.props
+                try {
+                await this.props
                   .comment(this.props.profile.uid, this.state.postId, text, new Date().toString(), parentCommentId)
-                  .catch(e => Alert.alert('Error', e.message));
+                } catch(e) {
+                  Alert.alert('Error', e.message)
+                }
               }
             }}
             editAction={(text, comment) => {
@@ -439,7 +448,7 @@ class Home extends Component<HomeProps, State> {
                 this.props.getComments(this.state.postId, 10, fromComment.key);
               }
             }}
-            getCommentRepsUsers={(key, amount) => this.props.getCommentRepsUsers(key, amount)}
+            getCommentRepsUsers={(comment, amount) => this.props.getCommentRepsUsers(comment, amount)}
           />
         </ModalBox>
         <RepsModal
@@ -457,16 +466,14 @@ class Home extends Component<HomeProps, State> {
     if (Object.values(feed).length > 0) {
       return (
         <FlatList
-          ref={ref => (this.feed = ref)}
           data={this.sortByDate(Object.values(feed))}
           keyExtractor={item => item.key}
-          onRefresh={() => {
+          onRefresh={async () => {
             this.setState({ refreshing: true });
             this.props.getFriends();
             this.props.getProfile();
-            this.props.getPosts(this.props.profile.uid, 30).then(() => {
-              this.setState({ refreshing: false });
-            });
+            await this.props.getPosts(this.props.profile.uid, 30)
+            this.setState({ refreshing: false });
           }}
           // onEndReached={()=> {
           //   this.setState({fetchAmount: this.state.fetchAmount+15}, () => {
@@ -481,15 +488,14 @@ class Home extends Component<HomeProps, State> {
                   <TouchableOpacity
                     style={{ alignItems: 'center', paddingVertical: 10 }}
                     onPress={() => {
-                      let feed = Object.keys(feed);
-                      let endAt = feed[feed.length - 1];
-                      this.setState({ spinner: true }, () => {
-                        this.props.getPosts(this.props.profile.uid, 30, endAt).then(() => {
-                          if (Object.values(feed).length == initial) {
-                            this.setState({ loadMore: false });
-                          }
-                          this.setState({ spinner: false });
-                        });
+                      const keys = Object.keys(feed);
+                      const endAt = keys[keys.length - 1];
+                      this.setState({ spinner: true }, async () => {
+                        await this.props.getPosts(this.props.profile.uid, 30, endAt)
+                        if (Object.values(feed).length == initial) {
+                          this.setState({ loadMore: false });
+                        }
+                        this.setState({ spinner: false });
                       });
                     }}
                   >
@@ -676,9 +682,8 @@ class Home extends Component<HomeProps, State> {
             {!!item.commentCount && item.commentCount > 0 && (
               <TouchableOpacity
                 style={{ alignSelf: 'flex-end', flex: 1 }}
-                onPress={() => {
-                  this.refs.commentModal.open();
-                  this.setState({ postId: item.key });
+                onPress={() => {                  
+                  this.setState({ postId: item.key, showCommentModal: true });
                   this.props.getComments(item.key);
                 }}
               >
@@ -722,8 +727,7 @@ class Home extends Component<HomeProps, State> {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            this.refs.commentModal.open();
-            this.setState({ focusCommentInput: true, postId: item.key });
+            this.setState({ focusCommentInput: true, postId: item.key, showCommentModal: true });
             this.props.getComments(item.key);
           }}
           style={{ flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center' }}
@@ -854,7 +858,7 @@ class Home extends Component<HomeProps, State> {
       .stat(statURI)
       .then(stats => {
         console.log(stats);
-        if (stats.size < MAX_VIDEO_SIZE) {
+        if (parseInt(stats.size) < MAX_VIDEO_SIZE) {
           this.props.previewFile('video', uri, false, this.state.status);
         } else {
           Alert.alert('Error', 'Sorry the file size is too large');
@@ -891,7 +895,7 @@ class Home extends Component<HomeProps, State> {
           ) : (
             <Icon name="md-contact" style={{ fontSize: 40, color: colors.primary }} />
           )}
-          <Text style={[cStyles.likeName]}>{like.username}</Text>
+          <Text>{like.username}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -900,7 +904,7 @@ class Home extends Component<HomeProps, State> {
   async sharePost(item) {
     this.setState({ spinner: true });
     const username = this.props.profile.username;
-    const options = {
+    const options: Options = {
       message: `${username} shared a post from ActivePals:\n ${item.text ? '"' + item.text + '"' : ''}`,
       title: `Share ${item.type}?`,
     };
@@ -951,6 +955,7 @@ import { fetchProfile } from '../actions/profile';
 import { fetchFriends } from '../actions/friends';
 import Comment from '../types/Comment';
 import ImagePickerOptions from '../types/Shared';
+import Profile from '../types/Profile';
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,

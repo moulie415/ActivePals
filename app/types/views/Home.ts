@@ -1,6 +1,6 @@
 import Profile from '../Profile';
 import Post from '../Post';
-import Comment from '../../components/comments/Comment';
+import Comment from '../Comment';
 import Rep from '../Rep';
 
 export default interface HomeProps {
@@ -14,7 +14,7 @@ export default interface HomeProps {
   viewProfile: (uid: string) => void;
   postStatus: (status: Post) => Promise<void>;
   onRepPost: (item: Post) => void;
-  previewFile: (type: string, uri: string, message: string, text: string) => void;
+  previewFile: (type: string, uri: string, message: boolean, text: string) => void;
   comment: (uid, postId, text, created_at, parentCommentId) => void;
   getComments: (key: string, amount?: number, fromComment?: string) => void;
   repComment: (comment: Comment) => void;
@@ -25,4 +25,5 @@ export default interface HomeProps {
   getProfile: () => void;
   getFriends: () => void;
   navigateFullScreenVideo: (uri: string) => void;
+  getReplies: (parentComment: Comment, amount: number, key: string);
 }

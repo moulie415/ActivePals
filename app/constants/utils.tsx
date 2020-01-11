@@ -56,9 +56,9 @@ export function getType(type: SessionType, size: number, tintColor?: string) {
 }
 
 export const getMentionsList = (status, friends) => {
-  let split = status.split(' ');
-  let last = split[split.length - 1];
-  let reduced = last.substring(1);
+  const split = status.split(' ');
+  const last = split[split.length - 1];
+  const reduced = last.substring(1);
   if (status && last && str.mentionRegex.test(last)) {
     const filtered = friends.filter(friend => {
       return friend.username && friend.username.toLowerCase().includes(reduced.toLowerCase());

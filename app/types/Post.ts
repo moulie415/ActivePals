@@ -1,3 +1,5 @@
+import Comment from "./Comment";
+
 export default interface Post {
     createdAt: string;
     text?: string;
@@ -6,6 +8,8 @@ export default interface Post {
     commentCount?: number;
     uid: string;
     username: string;
+    comments?: Comment[];
+    key?: string;
 }
 
 export enum PostType {
