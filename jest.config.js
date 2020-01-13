@@ -4,6 +4,8 @@ module.exports = {
     setupFiles: [
       "<rootDir>/jest/setup.js"
     ],
+    collectCoverage: true,
+    collectCoverageFrom: ['app/**/*.{ts,tsx}'],
     // setupFilesAfterEnv: [
     //   '<rootDir>/__tests__/__mocks__/firebase.ts',
     //   '<rootDir>/__tests__/__mocks__/@react-native-community/geolocation.ts',
