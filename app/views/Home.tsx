@@ -230,17 +230,20 @@ export class Home extends Component<HomeProps, State> {
                     { text: 'Cancel', style: 'cancel' },
                     {
                       text: 'Yes',
-                      onPress: () => {
-                        this.props
-                          .postStatus({
-                            type: PostType.STATUS,
-                            text: this.state.status,
-                            uid,
-                            username,
-                            createdAt: new Date().toString(),
-                          })
-                          .then(() => this.setState({ status: '' }))
-                          .catch(e => Alert.alert('Error', e.message));
+                      onPress: async () => {
+                        try {
+                          await this.props
+                            .postStatus({
+                              type: PostType.STATUS,
+                              text: this.state.status,
+                              uid,
+                              username,
+                              createdAt: new Date().toString(),
+                            })
+                          this.setState({ status: '' });
+                        } catch(e) {
+                          Alert.alert('Error', e.message);
+                        }
                       },
                     },
                   ]);

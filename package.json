@@ -78,7 +78,7 @@
     "redux-persist": "^5.10.0",
     "redux-persist-transform-filter": "0.0.18",
     "redux-thunk": "^2.3.0",
-    "rn-fetch-blob": "^0.10.13"
+    "rn-fetch-blob": "0.10.15"
   },
   "jest": {
     "preset": "react-native"

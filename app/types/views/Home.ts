@@ -12,7 +12,7 @@ export default interface HomeProps {
   viewPost: (id: string) => void;
   goToProfile: () => void;
   viewProfile: (uid: string) => void;
-  postStatus: (status: Post) => Promise<void>;
+  postStatus: (status: Post) => void;
   onRepPost: (item: Post) => void;
   previewFile: (type: string, uri: string, message: boolean, text: string) => void;
   comment: (uid, postId, text, created_at, parentCommentId) => void;
