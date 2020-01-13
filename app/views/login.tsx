@@ -174,7 +174,7 @@ class Login extends Component {
       AccessToken.getCurrentAccessToken().then(data => {
         const token = data.accessToken;
         fetch(
-          'https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,gender,birthday&access_token=' +
+          'https://graph.facebook.com/v5.0/me?fields=id,email,first_name,last_name,gender,birthday&access_token=' +
             token
         )
           .then(response => response.json())
