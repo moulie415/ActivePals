@@ -19,61 +19,70 @@ PODS:
     - FBSDKShareKit/Share (= 5.6.0)
   - FBSDKShareKit/Share (5.6.0):
     - FBSDKCoreKit (~> 5.0)
-  - Firebase/Auth (6.3.0):
+  - Firebase/Auth (6.13.0):
     - Firebase/CoreOnly
-    - FirebaseAuth (~> 6.1.2)
-  - Firebase/Core (6.3.0):
+    - FirebaseAuth (~> 6.4.0)
+  - Firebase/Core (6.13.0):
     - Firebase/CoreOnly
-    - FirebaseAnalytics (= 6.0.2)
-  - Firebase/CoreOnly (6.3.0):
-    - FirebaseCore (= 6.0.3)
-  - Firebase/Database (6.3.0):
+    - FirebaseAnalytics (= 6.1.6)
+  - Firebase/CoreOnly (6.13.0):
+    - FirebaseCore (= 6.4.0)
+  - Firebase/Database (6.13.0):
     - Firebase/CoreOnly
-    - FirebaseDatabase (~> 6.0.0)
-  - Firebase/Messaging (6.3.0):
+    - FirebaseDatabase (~> 6.1.2)
+  - Firebase/Messaging (6.13.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 4.1.0)
-  - Firebase/Storage (6.3.0):
+    - FirebaseMessaging (~> 4.1.9)
+  - Firebase/Storage (6.13.0):
     - Firebase/CoreOnly
-    - FirebaseStorage (~> 3.2.1)
-  - FirebaseAnalytics (6.0.2):
-    - FirebaseCore (~> 6.0)
+    - FirebaseStorage (~> 3.4.2)
+  - FirebaseAnalytics (6.1.6):
+    - FirebaseCore (~> 6.4)
     - FirebaseInstanceID (~> 4.2)
-    - GoogleAppMeasurement (= 6.0.2)
+    - GoogleAppMeasurement (= 6.1.6)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
-    - nanopb (~> 0.3)
+    - nanopb (= 0.3.9011)
   - FirebaseAnalyticsInterop (1.4.0)
-  - FirebaseAuth (6.1.2):
+  - FirebaseAuth (6.4.1):
     - FirebaseAuthInterop (~> 1.0)
-    - FirebaseCore (~> 6.0)
+    - FirebaseCore (~> 6.2)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.2)
     - GoogleUtilities/Environment (~> 6.2)
     - GTMSessionFetcher/Core (~> 1.1)
   - FirebaseAuthInterop (1.0.0)
-  - FirebaseCore (6.0.3):
-    - GoogleUtilities/Environment (~> 6.0)
-    - GoogleUtilities/Logger (~> 6.0)
-  - FirebaseDatabase (6.0.0):
+  - FirebaseCore (6.4.0):
+    - FirebaseCoreDiagnostics (~> 1.0)
+    - FirebaseCoreDiagnosticsInterop (~> 1.0)
+    - GoogleUtilities/Environment (~> 6.2)
+    - GoogleUtilities/Logger (~> 6.2)
+  - FirebaseCoreDiagnostics (1.1.2):
+    - FirebaseCoreDiagnosticsInterop (~> 1.0)
+    - GoogleDataTransportCCTSupport (~> 1.0)
+    - GoogleUtilities/Environment (~> 6.2)
+    - GoogleUtilities/Logger (~> 6.2)
+    - nanopb (~> 0.3.901)
+  - FirebaseCoreDiagnosticsInterop (1.1.0)
+  - FirebaseDatabase (6.1.3):
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 6.0)
-    - leveldb-library (~> 1.18)
+    - leveldb-library (~> 1.22)
   - FirebaseInstanceID (4.2.7):
     - FirebaseCore (~> 6.0)
     - GoogleUtilities/Environment (~> 6.0)
     - GoogleUtilities/UserDefaults (~> 6.0)
-  - FirebaseMessaging (4.1.1):
-    - FirebaseAnalyticsInterop (~> 1.1)
-    - FirebaseCore (~> 6.0)
+  - FirebaseMessaging (4.1.10):
+    - FirebaseAnalyticsInterop (~> 1.3)
+    - FirebaseCore (~> 6.2)
     - FirebaseInstanceID (~> 4.1)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.2)
     - GoogleUtilities/Environment (~> 6.2)
     - GoogleUtilities/Reachability (~> 6.2)
     - GoogleUtilities/UserDefaults (~> 6.2)
-    - Protobuf (~> 3.1)
-  - FirebaseStorage (3.2.1):
+    - Protobuf (>= 3.9.2, ~> 3.9)
+  - FirebaseStorage (3.4.3):
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 6.0)
     - GTMSessionFetcher/Core (~> 1.1)
@@ -95,12 +104,16 @@ PODS:
     - GoogleMaps
   - Google-Mobile-Ads-SDK (7.53.1):
     - GoogleAppMeasurement (~> 6.0)
-  - GoogleAppMeasurement (6.0.2):
+  - GoogleAppMeasurement (6.1.6):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
-    - nanopb (~> 0.3)
+    - nanopb (= 0.3.9011)
+  - GoogleDataTransport (3.2.0)
+  - GoogleDataTransportCCTSupport (1.2.3):
+    - GoogleDataTransport (~> 3.2)
+    - nanopb (~> 0.3.901)
   - GoogleMaps (3.1.0):
     - GoogleMaps/Maps (= 3.1.0)
   - GoogleMaps/Base (3.1.0)
@@ -231,11 +244,11 @@ DEPENDENCIES:
   - FBSDKCoreKit (~> 5.6.0)
   - FBSDKLoginKit (~> 5.6.0)
   - FBSDKShareKit (~> 5.6.0)
-  - Firebase/Auth (~> 6.3.0)
-  - Firebase/Core (~> 6.3.0)
-  - Firebase/Database (~> 6.3.0)
-  - Firebase/Messaging (~> 6.3.0)
-  - Firebase/Storage (~> 6.3.0)
+  - Firebase/Auth (~> 6.13.0)
+  - Firebase/Core (~> 6.13.0)
+  - Firebase/Database (~> 6.13.0)
+  - Firebase/Messaging (~> 6.13.0)
+  - Firebase/Storage (~> 6.13.0)
   - Google-Mobile-Ads-SDK
   - GoogleMaps
   - GoogleSignIn (~> 4.4.0)
@@ -281,6 +294,8 @@ SPEC REPOS:
     - FirebaseAuth
     - FirebaseAuthInterop
     - FirebaseCore
+    - FirebaseCoreDiagnostics
+    - FirebaseCoreDiagnosticsInterop
     - FirebaseDatabase
     - FirebaseInstanceID
     - FirebaseMessaging
@@ -288,6 +303,8 @@ SPEC REPOS:
     - Google-Maps-iOS-Utils
     - Google-Mobile-Ads-SDK
     - GoogleAppMeasurement
+    - GoogleDataTransport
+    - GoogleDataTransportCCTSupport
     - GoogleMaps
     - GoogleSignIn
     - GoogleToolboxForMac
@@ -340,19 +357,23 @@ SPEC CHECKSUMS:
   FBSDKCoreKit: d6655a343868d4bb5c29a60859bab07c3be14a0b
   FBSDKLoginKit: c5a623de88a6b0cda35b35582921f6cec2efcc36
   FBSDKShareKit: 0d8c4cfd5c1f185d5f9c26d79758b141086e1251
-  Firebase: 8432d732974498afd5987e9001a05f90f1a3d625
-  FirebaseAnalytics: 470ddab7253b21ad5a40bebd4a9903d7ae19386a
+  Firebase: 458d109512200d1aca2e1b9b6cf7d68a869a4a46
+  FirebaseAnalytics: 45f36d9c429fc91d206283900ab75390cd05ee8a
   FirebaseAnalyticsInterop: d48b6ab67bcf016a05e55b71fc39c61c0cb6b7f3
-  FirebaseAuth: 7fa2cc010b93770831a4e7a60651b52c3b8d111a
+  FirebaseAuth: 831577b184ecaba38bc886768c1c22a450cc44e3
   FirebaseAuthInterop: 0ffa57668be100582bb7643d4fcb7615496c41fc
-  FirebaseCore: 68f8a7f50cdae542715d4e86afa37c4067217dcb
-  FirebaseDatabase: f48e067716864be2b855cf716b927ef375d6cfa0
+  FirebaseCore: 307ea2508df730c5865334e41965bd9ea344b0e5
+  FirebaseCoreDiagnostics: 511f4f3ed7d440bb69127e8b97c2bc8befae639e
+  FirebaseCoreDiagnosticsInterop: e9b1b023157e3a2fc6418b5cb601e79b9af7b3a0
+  FirebaseDatabase: 9db0c9bb6d3308870cc831a8a6d70c82fd169f37
   FirebaseInstanceID: ebd2ea79ee38db0cb5f5167b17a0d387e1cc7b6e
-  FirebaseMessaging: 6bb0bdaf64c55fef7a219b7bb1e94e94a0855ced
-  FirebaseStorage: 926d41552072b9fee67aa645760f05f87b7ce604
+  FirebaseMessaging: 089b7a4991425783384acc8bcefcd78c0af913bd
+  FirebaseStorage: 93fe2f8190a01bfb2b2c4932df7d679744c4ef1d
   Google-Maps-iOS-Utils: c32891ff472eaaa1fca032beedafa1a013af7875
   Google-Mobile-Ads-SDK: fac081606dbd438d8db57198b83ba8b5f875a601
-  GoogleAppMeasurement: a35a645835bae31b6bdc0576396bc23908f12a22
+  GoogleAppMeasurement: dfe55efa543e899d906309eaaac6ca26d249862f
+  GoogleDataTransport: 8e9b210c97d55fbff306cc5468ff91b9cb32dcf5
+  GoogleDataTransportCCTSupport: 202d7cdf9c4a7d81a2bb7f7e7e1ba6faa421b1f2
   GoogleMaps: 5c13302e6fe6bb6e686b267196586b91cd594225
   GoogleSignIn: 7ff245e1a7b26d379099d3243a562f5747e23d39
   GoogleToolboxForMac: 800648f8b3127618c1b59c7f97684427630c5ea3
@@ -379,6 +400,6 @@ SPEC CHECKSUMS:
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: 03ff42a6f223fb88deeaed60249020d80c3091ee
 
-PODFILE CHECKSUM: 9c97d03b2637681ac9788ee60e73baf8dfe8ab9b
+PODFILE CHECKSUM: 9061af049997c9bedf8aa058d6f28d54983b2a90
 
 COCOAPODS: 1.8.4
