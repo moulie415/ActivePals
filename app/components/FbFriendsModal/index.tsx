@@ -1,20 +1,15 @@
-import React, { Component } from 'react'
-import Modal from 'react-native-modalbox'
-import styles from './styles'
-import {
-  View,
-  ScrollView,
-  Platform,
-  Alert,
-  TouchableOpacity
-} from 'react-native'
-import Image from 'react-native-fast-image'
-import Icon from 'react-native-vector-icons/Ionicons'
-import colors from '../../constants/colors'
-import { getFbFriends } from '../../actions/friends'
-import { PulseIndicator } from 'react-native-indicators'
-import Text, { globalTextStyle } from '../../components/Text'
-import Button from '../Button'
+import React, { Component } from 'react';
+import Modal from 'react-native-modalbox';
+import { PulseIndicator } from 'react-native-indicators';
+import Image from 'react-native-fast-image';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
+import { View, ScrollView, Platform, Alert, TouchableOpacity } from 'react-native';
+import colors from '../../constants/colors';
+import Text, { globalTextStyle } from '../Text';
+import Button from '../Button';
+import styles from './styles';
+import { sendRequest, getFbFriends } from '../../actions/friends';
 
 class FbFriendsModal extends Component {
 
@@ -141,18 +136,14 @@ class FbFriendsModal extends Component {
   }
 }
 
-import { connect } from 'react-redux'
-import { sendRequest } from '../../actions/friends';
-
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,
-  profile: profile.profile
+  profile: profile.profile,
 })
 
 const mapDispatchToProps = dispatch => ({
-  request: (friendUid) => dispatch(sendRequest(friendUid))
-})
-
+  request: friendUid => dispatch(sendRequest(friendUid)),
+});
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(FbFriendsModal)
