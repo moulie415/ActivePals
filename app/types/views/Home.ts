@@ -25,5 +25,5 @@ export default interface HomeProps {
   getProfile: () => void;
   getFriends: () => void;
   navigateFullScreenVideo: (uri: string) => void;
-  getReplies: (parentComment: Comment, amount: number, key: string);
+  getReplies: (parentComment: Comment, amount: number, key: string) => void;
 }
