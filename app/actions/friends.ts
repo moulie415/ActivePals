@@ -1,24 +1,22 @@
-import firebase from 'react-native-firebase'
-import { removeChat, addChat } from './chats'
-import { fetchPrivateSessions } from './sessions'
-import { upUnreadCount, fetchUsers } from './home'
-import { UserState } from '../types/Profile'
-export const SET_FRIENDS = 'SET_FRIENDS'
-export const ADD_FRIEND = 'ADD_FRIEND'
-export const UPDATE_FRIEND_STATE = 'UPDATE_FRIEND_STATE'
+import firebase from 'react-native-firebase';
+import { removeChat, addChat } from './chats';
+import { fetchPrivateSessions } from './sessions';
+import { upUnreadCount, fetchUsers } from './home';
+import { UserState } from '../types/Profile';
+export const SET_FRIENDS = 'SET_FRIENDS';
+export const ADD_FRIEND = 'ADD_FRIEND';
+export const UPDATE_FRIEND_STATE = 'UPDATE_FRIEND_STATE';
 
+const setFriends = friends => ({
+  type: SET_FRIENDS,
+  friends,
+});
 
-
-const setFriends = (friends) => ({
-	type: SET_FRIENDS,
-	friends,
-})
-
-const addToFriends = (uid,friend) => ({
-	type: ADD_FRIEND,
-	uid,
-	friend,
-})
+const addToFriends = (uid, friend) => ({
+  type: ADD_FRIEND,
+  uid,
+  friend,
+});
 
 export const updateFriendState = (uid, state) => ({
 	type: UPDATE_FRIEND_STATE,
@@ -117,7 +115,7 @@ export const addFriend = (uid) => {
 	}
 }
 
-export const sendRequest = (friendUid) => {
+export const sendRequest = friendUid => {
 	return (dispatch, getState) => {
 		const uid = getState().profile.profile.uid
 		const promise1 = firebase.database().ref('users/' + uid + '/friends').child(friendUid).set("outgoing")

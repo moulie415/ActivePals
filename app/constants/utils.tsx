@@ -303,5 +303,24 @@ export const addCommentIds = (comments: Comment[]) => {
   });
 };
 
+export const getNameString = friend => {
+  let string = '';
+  if (friend.username) {
+    string += friend.username;
+    if (friend.first_name) {
+      string += ` (${friend.first_name}`;
+      if (friend.last_name) {
+        string += ` ${friend.last_name})`;
+      } else string += ')';
+    }
+  } else {
+    string += 'No username set ';
+    if (friend.name) {
+      string += `(${friend.name})`;
+    }
+  }
+  return string;
+};
+
 export const dedupeSortAndAddCommentIds = pipe(dedupeComments, sortComments, addCommentIds);
 export const sortAndAddCommentIds = pipe(sortComments, addCommentIds)

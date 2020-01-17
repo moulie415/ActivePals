@@ -1,12 +1,12 @@
- import firebase from 'react-native-firebase'
-export const SET_PROFILE = 'SET_PROFILE'
-export const SET_LOGGED_IN = 'SET_LOGGED_IN'
-export const SET_LOGGED_OUT = 'SET_LOGGED_OUT'
-export const SET_GYM = 'SET_GYM'
-export const REMOVE_GYM = 'REMOVE_GYM'
-export const SET_LOCATION = 'SET_LOCATION'
-export const SET_HAS_VIEWED_WELCOME = 'SET_HAS_VIEWED_WELCOME'
-export const SET_ENV_VARS = 'SET_ENV_VARS'
+import firebase from 'react-native-firebase';
+export const SET_PROFILE = 'SET_PROFILE';
+export const SET_LOGGED_IN = 'SET_LOGGED_IN';
+export const SET_LOGGED_OUT = 'SET_LOGGED_OUT';
+export const SET_GYM = 'SET_GYM';
+export const REMOVE_GYM = 'REMOVE_GYM';
+export const SET_LOCATION = 'SET_LOCATION';
+export const SET_HAS_VIEWED_WELCOME = 'SET_HAS_VIEWED_WELCOME';
+export const SET_ENV_VARS = 'SET_ENV_VARS';
 import { fetchFriends } from './friends'
 import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat, getUnreadCount } from './chats'
 import { fetchPosts } from './home'
@@ -15,26 +15,21 @@ import { navigateLogin, navigateHome, navigateWelcome } from './navigation'
 import { UserState } from '../types/Profile'
 
 
-const setProfile = (profile) => ({
-	type: SET_PROFILE,
-	profile,
-})
+const setProfile = profile => ({
+  type: SET_PROFILE,
+  profile,
+});
 
-const setEnvVars = (vars) => ({
-	type: SET_ENV_VARS,
-	vars
-})
-
-export const setHasLoggedIn = (loggedIn) => ({
-	type: SET_LOGGED_IN,
-	loggedIn,
-})
+export const setHasLoggedIn = loggedIn => ({
+  type: SET_LOGGED_IN,
+  loggedIn,
+});
 
 export const setLoggedOut = () => ({
 	type: SET_LOGGED_OUT,
 })
 
-export const setGym = (gym) => ({
+export const setGym = gym => ({
 	type: SET_GYM,
 	gym,
 })
@@ -43,9 +38,9 @@ export const resetGym = () => ({
 	type: REMOVE_GYM,
 })
 
-export const setLocation = (location) => ({
+export const setLocation = location => ({
 	type: SET_LOCATION,
-	location
+	location,
 })
 
 export const setHasViewedWelcome = () => ({
