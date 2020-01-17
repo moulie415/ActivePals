@@ -20,8 +20,21 @@ import Header from '../components/Header/header'
 import Image from 'react-native-fast-image'
 import Text from '../components/Text'
 import Button from '../components/Button'
+import { connect } from 'react-redux'
+import { navigateMessaging, navigateProfileView } from '../actions/navigation'
+import {
+  fetchFriends,
+  sendRequest,
+  acceptRequest,
+  deleteFriend,
+  removeFriend,
+  addFriend,
+  updateFriendState,
+} from '../actions/friends'
+import { removeChat, addChat } from '../actions/chats'
+import { UserState } from "../types/Profile"
 
- class Friends extends Component {
+class Friends extends Component {
   static navigationOptions = {
     header: null,
     tabBarLabel: 'Pals',
@@ -107,65 +120,6 @@ import Button from '../components/Button'
     }
   }
 
-  render () {
-    return (
-    <>
-      <Header 
-        title={'Pals'}
-        right={<TouchableOpacity onPress={() => {
-        firebase.database().ref('users/' + this.uid).child('username')
-          .once('value', snapshot => {
-            snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a pal")
-          })
-          }}>
-            <Icon name='md-add' size={25} style={{color: '#fff', padding: 5}} />
-          </TouchableOpacity>}
-      />
-      <ScrollView contentContainerStyle={{flex: 1}}>
-      {Object.values(this.props.friends).length > 0 ?
-      this.renderFriends() :
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
-            <Text style={{color: colors.primary, textAlign: 'center'}}>
-            {"You don't have any pals yet, also please make sure you are connected to the internet"}
-          </Text></View>}
-
-      <Modal
-        backButtonClose={true}
-        backdropPressToClose={false}
-        style={styles.modal}
-        position={"center"}
-        ref={"modal"}>
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
-          Send pal request</Text>
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <TextInput
-            underlineColorAndroid='transparent'
-            style={styles.usernameInput}
-            autoCapitalize={'none'}
-            placeholder={'Enter username'}
-            onChangeText={username => this.username = username}
-            />
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10}}>
-          <Button onPress={()=> {
-            this.refs.modal.close()
-          }}
-          text='Cancel'
-          color='red'/>
-      
-          <Button onPress={()=> {
-            this.sendRequest(this.username)
-          }}
-          text='Submit'/>
-          
-          </View>
-        </Modal>
-        </ScrollView>
-    </>
-  )
-  }
-
 
   renderFriends() {
     return <FlatList 
@@ -245,6 +199,67 @@ import Button from '../components/Button'
     />
   }
 
+  render () {
+    return (
+    <>
+      <Header 
+        title={'Pals'}
+        right={<TouchableOpacity onPress={() => {
+        firebase.database().ref('users/' + this.uid).child('username')
+          .once('value', snapshot => {
+            snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a pal")
+          })
+          }}>
+            <Icon name='md-add' size={25} style={{color: '#fff', padding: 5}} />
+          </TouchableOpacity>}
+      />
+      <ScrollView contentContainerStyle={{flex: 1}}>
+      {Object.values(this.props.friends).length > 0 ?
+      this.renderFriends() :
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
+            <Text style={{color: colors.primary, textAlign: 'center'}}>
+            {"You don't have any pals yet, also please make sure you are connected to the internet"}
+          </Text></View>}
+
+      <Modal
+        backButtonClose={true}
+        backdropPressToClose={false}
+        style={styles.modal}
+        position={"center"}
+        ref={"modal"}>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
+          Send pal request</Text>
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <TextInput
+            underlineColorAndroid='transparent'
+            style={styles.usernameInput}
+            autoCapitalize={'none'}
+            placeholder={'Enter username'}
+            onChangeText={username => this.username = username}
+            />
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10}}>
+          <Button onPress={()=> {
+            this.refs.modal.close()
+          }}
+          text='Cancel'
+          color='red'/>
+      
+          <Button onPress={()=> {
+            this.sendRequest(this.username)
+          }}
+          text='Submit'/>
+          
+          </View>
+        </Modal>
+        </ScrollView>
+    </>
+  )
+  }
+
+
+
   accept(friend) {
     this.props.onAccept(this.uid, friend)
     .then(() => {
@@ -312,20 +327,6 @@ const getStateVal = (state) => {
       return 1
   }
 }
-
-import { connect } from 'react-redux'
-import { navigateMessaging, navigateProfileView } from '../actions/navigation'
-import {
-  fetchFriends,
-  sendRequest,
-  acceptRequest,
-  deleteFriend,
-  removeFriend,
-  addFriend,
-  updateFriendState,
-} from '../actions/friends'
-import { removeChat, addChat } from '../actions/chats'
-import { UserState } from "../types/Profile"
 
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,

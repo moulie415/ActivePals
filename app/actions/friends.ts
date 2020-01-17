@@ -19,10 +19,10 @@ const addToFriends = (uid, friend) => ({
 });
 
 export const updateFriendState = (uid, state) => ({
-	type: UPDATE_FRIEND_STATE,
-	uid,
-	state
-})
+  type: UPDATE_FRIEND_STATE,
+  uid,
+  state,
+});
 
 export const removeFriend = (uid) => {
 	return (dispatch, getState) => {
