@@ -21,7 +21,7 @@ export enum AccountType {
 }
 
 export enum UserState {
-    ONLINE = 'online',
-    AWAY = 'away',
-    OFFLINE = 'offline'
-}
+  ONLINE = 'online',
+  AWAY = 'away',
+  OFFLINE = 'offline',
+};

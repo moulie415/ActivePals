@@ -161,7 +161,7 @@ export const fetchPosts = (uid, amount = 30, endAt) => {
 						promises.push(firebase.database().ref('posts/' + post).once('value'))
 						const ref = firebase.database().ref('posts/' + post)
 						ref.on('child_changed', child => {
-								if (child.key == 'repCount') {
+								if (child.key === 'repCount') {
 									const obj = getState().home.feed[post]
 									if (obj) {
 										obj.repCount = child.val()

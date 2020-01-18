@@ -48,88 +48,91 @@ export const setHasViewedWelcome = () => ({
 });
 
 const setupPresence = uid => {
-	const ref = firebase.database().ref('users/' + uid).child('state')
-	const connectedRef = firebase.database().ref('.info/connected')
-	connectedRef.on('value', (snap) => {
-	if (snap.val() === true) {
-		ref.onDisconnect().remove()
-		ref.set(UserState.ONLINE)
-	}
-	})
+  const ref = firebase.database().ref('users/' + uid).child('state');
+  const connectedRef = firebase.database().ref('.info/connected');
+  connectedRef.on('value', snap => {
+    if (snap.val() === true) {
+      ref.onDisconnect().remove();
+      ref.set(UserState.ONLINE);
+    }
+  });
 };
+
+const fetchGym = async (profile, dispatch) => {
+  if (profile.gym) {
+    const snapshot = await firebase
+      .database()
+      .ref('gyms/' + profile.gym)
+      .once('value');
+    const gym = await fetchPhotoPath(snapshot.val());
+    dispatch(setGym(gym));
+  }
+}
 
 export const fetchProfile = () => {
   return async dispatch => {
     const user = firebase.auth().currentUser;
-    const envVar = await firebase.database().ref('ENV_VARS').child('GOOGLE_API_KEY').once('value')
+    const envVar = await firebase
+      .database()
+      .ref('ENV_VARS')
+      .child('GOOGLE_API_KEY')
+      .once('value');
     const GOOGLE_API_KEY = envVar.val();
-    process.env.GOOGLE_API_KEY = GOOGLE_API_KEY
-    //dispatch(setEnvVars(envVars.val()))
-    return new Promise(resolve => {
-      firebase.database().ref('users/' + user.uid).once('value', snapshot => {
-        firebase.storage().ref('images/' + user.uid ).child('avatar').getDownloadURL()
-        .then(url => {
-          dispatch(setProfile({...snapshot.val(), avatar: url}))
-          fetchGym(snapshot.val(), dispatch)
-          resolve({...snapshot.val(), avatar: url})
-        })
-        .catch(e => {
-          dispatch(setProfile(snapshot.val()))
-          fetchGym(snapshot.val(), dispatch)
-          resolve(snapshot.val())
-        })
-      })
-    })
-  }
-}
-
-const fetchGym = (profile, dispatch) => {
-  if (profile.gym) {
-    firebase.database().ref('gyms/' + profile.gym).once('value', gym => {
-      fetchPhotoPath(gym.val()).then(gym => {
-        dispatch(setGym(gym))
-      })
-    })
-  }
-}
+    process.env.GOOGLE_API_KEY = GOOGLE_API_KEY;
+    const snapshot = await firebase
+      .database()
+      .ref(`users/${user.uid}`)
+      .once('value');
+    try {
+      const url = await firebase
+        .storage()
+        .ref(`images/${user.uid}`)
+        .child('avatar')
+        .getDownloadURL();
+      dispatch(setProfile({ ...snapshot.val(), avatar: url }));
+      fetchGym(snapshot.val(), dispatch);
+      return { ...snapshot.val(), avatar: url };
+    } catch (e) {
+      dispatch(setProfile(snapshot.val()));
+      fetchGym(snapshot.val(), dispatch);
+      return snapshot.val();
+    }
+  };
+};
 
 export const doSetup = profile => {
   return async (dispatch, getState) => {
-    const uid = profile.uid
-    setupPresence(uid)
+    const { uid } = profile;
+    setupPresence(uid);
     try {
       const fcmToken = await firebase.messaging().getToken();
       if (fcmToken) {
         firebase.database().ref('users/' + uid).child('FCMToken').set(fcmToken)
         console.log('fcm token: ' + fcmToken)
-      } 
-      else {
+      } else {
         console.warn('no token')
       }
-    } catch(e) {
+    } catch (e) {
       console.warn(e)
     }
-    const friends = profile.friends
+    const { friends } = profile;
     if (getState().nav.index == 0) {
       if (getState().profile.hasViewedWelcome) {
         dispatch(navigateHome())
-      }
-      else {
+      } else {
         dispatch(navigateWelcome())
       }
     }
     dispatch(setHasLoggedIn(true));
     dispatch(getUnreadCount(uid));
-    return dispatch(fetchFriends(friends)).then(() => {
-        profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid))
-        profile.chats && dispatch(fetchChats(profile.chats))
-        profile.gym && dispatch(fetchGymChat(profile.gym))
-        dispatch(fetchPosts(uid))
-        dispatch(fetchSessions())
-    })
-
-  }
-}
+    await dispatch(fetchFriends(uid));
+    profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid));
+    profile.chats && dispatch(fetchChats(profile.chats));
+    profile.gym && dispatch(fetchGymChat(profile.gym));
+    dispatch(fetchPosts(uid));
+    dispatch(fetchSessions());
+  };
+};
 
 export const removeUser = () => {
 	return dispatch => {
@@ -143,18 +146,25 @@ export const removeUser = () => {
 }
 
 export const removeGym = () => {
-	return (dispatch, getState) => {
-		let currentGym = getState().profile.gym.place_id
-		let uid = getState().profile.profile.uid
-		firebase.database().ref('users/' + uid).child('gym').set(null)
-		firebase.database().ref('gyms').child(currentGym).once('value', gym => {
-			let count = gym.val().userCount - 1
-			firebase.database().ref('gyms/' + currentGym).child('userCount').set(count)
-			firebase.database().ref('gyms/' + currentGym + '/users').child(uid).remove()
-		})
-		dispatch(resetGym())
-		dispatch(setGymChat(null))
-	}
+  return async (dispatch, getState) => {
+    const currentGym = getState().profile.gym.place_id;
+    const { uid } = getState().profile.profile;
+    firebase
+      .database()
+      .ref('users/' + uid)
+      .child('gym')
+      .set(null);
+    const gym = await firebase
+      .database()
+      .ref('gyms')
+      .child(currentGym)
+      .once('value');
+    const count = gym.val().userCount - 1;
+    firebase.database().ref('gyms/' + currentGym).child('userCount').set(count);
+    firebase.database().ref('gyms/' + currentGym + '/users').child(uid).remove();
+    dispatch(resetGym());
+    dispatch(setGymChat(null));
+  }
 }
 
 export const joinGym = location => {

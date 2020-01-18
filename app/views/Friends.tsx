@@ -13,9 +13,7 @@ import firebase from 'react-native-firebase'
 import colors from '../constants/colors'
 import Modal from 'react-native-modalbox'
 import styles from '../styles/friendsStyles'
-import sStyles from '../styles/sessionStyles'
-import globalStyles from '../styles/globalStyles'
-import { arraysEqual, getStateColor } from '../constants/utils'
+import { getStateColor } from '../constants/utils'
 import Header from '../components/Header/header'
 import Image from 'react-native-fast-image'
 import Text from '../components/Text'
@@ -59,12 +57,12 @@ class Friends extends Component {
   }
 
   componentDidMount() {
-    this.listenForFriends()
-    this.listenForState()
+    this.listenForFriends();
+    this.listenForState();
   }
 
   listenForFriends() {
-    let ref = firebase.database().ref('users/' + this.uid + '/friends')
+    const ref = firebase.database().ref('users/' + this.uid + '/friends')
     ref.on('child_added', snapshot => {
       if (!this.props.friends[snapshot.key]) {
         this.listenForState()
@@ -277,28 +275,24 @@ class Friends extends Component {
 
   }
 
-  sendRequest(username) {
-    if (username != this.props.profile.username) {
-      firebase.database().ref('usernames/' + username).once('value').then(snapshot => {
+  async sendRequest(username) {
+    if (username !== this.props.profile.username) {
+      try {
+      const snapshot = await firebase.database().ref('usernames/' + username).once('value')
         if (snapshot.val()) {
-        firebase.database().ref('users/' + this.uid + '/friends').child(snapshot.val()).once('value', status => {
+          const status = await firebase.database().ref('userFriends/' + this.uid).child(snapshot.val()).once('value')
           if (status.val()) {
-            Alert.alert('Sorry', "You've already added this user as a pal")
+            Alert.alert('Sorry', "You've already added this user as a pal");
+          } else {
+            await this.props.onRequest(snapshot.val());
+            Alert.alert("Success", "Request sent")
+            this.refs.modal.close()
           }
-          else {
-            this.props.onRequest(snapshot.val()).then(() => {
-              Alert.alert("Success", "Request sent")
-              this.refs.modal.close()
-            })
-            .catch(e => Alert.alert("Error", e.message))
-          }
-        })
-      }
-      else Alert.alert('Sorry','Username does not exist')
-      })
-      .catch(e => Alert.alert("Error", e.message))
-    }
-    else {
+      } else Alert.alert('Sorry','Username does not exist')
+     } catch(e) {
+      Alert.alert("Error", e.message)
+     }
+    } else {
       Alert.alert("Error", "You cannot add yourself as a pal")
     }
   }
@@ -317,34 +311,34 @@ class Friends extends Component {
   }
 }
 
-const getStateVal = (state) => {
-  switch(state) {
+const getStateVal = state => {
+  switch (state) {
     case UserState.ONLINE:
-      return 3
+      return 3;
     case UserState.AWAY:
-      return 2
-    default :
-      return 1
+      return 2;
+    default:
+      return 1;
   }
-}
+};
 
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,
   profile: profile.profile,
-})
+});
 
 const mapDispatchToProps = dispatch => ({
-  getFriends: (uids)=> dispatch(fetchFriends(uids)),
-  onRequest: (friendUid)=> dispatch(sendRequest(friendUid)),
-  onAccept: (uid, friendUid)=> dispatch(acceptRequest(uid, friendUid)),
-  onRemove: (uid)=> {return dispatch(deleteFriend(uid))},
-  removeLocal: (uid) => dispatch(removeFriend(uid)),
-  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
+  getFriends: uids => dispatch(fetchFriends(uids)),
+  onRequest: friendUid => dispatch(sendRequest(friendUid)),
+  onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
+  onRemove: uid => dispatch(deleteFriend(uid)),
+  removeLocal: uid => dispatch(removeFriend(uid)),
+  viewProfile: uid => dispatch(navigateProfileView(uid)),
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
-  add: (friend) => dispatch(addFriend(friend)),
-  addChat: (chat) => dispatch(addChat(chat)),
-  removeChat: (chat) => dispatch(removeChat(chat)),
-  updateFriendState: (uid, state) => dispatch(updateFriendState(uid, state))
-})
+  add: friend => dispatch(addFriend(friend)),
+  addChat: chat => dispatch(addChat(chat)),
+  removeChat: chat => dispatch(removeChat(chat)),
+  updateFriendState: (uid, state) => dispatch(updateFriendState(uid, state)),
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(Friends)
+export default connect(mapStateToProps, mapDispatchToProps)(Friends);
