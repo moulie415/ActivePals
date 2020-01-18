@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Linking, Alert, DrawerLayoutAndroidComponent } from 'react-native';
-import str from './strings';
+import { Linking, Alert } from 'react-native';
+import { pipe } from 'ramda';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
+import str from './strings';
 import { SessionType } from '../types/Session';
 import { UserState } from '../types/Profile';
 import Comment from '../types/Comment';
-import { pipe } from 'ramda';
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming'];
 
@@ -148,16 +148,17 @@ export function nth(d) {
   }
 }
 
-export function dayDiff(first, second, round = true) {
-  let start = new Date(first);
-  let end = new Date(second);
-  let timeDiff = Math.abs(end.getTime() - start.getTime());
+export const dayDiff = (first, second, round = true) => {
+  const start = new Date(first);
+  const end = new Date(second);
+  const timeDiff = Math.abs(end.getTime() - start.getTime());
   if (round) {
     return Math.ceil(timeDiff / (1000 * 3600 * 24));
-  } else return timeDiff / (1000 * 3600 * 24);
-}
+  }
+  return timeDiff / (1000 * 3600 * 24);
+};
 
-export function getSimplifiedTime(createdAt) {
+export const getSimplifiedTime = createdAt => {
   const timeStamp = new Date(createdAt);
   let dateString;
   const now = new Date();
@@ -168,8 +169,8 @@ export function getSimplifiedTime(createdAt) {
   if (timeStamp < yesterday0) dateString = timeStamp.toDateString();
   else if (timeStamp < today0) dateString = 'Yesterday';
   else {
-    let minsBeforeNow = Math.floor((now.getTime() - timeStamp.getTime()) / (1000 * 60));
-    let hoursBeforeNow = Math.floor(minsBeforeNow / 60);
+    const minsBeforeNow = Math.floor((now.getTime() - timeStamp.getTime()) / (1000 * 60));
+    const hoursBeforeNow = Math.floor(minsBeforeNow / 60);
     if (hoursBeforeNow > 0) {
       dateString = hoursBeforeNow + ' ' + (hoursBeforeNow == 1 ? 'hour' : 'hours') + ' ago';
     } else if (minsBeforeNow > 0) {
@@ -187,14 +188,34 @@ export const getStateColor = (state: UserState) => {
       return 'green';
     case UserState.AWAY:
       return '#F9BD49';
-    case UserState.OFFLINE:
+    default:
       return 'red';
   }
 };
 
+const getStateVal = state => {
+  switch (state) {
+    case UserState.ONLINE:
+      return 3;
+    case UserState.AWAY:
+      return 2;
+    default:
+      return 1;
+  }
+};
+
+export const sortByState = friends => {
+  return friends.sort((a, b) => {
+    const stateA = getStateVal(a.state);
+    const stateB = getStateVal(b.state);
+    return stateB - stateA;
+  });
+};
+
 export const getDirections = (gym, yourLocation, selectedLocation, selectedSession) => {
   if (yourLocation) {
-    let lat2, lng2;
+    let lat2;
+    let lng2;
     const lat1 = yourLocation.latitude;
     const lng1 = yourLocation.longitude;
     if (gym) {
@@ -204,7 +225,7 @@ export const getDirections = (gym, yourLocation, selectedLocation, selectedSessi
       lat2 = selectedSession.location.position.lat;
       lng2 = selectedSession.location.position.lng;
     }
-    let url = `https://www.google.com/maps/dir/?api=1&origin=${lat1},${lng1}&destination=${lat2},${lng2}`;
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${lat1},${lng1}&destination=${lat2},${lng2}`;
     Linking.openURL(url).catch(err => console.error('An error occurred', err));
   } else {
     Alert.alert('No location found', 'You may need to change your settings to allow Fit Link to access your location');

@@ -379,10 +379,9 @@ const mapDispatchToProps = dispatch => ({
   onLogoutPress: () => {
     dispatch(navigateLogin());
   },
-  onLogin: () => {
-    dispatch(fetchProfile()).then(profile => {
-      dispatch(doSetup(profile));
-    });
+  onLogin: async () => {
+    const profile = await dispatch(fetchProfile());
+    dispatch(doSetup(profile));
   },
   logout: () => {
     dispatch(navigateLogin());

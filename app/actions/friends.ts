@@ -140,37 +140,45 @@ export const fetchFriends = (uid, limit = 10) => {
 //   }
 // }
 
-export const addFriend = uid => {
-  return (dispatch, getState) => {
-    const status = uid.val()
-    return new Promise(resolve => {
-      firebase.database().ref('users/' + uid.key).once('value', profile => {
-        let { state } = profile.val();
-        if (state && state !== UserState.AWAY) {
-          state = UserState.ONLINE
-        }
-        else if (!state) {
-          state = UserState.OFFLINE
-        }
-        firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL()
-        .then(url => {
-          resolve()
-          dispatch(addToFriends(uid.key, {...profile.val(), status, avatar: url, state}))
-        })
-        .catch(e => {
-          resolve()
-          dispatch(addToFriends(uid.key, {...profile.val(), status, state}))
-        })
-      })
-    })
-  }
-}
+// export const addFriend = uid => {
+//   return (dispatch, getState) => {
+//     const status = uid.val()
+//     return new Promise(resolve => {
+//       firebase.database().ref('users/' + uid.key).once('value', profile => {
+//         let { state } = profile.val();
+//         if (state && state !== UserState.AWAY) {
+//           state = UserState.ONLINE
+//         }
+//         else if (!state) {
+//           state = UserState.OFFLINE
+//         }
+//         firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL()
+//         .then(url => {
+//           resolve()
+//           dispatch(addToFriends(uid.key, {...profile.val(), status, avatar: url, state}))
+//         })
+//         .catch(e => {
+//           resolve()
+//           dispatch(addToFriends(uid.key, {...profile.val(), status, state}))
+//         })
+//       })
+//     })
+//   }
+// }
 
 export const sendRequest = friendUid => {
   return async (dispatch, getState) => {
     const { uid } = getState().profile.profile;
-    const promise1 = firebase.database().ref('userFriends/' + uid).child(friendUid).set("outgoing");
-    const promise2 = firebase.database().ref('userFriends/' + friendUid).child(uid).set("incoming");
+    const promise1 = firebase
+      .database()
+      .ref(`userFriends/${uid}`)
+      .child(friendUid)
+      .set('outgoing');
+    const promise2 = firebase
+      .database()
+      .ref(`userFriends/${friendUid}`)
+      .child(uid)
+      .set('incoming');
     await Promise.all([promise1, promise2]);
     const date = new Date().toString();
     const ref = firebase.database().ref('notifications').push();

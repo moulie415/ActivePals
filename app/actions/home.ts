@@ -1,60 +1,61 @@
-import firebase from 'react-native-firebase'
-import Sound from 'react-native-sound'
-export const ADD_POST = 'ADD_POST'
-export const SET_FEED = 'SET_FEED'
-export const SET_POST = 'SET_POST'
-export const SET_USER = 'SET_USER'
-export const UPDATE_USERS = 'UPDATE_USERS'
-export const SET_POST_COMMENTS = 'SET_POST_COMMENTS'
-export const ADD_COMMENT = 'ADD_COMMENT'
-export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS'
-export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT'
-export const SET_REPS_USERS = 'SET_REPS_USERS'
-import str from '../constants/strings'
-import Profile from '../types/Profile'
-import Comment from '../types/Comment'
-import { dedupeSortAndAddCommentIds, sortComments } from '../constants/utils'
+import firebase from 'react-native-firebase';
+import Sound from 'react-native-sound';
+import str from '../constants/strings';
+import Profile from '../types/Profile';
+import Comment from '../types/Comment';
+import { dedupeSortAndAddCommentIds, sortComments } from '../constants/utils';
 
-const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, (error) => {
-	if (error) {
-	  console.log('failed to load the sound', error);
-	  return;
-	}
-  })
+export const ADD_POST = 'ADD_POST';
+export const SET_FEED = 'SET_FEED';
+export const SET_POST = 'SET_POST';
+export const SET_USER = 'SET_USER';
+export const UPDATE_USERS = 'UPDATE_USERS';
+export const SET_POST_COMMENTS = 'SET_POST_COMMENTS';
+export const ADD_COMMENT = 'ADD_COMMENT';
+export const SET_NOTIFICATIONS = 'SET_NOTIFICATIONS';
+export const SET_NOTIFICATION_COUNT = 'SET_NOTIFICATION_COUNT';
+export const SET_REPS_USERS = 'SET_REPS_USERS';
+
+const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, error => {
+  if (error) {
+    console.log('failed to load the sound', error);
+    return;
+  }
+});
 
 
 const addToFeed = (post, id) => ({
-	type: ADD_POST,
-	post,
-	id,
-})
+  type: ADD_POST,
+  post,
+  id,
+});
 
-const setFeed = (feed) => ({
-	type: SET_FEED,
-	feed,
-})
+const setFeed = feed => ({
+  type: SET_FEED,
+  feed,
+});
 
-const setPost = (post) => ({
-	type: SET_POST,
-	post,
-})
+const setPost = post => ({
+  type: SET_POST,
+  post,
+});
 
-export const updateUsers = (users) => ({
-	type: UPDATE_USERS,
-	users,
-})
+export const updateUsers = users => ({
+  type: UPDATE_USERS,
+  users,
+});
 
-const setPostComments = (post: string, comments: Comment[], incrementCount?: boolean) =>  ({
-	type: SET_POST_COMMENTS,
-	post,
-	comments,
-	incrementCount
-})
+const setPostComments = (post: string, comments: Comment[], incrementCount?: boolean) => ({
+  type: SET_POST_COMMENTS,
+  post,
+  comments,
+  incrementCount,
+});
 
-const setNotifications = (notifications) => ({
-	type: SET_NOTIFICATIONS,
-	notifications
-})
+const setNotifications = notifications => ({
+  type: SET_NOTIFICATIONS,
+  notifications,
+});
 
 const setRepsUsers = (key: string, users) => ({
 	type: SET_REPS_USERS,
@@ -118,34 +119,34 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 	}
 }
 
-export const fetchPost = (key) => {
-	return (dispatch, getState) => {
-		return new Promise(resolve => {
-			const uid = getState().profile.profile.uid
-			firebase.database().ref('posts').child(key).once('value', snapshot => {
-				let post = snapshot.val()
-				post.key = snapshot.key
-				firebase.database().ref('userReps/' + uid).child(key).once('value', snapshot => {
-					if (snapshot.val()) {
-						post.rep = true
-					}
-					if (!getState().friends.friends[post.uid] && !getState().sharedInfo.users[post.uid]) {
-						fetchUser(post.uid).then(user => {
-							let sharedUsers = {}
-							sharedUsers[post.uid] = user
-							dispatch(updateUsers(sharedUsers))
-							dispatch(setPost(post))
-							resolve()
-						})
-					}
-					else {
-						dispatch(setPost(post))
-						resolve()
-					}
-				})
-			})
-	})
-	}
+export const fetchPost = key => {
+  return (dispatch, getState) => {
+    return new Promise(resolve => {
+      const uid = getState().profile.profile.uid
+      firebase.database().ref('posts').child(key).once('value', snapshot => {
+        let post = snapshot.val()
+        post.key = snapshot.key
+        firebase.database().ref('userReps/' + uid).child(key).once('value', snapshot => {
+          if (snapshot.val()) {
+            post.rep = true
+          }
+          if (!getState().friends.friends[post.uid] && !getState().sharedInfo.users[post.uid]) {
+            fetchUser(post.uid).then(user => {
+              let sharedUsers = {}
+              sharedUsers[post.uid] = user
+              dispatch(updateUsers(sharedUsers))
+              dispatch(setPost(post))
+              resolve()
+            })
+          }
+          else {
+            dispatch(setPost(post))
+            resolve()
+          }
+        })
+      })
+  })
+  }
 }
 
 

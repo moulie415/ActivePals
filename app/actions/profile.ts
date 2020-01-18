@@ -48,7 +48,10 @@ export const setHasViewedWelcome = () => ({
 });
 
 const setupPresence = uid => {
-  const ref = firebase.database().ref('users/' + uid).child('state');
+  const ref = firebase
+    .database()
+    .ref(`users/${uid}`)
+    .child('state');
   const connectedRef = firebase.database().ref('.info/connected');
   connectedRef.on('value', snap => {
     if (snap.val() === true) {
@@ -110,17 +113,16 @@ export const doSetup = profile => {
         firebase.database().ref('users/' + uid).child('FCMToken').set(fcmToken)
         console.log('fcm token: ' + fcmToken)
       } else {
-        console.warn('no token')
+        console.warn('no token');
       }
     } catch (e) {
-      console.warn(e)
+      console.warn(e);
     }
-    const { friends } = profile;
-    if (getState().nav.index == 0) {
+    if (getState().nav.index === 0) {
       if (getState().profile.hasViewedWelcome) {
-        dispatch(navigateHome())
+        dispatch(navigateHome());
       } else {
-        dispatch(navigateWelcome())
+        dispatch(navigateWelcome());
       }
     }
     dispatch(setHasLoggedIn(true));
@@ -135,15 +137,13 @@ export const doSetup = profile => {
 };
 
 export const removeUser = () => {
-	return dispatch => {
-		//let cloud function do all the heavy lifting of deleting user data
-		const user = firebase.auth().currentUser
-		dispatch(setLoggedOut())
-		return user.delete().then(() => {
-			dispatch(navigateLogin())
-		})
-	}
-}
+  return async dispatch => {
+    const user = firebase.auth().currentUser;
+    dispatch(setLoggedOut());
+    await user.delete();
+    dispatch(navigateLogin());
+  };
+};
 
 export const removeGym = () => {
   return async (dispatch, getState) => {
