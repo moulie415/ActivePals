@@ -284,7 +284,7 @@ export const removeSession = (key, isPrivate, force = false) => {
     const type = isPrivate ? 'privateSessions' : 'sessions';
     if (session && session.host.uid === uid) {
       firebase.database().ref(type + '/' + key).remove()
-      Object.keys(session.users).forEach(user => firebase.database().ref('users/' + user + '/sessions').child(key).remove())
+      Object.keys(session.users).forEach(user => firebase.database().ref(`userSessions/${user}`).child(key).remove())
       firebase.database().ref('sessionChats').child(key).remove()
       if (!isPrivate) {
         geofire.remove(key);
@@ -293,7 +293,7 @@ export const removeSession = (key, isPrivate, force = false) => {
       firebase.database().ref(`userSessions/${uid}`).child(key).remove()
       firebase.database().ref(type + '/' + key + '/users').child(uid).remove()
     }
-    let obj
+    let obj;
     if (session && (isPrivate || session.host.uid === uid || force)) {
       const sessionsArr = Object.values(sessions).filter(session => session.key !== key)
       obj = sessionsArr.reduce((acc, cur, i) => {
@@ -305,7 +305,7 @@ export const removeSession = (key, isPrivate, force = false) => {
     } else {
       obj = sessions
       if (obj[key] && obj[key].users) {
-        obj[key].users[uid] = false
+        obj[key].users[uid] = false;
       }
     }
     isPrivate ? dispatch(updatePrivateSessions(obj)) : dispatch(updateSessions(obj))

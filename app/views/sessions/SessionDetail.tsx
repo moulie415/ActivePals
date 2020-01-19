@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
+import NumericInput from 'react-native-numeric-input';
+import RadioForm from 'react-native-simple-radio-button';
+import { connect } from 'react-redux';
 import { Text, View, Alert, TextInput, TouchableOpacity, Platform, Switch, ScrollView } from 'react-native';
 import styles from '../../styles/sessionDetailStyles';
 import Geocoder from 'react-native-geocoder';
@@ -12,10 +15,12 @@ import { types, getType } from '../../constants/utils';
 import Header from '../../components/Header/header';
 import MapModal from '../../components/MapModal';
 import LocationSearchModal from '../../components/LocationSearchModal';
-import RadioForm from 'react-native-simple-radio-button';
 import Button from '../../components/Button';
 import { addSessionToCalendar } from '../../constants/utils';
-import NumericInput from 'react-native-numeric-input';
+import { navigateSessions } from '../../actions/navigation';
+import { addSessionChat } from '../../actions/chats';
+import { addPost } from '../../actions/home';
+import { fetchSessions } from '../../actions/sessions';
 
 const genderProps = [
   { label: 'Unspecified', value: 'Unspecified' },
@@ -351,7 +356,7 @@ class SessionDetail extends Component {
           this.friends.forEach(friend => {
             firebase
               .database()
-              .ref('users/' + friend + '/sessions')
+              .ref(`userSessions/${friend}`)
               .child(key)
               .set(val);
           });
@@ -363,7 +368,7 @@ class SessionDetail extends Component {
           .set(true);
         firebase
           .database()
-          .ref('users/' + this.user.uid + '/sessions')
+          .ref(`userSessions/${this.user.uid}`)
           .child(key)
           .set(val);
         const coords = this.location.position;
@@ -391,22 +396,7 @@ class SessionDetail extends Component {
       Alert.alert('Error', 'Please enter all the necessary fields');
     }
   }
-
-  validatePostcode(code) {
-    let postcode = code.replace(/\s/g, '');
-    let regex = /^[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}$/i;
-    return regex.test(postcode);
-  }
 }
-
-import { connect } from 'react-redux';
-import { navigateSessions } from '../../actions/navigation';
-import { addSessionChat } from '../../actions/chats';
-import { addPost } from '../../actions/home';
-import { fetchSessions } from '../../actions/sessions';
-
-// const mapStateToProps = ({ home, settings }) => ({
-// })
 
 const mapDispatchToProps = dispatch => ({
   onCreate: (session, isPrivate) => dispatch(addSessionChat(session, isPrivate)),

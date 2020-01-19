@@ -1,11 +1,7 @@
-import React, { FunctionComponent } from 'react'
-import Modal from 'react-native-modalbox'
-import {
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Alert
-} from 'react-native'
+import React, { FunctionComponent } from 'react';
+import Modal from 'react-native-modalbox';
+import { View, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/Ionicons'
 import Text from '../Text'
 import Hyperlink from 'react-native-hyperlink'
@@ -14,7 +10,6 @@ import PrivateIcon from '../PrivateIcon'
 import { getDistance, formatDateTime } from '../../constants/utils'
 import Button from '../Button'
 import styles from './styles'
-import firebase from 'react-native-firebase'
 import SessionModalProps from '../../types/components/SessionModal'
 
 const SessionModal: FunctionComponent<SessionModalProps> = ({
@@ -30,7 +25,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
   join,
   remove,
   close,
-  users
+  users,
 }) => {
   return  <Modal style={styles.modal} position={"center"} ref={"modal"} isDisabled={disabled}>
   {session && <View style={{flex: 1}}>
@@ -141,11 +136,9 @@ const fetchButtons = (session, uid, join, remove, close) => {
         <Button
         text="Join"
         style={{alignSelf: 'center'}}
-        onPress={()=> {
-          firebase.database().ref('users/' + uid + '/sessions').child(session.key).set(true)
-          .then(() => {
-            join(session.key, session.private)
-          })
+        onPress={async ()=> {
+          await firebase.database().ref('userSession/' + uid).child(session.key).set(true)
+          join(session.key, session.private)
           firebase.database().ref('sessions/' + session.key + '/users').child(uid).set(true)
           close()
           Alert.alert('Session joined', 'You should now see this session in your session chats')
@@ -156,20 +149,20 @@ const fetchButtons = (session, uid, join, remove, close) => {
 }
 
 const fetchHost = (host, uid, viewProfile, users) => {
-  if (host.uid == uid) {
-    return <Text style={{fontWeight: 'bold'}}>You</Text>
+  if (host.uid === uid) {
+    return <Text style={{ fontWeight: 'bold '}}>You</Text>
   }
-  else if (host.username) {
+  if (host.username) {
     return <TouchableOpacity onPress={()=> viewProfile(host.uid)}>
             <Text style={{color: colors.secondary}}>{host.username}</Text>
           </TouchableOpacity>
   }
-  else if (users[host.uid]) {
+  if (users[host.uid]) {
     return <TouchableOpacity onPress={()=> viewProfile(host.uid)}>
             <Text style={{color: colors.secondary}}>{users[host.uid].username}</Text>
           </TouchableOpacity>
   }
-  else return <Text>N/A</Text>
+  return <Text>N/A</Text>
 }
 
 export default SessionModal

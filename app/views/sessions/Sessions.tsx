@@ -1,17 +1,12 @@
-import React, { Component } from "react"
-import {
-  Alert,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Platform,
-  Switch
-} from "react-native"
+import React, { Component } from 'react';
+import { Alert, View, FlatList, TouchableOpacity, Platform, Switch } from 'react-native';
+import ActionSheet from 'react-native-actionsheet'
+import { AdMobInterstitial } from 'react-native-admob'
+import { connect } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Slider from '@react-native-community/slider'
 import { PulseIndicator } from 'react-native-indicators'
 import Image from 'react-native-fast-image'
-import firebase from 'react-native-firebase'
 import Text, { globalTextStyle } from '../../components/Text'
 import Permissions from 'react-native-permissions'
 import styles from '../../styles/sessionStyles'
@@ -30,16 +25,32 @@ import GymSearch from '../../components/GymSearch'
 import { CheckBox } from 'react-native-elements'
 import Button from '../../components/Button'
 import PrivateIcon from '../../components/PrivateIcon'
-import ActionSheet from 'react-native-actionsheet'
 import {
-  AdMobInterstitial,
-} from 'react-native-admob'
+  navigateMessagingSession,
+  navigateTestScreen,
+  navigateProfileView,
+  navigateGym,
+  navigateGymMessaging,
+  navigateSessionDetail,
+  navigateSessionInfo
+} from '../../actions/navigation'
+import { fetchSessionChats } from '../../actions/chats'
+import {
+  fetchSessions,
+  fetchPrivateSessions,
+  removeSession,
+  setPlaces,
+  fetchPhotoPaths,
+  fetchPlaces,
+  setRadius
+} from '../../actions/sessions'
+import { removeGym, joinGym, setLocation } from '../../actions/profile'
 
 AdMobInterstitial.setAdUnitID(str.admobInterstitial);
 AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
 
  class Sessions extends Component {
-
+   
  static navigationOptions = {
     header: null,
     tabBarLabel: 'Sessions',
@@ -82,14 +93,6 @@ AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
       }
       else {
         this.getPosition()
-      }
-    })
-    // firebase.database().ref('sessions').orderByKey().limitToLast(this.state.amount).on('child_removed', snapshot => {
-    //     this.props.remove(snapshot.key, snapshot.val().private)
-    // })
-    firebase.database().ref('users/' + this.props.profile.uid).child('sessions').on('child_removed', snapshot => {
-      if (snapshot.val() == 'private') {
-        this.props.remove(snapshot.key, true)
       }
     })
   }
@@ -644,28 +647,6 @@ gymFilter(gym) {
 }
 
 }
-
-import { connect } from 'react-redux'
-import {
-  navigateMessagingSession,
-  navigateTestScreen,
-  navigateProfileView,
-  navigateGym,
-  navigateGymMessaging,
-  navigateSessionDetail,
-  navigateSessionInfo
-} from '../../actions/navigation'
-import { fetchSessionChats } from '../../actions/chats'
-import {
-  fetchSessions,
-  fetchPrivateSessions,
-  removeSession,
-  setPlaces,
-  fetchPhotoPaths,
-  fetchPlaces,
-  setRadius
-} from '../../actions/sessions'
-import { removeGym, joinGym, setLocation } from '../../actions/profile'
 
 const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => ({
   friends: friends.friends,

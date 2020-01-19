@@ -354,14 +354,11 @@ class Messaging extends React.Component {
   }
 
 
-  openChat(user) {
-    firebase.database().ref('users/' + this.uid + '/chats').child(user.uid).once('value')
-      .then(snapshot => {
-        if (snapshot.val()) {
-              this.props.onOpenChat(snapshot.val(), user.username, user.uid)
-        }
-      })
-      .catch(e => Alert.alert('Error', e.message))
+  async openChat(user) {
+    const snapshot = await firebase.database().ref('userChats/' + this.uid).child(user.uid).once('value');
+    if (snapshot.val()) {
+      this.props.onOpenChat(snapshot.val(), user.username, user.uid)
+    }
   }
 
   showPicker() {
