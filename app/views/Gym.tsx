@@ -66,7 +66,7 @@ import styles from '../styles/gymStyles'
     return (
     <>
     <Header 
-    hasBack={true}
+    hasBack
      title={gym && gym.name}
       />
       {gym ? <View style={{flex: 1}}>

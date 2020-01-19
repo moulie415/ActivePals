@@ -1,32 +1,30 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import { View, TouchableOpacity, Alert, ScrollView, Switch, Platform } from 'react-native';
+import { pathOr } from 'ramda';
+import { PulseIndicator } from 'react-native-indicators';
+import RNCalendarEvents from 'react-native-calendar-events';
+import Image from 'react-native-fast-image';
+import { connect } from 'react-redux';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { Popup } from 'react-native-map-link';
+import Header from '../components/Header/header';
+import Text from '../components/Text';
+import colors from '../constants/colors';
+import { getType, formatDateTime, addSessionToCalendar, durationString } from '../constants/utils';
+import globalStyles from '../styles/globalStyles';
+import styles from '../styles/sessionStyles';
+import Button from '../components/Button';
+import PrivateIcon from '../components/PrivateIcon';
+import FriendsModal from '../components/friendsModal';
 import {
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Switch,
-  Platform
-} from 'react-native'
-import Icon from 'react-native-vector-icons/Ionicons'
-import Header from '../components/Header/header'
-import Text from '../components/Text'
-import colors from '../constants/colors'
-import { PulseIndicator } from 'react-native-indicators'
-import {
-  getType,
-  formatDateTime,
-  addSessionToCalendar,
-  durationString
-} from '../constants/utils'
-import Image from 'react-native-fast-image'
-import globalStyles from '../styles/globalStyles'
-import styles from '../styles/sessionStyles'
-import Button from '../components/Button'
-import { Popup } from 'react-native-map-link'
-import PrivateIcon from '../components/PrivateIcon'
-import FriendsModal from '../components/friendsModal'
-import RNCalendarEvents from 'react-native-calendar-events'
-
+  navigateProfileView,
+  navigateGym,
+  navigateProfile,
+  navigateBack,
+  navigateMessagingSession,
+} from '../actions/navigation';
+import { fetchGym, removeSession, addUser, fetchSession, fetchPrivateSession } from '../actions/sessions';
+import { addSessionChat, muteChat } from '../actions/chats';
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -38,12 +36,14 @@ class SessionInfo extends Component {
       popUpVisible: false
     }
   }
+
   componentDidMount() {
     this.isPrivate ? this.props.fetchPrivateSession(this.sessionId) : this.props.fetchSession(this.sessionId)
   }
 
   render() {
     const session = this.props.sessions[this.sessionId] || this.props.privateSessions[this.sessionId]
+
     let host
     if (session && session.host.uid == this.props.profile.uid) {
       host = this.props.profile
@@ -76,7 +76,10 @@ class SessionInfo extends Component {
         </View>
       <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow}}>
         {session && host && this.getButtons(host, session)}
-        <TouchableOpacity onPress={()=> Alert.alert('Details', session.details)} style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
+        <TouchableOpacity
+          onPress={()=> Alert.alert('Details', session.details)}
+          style={[styles.infoRowContainer, styles.rowSpaceBetween]}
+        >
           <View >
             {this.renderInfoHeader('Details')}
             <Text numberOfLines={1} style={{color: '#999'}}>{session.details}</Text>
@@ -333,26 +336,6 @@ muteButton() {
 
 }
 
-import { connect } from 'react-redux'
-import {
-  navigateProfileView,
-  navigateGym,
-  navigateProfile,
-  navigateBack,
-  navigateMessagingSession
-} from '../actions/navigation'
-import {
-  fetchGym,
-  removeSession,
-  addUser,
-  fetchSession,
-  fetchPrivateSession
-} from '../actions/sessions'
-import {
-  addSessionChat,
-  muteChat
-} from '../actions/chats'
-
 const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => ({
   profile: profile.profile,
   users: sharedInfo.users,
@@ -361,7 +344,7 @@ const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => (
   places: sessions.places,
   sessions: sessions.sessions,
   privateSessions: sessions.privateSessions,
-  muted: chats.muted
+  muted: chats.muted,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -379,6 +362,6 @@ const mapDispatchToProps = dispatch => ({
   fetchPrivateSession: (id) => dispatch(fetchPrivateSession(id)),
   openSessionChat: (session) => dispatch(navigateMessagingSession(session)),
   muteChat: (id, mute) => dispatch(muteChat(id, mute))
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo)

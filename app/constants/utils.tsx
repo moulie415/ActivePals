@@ -235,6 +235,10 @@ export const getDirections = (gym, yourLocation, selectedLocation, selectedSessi
   }
 };
 
+export function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
+
 export const getDistance = (item, lat1, lon1, gym = false) => {
   if (lat1 && lon1) {
     let lat2;
@@ -258,12 +262,9 @@ export const getDistance = (item, lat1, lon1, gym = false) => {
     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     let d = R * c;
     return d.toFixed(2);
-  } else return 'N/A';
+  }
+  return 'N/A';
 };
-
-export function deg2rad(deg) {
-  return deg * (Math.PI / 180);
-}
 
 export const addSessionToCalendar = (calendarId, session) => {
   const date = new Date(session.dateTime.replace(/-/g, '/'));
@@ -346,5 +347,13 @@ export const getNameString = friend => {
   return string;
 };
 
+export const getFormattedBirthday = date => {
+  if (date) {
+    const d = new Date(date);
+    return `${str.months[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}`;
+  }
+  return null;
+};
+
 export const dedupeSortAndAddCommentIds = pipe(dedupeComments, sortComments, addCommentIds);
-export const sortAndAddCommentIds = pipe(sortComments, addCommentIds)
+export const sortAndAddCommentIds = pipe(sortComments, addCommentIds);

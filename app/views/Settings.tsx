@@ -27,7 +27,7 @@ class Settings extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Header hasBack={true} title={'Settings'} />
+        <Header hasBack title={'Settings'} />
         <ScrollView>
           <TouchableOpacity
             onPress={() => {

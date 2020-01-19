@@ -1,9 +1,9 @@
 import firebase from 'react-native-firebase';
 import { Alert } from 'react-native';
-import { geofire }  from '../../index';
+import { geofire } from '../../index';
 import { fetchUsers, updateUsers } from './home';
 import { setGym } from './profile';
-import  { calculateDuration } from '../constants/utils';
+import { calculateDuration } from '../constants/utils';
 
 export const SET_SESSIONS = 'SET_SESSIONS';
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS';
@@ -123,60 +123,58 @@ export const fetchSessions = () => {
             dispatch(updateSessions(obj))
             dispatch(fetchUsers(userFetches))
           });
-          }
-          else {
-              dispatch(removeSession(snapshot.key, false))
-          }
+        } else {
+          dispatch(removeSession(snapshot.key, false))
+        }
+      });
 
-      })
+    return new Promise(resolve => {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const geoQuery = geofire.query({
+            center: [lat, lon],
+            radius,
+          });
 
-      return new Promise(resolve => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const lat = position.coords.latitude
-            const lon = position.coords.longitude
-            const geoQuery = geofire.query({
-              center: [lat, lon],
-              radius: radius,
-            })
+          const onReadyRegistration = geoQuery.on("ready",() => {
+            console.log("GeoQuery has loaded and fired all other events for initial data")
+            resolve()
+          })
 
-            const onReadyRegistration = geoQuery.on("ready",() => {
-              console.log("GeoQuery has loaded and fired all other events for initial data")
-              resolve()
-            })
-
-            const onKeyEnteredRegistration = geoQuery.on("key_entered", (key, location, distance) => {
-              console.log(key + " entered query at " + location + " (" + distance + " km from center)")
-              firebase.database().ref('sessions/' + key).once('value', snapshot => {
-                if (snapshot.val()) {
-                  const duration = calculateDuration(snapshot.val());
-                  const time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
-                  const current = new Date().getTime();
-                  if (time + duration > current) {
-                    const inProgress = time < current;
-                    firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
-                      dispatch(setSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
-                    })
-                  }
+          const onKeyEnteredRegistration = geoQuery.on("key_entered", (key, location, distance) => {
+            console.log(key + " entered query at " + location + " (" + distance + " km from center)")
+            firebase.database().ref('sessions/' + key).once('value', snapshot => {
+              if (snapshot.val()) {
+                const duration = calculateDuration(snapshot.val());
+                const time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
+                const current = new Date().getTime();
+                if (time + duration > current) {
+                  const inProgress = time < current;
+                  firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
+                    dispatch(setSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
+                  })
                 }
-              })
+              }
             })
+          })
 
-            const onKeyExitedRegistration = geoQuery.on("key_exited", (key, location, distance) => {
-              console.log(key + " exited query to " + location + " (" + distance + " km from center)")
-              dispatch(removeSession(key, false, true));
-            })
+          const onKeyExitedRegistration = geoQuery.on("key_exited", (key, location, distance) => {
+            console.log(key + " exited query to " + location + " (" + distance + " km from center)")
+            dispatch(removeSession(key, false, true));
+          })
 
-            const onKeyMovedRegistration = geoQuery.on("key_moved", (key, location, distance) => {
-              console.log(key + " moved within query to " + location + " (" + distance + " km from center)")
-            })
+          const onKeyMovedRegistration = geoQuery.on("key_moved", (key, location, distance) => {
+            console.log(key + " moved within query to " + location + " (" + distance + " km from center)")
+          })
 
-          },
-          (error) => {
+        },
+        (error) => {
 
-          },
-        { enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
-        )
+        },
+      { enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
+      )
       })
         
     }
@@ -253,7 +251,7 @@ export const fetchSession = (id) => {
     const current = new Date().getTime();
     const inProgress = (time + duration > current && time < current)
     const host = await firebase.database().ref('users/' + session.val().host).once('value')
-    dispatch(setSession({...session.val(), key: session.key, inProgress, distance, host: host.val()}))
+    dispatch(setSession({ ...session.val(), key: session.key, inProgress, distance, host: host.val() }));
   }
 }
 
@@ -264,7 +262,7 @@ export const fetchPrivateSession = (id) => {
       dispatch(fetchGym(session.val().gym.place_id))
     }
     if (session.val().users) {
-      const	unfetched = Object.keys(session.val().users).filter(user => {
+      const unfetched = Object.keys(session.val().users).filter(user => {
         return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
       })
       dispatch(fetchUsers(unfetched));
@@ -277,8 +275,6 @@ export const fetchPrivateSession = (id) => {
     dispatch(setPrivateSession({ ...session.val(), key: session.key, inProgress, host: host.val() }));
   };
 };
-
-
 
 export const removeSession = (key, isPrivate, force = false) => {
   return (dispatch, getState) => {
@@ -305,17 +301,16 @@ export const removeSession = (key, isPrivate, force = false) => {
           acc[cur.key] = cur;
         }
         return acc;
-      }, {})
+      }, {});
+    } else {
+      obj = sessions
+      if (obj[key] && obj[key].users) {
+        obj[key].users[uid] = false
       }
-      else {
-        obj = sessions
-        if (obj[key] && obj[key].users) {
-          obj[key].users[uid] = false
-        }
-      }
-      isPrivate ? dispatch(updatePrivateSessions(obj)) : dispatch(updateSessions(obj))
     }
-	}
+    isPrivate ? dispatch(updatePrivateSessions(obj)) : dispatch(updateSessions(obj))
+  };
+};
 
 export const addUser = (key, isPrivate, uid) => {
   return async (dispatch, getState) => {
@@ -333,19 +328,18 @@ export const fetchPhotoPath = (result) => {
   return new Promise(resolve => {
     if (result.photos && result.photos[0].photo_reference) {
       const url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
-			const fullUrl = `${url}${result.photos[0].photo_reference}&key=${process.env.GOOGLE_API_KEY}`;
-			fetch(fullUrl)
-			.then(response => {
-					resolve ({...result, photo: response.url})
-			})
-      .catch(e => {
-        console.log(e)
-        resolve(result)
-      })
-    }
-    else resolve(result)
-  })
-}
+      const fullUrl = `${url}${result.photos[0].photo_reference}&key=${process.env.GOOGLE_API_KEY}`;
+      fetch(fullUrl)
+        .then(response => {
+          resolve({ ...result, photo: response.url });
+        })
+        .catch(e => {
+          console.log(e);
+          resolve(result);
+        });
+    } else resolve(result);
+  });
+};
 
 export const fetchPhotoPaths = () => {
   return (dispatch, getState) => {
@@ -363,7 +357,7 @@ export const fetchPhotoPaths = () => {
 export const fetchGym = (id) => {
   return (dispatch, getState) => {
     const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${process.env.GOOGLE_API_KEY}`;
-      return fetch(url).then(response => response.json())
+    return fetch(url).then(response => response.json())
       .then(json => fetchPhotoPath(json.result))
       .then(async gym => {
         const users = await firebase.database().ref('gyms/' + id + '/users').once('value')

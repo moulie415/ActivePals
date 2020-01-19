@@ -264,25 +264,25 @@ export const fetchMessages = (id, amount, uid, endAt) => {
     const ref = endAt
       ? firebase
           .database()
-          .ref('chats/' + id)
+          .ref(`chats/${id}`)
           .orderByKey()
           .endAt(endAt)
           .limitToLast(amount)
       : firebase
           .database()
-          .ref('chats/' + id)
+          .ref(`chats/${id}`)
           .orderByKey()
           .limitToLast(amount);
     return ref.once('value', snapshot => {
       const messages = {};
       firebase
         .storage()
-        .ref('images/' + uid)
+        .ref(`images/${uid}`)
         .child('avatar')
         .getDownloadURL()
         .then(url => {
           snapshot.forEach(child => {
-            if (child.val().user && child.val().user._id == uid) {
+            if (child.val().user && child.val().user._id === uid) {
               messages[child.key] = {
                 ...child.val(),
                 key: child.key,
@@ -394,19 +394,19 @@ export const fetchGymMessages = (id, amount, endAt) => {
     const ref = endAt
       ? firebase
           .database()
-          .ref('gymChats/' + id)
+          .ref(`gymChats/${id}`)
           .endAt(endAt)
           .limitToLast(amount)
       : firebase
           .database()
-          .ref('gymChats/' + id)
+          .ref(`gymChats/${id}`)
           .limitToLast(amount);
     return ref.once('value', snapshot => {
       const messages = {};
       const promises = [];
       firebase
         .database()
-        .ref('gyms/' + id)
+        .ref(`gyms/${id}`)
         .child('users')
         .once('value', users => {
           users.forEach(child => {
@@ -414,7 +414,7 @@ export const fetchGymMessages = (id, amount, endAt) => {
               new Promise(resolve => {
                 firebase
                   .storage()
-                  .ref('images/' + child.key)
+                  .ref(`images/${child.key}`)
                   .child('avatar')
                   .getDownloadURL()
                   .then(url => resolve({ [child.key]: url }))

@@ -49,7 +49,7 @@ class Notifications extends Component {
   render() {
     return (
       <View style={{ backgroundColor: '#9993' }}>
-        <Header hasBack={true} title={'Notifications'} />
+        <Header hasBack title={'Notifications'} />
         {Object.keys(this.props.notifications).length > 0 ? (
           <ScrollView>{this.renderNotifications()}</ScrollView>
         ) : this.state.spinner ? (

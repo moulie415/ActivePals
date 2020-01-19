@@ -235,7 +235,7 @@ class Messaging extends React.Component {
     return (
       <View style={{flex: 1, backgroundColor: '#9993'}}>
       <Header 
-      hasBack={true}
+      hasBack
       title={this.friendUsername || this.sessionTitle || this.gymName}
       right={this.getRightHandIcon()}
        />

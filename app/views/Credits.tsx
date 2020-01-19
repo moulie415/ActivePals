@@ -17,7 +17,7 @@ class Credits extends Component {
     render() {
         return <>
             <Header 
-                hasBack={true}
+                hasBack
                 title={'Credits'}
             />
             <ScrollView>

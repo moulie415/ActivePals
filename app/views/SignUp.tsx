@@ -30,7 +30,7 @@ class SignUp extends Component {
   render() {
     return (
       <ImageBackground style={styles.container} source={background}>
-        <Header hasBack={true} title={'Sign up'} />
+        <Header hasBack title={'Sign up'} />
         {this.state.spinner && (
           <View style={sStyles.spinner}>
             <PulseIndicator color={colors.secondary} />

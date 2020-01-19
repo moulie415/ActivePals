@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
 import { Alert, View, TouchableOpacity, Platform, Modal, SafeAreaView } from 'react-native';
+import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { PulseIndicator } from 'react-native-indicators';
+import ImageViewer from 'react-native-image-zoom-viewer';
+import Image from 'react-native-fast-image';
 import firebase from 'react-native-firebase';
 import Text, { globalTextStyle } from '../components/Text';
-import Image from 'react-native-fast-image';
-import styles from '../styles/profileStyles';
-import str from '../constants/strings';
 import hStyles from '../styles/homeStyles';
 import colors from '../constants/colors';
-import ImageViewer from 'react-native-image-zoom-viewer';
-import { calculateAge } from '../constants/utils';
+import { calculateAge, getFormattedBirthday } from '../constants/utils';
 import Header from '../components/Header/header';
-import { PulseIndicator } from 'react-native-indicators';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
+import { navigateBack, navigateGym } from '../actions/navigation';
+import { deleteFriend, sendRequest } from '../actions/friends';
 
 class ProfileView extends Component {
   static navigationOptions = {
@@ -80,7 +81,7 @@ class ProfileView extends Component {
     const { username, first_name, last_name, birthday, email, uid, accountType, activity, level } = this.state.profile;
     return (
       <>
-        <Header hasBack={true} title={username || 'Profile'} />
+        <Header hasBack title={username || 'Profile'} />
         {this.state.loaded ? (
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
             <View>
@@ -194,7 +195,7 @@ class ProfileView extends Component {
                 <Text style={{ marginLeft: 10, marginVertical: 5 }}>
                   <Text style={{ color: '#999', marginLeft: 10, marginVertical: 5 }}>Birthday: </Text>
                   <Text style={{ color: colors.secondary }}>
-                    {`${this.getFormattedBirthday(birthday)} (${calculateAge(new Date(birthday))})`}
+                    {`${getFormattedBirthday(birthday)} (${calculateAge(new Date(birthday))})`}
                   </Text>
                 </Text>
               )}
@@ -277,18 +278,7 @@ class ProfileView extends Component {
       </>
     );
   }
-
-  getFormattedBirthday(date) {
-    if (date) {
-      let d = new Date(date);
-      return `${str.months[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}`;
-    } else return null;
-  }
 }
-
-import { connect } from 'react-redux';
-import { navigateBack, navigateGym } from '../actions/navigation';
-import { deleteFriend, sendRequest } from '../actions/friends';
 
 const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
   friends: friends.friends,

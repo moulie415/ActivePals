@@ -103,7 +103,7 @@ class PostView extends Component<PostViewProps, State> {
             style={{flex: 1}}
             behavior={this.state.post && this.state.post.type == 'status'? 'padding' : 'position'}>
                 <Header 
-                hasBack={true}
+                hasBack
                 />
                 <ScrollView style={styles.container}>
         {this.state.post && <View>{this.renderPost(this.state.post)}</View>}

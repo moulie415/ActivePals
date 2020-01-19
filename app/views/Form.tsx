@@ -50,7 +50,7 @@ class Form extends Component {
                 behavior = { Platform.OS === "ios"? "padding" : null}
                 keyboardVerticalOffset = {50}
                 >
-                <Header hasBack={true} title={this.verification ? 'Get verified' : 'Support'}/>
+                <Header hasBack title={this.verification ? 'Get verified' : 'Support'}/>
                  <View style = {this.state.listStyle}>
                     <FlatList
                     ref = {'list'}
