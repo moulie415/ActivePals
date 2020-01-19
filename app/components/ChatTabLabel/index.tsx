@@ -1,10 +1,17 @@
-import React, { Component, FunctionComponent } from 'react'
-import { View, Platform } from 'react-native'
-import Text from '../Text'
-import styles from './styles'
+import React, { Component, FunctionComponent } from 'react';
+import { View, Platform } from 'react-native';
+import { connect } from 'react-redux';
+import Text from '../Text';
+import styles from './styles';
 
-
-const ChatTabLabel: FunctionComponent = ({unreadCount, color, type, chats, sessionChats, gymChat}) => {
+const ChatTabLabel: FunctionComponent = ({
+  unreadCount,
+  color,
+  type,
+  chats,
+  sessionChats,
+  gymChat
+}) => {
   let count = 0
   const chatType = type.toLowerCase()
   Object.keys(unreadCount).forEach(key => {
@@ -36,8 +43,6 @@ const ChatTabLabel: FunctionComponent = ({unreadCount, color, type, chats, sessi
     </View>
   )
 }
-
-import { connect } from 'react-redux'
 
 const mapStateToProps = ({ chats }) => ({
   unreadCount: chats.unreadCount,

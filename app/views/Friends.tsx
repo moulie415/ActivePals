@@ -45,7 +45,7 @@ class Friends extends Component {
     if (this.props.profile.friends) {
       this.setState({ refreshing: true });
       await this.props.getFriends(this.props.profile.friends);
-      this.setState({refreshing: false});
+      this.setState({ refreshing: false });
     }
   }
 
@@ -64,18 +64,17 @@ class Friends extends Component {
                 <View style={{flexDirection: 'row', height: 40, alignItems: 'center', justifyContent: 'center'}} >
                   <Text style={{marginHorizontal: 10, flex: 1}}>{item.username + ' request sent'}</Text>
                   <TouchableOpacity
-                    style={{ marginTop: Platform.OS == 'ios' ? -5 : 0 }}
+                    style={{ marginTop: Platform.OS === 'ios' ? -5 : 0 }}
                     onPress={() => {
                       Alert.alert(
-                        'Cancel Pal request',
-                        'Are you sure?',
+                        'Cancel Pal request', 'Are you sure?',
                         [
-                          {text: 'Cancel', style: 'cancel'},
-                          {text: 'OK', onPress: () => this.remove(item.uid)},
+                          { text: 'Cancel', style: 'cancel' },
+                          { text: 'OK', onPress: () => this.remove(item.uid) },
                         ],
                       )
                     }}>
-                    <Icon name='ios-close' size={50} style={{color: 'red', paddingHorizontal: 10}}/>
+                    <Icon name="ios-close" size={50} style={{ color: 'red', paddingHorizontal: 10 }} />
                   </TouchableOpacity>
                 </View>
               </View>

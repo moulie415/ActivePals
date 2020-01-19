@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Text, View, Alert, TextInput, TouchableOpacity, Platform, Switch, ScrollView } from 'react-native';
-import styles from '../styles/sessionDetailStyles';
+import styles from '../../styles/sessionDetailStyles';
 import Geocoder from 'react-native-geocoder';
 import firebase from 'react-native-firebase';
-import { geofire } from '../../index';
+import { geofire } from '../../../index';
 import DatePicker from 'react-native-datepicker';
-import colors from '../constants/colors';
+import colors from '../../constants/colors';
 import RNCalendarEvents from 'react-native-calendar-events';
-import { types, getType } from '../constants/utils';
-import Header from '../components/Header/header';
-import MapModal from '../components/MapModal';
-import LocationSearchModal from '../components/LocationSearchModal';
+import { types, getType } from '../../constants/utils';
+import Header from '../../components/Header/header';
+import MapModal from '../../components/MapModal';
+import LocationSearchModal from '../../components/LocationSearchModal';
 import RadioForm from 'react-native-simple-radio-button';
-import Button from '../components/Button';
-import { addSessionToCalendar } from '../constants/utils';
+import Button from '../../components/Button';
+import { addSessionToCalendar } from '../../constants/utils';
 import NumericInput from 'react-native-numeric-input';
 
 const genderProps = [
@@ -69,7 +69,7 @@ class SessionDetail extends Component {
   render() {
     return (
       <>
-        <Header title={'Enter details'} hasBack={true} />
+        <Header title={'Enter details'} hasBack />
         <ScrollView style={{ flex: 1 }}>
           <TextInput
             style={{ padding: 5, borderWidth: 0.5, borderColor: '#999', flex: 1, margin: 10, height: 50 }}
@@ -400,10 +400,10 @@ class SessionDetail extends Component {
 }
 
 import { connect } from 'react-redux';
-import { navigateSessions } from '../actions/navigation';
-import { addSessionChat } from '../actions/chats';
-import { addPost } from '../actions/home';
-import { fetchSessions } from '../actions/sessions';
+import { navigateSessions } from '../../actions/navigation';
+import { addSessionChat } from '../../actions/chats';
+import { addPost } from '../../actions/home';
+import { fetchSessions } from '../../actions/sessions';
 
 // const mapStateToProps = ({ home, settings }) => ({
 // })

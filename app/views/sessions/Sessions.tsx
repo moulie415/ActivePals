@@ -12,24 +12,24 @@ import Slider from '@react-native-community/slider'
 import { PulseIndicator } from 'react-native-indicators'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
-import Text, { globalTextStyle } from '../components/Text'
+import Text, { globalTextStyle } from '../../components/Text'
 import Permissions from 'react-native-permissions'
-import styles from '../styles/sessionStyles'
-import colors from '../constants/colors'
+import styles from '../../styles/sessionStyles'
+import colors from '../../constants/colors'
 import MapView  from 'react-native-maps'
 import Modal from 'react-native-modalbox'
-import { getType, getResource } from '../constants/utils'
-import str from '../constants/strings'
+import { getType, getResource } from '../../constants/utils'
+import str from '../../constants/strings'
 import {Image as SlowImage } from 'react-native'
-import { formatDateTime, getDistance } from '../constants/utils'
+import { formatDateTime, getDistance } from '../../constants/utils'
 import SegmentedControlTab from 'react-native-segmented-control-tab'
 import { Popup } from 'react-native-map-link'
-import Header from '../components/Header/header'
-import FriendsModal from '../components/friendsModal'
-import GymSearch from '../components/GymSearch'
+import Header from '../../components/Header/header'
+import FriendsModal from '../../components/friendsModal'
+import GymSearch from '../../components/GymSearch'
 import { CheckBox } from 'react-native-elements'
-import Button from '../components/Button'
-import PrivateIcon from '../components/PrivateIcon'
+import Button from '../../components/Button'
+import PrivateIcon from '../../components/PrivateIcon'
 import ActionSheet from 'react-native-actionsheet'
 import {
   AdMobInterstitial,
@@ -657,8 +657,8 @@ import {
   navigateGymMessaging,
   navigateSessionDetail,
   navigateSessionInfo
-} from '../actions/navigation'
-import { fetchSessionChats } from '../actions/chats'
+} from '../../actions/navigation'
+import { fetchSessionChats } from '../../actions/chats'
 import {
   fetchSessions,
   fetchPrivateSessions,
@@ -667,8 +667,8 @@ import {
   fetchPhotoPaths,
   fetchPlaces,
   setRadius
-} from '../actions/sessions'
-import { removeGym, joinGym, setLocation } from '../actions/profile'
+} from '../../actions/sessions'
+import { removeGym, joinGym, setLocation } from '../../actions/profile'
 
 const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => ({
   friends: friends.friends,

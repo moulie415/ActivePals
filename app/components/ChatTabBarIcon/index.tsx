@@ -1,7 +1,9 @@
 import React, { FunctionComponent } from 'react';
 import { View } from 'react-native';
-import Text from '../Text';
+import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Text from '../Text';
+
 import styles from './styles';
 
 const ChatTabBarIcon: FunctionComponent = ({ unreadCount, color }) => {
@@ -19,7 +21,7 @@ const ChatTabBarIcon: FunctionComponent = ({ unreadCount, color }) => {
   );
 };
 
-import { connect } from 'react-redux';
+
 
 const mapStateToProps = ({ chats }) => ({
   unreadCount: chats.unreadCount,

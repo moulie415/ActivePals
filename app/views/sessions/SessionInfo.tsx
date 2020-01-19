@@ -7,24 +7,24 @@ import Image from 'react-native-fast-image';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Popup } from 'react-native-map-link';
-import Header from '../components/Header/header';
-import Text from '../components/Text';
-import colors from '../constants/colors';
-import { getType, formatDateTime, addSessionToCalendar, durationString } from '../constants/utils';
-import globalStyles from '../styles/globalStyles';
-import styles from '../styles/sessionStyles';
-import Button from '../components/Button';
-import PrivateIcon from '../components/PrivateIcon';
-import FriendsModal from '../components/friendsModal';
+import Header from '../../components/Header/header';
+import Text from '../../components/Text';
+import colors from '../../constants/colors';
+import { getType, formatDateTime, addSessionToCalendar, durationString } from '../../constants/utils';
+import globalStyles from '../../styles/globalStyles';
+import styles from '../../styles/sessionStyles';
+import Button from '../../components/Button';
+import PrivateIcon from '../../components/PrivateIcon';
+import FriendsModal from '../../components/friendsModal';
 import {
   navigateProfileView,
   navigateGym,
   navigateProfile,
   navigateBack,
   navigateMessagingSession,
-} from '../actions/navigation';
-import { fetchGym, removeSession, addUser, fetchSession, fetchPrivateSession } from '../actions/sessions';
-import { addSessionChat, muteChat } from '../actions/chats';
+} from '../../actions/navigation';
+import { fetchGym, removeSession, addUser, fetchSession, fetchPrivateSession } from '../../actions/sessions';
+import { addSessionChat, muteChat } from '../../actions/chats';
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -59,7 +59,7 @@ class SessionInfo extends Component {
 
     return <>
     <Header 
-    hasBack={true}
+    hasBack
     title={session ? session.title : ''}
     />
     <ScrollView style={{backgroundColor: '#9993'}}>

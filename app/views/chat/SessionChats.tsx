@@ -1,17 +1,18 @@
-import React, { Component } from "react"
+import React, { Component } from 'react';
 import {
   View,
   TouchableOpacity,
   FlatList,
-} from 'react-native'
-import Text from '../../components/Text'
-import firebase from 'react-native-firebase'
-import { getType, getSimplifiedTime } from '../../constants/utils'
-import colors from '../../constants/colors'
-import ChatTabBarIcon from '../../components/ChatTabBarIcon'
-import ChatTabLabel from '../../components/ChatTabLabel'
-import ChatRowCount from '../../components/ChatRowCount'
-//import  styles  from './styles/loginStyles'
+} from 'react-native';
+import { connect } from 'react-redux';
+import Text from '../../components/Text';
+import { getType, getSimplifiedTime } from '../../constants/utils';
+import colors from '../../constants/colors';
+import ChatTabBarIcon from '../../components/ChatTabBarIcon';
+import ChatTabLabel from '../../components/ChatTabLabel';
+import ChatRowCount from '../../components/ChatRowCount';
+import { navigateMessagingSession } from '../../actions/navigation';
+import { fetchSessionChats } from '../../actions/chats';
 
  class SessionChats extends Component {
   static navigationOptions = {
@@ -77,11 +78,6 @@ import ChatRowCount from '../../components/ChatRowCount'
   }
 
 }
-
-
-import { connect } from 'react-redux'
-import { navigateMessagingSession } from '../../actions/navigation'
-import { fetchSessionChats } from '../../actions/chats'
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
   friends: friends.friends,

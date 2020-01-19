@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Modal from 'react-native-modalbox'
+import { connect } from 'react-redux'
 import styles from './styles'
 import {
   View,
@@ -93,13 +94,10 @@ class FriendsModal extends Component {
   }
 }
 
-
-import { connect } from 'react-redux'
-
 const mapStateToProps = ({ friends, profile }) => ({
-    friends: friends.friends,
-    profile: profile.profile
-})
+  friends: friends.friends,
+  profile: profile.profile,
+});
 
-export default connect(mapStateToProps)(FriendsModal)
+export default connect(mapStateToProps)(FriendsModal);
 

@@ -9,6 +9,11 @@ import ChatRowCount from '../../components/ChatRowCount';
 import Image from 'react-native-fast-image';
 import styles from '../../styles/chatStyles';
 import { SessionType } from '../../types/Session';
+import { connect } from 'react-redux';
+import { navigateGymMessaging } from '../../actions/navigation';
+import { fetchGymChat } from '../../actions/chats';
+import { GymChatProps } from '../../types/views/chat/GymChat';
+
 
 class GymChat extends Component<GymChatProps, { refreshing: boolean }> {
   static navigationOptions = {
@@ -85,11 +90,6 @@ class GymChat extends Component<GymChatProps, { refreshing: boolean }> {
     );
   }
 }
-
-import { connect } from 'react-redux';
-import { navigateGymMessaging } from '../../actions/navigation';
-import { fetchGymChat } from '../../actions/chats';
-import { GymChatProps } from '../../types/views/chat/GymChat';
 
 const mapStateToProps = ({ friends, profile, chats }) => ({
   friends: friends.friends,

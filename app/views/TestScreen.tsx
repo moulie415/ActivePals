@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { StyleSheet, Text, View } from "react-native"
-import { GooglePlacesInput } from '../sessions/Sessions'
+import { GooglePlacesInput } from './sessions/Sessions'
 
 const styles = StyleSheet.create({
   container: {

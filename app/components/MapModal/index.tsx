@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import MapView  from 'react-native-maps'
+import MapView from 'react-native-maps'
 import Modal from 'react-native-modalbox'
+import { connect } from 'react-redux'
 import styles from './styles'
 import Text from '../Text'
 import Button from '../Button'
@@ -9,7 +10,6 @@ import { Alert, View } from 'react-native'
 import colors from '../../constants/colors'
 
 class MapModal extends Component {
-
   constructor(props) {
     super(props)
     this.state = {
@@ -92,11 +92,9 @@ class MapModal extends Component {
   }
 }
 
-import { connect } from 'react-redux'
-
-const mapStateToProps =  ({ profile, sessions }) => ({
+const mapStateToProps = ({ profile, sessions }) => ({
   location: profile.location,
-  places: sessions.places
-})
+  places: sessions.places,
+});
 
 export default connect(mapStateToProps)(MapModal)
