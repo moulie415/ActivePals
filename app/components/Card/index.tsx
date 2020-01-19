@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent } from 'react';
 import { View } from 'react-native'
 import CardProps from "../../types/components/Card";
 import styles from '../../styles/components/Card'

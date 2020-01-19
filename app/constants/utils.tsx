@@ -361,5 +361,11 @@ export const validatePostcode = code => {
   return regex.test(postcode);
 };
 
+export const sortChatsByDate = array => {
+  return array.sort((a, b) => {
+    return new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime();
+  });
+};
+
 export const dedupeSortAndAddCommentIds = pipe(dedupeComments, sortComments, addCommentIds);
 export const sortAndAddCommentIds = pipe(sortComments, addCommentIds);

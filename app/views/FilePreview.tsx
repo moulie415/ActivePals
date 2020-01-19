@@ -338,7 +338,7 @@ const mapStateToProps = ({ profile, friends }) => ({
 
 const mapDispatchToProps = dispatch => ({
     goBack: () => dispatch(navigateBack()),
-    postStatus: (status) => {return dispatch(addPost(status))},
+    postStatus: (status) => dispatch(addPost(status)),
     setMessage: (url, text) => dispatch(setMessage(url, text))
 })
 

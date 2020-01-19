@@ -1,17 +1,12 @@
-import React, { Component } from "react"
-import {
-  Alert,
-  Platform,
-  TouchableOpacity,
-  View,
-  BackHandler,
-  Keyboard
-} from "react-native"
-import Icon from 'react-native-vector-icons/Ionicons'
+import React, { Component } from 'react';
+import { Alert, Platform, TouchableOpacity, View, BackHandler, Keyboard } from "react-native"
+import Icon from 'react-native-vector-icons/Ionicons';
+import { PulseIndicator } from 'react-native-indicators';
+import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
+import { connect } from 'react-redux'
 import Text, { globalTextStyle } from '../../components/Text'
 import Image from 'react-native-fast-image'
 import firebase from 'react-native-firebase'
-import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
 import colors from '../../constants/colors'
 import sStyles from '../../styles/sessionStyles'
 import globalStyles from '../../styles/globalStyles'
@@ -22,12 +17,32 @@ import ImagePicker from 'react-native-image-picker'
 import ImageResizer from 'react-native-image-resizer'
 import str from '../../constants/strings'
 //import EmojiInput from 'react-native-emoji-input'
-import { PulseIndicator } from 'react-native-indicators'
+import {
+  navigateMessaging,
+  navigateProfile,
+  navigateProfileView,
+  navigateGym,
+  navigateFilePreview,
+  navigateBack,
+  navigateSessionInfo
+} from '../../actions/navigation'
+import { sendRequest, acceptRequest } from '../../actions/friends'
+import {
+  fetchMessages,
+  fetchSessionMessages,
+  fetchGymMessages,
+  resetNotification,
+  resetMessage,
+  resetUnreadCount,
+  updateLastMessage
+} from '../../actions/chats'
+import { fetchProfile } from '../../actions/profile'
 
 class Messaging extends React.Component {
   static navigationOptions = {
     header: null,
   }
+
   constructor(props) {
     super(props)
     this.params = this.props.navigation.state.params
@@ -66,14 +81,14 @@ class Messaging extends React.Component {
   }
 
   onBackPress() {
-        if (this.state.showEmojiKeyboard) {
-          this.setState({showEmojiKeyboard: false})
-        }
-        else {
-          this.props.goBack()
-        }
-        return true
+    if (this.state.showEmojiKeyboard) {
+      this.setState({showEmojiKeyboard: false})
     }
+    else {
+      this.props.goBack()
+    }
+    return true
+  }
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress())
@@ -93,7 +108,7 @@ class Messaging extends React.Component {
 
   keyboardDidShow() {
     if (Platform.OS == 'ios') {
-      this.setState({showEmojiKeyboard: false})
+      this.setState({ showEmojiKeyboard: false })
     }
   
   }
@@ -202,13 +217,13 @@ class Messaging extends React.Component {
 
 
       if (this.session) {
-        this.props.updateLastMessage({...converted[0], type: 'sessionMessage'})
+        this.props.updateLastMessage({ ...converted[0], type: 'sessionMessage' })
       }
       else if (this.gymId) {
-        this.props.updateLastMessage({...converted[0], type: 'gymMessage'})
+        this.props.updateLastMessage({ ...converted[0], type: 'gymMessage' })
       }
       else {
-        this.props.updateLastMessage({...converted[0], type: 'message'})
+        this.props.updateLastMessage({ ...converted[0], type: 'message' })
       }
       
     })
@@ -427,28 +442,6 @@ class Messaging extends React.Component {
 
 }
 
-import { connect } from 'react-redux'
-import {
-  navigateMessaging,
-  navigateProfile,
-  navigateProfileView,
-  navigateGym,
-  navigateFilePreview,
-  navigateBack,
-  navigateSessionInfo
-} from '../../actions/navigation'
-import { sendRequest, acceptRequest } from '../../actions/friends'
-import {
-  fetchMessages,
-  fetchSessionMessages,
-  fetchGymMessages,
-  resetNotification,
-  resetMessage,
-  resetUnreadCount,
-  updateLastMessage
-} from '../../actions/chats'
-import { fetchProfile } from '../../actions/profile'
-
 const fetchId = (params) => {
   if (params.session) {
     return params.session.key
@@ -477,7 +470,7 @@ const mapDispatchToProps = dispatch => ({
   updateLastMessage: (message) => dispatch(updateLastMessage(message)),
   onRequest: (friendUid)=> dispatch(sendRequest(friendUid)),
   onAccept: (uid, friendUid)=> dispatch(acceptRequest(uid, friendUid)),
-  onOpenChat: (chatId, friendUsername, friendUid)=> dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
+  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   getMessages: (id, amount, uid, endAt) => dispatch(fetchMessages(id, amount, uid, endAt)),
   getSessionMessages: (id, amount, isPrivate, endAt) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
   getGymMessages: (id, amount, endAt) => dispatch(fetchGymMessages(id, amount, endAt)),

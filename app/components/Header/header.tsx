@@ -1,4 +1,4 @@
-import React, { Component, FunctionComponent } from "react"
+import React, { Component, FunctionComponent } from 'react'
 import { TouchableOpacity, View, StatusBar, SafeAreaView } from "react-native"
 import Text from '../Text'
 import Icon from 'react-native-vector-icons/Ionicons'

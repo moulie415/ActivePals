@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import Text from '../../components/Text';
-import { getType, getSimplifiedTime } from '../../constants/utils';
+import { getType, getSimplifiedTime, sortChatsByDate } from '../../constants/utils';
 import colors from '../../constants/colors';
 import ChatTabBarIcon from '../../components/ChatTabBarIcon';
 import ChatTabLabel from '../../components/ChatTabLabel';
@@ -45,16 +45,10 @@ import { fetchSessionChats } from '../../actions/chats';
   )
   }
 
-  sortByDate(array) {
-    return array.sort((a,b) => {
-      return new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt)
-    })
-  }
-
   renderChats() {
     return <FlatList 
       style={{backgroundColor: colors.bgColor}}
-      data={this.sortByDate(Object.values(this.props.chats))}
+      data={sortChatsByDate(Object.values(this.props.chats))}
       keyExtractor={(chat) => chat.key}
       renderItem={({item}) => {
         return <TouchableOpacity
@@ -86,8 +80,8 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  getChats: (sessions, uid) => {return dispatch(fetchSessionChats(sessions, uid))},
-  onOpenChat: (session) => {return dispatch(navigateMessagingSession(session))}
+  getChats: (sessions, uid) => dispatch(fetchSessionChats(sessions, uid)),
+  onOpenChat: (session) => dispatch(navigateMessagingSession(session)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionChats)

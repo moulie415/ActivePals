@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Image from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/Ionicons';
 import colors from '../../constants/colors';
-import { getSimplifiedTime } from '../../constants/utils';
+import { getSimplifiedTime, sortChatsByDate } from '../../constants/utils';
 import ChatTabBarIcon from '../../components/ChatTabBarIcon';
 import ChatTabLabel from '../../components/ChatTabLabel';
 import ChatRowCount from '../../components/ChatRowCount';
@@ -13,12 +13,6 @@ import { navigateMessaging } from '../../actions/navigation';
 import { fetchChats, addChat, removeChat } from '../../actions/chats';
 import { fetchProfile } from '../../actions/profile';
 //import  styles  from './styles/loginStyles'
-
-const sortByDate = array => {
-  return array.sort((a, b) => {
-    return new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime();
-  });
-};
 
 class DirectMessages extends Component {
   constructor(props) {
@@ -41,7 +35,7 @@ class DirectMessages extends Component {
     return (
       <FlatList
         style={{ backgroundColor: colors.bgColor }}
-        data={sortByDate(Object.values(this.props.chats))}
+        data={sortChatsByDate(Object.values(this.props.chats))}
         keyExtractor={chat => chat.chatId}
         renderItem={({ item }) => {
           const friend = this.props.friends[item.uid]

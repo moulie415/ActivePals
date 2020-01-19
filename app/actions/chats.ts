@@ -1,5 +1,4 @@
 import firebase from 'react-native-firebase';
-import { fetchProfile } from './profile';
 
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS';
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT';
@@ -21,21 +20,9 @@ const setSessionChats = sessionChats => ({
   sessionChats,
 });
 
-const addToSessionChats = (key, session) => ({
-  type: ADD_SESSION_CHAT,
-  key,
-  session,
-});
-
 const setChats = chats => ({
   type: SET_CHATS,
   chats,
-});
-
-const addToChats = (uid, chat) => ({
-  type: ADD_CHAT,
-  uid,
-  chat,
 });
 
 const setMessageSession = (id, messages) => ({
@@ -196,12 +183,12 @@ export const fetchChats = (uid, limit = 10) => {
                 .orderByKey()
                 .limitToLast(1)
                 .once('value');
-              let message = { text: 'new chat created' };
+              let message = { text: 'Beginning of chat' };
               if (lastMessage.val()) {
                 const key = Object.keys(lastMessage.val())[0];
                 message = { ...lastMessage.val()[key], key };
               }
-              return { uid: chat, chatId: chat, lastMessage: message };
+              return { uid: chat, chatId: chat, lastMessage: message, key: chat };
             })
           );
           const obj = chats.reduce((acc, cur) => {
@@ -239,7 +226,7 @@ export const fetchSessionChats = (uid, limit = 10) => {
                 .orderByKey()
                 .limitToLast(1)
                 .once('value');
-              let message = { text: 'new session chat created' };
+              let message = { text: 'Beginning of chat' };
               if (lastMessage.val()) {
                 const key = Object.keys(lastMessage.val())[0];
                 message = { ...lastMessage.val()[key], key };

@@ -24,7 +24,7 @@ import {
   navigateMessagingSession,
 } from '../../actions/navigation';
 import { fetchGym, removeSession, addUser, fetchSession, fetchPrivateSession } from '../../actions/sessions';
-import { addSessionChat, muteChat } from '../../actions/chats';
+import { muteChat } from '../../actions/chats';
 
 class SessionInfo extends Component {
   constructor(props) {
@@ -354,10 +354,7 @@ const mapDispatchToProps = dispatch => ({
   goToProfile: () => dispatch(navigateProfile()),
   goBack: ()=> dispatch(navigateBack()),
   remove: (key, type) => dispatch(removeSession(key, type)),
-  addUser: (session, isPrivate, uid) => {
-    dispatch(addUser(session, isPrivate, uid))
-    return dispatch(addSessionChat(session, isPrivate))
-  },
+  addUser: (session, isPrivate, uid) => dispatch(addUser(session, isPrivate, uid)),
   fetchSession: (id) => dispatch(fetchSession(id)),
   fetchPrivateSession: (id) => dispatch(fetchPrivateSession(id)),
   openSessionChat: (session) => dispatch(navigateMessagingSession(session)),

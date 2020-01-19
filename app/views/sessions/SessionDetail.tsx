@@ -18,7 +18,6 @@ import LocationSearchModal from '../../components/LocationSearchModal';
 import Button from '../../components/Button';
 import { addSessionToCalendar } from '../../constants/utils';
 import { navigateSessions } from '../../actions/navigation';
-import { addSessionChat } from '../../actions/chats';
 import { addPost } from '../../actions/home';
 import { fetchSessions } from '../../actions/sessions';
 
@@ -385,7 +384,6 @@ class SessionDetail extends Component {
           .database()
           .ref('sessionChats/' + key)
           .push(systemMessage);
-        this.props.onCreate(key, session.private);
         if (this.state.addToCalendar) {
           await addSessionToCalendar(this.state.calendarId, session);
         }
@@ -399,7 +397,6 @@ class SessionDetail extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  onCreate: (session, isPrivate) => dispatch(addSessionChat(session, isPrivate)),
   goSessions: () => dispatch(navigateSessions()),
   createPost: post => dispatch(addPost(post)),
   fetchSessions: () => dispatch(fetchSessions()),

@@ -1,7 +1,7 @@
 /**
  * Created by tino on 6/6/17.
  */
-import React, { PureComponent } from "react";
+import React, { PureComponent } from 'react';
 import {
   View,
   FlatList,

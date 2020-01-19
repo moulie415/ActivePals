@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import VideoPlayer from 'react-native-video-controls'
 import {
     StatusBar,
