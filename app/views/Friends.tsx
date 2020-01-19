@@ -19,23 +19,11 @@ import {
   deleteFriend,
   removeFriend,
   addFriend,
-  updateFriendState
+  updateFriendState,
 } from '../actions/friends';
 import { removeChat, addChat } from '../actions/chats';
 
 class Friends extends Component {
-  static navigationOptions = {
-    header: null,
-    tabBarLabel: 'Pals',
-    tabBarIcon: ({ tintColor }) => (
-      <Icon
-        name='md-people'
-        size={25}
-        style={{ color: tintColor }}
-      />
-    ),
-  }
-
   constructor(props) {
     super(props);
     this.nav = this.props.navigation
@@ -44,10 +32,16 @@ class Friends extends Component {
     this.state = {
       friends: Object.values(this.props.friends),
       refreshing: false,
-    }
+    };
   }
 
-  async onRefresh() {
+  static navigationOptions = {
+    header: null,
+    tabBarLabel: 'Pals',
+    tabBarIcon: ({ tintColor }) => <Icon name="md-people" size={25} style={{ color: tintColor }} />,
+  };
+
+  async refresh() {
     if (this.props.profile.friends) {
       this.setState({ refreshing: true });
       await this.props.getFriends(this.props.profile.friends);
@@ -61,7 +55,7 @@ class Friends extends Component {
         style={{ backgroundColor: colors.bgColor }}
         data={sortByState(Object.values(this.props.friends))}
         keyExtractor={friend => friend.uid}
-        onRefresh={()=> this.onRefresh()}
+        onRefresh={()=> this.refresh()}
         refreshing={this.state.refreshing}
         renderItem={({ item }) => {
           if (item.status === 'outgoing') {

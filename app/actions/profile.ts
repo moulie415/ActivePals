@@ -110,8 +110,12 @@ export const doSetup = profile => {
     try {
       const fcmToken = await firebase.messaging().getToken();
       if (fcmToken) {
-        firebase.database().ref('users/' + uid).child('FCMToken').set(fcmToken)
-        console.log('fcm token: ' + fcmToken)
+        firebase
+          .database()
+          .ref(`users/${uid}`)
+          .child('FCMToken')
+          .set(fcmToken);
+        console.log(fcmToken);
       } else {
         console.warn('no token');
       }
@@ -128,8 +132,8 @@ export const doSetup = profile => {
     dispatch(setHasLoggedIn(true));
     dispatch(getUnreadCount(uid));
     await dispatch(fetchFriends(uid));
-    profile.sessions && dispatch(fetchSessionChats(profile.sessions, uid));
-    profile.chats && dispatch(fetchChats(profile.chats));
+    dispatch(fetchSessionChats(uid));
+    dispatch(fetchChats(uid));
     profile.gym && dispatch(fetchGymChat(profile.gym));
     dispatch(fetchPosts(uid));
     dispatch(fetchSessions());
@@ -168,13 +172,13 @@ export const removeGym = () => {
 }
 
 export const joinGym = location => {
-  return (dispatch, getState) => {
-    let uid = getState().profile.profile.uid
+  return async (dispatch, getState) => {
+    const { uid } = getState().profile.profile;
     if (getState().profile.gym) {
-      dispatch(removeGym())
+      dispatch(removeGym());
     }
     firebase.database().ref('users/' + uid).child('gym').set(location.place_id)
-    firebase.database().ref('gyms').child(location.place_id).once('value', gym => {
+    const gym =  await firebase.database().ref('gyms').child(location.place_id).once('value')
     if (!gym.val()) {
       location.users = {[uid]: true}
       location.userCount = 1
@@ -185,20 +189,15 @@ export const joinGym = location => {
         createdAt: new Date().toString(),
         system: true,
       }
-      firebase.database().ref('gymChats/' + location.place_id).push(systemMessage).then(() => {
-        dispatch(fetchGymChat(location.place_id))
-      })
+      await firebase.database().ref('gymChats/' + location.place_id).push(systemMessage)
+      dispatch(fetchGymChat(location.place_id))
 
-    }
-    else {
-      let count = gym.val().userCount ? gym.val().userCount + 1 : 1
+    } else {
+      const count = gym.val().userCount ? gym.val().userCount + 1 : 1
       firebase.database().ref('gyms/' + gym.val().place_id).child('userCount').set(count)
       firebase.database().ref('gyms/' + gym.val().place_id + '/users').child(uid).set(true)
       dispatch(fetchGymChat(location.place_id))
     }
-    dispatch(setGym(location))
-    })
-  }
-}
-
-
+    dispatch(setGym(location));
+  };
+};

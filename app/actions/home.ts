@@ -58,17 +58,15 @@ const setNotifications = notifications => ({
 });
 
 const setRepsUsers = (key: string, users) => ({
-	type: SET_REPS_USERS,
-	key,
-	users
-})
+  type: SET_REPS_USERS,
+  key,
+  users,
+});
 
 export const setNotificationCount = (count) => ({
-	type: SET_NOTIFICATION_COUNT,
-	count
+  type: SET_NOTIFICATION_COUNT,
+  count,
 })
-
-
 
 
 export const addPost = (item) => {
@@ -239,81 +237,81 @@ export const fetchPosts = (uid, amount = 30, endAt) => {
 }
 
 export const resetFeed = () => {
-	return (dispatch, getState) => {
-		let uid = getState().profile.profile.uid
-		dispatch(setFeed({}))
-		dispatch(fetchPosts(uid, 30))
-	}
+  return (dispatch, getState) => {
+    const uid = getState().profile.profile.uid
+    dispatch(setFeed({}))
+    dispatch(fetchPosts(uid, 30))
+  }
 }
 
-export const repPost = (item) => {
-	return (dispatch, getState) => {
-		repSound.play()
-		let post = item.key
-		let uid = getState().profile.profile.uid
-		let obj = getState().home.feed[post]
-		let rep = obj.rep ? false : obj.uid
-		if (obj.rep) {
-			obj.rep = false
-			obj.repCount -= 1
-		}
-		else {
-			obj.rep = true
-			if (obj.repCount) {
-				obj.repCount += 1
-			}
-			else obj.repCount = 1
-		}
-		dispatch(setPost(obj))
-		return new Promise(resolve => {
-			if (rep) {
-			let date  = new Date().toString()
-			firebase.database().ref('reps/' + post).child(uid).set({date, uid, post, type: 'post'}).then(() => {
-				if (uid != obj.uid) {
-					//add notification for user
-					firebase.database().ref('userNotifications/' + obj.uid).child(post + uid).once('value', snapshot => {
-						if (!snapshot.val()) {
-							firebase.database().ref('notifications').child(post + uid).set({date, uid, postId: post, type: 'postRep'})
-								.then(()=> firebase.database().ref('userNotifications/' + obj.uid).child(post + uid).set(true))
-								.then(() => upUnreadCount(obj.uid))
-						}
-					})
-					
-				}
-				firebase.database().ref('posts/' + post).child('repCount').once('value', snapshot => {
-					let count
-					if (snapshot.val()) {
-						count = snapshot.val()
-						count += 1
-					}
-					else count = 1
-					firebase.database().ref('posts/' + post).child('repCount').set(count).then(() => {
-						firebase.database().ref('userReps/' + uid).child(post).set(rep).then(() => {
-							resolve()
-						})
-					})
-				})
-			})
-		}
-		else {
-			firebase.database().ref('reps/' + post).child(uid).remove().then(() => {
-				firebase.database().ref('posts/' + post).child('repCount').once('value', snapshot => {
-					let count
-					if (snapshot.val()) {
-						count = snapshot.val()
-						count -= 1
-					}
-					else count = 0
-					firebase.database().ref('posts/' + post).child('repCount').set(count).then(() => {
-						firebase.database().ref('userReps/' + uid).child(post).set(rep).then(() => {
-							resolve()
-						})
-					})
-				})
-			})
-		}
-		})
-	}
+export const repPost = item => {
+  return (dispatch, getState) => {
+    repSound.play();
+    let post = item.key
+    let uid = getState().profile.profile.uid
+    let obj = getState().home.feed[post]
+    let rep = obj.rep ? false : obj.uid
+    if (obj.rep) {
+      obj.rep = false
+      obj.repCount -= 1
+    }
+    else {
+      obj.rep = true
+      if (obj.repCount) {
+        obj.repCount += 1
+      }
+      else obj.repCount = 1
+    }
+    dispatch(setPost(obj))
+    return new Promise(resolve => {
+      if (rep) {
+      let date  = new Date().toString()
+      firebase.database().ref('reps/' + post).child(uid).set({date, uid, post, type: 'post'}).then(() => {
+        if (uid != obj.uid) {
+          //add notification for user
+          firebase.database().ref('userNotifications/' + obj.uid).child(post + uid).once('value', snapshot => {
+            if (!snapshot.val()) {
+              firebase.database().ref('notifications').child(post + uid).set({date, uid, postId: post, type: 'postRep'})
+                .then(()=> firebase.database().ref('userNotifications/' + obj.uid).child(post + uid).set(true))
+                .then(() => upUnreadCount(obj.uid))
+            }
+          })
+          
+        }
+        firebase.database().ref('posts/' + post).child('repCount').once('value', snapshot => {
+          let count
+          if (snapshot.val()) {
+            count = snapshot.val()
+            count += 1
+          }
+          else count = 1
+          firebase.database().ref('posts/' + post).child('repCount').set(count).then(() => {
+            firebase.database().ref('userReps/' + uid).child(post).set(rep).then(() => {
+              resolve()
+            })
+          })
+        })
+      })
+    }
+    else {
+      firebase.database().ref('reps/' + post).child(uid).remove().then(() => {
+        firebase.database().ref('posts/' + post).child('repCount').once('value', snapshot => {
+          let count
+          if (snapshot.val()) {
+            count = snapshot.val()
+            count -= 1
+          }
+          else count = 0
+          firebase.database().ref('posts/' + post).child('repCount').set(count).then(() => {
+            firebase.database().ref('userReps/' + uid).child(post).set(rep).then(() => {
+              resolve()
+            })
+          })
+        })
+      })
+    }
+    })
+  }
 }
 
 export const postComment = (uid, postId, text, created_at, parentCommentId) => {

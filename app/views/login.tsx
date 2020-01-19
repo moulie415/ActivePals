@@ -2,22 +2,26 @@ import React, { Component } from 'react';
 import { Alert, View, ImageBackground, Platform, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
-import styles from '../styles/loginStyles';
-import sStyles from '../styles/settingsStyles';
 import { GoogleSignin } from 'react-native-google-signin';
 import VersionNumber from 'react-native-version-number';
+import SplashScreen from 'react-native-splash-screen';
+import RNFetchBlob from 'rn-fetch-blob';
+import SpinnerButton from 'react-native-spinner-button';
+import { PulseIndicator } from 'react-native-indicators';
+import { connect } from 'react-redux';
+import Button from '../components/Button';
+import { navigateLogin, navigateHome } from '../actions/navigation';
+import { AccountType } from '../types/Profile';
+import styles from '../styles/loginStyles';
+import sStyles from '../styles/settingsStyles';
+import colors from '../constants/colors';
+import Text, { globalTextStyle } from '../components/Text';
+import str from '../constants/strings';
+import { doSetup, fetchProfile, setLoggedOut } from '../actions/profile';
+
 const FBSDK = require('react-native-fbsdk');
 const { LoginManager, AccessToken } = FBSDK;
 const background = require('Anyone/assets/images/Running-background.jpg');
-import colors from '../constants/colors';
-import Text, { globalTextStyle } from '../components/Text';
-import SplashScreen from 'react-native-splash-screen';
-import RNFetchBlob from 'rn-fetch-blob';
-import str from '../constants/strings';
-import SpinnerButton from 'react-native-spinner-button';
-import { PulseIndicator } from 'react-native-indicators';
-import Config from 'react-native-config';
-import Button from '../components/Button';
 
 class Login extends Component {
   constructor(props) {
@@ -351,24 +355,7 @@ class Login extends Component {
     }
     this.setState({ waitForData: false });
   }
-
-  logout() {
-    firebase
-      .auth()
-      .signOut()
-      .then(
-        function() {},
-        function(error) {
-          Alert.alert(error.toString());
-        }
-      );
-  }
 }
-
-import { connect } from 'react-redux';
-import { navigateLogin, navigateHome } from '../actions/navigation';
-import { doSetup, fetchProfile, setLoggedOut } from '../actions/profile';
-import { AccountType } from '../types/Profile';
 
 const mapStateToProps = ({ profile, nav, sharedInfo }) => ({
   loggedIn: profile.loggedIn,

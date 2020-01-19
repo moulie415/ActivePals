@@ -71,34 +71,36 @@ export const getMentionsList = (status, friends) => {
   }
 };
 
-export function guid() {
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-}
-
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000)
     .toString(16)
     .substring(1);
 }
 
+export function guid() {
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
+
 export function getResource(type: SessionType) {
   if (SessionType.CYCLING) {
     return require('../../assets/images/bicycle.png');
-  } else if (SessionType.CUSTOM) {
-    return require('../../assets/images/custom.png');
-  } else if (type == SessionType.GYM) {
+  }
+  if (type === SessionType.GYM) {
     return require('../../assets/images/dumbbell.png');
-  } else if (type == SessionType.RUNNING) {
+  }
+  if (type === SessionType.RUNNING) {
     return require('../../assets/images/running.png');
-  } else if (type == SessionType.SWIMMING) {
+  }
+  if (type === SessionType.SWIMMING) {
     return require('../../assets/images/swim.png');
   }
+  return require('../../assets/images/custom.png');
 }
 
 export function calculateAge(birthday) {
   // birthday is a date
-  var ageDifMs = Date.now() - birthday.getTime();
-  var ageDate = new Date(ageDifMs); // miliseconds from epoch
+  const ageDifMs = Date.now() - birthday.getTime();
+  const ageDate = new Date(ageDifMs); // miliseconds from epoch
   return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
@@ -115,7 +117,8 @@ export function likesExtractor(item, uid, viewProfile, goToProfile) {
         },
       };
     });
-  } else return null;
+  }
+  return null;
 }
 
 export function formatDateTime(dateTime) {

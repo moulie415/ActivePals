@@ -61,6 +61,7 @@ export const fetchFriends = (uid, limit = 10) => {
           const uids = Object.keys(snapshot.val());
           const friends = await Promise.all(
             uids.map(async friendUid => {
+              const status = snapshot.val()[friendUid];
               const profile = await firebase
                 .database()
                 .ref('users')
@@ -69,14 +70,14 @@ export const fetchFriends = (uid, limit = 10) => {
               const { state } = profile.val();
               const userState = getStateString(state);
               try {
-                const avatar = firebase
+                const avatar = await firebase
                   .storage()
                   .ref(`images/${friendUid}`)
                   .child('avatar')
                   .getDownloadURL();
-                return { ...profile.val(), state: userState, avatar };
+                return { ...profile.val(), state: userState, avatar, status };
               } catch (e) {
-                return { ...profile.val(), state: userState };
+                return { ...profile.val(), state: userState, status };
               }
             })
           );
@@ -85,86 +86,12 @@ export const fetchFriends = (uid, limit = 10) => {
             return acc;
           }, {});
           dispatch(setFriends(obj));
+        } else {
+          dispatch(setFriends({}));
         }
       });
   };
 };
-
-// export const fetchFriends = (uids?) => {
-//   return (dispatch, getState) => {
-//     let friends = []
-//     if (!uids) {
-//       uids = getState().profile.profile.friends
-//     }
-//     if (uids) {
-//     Object.keys(uids).forEach(friend => {
-//       const promise = new Promise((resolve, reject) => {
-//         let status = uids[friend]
-//         firebase.database().ref('users/' + friend).once('value', profile => {
-//           let state = profile.val().state
-//           if (state && state !== UserState.AWAY) {
-//             state = UserState.ONLINE
-//           }
-//           else if (!state) {
-//             state = UserState.OFFLINE
-//           }
-//           firebase.storage().ref('images/' + friend ).child('avatar').getDownloadURL()
-//           .then(url => {
-//             resolve({...profile.val(), status, avatar: url, state})
-//           })
-//           .catch(e => {
-//             resolve({...profile.val(), status, state})
-//           })
-
-//         })
-//       })
-
-//       friends.push(promise)
-//     })
-//     return Promise.all(friends).then(items => {
-//       let obj = items.reduce(function(acc, cur, i) {
-//         acc[cur.uid] = cur
-//         return acc
-//       }, {})
-//       dispatch(setFriends(obj))
-//       dispatch(fetchPrivateSessions())
-//     })
-//   }
-//   else {
-//       return new Promise(resolve => {
-//         dispatch(setFriends({}))
-//         resolve()
-//       })
-      
-//     }	
-//   }
-// }
-
-// export const addFriend = uid => {
-//   return (dispatch, getState) => {
-//     const status = uid.val()
-//     return new Promise(resolve => {
-//       firebase.database().ref('users/' + uid.key).once('value', profile => {
-//         let { state } = profile.val();
-//         if (state && state !== UserState.AWAY) {
-//           state = UserState.ONLINE
-//         }
-//         else if (!state) {
-//           state = UserState.OFFLINE
-//         }
-//         firebase.storage().ref('images/' + uid.key).child('avatar').getDownloadURL()
-//         .then(url => {
-//           resolve()
-//           dispatch(addToFriends(uid.key, {...profile.val(), status, avatar: url, state}))
-//         })
-//         .catch(e => {
-//           resolve()
-//           dispatch(addToFriends(uid.key, {...profile.val(), status, state}))
-//         })
-//       })
-//     })
-//   }
-// }
 
 export const sendRequest = friendUid => {
   return async (dispatch, getState) => {
@@ -181,18 +108,33 @@ export const sendRequest = friendUid => {
       .set('incoming');
     await Promise.all([promise1, promise2]);
     const date = new Date().toString();
-    const ref = firebase.database().ref('notifications').push();
+    const ref = firebase
+      .database()
+      .ref('notifications')
+      .push();
     const { key } = ref;
     await ref.set({ date, uid, type: 'friendRequest' });
-    firebase.database().ref('userNotifications/' + friendUid).child(key).set(true);
+    firebase
+      .database()
+      .ref(`userNotifications/${friendUid}`)
+      .child(key)
+      .set(true);
     upUnreadCount(friendUid);
   };
 };
 
 export const acceptRequest = (uid, friendUid) => {
   return dispatch => {
-    const promise1 = firebase.database().ref('userFriends/' + uid).child(friendUid).set("connected")
-    const promise2 = firebase.database().ref('userFriends/' + friendUid).child(uid).set("connected")
+    const promise1 = firebase
+      .database()
+      .ref(`userFriends/${uid}`)
+      .child(friendUid)
+      .set('connected');
+    const promise2 = firebase
+      .database()
+      .ref(`userFriends/${friendUid}`)
+      .child(uid)
+      .set('connected');
     return Promise.all([promise1, promise2]);
   };
 };
@@ -200,15 +142,18 @@ export const acceptRequest = (uid, friendUid) => {
 export const deleteFriend = uid => {
   return (dispatch, getState) => {
     const you = getState().profile.profile.uid;
-    //handle most the deletion server side using cloud function
     dispatch(removeFriend(uid));
-    return firebase.database().ref('usersFriends/' + you).child(uid).remove()
+    return firebase
+      .database()
+      .ref(`usersFriends/${you}`)
+      .child(uid)
+      .remove();
   };
 };
 
 export const getFbFriends = token => {
-  const noUsernames = []
-  return fetch('https://graph.facebook.com/v5.0/me?fields=friends&access_token=' + token)
+  const noUsernames = [];
+  return fetch(`https://graph.facebook.com/v5.0/me?fields=friends&access_token=${token}`)
     .then(response => response.json())
     .then(async json => {
       if (json.friends && json.friends.data) {
@@ -218,7 +163,7 @@ export const getFbFriends = token => {
               if (snapshot.val()) {
                 return snapshot.val()
               }
-              else noUsernames.push(friend)
+              noUsernames.push(friend)
             })
         }))
         uids = uids.filter(uid => uid != undefined)

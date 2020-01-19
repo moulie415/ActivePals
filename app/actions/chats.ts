@@ -1,5 +1,6 @@
 import firebase from 'react-native-firebase';
 import { fetchProfile } from './profile';
+
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS';
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT';
 export const SET_CHATS = 'SET_CHATS';
@@ -93,7 +94,7 @@ export const setUnreadCount = ({ id, count }) => ({
 
 export const updateLastMessage = notif => {
   return dispatch => {
-    if (notif.type == 'message') {
+    if (notif.type === 'message') {
       return firebase
         .database()
         .ref('chats')
@@ -108,7 +109,8 @@ export const updateLastMessage = notif => {
             dispatch(updateChat(notif.uid || notif.friendUid, { ...message, key, createdAt }));
           }
         });
-    } else if (notif.type == 'sessionMessage') {
+    }
+    if (notif.type === 'sessionMessage') {
       return firebase
         .database()
         .ref('sessionChats')
@@ -123,7 +125,8 @@ export const updateLastMessage = notif => {
             dispatch(updateSessionChat(notif.sessionId, { ...message, key, createdAt }));
           }
         });
-    } else if (notif.type == 'gymMessage') {
+    }
+    if (notif.type === 'gymMessage') {
       dispatch(fetchGymChat(notif.gymId));
     }
   };
@@ -139,19 +142,18 @@ export const getUnreadCount = uid => {
         if (snapshot.val()) {
           Object.keys(snapshot.val()).forEach(id => {
             const count = snapshot.val()[id];
-            const nav = getState().nav;
-            const routes = nav.routes;
+            const { nav } = getState();
+            const { routes } = nav;
             let route = {};
             if (routes) {
               route = routes[nav.index];
             }
-
             if (
               count !== 0 &&
               (!route.params ||
-                (route.params.friendUid && route.params.friendUid != id) ||
-                  (route.params.session && route.params.session.key != id) ||
-                  (route.params.gymId && route.params.gymId != id))
+                (route.params.friendUid && route.params.friendUid !== id) ||
+                (route.params.session && route.params.session.key !== id) ||
+                (route.params.gymId && route.params.gymId !== id))
             ) {
               dispatch(setUnreadCount({ id, count }));
             } else if (count !== 0) {
@@ -166,176 +168,100 @@ export const getUnreadCount = uid => {
 export const resetUnreadCount = id => {
   return (dispatch, getState) => {
     const count = 0;
-    const uid = getState().profile.profile.uid;
+    const { uid } = getState().profile.profile;
     firebase
       .database()
-      .ref('unreadCount/' + uid)
+      .ref(`unreadCount/${uid}`)
       .child(id)
       .set(count);
     dispatch(setUnreadCount({ id, count }));
   };
 };
 
-export const fetchChats = chats => {
-  return dispatch => {
-    const chatList = [];
-    Object.keys(chats).forEach(chat => {
-      const val = chats[chat];
-      const promise = new Promise(function(resolve, reject) {
-        firebase
-          .database()
-          .ref('chats')
-          .child(val)
-          .orderByKey()
-          .limitToLast(1)
-          .once('value', lastMessage => {
-            let message = { text: 'new chat created' };
-            if (lastMessage.val()) {
-              const key = Object.keys(lastMessage.val())[0];
-              message = { ...lastMessage.val()[key], key };
-            }
-            resolve({ uid: chat, chatId: val, lastMessage: message });
-          });
-      });
-      chatList.push(promise);
-    });
-    return Promise.all(chatList).then(chats => {
-      const obj = chats.reduce(function(acc, cur, i) {
-        acc[cur.uid] = cur;
-        return acc;
-      }, {});
-      dispatch(setChats(obj));
-    });
-  };
-};
-
-export const addChat = chat => {
-  return dispatch => {
-    let uid = chat.key;
-    let chatId = chat.val();
+export const fetchChats = (uid, limit = 10) => {
+  return async dispatch => {
     return firebase
       .database()
-      .ref('chats')
-      .child(chatId)
-      .orderByKey()
-      .limitToLast(1)
-      .once('value', lastMessage => {
-        let message = { text: 'new chat created' };
-        if (lastMessage.val()) {
-          const key = Object.keys(lastMessage.val())[0];
-          message = { ...lastMessage.val()[key], key };
-        }
-        dispatch(addToChats(uid, { uid, chatId, lastMessage: message }));
-        dispatch(fetchProfile());
-      });
-  };
-};
-
-export const removeChat = uid => {
-  return (dispatch, getState) => {
-    const chats = getState().chats.chats;
-    const chatArr = Object.values(chats).filter(chat => chat.uid != uid);
-    const obj = chatArr.reduce(function(acc, cur, i) {
-      acc[cur.uid] = cur;
-      return acc;
-    }, {});
-    dispatch(setChats(obj));
-  };
-};
-
-export const fetchSessionChats = (sessions, uid) => {
-  return dispatch => {
-    const chatList = [];
-    Object.keys(sessions).forEach(session => {
-      const type = sessions[session] == 'private' ? 'privateSessions' : 'sessions';
-      let promise = new Promise(function(resolve) {
-        firebase
-          .database()
-          .ref(type + '/' + session)
-          .once('value', snapshot => {
-            if (snapshot.val()) {
-              firebase
+      .ref('userChats')
+      .child(uid)
+      .limitToFirst(limit)
+      .on('value', async snapshot => {
+        if (snapshot.val()) {
+          const chats = await Promise.all(
+            Object.keys(snapshot.val()).map(async chat => {
+              const lastMessage = await firebase
                 .database()
-                .ref('sessionChats/' + session)
+                .ref('chats')
+                .child(chat)
                 .orderByKey()
                 .limitToLast(1)
-                .once('value', lastMessage => {
-                  let message = { text: 'new session chat created' };
-                  if (lastMessage.val()) {
-                    const key = Object.keys(lastMessage.val())[0];
-                    message = { ...lastMessage.val()[key], key };
-                  }
-                  resolve({ ...snapshot.val(), key: session, lastMessage: message });
-                });
-            } else {
-              resolve();
-              dispatch(removeSessionChat(session));
-              firebase
-                .database()
-                .ref('users/' + uid + '/sessions')
-                .child(session)
-                .remove();
-            }
-          });
-      });
-      chatList.push(promise);
-    });
-    return Promise.all(chatList).then(sessionChats => {
-      let obj = sessionChats.reduce(function(acc, cur, i) {
-        if (cur) {
-          acc[cur.key] = cur;
+                .once('value');
+              let message = { text: 'new chat created' };
+              if (lastMessage.val()) {
+                const key = Object.keys(lastMessage.val())[0];
+                message = { ...lastMessage.val()[key], key };
+              }
+              return { uid: chat, chatId: chat, lastMessage: message };
+            })
+          );
+          const obj = chats.reduce((acc, cur) => {
+            acc[cur.uid] = cur;
+            return acc;
+          }, {});
+          dispatch(setChats(obj));
+        } else {
+          dispatch(setChats({}));
         }
-        return acc;
-      }, {});
-      dispatch(setSessionChats(obj));
-    });
+      });
   };
 };
 
-export const addSessionChat = (session, isPrivate = false) => {
-  return dispatch => {
-    const type = isPrivate ? 'privateSessions' : 'sessions';
-    return new Promise(resolve => {
-      firebase
-        .database()
-        .ref(type + '/' + session)
-        .once('value', snapshot => {
-          firebase
-            .database()
-            .ref('sessionChats/' + session)
-            .orderByKey()
-            .limitToLast(1)
-            .once('value', lastMessage => {
+export const fetchSessionChats = (uid, limit = 10) => {
+  return async dispatch => {
+    return firebase
+      .database()
+      .ref('userSessions')
+      .child(uid)
+      .limitToFirst(limit)
+      .on('value', async userSessions => {
+        if (userSessions.val()) {
+          const chats = await Promise.all(
+            Object.keys(userSessions.val()).map(async session => {
+              const type = userSessions.val()[session] === 'private' ? 'privateSessions' : 'sessions';
+              const snapshot = await firebase
+                .database()
+                .ref(`${type}/${session}`)
+                .once('value');
+              const lastMessage = await firebase
+                .database()
+                .ref('sessionChats')
+                .child(session)
+                .orderByKey()
+                .limitToLast(1)
+                .once('value');
               let message = { text: 'new session chat created' };
               if (lastMessage.val()) {
-                message = Object.values(lastMessage.val())[0];
+                const key = Object.keys(lastMessage.val())[0];
+                message = { ...lastMessage.val()[key], key };
               }
-              resolve({ ...snapshot.val(), key: session, lastMessage: message });
-              dispatch(addToSessionChats(session, { ...snapshot.val(), key: session, lastMessage: message }));
-              dispatch(fetchProfile());
-            });
-        });
-    });
-  };
-};
-
-export const removeSessionChat = key => {
-  return (dispatch, getState) => {
-    let sessionChats = getState().chats.sessionChats;
-    let chatArr = Object.values(sessionChats).filter(chat => chat.key != key);
-    let obj = chatArr.reduce(function(acc, cur, i) {
-      if (cur) {
-        acc[cur.key] = cur;
-      }
-      return acc;
-    }, {});
-    dispatch(setSessionChats(obj));
+              return { ...snapshot.val(), key: session, lastMessage: message };
+            })
+          );
+          const obj = chats.reduce((acc, cur) => {
+            acc[cur.uid] = cur;
+            return acc;
+          }, {});
+          dispatch(setSessionChats(obj));
+        } else {
+          dispatch(setSessionChats({}));
+        }
+      });
   };
 };
 
 export const fetchMessages = (id, amount, uid, endAt) => {
   return dispatch => {
-    let ref = endAt
+    const ref = endAt
       ? firebase
           .database()
           .ref('chats/' + id)
@@ -348,7 +274,7 @@ export const fetchMessages = (id, amount, uid, endAt) => {
           .orderByKey()
           .limitToLast(amount);
     return ref.once('value', snapshot => {
-      let messages = {};
+      const messages = {};
       firebase
         .storage()
         .ref('images/' + uid)
@@ -381,8 +307,8 @@ export const fetchMessages = (id, amount, uid, endAt) => {
 
 export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
   return dispatch => {
-    let type = isPrivate ? 'privateSessions' : 'sessions';
-    let ref = endAt
+    const type = isPrivate ? 'privateSessions' : 'sessions';
+    const ref = endAt
       ? firebase
           .database()
           .ref('sessionChats/' + id)
@@ -393,8 +319,8 @@ export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
           .ref('sessionChats/' + id)
           .limitToLast(amount);
     return ref.once('value', snapshot => {
-      let messages = {};
-      let promises = [];
+      const messages = {};
+      const promises = [];
       firebase
         .database()
         .ref(type + '/' + id)
@@ -449,7 +375,7 @@ export const fetchGymChat = gym => {
       .child(gym)
       .orderByKey()
       .limitToLast(1)
-      .once('value', lastMessage => {
+      .on('value', lastMessage => {
         if (lastMessage.val()) {
           const key = Object.keys(lastMessage.val())[0];
           const message = lastMessage.val()[key];
@@ -465,7 +391,7 @@ export const fetchGymChat = gym => {
 
 export const fetchGymMessages = (id, amount, endAt) => {
   return dispatch => {
-    let ref = endAt
+    const ref = endAt
       ? firebase
           .database()
           .ref('gymChats/' + id)
@@ -476,8 +402,8 @@ export const fetchGymMessages = (id, amount, endAt) => {
           .ref('gymChats/' + id)
           .limitToLast(amount);
     return ref.once('value', snapshot => {
-      let messages = {};
-      let promises = [];
+      const messages = {};
+      const promises = [];
       firebase
         .database()
         .ref('gyms/' + id)
@@ -505,7 +431,7 @@ export const fetchGymMessages = (id, amount, endAt) => {
               }
             });
             snapshot.forEach(child => {
-              let avatar = child.val().user ? avatars[child.val().user._id] : '';
+              const avatar = child.val().user ? avatars[child.val().user._id] : '';
               if (avatar) {
                 messages[child.key] = {
                   ...child.val(),
@@ -526,11 +452,11 @@ export const fetchGymMessages = (id, amount, endAt) => {
 
 export const muteChat = (id, mute) => {
   return (dispatch, getState) => {
-    const uid = getState().profile.profile.uid;
+    const { uid } = getState().profile.profile;
     dispatch(setMute(id, mute));
     firebase
       .database()
-      .ref('muted/' + uid)
+      .ref(`muted/${uid}`)
       .child(id)
       .set(mute);
   };
