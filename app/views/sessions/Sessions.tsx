@@ -361,8 +361,6 @@ AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
     let gym, yourLat, yourLon
       if (this.props.gym && this.props.gym.geometry) {
         gym = this.props.gym
-        lat = gym.geometry.location.lat
-        lng = gym.geometry.location.lng
       }
       if (this.props.location) {
         yourLat = this.props.location.lat
@@ -462,11 +460,10 @@ AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
             ListFooterComponent={Object.values(this.props.places).length > 0 && this.state.token &&
             <TouchableOpacity 
             disabled={this.state.loadingGyms}
-            onPress={() => {
+            onPress={async () => {
               this.setState({loadingGyms: true})
-              this.props.fetchPlaces(lat, lon, this.state.token).then(({token}) => {
-                this.setState({loadingGyms: false, token})
-              })
+              const { token } = await this.props.fetchPlaces(yourLat, yourLon, this.state.token)
+              this.setState({loadingGyms: false, token})
             }}>
               {!this.state.loadingGyms  && !this.state.refreshing ? 
               <Text style={{color: colors.secondary, textAlign: 'center', backgroundColor: '#fff', fontSize: 20, paddingVertical: 5}}>
