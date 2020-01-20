@@ -23,7 +23,7 @@ import {
   navigateBack,
   navigateMessagingSession,
 } from '../../actions/navigation';
-import { fetchGym, removeSession, addUser, fetchSession, fetchPrivateSession } from '../../actions/sessions';
+import { removeSession, addUser, fetchSession, fetchPrivateSession } from '../../actions/sessions';
 import { muteChat } from '../../actions/chats';
 
 class SessionInfo extends Component {
@@ -367,7 +367,6 @@ const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => (
 
 const mapDispatchToProps = dispatch => ({
   viewProfile: (uid) => dispatch(navigateProfileView(uid)),
-  fetchGym: (id) => dispatch(fetchGym(id)),
   viewGym: (id) => dispatch(navigateGym(id)),
   goToProfile: () => dispatch(navigateProfile()),
   goBack: ()=> dispatch(navigateBack()),

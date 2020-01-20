@@ -7,7 +7,6 @@ import {
   SET_NOTIFICATIONS,
   SET_REPS_USERS,
 } from '../actions/home';
-
 import { SET_LOGGED_OUT } from '../actions/profile';
 import Post from '../types/Post';
 
