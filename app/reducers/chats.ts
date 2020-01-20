@@ -23,7 +23,7 @@ const initialState = {
   unreadCount: {},
   gymChat: {},
   muted: {},
-},
+};
 
 export default function(state = initialState, action) {
   switch (action.type) {

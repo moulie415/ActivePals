@@ -180,7 +180,7 @@ export const fetchChats = (uid, limit = 10) => {
               const lastMessage = await firebase
                 .database()
                 .ref('chats')
-                .child(chat)
+                .child(chatId)
                 .orderByKey()
                 .limitToLast(1)
                 .once('value');
