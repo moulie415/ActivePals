@@ -193,11 +193,9 @@ class Messaging extends React.Component {
       if (this.session) {
         const type = this.session.private ? 'privateSessions' : 'sessions'
         converted.push({...message, createdAt: message.createdAt.toString(), sessionTitle: this.sessionTitle, sessionId: this.sessionId, type})
-      }
-      else if (this.gymId) {
+      } else if (this.gymId) {
         converted.push({...message, createdAt: message.createdAt.toString(), gymId: this.gymId, gymName: this.gymName})
-      }
-      else {
+      } else {
         converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, friendUid: this.friendUid})
       }
     })

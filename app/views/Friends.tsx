@@ -228,7 +228,11 @@ class Friends extends Component {
 
   async openChat(uid, username) {
     try {
-      const snapshot = await firebase.database().ref('userChats/' + this.uid).child(uid).once('value')
+      const snapshot = await firebase
+        .database()
+        .ref(`userChats/${this.uid}`)
+        .child(uid)
+        .once('value');
       if (snapshot.val()) {
         this.props.onOpenChat(snapshot.val(), username, uid);
       } else {

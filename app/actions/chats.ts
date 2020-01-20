@@ -176,6 +176,7 @@ export const fetchChats = (uid, limit = 10) => {
         if (snapshot.val()) {
           const chats = await Promise.all(
             Object.keys(snapshot.val()).map(async chat => {
+              const chatId = snapshot.val()[chat];
               const lastMessage = await firebase
                 .database()
                 .ref('chats')
@@ -188,7 +189,7 @@ export const fetchChats = (uid, limit = 10) => {
                 const key = Object.keys(lastMessage.val())[0];
                 message = { ...lastMessage.val()[key], key };
               }
-              return { uid: chat, chatId: chat, lastMessage: message, key: chat };
+              return { uid: chat, chatId, lastMessage: message, key: chatId };
             })
           );
           const obj = chats.reduce((acc, cur) => {
@@ -235,7 +236,7 @@ export const fetchSessionChats = (uid, limit = 10) => {
             })
           );
           const obj = chats.reduce((acc, cur) => {
-            acc[cur.uid] = cur;
+            acc[cur.key] = cur;
             return acc;
           }, {});
           dispatch(setSessionChats(obj));

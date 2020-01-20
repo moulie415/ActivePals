@@ -358,7 +358,7 @@ const mapDispatchToProps = dispatch => ({
   fetchSession: (id) => dispatch(fetchSession(id)),
   fetchPrivateSession: (id) => dispatch(fetchPrivateSession(id)),
   openSessionChat: (session) => dispatch(navigateMessagingSession(session)),
-  muteChat: (id, mute) => dispatch(muteChat(id, mute))
+  muteChat: (id, mute) => dispatch(muteChat(id, mute)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo)
