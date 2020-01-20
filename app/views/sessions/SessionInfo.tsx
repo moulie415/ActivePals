@@ -126,73 +126,82 @@ class SessionInfo extends Component {
                   </TouchableOpacity>
                   <Button
                     onPress={() => {
-                      Alert.alert(
-                        `Add ${session.title} to calendar?`,
-                        '',
-                        [
-                          {text: 'Cancel', style: 'cancel'},
-                          {text: 'Yes', onPress: async ()=> {
+                      Alert.alert(`Add ${session.title} to calendar?`, '', [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                          text: 'Yes',
+                          onPress: async () => {
                             try {
-                              const result = await RNCalendarEvents.authorizeEventStore()
-                              if (result == 'authorized') {
-                                const calendars = await RNCalendarEvents.findCalendars()
-                                const validList = calendars.filter(calendar => calendar.allowsModifications)
+                              const result = await RNCalendarEvents.authorizeEventStore();
+                              if (result === 'authorized') {
+                                const calendars = await RNCalendarEvents.findCalendars();
+                                const validList = calendars.filter(calendar => calendar.allowsModifications);
                                 if (validList && validList.length > 0) {
-                                  const calendarId = validList[0].id
-                                  await addSessionToCalendar(calendarId, session)
-                                  Alert.alert('Success', session.title + ' saved to calendar')
-                                }
-                                else {
-                                  Alert.alert("Sorry", "You don't have any calendars that allow modification")
+                                  const calendarId = validList[0].id;
+                                  await addSessionToCalendar(calendarId, session);
+                                  Alert.alert('Success', `${session.title} saved to calendar`);
+                                } else {
+                                  Alert.alert('Sorry', "You don't have any calendars that allow modification");
                                 }
                               }
-                            } catch(e) {
-                              Alert.alert('Error', e.message)
+                            } catch (e) {
+                              Alert.alert('Error', e.message);
                             }
-                          }}
-                        ]
-                      )
+                          },
+                        },
+                      ]);
                     }}
                     text="Add to calendar"
                   />
                 </View>
                 <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-                <TouchableOpacity onPress={()=> Alert.alert('Location', session.location.formattedAddress)}
-                style={{flex: 5}}>
-                  {this.renderInfoHeader('Location')}
-                  <Text numberOfLines={1} style={{color: '#999'}}>{session.location.formattedAddress}</Text>
-                </TouchableOpacity>
-                {this.props.location && <View style={{flex: 2}}>
-                <Button onPress={()=> {
-                  const { lat, lng } = session.location.position
-                  const options = {
-                    latitude: lat,
-                    longitude: lng,
-                    cancelText: 'Cancel',
-                    sourceLatitude: this.props.location.latitude,  
-                    sourceLongitude: this.props.location.longitude,  
-                    }
-                    this.setState({popUpVisible: true, options})
-                  }}
-                  text='Directions'
-                  style={{alignSelf: 'flex-end'}}
-                /></View>}
+                  <TouchableOpacity
+                    onPress={() => Alert.alert('Location', session.location.formattedAddress)}
+                    style={{ flex: 5 }}
+                  >
+                    {this.renderInfoHeader('Location')}
+                    <Text numberOfLines={1} style={{ color: '#999' }}>
+                      {session.location.formattedAddress}
+                    </Text>
+                  </TouchableOpacity>
+                  {this.props.location && (
+                    <View style={{ flex: 2 }}>
+                      <Button
+                        onPress={() => {
+                          const { lat, lng } = session.location.position;
+                          const options = {
+                            latitude: lat,
+                            longitude: lng,
+                            cancelText: 'Cancel',
+                            sourceLatitude: this.props.location.latitude,
+                            sourceLongitude: this.props.location.longitude,
+                          };
+                          this.setState({ popUpVisible: true, options });
+                        }}
+                        text="Directions"
+                        style={{ alignSelf: 'flex-end' }}
+                      />
+                    </View>
+                  )}
                 </View>
-                {gym && <TouchableOpacity 
-                onPress={() => this.props.viewGym(gym.place_id)}
-                style={[styles.infoRowContainer, styles.userRow]}>
-                <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}>
-                    {gym.photo ? <Image source={{uri: gym.photo}}
-                    style={{height: 40, width: 40, borderRadius: 25}}/> :
-                    getType('gym', 40)
-                    }
-                  </View>
-                  <View >
-                    {this.renderInfoHeader('Gym')}
-                    <Text style={{color: '#999'}}>{gym.name}</Text>
-                  </View>
-                    
-                </TouchableOpacity>}
+                {gym && (
+                  <TouchableOpacity 
+                    onPress={() => this.props.viewGym(gym.place_id)}
+                    style={[styles.infoRowContainer, styles.userRow]}
+                  >
+                  <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}>
+                      {gym.photo ? <Image source={{uri: gym.photo}}
+                      style={{height: 40, width: 40, borderRadius: 25}}/> :
+                      getType('gym', 40)
+                      }
+                    </View>
+                    <View >
+                      {this.renderInfoHeader('Gym')}
+                      <Text style={{color: '#999'}}>{gym.name}</Text>
+                    </View>
+                      
+                  </TouchableOpacity>
+                )}
                 {host && <TouchableOpacity 
                 onPress={() => this.handleUserPress(host.uid)}
                 style={[styles.infoRowContainer, styles.userRow, { paddingVertical: host.avatar ? 10 : 5}]}>
@@ -262,20 +271,20 @@ class SessionInfo extends Component {
     else this.props.viewProfile(uid)
   }
 
-chatButton(session) {
-  return <Button  text="Chat" onPress={()=> this.props.openSessionChat(session)}/>
-}
+  chatButton(session) {
+    return <Button  text="Chat" onPress={()=> this.props.openSessionChat(session)}/>
+  }
 
-muteButton() {
-  return <View style={{flexDirection: 'row', alignItems: 'center'}}>
-    <Text>Mute </Text>
-    <Switch
-    trackColor={{true: colors.secondary}}
-    thumbColor={Platform.select({android: this.props.muted[this.sessionId] ? colors.secondary : '#fff'})}
-    value={this.props.muted[this.sessionId]}
-    onValueChange={(val) => this.props.muteChat(this.sessionId, val)} />
-    </View>
-}
+  muteButton() {
+    return <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <Text>Mute </Text>
+      <Switch
+      trackColor={{true: colors.secondary}}
+      thumbColor={Platform.select({android: this.props.muted[this.sessionId] ? colors.secondary : '#fff'})}
+      value={this.props.muted[this.sessionId]}
+      onValueChange={(val) => this.props.muteChat(this.sessionId, val)} />
+      </View>
+  }
 
   getButtons(host, session) {
     const you = this.props.profile.uid
