@@ -148,7 +148,7 @@ export const fetchPost = key => {
 }
 
 
-export const fetchPosts = (uid, amount = 30, endAt) => {
+export const fetchPosts = (uid, amount = 30, endAt?: string) => {
 	return (dispatch, getState) => {
 		let promises = []
 		return new Promise(resolve => {

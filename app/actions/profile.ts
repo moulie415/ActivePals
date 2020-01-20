@@ -65,12 +65,12 @@ const fetchGym = async (profile, dispatch) => {
   if (profile.gym) {
     const snapshot = await firebase
       .database()
-      .ref('gyms/' + profile.gym)
+      .ref(`gyms/${profile.gym}`)
       .once('value');
     const gym = await fetchPhotoPath(snapshot.val());
     dispatch(setGym(gym));
   }
-}
+};
 
 export const fetchProfile = () => {
   return async dispatch => {
@@ -155,7 +155,7 @@ export const removeGym = () => {
     const { uid } = getState().profile.profile;
     firebase
       .database()
-      .ref('users/' + uid)
+      .ref(`users/${uid}`)
       .child('gym')
       .set(null);
     const gym = await firebase
@@ -164,12 +164,20 @@ export const removeGym = () => {
       .child(currentGym)
       .once('value');
     const count = gym.val().userCount - 1;
-    firebase.database().ref('gyms/' + currentGym).child('userCount').set(count);
-    firebase.database().ref('gyms/' + currentGym + '/users').child(uid).remove();
+    firebase
+      .database()
+      .ref(`gyms/${currentGym}`)
+      .child('userCount')
+      .set(count);
+    firebase
+      .database()
+      .ref(`gyms/${currentGym}/users`)
+      .child(uid)
+      .remove();
     dispatch(resetGym());
     dispatch(setGymChat(null));
-  }
-}
+  };
+};
 
 export const joinGym = location => {
   return async (dispatch, getState) => {
@@ -177,26 +185,48 @@ export const joinGym = location => {
     if (getState().profile.gym) {
       dispatch(removeGym());
     }
-    firebase.database().ref('users/' + uid).child('gym').set(location.place_id)
-    const gym =  await firebase.database().ref('gyms').child(location.place_id).once('value')
+    firebase
+      .database()
+      .ref(`users/${uid}`)
+      .child('gym')
+      .set(location.place_id);
+    const gym = await firebase
+      .database()
+      .ref('gyms')
+      .child(location.place_id)
+      .once('value');
     if (!gym.val()) {
-      location.users = {[uid]: true}
-      location.userCount = 1
-      firebase.database().ref('gyms').child(location.place_id).set(location)
-      let systemMessage = {
+      location.users = { [uid]: true };
+      location.userCount = 1;
+      firebase
+        .database()
+        .ref('gyms')
+        .child(location.place_id)
+        .set(location);
+      const systemMessage = {
         _id: 1,
         text: 'Beginning of chat',
         createdAt: new Date().toString(),
         system: true,
-      }
-      await firebase.database().ref('gymChats/' + location.place_id).push(systemMessage)
-      dispatch(fetchGymChat(location.place_id))
-
+      };
+      await firebase
+        .database()
+        .ref(`gymChats/${location.place_id}`)
+        .push(systemMessage);
+      dispatch(fetchGymChat(location.place_id));
     } else {
-      const count = gym.val().userCount ? gym.val().userCount + 1 : 1
-      firebase.database().ref('gyms/' + gym.val().place_id).child('userCount').set(count)
-      firebase.database().ref('gyms/' + gym.val().place_id + '/users').child(uid).set(true)
-      dispatch(fetchGymChat(location.place_id))
+      const count = gym.val().userCount ? gym.val().userCount + 1 : 1;
+      firebase
+        .database()
+        .ref(`gyms/${gym.val().place_id}`)
+        .child('userCount')
+        .set(count);
+      firebase
+        .database()
+        .ref(`gyms/${gym.val().place_id}/users`)
+        .child(uid)
+        .set(true);
+      dispatch(fetchGymChat(location.place_id));
     }
     dispatch(setGym(location));
   };

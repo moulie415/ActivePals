@@ -119,6 +119,19 @@ export const updateLastMessage = notif => {
   };
 };
 
+export const resetUnreadCount = id => {
+  return (dispatch, getState) => {
+    const count = 0;
+    const { uid } = getState().profile.profile;
+    firebase
+      .database()
+      .ref(`unreadCount/${uid}`)
+      .child(id)
+      .set(count);
+    dispatch(setUnreadCount({ id, count }));
+  };
+};
+
 export const getUnreadCount = uid => {
   return (dispatch, getState) => {
     firebase
@@ -149,19 +162,6 @@ export const getUnreadCount = uid => {
           });
         }
       });
-  };
-};
-
-export const resetUnreadCount = id => {
-  return (dispatch, getState) => {
-    const count = 0;
-    const { uid } = getState().profile.profile;
-    firebase
-      .database()
-      .ref(`unreadCount/${uid}`)
-      .child(id)
-      .set(count);
-    dispatch(setUnreadCount({ id, count }));
   };
 };
 
