@@ -389,34 +389,31 @@ const mapIdsToPlaces = places => {
 export const fetchPlaces = (lat, lon, token) => {
   return dispatch => {
     return new Promise(resolve => {
-      const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+      const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?';
       const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${process.env.GOOGLE_API_KEY}`;
       if (token) {
         fetch(`${fullUrl}&pagetoken=${token}`)
-        .then(response => response.json())
-        .then(json => {
-          if (json.error_message) {
-            throw json.error_message;
-          }
-          else {
-            dispatch(setPlaces(mapIdsToPlaces(json.results)))
-            dispatch(fetchPhotoPaths())
-            resolve({token: json.next_page_token})
-          }
-        })
-      }
-      else {
+          .then(response => response.json())
+          .then(json => {
+            if (json.error_message) {
+              throw json.error_message;
+            } else {
+              dispatch(setPlaces(mapIdsToPlaces(json.results)));
+              dispatch(fetchPhotoPaths());
+              resolve({ token: json.next_page_token });
+            }
+          });
+      } else {
         fetch(fullUrl).then(response => response.json())
-        .then(json => {
-          if (json.error_message) {
-            throw json.error_message;
-          }
-          else {
-            dispatch(setPlaces(mapIdsToPlaces(json.results)))
-            dispatch(fetchPhotoPaths())
-            resolve({token: json.next_page_token})
-          }
-        })
+          .then(json => {
+            if (json.error_message) {
+              throw json.error_message;
+            } else {
+              dispatch(setPlaces(mapIdsToPlaces(json.results)));
+              dispatch(fetchPhotoPaths());
+              resolve({ token: json.next_page_token });
+            }
+          });
       }
     })
   }
