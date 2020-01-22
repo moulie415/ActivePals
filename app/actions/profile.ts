@@ -13,7 +13,7 @@ export const SET_GYM = 'SET_GYM';
 export const REMOVE_GYM = 'REMOVE_GYM';
 export const SET_LOCATION = 'SET_LOCATION';
 export const SET_HAS_VIEWED_WELCOME = 'SET_HAS_VIEWED_WELCOME';
-export const SET_ENV_VARS = 'SET_ENV_VARS';
+export const SET_ENV_VAR = 'SET_ENV_VAR';
 
 const setProfile = profile => ({
   type: SET_PROFILE,
@@ -47,6 +47,12 @@ export const setHasViewedWelcome = () => ({
   type: SET_HAS_VIEWED_WELCOME,
 });
 
+const setEnvVar = (key, value) => ({
+  type: SET_ENV_VAR,
+  key,
+  value,
+});
+
 const setupPresence = uid => {
   const ref = firebase
     .database()
@@ -61,15 +67,17 @@ const setupPresence = uid => {
   });
 };
 
-const fetchGym = async (profile, dispatch) => {
-  if (profile.gym) {
-    const snapshot = await firebase
-      .database()
-      .ref(`gyms/${profile.gym}`)
-      .once('value');
-    const gym = await fetchPhotoPath(snapshot.val());
-    dispatch(setGym(gym));
-  }
+const fetchGym = profile => {
+  return async (dispatch, getState) => {
+    if (profile.gym) {
+      const snapshot = await firebase
+        .database()
+        .ref(`gyms/${profile.gym}`)
+        .once('value');
+      const gym = await fetchPhotoPath(snapshot.val(), getState());
+      dispatch(setGym(gym));
+    }
+  };
 };
 
 export const fetchProfile = () => {
@@ -81,7 +89,7 @@ export const fetchProfile = () => {
       .child('GOOGLE_API_KEY')
       .once('value');
     const GOOGLE_API_KEY = envVar.val();
-    process.env.GOOGLE_API_KEY = GOOGLE_API_KEY;
+    dispatch(setEnvVar('GOOGLE_API_KEY', GOOGLE_API_KEY));
     const snapshot = await firebase
       .database()
       .ref(`users/${user.uid}`)
@@ -93,11 +101,11 @@ export const fetchProfile = () => {
         .child('avatar')
         .getDownloadURL();
       dispatch(setProfile({ ...snapshot.val(), avatar: url }));
-      fetchGym(snapshot.val(), dispatch);
+      dispatch(fetchGym(snapshot.val()));
       return { ...snapshot.val(), avatar: url };
     } catch (e) {
       dispatch(setProfile(snapshot.val()));
-      fetchGym(snapshot.val(), dispatch);
+      dispatch(fetchGym(snapshot.val()));
       return snapshot.val();
     }
   };

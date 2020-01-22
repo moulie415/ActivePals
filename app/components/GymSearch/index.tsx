@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { Alert } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Marker } from 'react-native-maps';
+import { connect } from 'react-redux';
 import colors from '../../constants/colors';
 import { fetchPhotoPath } from '../../actions/sessions';
 import styles from './styles';
 
-const GooglePlacesInput = ({ parent, onOpen }) => {
+const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) => {
   return (
     <GooglePlacesAutocomplete
       style={{ flex: 0 }}
@@ -61,7 +62,7 @@ const GooglePlacesInput = ({ parent, onOpen }) => {
       getDefaultValue={() => ''}
       query={{
         // available options: https://developers.google.com/places/web-service/autocomplete
-        key: process.env.GOOGLE_API_KEY,
+        key: googleApiKey,
         language: 'en', // language of the results
         types: 'establishment', // default: 'geocode'
       }}
@@ -84,6 +85,10 @@ const GooglePlacesInput = ({ parent, onOpen }) => {
       //renderRightButton={() => <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 30, alignSelf: 'center', marginRight: 10}}/>}
     />
   );
-}
+};
 
-export default GooglePlacesInput
+const mapStateToProps = ({ sharedInfo }) => ({
+  googleApiKey: sharedInfo.envVars.GOOGLE_API_KEY,
+});
+
+export default connect(mapStateToProps)(GooglePlacesInput);

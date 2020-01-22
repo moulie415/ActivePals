@@ -227,6 +227,50 @@ export const fetchPrivateSessions = () => {
   }
 }
 
+export const fetchPhotoPath = async (result, state) => {
+  const { GOOGLE_API_KEY } = state.sharedInfo.envVars;
+  if (result.photos && result.photos[0].photo_reference) {
+    const url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
+    const fullUrl = `${url}${result.photos[0].photo_reference}&key=${GOOGLE_API_KEY}`;
+    try {
+      const response = await fetch(fullUrl);
+      return { ...result, photo: response.url };
+    } catch (e) {
+      return result;
+    }
+  }
+  return result;
+};
+
+export const fetchGym = id => {
+  return (dispatch, getState) => {
+    const { GOOGLE_API_KEY } = getState().sharedInfo.envVars;
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${GOOGLE_API_KEY}`;
+    return fetch(url)
+      .then(response => response.json())
+      .then(json => fetchPhotoPath(json.result, getState()))
+      .then(async gym => {
+        const users = await firebase
+          .database()
+          .ref(`gyms/${id}/users`)
+          .once('value');
+        if (users && users.val()) {
+          gym.users = users.val()
+          const	unfetched = Object.keys(users.val()).filter(user => {
+            return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
+          })
+          dispatch(fetchUsers(unfetched))
+        }
+
+        dispatch(setPlace(gym))
+        const yourGym = getState().profile.gym
+        if (yourGym && yourGym.place_id === gym.place_id) {
+          dispatch(setGym(gym))
+        }
+      })
+  }
+}
+
 export const fetchSession = (id) => {
   return async (dispatch, getState) => {
     let distance;
@@ -315,8 +359,16 @@ export const removeSession = (key, isPrivate, force = false) => {
 export const addUser = (key, isPrivate, uid) => {
   return async (dispatch, getState) => {
     const type = isPrivate ? 'privateSessions/' : 'sessions/';
-    await firebase.database().ref(`userSessions/${uid}`).child(key).set(isPrivate ? 'private' : true);
-    await firebase.database().ref(type + key + '/users').child(uid).set(true);
+    await firebase
+      .database()
+      .ref(`userSessions/${uid}`)
+      .child(key)
+      .set(isPrivate ? 'private' : true);
+    await firebase
+      .database()
+      .ref(`${type}${key}/users`)
+      .child(uid)
+      .set(true);
     const sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions;
     const session = sessions[key];
     session.users = { ...session.users, [uid]: true };
@@ -324,59 +376,18 @@ export const addUser = (key, isPrivate, uid) => {
   };
 };
 
-export const fetchPhotoPath = (result) => {
-  return new Promise(resolve => {
-    if (result.photos && result.photos[0].photo_reference) {
-      const url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
-      const fullUrl = `${url}${result.photos[0].photo_reference}&key=${process.env.GOOGLE_API_KEY}`;
-      fetch(fullUrl)
-        .then(response => {
-          resolve({ ...result, photo: response.url });
-        })
-        .catch(e => {
-          console.log(e);
-          resolve(result);
-        });
-    } else resolve(result);
-  });
+export const fetchPhotoPaths = () => {
+  return async (dispatch, getState) => {
+    const obj = getState().sessions.places;
+    const places = await Promise.all(Object.values(obj).map(place => fetchPhotoPath(place, getState())));
+    places.forEach(place => {
+      obj[place.place_id] = place;
+    });
+    dispatch(setPlaces(obj));
+  };
 };
 
-export const fetchPhotoPaths = () => {
-  return (dispatch, getState) => {
-    const obj = getState().sessions.places;
-    const paths = Object.values(obj).map(place => fetchPhotoPath(place));
-    Promise.all(paths).then(places => {
-      places.forEach(place => {
-        obj[place.place_id] = place
-      })
-      dispatch(setPlaces(obj))
-    })
-  }
-}
 
-export const fetchGym = (id) => {
-  return (dispatch, getState) => {
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${process.env.GOOGLE_API_KEY}`;
-    return fetch(url).then(response => response.json())
-      .then(json => fetchPhotoPath(json.result))
-      .then(async gym => {
-        const users = await firebase.database().ref('gyms/' + id + '/users').once('value')
-        if (users && users.val()) {
-          gym.users = users.val()
-          const	unfetched = Object.keys(users.val()).filter(user => {
-            return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
-          })
-          dispatch(fetchUsers(unfetched))
-        }
-
-        dispatch(setPlace(gym))
-        const yourGym = getState().profile.gym
-        if (yourGym && yourGym.place_id == gym.place_id) {
-          dispatch(setGym(gym))
-        }
-      })
-  }
-}
 
 const mapIdsToPlaces = places => {
   const obj = {};
@@ -387,10 +398,11 @@ const mapIdsToPlaces = places => {
 };
 
 export const fetchPlaces = (lat, lon, token) => {
-  return dispatch => {
+  return (dispatch, getState) => {
+    const { GOOGLE_API_KEY } = getState().sharedInfo.envVars;
     return new Promise(resolve => {
       const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?';
-      const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${process.env.GOOGLE_API_KEY}`;
+      const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${GOOGLE_API_KEY}`;
       if (token) {
         fetch(`${fullUrl}&pagetoken=${token}`)
           .then(response => response.json())
@@ -404,7 +416,8 @@ export const fetchPlaces = (lat, lon, token) => {
             }
           });
       } else {
-        fetch(fullUrl).then(response => response.json())
+        fetch(fullUrl)
+          .then(response => response.json())
           .then(json => {
             if (json.error_message) {
               throw json.error_message;

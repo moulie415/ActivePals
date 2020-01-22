@@ -49,7 +49,7 @@
   
   
   
-  [GMSServices provideAPIKey:[ReactNativeConfig envFor:@"GOOGLE_API_KEY"]];
+  [GMSServices provideAPIKey:@"AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw"];
   
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
