@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Alert, ScrollView, Switch, Platform } from 'react-native';
-import { pathOr } from 'ramda';
 import { PulseIndicator } from 'react-native-indicators';
 import RNCalendarEvents from 'react-native-calendar-events';
 import Image from 'react-native-fast-image';
@@ -46,32 +45,33 @@ class SessionInfo extends Component {
       let userItem = this.props.friends[user] || this.props.users[user]
       if (user === this.props.profile.uid) userItem = this.props.profile
       if (userItem) {
-       return <TouchableOpacity
-       onPress={()=> this.handleUserPress(user)}
-       style={[styles.infoRowContainer, styles.userRow, { paddingVertical: userItem.avatar ? 10 : 5}]}
-       key={user}> 
-         {userItem.avatar ? <Image source={{uri: userItem.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-            <Icon size={50} name='md-contact'  style={{color: colors.primary}}/>}
-            <Text style={{marginLeft: 10}}>{userItem.username}</Text>
-       </TouchableOpacity>
+        return (
+          <TouchableOpacity
+            onPress={() => this.handleUserPress(user)}
+            style={[styles.infoRowContainer, styles.userRow, { paddingVertical: userItem.avatar ? 10 : 5 }]}
+            key={user}
+          >
+            {userItem.avatar ? (
+              <Image source={{ uri: userItem.avatar }} style={{ height: 40, width: 40, borderRadius: 25 }} />
+            ) : (
+              <Icon size={50} name="md-contact" style={{ color: colors.primary }} />
+            )}
+            <Text style={{ marginLeft: 10 }}>{userItem.username}</Text>
+          </TouchableOpacity>
+        );
       }
-      else return null
-     })
-   }
-
-   renderInfoHeader(text) {
-    return <Text style={{fontSize: 18}}>{text}</Text>
+      return null;
+    });
   }
 
-
   render() {
-    const session = this.props.sessions[this.sessionId] || this.props.privateSessions[this.sessionId]
+    const session = this.props.sessions[this.sessionId] || this.props.privateSessions[this.sessionId];
 
     let host
-    if (session && session.host.uid == this.props.profile.uid) {
+    if (session && session.host === this.props.profile.uid) {
       host = this.props.profile
     } else if (session && session.host){
-      host = this.props.friends[session.host.uid] || this.props.users[session.host.uid]
+      host = this.props.friends[session.host] || this.props.users[session.host];
     }
     let gym
     if (session && session.gym) {
@@ -90,7 +90,15 @@ class SessionInfo extends Component {
                 ) : (
                   <View style={{ height: 150, backgroundColor: colors.primaryLighter }} />
                 )}
-                <View style={{ backgroundColor: '#fff', alignSelf: 'center', marginTop: -40, ...globalStyles.shadow, padding: 5 }}>
+                <View
+                  style={{
+                    backgroundColor: '#fff',
+                    alignSelf: 'center',
+                    marginTop: -40,
+                    ...globalStyles.shadow,
+                    padding: 5,
+                  }}
+                >
                   {getType(session.type, 80)}
                 </View>
               </View>
@@ -100,15 +108,15 @@ class SessionInfo extends Component {
                   onPress={()=> Alert.alert('Details', session.details)}
                   style={[styles.infoRowContainer, styles.rowSpaceBetween]}
                 >
-                  <View >
-                    {this.renderInfoHeader('Details')}
+                  <View>
+                    <Text style={{ fontSize: 18 }}>Details</Text>
                     <Text numberOfLines={1} style={{ color: '#999' }}>
                       {session.details}
                     </Text>
                   </View>
                   {this.isPrivate && <PrivateIcon />}
                   <View>
-                    {this.renderInfoHeader('Gender')}
+                    <Text style={{ fontSize: 18 }}>Gender</Text>
                     <Text style={{ color: '#999' }}>{session.gender}</Text>
                   </View>
                 </TouchableOpacity>
@@ -119,7 +127,7 @@ class SessionInfo extends Component {
                       Alert.alert('Date and duration', formatDateTime(session.dateTime) + durationString(session));
                     }}
                   >
-                    {this.renderInfoHeader('Date')}
+                    <Text style={{ fontSize: 18 }}>Date</Text>
                     <Text numberOfLines={1} style={{ color: '#999' }}>
                       {formatDateTime(session.dateTime) + durationString(session)}
                     </Text>
@@ -159,7 +167,7 @@ class SessionInfo extends Component {
                     onPress={() => Alert.alert('Location', session.location.formattedAddress)}
                     style={{ flex: 5 }}
                   >
-                    {this.renderInfoHeader('Location')}
+                    <Text style={{ fontSize: 18 }}>Location</Text>
                     <Text numberOfLines={1} style={{ color: '#999' }}>
                       {session.location.formattedAddress}
                     </Text>
@@ -185,173 +193,176 @@ class SessionInfo extends Component {
                   )}
                 </View>
                 {gym && (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={() => this.props.viewGym(gym.place_id)}
                     style={[styles.infoRowContainer, styles.userRow]}
                   >
-                  <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}>
-                      {gym.photo ? <Image source={{uri: gym.photo}}
-                      style={{height: 40, width: 40, borderRadius: 25}}/> :
-                      getType('gym', 40)
-                      }
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
+                      {gym.photo ? (
+                        <Image source={{ uri: gym.photo }} style={{ height: 40, width: 40, borderRadius: 25 }} />
+                      ) : (
+                        getType('gym', 40)
+                      )}
                     </View>
-                    <View >
-                      {this.renderInfoHeader('Gym')}
-                      <Text style={{color: '#999'}}>{gym.name}</Text>
+                    <View>
+                      <Text style={{ fontSize: 18 }}>Gym</Text>
+                      <Text style={{vcolor: '#999' }}>{gym.name}</Text>
                     </View>
-                      
                   </TouchableOpacity>
                 )}
-                {host && <TouchableOpacity 
-                onPress={() => this.handleUserPress(host.uid)}
-                style={[styles.infoRowContainer, styles.userRow, { paddingVertical: host.avatar ? 10 : 5}]}>
-                <View
-                    style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}
-                    >
-                    {host.avatar ? <Image source={{uri: host.avatar}} style={{height: 40, width: 40, borderRadius: 25}}/> :
-                    <Icon size={50} name='md-contact'  style={{color: colors.primary}}/>}
-                  </View>
-                  <View style={{marginRight: 10}}>
-                    {this.renderInfoHeader('Host')}
-                    <Text style={{color: '#999'}}>{host.username}</Text>
-                  </View>
-                </TouchableOpacity>}
+                {host && (
+                  <TouchableOpacity
+                    onPress={() => this.handleUserPress(host.uid)}
+                    style={[styles.infoRowContainer, styles.userRow, { paddingVertical: host.avatar ? 10 : 5 }]}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
+                      {host.avatar ? (
+                        <Image source={{ uri: host.avatar }} style={{ height: 40, width: 40, borderRadius: 25 }} />
+                      ) : (
+                        <Icon size={50} name="md-contact" style={{ color: colors.primary }} />
+                      )}
+                    </View>
+                    <View style={{ marginRight: 10 }}>
+                      <Text style={{ fontSize: 18 }}>Host</Text>
+                      <Text style={{ color: '#999' }}>{host.username}</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
               </View>
-            <View style={{backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20}}>
-              <View style={[styles.rowSpaceBetween, {padding: 5, paddingHorizontal: 10}]}>
-                {this.renderInfoHeader('Users')}
-                
-                {(!this.isPrivate || (host && this.props.profile.uid == host.uid))  && 
-                <TouchableOpacity onPress={()=> this.setState({friendsModalOpen: true})}>
-                  <Icon size={40} style={{color: colors.secondary, marginRight: 10}} name="ios-add"/>
-                </TouchableOpacity>}
+              <View style={{ backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20 }}>
+                <View style={[styles.rowSpaceBetween, { padding: 5, paddingHorizontal: 10 }]}>
+                  <Text style={{ fontSize: 18 }}>Users</Text>
+                  {(!this.isPrivate || (host && this.props.profile.uid === host.uid)) && (
+                    <TouchableOpacity onPress={() => this.setState({ friendsModalOpen: true })}>
+                      <Icon size={40} style={{ color: colors.secondary, marginRight: 10 }} name="ios-add" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                {session && this.renderUsers(session.users)}
               </View>
-              {session && this.renderUsers(session.users)}
-            </View>  
-            </View> 
-          ) : <PulseIndicator color={colors.secondary} />}
+            </View>
+          ) : (
+            <PulseIndicator color={colors.secondary} />
+          )}
           <Popup
-              isVisible={this.state.popUpVisible}
-              onCancelPressed={() => this.setState({ popUpVisible: false })}
-              onAppPressed={() => this.setState({ popUpVisible: false })}
-              onBackButtonPressed={() => this.setState({ popUpVisible: false })}
-              modalProps={{ 
-                  animationIn: 'slideInUp'
-              }}
-              options={this.state.options}
-              style={{
-                cancelButtonText: {color: colors.secondary},
-              }}
-              />
+            isVisible={this.state.popUpVisible}
+            onCancelPressed={() => this.setState({ popUpVisible: false })}
+            onAppPressed={() => this.setState({ popUpVisible: false })}
+            onBackButtonPressed={() => this.setState({ popUpVisible: false })}
+            modalProps={{ animationIn: 'slideInUp' }}
+            options={this.state.options}
+            style={{
+              cancelButtonText: { color: colors.secondary },
+            }}
+          />
         </ScrollView>
-        <FriendsModal 
-              title="Add Pals to Session"
-              onClosed={()=> this.setState({friendsModalOpen: false})}
-              onContinue={async (friends) => {
-                const invites = []
-      
-                friends.forEach(friend => {
-                  if (!Object.values(session.users).some(user => friend == user)) {
-                    invites.push(this.props.addUser(session.key, session.private, friend))
-                  }
-                })
-                await Promise.all(invites)
-                Alert.alert('Success', (friends.length > 1  ? 'Pals' : 'Pal') + ' added')
-                this.setState({friendsModalOpen: false})
-              }}
-              isOpen={this.state.friendsModalOpen}/>
+        <FriendsModal
+          title="Add Pals to Session"
+          onClosed={() => this.setState({ friendsModalOpen: false })}
+          onContinue={async friends => {
+            const invites = []
+            friends.forEach(friend => {
+              if (!Object.values(session.users).some(user => friend == user)) {
+                invites.push(this.props.addUser(session.key, session.private, friend))
+              }
+            })
+            await Promise.all(invites)
+            Alert.alert('Success', (friends.length > 1  ? 'Pals' : 'Pal') + ' added')
+            this.setState({friendsModalOpen: false})
+          }}
+          isOpen={this.state.friendsModalOpen}
+        />
       </>
     )};
 
-
   handleUserPress(uid) {
-    if (uid == this.props.profile.uid) {
+    if (uid === this.props.profile.uid) {
       this.props.goToProfile()
     }
     else this.props.viewProfile(uid)
   }
 
   chatButton(session) {
-    return <Button  text="Chat" onPress={()=> this.props.openSessionChat(session)}/>
+    return <Button text="Chat" onPress={() => this.props.openSessionChat(session)} />;
   }
 
   muteButton() {
-    return <View style={{flexDirection: 'row', alignItems: 'center'}}>
-      <Text>Mute </Text>
-      <Switch
-      trackColor={{true: colors.secondary}}
-      thumbColor={Platform.select({android: this.props.muted[this.sessionId] ? colors.secondary : '#fff'})}
-      value={this.props.muted[this.sessionId]}
-      onValueChange={(val) => this.props.muteChat(this.sessionId, val)} />
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Text>Mute </Text>
+        <Switch
+          trackColor={{ true: colors.secondary }}
+          thumbColor={Platform.select({ android: this.props.muted[this.sessionId] ? colors.secondary : '#fff' })}
+          value={this.props.muted[this.sessionId]}
+          onValueChange={val => this.props.muteChat(this.sessionId, val)}
+        />
       </View>
+    );
   }
 
   getButtons(host, session) {
     const you = this.props.profile.uid
-    if (session.users[you]){
-      if (host.uid == you) {
+    if (session.users[you]) {
+      if (host.uid === you) {
         return (
           <View style={styles.infoRowSpaceEvenly}>
             <Button
-            onPress={()=> {
-              Alert.alert(
-                "Delete session",
-                "Are you sure?",
-                [
-                {text: 'cancel', style: 'cancel'},
-                {text: 'Yes', onPress: ()=> {
-                  this.props.remove(this.sessionId, session.private)
-                  this.props.goBack()
-                },
-                style: 'destructive'}
-                ],
-              )
-            }}
-            style={{alignSelf: 'center'}}
-            color='red'
-            text="Delete"
+              onPress={() => {
+                Alert.alert(
+                  "Delete session",
+                  "Are you sure?",
+                  [
+                  {text: 'cancel', style: 'cancel'},
+                  {text: 'Yes', onPress: ()=> {
+                    this.props.remove(this.sessionId, session.private)
+                    this.props.goBack()
+                  },
+                  style: 'destructive'}
+                  ],
+                )
+              }}
+              style={{ alignSelf: 'center' }}
+              color="red"
+              text="Delete"
             />
             {this.chatButton(session)}
             {/* {this.muteButton()} */}
           </View>
-          )
-      }
-      else return (
-        <View style={styles.infoRowSpaceEvenly}>
-          <Button
-          color='red'
-          text="Leave"
-          style={{alignSelf: 'center'}}
-          onPress={()=> {
-            this.props.remove(this.sessionId, session.private)
-            this.props.goBack()
-          }}
-          />
-          {this.chatButton(session)}
-          {/* {this.muteButton()} */}
-          </View>
         )
-    }
-    else {
+      }
       return (
         <View style={styles.infoRowSpaceEvenly}>
           <Button
-          text="Join"
-          style={{alignSelf: 'center'}}
-          onPress={async ()=> {
-            try {
-              await this.props.addUser(this.sessionid, session.private, this.props.profile.uid)
-              Alert.alert('Session joined', 'You should now see this session in your session chats')
-            } catch(e) {
-              Alert.alert('Error', e.message)
-            }
-          }}
+            color="red"
+            text="Leave"
+            style={{ alignSelf: 'center' }}
+            onPress={() => {
+              this.props.remove(this.sessionId, session.private);
+              this.props.goBack();
+            }}
           />
+          {this.chatButton(session)}
+          {/* {this.muteButton()} */}
         </View>
       )
     }
+    return (
+      <View style={styles.infoRowSpaceEvenly}>
+        <Button
+          text="Join"
+          style={{ alignSelf: 'center' }}
+          onPress={async () => {
+            try {
+              await this.props.addUser(this.sessionid, session.private, this.props.profile.uid);
+              Alert.alert('Session joined', 'You should now see this session in your session chats');
+            } catch (e) {
+              Alert.alert('Error', e.message);
+            }
+          }}
+        />
+      </View>
+    );
   }
-
 }
 
 const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => ({
@@ -363,19 +374,19 @@ const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => (
   sessions: sessions.sessions,
   privateSessions: sessions.privateSessions,
   muted: chats.muted,
-})
+});
 
 const mapDispatchToProps = dispatch => ({
-  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
-  viewGym: (id) => dispatch(navigateGym(id)),
+  viewProfile: uid => dispatch(navigateProfileView(uid)),
+  viewGym: id => dispatch(navigateGym(id)),
   goToProfile: () => dispatch(navigateProfile()),
-  goBack: ()=> dispatch(navigateBack()),
+  goBack: () => dispatch(navigateBack()),
   remove: (key, type) => dispatch(removeSession(key, type)),
   addUser: (session, isPrivate, uid) => dispatch(addUser(session, isPrivate, uid)),
-  fetchSession: (id) => dispatch(fetchSession(id)),
-  fetchPrivateSession: (id) => dispatch(fetchPrivateSession(id)),
-  openSessionChat: (session) => dispatch(navigateMessagingSession(session)),
+  fetchSession: id => dispatch(fetchSession(id)),
+  fetchPrivateSession: id => dispatch(fetchPrivateSession(id)),
+  openSessionChat: session => dispatch(navigateMessagingSession(session)),
   muteChat: (id, mute) => dispatch(muteChat(id, mute)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo)
+export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo);

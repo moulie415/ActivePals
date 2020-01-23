@@ -36,27 +36,27 @@ const setSession = session => ({
   session,
 });
 
-const setPrivateSession = (session) => ({
+const setPrivateSession = session => ({
   type: SET_PRIVATE_SESSION,
   session,
 });
 
-export const setPlaces = (places) => ({
+export const setPlaces = places => ({
   type: SET_PLACES,
   places,
 });
 
-export const setPlace = (place) => ({
+export const setPlace = place => ({
   type: SET_PLACE,
   place,
 });
 
-export const setRadius = (radius) => ({
+export const setRadius = radius => ({
   type: SET_RADIUS,
   radius,
 });
 
-export const setIgnored = (session) => ({
+export const setIgnored = session => ({
   type: SET_IGNORED,
   session,
 });
@@ -68,21 +68,74 @@ const checkHost = (host, state) => {
   if (state.sharedInfo.users[host]) return true;
 };
 
+export const removeSession = (key, isPrivate, force = false) => {
+  return (dispatch, getState) => {
+    const { uid } = getState().profile.profile;
+    const sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions;
+    const session = sessions[key];
+    const type = isPrivate ? 'privateSessions' : 'sessions';
+    if (session && session.host.uid === uid) {
+      firebase
+        .database()
+        .ref(`${type}/${key}`)
+        .remove();
+      Object.keys(session.users).forEach(user =>
+        firebase
+          .database()
+          .ref(`userSessions/${user}`)
+          .child(key)
+          .remove()
+      );
+      firebase
+        .database()
+        .ref('sessionChats')
+        .child(key)
+        .remove();
+      if (!isPrivate) {
+        geofire.remove(key);
+      }
+    } else {
+      firebase
+        .database()
+        .ref(`userSessions/${uid}`)
+        .child(key)
+        .remove();
+      firebase
+        .database()
+        .ref(`${type}/${key}/users`)
+        .child(uid)
+        .remove();
+    }
+    let obj;
+    if (session && (isPrivate || session.host.uid === uid || force)) {
+      const sessionsArr = Object.values(sessions).filter(session => session.key !== key);
+      obj = sessionsArr.reduce((acc, cur, i) => {
+        if (cur) {
+          acc[cur.key] = cur;
+        }
+        return acc;
+      }, {});
+    } else {
+      obj = sessions;
+      if (obj[key] && obj[key].users) {
+        obj[key].users[uid] = false;
+      }
+    }
+    isPrivate ? dispatch(updatePrivateSessions(obj)) : dispatch(updateSessions(obj));
+  };
+};
+
 const expirationAlert = (session, isPrivate) => {
   return (dispatch, getState) => {
     const ignore = getState().sessions.ignored[session.key];
     if (!ignore) {
       const { uid } = getState().profile.profile;
       const action = session.val().host === uid ? 'delete' : 'leave';
-      Alert.alert(
-        `${session.val().title} has expired`,
-        `Do you want to ${action} the session?`,
-        [
-          {text: "Don't ask me again", onPress: () => dispatch(setIgnored(session.key)) },
-          {text: 'Yes', onPress: () => dispatch(removeSession(session.key, isPrivate)), style: 'destructive'},
-          {text: 'Cancel', style: 'cancel'}
-        ]
-      )
+      Alert.alert(`${session.val().title} has expired`, `Do you want to ${action} the session?`, [
+        { text: "Don't ask me again", onPress: () => dispatch(setIgnored(session.key)) },
+        { text: 'Yes', onPress: () => dispatch(removeSession(session.key, isPrivate)), style: 'destructive' },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
     }
   };
 };
@@ -97,135 +150,142 @@ export const fetchSessions = () => {
       .database()
       .ref('userSessions')
       .child(uid)
-      .on('value', snapshot => {
+      .on('value', async snapshot => {
         if (snapshot.val()) {
-          const promises = [];
-          Object.keys(snapshot.val()).forEach(key => {
-            if (snapshot.val()[key] !== 'private') {
-              promises.push(firebase.database().ref('sessions').child(key).once('value'))
-            }
-          });
-          Promise.all(promises).then(sessions => {
-            const obj = {}
-            sessions.forEach(session => {
-              const { host } = session.val();
-              if (!checkHost(host, getState())) {
-                userFetches.push(host);
+          const sessions = await Promise.all(
+            Object.keys(snapshot.val()).map(async key => {
+              if (snapshot.val()[key] !== 'private') {
+                return firebase
+                  .database()
+                  .ref('sessions')
+                  .child(key)
+                  .once('value');
               }
-              const duration = calculateDuration(session.val());
-              const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
-              const current = new Date().getTime()
-              if (time + duration < current) {
-                dispatch(expirationAlert(session, false));
-              }
-              obj[session.key] = { ...session.val(), host, key: session.key }
             })
-            dispatch(updateSessions(obj))
-            dispatch(fetchUsers(userFetches))
+          );
+          const obj = {};
+          sessions.forEach(session => {
+            const { host } = session.val();
+            if (!checkHost(host, getState())) {
+              userFetches.push(host);
+            }
+            const duration = calculateDuration(session.val());
+            const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
+            const current = new Date().getTime();
+            if (time + duration < current) {
+              dispatch(expirationAlert(session, false));
+            }
+            obj[session.key] = { ...session.val(), host, key: session.key };
           });
+          dispatch(updateSessions(obj));
+          dispatch(fetchUsers(userFetches));
         } else {
-          dispatch(removeSession(snapshot.key, false))
+          dispatch(removeSession(snapshot.key, false));
         }
       });
 
-    return new Promise(resolve => {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          const geoQuery = geofire.query({
-            center: [lat, lon],
-            radius,
-          });
+    // @ts-ignore
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const geoQuery = geofire.query({
+          center: [lat, lon],
+          radius,
+        });
 
-          const onReadyRegistration = geoQuery.on("ready",() => {
-            console.log("GeoQuery has loaded and fired all other events for initial data")
-            resolve()
-          })
+        geoQuery.on('ready', () => {
+          console.log('GeoQuery has loaded and fired all other events for initial data');
+        });
 
-          const onKeyEnteredRegistration = geoQuery.on("key_entered", (key, location, distance) => {
-            console.log(key + " entered query at " + location + " (" + distance + " km from center)")
-            firebase.database().ref('sessions/' + key).once('value', snapshot => {
+        geoQuery.on('key_entered', (key, location, distance) => {
+          console.log(`${key} entered query at ${location} (${distance} km from center)`);
+          firebase
+            .database()
+            .ref(`sessions/${key}`)
+            .once('value', snapshot => {
               if (snapshot.val()) {
                 const duration = calculateDuration(snapshot.val());
-                const time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime()
+                const time = new Date(snapshot.val().dateTime.replace(/-/g, '/')).getTime();
                 const current = new Date().getTime();
                 if (time + duration > current) {
                   const inProgress = time < current;
-                  firebase.database().ref('users/' + snapshot.val().host).once('value', host => {
-                    dispatch(setSession({...snapshot.val(), key, inProgress, distance, host: host.val()}))
-                  })
+                  firebase
+                    .database()
+                    .ref(`users/${snapshot.val().host}`)
+                    .once('value', host => {
+                      dispatch(setSession({ ...snapshot.val(), key, inProgress, distance, host: host.val() }));
+                    });
                 }
               }
-            })
-          })
+            });
+        });
 
-          const onKeyExitedRegistration = geoQuery.on("key_exited", (key, location, distance) => {
-            console.log(key + " exited query to " + location + " (" + distance + " km from center)")
-            dispatch(removeSession(key, false, true));
-          })
+        geoQuery.on('key_exited', (key, location, distance) => {
+          console.log(`${key} exited query to ${location} (${distance} km from center)`);
+          dispatch(removeSession(key, false, true));
+        });
 
-          const onKeyMovedRegistration = geoQuery.on("key_moved", (key, location, distance) => {
-            console.log(key + " moved within query to " + location + " (" + distance + " km from center)")
-          })
-
-        },
-        (error) => {
-
-        },
-      { enableHighAccuracy: true, timeout: 20000 /*, maximumAge: 1000*/ },
-      )
-      })
-        
-    }
-	}
-
+        geoQuery.on('key_moved', (key, location, distance) => {
+          console.log(`${key} moved within query to ${location} (${distance} km from center)`);
+        });
+      },
+      error => console.warn(error.message),
+      { enableHighAccuracy: true, timeout: 20000 /* , maximumAge: 1000 */ }
+    );
+  };
+};
 
 export const fetchPrivateSessions = () => {
   return async (dispatch, getState) => {
     const { uid } = getState().profile.profile;
     const userFetches = [];
-    return firebase.database().ref('userSessions').child(uid).on('value', snapshot => {
-      if (snapshot.val()) {
-          const promises = [];
-          Object.keys(snapshot.val()).forEach(key => {
-          if (snapshot.val()[key] === 'private') {
-            promises.push(firebase.database().ref('privateSessions').child(key).once('value'))
-          }
-        })
-        return Promise.all(promises).then(sessions => {
+    return firebase
+      .database()
+      .ref('userSessions')
+      .child(uid)
+      .on('value', async snapshot => {
+        if (snapshot.val()) {
+          const sessions = await Promise.all(
+            Object.keys(snapshot.val()).map(key => {
+              if (snapshot.val()[key] === 'private') {
+                return firebase
+                  .database()
+                  .ref('privateSessions')
+                  .child(key)
+                  .once('value');
+              }
+            })
+          );
           const privateSessions = sessions.map(session => {
-            const duration = calculateDuration(session.val())
-            const time = new Date(session.val().dateTime.replace(/-/g, "/")).getTime()
-            const current = new Date().getTime()
+            const duration = calculateDuration(session.val());
+            const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
+            const current = new Date().getTime();
             if (time + duration < current) {
-              dispatch(expirationAlert(session, true))
+              dispatch(expirationAlert(session, true));
             }
-            const inProgress = (time + duration > current && time < current);
-            const host = session.val().host
-            
+            const inProgress = time + duration > current && time < current;
+            const { host } = session.val();
             if (!checkHost(host, getState())) {
               userFetches.push(host);
             }
-            return {...session.val(), key: session.key, inProgress, host}
-          })
+            return { ...session.val(), key: session.key, inProgress, host };
+          });
 
           const obj = privateSessions.reduce((acc, cur, i) => {
             if (cur) {
-              acc[cur.key] = cur
+              acc[cur.key] = cur;
             }
-            return acc
-          }, {})
-          dispatch(setPrivateSessions(obj))
-          dispatch(fetchUsers(userFetches))
-        })
-      }
-      else {
-        dispatch(removeSession(snapshot.key, true))
-      }
-    })
-  }
-}
+            return acc;
+          }, {});
+          dispatch(setPrivateSessions(obj));
+          dispatch(fetchUsers(userFetches));
+        } else {
+          dispatch(removeSession(snapshot.key, true));
+        }
+      });
+  };
+};
 
 export const fetchPhotoPath = async (result, state) => {
   const { GOOGLE_API_KEY } = state.sharedInfo.envVars;
@@ -255,104 +315,74 @@ export const fetchGym = id => {
           .ref(`gyms/${id}/users`)
           .once('value');
         if (users && users.val()) {
-          gym.users = users.val()
-          const	unfetched = Object.keys(users.val()).filter(user => {
-            return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
-          })
-          dispatch(fetchUsers(unfetched))
+          gym.users = users.val();
+          const unfetched = Object.keys(users.val()).filter(user => {
+            return !(getState().friends.friends[user] && getState().sharedInfo.users[user]);
+          });
+          dispatch(fetchUsers(unfetched));
         }
 
-        dispatch(setPlace(gym))
-        const yourGym = getState().profile.gym
+        dispatch(setPlace(gym));
+        const yourGym = getState().profile.gym;
         if (yourGym && yourGym.place_id === gym.place_id) {
-          dispatch(setGym(gym))
+          dispatch(setGym(gym));
         }
-      })
-  }
-}
+      });
+  };
+};
 
-export const fetchSession = (id) => {
+export const fetchSession = id => {
   return async (dispatch, getState) => {
     let distance;
-    //check if session exists and use existing distance value
+    // check if session exists and use existing distance value
     const currentSession = getState().sessions.sessions[id];
     if (currentSession) {
-      distance = currentSession.distance
+      distance = currentSession.distance;
     }
 
-    const session = await firebase.database().ref('sessions').child(id).once('value')
+    const session = await firebase
+      .database()
+      .ref('sessions')
+      .child(id)
+      .once('value');
     if (session.val().gym) {
       dispatch(fetchGym(session.val().gym.place_id));
     }
     if (session.val().users) {
-      const	unfetched = Object.keys(session.val().users).filter(user => {
-        return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
-      })
-      dispatch(fetchUsers(unfetched))
-    }
-    const duration = calculateDuration(session.val());
-    const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
-    const current = new Date().getTime();
-    const inProgress = (time + duration > current && time < current)
-    const host = await firebase.database().ref('users/' + session.val().host).once('value')
-    dispatch(setSession({ ...session.val(), key: session.key, inProgress, distance, host: host.val() }));
-  }
-}
-
-export const fetchPrivateSession = (id) => {
-  return async (dispatch, getState) => {
-    const session = await firebase.database().ref('privateSessions').child(id).once('value')
-    if (session.val().gym) {
-      dispatch(fetchGym(session.val().gym.place_id))
-    }
-    if (session.val().users) {
       const unfetched = Object.keys(session.val().users).filter(user => {
-        return !(getState().friends.friends[user] && getState().sharedInfo.users[user])
-      })
+        return !(getState().friends.friends[user] && getState().sharedInfo.users[user]);
+      });
       dispatch(fetchUsers(unfetched));
     }
     const duration = calculateDuration(session.val());
     const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
     const current = new Date().getTime();
-    const inProgress = (time + duration > current && time < current)
-    const host = await firebase.database().ref('users/' + session.val().host).once('value')
-    dispatch(setPrivateSession({ ...session.val(), key: session.key, inProgress, host: host.val() }));
+    const inProgress = time + duration > current && time < current;
+    dispatch(setSession({ ...session.val(), key: session.key, inProgress, distance }));
   };
 };
 
-export const removeSession = (key, isPrivate, force = false) => {
-  return (dispatch, getState) => {
-    const { uid } = getState().profile.profile;
-    const sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions;
-    const session = sessions[key];
-    const type = isPrivate ? 'privateSessions' : 'sessions';
-    if (session && session.host.uid === uid) {
-      firebase.database().ref(type + '/' + key).remove()
-      Object.keys(session.users).forEach(user => firebase.database().ref(`userSessions/${user}`).child(key).remove())
-      firebase.database().ref('sessionChats').child(key).remove()
-      if (!isPrivate) {
-        geofire.remove(key);
-      }
-    } else {
-      firebase.database().ref(`userSessions/${uid}`).child(key).remove()
-      firebase.database().ref(type + '/' + key + '/users').child(uid).remove()
+export const fetchPrivateSession = id => {
+  return async (dispatch, getState) => {
+    const session = await firebase
+      .database()
+      .ref('privateSessions')
+      .child(id)
+      .once('value');
+    if (session.val().gym) {
+      dispatch(fetchGym(session.val().gym.place_id));
     }
-    let obj;
-    if (session && (isPrivate || session.host.uid === uid || force)) {
-      const sessionsArr = Object.values(sessions).filter(session => session.key !== key)
-      obj = sessionsArr.reduce((acc, cur, i) => {
-        if (cur) {
-          acc[cur.key] = cur;
-        }
-        return acc;
-      }, {});
-    } else {
-      obj = sessions
-      if (obj[key] && obj[key].users) {
-        obj[key].users[uid] = false;
-      }
+    if (session.val().users) {
+      const unfetched = Object.keys(session.val().users).filter(user => {
+        return !(getState().friends.friends[user] && getState().sharedInfo.users[user]);
+      });
+      dispatch(fetchUsers(unfetched));
     }
-    isPrivate ? dispatch(updatePrivateSessions(obj)) : dispatch(updateSessions(obj))
+    const duration = calculateDuration(session.val());
+    const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
+    const current = new Date().getTime();
+    const inProgress = time + duration > current && time < current;
+    dispatch(setPrivateSession({ ...session.val(), key: session.key, inProgress }));
   };
 };
 
@@ -386,8 +416,6 @@ export const fetchPhotoPaths = () => {
     dispatch(setPlaces(obj));
   };
 };
-
-
 
 const mapIdsToPlaces = places => {
   const obj = {};
@@ -428,8 +456,6 @@ export const fetchPlaces = (lat, lon, token) => {
             }
           });
       }
-    })
-  }
-}
-
-
+    });
+  };
+};
