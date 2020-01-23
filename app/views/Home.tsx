@@ -11,33 +11,58 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
+  Image as SlowImage,
 } from 'react-native';
-import Card from '../components/Card';
+import { connect } from 'react-redux';
+import ImagePicker from 'react-native-image-picker';
+import ImageResizer from 'react-native-image-resizer';
+import ImageViewer from 'react-native-image-zoom-viewer';
+import ModalBox from 'react-native-modalbox';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { PulseIndicator } from 'react-native-indicators';
 import firebase from 'react-native-firebase';
+import Video from 'react-native-video';
+import Share, { Options } from 'react-native-share';
+import RNFetchBlob, { RNFetchBlobStat } from 'rn-fetch-blob';
+import Image from 'react-native-fast-image';
+import Card from '../components/Card';
 import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
 import sStyles from '../styles/settingsStyles';
 import cStyles from '../components/comments/styles';
 import Text, { globalTextStyle } from '../components/Text';
-import ImagePicker from 'react-native-image-picker';
-import ImageResizer from 'react-native-image-resizer';
-import ImageViewer from 'react-native-image-zoom-viewer';
-import ModalBox from 'react-native-modalbox';
 import Comments from '../components/comments';
-import Image from 'react-native-fast-image';
-import { Image as SlowImage } from 'react-native';
 import Header from '../components/Header/header';
-import { likesExtractor, getSimplifiedTime, getMentionsList } from '../constants/utils';
+import { likesExtractor, getSimplifiedTime, getMentionsList, sortPostsByDate } from '../constants/utils';
 import ParsedText from '../components/ParsedText';
-import Video from 'react-native-video';
-import RNFetchBlob, { RNFetchBlobStat } from 'rn-fetch-blob';
 import AdView from '../components/AdView';
-import Share, { Options } from 'react-native-share';
-import Post, { PostType } from '../types/Post';
+import { PostType } from '../types/Post';
 import HomeProps from '../types/views/Home';
 import RepsModal from '../components/RepsModal';
+import {
+  navigateProfile,
+  navigateProfileView,
+  navigateFilePreview,
+  navigateNotifications,
+  navigateFullScreenVideo,
+  navigatePostView,
+} from '../actions/navigation';
+import {
+  addPost,
+  repPost,
+  postComment,
+  fetchComments,
+  repComment,
+  fetchPosts,
+  fetchCommentRepsUsers,
+  fetchRepsUsers,
+  fetchReplies,
+} from '../actions/home';
+import { fetchProfile } from '../actions/profile';
+import { fetchFriends } from '../actions/friends';
+import Comment from '../types/Comment';
+import ImagePickerOptions from '../types/Shared';
+import Profile from '../types/Profile';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
 const weightDown = require('../../assets/images/weightlifting_down.png');
@@ -108,10 +133,230 @@ export class Home extends Component<HomeProps, State> {
       });
   }
 
-  sortByDate(array: Post[]) {
-    return array.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  renderFeedItem(item) {
+    switch (item.type) {
+      case PostType.STATUS:
+        return (
+          <View style={{ padding: 10, margin: 5 }}>
+            <View style={{ flexDirection: 'row', flex: 1, marginBottom: 10 }}>
+              {this.fetchAvatar(item.uid)}
+              <View style={{ flex: 1 }}>
+                {this.getUsernameFormatted(item.uid)}
+                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+              </View>
+              <TouchableOpacity>
+                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
+              </TouchableOpacity>
+            </View>
+            <View style={{ marginBottom: 5 }}>
+              <ParsedText text={item.text} />
+            </View>
+            {this.repCommentCount(item)}
+            {this.repsAndComments(item)}
+          </View>
+        );
+      case PostType.PHOTO:
+        return (
+          <View>
+            <View style={{ flexDirection: 'row', flex: 1, padding: 10 }}>
+              {this.fetchAvatar(item.uid)}
+              <View style={{ flex: 1 }}>
+                {this.getUsernameFormatted(item.uid)}
+                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+              </View>
+              <TouchableOpacity>
+                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
+              </TouchableOpacity>
+            </View>
+            <View style={{ marginBottom: 5 }}>
+              <ParsedText text={item.text} />
+            </View>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => this.setState({ selectedImage: [{ url: item.url }], showImage: true })}
+              style={{ marginTop: 10, marginBottom: 10 }}
+            >
+              <Image style={{ width: '100%', height: 400 }} resizeMode={'cover'} source={{ uri: item.url }} />
+            </TouchableOpacity>
+            {this.repCommentCount(item)}
+            <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
+          </View>
+        );
+      case PostType.VIDEO:
+        return (
+          <View>
+            <View style={{ flexDirection: 'row', flex: 1, padding: 10, zIndex: 2 }}>
+              {this.fetchAvatar(item.uid)}
+              <View style={{ flex: 1 }}>
+                {this.getUsernameFormatted(item.uid)}
+                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+              </View>
+              <TouchableOpacity>
+                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
+              </TouchableOpacity>
+            </View>
+            <ParsedText style={{ marginVertical: 10 }} text={item.text} />
+            <TouchableWithoutFeedback
+              onPress={() => {
+                this.setState({ playing: { [item.uid]: false } });
+              }}
+            >
+              <Video
+                ref={ref => (this.players[item.key] = ref)}
+                source={{ uri: item.url }}
+                style={{ width: '100%', height: 400 }}
+                paused={!this.state.playing[item.key]}
+                ignoreSilentSwitch="ignore"
+                repeat
+                onFullscreenPlayerDidPresent={() => this.setState({ playing: { [item.key]: false } })}
+                resizeMode="cover"
+                onBuffer={() => {
+                  console.log('buffering');
+                }} // Callback when remote video is buffering
+                onError={e => {
+                  if (e.error && e.error.code) {
+                    Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain);
+                  } else if (e.message) {
+                    Alert.alert('Error', e.message);
+                  } else Alert.alert('Error', 'Error playing video');
+                }}
+              />
+            </TouchableWithoutFeedback>
+            {!this.state.playing[item.key] && (
+              <View style={styles.playButtonContainer}>
+                <TouchableOpacity onPress={() => this.setState({ playing: { [item.key]: true } })}>
+                  <Icon
+                    size={50}
+                    name={'md-play'}
+                    style={{ color: '#fff', backgroundColor: 'transparent', opacity: 0.8 }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    bottom:
+                      (item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0) ? 110 : 70,
+                    right: 15,
+                    position: 'absolute',
+                    padding: 2,
+                    paddingHorizontal: 6,
+                    backgroundColor: 'rgba(0,0,0,0.3)',
+                    borderRadius: 5,
+                  }}
+                  onPress={() => {
+                    this.setState({ playing: { [item.key]: false } });
+                    if (Platform.OS ==='ios') {
+                      this.players[item.key].presentFullscreenPlayer();
+                    } else {
+                      this.props.navigateFullScreenVideo(item.url);
+                    }
+                  }}
+                >
+                  <Icon
+                    name="md-expand"
+                    size={30}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: '#fff',
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+            {this.repCommentCount(item)}
+            <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
+          </View>
+        );
+      default:
+        return null;
+    }
+  }
+
+  renderRep(l) {
+    const like = l.item;
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.setState({ likesModalVisible: false });
+          like.user_id ===this.props.profile.uid ? this.props.goToProfile() : this.props.viewProfile(like.user_id);
+        }}
+        style={cStyles.likeButton}
+        key={like.user_id + ''}
+      >
+        <View style={[cStyles.likeContainer]}>
+          {like.image ? (
+            <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
+          ) : (
+            <Icon name="md-contact" style={{ fontSize: 40, color: colors.primary }} />
+          )}
+          <Text>{like.username}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  renderFeed() {
+    const { feed } = this.props;
+    if (Object.values(feed).length > 0) {
+      return (
+        <FlatList
+          data={sortPostsByDate(Object.values(feed))}
+          keyExtractor={item => item.key}
+          onRefresh={async () => {
+            this.setState({ refreshing: true });
+            this.props.getFriends();
+            this.props.getProfile();
+            await this.props.getPosts(this.props.profile.uid, 30);
+            this.setState({ refreshing: false });
+          }}
+          // onEndReached={()=> {
+          //   this.setState({fetchAmount: this.state.fetchAmount+15}, () => {
+          //     this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
+          //   })
+          // }}
+          ListFooterComponent={() => {
+            const initial = Object.values(feed).length;
+            if (initial > 29 && this.state.loadMore) {
+              return (
+                <Card>
+                  <TouchableOpacity
+                    style={{ alignItems: 'center', paddingVertical: 10 }}
+                    onPress={() => {
+                      const keys = Object.keys(feed);
+                      const endAt = keys[keys.length - 1];
+                      this.setState({ spinner: true }, async () => {
+                        await this.props.getPosts(this.props.profile.uid, 30, endAt)
+                        if (Object.values(feed).length ===initial) {
+                          this.setState({ loadMore: false });
+                        }
+                        this.setState({ spinner: false });
+                      });
+                    }}
+                  >
+                    <Text style={{ color: colors.secondary }}>Load more</Text>
+                  </TouchableOpacity>
+                </Card>
+              );
+            } else return null;
+          }}
+          refreshing={this.state.refreshing}
+          renderItem={({ item, index }) => {
+            return (
+              <View>
+                <AdView index={index} />
+                <Card style={{ marginBottom: 10 }}>
+                  <TouchableOpacity
+                    onPress={() => this.props.viewPost(item.key)}
+                    style={{ alignSelf: 'flex-end' }}
+                  ></TouchableOpacity>
+                  {this.renderFeedItem(item)}
+                </Card>
+              </View>
+            );
+          }}
+        />
+      );
+    } else
+      return <Text style={{ fontSize: 20, alignSelf: 'center', marginTop: 20, color: '#999' }}>No feed items yet</Text>;
   }
 
   render() {
@@ -254,7 +499,7 @@ export class Home extends Component<HomeProps, State> {
                   ]);
                 }
               } else {
-                //alert no status
+                // alert no status
               }
             }}
           >
@@ -361,7 +606,7 @@ export class Home extends Component<HomeProps, State> {
           swipeToClose={false}
           isOpen={this.state.showCommentModal}
           onClosed={() => this.setState({ focusCommentInput: false, showCommentModal: false })}
-          backButtonClose={true}
+          backButtonClose
           position={'center'}
         >
           <TouchableOpacity onPress={() => this.setState({ showCommentModal: false })}>
@@ -381,7 +626,7 @@ export class Home extends Component<HomeProps, State> {
             //lastCommentUpdate={this.state.lastCommentUpdate}
             users={Object.values(combined)}
             usernameTapAction={(username, uid) => {
-              if (uid == this.props.profile.uid) {
+              if (uid ===this.props.profile.uid) {
                 this.props.goToProfile();
               } else {
                 this.props.viewProfile(uid);
@@ -464,207 +709,6 @@ export class Home extends Component<HomeProps, State> {
     );
   }
 
-  renderFeed() {
-    const { feed } = this.props;
-    if (Object.values(feed).length > 0) {
-      return (
-        <FlatList
-          data={this.sortByDate(Object.values(feed))}
-          keyExtractor={item => item.key}
-          onRefresh={async () => {
-            this.setState({ refreshing: true });
-            this.props.getFriends();
-            this.props.getProfile();
-            await this.props.getPosts(this.props.profile.uid, 30)
-            this.setState({ refreshing: false });
-          }}
-          // onEndReached={()=> {
-          //   this.setState({fetchAmount: this.state.fetchAmount+15}, () => {
-          //     this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
-          //   })
-          // }}
-          ListFooterComponent={() => {
-            const initial = Object.values(feed).length;
-            if (initial > 29 && this.state.loadMore) {
-              return (
-                <Card>
-                  <TouchableOpacity
-                    style={{ alignItems: 'center', paddingVertical: 10 }}
-                    onPress={() => {
-                      const keys = Object.keys(feed);
-                      const endAt = keys[keys.length - 1];
-                      this.setState({ spinner: true }, async () => {
-                        await this.props.getPosts(this.props.profile.uid, 30, endAt)
-                        if (Object.values(feed).length == initial) {
-                          this.setState({ loadMore: false });
-                        }
-                        this.setState({ spinner: false });
-                      });
-                    }}
-                  >
-                    <Text style={{ color: colors.secondary }}>Load more</Text>
-                  </TouchableOpacity>
-                </Card>
-              );
-            } else return null;
-          }}
-          refreshing={this.state.refreshing}
-          renderItem={({ item, index }) => {
-            return (
-              <View>
-                <AdView index={index} />
-                <Card style={{ marginBottom: 10 }}>
-                  <TouchableOpacity
-                    onPress={() => this.props.viewPost(item.key)}
-                    style={{ alignSelf: 'flex-end' }}
-                  ></TouchableOpacity>
-                  {this.renderFeedItem(item)}
-                </Card>
-              </View>
-            );
-          }}
-        />
-      );
-    } else
-      return <Text style={{ fontSize: 20, alignSelf: 'center', marginTop: 20, color: '#999' }}>No feed items yet</Text>;
-  }
-
-  renderFeedItem(item) {
-    switch (item.type) {
-      case PostType.STATUS:
-        return (
-          <View style={{ padding: 10, margin: 5 }}>
-            <View style={{ flexDirection: 'row', flex: 1, marginBottom: 10 }}>
-              {this.fetchAvatar(item.uid)}
-              <View style={{ flex: 1 }}>
-                {this.getUsernameFormatted(item.uid)}
-                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
-              </View>
-              <TouchableOpacity>
-                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
-              </TouchableOpacity>
-            </View>
-            <View style={{ marginBottom: 5 }}>
-              <ParsedText text={item.text} />
-            </View>
-            {this.repCommentCount(item)}
-            {this.repsAndComments(item)}
-          </View>
-        );
-      case PostType.PHOTO:
-        return (
-          <View>
-            <View style={{ flexDirection: 'row', flex: 1, padding: 10 }}>
-              {this.fetchAvatar(item.uid)}
-              <View style={{ flex: 1 }}>
-                {this.getUsernameFormatted(item.uid)}
-                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
-              </View>
-              <TouchableOpacity>
-                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
-              </TouchableOpacity>
-            </View>
-            <View style={{ marginBottom: 5 }}>
-              <ParsedText text={item.text} />
-            </View>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() => this.setState({ selectedImage: [{ url: item.url }], showImage: true })}
-              style={{ marginTop: 10, marginBottom: 10 }}
-            >
-              <Image style={{ width: '100%', height: 400 }} resizeMode={'cover'} source={{ uri: item.url }} />
-            </TouchableOpacity>
-            {this.repCommentCount(item)}
-            <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
-          </View>
-        );
-      case PostType.VIDEO:
-        return (
-          <View>
-            <View style={{ flexDirection: 'row', flex: 1, padding: 10, zIndex: 2 }}>
-              {this.fetchAvatar(item.uid)}
-              <View style={{ flex: 1 }}>
-                {this.getUsernameFormatted(item.uid)}
-                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
-              </View>
-              <TouchableOpacity>
-                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
-              </TouchableOpacity>
-            </View>
-            <ParsedText style={{ marginVertical: 10 }} text={item.text} />
-            <TouchableWithoutFeedback
-              onPress={() => {
-                this.setState({ playing: { [item.uid]: false } });
-              }}
-            >
-              <Video
-                ref={ref => (this.players[item.key] = ref)}
-                source={{ uri: item.url }}
-                style={{ width: '100%', height: 400 }}
-                paused={!this.state.playing[item.key]}
-                ignoreSilentSwitch="ignore"
-                repeat={true}
-                onFullscreenPlayerDidPresent={() => this.setState({ playing: { [item.key]: false } })}
-                resizeMode="cover"
-                onBuffer={() => {
-                  console.log('buffering');
-                }} // Callback when remote video is buffering
-                onError={e => {
-                  if (e.error && e.error.code) {
-                    Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain);
-                  } else if (e.message) {
-                    Alert.alert('Error', e.message);
-                  } else Alert.alert('Error', 'Error playing video');
-                }}
-              />
-            </TouchableWithoutFeedback>
-            {!this.state.playing[item.key] && (
-              <View style={styles.playButtonContainer}>
-                <TouchableOpacity onPress={() => this.setState({ playing: { [item.key]: true } })}>
-                  <Icon
-                    size={50}
-                    name={'md-play'}
-                    style={{ color: '#fff', backgroundColor: 'transparent', opacity: 0.8 }}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    bottom:
-                      (item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0) ? 110 : 70,
-                    right: 15,
-                    position: 'absolute',
-                    padding: 2,
-                    paddingHorizontal: 6,
-                    backgroundColor: 'rgba(0,0,0,0.3)',
-                    borderRadius: 5,
-                  }}
-                  onPress={() => {
-                    this.setState({ playing: { [item.key]: false } });
-                    if (Platform.OS == 'ios') {
-                      this.players[item.key].presentFullscreenPlayer();
-                    } else {
-                      this.props.navigateFullScreenVideo(item.url);
-                    }
-                  }}
-                >
-                  <Icon
-                    name="md-expand"
-                    size={30}
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: '#fff',
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-            {this.repCommentCount(item)}
-            <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
-          </View>
-        );
-    }
-  }
-
   repCommentCount(item) {
     if ((item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0)) {
       return (
@@ -699,13 +743,14 @@ export class Home extends Component<HomeProps, State> {
           <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5 }} />
         </View>
       );
-    } else return <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5 }} />;
+    }
+    return <View style={{ borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5 }} />;
   }
 
   repsAndComments(item) {
     return (
       <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-        {item.type != 'video' && (
+        {item.type !== 'video' && (
           <TouchableOpacity
             onPress={() => {
               this.sharePost(item);
@@ -743,10 +788,10 @@ export class Home extends Component<HomeProps, State> {
   }
 
   fetchAvatar(uid) {
-    if (this.props.profile.avatar && uid == this.props.profile.uid) {
+    if (this.props.profile.avatar && uid === this.props.profile.uid) {
       return (
         <TouchableOpacity
-          onPress={() => (uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
+          onPress={() => (uid !== this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
         >
           <Image
             source={{ uri: this.props.profile.avatar }}
@@ -754,10 +799,11 @@ export class Home extends Component<HomeProps, State> {
           />
         </TouchableOpacity>
       );
-    } else if (this.props.friends[uid] && this.props.friends[uid].avatar) {
+    }
+    if (this.props.friends[uid] && this.props.friends[uid].avatar) {
       return (
         <TouchableOpacity
-          onPress={() => (uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
+          onPress={() => (uid !== this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
         >
           <Image
             source={{ uri: this.props.friends[uid].avatar }}
@@ -765,26 +811,25 @@ export class Home extends Component<HomeProps, State> {
           />
         </TouchableOpacity>
       );
-    } else {
-      return (
-        <TouchableOpacity
-          onPress={() => (uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
-        >
-          <Icon name="md-contact" style={{ fontSize: 45, color: colors.primary, marginRight: 10 }} />
-        </TouchableOpacity>
-      );
     }
+    return (
+      <TouchableOpacity
+        onPress={() => (uid !== this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
+      >
+        <Icon name="md-contact" style={{ fontSize: 45, color: colors.primary, marginRight: 10 }} />
+      </TouchableOpacity>
+    );
   }
 
   getUsernameFormatted(uid) {
     return (
       <TouchableOpacity
         onPress={() => {
-          uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile();
+          uid !== this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile();
         }}
       >
         <Text style={{ fontWeight: 'bold', color: colors.secondary, flex: 1 }}>
-          {uid == this.props.profile.uid ? 'You' : this.getUsername(uid)}
+          {uid === this.props.profile.uid ? 'You' : this.getUsername(uid)}
         </Text>
       </TouchableOpacity>
     );
@@ -794,7 +839,7 @@ export class Home extends Component<HomeProps, State> {
     const videoOptions: ImagePickerOptions = {
       mediaType: 'video',
       durationLimit: 30,
-      videoQuality: Platform.OS == 'ios' ? 'medium' : 'low',
+      videoQuality: Platform.OS ==='ios' ? 'medium' : 'low',
     };
     const options: ImagePickerOptions = {
       title: null,
@@ -819,7 +864,7 @@ export class Home extends Component<HomeProps, State> {
         Alert.alert('Error', response.error);
         this.setState({ spinner: false });
       } else if (response.customButton) {
-        if (response.customButton == 'uploadVideo') {
+        if (response.customButton ==='uploadVideo') {
           ImagePicker.launchImageLibrary(videoOptions, response => {
             this.setState({ spinner: false });
             if (response.error) {
@@ -828,7 +873,7 @@ export class Home extends Component<HomeProps, State> {
               this.processVideo(response.uri);
             }
           });
-        } else if (response.customButton == 'video') {
+        } else if (response.customButton ==='video') {
           ImagePicker.launchCamera(videoOptions, response => {
             this.setState({ spinner: false });
             if (response.error) {
@@ -855,8 +900,8 @@ export class Home extends Component<HomeProps, State> {
 
   processVideo(uri) {
     const statURI = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-    //if (Platform.OS == 'ios') {
-    //TODO android needs compressing
+    // if (Platform.OS ==='ios') {
+    // TODO android needs compressing
     RNFetchBlob.fs
       .stat(statURI)
       .then(stats => {
@@ -876,42 +921,21 @@ export class Home extends Component<HomeProps, State> {
   getUsername(uid) {
     if (this.props.friends[uid]) {
       return this.props.friends[uid].username;
-    } else if (this.props.users[uid]) {
+    }
+    if (this.props.users[uid]) {
       return this.props.users[uid].username;
-    } else return 'N/A';
-  }
-
-  renderRep(l) {
-    let like = l.item;
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          this.setState({ likesModalVisible: false });
-          like.user_id == this.props.profile.uid ? this.props.goToProfile() : this.props.viewProfile(like.user_id);
-        }}
-        style={cStyles.likeButton}
-        key={like.user_id + ''}
-      >
-        <View style={[cStyles.likeContainer]}>
-          {like.image ? (
-            <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
-          ) : (
-            <Icon name="md-contact" style={{ fontSize: 40, color: colors.primary }} />
-          )}
-          <Text>{like.username}</Text>
-        </View>
-      </TouchableOpacity>
-    );
+    }
+    return 'N/A';
   }
 
   async sharePost(item) {
     this.setState({ spinner: true });
-    const username = this.props.profile.username;
+    const { username } = this.props.profile;
     const options: Options = {
       message: `${username} shared a post from ActivePals:\n ${item.text ? '"' + item.text + '"' : ''}`,
       title: `Share ${item.type}?`,
     };
-    if (item.type == 'photo') {
+    if (item.type === 'photo') {
       try {
         const resp = await RNFetchBlob.config({ fileCache: false }).fetch('GET', item.url);
         const base64 = await resp.base64();
@@ -933,32 +957,6 @@ export class Home extends Component<HomeProps, State> {
     }
   }
 }
-
-import { connect } from 'react-redux';
-import {
-  navigateProfile,
-  navigateProfileView,
-  navigateFilePreview,
-  navigateNotifications,
-  navigateFullScreenVideo,
-  navigatePostView,
-} from '../actions/navigation';
-import {
-  addPost,
-  repPost,
-  postComment,
-  fetchComments,
-  repComment,
-  fetchPosts,
-  fetchCommentRepsUsers,
-  fetchRepsUsers,
-  fetchReplies,
-} from '../actions/home';
-import { fetchProfile } from '../actions/profile';
-import { fetchFriends } from '../actions/friends';
-import Comment from '../types/Comment';
-import ImagePickerOptions from '../types/Shared';
-import Profile from '../types/Profile';
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,

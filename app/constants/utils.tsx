@@ -7,6 +7,7 @@ import str from './strings';
 import { SessionType } from '../types/Session';
 import { UserState } from '../types/Profile';
 import Comment from '../types/Comment';
+import Post from '../types/Post';
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming'];
 
@@ -364,6 +365,12 @@ export const validatePostcode = code => {
 export const sortChatsByDate = array => {
   return array.sort((a, b) => {
     return new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime();
+  });
+};
+
+export const sortPostsByDate = (array: Post[]) => {
+  return array.sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 };
 
