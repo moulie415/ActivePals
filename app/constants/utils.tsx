@@ -241,6 +241,7 @@ export function deg2rad(deg) {
 }
 
 export const getDistance = (item, lat1, lon1, gym = false) => {
+  const DEFAULT_DISTANCE = 999999;
   if (lat1 && lon1) {
     let lat2;
     let lon2;
@@ -248,23 +249,23 @@ export const getDistance = (item, lat1, lon1, gym = false) => {
       if (item.geometry) {
         lat2 = item.geometry.location.lat;
         lon2 = item.geometry.location.lng;
-      } else return 'N/A';
+      } else return DEFAULT_DISTANCE;
     } else {
       lat2 = item.location.position.lat;
       lon2 = item.location.position.lng;
     }
-    let R = 6371;
-    let dLat = deg2rad(lat2 - lat1);
-    let dLon = deg2rad(lon2 - lon1);
-    let a =
+    const R = 6371;
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
-    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    let d = R * c;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c;
     return d.toFixed(2);
   }
-  return 'N/A';
+  return DEFAULT_DISTANCE;
 };
 
 export const addSessionToCalendar = (calendarId, session) => {
@@ -371,6 +372,25 @@ export const sortChatsByDate = array => {
 export const sortPostsByDate = (array: Post[]) => {
   return array.sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+};
+
+export const sortSessionsByDateTime = sessions => {
+  return sessions.sort((a, b) => {
+    const aDate = a.dateTime.replace(/-/g, '/');
+    const bDate = b.dateTime.replace(/-/g, '/');
+    return new Date(aDate).getTime() - new Date(bDate).getTime();
+  });
+};
+
+export const sortSessionsByDistance = sessions =>  {
+  return sessions.sort((a, b) => {
+    if (a.distance && b.distance) {
+      const aDistance = a.distance;
+      const bDistance = b.distance;
+      return aDistance - bDistance;
+    }
+    return -100;
   });
 };
 

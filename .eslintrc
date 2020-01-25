@@ -17,6 +17,7 @@
     "prettier/@typescript-eslint"
   ],
   "rules": {
+    "global-require": 0 ,
     /**
      * @description rules of eslint official
      */

@@ -69,7 +69,7 @@ const weightDown = require('../../assets/images/weightlifting_down.png');
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const MAX_VIDEO_SIZE = 30000000; //30mb
+const MAX_VIDEO_SIZE = 30000000; // 30mb
 
 interface State {
   spinner: boolean;
@@ -244,7 +244,7 @@ export class Home extends Component<HomeProps, State> {
                   }}
                   onPress={() => {
                     this.setState({ playing: { [item.key]: false } });
-                    if (Platform.OS ==='ios') {
+                    if (Platform.OS === 'ios') {
                       this.players[item.key].presentFullscreenPlayer();
                     } else {
                       this.props.navigateFullScreenVideo(item.url);
@@ -277,7 +277,7 @@ export class Home extends Component<HomeProps, State> {
       <TouchableOpacity
         onPress={() => {
           this.setState({ likesModalVisible: false });
-          like.user_id ===this.props.profile.uid ? this.props.goToProfile() : this.props.viewProfile(like.user_id);
+          like.user_id === this.props.profile.uid ? this.props.goToProfile() : this.props.viewProfile(like.user_id);
         }}
         style={cStyles.likeButton}
         key={like.user_id + ''}
@@ -325,7 +325,7 @@ export class Home extends Component<HomeProps, State> {
                       const endAt = keys[keys.length - 1];
                       this.setState({ spinner: true }, async () => {
                         await this.props.getPosts(this.props.profile.uid, 30, endAt)
-                        if (Object.values(feed).length ===initial) {
+                        if (Object.values(feed).length === initial) {
                           this.setState({ loadMore: false });
                         }
                         this.setState({ spinner: false });
@@ -626,7 +626,7 @@ export class Home extends Component<HomeProps, State> {
             //lastCommentUpdate={this.state.lastCommentUpdate}
             users={Object.values(combined)}
             usernameTapAction={(username, uid) => {
-              if (uid ===this.props.profile.uid) {
+              if (uid === this.props.profile.uid) {
                 this.props.goToProfile();
               } else {
                 this.props.viewProfile(uid);
@@ -839,7 +839,7 @@ export class Home extends Component<HomeProps, State> {
     const videoOptions: ImagePickerOptions = {
       mediaType: 'video',
       durationLimit: 30,
-      videoQuality: Platform.OS ==='ios' ? 'medium' : 'low',
+      videoQuality: Platform.OS === 'ios' ? 'medium' : 'low',
     };
     const options: ImagePickerOptions = {
       title: null,
@@ -864,7 +864,7 @@ export class Home extends Component<HomeProps, State> {
         Alert.alert('Error', response.error);
         this.setState({ spinner: false });
       } else if (response.customButton) {
-        if (response.customButton ==='uploadVideo') {
+        if (response.customButton === 'uploadVideo') {
           ImagePicker.launchImageLibrary(videoOptions, response => {
             this.setState({ spinner: false });
             if (response.error) {
@@ -873,7 +873,7 @@ export class Home extends Component<HomeProps, State> {
               this.processVideo(response.uri);
             }
           });
-        } else if (response.customButton ==='video') {
+        } else if (response.customButton === 'video') {
           ImagePicker.launchCamera(videoOptions, response => {
             this.setState({ spinner: false });
             if (response.error) {
