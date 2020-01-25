@@ -1,4 +1,5 @@
 import Session from '../Session';
+import Place from '../Place';
 
 export default interface SessionsProps {
   sessions: { [key: string]: Session };
@@ -11,4 +12,6 @@ export default interface SessionsProps {
   onOpenGymChat: (id: string) => void;
   viewGym: (id: string) => void;
   viewSession: (id: string, isPrivate?: boolean) => void;
+  places: { [key: string]: Place };
+  gym: Place;
 }

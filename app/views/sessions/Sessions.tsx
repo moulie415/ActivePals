@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { pathOr } from 'ramda';
-import { Alert, View, FlatList, TouchableOpacity, Platform, Switch, Image as SlowImage, ActionSheetIOS } from 'react-native';
+import { Alert, View, FlatList, TouchableOpacity, Platform, Switch, Image as SlowImage } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
 import { CheckBox } from 'react-native-elements';
@@ -182,8 +181,8 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   renderLists() {
-    const { gym, location, onOpenGymChat, viewGym, viewSession } = this.props;
-    const { selectedIndex, refreshing, sessions } = this.state;
+    const { gym, location, onOpenGymChat, viewGym, viewSession, places } = this.props;
+    const { selectedIndex, refreshing, sessions, token, loadingGyms } = this.state;
     const emptyComponent = (
       <View>
         <Text style={{ color: colors.primary, textAlign: 'center', marginHorizontal: 20 }}>
@@ -240,7 +239,7 @@ class Sessions extends Component<SessionsProps, State> {
                     >
                       <Icon name="md-chatboxes" size={25} style={{ color: colors.secondary }} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() =>  viewGym(gym.place_id)}>
+                    <TouchableOpacity onPress={() => viewGym(gym.place_id)}>
                       <Icon name="md-information-circle" size={25} style={{ color: colors.secondary }}/>
                     </TouchableOpacity>
                   </View>
@@ -294,7 +293,7 @@ class Sessions extends Component<SessionsProps, State> {
                           })
                         }}
                       >
-                        <Icon name="ios-pin" size={40} style={{color: colors.secondary}}/>
+                        <Icon name="ios-pin" size={40} style={{ color: colors.secondary }}/>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -304,56 +303,74 @@ class Sessions extends Component<SessionsProps, State> {
           />
         ) : (
           <FlatList
-            data={this.sortPlacesByDistance(Object.values(this.props.places))}
+            data={this.sortPlacesByDistance(Object.values(places))}
             refreshing={refreshing}
-            ListFooterComponent={Object.values(this.props.places).length > 0 && this.state.token &&
-            <TouchableOpacity 
-            disabled={this.state.loadingGyms}
-            onPress={async () => {
-              this.setState({ loadingGyms: true });
-              const { getPlaces } = this.props;
-              const { token } = await getPlaces(yourLat, yourLon, this.state.token)
-              this.setState({loadingGyms: false, token})
-            }}>
-              {!this.state.loadingGyms  && !this.state.refreshing ? 
-              <Text style={{color: colors.secondary, textAlign: 'center', backgroundColor: '#fff', fontSize: 20, paddingVertical: 5}}>
-              Load more gyms
-              </Text> :
-              <PulseIndicator color={colors.secondary} />
-              }
-            </TouchableOpacity>}
+            ListFooterComponent={
+              Object.values(places).length > 0 &&
+              token && (
+                <TouchableOpacity
+                  disabled={loadingGyms}
+                  onPress={async () => {
+                    this.setState({ loadingGyms: true });
+                    const { getPlaces } = this.props;
+                    const { token: newToken } = await getPlaces(yourLat, yourLon, token);
+                    this.setState({ loadingGyms: false, token: newToken });
+                  }}
+                >
+                  {!loadingGyms && !refreshing ? (
+                    <Text
+                      style={{
+                        color: colors.secondary,
+                        textAlign: 'center',
+                        backgroundColor: '#fff',
+                        fontSize: 20,
+                        paddingVertical: 5,
+                      }}
+                    >
+                      Load more gyms
+                    </Text>
+                  ) : (
+                    <PulseIndicator color={colors.secondary} />
+                  )}
+                </TouchableOpacity>
+              )
+            }
             onRefresh={() => this.handleRefresh()}
-            style={{backgroundColor: '#9993'}}
+            style={{ backgroundColor: '#9993' }}
             keyExtractor={(item) => item.place_id}
             renderItem={({ item, index }) => {
-              const { lat, lng } = item.geometry.location
+              const { lat, lng } = item.geometry.location;
               if (this.gymFilter(item)) {
-                return <TouchableOpacity onPress={() => {
-                  this.setState({selectedLocation: item, latitude: lat, longitude: lng},
-                      ()=> this.props.viewGym(item.place_id))
-                  }}>
-                <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
-                  <View style={{flexDirection: 'row'}} >
-                    {item.photo ? <Image source={{uri: item.photo}} style={{height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10}}/> : 
-                    <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>}
-                      <View style={{flex: 5}}>
-                        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                          <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState({ selectedLocation: item, latitude: lat, longitude: lng }, () => viewGym(item.place_id))
+                    }}
+                  >
+                    <View
+                      style={{ padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index === 0 ? 1 : 0 }}
+                    >
+                      <View style={{ flexDirection: 'row '}} >
+                        {item.photo ? <Image source={{uri: item.photo}} style={{height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10}}/> : 
+                        <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>}
+                          <View style={{flex: 5}}>
+                            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                              <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
+                            </View>
+                            <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
+                            <Text style={{color: '#999'}}>{' (' +  getDistance(item, yourLat, yourLon, true) + ' km away)'}</Text>
                         </View>
-                        <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
-                        <Text style={{color: '#999'}}>{' (' +  getDistance(item, yourLat, yourLon, true) + ' km away)'}</Text>
+                        <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
+                        <TouchableOpacity onPress={()=>{
+                          this.setState({longitude: lng, latitude: lat, switch: true})
+                        }}>
+                          <Icon size={40} name="ios-pin" style={{color: colors.secondary}}/>
+                        </TouchableOpacity>
+                      </View>
+                      </View>
                     </View>
-                    <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
-                    <TouchableOpacity onPress={()=>{
-                      this.setState({longitude: lng, latitude: lat, switch: true})
-                    }}>
-                      <Icon size={40} name="ios-pin" style={{color: colors.secondary}}/>
-                    </TouchableOpacity>
-                  </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
-              }
+                </TouchableOpacity>
+            )}
           }}
         />
         )}
@@ -362,8 +379,8 @@ class Sessions extends Component<SessionsProps, State> {
 }
 
   render() {
-    //switch for list view and map view
-    //action sheet when pressing
+    // switch for list view and map view
+    // action sheet when pressing
     return (
       <>
       {this.state.spinner && <PulseIndicator color={colors.secondary} style={styles.spinner} />}
@@ -375,7 +392,7 @@ class Sessions extends Component<SessionsProps, State> {
             }}>
             <Text style={{color: '#fff'}}>Filters</Text>
           </TouchableOpacity>}
-          title={'Sessions'}
+            title="Sessions"
            right={<View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{color: '#fff'}}>Map: </Text>
             <Switch
