@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { pathOr } from 'ramda';
-import { Alert, View, FlatList, TouchableOpacity, Platform, Switch, Image as SlowImage } from 'react-native';
+import { Alert, View, FlatList, TouchableOpacity, Platform, Switch, Image as SlowImage, ActionSheetIOS } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
 import { CheckBox } from 'react-native-elements';
@@ -66,10 +66,12 @@ interface State {
   selectedLocation: {};
   locationPermission?: string;
   token?: string;
-  longitude?: string;
-  latitude?: string;
+  longitude?: number;
+  latitude?: number;
 }
 class Sessions extends Component<SessionsProps, State> {
+  ActionSheet: ActionSheet;
+
   constructor(props) {
     super(props);
     const sessions = Object.values(props.sessions);
@@ -171,9 +173,24 @@ class Sessions extends Component<SessionsProps, State> {
     return places;
   }
 
+  handlePress(event) {
+    const lat = event.nativeEvent.coordinate.latitude;
+    const lng = event.nativeEvent.coordinate.longitude;
+    const location = { geometry: { location: { lat, lng } } };
+    this.setState({ selectedLocation: location, latitude: lat, longitude: lng });
+    this.ActionSheet.show();
+  }
+
   renderLists() {
-    const { gym, location } = this.props;
-    const { selectedIndex } = this.state;
+    const { gym, location, onOpenGymChat, viewGym, viewSession } = this.props;
+    const { selectedIndex, refreshing, sessions } = this.state;
+    const emptyComponent = (
+      <View>
+        <Text style={{ color: colors.primary, textAlign: 'center', marginHorizontal: 20 }}>
+          No sessions near you have been created yet, also please make sure you are connected to the internet
+        </Text>
+      </View>
+    );
     let yourLat;
     let yourLon;
     if (location) {
@@ -188,7 +205,7 @@ class Sessions extends Component<SessionsProps, State> {
           onTabPress={index => {
             this.setState({ selectedIndex: index });
           }}
-          tabsContainerStyle={{ marginHorizontal:8, marginVertical: 5 }}
+          tabsContainerStyle={{ marginHorizontal: 8, marginVertical: 5 }}
           tabStyle={{ borderColor: colors.secondary }}
           tabTextStyle={{ color: colors.secondary, fontFamily: 'Montserrat' }}
           activeTabStyle={{ backgroundColor: colors.secondary }}
@@ -202,82 +219,93 @@ class Sessions extends Component<SessionsProps, State> {
                   style={{ height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10 }}
                 />
               ) : (
-             <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>)}
-                <View style={{flex: 1}}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <View>
-                  <Text style={{color: colors.secondary}}>Your gym:</Text>
-                  <Text>{gym.name}</Text>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                  <TouchableOpacity 
-                  onPress={() => {
-                      this.props.onOpenGymChat(gym.place_id)
-                  }}
-                  style={{
-                    justifyContent: 'center',
-                    marginRight: 20
-                    }}>
-                    <Icon name='md-chatboxes' size={25} style={{color: colors.secondary}}/>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                  onPress={() => {
-                    this.props.viewGym(gym.place_id)
-                  }}>
-                    <Icon name='md-information-circle' size={25} style={{color: colors.secondary}}/>
-                  </TouchableOpacity>
+                <Image
+                  source={require('../../../assets/images/dumbbell.png')}
+                  style={{ height: 40, width: 40, alignSelf: 'center', marginRight: 10 }}
+                />
+              )}
+              <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <View>
+                    <Text style={{ color: colors.secondary }}>Your gym:</Text>
+                    <Text>{gym.name}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row' }}>
+                    <TouchableOpacity
+                      onPress={() => onOpenGymChat(gym.place_id)}
+                      style={{
+                        justifyContent: 'center',
+                        marginRight: 20,
+                      }}
+                    >
+                      <Icon name="md-chatboxes" size={25} style={{ color: colors.secondary }} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() =>  viewGym(gym.place_id)}>
+                      <Icon name="md-information-circle" size={25} style={{ color: colors.secondary }}/>
+                    </TouchableOpacity>
                   </View>
                 </View>
-
               </View>
             </View>
           </View>
         )}
-          {this.state.selectedIndex == 0 ? <FlatList
-          style={{backgroundColor: '#9993'}}
-          refreshing={this.state.refreshing}
-          onRefresh={() => this.handleRefresh()}
-          contentContainerStyle={[{flexGrow: 1}, this.state.sessions.length > 0 ? null : { justifyContent: 'center'}]}
-          ListEmptyComponent={<View>
-            <Text style={{color: colors.primary, textAlign: 'center', marginHorizontal: 20}}>
-            No sessions near you have been created yet, also please make sure you are connected to the internet
-          </Text></View>}
-          data={this.state.sessions}
-          keyExtractor={(item) => item.key}
-          renderItem={({ item, index }) => (
-            <TouchableOpacity onPress={() => {
-                this.props.viewSession(item.key, item.private)
-            }}>
-              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index == 0 ? 1 : 0}}>
-                <View style={{flexDirection: 'row'}} >
-
-                  <View style={{alignItems: 'center', marginRight: 10, justifyContent: 'center'}}>{getType(item.type, 40)}</View>
-                    <View style={{flex: 5}}>
-                      <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <Text style={{flex: 3}} numberOfLines={1}><Text  style={styles.title}>{item.title}</Text>
-                        <Text style={{color: '#999'}}>{' (' + (item.distance ? item.distance.toFixed(2) : getDistance(item, yourLat, yourLon)) + ' km away)'}</Text></Text>
+        {selectedIndex === 0 ? (
+          <FlatList
+            style={{ backgroundColor: '#9993' }}
+            refreshing={refreshing}
+            onRefresh={() => this.handleRefresh()}
+            contentContainerStyle={[{ flexGrow: 1 }, sessions.length > 0 ? null : { justifyContent: 'center' }]}
+            ListEmptyComponent={emptyComponent}
+            data={sessions}
+            keyExtractor={item => item.key}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity onPress={() => viewSession(item.key, item.private)}>
+                <View style={{ padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index === 0 ? 1 : 0 }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={{ alignItems: 'center', marginRight: 10, justifyContent: 'center' }}>
+                      {getType(item.type, 40)}
+                    </View>
+                    <View style={{ flex: 5 }}>
+                      <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                        <Text style={{ flex: 3 }} numberOfLines={1}>
+                          <Text style={styles.title}>{item.title}</Text>
+                          <Text style={{ color: '#999' }}>
+                            {' (' + (item.distance ? item.distance.toFixed(2) : getDistance(item, yourLat, yourLon)) + ' km away)'}
+                          </Text>
+                        </Text>
                       </View>
-                      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <Text style={[styles.date, {color: item.inProgress ? colors.secondary : "#999"}]} >
-                      {item.inProgress? "In progress" : formatDateTime(item.dateTime)}</Text>
-                      {item.private && <PrivateIcon size={25}/>}</View>
-                      <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.location.formattedAddress}</Text>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={[styles.date, { color: item.inProgress ? colors.secondary : '#999' }]}>
+                          {item.inProgress ? 'In progress' : formatDateTime(item.dateTime)}
+                        </Text>
+                        {item.private && <PrivateIcon size={25} />}
+                      </View>
+                      <Text style={{ flex: 2, color: '#000' }} numberOfLines={1}>
+                        {item.location.formattedAddress}
+                      </Text>
+                    </View>
+                    <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          this.setState({
+                            longitude: item.location.position.lng,
+                            latitude: item.location.position.lat,
+                            switch: true,
+                          })
+                        }}
+                      >
+                        <Icon name="ios-pin" size={40} style={{color: colors.secondary}}/>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                  <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
-                    <TouchableOpacity onPress={()=>{
-                      this.setState({longitude: item.location.position.lng, latitude: item.location.position.lat, switch: true})
-                    }}>
-                      <Icon name="ios-pin" size={40} style={{color: colors.secondary}}/>
-                    </TouchableOpacity>
-                  </View>
-
                 </View>
-              </View>
-            </TouchableOpacity>
-          )}
-      /> : <FlatList 
+              </TouchableOpacity>
+            )}
+          />
+        ) : (
+          <FlatList
             data={this.sortPlacesByDistance(Object.values(this.props.places))}
-            refreshing={this.state.refreshing}
+            refreshing={refreshing}
             ListFooterComponent={Object.values(this.props.places).length > 0 && this.state.token &&
             <TouchableOpacity 
             disabled={this.state.loadingGyms}
@@ -327,7 +355,8 @@ class Sessions extends Component<SessionsProps, State> {
               </TouchableOpacity>
               }
           }}
-      />}
+        />
+        )}
       </View>
     );
 }
@@ -534,15 +563,6 @@ class Sessions extends Component<SessionsProps, State> {
         />
       </>
       )
-  }
-
-
-  handlePress(event) {
-    const lat = event.nativeEvent.coordinate.latitude
-    const lng = event.nativeEvent.coordinate.longitude
-    const location = {geometry: {location: {lat, lng}}}
-    this.setState({selectedLocation: location, latitude: lat, longitude: lng})
-    this.ActionSheet.show()
   }
 
   markers(sessions) {
