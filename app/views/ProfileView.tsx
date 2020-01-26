@@ -154,15 +154,11 @@ class ProfileView extends Component<ProfileViewProps, State> {
               </View>
 
               <Text style={{ alignSelf: 'center', fontSize: 15, textAlign: 'center', fontWeight: 'bold' }}>
-                <Text>{username}</Text>
+                <Text>{`${username} `}</Text>
                 {(first_name || last_name) && (
                   <Text style={{ marginLeft: 10, marginVertical: 5 }}>
-                    {' '}
-                    ({first_name &&
-                      <Text>
-                      {`${first_name}${last_name ? ' ' : ''}`}
-                      </Text>}
-                    {last_name && <Text>{last_name}</Text>})
+                    {first_name && <Text>{`${first_name}${last_name ? ' ' : ''}`}</Text>}
+                    {last_name && <Text>{last_name}</Text>}
                   </Text>
                 )}
               </Text>
