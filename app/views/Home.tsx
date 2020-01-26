@@ -75,11 +75,9 @@ interface State {
   spinner: boolean;
   selectedImage?: { url: string }[];
   showImage: boolean;
-  userFetchAmount: number;
   refreshing: boolean;
   likesModalVisible: boolean;
   loadMore: boolean;
-  paused: boolean;
   playing: { [key: string]: boolean };
   status?: string;
   focusCommentInput?: boolean;
@@ -91,13 +89,10 @@ interface State {
 }
 export class Home extends Component<HomeProps, State> {
   players: object;
+
   scrollIndex: number;
+
   input: TextInput;
-  static navigationOptions = {
-    header: null,
-    tabBarLabel: 'Home',
-    tabBarIcon: ({ tintColor }) => <Icon name="md-home" size={25} style={{ color: tintColor }} />,
-  };
 
   constructor(props) {
     super(props);
@@ -107,11 +102,9 @@ export class Home extends Component<HomeProps, State> {
       spinner: false,
       selectedImage: null,
       showImage: false,
-      userFetchAmount: 10,
       refreshing: false,
       likesModalVisible: false,
       loadMore: true,
-      paused: true,
       playing: {},
       postId: '',
       repsId: '',
@@ -133,581 +126,37 @@ export class Home extends Component<HomeProps, State> {
       });
   }
 
-  renderFeedItem(item) {
-    switch (item.type) {
-      case PostType.STATUS:
-        return (
-          <View style={{ padding: 10, margin: 5 }}>
-            <View style={{ flexDirection: 'row', flex: 1, marginBottom: 10 }}>
-              {this.fetchAvatar(item.uid)}
-              <View style={{ flex: 1 }}>
-                {this.getUsernameFormatted(item.uid)}
-                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
-              </View>
-              <TouchableOpacity>
-                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
-              </TouchableOpacity>
-            </View>
-            <View style={{ marginBottom: 5 }}>
-              <ParsedText text={item.text} />
-            </View>
-            {this.repCommentCount(item)}
-            {this.repsAndComments(item)}
-          </View>
-        );
-      case PostType.PHOTO:
-        return (
-          <View>
-            <View style={{ flexDirection: 'row', flex: 1, padding: 10 }}>
-              {this.fetchAvatar(item.uid)}
-              <View style={{ flex: 1 }}>
-                {this.getUsernameFormatted(item.uid)}
-                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
-              </View>
-              <TouchableOpacity>
-                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
-              </TouchableOpacity>
-            </View>
-            <View style={{ marginBottom: 5 }}>
-              <ParsedText text={item.text} />
-            </View>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() => this.setState({ selectedImage: [{ url: item.url }], showImage: true })}
-              style={{ marginTop: 10, marginBottom: 10 }}
-            >
-              <Image style={{ width: '100%', height: 400 }} resizeMode={'cover'} source={{ uri: item.url }} />
-            </TouchableOpacity>
-            {this.repCommentCount(item)}
-            <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
-          </View>
-        );
-      case PostType.VIDEO:
-        return (
-          <View>
-            <View style={{ flexDirection: 'row', flex: 1, padding: 10, zIndex: 2 }}>
-              {this.fetchAvatar(item.uid)}
-              <View style={{ flex: 1 }}>
-                {this.getUsernameFormatted(item.uid)}
-                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
-              </View>
-              <TouchableOpacity>
-                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
-              </TouchableOpacity>
-            </View>
-            <ParsedText style={{ marginVertical: 10 }} text={item.text} />
-            <TouchableWithoutFeedback
-              onPress={() => {
-                this.setState({ playing: { [item.uid]: false } });
-              }}
-            >
-              <Video
-                ref={ref => (this.players[item.key] = ref)}
-                source={{ uri: item.url }}
-                style={{ width: '100%', height: 400 }}
-                paused={!this.state.playing[item.key]}
-                ignoreSilentSwitch="ignore"
-                repeat
-                onFullscreenPlayerDidPresent={() => this.setState({ playing: { [item.key]: false } })}
-                resizeMode="cover"
-                onBuffer={() => {
-                  console.log('buffering');
-                }} // Callback when remote video is buffering
-                onError={e => {
-                  if (e.error && e.error.code) {
-                    Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain);
-                  } else if (e.message) {
-                    Alert.alert('Error', e.message);
-                  } else Alert.alert('Error', 'Error playing video');
-                }}
-              />
-            </TouchableWithoutFeedback>
-            {!this.state.playing[item.key] && (
-              <View style={styles.playButtonContainer}>
-                <TouchableOpacity onPress={() => this.setState({ playing: { [item.key]: true } })}>
-                  <Icon
-                    size={50}
-                    name={'md-play'}
-                    style={{ color: '#fff', backgroundColor: 'transparent', opacity: 0.8 }}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    bottom:
-                      (item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0) ? 110 : 70,
-                    right: 15,
-                    position: 'absolute',
-                    padding: 2,
-                    paddingHorizontal: 6,
-                    backgroundColor: 'rgba(0,0,0,0.3)',
-                    borderRadius: 5,
-                  }}
-                  onPress={() => {
-                    this.setState({ playing: { [item.key]: false } });
-                    if (Platform.OS === 'ios') {
-                      this.players[item.key].presentFullscreenPlayer();
-                    } else {
-                      this.props.navigateFullScreenVideo(item.url);
-                    }
-                  }}
-                >
-                  <Icon
-                    name="md-expand"
-                    size={30}
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: '#fff',
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-            {this.repCommentCount(item)}
-            <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
-          </View>
-        );
-      default:
-        return null;
+  getUsername(uid) {
+    const { friends, users } = this.props;
+    if (friends[uid]) {
+      return friends[uid].username;
     }
+    if (users[uid]) {
+      return users[uid].username;
+    }
+    return 'N/A';
   }
 
-  renderRep(l) {
-    const like = l.item;
+  getUsernameFormatted(uid) {
+    const { profile, viewProfile, goToProfile } = this.props;
     return (
       <TouchableOpacity
         onPress={() => {
-          this.setState({ likesModalVisible: false });
-          like.user_id === this.props.profile.uid ? this.props.goToProfile() : this.props.viewProfile(like.user_id);
+          uid !== profile.uid ? viewProfile(uid) : goToProfile();
         }}
-        style={cStyles.likeButton}
-        key={like.user_id + ''}
       >
-        <View style={[cStyles.likeContainer]}>
-          {like.image ? (
-            <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
-          ) : (
-            <Icon name="md-contact" style={{ fontSize: 40, color: colors.primary }} />
-          )}
-          <Text>{like.username}</Text>
-        </View>
+        <Text style={{ fontWeight: 'bold', color: colors.secondary, flex: 1 }}>
+          {uid === profile.uid ? 'You' : this.getUsername(uid)}
+        </Text>
       </TouchableOpacity>
     );
   }
 
-  renderFeed() {
-    const { feed } = this.props;
-    if (Object.values(feed).length > 0) {
-      return (
-        <FlatList
-          data={sortPostsByDate(Object.values(feed))}
-          keyExtractor={item => item.key}
-          onRefresh={async () => {
-            this.setState({ refreshing: true });
-            this.props.getFriends();
-            this.props.getProfile();
-            await this.props.getPosts(this.props.profile.uid, 30);
-            this.setState({ refreshing: false });
-          }}
-          // onEndReached={()=> {
-          //   this.setState({fetchAmount: this.state.fetchAmount+15}, () => {
-          //     this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
-          //   })
-          // }}
-          ListFooterComponent={() => {
-            const initial = Object.values(feed).length;
-            if (initial > 29 && this.state.loadMore) {
-              return (
-                <Card>
-                  <TouchableOpacity
-                    style={{ alignItems: 'center', paddingVertical: 10 }}
-                    onPress={() => {
-                      const keys = Object.keys(feed);
-                      const endAt = keys[keys.length - 1];
-                      this.setState({ spinner: true }, async () => {
-                        await this.props.getPosts(this.props.profile.uid, 30, endAt)
-                        if (Object.values(feed).length === initial) {
-                          this.setState({ loadMore: false });
-                        }
-                        this.setState({ spinner: false });
-                      });
-                    }}
-                  >
-                    <Text style={{ color: colors.secondary }}>Load more</Text>
-                  </TouchableOpacity>
-                </Card>
-              );
-            } else return null;
-          }}
-          refreshing={this.state.refreshing}
-          renderItem={({ item, index }) => {
-            return (
-              <View>
-                <AdView index={index} />
-                <Card style={{ marginBottom: 10 }}>
-                  <TouchableOpacity
-                    onPress={() => this.props.viewPost(item.key)}
-                    style={{ alignSelf: 'flex-end' }}
-                  ></TouchableOpacity>
-                  {this.renderFeedItem(item)}
-                </Card>
-              </View>
-            );
-          }}
-        />
-      );
-    } else
-      return <Text style={{ fontSize: 20, alignSelf: 'center', marginTop: 20, color: '#999' }}>No feed items yet</Text>;
-  }
-
-  render() {
-    const scrollRef = React.createRef<ScrollView>();
-    const { uid, username, unreadCount } = this.props.profile;
-    let combined = { ...this.props.users, ...this.props.friends };
-    return (
-      <>
-        <Header
-          title={'Feed'}
-          right={
-            <TouchableOpacity
-              onPress={() => {
-                this.props.onNotificationPress();
-              }}
-            >
-              {/*<Icon name='ios-notifications' style={{color: '#fff', marginRight: 10}}/>*/}
-              <View style={{ width: 30, alignItems: 'center' }}>
-                <Icon name="ios-notifications" size={25} style={{ color: '#fff', marginLeft: -10 }} />
-                {!!unreadCount && unreadCount > 0 && (
-                  <View style={styles.unreadBadge}>
-                    <Text
-                      numberOfLines={1}
-                      adjustsFontSizeToFit={unreadCount > 0}
-                      style={{ fontSize: 10, color: '#fff' }}
-                    >
-                      {unreadCount}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          }
-        />
-        <View
-          style={{
-            flexDirection: 'row',
-            backgroundColor: '#fff',
-            padding: 10,
-            alignItems: 'center',
-            borderBottomWidth: 0.5,
-            borderColor: '#999',
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => this.props.goToProfile()}
-            style={{
-              elevation: 4,
-              shadowOffset: { width: 5, height: 5 },
-              shadowColor: 'grey',
-              shadowOpacity: 0.5,
-              shadowRadius: 10,
-            }}
-          >
-            {this.props.profile && this.props.profile.avatar ? (
-              <Image source={{ uri: this.props.profile.avatar }} style={{ height: 50, width: 50, borderRadius: 25 }} />
-            ) : (
-              <Icon name="md-contact" size={60} style={{ color: colors.primary }} />
-            )}
-          </TouchableOpacity>
-          <TextInput
-            ref={ref => (this.input = ref)}
-            underlineColorAndroid={'transparent'}
-            value={this.state.status}
-            maxLength={280}
-            autoCorrect={false}
-            onChangeText={status => {
-              this.setState({ status });
-              const friends = Object.values(this.props.friends);
-              const list = getMentionsList(status, friends);
-              list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
-            }}
-            placeholder="Post a status for your pals..."
-            style={{
-              flex: 1,
-              borderColor: '#999',
-              borderWidth: 0.5,
-              marginHorizontal: 10,
-              height: 40,
-              padding: 5,
-              fontFamily: 'Montserrat',
-            }}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              if (username) {
-                this.showPicker();
-              } else {
-                Alert.alert('Username not set', 'You need a username before making posts, go to your profile now?', [
-                  { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                  { text: 'OK', onPress: () => this.props.goToProfile() },
-                ]);
-              }
-            }}
-          >
-            <Icon
-              name="ios-attach"
-              size={40}
-              style={{
-                color: colors.secondary,
-                marginLeft: 5,
-                marginRight: 10,
-                // elevation:4,
-                // shadowOffset: { width: 5, height: 5 },
-                // shadowColor: "grey",
-                // shadowOpacity: 0.5,
-                // shadowRadius: 10,
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              if (this.state.status) {
-                if (username) {
-                  Alert.alert('Confirm', 'Submit post?', [
-                    { text: 'Cancel', style: 'cancel' },
-                    {
-                      text: 'Yes',
-                      onPress: async () => {
-                        try {
-                          await this.props
-                            .postStatus({
-                              type: PostType.STATUS,
-                              text: this.state.status,
-                              uid,
-                              username,
-                              createdAt: new Date().toString(),
-                            })
-                          this.setState({ status: '' });
-                        } catch(e) {
-                          Alert.alert('Error', e.message);
-                        }
-                      },
-                    },
-                  ]);
-                } else {
-                  Alert.alert('Username not set', 'You need a username before making posts, go to your profile now?', [
-                    { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                    { text: 'OK', onPress: () => this.props.goToProfile() },
-                  ]);
-                }
-              } else {
-                // alert no status
-              }
-            }}
-          >
-            <Icon
-              name="md-return-right"
-              size={40}
-              style={{
-                color: colors.secondary,
-                paddingTop: 5,
-                // elevation:4,
-                // shadowOffset: { width: 5, height: 5 },
-                // shadowColor: "grey",
-                // shadowOpacity: 0.5,
-                // shadowRadius: 10,
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView
-          contentContainerStyle={{ backgroundColor: '#9993', flex: 1, paddingTop: 10 }}
-          ref={scrollRef}
-          onScroll={event => {
-            this.scrollIndex = event.nativeEvent.contentOffset.y;
-          }}
-        >
-          {this.state.mentionList && (
-            <View style={styles.mentionList}>
-              <FlatList
-                keyboardShouldPersistTaps={'handled'}
-                data={this.state.mentionList}
-                style={{ backgroundColor: '#fff' }}
-                keyExtractor={item => item.uid}
-                renderItem={({ item, index }) => {
-                  if (index < 10) {
-                    return (
-                      <TouchableOpacity
-                        onPress={() => {
-                          let split = this.state.status.split(' ');
-                          split[split.length - 1] = '@' + item.username + ' ';
-                          this.setState({ status: split.join(' '), mentionList: null });
-                        }}
-                        style={{ backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5 }}
-                      >
-                        {item.avatar ? (
-                          <Image source={{ uri: item.avatar }} style={{ height: 30, width: 30, borderRadius: 15 }} />
-                        ) : (
-                          <Icon name="md-contact" style={{ fontSize: 35, color: colors.primary }} />
-                        )}
-                        <Text style={{ marginLeft: 10 }}>{item.username}</Text>
-                      </TouchableOpacity>
-                    );
-                  }
-                  return null;
-                }}
-              />
-            </View>
-          )}
-          {this.props.friends && this.props.profile && this.renderFeed()}
-        </ScrollView>
-        {this.state.spinner && (
-          <View style={sStyles.spinner}>
-            <PulseIndicator color={colors.secondary} />
-          </View>
-        )}
-        <Modal onRequestClose={() => null} visible={this.state.showImage} transparent={true}>
-          <ImageViewer
-            renderIndicator={(currentIndex, allSize) => null}
-            loadingRender={() => (
-              <SafeAreaView>
-                <Text style={{ color: '#fff', fontSize: 20 }}>Loading...</Text>
-              </SafeAreaView>
-            )}
-            renderHeader={() => {
-              return (
-                <TouchableOpacity
-                  style={{ position: 'absolute', top: 20, left: 10, padding: 10, zIndex: 9999 }}
-                  onPress={() => this.setState({ selectedImage: null, showImage: false })}
-                >
-                  <View
-                    style={{
-                      backgroundColor: '#0007',
-                      paddingHorizontal: 15,
-                      paddingVertical: 2,
-                      borderRadius: 10,
-                    }}
-                  >
-                    <Icon name={'ios-arrow-back'} size={40} style={{ color: '#fff' }} />
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-            imageUrls={this.state.selectedImage}
-          />
-        </Modal>
-        <ModalBox
-          style={{
-            width: SCREEN_WIDTH - 20,
-            height: SCREEN_HEIGHT - 150,
-            marginTop: Platform.select({ ios: 10 }),
-            borderRadius: 5,
-            padding: 5,
-          }}
-          swipeToClose={false}
-          isOpen={this.state.showCommentModal}
-          onClosed={() => this.setState({ focusCommentInput: false, showCommentModal: false })}
-          backButtonClose
-          position={'center'}
-        >
-          <TouchableOpacity onPress={() => this.setState({ showCommentModal: false })}>
-            <Icon name={'ios-arrow-back'} size={30} style={{ color: '#000', padding: 10 }} />
-          </TouchableOpacity>
-          <Comments
-            data={
-              this.props.feed[this.state.postId]
-                ? this.props.feed[this.state.postId].comments
-                : []
-            }
-            viewingUserName={this.props.profile.username}
-            initialDisplayCount={10}
-            editMinuteLimit={900}
-            focusCommentInput={this.state.focusCommentInput}
-            childrenPerPage={5}
-            //lastCommentUpdate={this.state.lastCommentUpdate}
-            users={Object.values(combined)}
-            usernameTapAction={(username, uid) => {
-              if (uid === this.props.profile.uid) {
-                this.props.goToProfile();
-              } else {
-                this.props.viewProfile(uid);
-              }
-            }}
-            childPropName={'children'}
-            isChild={comment => comment.parentCommentId}
-            parentIdExtractor={comment => comment.key}
-            keyExtractor={item => item.comment_id}
-            usernameExtractor={item => {
-              if (item.uid === this.props.profile.uid) {
-                return 'You';
-              } else {
-                return this.props.friends[item.uid].username || this.props.users[item.uid].username;
-              }
-            }}
-            uidExtractor={item => (item.user ? item.user.uid : null)}
-            editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
-            createdTimeExtractor={item => new Date(item.created_at).toISOString()}
-            bodyExtractor={item => item.text}
-            imageExtractor={item => {
-              if (item.uid === this.props.profile.uid) {
-                return this.props.profile.avatar;
-              } else {
-                return this.props.friends[item.uid].avatar || this.props.users[item.uid].avatar;
-              }
-            }}
-            likeExtractor={item => item.rep}
-            reportedExtractor={item => item.reported}
-            likesExtractor={item =>
-              likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile)
-            }
-            likeCountExtractor={item => item.repCount}
-            commentCount={this.props.feed[this.state.postId] ? this.props.feed[this.state.postId].commentCount : 0}
-            childrenCountExtractor={comment => comment.childrenCount}
-            timestampExtractor={item => new Date(item.created_at).toISOString()}
-            replyAction={offset => {
-              scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
-            }}
-            saveAction={async (text, parentCommentId) => {
-              if (text) {
-                try {
-                await this.props
-                  .comment(this.props.profile.uid, this.state.postId, text, new Date().toString(), parentCommentId)
-                } catch(e) {
-                  Alert.alert('Error', e.message)
-                }
-              }
-            }}
-            editAction={(text, comment) => {
-              console.log(text);
-            }}
-            reportAction={comment => {
-              console.log(comment);
-            }}
-            likeAction={comment => {
-              this.props.repComment(comment);
-            }}
-            likesTapAction={(comment: Comment) => {
-              this.setState({ likesModalVisible: true, repsId: comment.key, repCount: comment.repCount });
-              this.props.getRepsUsers(comment.key)
-            }}
-            paginateAction={(fromComment: Comment, direction: string, parentComment: Comment | undefined) => {
-              if (parentComment) {
-                this.props.getReplies(parentComment, 10, fromComment.key);
-              } else {
-                this.props.getComments(this.state.postId, 10, fromComment.key);
-              }
-            }}
-            getCommentRepsUsers={(comment, amount) => this.props.getCommentRepsUsers(comment, amount)}
-          />
-        </ModalBox>
-        <RepsModal
-          onClosed={() => this.setState({ likesModalVisible: false })}
-          isOpen={this.state.likesModalVisible}
-          id={this.state.repsId}
-          repCount={this.state.repCount}
-        />
-      </>
-    );
-  }
+  static navigationOptions = {
+    header: null,
+    tabBarLabel: 'Home',
+    tabBarIcon: ({ tintColor }) => <Icon name="md-home" size={25} style={{ color: tintColor }} />,
+  };
 
   repCommentCount(item) {
     if ((item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0)) {
@@ -729,7 +178,7 @@ export class Home extends Component<HomeProps, State> {
             {!!item.commentCount && item.commentCount > 0 && (
               <TouchableOpacity
                 style={{ alignSelf: 'flex-end', flex: 1 }}
-                onPress={() => {                  
+                onPress={() => {
                   this.setState({ postId: item.key, showCommentModal: true });
                   this.props.getComments(item.key);
                 }}
@@ -748,6 +197,7 @@ export class Home extends Component<HomeProps, State> {
   }
 
   repsAndComments(item) {
+    const { onRepPost, getComments } = this.props;
     return (
       <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
         {item.type !== 'video' && (
@@ -762,9 +212,7 @@ export class Home extends Component<HomeProps, State> {
           </TouchableOpacity>
         )}
         <TouchableOpacity
-          onPress={() => {
-            this.props.onRepPost(item);
-          }}
+          onPress={() => onRepPost(item)}
           style={{ flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center' }}
         >
           <SlowImage
@@ -776,7 +224,7 @@ export class Home extends Component<HomeProps, State> {
         <TouchableOpacity
           onPress={() => {
             this.setState({ focusCommentInput: true, postId: item.key, showCommentModal: true });
-            this.props.getComments(item.key);
+            getComments(item.key);
           }}
           style={{ flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center' }}
         >
@@ -784,54 +232,6 @@ export class Home extends Component<HomeProps, State> {
           {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Comment</Text> */}
         </TouchableOpacity>
       </View>
-    );
-  }
-
-  fetchAvatar(uid) {
-    if (this.props.profile.avatar && uid === this.props.profile.uid) {
-      return (
-        <TouchableOpacity
-          onPress={() => (uid !== this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
-        >
-          <Image
-            source={{ uri: this.props.profile.avatar }}
-            style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
-          />
-        </TouchableOpacity>
-      );
-    }
-    if (this.props.friends[uid] && this.props.friends[uid].avatar) {
-      return (
-        <TouchableOpacity
-          onPress={() => (uid !== this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
-        >
-          <Image
-            source={{ uri: this.props.friends[uid].avatar }}
-            style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
-          />
-        </TouchableOpacity>
-      );
-    }
-    return (
-      <TouchableOpacity
-        onPress={() => (uid !== this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile())}
-      >
-        <Icon name="md-contact" style={{ fontSize: 45, color: colors.primary, marginRight: 10 }} />
-      </TouchableOpacity>
-    );
-  }
-
-  getUsernameFormatted(uid) {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          uid !== this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile();
-        }}
-      >
-        <Text style={{ fontWeight: 'bold', color: colors.secondary, flex: 1 }}>
-          {uid === this.props.profile.uid ? 'You' : this.getUsername(uid)}
-        </Text>
-      </TouchableOpacity>
     );
   }
 
@@ -918,16 +318,6 @@ export class Home extends Component<HomeProps, State> {
     // }
   }
 
-  getUsername(uid) {
-    if (this.props.friends[uid]) {
-      return this.props.friends[uid].username;
-    }
-    if (this.props.users[uid]) {
-      return this.props.users[uid].username;
-    }
-    return 'N/A';
-  }
-
   async sharePost(item) {
     this.setState({ spinner: true });
     const { username } = this.props.profile;
@@ -956,6 +346,588 @@ export class Home extends Component<HomeProps, State> {
       console.log(e);
     }
   }
+
+  renderAvatar(uid) {
+    const { profile, goToProfile, viewProfile, friends } = this.props;
+    if (profile.avatar && uid === profile.uid) {
+      return (
+        <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+          <Image
+            source={{ uri: profile.avatar }}
+            style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
+          />
+        </TouchableOpacity>
+      );
+    }
+    if (friends[uid] && friends[uid].avatar) {
+      return (
+        <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+          <Image
+            source={{ uri: friends[uid].avatar }}
+            style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
+          />
+        </TouchableOpacity>
+      );
+    }
+    return (
+      <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+        <Icon name="md-contact" style={{ fontSize: 45, color: colors.primary, marginRight: 10 }} />
+      </TouchableOpacity>
+    );
+  }
+
+  renderFeedItem(item) {
+    switch (item.type) {
+      case PostType.STATUS:
+        return (
+          <View style={{ padding: 10, margin: 5 }}>
+            <View style={{ flexDirection: 'row', flex: 1, marginBottom: 10 }}>
+              {this.renderAvatar(item.uid)}
+              <View style={{ flex: 1 }}>
+                {this.getUsernameFormatted(item.uid)}
+                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+              </View>
+              <TouchableOpacity>
+                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
+              </TouchableOpacity>
+            </View>
+            <View style={{ marginBottom: 5 }}>
+              <ParsedText text={item.text} />
+            </View>
+            {this.repCommentCount(item)}
+            {this.repsAndComments(item)}
+          </View>
+        );
+      case PostType.PHOTO:
+        return (
+          <View>
+            <View style={{ flexDirection: 'row', flex: 1, padding: 10 }}>
+              {this.renderAvatar(item.uid)}
+              <View style={{ flex: 1 }}>
+                {this.getUsernameFormatted(item.uid)}
+                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+              </View>
+              <TouchableOpacity>
+                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
+              </TouchableOpacity>
+            </View>
+            <View style={{ marginBottom: 5 }}>
+              <ParsedText text={item.text} />
+            </View>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => this.setState({ selectedImage: [{ url: item.url }], showImage: true })}
+              style={{ marginTop: 10, marginBottom: 10 }}
+            >
+              <Image style={{ width: '100%', height: 400 }} resizeMode={'cover'} source={{ uri: item.url }} />
+            </TouchableOpacity>
+            {this.repCommentCount(item)}
+            <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
+          </View>
+        );
+      case PostType.VIDEO:
+        return (
+          <View>
+            <View style={{ flexDirection: 'row', flex: 1, padding: 10, zIndex: 2 }}>
+              {this.renderAvatar(item.uid)}
+              <View style={{ flex: 1 }}>
+                {this.getUsernameFormatted(item.uid)}
+                <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+              </View>
+              <TouchableOpacity>
+                <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
+              </TouchableOpacity>
+            </View>
+            <ParsedText style={{ marginVertical: 10 }} text={item.text} />
+            <TouchableWithoutFeedback
+              onPress={() => {
+                this.setState({ playing: { [item.uid]: false } });
+              }}
+            >
+              <Video
+                ref={ref => (this.players[item.key] = ref)}
+                source={{ uri: item.url }}
+                style={{ width: '100%', height: 400 }}
+                paused={!this.state.playing[item.key]}
+                ignoreSilentSwitch="ignore"
+                repeat
+                onFullscreenPlayerDidPresent={() => this.setState({ playing: { [item.key]: false } })}
+                resizeMode="cover"
+                onBuffer={() => {
+                  console.log('buffering');
+                }} // Callback when remote video is buffering
+                onError={e => {
+                  if (e.error && e.error.code) {
+                    Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain);
+                  } else if (e.message) {
+                    Alert.alert('Error', e.message);
+                  } else Alert.alert('Error', 'Error playing video');
+                }}
+              />
+            </TouchableWithoutFeedback>
+            {!this.state.playing[item.key] && (
+              <View style={styles.playButtonContainer}>
+                <TouchableOpacity onPress={() => this.setState({ playing: { [item.key]: true } })}>
+                  <Icon
+                    size={50}
+                    name="md-play"
+                    style={{ color: '#fff', backgroundColor: 'transparent', opacity: 0.8 }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    bottom:
+                      (item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0) ? 110 : 70,
+                    right: 15,
+                    position: 'absolute',
+                    padding: 2,
+                    paddingHorizontal: 6,
+                    backgroundColor: 'rgba(0,0,0,0.3)',
+                    borderRadius: 5,
+                  }}
+                  onPress={() => {
+                    this.setState({ playing: { [item.key]: false } });
+                    if (Platform.OS === 'ios') {
+                      this.players[item.key].presentFullscreenPlayer();
+                    } else {
+                      this.props.navigateFullScreenVideo(item.url);
+                    }
+                  }}
+                >
+                  <Icon
+                    name="md-expand"
+                    size={30}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: '#fff',
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+            {this.repCommentCount(item)}
+            <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
+          </View>
+        );
+      default:
+        return null;
+    }
+  }
+
+  renderRep(l) {
+    const { profile, goToProfile, viewProfile } = this.props;
+    const like = l.item;
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.setState({ likesModalVisible: false });
+          like.user_id === profile.uid ? goToProfile() : viewProfile(like.user_id);
+        }}
+        style={cStyles.likeButton}
+        key={like.user_id + ''}
+      >
+        <View style={[cStyles.likeContainer]}>
+          {like.image ? (
+            <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
+          ) : (
+            <Icon name="md-contact" style={{ fontSize: 40, color: colors.primary }} />
+          )}
+          <Text>{like.username}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  renderFeed() {
+    const { feed, getFriends, getProfile, getPosts, profile } = this.props;
+    const { loadMore, refreshing } = this.state;
+    if (Object.values(feed).length > 0) {
+      return (
+        <FlatList
+          data={sortPostsByDate(Object.values(feed))}
+          keyExtractor={item => item.key}
+          onRefresh={async () => {
+            this.setState({ refreshing: true });
+            getFriends();
+            getProfile();
+            await getPosts(profile.uid, 30);
+            this.setState({ refreshing: false });
+          }}
+          // onEndReached={()=> {
+          //   this.setState({fetchAmount: this.state.fetchAmount+15}, () => {
+          //     this.props.getPosts(this.props.profile.uid, this.state.fetchAmount)
+          //   })
+          // }}
+          ListFooterComponent={() => {
+            const initial = Object.values(feed).length;
+            if (initial > 29 && loadMore) {
+              return (
+                <Card>
+                  <TouchableOpacity
+                    style={{ alignItems: 'center', paddingVertical: 10 }}
+                    onPress={() => {
+                      const keys = Object.keys(feed);
+                      const endAt = keys[keys.length - 1];
+                      this.setState({ spinner: true }, async () => {
+                        await getPosts(profile.uid, 30, endAt);
+                        if (Object.values(feed).length === initial) {
+                          this.setState({ loadMore: false });
+                        }
+                        this.setState({ spinner: false });
+                      });
+                    }}
+                  >
+                    <Text style={{ color: colors.secondary }}>Load more</Text>
+                  </TouchableOpacity>
+                </Card>
+              );
+            }
+            return null;
+          }}
+          refreshing={refreshing}
+          renderItem={({ item, index }) => {
+            return (
+              <View>
+                <AdView index={index} />
+                <Card style={{ marginBottom: 10 }}>
+                  <TouchableOpacity
+                    onPress={() => viewPost(item.key)}
+                    style={{ alignSelf: 'flex-end' }}
+                  ></TouchableOpacity>
+                  {this.renderFeedItem(item)}
+                </Card>
+              </View>
+            );
+          }}
+        />
+      );
+    }
+    return <Text style={{ fontSize: 20, alignSelf: 'center', marginTop: 20, color: '#999' }}>No feed items yet</Text>;
+  }
+
+  render() {
+    const scrollRef = React.createRef<ScrollView>();
+    const { profile, friends, users, onNotificationPress, goToProfile, postStatus } = this.props;
+    const { uid, username, unreadCount, avatar } = profile;
+    const { status, mentionList, spinner, selectedImage, showImage } = this.state;
+
+    const combined = { ...users, ...friends };
+
+    const notificationsButton = (
+      <TouchableOpacity onPress={() => onNotificationPress()}>
+        <View style={{ width: 30, alignItems: 'center' }}>
+          <Icon name="ios-notifications" size={25} style={{ color: '#fff', marginLeft: -10 }} />
+          {!!unreadCount && unreadCount > 0 && (
+            <View style={styles.unreadBadge}>
+              <Text numberOfLines={1} adjustsFontSizeToFit={unreadCount > 0} style={{ fontSize: 10, color: '#fff' }}>
+                {unreadCount}
+              </Text>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+    return (
+      <>
+        <Header title="Feed" right={notificationsButton} />
+        <View
+          style={{
+            flexDirection: 'row',
+            backgroundColor: '#fff',
+            padding: 10,
+            alignItems: 'center',
+            borderBottomWidth: 0.5,
+            borderColor: '#999',
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => goToProfile()}
+            style={{
+              elevation: 4,
+              shadowOffset: { width: 5, height: 5 },
+              shadowColor: 'grey',
+              shadowOpacity: 0.5,
+              shadowRadius: 10,
+            }}
+          >
+            {profile && avatar ? (
+              <Image source={{ uri: avatar }} style={{ height: 50, width: 50, borderRadius: 25 }} />
+            ) : (
+              <Icon name="md-contact" size={60} style={{ color: colors.primary }} />
+            )}
+          </TouchableOpacity>
+          <TextInput
+            ref={ref => (this.input = ref)}
+            underlineColorAndroid="transparent"
+            value={status}
+            maxLength={280}
+            autoCorrect={false}
+            onChangeText={status => {
+              this.setState({ status });
+              const mentionFriends = Object.values(friends);
+              const list = getMentionsList(status, mentionFriends);
+              list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
+            }}
+            placeholder="Post a status for your pals..."
+            style={{
+              flex: 1,
+              borderColor: '#999',
+              borderWidth: 0.5,
+              marginHorizontal: 10,
+              height: 40,
+              padding: 5,
+              fontFamily: 'Montserrat',
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              if (username) {
+                this.showPicker();
+              } else {
+                Alert.alert('Username not set', 'You need a username before making posts, go to your profile now?', [
+                  { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                  { text: 'OK', onPress: () => goToProfile() },
+                ]);
+              }
+            }}
+          >
+            <Icon
+              name="ios-attach"
+              size={40}
+              style={{
+                color: colors.secondary,
+                marginLeft: 5,
+                marginRight: 10,
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              if (status) {
+                if (username) {
+                  Alert.alert('Confirm', 'Submit post?', [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Yes',
+                      onPress: async () => {
+                        try {
+                          await postStatus({
+                            type: PostType.STATUS,
+                            text: status,
+                            uid,
+                            username,
+                            createdAt: new Date().toString(),
+                          })
+                          this.setState({ status: '' });
+                        } catch (e) {
+                          Alert.alert('Error', e.message);
+                        }
+                      },
+                    },
+                  ]);
+                } else {
+                  Alert.alert('Username not set', 'You need a username before making posts, go to your profile now?', [
+                    { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                    { text: 'OK', onPress: () => goToProfile() },
+                  ]);
+                }
+              } else {
+                // alert no status
+              }
+            }}
+          >
+            <Icon
+              name="md-return-right"
+              size={40}
+              style={{
+                color: colors.secondary,
+                paddingTop: 5,
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          contentContainerStyle={{ backgroundColor: '#9993', flex: 1, paddingTop: 10 }}
+          ref={scrollRef}
+          onScroll={event => {
+            this.scrollIndex = event.nativeEvent.contentOffset.y;
+          }}
+        >
+          {mentionList && (
+            <View style={styles.mentionList}>
+              <FlatList
+                keyboardShouldPersistTaps="handled"
+                data={mentionList}
+                style={{ backgroundColor: '#fff' }}
+                keyExtractor={item => item.uid}
+                renderItem={({ item, index }) => {
+                  if (index < 10) {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => {
+                          const split = status.split(' ');
+                          split[split.length - 1] = `@${item.username} `;
+                          this.setState({ status: split.join(' '), mentionList: null });
+                        }}
+                        style={{ backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5 }}
+                      >
+                        {item.avatar ? (
+                          <Image source={{ uri: item.avatar }} style={{ height: 30, width: 30, borderRadius: 15 }} />
+                        ) : (
+                          <Icon name="md-contact" style={{ fontSize: 35, color: colors.primary }} />
+                        )}
+                        <Text style={{ marginLeft: 10 }}>{item.username}</Text>
+                      </TouchableOpacity>
+                    );
+                  }
+                  return null;
+                }}
+              />
+            </View>
+          )}
+          {friends && profile && this.renderFeed()}
+        </ScrollView>
+        {spinner && (
+          <View style={sStyles.spinner}>
+            <PulseIndicator color={colors.secondary} />
+          </View>
+        )}
+        <Modal onRequestClose={() => null} visible={showImage} transparent>
+          <ImageViewer
+            renderIndicator={(currentIndex, allSize) => null}
+            loadingRender={() => (
+              <SafeAreaView>
+                <Text style={{ color: '#fff', fontSize: 20 }}>Loading...</Text>
+              </SafeAreaView>
+            )}
+            renderHeader={() => {
+              return (
+                <TouchableOpacity
+                  style={{ position: 'absolute', top: 20, left: 10, padding: 10, zIndex: 9999 }}
+                  onPress={() => this.setState({ selectedImage: null, showImage: false })}
+                >
+                  <View
+                    style={{
+                      backgroundColor: '#0007',
+                      paddingHorizontal: 15,
+                      paddingVertical: 2,
+                      borderRadius: 10,
+                    }}
+                  >
+                    <Icon name="ios-arrow-back" size={40} style={{ color: '#fff' }} />
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+            imageUrls={selectedImage}
+          />
+        </Modal>
+        <ModalBox
+          style={{
+            width: SCREEN_WIDTH - 20,
+            height: SCREEN_HEIGHT - 150,
+            marginTop: Platform.select({ ios: 10 }),
+            borderRadius: 5,
+            padding: 5,
+          }}
+          swipeToClose={false}
+          isOpen={this.state.showCommentModal}
+          onClosed={() => this.setState({ focusCommentInput: false, showCommentModal: false })}
+          backButtonClose
+          position="center"
+        >
+          <TouchableOpacity onPress={() => this.setState({ showCommentModal: false })}>
+            <Icon name="ios-arrow-back" size={30} style={{ color: '#000', padding: 10 }} />
+          </TouchableOpacity>
+          <Comments
+            data={
+              this.props.feed[this.state.postId]
+                ? this.props.feed[this.state.postId].comments
+                : []
+            }
+            viewingUserName={this.props.profile.username}
+            initialDisplayCount={10}
+            editMinuteLimit={900}
+            focusCommentInput={this.state.focusCommentInput}
+            childrenPerPage={5}
+            //lastCommentUpdate={this.state.lastCommentUpdate}
+            users={Object.values(combined)}
+            usernameTapAction={(username, uid) => {
+              if (uid === this.props.profile.uid) {
+                this.props.goToProfile();
+              } else {
+                this.props.viewProfile(uid);
+              }
+            }}
+            childPropName="children"
+            isChild={comment => comment.parentCommentId}
+            parentIdExtractor={comment => comment.key}
+            keyExtractor={item => item.comment_id}
+            usernameExtractor={item => {
+              if (item.uid === this.props.profile.uid) {
+                return 'You';
+              }
+              return this.props.friends[item.uid].username || this.props.users[item.uid].username;
+            }}
+            uidExtractor={item => (item.user ? item.user.uid : null)}
+            editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
+            createdTimeExtractor={item => new Date(item.created_at).toISOString()}
+            bodyExtractor={item => item.text}
+            imageExtractor={item => {
+              if (item.uid === this.props.profile.uid) {
+                return this.props.profile.avatar;
+              }
+              return this.props.friends[item.uid].avatar || this.props.users[item.uid].avatar;
+            }}
+            likeExtractor={item => item.rep}
+            reportedExtractor={item => item.reported}
+            likesExtractor={item =>
+              likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile)
+            }
+            likeCountExtractor={item => item.repCount}
+            commentCount={this.props.feed[this.state.postId] ? this.props.feed[this.state.postId].commentCount : 0}
+            childrenCountExtractor={comment => comment.childrenCount}
+            timestampExtractor={item => new Date(item.created_at).toISOString()}
+            replyAction={offset => {
+              scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
+            }}
+            saveAction={async (text, parentCommentId) => {
+              if (text) {
+                try {
+                await this.props
+                  .comment(this.props.profile.uid, this.state.postId, text, new Date().toString(), parentCommentId)
+                } catch(e) {
+                  Alert.alert('Error', e.message)
+                }
+              }
+            }}
+            editAction={(text, comment) =>  console.log(text)}
+            reportAction={comment => console.log(comment)}
+            likeAction={comment => this.props.repComment(comment)}
+            likesTapAction={(comment: Comment) => {
+              this.setState({ likesModalVisible: true, repsId: comment.key, repCount: comment.repCount });
+              this.props.getRepsUsers(comment.key)
+            }}
+            paginateAction={(fromComment: Comment, direction: string, parentComment: Comment | undefined) => {
+              if (parentComment) {
+                this.props.getReplies(parentComment, 10, fromComment.key);
+              } else {
+                this.props.getComments(this.state.postId, 10, fromComment.key);
+              }
+            }}
+            getCommentRepsUsers={(comment, amount) => this.props.getCommentRepsUsers(comment, amount)}
+          />
+        </ModalBox>
+        <RepsModal
+          onClosed={() => this.setState({ likesModalVisible: false })}
+          isOpen={this.state.likesModalVisible}
+          id={this.state.repsId}
+          repCount={this.state.repCount}
+        />
+      </>
+    );
+  }
 }
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
@@ -981,7 +953,7 @@ const mapDispatchToProps = dispatch => ({
   getRepsUsers: (postId: string, limit?: number) => dispatch(fetchRepsUsers(postId, limit)),
   onNotificationPress: () => dispatch(navigateNotifications()),
   getProfile: () => dispatch(fetchProfile()),
-  getFriends: () => dispatch(fetchFriends()),
+  getFriends: (uid, limit?, endAt?) => dispatch(fetchFriends(uid, limit, endAt)),
   navigateFullScreenVideo: uri => dispatch(navigateFullScreenVideo(uri)),
   getReplies: (fromCommentId: Comment, limit: number, endAt?: string) =>
     dispatch(fetchReplies(fromCommentId, limit, endAt)),

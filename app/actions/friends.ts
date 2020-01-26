@@ -48,7 +48,7 @@ const getStateString = state => {
   return UserState.AWAY;
 };
 
-export const fetchFriends = (uid, limit = 10) => {
+export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
   return async dispatch => {
     await firebase
       .database()
