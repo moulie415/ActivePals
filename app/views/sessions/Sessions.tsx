@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { pathOr } from 'ramda';
 import { Alert, View, FlatList, TouchableOpacity, Platform, Switch, Image as SlowImage } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
@@ -190,12 +191,8 @@ class Sessions extends Component<SessionsProps, State> {
         </Text>
       </View>
     );
-    let yourLat;
-    let yourLon;
-    if (location) {
-      yourLat = location.lat;
-      yourLon = location.lon;
-    }
+    const yourLat = pathOr(null, ['lat'], location);
+    const yourLon = pathOr(null, ['lon'], location);
     return (
       <View style={{ flex: 1, marginTop: 45 }}>
         <SegmentedControlTab
@@ -267,9 +264,9 @@ class Sessions extends Component<SessionsProps, State> {
                     <View style={{ flex: 5 }}>
                       <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
                         <Text style={{ flex: 3 }} numberOfLines={1}>
-                          <Text style={styles.title}>{item.title}</Text>
+                          <Text style={styles.title}>{`${item.title} `}</Text>
                           <Text style={{ color: '#999' }}>
-                            {' (' + (item.distance ? item.distance.toFixed(2) : getDistance(item, yourLat, yourLon)) + ' km away)'}
+                            {`(${item.distance ? item.distance.toFixed(2) : getDistance(item, yourLat, yourLon)} km away)`}
                           </Text>
                         </Text>
                       </View>
@@ -350,33 +347,45 @@ class Sessions extends Component<SessionsProps, State> {
                     <View
                       style={{ padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index === 0 ? 1 : 0 }}
                     >
-                      <View style={{ flexDirection: 'row '}} >
-                        {item.photo ? <Image source={{uri: item.photo}} style={{height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10}}/> : 
-                        <Image source={require('Anyone/assets/images/dumbbell.png')} style={{height: 40, width: 40, alignSelf: 'center', marginRight: 10}}/>}
-                          <View style={{flex: 5}}>
-                            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                              <Text style={[{flex: 3} , styles.title]} numberOfLines={1}>{item.name}</Text>
-                            </View>
-                            <Text style={{flex: 2, color: '#000'}} numberOfLines={1} >{item.vicinity}</Text>
-                            <Text style={{color: '#999'}}>{' (' +  getDistance(item, yourLat, yourLon, true) + ' km away)'}</Text>
+                      <View style={{ flexDirection: 'row' }}>
+                        {item.photo ? (
+                          <Image
+                            source={{ uri: item.photo }}
+                            style={{ height: 40, width: 40, alignSelf: 'center', borderRadius: 20, marginRight: 10 }}
+                          />
+                        ) : (
+                          <Image
+                            source={require('../../../assets/images/dumbbell.png')}
+                            style={{ height: 40, width: 40, alignSelf: 'center', marginRight: 10 }}
+                          />
+                        )}
+                        <View style={{ flex: 5 }}>
+                          <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+                            <Text style={[{ flex: 3 }, styles.title]} numberOfLines={1}>
+                              {item.name}
+                            </Text>
+                          </View>
+                          <Text style={{ flex: 2, color: '#000' }} numberOfLines={1} >{item.vicinity}</Text>
+                          <Text style={{ color: '#999' }}>{` (${getDistance(item, yourLat, yourLon, true)} km away)`}</Text>
                         </View>
-                        <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
-                        <TouchableOpacity onPress={()=>{
-                          this.setState({longitude: lng, latitude: lat, switch: true})
-                        }}>
-                          <Icon size={40} name="ios-pin" style={{color: colors.secondary}}/>
-                        </TouchableOpacity>
-                      </View>
+                        <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+                          <TouchableOpacity
+                            onPress={() => this.setState({ longitude: lng, latitude: lat, switch: true })}
+                          >
+                            <Icon size={40} name="ios-pin" style={{ color: colors.secondary }} />
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     </View>
-                </TouchableOpacity>
-            )}
-          }}
-        />
+                  </TouchableOpacity>
+                );
+              }
+            }}
+          />
         )}
       </View>
     );
-}
+  }
 
   render() {
     // switch for list view and map view
