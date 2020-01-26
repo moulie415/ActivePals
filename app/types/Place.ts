@@ -20,6 +20,12 @@ export default interface Place {
   utc_offset: string;
   vicinity: string;
   website: string;
+  opening_hours: OpeningHours;
+}
+
+interface OpeningHours {
+  open_now: boolean;
+  weekday_text: string[];
 }
 
 interface Geometry {
