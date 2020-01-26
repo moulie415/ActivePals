@@ -17,7 +17,8 @@
     "prettier/@typescript-eslint"
   ],
   "rules": {
-    "global-require": 0 ,
+    "global-require": 0,
+    "@typescript-eslint/camelcase": 0,
     /**
      * @description rules of eslint official
      */

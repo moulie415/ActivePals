@@ -13,6 +13,8 @@ export default interface Profile {
   avatar?: string;
   friends?: { [key: string]: UserState };
   chats?: { [key: string]: string };
+  activity?: string;
+  level?: string;
 }
 
 export enum AccountType {

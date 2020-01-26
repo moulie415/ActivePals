@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { pathOr } from 'ramda';
 import { Alert, View, TouchableOpacity, Platform, Modal, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -15,54 +16,43 @@ import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
 import { navigateBack, navigateGym } from '../actions/navigation';
 import { deleteFriend, sendRequest } from '../actions/friends';
+import ProfileViewProps from '../types/views/ProfileView';
+import Profile from '../types/Profile';
+import Place from '../types/Place';
 
-class ProfileView extends Component {
-  static navigationOptions = {
-    header: null,
-    tabBarLabel: 'Profile',
-    tabBarIcon: ({ tintColor }) => <Icon name="md-person" style={{ color: tintColor }} />,
-  };
-
+interface State {
+  profile?: Profile;
+  loaded: boolean;
+  isFriend: boolean;
+  showImage: boolean;
+  gym?: Place;
+  backdrop?: string;
+  avatar?: string;
+  selectedImage?: { url: string }[];
+}
+class ProfileView extends Component<ProfileViewProps, State> {
   constructor(props) {
     super(props);
-    this.params = this.props.navigation.state.params;
-    this.uid = this.params.uid;
-
-    this.fetch();
-
-    firebase
-      .database()
-      .ref('users/' + this.uid)
-      .once('value', user => {
-        this.setState({ profile: user.val() });
-        if (user.val().gym) {
-          firebase
-            .database()
-            .ref('gyms/' + user.val().gym)
-            .once('value', gym => {
-              this.setState({ gym: gym.val(), loaded: true });
-            });
-        } else this.setState({ loaded: true });
-        if (this.props.friends[user.val().uid]) {
-          this.setState({ isFriend: true });
-        }
-      });
-
-    this.user = null;
     this.state = {
       isFriend: false,
-      profile: {},
-      gym: {},
       showImage: false,
       loaded: false,
-      //avatar: this.props.friends[this.uid] ? this.props.friends[this.uid].avatar : null
     };
   }
 
-  fetch() {
+  componentDidMount() {
+    // TODO update friend in redux
+    const {
+      friends,
+      navigation: {
+        state: {
+          params: { uid },
+        },
+      },
+    } = this.props;
     firebase
       .storage()
-      .ref('images/' + this.uid)
+      .ref(`images/${uid}`)
       .child('backdrop')
       .getDownloadURL()
       .then(backdrop => this.setState({ backdrop }))
@@ -70,34 +60,57 @@ class ProfileView extends Component {
 
     firebase
       .storage()
-      .ref('images/' + this.uid)
+      .ref(`images/${uid}`)
       .child('avatar')
       .getDownloadURL()
       .then(avatar => this.setState({ avatar }))
       .catch(e => console.log(e));
+
+    firebase
+      .database()
+      .ref(`users/${uid}`)
+      .once('value', user => {
+        this.setState({ profile: user.val() });
+        if (user.val().gym) {
+          firebase
+            .database()
+            .ref(`gyms/${user.val().gym}`)
+            .once('value', gym => {
+              this.setState({ gym: gym.val(), loaded: true });
+            });
+        } else this.setState({ loaded: true });
+        if (friends[user.val().uid]) {
+          this.setState({ isFriend: true });
+        }
+      });
   }
 
+  static navigationOptions = {
+    header: null,
+    tabBarLabel: 'Profile',
+    tabBarIcon: ({ tintColor }) => <Icon name="md-person" style={{ color: tintColor }} />,
+  };
+
   render() {
-    const { username, first_name, last_name, birthday, email, uid, accountType, activity, level } = this.state.profile;
+    const { remove, request, goBack, goToGym } = this.props;
+    const { loaded, backdrop, avatar, isFriend, gym, showImage, selectedImage } = this.state;
+    const profile = pathOr({}, ['profile'], this.state);
+    const { username, first_name, last_name, birthday, uid, accountType, activity, level } = profile;
     return (
       <>
         <Header hasBack title={username || 'Profile'} />
-        {this.state.loaded ? (
+        {loaded ? (
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
             <View>
               <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                {this.state.backdrop ? (
+                {backdrop ? (
                   <TouchableOpacity
                     style={{ height: 150, width: '100%' }}
                     onPress={() => {
-                      this.setState({ selectedImage: [{ url: this.state.backdrop }], showImage: true });
+                      this.setState({ selectedImage: [{ url: backdrop }], showImage: true });
                     }}
                   >
-                    <Image
-                      style={{ height: 150, width: '100%' }}
-                      resizeMode="cover"
-                      source={{ uri: this.state.backdrop }}
-                    />
+                    <Image style={{ height: 150, width: '100%' }} resizeMode="cover" source={{ uri: backdrop }} />
                   </TouchableOpacity>
                 ) : (
                   <View
@@ -109,17 +122,17 @@ class ProfileView extends Component {
                     }}
                   />
                 )}
-                {this.state.avatar ? (
+                {avatar ? (
                   <TouchableOpacity
                     onPress={() => {
-                      this.setState({ selectedImage: [{ url: this.state.avatar }], showImage: true });
+                      this.setState({ selectedImage: [{ url: avatar }], showImage: true });
                     }}
                     style={[
                       { marginTop: -45, marginHorizontal: 20, borderWidth: 0.5, borderColor: '#fff' },
                       globalStyles.shadow,
                     ]}
                   >
-                    <Image style={{ height: 90, width: 90 }} source={{ uri: this.state.avatar }} />
+                    <Image style={{ height: 90, width: 90 }} source={{ uri: avatar }} />
                   </TouchableOpacity>
                 ) : (
                   <Icon
@@ -132,7 +145,7 @@ class ProfileView extends Component {
                       backgroundColor: '#fff',
                       marginBottom: 10,
                       paddingHorizontal: 10,
-                      paddingTop: Platform.OS == 'ios' ? 5 : 0,
+                      paddingTop: Platform.OS === 'ios' ? 5 : 0,
                       borderWidth: 1,
                       borderColor: colors.secondary,
                     }}
@@ -145,26 +158,29 @@ class ProfileView extends Component {
                 {(first_name || last_name) && (
                   <Text style={{ marginLeft: 10, marginVertical: 5 }}>
                     {' '}
-                    ({first_name && <Text>{`${first_name}${last_name ? ' ' : ''}`}</Text>}
+                    ({first_name &&
+                      <Text>
+                      {`${first_name}${last_name ? ' ' : ''}`}
+                      </Text>}
                     {last_name && <Text>{last_name}</Text>})
                   </Text>
                 )}
               </Text>
-              {!this.state.isFriend && (
+              {!isFriend && (
                 <Button
                   onPress={() => {
                     Alert.alert('Send pal request', 'Are you sure?', [
                       { text: 'Cancel', style: 'cancel' },
                       {
                         text: 'Yes',
-                        onPress: () => {
-                          this.props
-                            .request(uid)
-                            .then(() => {
-                              this.props.goBack();
-                              Alert.alert('Success', 'Request sent');
-                            })
-                            .catch(e => Alert.alert('Error', e.message));
+                        onPress: async () => {
+                          try {
+                            await request(uid);
+                            goBack();
+                            Alert.alert('Success', 'Request sent');
+                          } catch (e) {
+                            Alert.alert('Error', e.message);
+                          }
                         },
                         style: 'destructive',
                       },
@@ -175,23 +191,23 @@ class ProfileView extends Component {
                 />
               )}
 
-              {accountType && this.state.isFriend && (
+              {accountType && isFriend && (
                 <Text style={{ color: '#999', marginLeft: 10, marginVertical: 5 }}>
                   Account type:
-                  <Text style={{ color: colors.secondary }}> {accountType}</Text>
+                  <Text style={{ color: colors.secondary }}>{` ${accountType}`}</Text>
                 </Text>
               )}
 
-              {this.state.gym && this.state.gym.name && this.state.isFriend && (
-                <TouchableOpacity onPress={() => this.props.goToGym(this.state.gym.place_id)}>
+              {gym && gym.name && isFriend && (
+                <TouchableOpacity onPress={() => goToGym(gym.place_id)}>
                   <Text style={{ color: '#999', marginLeft: 10, marginVertical: 5 }}>
                     Gym:
-                    <Text style={{ color: colors.secondary }}> {this.state.gym.name}</Text>
+                    <Text style={{ color: colors.secondary }}>{` ${gym.name}`}</Text>
                   </Text>
                 </TouchableOpacity>
               )}
 
-              {birthday && this.state.isFriend && (
+              {birthday && isFriend && (
                 <Text style={{ marginLeft: 10, marginVertical: 5 }}>
                   <Text style={{ color: '#999', marginLeft: 10, marginVertical: 5 }}>Birthday: </Text>
                   <Text style={{ color: colors.secondary }}>
@@ -200,14 +216,14 @@ class ProfileView extends Component {
                 </Text>
               )}
 
-              {this.state.isFriend && (
+              {isFriend && (
                 <Text style={{ color: '#999', marginLeft: 10, marginVertical: 5 }}>
                   {'Preferred activity: '}
                   <Text style={{ color: colors.secondary }}>{activity || 'Unspecified'}</Text>
                 </Text>
               )}
 
-              {activity && this.state.isFriend && (
+              {activity && isFriend && (
                 <Text style={{ color: '#999', marginLeft: 10, marginVertical: 5 }}>
                   {'Level: '}
                   <Text style={{ color: colors.secondary }}>{level || 'Unspecified'}</Text>
@@ -215,7 +231,7 @@ class ProfileView extends Component {
               )}
             </View>
 
-            {this.state.isFriend && (
+            {isFriend && (
               <Button
                 color="red"
                 text="Remove pal"
@@ -225,8 +241,9 @@ class ProfileView extends Component {
                     { text: 'Cancel', style: 'cancel' },
                     {
                       text: 'Yes',
-                      onPress: () => {
-                        this.props.remove(uid).then(() => this.props.goBack());
+                      onPress: async () => {
+                        await remove(uid);
+                        goBack();
                       },
                       style: 'destructive',
                     },
@@ -240,12 +257,7 @@ class ProfileView extends Component {
             <PulseIndicator color={colors.secondary} />
           </View>
         )}
-        {this.state.spinner && (
-          <View style={hStyles.spinner}>
-            <PulseIndicator color={colors.secondary} />
-          </View>
-        )}
-        <Modal onRequestClose={() => null} visible={this.state.showImage} transparent={true}>
+        <Modal onRequestClose={() => null} visible={showImage} transparent>
           <ImageViewer
             renderIndicator={(currentIndex, allSize) => null}
             loadingRender={() => (
@@ -267,12 +279,12 @@ class ProfileView extends Component {
                       borderRadius: 10,
                     }}
                   >
-                    <Icon name={'ios-arrow-back'} style={{ color: '#fff', fontSize: 40 }} />
+                    <Icon name="ios-arrow-back" style={{ color: '#fff', fontSize: 40 }} />
                   </View>
                 </TouchableOpacity>
               );
             }}
-            imageUrls={this.state.selectedImage}
+            imageUrls={selectedImage}
           />
         </Modal>
       </>
