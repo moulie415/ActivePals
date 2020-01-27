@@ -208,7 +208,7 @@ class PostView extends Component<PostViewProps, State> {
           ) : null}
         </Modal>
         <Modal onRequestClose={()=> null}
-          visible={this.state.showImage} transparent={true}>
+          visible={this.state.showImage} transparent>
         <ImageViewer
           renderIndicator= {(currentIndex, allSize) => null}
           loadingRender={()=> <SafeAreaView><Text style={{color: '#fff', fontSize: 20}}>Loading...</Text></SafeAreaView>}

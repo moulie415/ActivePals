@@ -34,7 +34,7 @@ class Welcome extends Component<WelcomeProps, State> {
     return (
       <Swiper
         style={styles.wrapper}
-        showsButtons={true}
+        showsButtons
         loop={false}
         activeDotColor={colors.secondary}
         nextButton={<Text style={styles.buttonText}>›</Text>}

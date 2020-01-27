@@ -203,7 +203,7 @@ class Profile extends Component {
                 label: 'Unspecified',
                 value: null,
               }}
-              hideIcon={true}
+              hideIcon
               items={pickerItems(activities)}
               style={{
                 underline: { opacity: 0 },
@@ -237,7 +237,7 @@ class Profile extends Component {
                   label: 'Unspecified',
                   value: null,
                 }}
-                hideIcon={true}
+                hideIcon
                 items={pickerItems(levels)}
                 style={{
                   underline: { opacity: 0 },

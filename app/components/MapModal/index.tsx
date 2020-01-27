@@ -41,7 +41,7 @@ class MapModal extends Component {
 				    .catch(err => Alert.alert('Error', "Invalid location"))
              //this.props.handlePress(event)
             }}
-          showsUserLocation={true}
+          showsUserLocation
           initialRegion={{
             latitude: this.state.latitude,
             longitude: this.state.longitude,

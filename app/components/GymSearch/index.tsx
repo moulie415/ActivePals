@@ -67,7 +67,7 @@ const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) 
         types: 'establishment', // default: 'geocode'
       }}
       styles={styles}
-      //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
+      //currentLocation // Will add a 'Current location' button at the top of the predefined places list
       //currentLocationLabel="Current location"
       nearbyPlacesAPI="GooglePlacesSearch" // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
       GoogleReverseGeocodingQuery={{

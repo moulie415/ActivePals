@@ -86,7 +86,7 @@ class SessionDetail extends Component {
             style={{ padding: 5, borderWidth: 0.5, borderColor: '#999', height: 100, margin: 10 }}
             placeholder="Details..."
             textAlignVertical={'top'}
-            multiline={true}
+            multiline
             underlineColorAndroid="transparent"
             onChangeText={details => (this.details = details)}
           />
@@ -208,7 +208,7 @@ class SessionDetail extends Component {
           </View>
           <Text style={{ fontSize: 20, margin: 10, fontWeight: 'bold' }}>Gender</Text>
           <RadioForm
-            formHorizontal={true}
+            formHorizontal
             radio_props={genderProps}
             initial={0}
             style={{ padding: 10, borderBottomWidth: 0.5, borderColor: '#999' }}
@@ -224,7 +224,7 @@ class SessionDetail extends Component {
             {getType(this.state.type, 20)}
           </View>
           <RadioForm
-            formHorizontal={true}
+            formHorizontal
             radio_props={typeProps}
             initial={0}
             style={{ padding: 10, borderBottomWidth: 0.5, borderColor: '#999', flexWrap: 'wrap' }}

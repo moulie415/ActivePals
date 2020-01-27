@@ -19,6 +19,7 @@
   "rules": {
     "global-require": 0,
     "@typescript-eslint/camelcase": 0,
+    "@typescript-eslint/ban-ts-ignore": 0,
     /**
      * @description rules of eslint official
      */
@@ -64,7 +65,7 @@
      * @description rules of eslint-plugin-prettier
      */
     "prettier/prettier": "error",
-    "no-underscore-dangle": [2, { "allow": ["__typename"] }],
+    "no-underscore-dangle": [2, { "allow": ["__typename", "_ref"] }],
     "import/extensions": [
       "error",
       "ignorePackages",

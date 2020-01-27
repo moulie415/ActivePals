@@ -175,7 +175,7 @@ export default class Comments extends PureComponent<CommentsProps> {
         updatedAt={this.props.editTimeExtractor(c)}
         replyAction={this.props.replyAction ? this.handleReply : null}
         image={this.props.imageExtractor(c)}
-        child={true}
+        child
         reportAction={this.props.reportAction ? this.handleReport : null}
         liked={this.props.likeExtractor ? this.props.likeExtractor(c) : null}
         reported={this.props.reportedExtractor ? this.props.reportedExtractor(c) : null}
@@ -336,7 +336,7 @@ export default class Comments extends PureComponent<CommentsProps> {
               <TextInput
                 ref={input => (this.textInputs['input' + this.props.keyExtractor(item)] = input)}
                 style={styles.input}
-                multiline={true}
+                multiline
                 onChangeText={text => (this.replyCommentText = text)}
                 placeholder={'Write comment'}
                 numberOfLines={3}
@@ -365,7 +365,7 @@ export default class Comments extends PureComponent<CommentsProps> {
           <TextInput
             style={styles.input}
             ref={input => (this.inputMain = input)}
-            multiline={true}
+            multiline
             value={this.state.text}
             maxLength={280}
             onChangeText={text => {
@@ -468,7 +468,7 @@ export default class Comments extends PureComponent<CommentsProps> {
             }}
           >
             <ActivityIndicator
-              animating={true}
+              animating
               style={{
                 height: 50,
                 width: screen.width,
@@ -500,7 +500,7 @@ export default class Comments extends PureComponent<CommentsProps> {
           onShow={() => {
             this.textInputs['editCommentInput'].focus();
           }}
-          transparent={true}
+          transparent
           visible={this.state.editModalVisible}
           onRequestClose={() => {
             this.setEditModalVisible(false);
@@ -512,7 +512,7 @@ export default class Comments extends PureComponent<CommentsProps> {
               <TextInput
                 ref={input => (this.textInputs['editCommentInput'] = input)}
                 style={styles.input}
-                multiline={true}
+                multiline
                 defaultValue={this.editCommentText}
                 onChangeText={text => (this.editCommentText = text)}
                 placeholder={'Edit comment'}

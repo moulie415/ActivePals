@@ -15,8 +15,8 @@ const LocationSearch: FunctionComponent = ({isOpen, onPress, onClosed}) => {
     ref={(instance) => { this.GooglePlacesRef = instance }}
     placeholder='Search...'
     minLength={2}
-    autoFocus={true}
-    fetchDetails={true}
+    autoFocus
+    fetchDetails
     listViewDisplayed='auto'
     returnKeyType={'search'}
     onPress={(data, details) => {

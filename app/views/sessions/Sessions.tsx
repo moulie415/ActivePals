@@ -432,7 +432,7 @@ class Sessions extends Component<SessionsProps, State> {
           style={styles.map}
           onPress={(event)=> this.handlePress(event)}
           //onLongPress={event => this.handlePress(event)}
-          showsUserLocation={true}
+          showsUserLocation
           initialRegion={{
             latitude: this.state.latitude,
             longitude: this.state.longitude,

@@ -22,7 +22,7 @@ class Credits extends Component {
             />
             <ScrollView>
                 <Hyperlink
-                linkDefault={true}
+                linkDefault
                 linkStyle={ { color: colors.secondary } }
                 linkText={ url => {
                     switch(url) {

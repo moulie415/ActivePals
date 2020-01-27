@@ -159,7 +159,7 @@ class Friends extends Component {
             </Text></View>}
 
         <Modal
-          backButtonClose={true}
+          backButtonClose
           backdropPressToClose={false}
           style={styles.modal}
           position={"center"}

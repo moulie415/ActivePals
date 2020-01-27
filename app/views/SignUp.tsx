@@ -65,7 +65,7 @@ class SignUp extends Component {
             <Icon size={25} name="md-unlock" style={styles.icon} />
             <TextInput
               placeholder="Password"
-              secureTextEntry={true}
+              secureTextEntry
               placeholderTextColor="#FFF"
               onChangeText={p => (this.pass = p)}
               style={styles.input}
@@ -75,7 +75,7 @@ class SignUp extends Component {
             <Icon size={25} name="md-unlock" style={styles.icon} />
             <TextInput
               placeholder="Confirm Password"
-              secureTextEntry={true}
+              secureTextEntry
               placeholderTextColor="#FFF"
               onChangeText={p => (this.confirm = p)}
               style={styles.input}
