@@ -38,6 +38,7 @@ import {
 import { fetchProfile } from '../../actions/profile';
 import MessagingProps from '../../types/views/Messaging';
 import Message from '../../types/Message';
+import ImagePickerOptions from '../../types/Shared';
 
 interface State {
   spinner: boolean;
@@ -49,6 +50,8 @@ interface State {
 }
 
 class Messaging extends Component<MessagingProps, State> {
+  keyboardDidShowListener;
+
   constructor(props) {
     super(props);
     const { messageSession } = this.props;
@@ -171,7 +174,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   async onSend(messages = []) {
-    const { navigation, gym } = this.props;
+    const { navigation, gym, onUpdateLastMessage } = this.props;
     const { params } = navigation.state;
     const { friendUid, gymId, session, chatId } = params;
     // make messages database friendly
@@ -189,32 +192,46 @@ class Messaging extends Component<MessagingProps, State> {
       }
     });
 
-    let ref = session ? firebase.database().ref('sessionChats').child(session.key) :
-    firebase.database().ref('chats').child(chatId)
-
-    if (gymId) {
-      ref = firebase.database().ref('gymChats').child(gymId)
-    }
+    const ref = this.getDbRef();
 
     try {
       await ref.push(...converted);
       this.setState(previousState => ({
         messages: GiftedChat.append(Object.values(previousState.messages), messages),
-      }))
+      }));
 
-      if (this.session) {
-        this.props.updateLastMessage({ ...converted[0], type: 'sessionMessage' })
-      }
-      else if (this.gymId) {
-        this.props.updateLastMessage({ ...converted[0], type: 'gymMessage' })
-      }
-      else {
-        this.props.updateLastMessage({ ...converted[0], type: 'message' })
+      if (session) {
+        onUpdateLastMessage({ ...converted[0], type: 'sessionMessage' });
+      } else if (gymId) {
+        updateLastMessage({ ...converted[0], type: 'gymMessage' });
+      } else {
+        updateLastMessage({ ...converted[0], type: 'message' });
       }
     } catch (e) {
-      Alert.alert('Error sending message', e.message)
+      Alert.alert('Error sending message', e.message);
     }
+  }
 
+  getDbRef() {
+    const { navigation } = this.props;
+    const { params } = navigation.state;
+    const { gymId, session, chatId } = params;
+    if (session) {
+      return firebase
+        .database()
+        .ref('sessionChats')
+        .child(session.key);
+    }
+    if (gymId) {
+      return firebase
+        .database()
+        .ref('gymChats')
+        .child(gymId);
+    }
+    return firebase
+      .database()
+      .ref('chats')
+      .child(chatId);
   }
 
   getRightHandIcon() {
@@ -224,7 +241,7 @@ class Messaging extends Component<MessagingProps, State> {
     if (gymId) {
       return (
         <TouchableOpacity onPress={() => goToGym(gymId)}>
-          <Icon size={25} name="md-information-circle" style={{ color: '#fff' }}/>
+          <Icon size={25} name="md-information-circle" style={{ color: '#fff' }} />
         </TouchableOpacity>
       );
     }
@@ -232,7 +249,7 @@ class Messaging extends Component<MessagingProps, State> {
       const { key, private: isPrivate } = session;
       return (
         <TouchableOpacity onPress={() => viewSession(key, isPrivate)}>
-          <Icon size={25} name="md-information-circle" style={{ color: '#fff' }}/>
+          <Icon size={25} name="md-information-circle" style={{ color: '#fff' }} />
         </TouchableOpacity>
       );
     }
@@ -250,27 +267,29 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   loadMessages(endAt?: string) {
-    const { navigation } = this.props;
+    const { navigation, getSessionMessages, getGymMessages, getMessages } = this.props;
     const { amount } = this.state;
     const { params } = navigation.state;
     const { friendUid, gymId, session, chatId } = params;
     this.setState({ spinner: true });
     if (session) {
       const { key, private: isPrivate } = session;
-      this.props.getSessionMessages(key, amount, isPrivate, endAt);
+      getSessionMessages(key, amount, isPrivate, endAt);
     } else if (gymId) {
-      this.props.getGymMessages(gymId, amount, endAt);
+      getGymMessages(gymId, amount, endAt);
     } else {
-      this.props.getMessages(chatId, amount, friendUid, endAt);
+      getMessages(chatId, amount, friendUid, endAt);
     }
   }
 
   showPicker() {
-    const videoOptions = {
+    const { previewFile } = this.props;
+    const { text } = this.state;
+    const videoOptions: ImagePickerOptions = {
       mediaType: 'video',
       durationLimit: 30,
     };
-    const options = {
+    const options: ImagePickerOptions = {
       title: null,
       mediaType: 'photo',
       // customButtons: [
@@ -282,7 +301,7 @@ class Messaging extends Component<MessagingProps, State> {
         skipBackup: true,
       },
     };
-    ImagePicker.showImagePicker(options, response => {
+    ImagePicker.showImagePicker(options, async response => {
       this.setState({ spinner: true });
       console.log('Response = ', response);
       if (response.didCancel) {
@@ -293,45 +312,51 @@ class Messaging extends Component<MessagingProps, State> {
         this.setState({ spinner: false });
       } else if (response.customButton) {
         if (response.customButton === 'uploadVideo') {
-          ImagePicker.launchImageLibrary(videoOptions, response => {
-            if (response.error) {
-              Alert.alert('Error', response.error);
+          ImagePicker.launchImageLibrary(videoOptions, imageResponse => {
+            if (imageResponse.error) {
+              Alert.alert('Error', imageResponse.error);
               this.setState({ spinner: false });
             }
           });
         } else if (response.customButton === 'video') {
-          ImagePicker.launchCamera(videoOptions, response => {
-            if (response.error) {
-              Alert.alert('Error', response.error);
+          ImagePicker.launchCamera(videoOptions, videoResponse => {
+            if (videoResponse.error) {
+              Alert.alert('Error', videoResponse.error);
               this.setState({ spinner: false });
             }
           });
         }
       } else {
         const size = 720;
-        ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then(resized => {
-          this.setState({ spinner: false })
-          this.props.previewFile('image', resized.uri, true, this.state.text)
-        }).catch((e) => {
-          Alert.alert('Error', e.message)
-          this.setState({spinner: false})
-        })
+        try {
+          const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100);
+          this.setState({ spinner: false });
+          previewFile('image', resized.uri, true, text);
+        } catch (e) {
+          Alert.alert('Error', e.message);
+          this.setState({ spinner: false });
+        }
       }
     })
   }
 
   async openChat(user) {
-    const snapshot = await firebase.database().ref('userChats/' + this.uid).child(user.uid).once('value');
+    const { profile, onOpenChat } = this.props;
+    const snapshot = await firebase
+      .database()
+      .ref(`userChats/${profile.uid}`)
+      .child(user.uid)
+      .once('value');
     if (snapshot.val()) {
-      this.props.onOpenChat(snapshot.val(), user.username, user.uid)
+      onOpenChat(snapshot.val(), user.username, user.uid);
     }
   }
 
   render() {
-    const { navigation, gym, profile, friends, users } = this.props;
-    const { amount, messages, showLoadEarlier, spinner } = this.state;
+    const { navigation, gym, profile, friends, users, viewProfile } = this.props;
+    const { messages, showLoadEarlier, spinner, text } = this.state;
     const { params } = navigation.state;
-    const { friendUid, friendUsername, gymId, session, chatId } = params;
+    const { friendUsername, session } = params;
     return (
       <View style={{ flex: 1, backgroundColor: '#9993' }}>
         <Header
@@ -341,31 +366,24 @@ class Messaging extends Component<MessagingProps, State> {
         />
         <GiftedChat
           // inverted={false}
-          ref={ref => this.chat = ref}
-          text={this.state.text}
-          onInputTextChanged={text => this.setState({ text })}
-          messages={this.state.messages ? sortByCreatedAt(Object.values(messages)) : []}
-          onSend={messages => {
-            if (this.props.profile.username) {
-              this.onSend(messages)
-            }
-            else {
-              Alert.alert(
-                'Username not set',
-                'You need a username before sending messages, go to your profile now?',
-                [
-                {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                {text: 'OK', onPress: () => this.props.navigateProfile()},
-                ]
-                )
+          text={text}
+          onInputTextChanged={input => this.setState({ text: input })}
+          messages={messages ? sortByCreatedAt(Object.values(messages)) : []}
+          onSend={msgs => {
+            if (profile.username) {
+              this.onSend(msgs);
+            } else {
+              Alert.alert('Username not set', 'You need a username before sending messages, go to your profile now?', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'OK', onPress: () => navigateProfile() },
+              ]);
             }
           }}
-          onPressAvatar={user => this.props.viewProfile(user._id)}
+          onPressAvatar={user => viewProfile(user._id)}
           onLoadEarlier={() => {
-            this.fetched = false
             const sorted = sortByCreatedAt(Object.values(messages));
-            const endAt = sorted[sorted.length - 1 ].key;
-            this.setState({ spinner: true } ,() => this.loadMessages(endAt))
+            const endAt = sorted[sorted.length - 1].key;
+            this.setState({ spinner: true }, () => this.loadMessages(endAt));
           }}
           loadEarlier={messages && Object.values(messages).length > 14 && showLoadEarlier}
           user={{
@@ -373,7 +391,8 @@ class Messaging extends Component<MessagingProps, State> {
             name: profile.username,
             avatar: profile.avatar,
           }}
-          renderBubble={(props) => { return (
+          renderBubble={props => {
+            return (
             <Bubble {...props}
             wrapperStyle={{
               right: {
@@ -386,7 +405,8 @@ class Messaging extends Component<MessagingProps, State> {
               
             }}/>
             )}}
-          renderMessageText={(props)=> { return (
+          renderMessageText={props=> {
+            return (
             <View>
               {((props.previousMessage.user && props.position == 'left' && props.previousMessage.user._id != props.currentMessage.user._id) ||
               (!props.previousMessage.user && props.currentMessage.user && props.position == 'left')) &&
@@ -412,25 +432,25 @@ class Messaging extends Component<MessagingProps, State> {
               </TouchableOpacity>*/}
               </View>
             }}
-            parsePatterns={(linkStyle) => [
-              { pattern: str.mentionRegex, style: linkStyle, onPress: async (mention) => {
+            parsePatterns={linkStyle => [
+              { pattern: str.mentionRegex, style: linkStyle, onPress: async mention => {
                 const name = mention.substring(1)
                 const combined = [
                   ...Object.values(friends),
                   ...Object.values(users)]
                 if (name === profile.username) {
-                  this.props.navigateProfile()
+                  navigateProfile()
                 }
                 else {
                   const found = combined.find(friend => friend.username == name)
                   if (found) {
-                    this.props.viewProfile(found.uid)
+                    viewProfile(found.uid)
                   }
                   else {
                     try {
                       const snapshot = await firebase.database().ref('usernames').child(name).once('value')
                       if (snapshot.val()) {
-                        this.props.viewProfile(snapshot.val())
+                        viewProfile(snapshot.val())
                       }
                     } catch(e) {
                       console.warn(e.message)
@@ -481,7 +501,7 @@ const mapStateToProps = ({ friends, profile, chats, sharedInfo }, ownProps) => (
 });
 
 const mapDispatchToProps = dispatch => ({
-  updateLastMessage: message => dispatch(updateLastMessage(message)),
+  onUpdateLastMessage: message => dispatch(updateLastMessage(message)),
   onRequest: friendUid => dispatch(sendRequest(friendUid)),
   onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
@@ -489,7 +509,7 @@ const mapDispatchToProps = dispatch => ({
   getSessionMessages: (id, amount, isPrivate, endAt) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
   getGymMessages: (id, amount, endAt) => dispatch(fetchGymMessages(id, amount, endAt)),
   resetNotif: () => dispatch(resetNotification()),
-  navigateProfile: () => dispatch(navigateProfile()),
+  goToProfile: () => dispatch(navigateProfile()),
   viewProfile: uid => dispatch(navigateProfileView(uid)),
   goToGym: gym => dispatch(navigateGym(gym)),
   onResetMessage: () => dispatch(resetMessage()),
@@ -497,7 +517,7 @@ const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
   onResetUnreadCount: id => dispatch(resetUnreadCount(id)),
   fetchProfile: () => dispatch(fetchProfile()),
-  viewSession: (sessionId, isPrivate) => dispatch(navigateSessionInfo(sessionId, isPrivate))
+  viewSession: (sessionId, isPrivate) => dispatch(navigateSessionInfo(sessionId, isPrivate)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Messaging)
+export default connect(mapStateToProps, mapDispatchToProps)(Messaging);
