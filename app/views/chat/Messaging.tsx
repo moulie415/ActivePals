@@ -55,22 +55,6 @@ class Messaging extends Component<MessagingProps, State> {
   constructor(props) {
     super(props);
     const { messageSession } = this.props;
-    // this.params = this.props.navigation.state.params
-    // this.session = this.params.session
-    // this.gymId = this.params.gymId
-    // this.uid = this.props.profile.uid
-    // this.nav = this.props.navigation
-
-    // if (this.session) {
-    //   this.sessionId = this.session.key
-    //   this.sessionTitle = this.session.title
-    // } else if (this.gymId) {
-    //   this.gymName = this.props.gym.name
-    // } else {
-    //   this.chatId = this.params.chatId
-    //   this.friendUsername = this.params.friendUsername
-    //   this.friendUid = this.params.friendUid
-    // }
     this.state = {
       messages: Object.values(messageSession),
       spinner: false,
@@ -80,7 +64,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   componentDidMount() {
-    const { navigation, profile, unreadCount, onResetUnreadCount } = this.props;
+    const { navigation, unreadCount, onResetUnreadCount } = this.props;
     const { params } = navigation.state;
     const { gymId, friendUid, sessionId } = params;
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
@@ -391,87 +375,107 @@ class Messaging extends Component<MessagingProps, State> {
           }}
           renderBubble={props => {
             return (
-            <Bubble {...props}
-            wrapperStyle={{
-              right: {
-                backgroundColor: colors.secondary,
-                ...globalStyles.bubbleShadow
-              },
-              left: {
-                ...globalStyles.bubbleShadow
-              }
-              
-            }}/>
-            )}}
-          renderMessageText={props=> {
-            return (
-            <View>
-              {((props.previousMessage.user && props.position == 'left' && props.previousMessage.user._id != props.currentMessage.user._id) ||
-              (!props.previousMessage.user && props.currentMessage.user && props.position == 'left')) &&
-              <Text style={{color: colors.secondary, fontSize: 12, padding: 10, paddingBottom: 0}}>
-              {props.currentMessage.user.name}</Text>}
-              <MessageText {...props} />
-            </View>
-            )}}
-            renderActions={() => {
-              return <View style={{flexDirection: 'row'}}>
-              <TouchableOpacity
-              onPress={()=> this.showPicker()}
-              style={{marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 15, paddingRight: 10}}>
-                <Icon size={25} name="ios-attach" style={{color: colors.secondary}}/>
-              </TouchableOpacity>
-              {/*<TouchableOpacity 
-              style={{padding: 5}}
-              onPress={() => {
-                this.setState({showEmojiKeyboard: !this.state.showEmojiKeyboard})
-                Keyboard.dismiss()
-                }}>
-                <Icon name="md-happy" style={{color: colors.secondary, marginTop: Platform.OS == 'ios' ? 0 : -1}}/>
-              </TouchableOpacity>*/}
-              </View>
-            }}
-            parsePatterns={linkStyle => [
-              { pattern: str.mentionRegex, style: linkStyle, onPress: async mention => {
-                const name = mention.substring(1)
-                const combined = [
-                  ...Object.values(friends),
-                  ...Object.values(users)]
-                if (name === profile.username) {
-                  navigateProfile()
-                }
-                else {
-                  const found = combined.find(friend => friend.username == name)
-                  if (found) {
-                    viewProfile(found.uid)
+              <Bubble
+                {...props}
+                wrapperStyle={{
+                  right: {
+                    backgroundColor: colors.secondary,
+                    ...globalStyles.bubbleShadow,
+                  },
+                  left: {
+                    ...globalStyles.bubbleShadow,
                   }
-                  else {
+                }}
+              />
+            );
+          }}
+          renderMessageText={props => {
+            return (
+              <View>
+                {((props.previousMessage.user && props.position === 'left' && props.previousMessage.user._id !== props.currentMessage.user._id) ||
+                (!props.previousMessage.user && props.currentMessage.user && props.position == 'left')) &&
+                <Text style={{color: colors.secondary, fontSize: 12, padding: 10, paddingBottom: 0}}>
+                {props.currentMessage.user.name}</Text>}
+                <MessageText {...props} />
+              </View>
+            );
+          }}
+          renderActions={() => {
+            return (
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                  onPress={() => this.showPicker()}
+                  style={{ marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 15, paddingRight: 10 }}
+                >
+                  <Icon size={25} name="ios-attach" style={{ color: colors.secondary }} />
+                </TouchableOpacity>
+                {/* <TouchableOpacity 
+                style={{padding: 5}}
+                onPress={() => {
+                  this.setState({showEmojiKeyboard: !this.state.showEmojiKeyboard})
+                  Keyboard.dismiss()
+                  }}>
+                  <Icon name="md-happy" style={{color: colors.secondary, marginTop: Platform.OS == 'ios' ? 0 : -1}}/>
+                </TouchableOpacity> */}
+              </View>
+            );
+          }}
+          parsePatterns={linkStyle => [
+            {
+              pattern: str.mentionRegex,
+              style: linkStyle,
+              onPress: async mention => {
+                const name = mention.substring(1);
+                const combined = [...Object.values(friends), ...Object.values(users)];
+                if (name === profile.username) {
+                  navigateProfile();
+                } else {
+                  const found = combined.find(friend => friend.username === name);
+                  if (found) {
+                    viewProfile(found.uid);
+                  } else {
                     try {
-                      const snapshot = await firebase.database().ref('usernames').child(name).once('value')
+                      const snapshot = await firebase
+                        .database()
+                        .ref('usernames')
+                        .child(name)
+                        .once('value');
                       if (snapshot.val()) {
-                        viewProfile(snapshot.val())
+                        viewProfile(snapshot.val());
                       }
-                    } catch(e) {
-                      console.warn(e.message)
+                    } catch (e) {
+                      console.warn(e.message);
                     }
                   }
                 }
-              } },
-             ]}
-          />
-          {/*this.state.showEmojiKeyboard &&  <EmojiInput
-            enableSearch={Platform.OS == 'android'}
-	              onEmojiSelected={(emoji) => {
-                    this.setState({text: this.state.text += emoji.char})
-                  }}
-	            />*/}
-        {spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
-          <PulseIndicator color={colors.secondary}/>
-        </View>}
+              },
+            },
+          ]}
+        />
+        {/* this.state.showEmojiKeyboard &&  <EmojiInput
+          enableSearch={Platform.OS == 'android'}
+              onEmojiSelected={(emoji) => {
+                  this.setState({text: this.state.text += emoji.char})
+                }}
+            /> */}
+        {spinner && (
+          <View
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <PulseIndicator color={colors.secondary} />
+          </View>
+        )}
       </View>
-    )
+    );
   }
-
-
 }
 
 const fetchId = params => {
