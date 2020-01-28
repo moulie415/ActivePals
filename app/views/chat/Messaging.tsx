@@ -13,7 +13,7 @@ import Text, { globalTextStyle } from '../../components/Text';
 import colors from '../../constants/colors';
 import globalStyles from '../../styles/globalStyles';
 import Header from '../../components/Header/header';
-import { guid, sortByCreatedAt } from '../../constants/utils';
+import { guid, sortMessagesByCreatedAt } from '../../constants/utils';
 import str from '../../constants/strings';
 // import EmojiInput from 'react-native-emoji-input'
 import {
@@ -44,7 +44,7 @@ interface State {
   spinner: boolean;
   showLoadEarlier: boolean;
   showEmojiKeyboard?: boolean;
-  messages: { [key: string]: Message };
+  messages: Message[];
   amount: number;
   text?: string;
 }
@@ -72,7 +72,7 @@ class Messaging extends Component<MessagingProps, State> {
     //   this.friendUid = this.params.friendUid
     // }
     this.state = {
-      messages: messageSession,
+      messages: Object.values(messageSession),
       spinner: false,
       amount: 15,
       showLoadEarlier: true,
@@ -98,8 +98,8 @@ class Messaging extends Component<MessagingProps, State> {
     const { params } = navigation.state;
     const { friendUid, gymId } = params;
     const session = pathOr({}, ['session'], params);
-    const { key: sessionId, title: sessionTitle } = session;
-    const { messages: stateMessages } = this.state;
+    const { key: sessionId } = session;
+    const { messages } = this.state;
     // message it populated when an attachment is sent
     if (nextProps.message) {
       const message = {
@@ -117,7 +117,7 @@ class Messaging extends Component<MessagingProps, State> {
       onResetMessage();
     }
     if (nextProps.messageSession) {
-      this.setState({ messages: nextProps.messageSession, spinner: false });
+      this.setState({ messages: Object.values(nextProps.messageSession), spinner: false });
       if (nextProps.messageSession && Object.values(nextProps.messageSession).some(message => message._id === 1)) {
         this.setState({ showLoadEarlier: false });
       }
@@ -146,10 +146,9 @@ class Messaging extends Component<MessagingProps, State> {
           (type === 'gymMessage' && messageGymId === gymId && profile.uid !== uid)
         ) {
           // check if its a dupe
-          const messages = stateMessages ? Object.values(stateMessages) : [];
           if (!messages.some(msg => msg._id === message._id)) {
             this.setState(previousState => ({
-              messages: GiftedChat.append(previousState.messages ? Object.values(previousState.messages) : [], message),
+              messages: previousState.messages ? [...previousState.messages, message] : [message],
             }));
           }
         }
@@ -173,7 +172,7 @@ class Messaging extends Component<MessagingProps, State> {
     return true;
   }
 
-  async onSend(messages = []) {
+  async onSend(messages: Message[] = []) {
     const { navigation, gym, onUpdateLastMessage } = this.props;
     const { params } = navigation.state;
     const { friendUid, gymId, session, chatId } = params;
@@ -197,7 +196,7 @@ class Messaging extends Component<MessagingProps, State> {
     try {
       await ref.push(...converted);
       this.setState(previousState => ({
-        messages: GiftedChat.append(Object.values(previousState.messages), messages),
+        messages: [...previousState.messages, ...messages],
       }));
 
       if (session) {
@@ -337,7 +336,7 @@ class Messaging extends Component<MessagingProps, State> {
           this.setState({ spinner: false });
         }
       }
-    })
+    });
   }
 
   async openChat(user) {
@@ -365,10 +364,9 @@ class Messaging extends Component<MessagingProps, State> {
           right={this.getRightHandIcon()}
         />
         <GiftedChat
-          // inverted={false}
           text={text}
           onInputTextChanged={input => this.setState({ text: input })}
-          messages={messages ? sortByCreatedAt(Object.values(messages)) : []}
+          messages={sortMessagesByCreatedAt(messages)}
           onSend={msgs => {
             if (profile.username) {
               this.onSend(msgs);
@@ -381,11 +379,11 @@ class Messaging extends Component<MessagingProps, State> {
           }}
           onPressAvatar={user => viewProfile(user._id)}
           onLoadEarlier={() => {
-            const sorted = sortByCreatedAt(Object.values(messages));
+            const sorted = sortMessagesByCreatedAt(messages);
             const endAt = sorted[sorted.length - 1].key;
             this.setState({ spinner: true }, () => this.loadMessages(endAt));
           }}
-          loadEarlier={messages && Object.values(messages).length > 14 && showLoadEarlier}
+          loadEarlier={messages && messages.length > 14 && showLoadEarlier}
           user={{
             _id: profile.uid,
             name: profile.username,

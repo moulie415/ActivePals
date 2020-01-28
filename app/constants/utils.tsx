@@ -8,6 +8,7 @@ import { SessionType } from '../types/Session';
 import { UserState } from '../types/Profile';
 import Comment from '../types/Comment';
 import Post from '../types/Post';
+import Message from '../types/Message';
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming'];
 
@@ -375,8 +376,8 @@ export const sortPostsByDate = (array: Post[]) => {
   });
 };
 
-export const sortByCreatedAt = (array: any[]) => {
-  return array.sort((a, b) => {
+export const sortMessagesByCreatedAt = (messages: Message[]) => {
+  return messages.sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 }
