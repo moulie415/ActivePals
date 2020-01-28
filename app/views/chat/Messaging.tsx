@@ -420,7 +420,8 @@ class Messaging extends Component<MessagingProps, State> {
                 {((props.previousMessage.user && props.position === 'left' && props.previousMessage.user._id !== props.currentMessage.user._id) ||
                 (!props.previousMessage.user && props.currentMessage.user && props.position == 'left')) &&
                 <Text style={{color: colors.secondary, fontSize: 12, padding: 10, paddingBottom: 0}}>
-                {props.currentMessage.user.name}</Text>}
+                  {props.currentMessage.user.name}
+                </Text>}
                 <MessageText {...props} />
               </View>
             );

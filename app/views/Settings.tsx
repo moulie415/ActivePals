@@ -2,19 +2,24 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import VersionNumber from 'react-native-version-number';
+import DialogInput from 'react-native-dialog-input';
+import { PulseIndicator } from 'react-native-indicators';
+import { connect } from 'react-redux';
 import colors from '../constants/colors';
 import styles from '../styles/settingsStyles';
 import Text, { globalTextStyle } from '../components/Text';
 import Header from '../components/Header/header';
-import { PulseIndicator } from 'react-native-indicators';
 import FbFriendsModal from '../components/FbFriendsModal';
-import DialogInput from 'react-native-dialog-input';
+import { navigateBack, navigateWelcome, navigateCredits } from '../actions/navigation';
+import { removeUser } from '../actions/profile';
+import SettingsProps from '../types/views/Settings';
 
-class Settings extends Component {
-  static navigationOptions = {
-    header: null,
-  };
-
+interface State {
+  spinner: boolean;
+  showDialog: boolean;
+  fbModalOpen?: boolean;
+}
+class Settings extends Component<SettingsProps, State> {
   constructor(props) {
     super(props);
 
@@ -24,10 +29,14 @@ class Settings extends Component {
     };
   }
 
+  static navigationOptions = {
+    header: null,
+  };
+
   render() {
     return (
       <View style={styles.container}>
-        <Header hasBack title={'Settings'} />
+        <Header hasBack title="Settings" />
         <ScrollView>
           <TouchableOpacity
             onPress={() => {
@@ -111,10 +120,6 @@ class Settings extends Component {
     );
   }
 }
-
-import { connect } from 'react-redux';
-import { navigateBack, navigateWelcome, navigateCredits } from '../actions/navigation';
-import { removeUser } from '../actions/profile';
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile,

@@ -151,24 +151,25 @@ export const deleteFriend = uid => {
   };
 };
 
-export const getFbFriends = token => {
-  const noUsernames = [];
-  return fetch(`https://graph.facebook.com/v5.0/me?fields=friends&access_token=${token}`)
-    .then(response => response.json())
-    .then(async json => {
-      if (json.friends && json.friends.data) {
-        let uids = await Promise.all(json.friends.data.map(friend => {
-          return firebase.database().ref('fbusers').child(friend.id).once('value')
-            .then(snapshot => {
-              if (snapshot.val()) {
-                return snapshot.val()
-              }
-              noUsernames.push(friend)
-            })
-        }))
-        uids = uids.filter(uid => uid != undefined)
-        return fetchUsers(uids).then(users => [...users, ...noUsernames])
-      }
-    })
-}
-
+export const fetchFbFriends = (token: string) => {
+  return async dispatch => {
+    const response = await fetch(`https://graph.facebook.com/v5.0/me?fields=friends&access_token=${token}`);
+    const json = await response.json();
+    if (json.friends && json.friends.data) {
+      const uids = await Promise.all(
+        json.friends.data.map(async friend => {
+          const snapshot = await firebase
+            .database()
+            .ref('fbusers')
+            .child(friend.id)
+            .once('value');
+          return snapshot.val();
+        })
+      );
+      const validUids = uids.filter(uid => uid != null);
+      const users = await dispatch(fetchUsers(validUids)) || {};
+      return Object.values(users);
+    }
+    return [];
+  }
+};
