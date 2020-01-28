@@ -65,7 +65,7 @@
      * @description rules of eslint-plugin-prettier
      */
     "prettier/prettier": "error",
-    "no-underscore-dangle": [2, { "allow": ["__typename", "_ref"] }],
+    "no-underscore-dangle": [2, { "allow": ["__typename", "_ref", "_id"] }],
     "import/extensions": [
       "error",
       "ignorePackages",

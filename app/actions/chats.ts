@@ -79,6 +79,28 @@ export const setUnreadCount = ({ id, count }) => ({
   count,
 });
 
+export const fetchGymChat = gym => {
+  return dispatch => {
+    return firebase
+      .database()
+      .ref('gymChats')
+      .child(gym)
+      .orderByKey()
+      .limitToLast(1)
+      .on('value', lastMessage => {
+        if (lastMessage.val()) {
+          const key = Object.keys(lastMessage.val())[0];
+          const message = lastMessage.val()[key];
+          const createdAt = new Date(message.createdAt);
+          const chat = { lastMessage: { ...message, createdAt, key }, key: gym };
+          dispatch(setGymChat(chat));
+        } else {
+          dispatch(setGymChat(null));
+        }
+      });
+  };
+};
+
 export const updateLastMessage = notif => {
   return dispatch => {
     if (notif.type === 'message') {
@@ -352,28 +374,6 @@ export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
           });
         });
     });
-  };
-};
-
-export const fetchGymChat = gym => {
-  return dispatch => {
-    return firebase
-      .database()
-      .ref('gymChats')
-      .child(gym)
-      .orderByKey()
-      .limitToLast(1)
-      .on('value', lastMessage => {
-        if (lastMessage.val()) {
-          const key = Object.keys(lastMessage.val())[0];
-          const message = lastMessage.val()[key];
-          const createdAt = new Date(message.createdAt);
-          const chat = { lastMessage: { ...message, createdAt, key }, key: gym };
-          dispatch(setGymChat(chat));
-        } else {
-          dispatch(setGymChat(null));
-        }
-      });
   };
 };
 

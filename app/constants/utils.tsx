@@ -375,6 +375,12 @@ export const sortPostsByDate = (array: Post[]) => {
   });
 };
 
+export const sortByCreatedAt = (array: any[]) => {
+  return array.sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+}
+
 export const sortSessionsByDateTime = sessions => {
   return sessions.sort((a, b) => {
     const aDate = a.dateTime.replace(/-/g, '/');
@@ -383,7 +389,7 @@ export const sortSessionsByDateTime = sessions => {
   });
 };
 
-export const sortSessionsByDistance = sessions =>  {
+export const sortSessionsByDistance = sessions => {
   return sessions.sort((a, b) => {
     if (a.distance && b.distance) {
       const aDistance = a.distance;

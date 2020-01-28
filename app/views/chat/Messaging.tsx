@@ -1,22 +1,21 @@
 import React, { Component } from 'react';
-import { Alert, Platform, TouchableOpacity, View, BackHandler, Keyboard } from "react-native"
+import { Alert, Platform, TouchableOpacity, View, BackHandler, Keyboard } from 'react-native';
+import { pathOr } from 'ramda';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { PulseIndicator } from 'react-native-indicators';
-import { GiftedChat, Bubble, MessageText, Avatar } from 'react-native-gifted-chat'
-import { connect } from 'react-redux'
-import Text, { globalTextStyle } from '../../components/Text'
-import Image from 'react-native-fast-image'
-import firebase from 'react-native-firebase'
-import colors from '../../constants/colors'
-import sStyles from '../../styles/sessionStyles'
-import globalStyles from '../../styles/globalStyles'
-import Header from '../../components/Header/header'
-import { isIphoneX } from 'react-native-iphone-x-helper'
-import { guid } from '../../constants/utils'
-import ImagePicker from 'react-native-image-picker'
-import ImageResizer from 'react-native-image-resizer'
-import str from '../../constants/strings'
-//import EmojiInput from 'react-native-emoji-input'
+import firebase from 'react-native-firebase';
+import ImagePicker from 'react-native-image-picker';
+import ImageResizer from 'react-native-image-resizer';
+import { isIphoneX } from 'react-native-iphone-x-helper';
+import { GiftedChat, Bubble, MessageText } from 'react-native-gifted-chat';
+import { connect } from 'react-redux';
+import Text, { globalTextStyle } from '../../components/Text';
+import colors from '../../constants/colors';
+import globalStyles from '../../styles/globalStyles';
+import Header from '../../components/Header/header';
+import { guid, sortByCreatedAt } from '../../constants/utils';
+import str from '../../constants/strings';
+// import EmojiInput from 'react-native-emoji-input'
 import {
   navigateMessaging,
   navigateProfile,
@@ -24,9 +23,9 @@ import {
   navigateGym,
   navigateFilePreview,
   navigateBack,
-  navigateSessionInfo
-} from '../../actions/navigation'
-import { sendRequest, acceptRequest } from '../../actions/friends'
+  navigateSessionInfo,
+} from '../../actions/navigation';
+import { sendRequest, acceptRequest } from '../../actions/friends';
 import {
   fetchMessages,
   fetchSessionMessages,
@@ -34,101 +33,71 @@ import {
   resetNotification,
   resetMessage,
   resetUnreadCount,
-  updateLastMessage
-} from '../../actions/chats'
-import { fetchProfile } from '../../actions/profile'
+  updateLastMessage,
+} from '../../actions/chats';
+import { fetchProfile } from '../../actions/profile';
+import MessagingProps from '../../types/views/Messaging';
+import Message from '../../types/Message';
 
-class Messaging extends React.Component {
-  static navigationOptions = {
-    header: null,
-  }
+interface State {
+  spinner: boolean;
+  showLoadEarlier: boolean;
+  showEmojiKeyboard?: boolean;
+  messages: { [key: string]: Message };
+  amount: number;
+  text?: string;
+}
 
+class Messaging extends Component<MessagingProps, State> {
   constructor(props) {
-    super(props)
-    this.params = this.props.navigation.state.params
-    this.session = this.params.session
-    this.gymId = this.params.gymId
-    this.uid = this.props.profile.uid
-    this.nav = this.props.navigation
+    super(props);
+    const { messageSession } = this.props;
+    // this.params = this.props.navigation.state.params
+    // this.session = this.params.session
+    // this.gymId = this.params.gymId
+    // this.uid = this.props.profile.uid
+    // this.nav = this.props.navigation
 
-
-    if (this.session) {
-      this.sessionId = this.session.key
-      this.sessionTitle = this.session.title
-    }
-    else if (this.gymId) {
-      this.gymName = this.props.gym.name
-    }
-    else {
-      this.chatId = this.params.chatId
-      this.friendUsername = this.params.friendUsername
-      this.friendUid = this.params.friendUid
-    }
+    // if (this.session) {
+    //   this.sessionId = this.session.key
+    //   this.sessionTitle = this.session.title
+    // } else if (this.gymId) {
+    //   this.gymName = this.props.gym.name
+    // } else {
+    //   this.chatId = this.params.chatId
+    //   this.friendUsername = this.params.friendUsername
+    //   this.friendUid = this.params.friendUid
+    // }
     this.state = {
-      messages: this.props.messageSession,
-      user: {},
-      avatar: '',
+      messages: messageSession,
       spinner: false,
       amount: 15,
       showLoadEarlier: true,
-    }
-  }
-
-  sortByDate(array) {
-    return array.sort((a,b) => {
-      return new Date(b.createdAt) - new Date(a.createdAt)
-    })
-  }
-
-  onBackPress() {
-    if (this.state.showEmojiKeyboard) {
-      this.setState({showEmojiKeyboard: false})
-    }
-    else {
-      this.props.goBack()
-    }
-    return true
+    };
   }
 
   componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress())
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
-    this.loadMessages()
-    this.props.profile.avatar ? this.setState({avatar: this.props.profile.avatar}) : this.setState({avatar: ''})
-    const id = this.friendUid || this.sessionId || this.gymId
-    const unreadCount = this.props.unreadCount[id]
-    if (unreadCount && unreadCount > 0) {
-      this.props.resetUnreadCount(id)
-    }
-  }
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress())
-    this.keyboardDidShowListener.remove()
-  }
-
-  keyboardDidShow() {
-    if (Platform.OS == 'ios') {
-      this.setState({ showEmojiKeyboard: false })
-    }
-  
-  }
-  
-
-  loadMessages(endAt) {
-    this.setState({spinner: true})
-    if (this.session) {
-      this.props.getSessionMessages(this.sessionId, this.state.amount, this.session.private, endAt)
-    }
-    else if (this.gymId) {
-      this.props.getGymMessages(this.gymId, this.state.amount, endAt)
-    }
-    else {
-      this.props.getMessages(this.chatId, this.state.amount, this.friendUid, endAt)
+    const { navigation, profile, unreadCount, onResetUnreadCount } = this.props;
+    const { params } = navigation.state;
+    const { gymId, friendUid, sessionId } = params;
+    BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this));
+    this.loadMessages();
+    const id = friendUid || sessionId || gymId;
+    const count = unreadCount[id];
+    if (count && count > 0) {
+      onResetUnreadCount(id);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    //message it populated when an attachment is sent 
+    const { navigation, profile, onResetMessage, resetNotif } = this.props;
+    const { params } = navigation.state;
+    const { friendUid, gymId } = params;
+    const session = pathOr({}, ['session'], params);
+    const { key: sessionId, title: sessionTitle } = session;
+    const { messages: stateMessages } = this.state;
+    // message it populated when an attachment is sent
     if (nextProps.message) {
       const message = {
         _id: guid(),
@@ -136,83 +105,102 @@ class Messaging extends React.Component {
         text: nextProps.message.text,
         image: nextProps.message.url,
         user: {
-          _id: this.uid,
-          name: this.props.profile.username,
-          avatar: this.state.avatar
-        }
-      }
-      this.onSend([message])
-      this.props.resetMessage()
+          _id: profile.uid,
+          name: profile.username,
+          avatar: profile.avatar,
+        },
+      };
+      this.onSend([message]);
+      onResetMessage();
     }
     if (nextProps.messageSession) {
-      this.setState({messages: nextProps.messageSession, spinner: false})
-      if (nextProps.messageSession && Object.values(nextProps.messageSession).some(message => message._id == 1)) {
-        this.setState({showLoadEarlier: false})
+      this.setState({ messages: nextProps.messageSession, spinner: false });
+      if (nextProps.messageSession && Object.values(nextProps.messageSession).some(message => message._id === 1)) {
+        this.setState({ showLoadEarlier: false });
       }
     }
     if (nextProps.notif) {
-      this.props.resetNotif()
-      //ignore inital fetch when component mounts
-      //if (this.listenForNotif) {
-        const { 
-          type,
-          uid,
-          username,
-          _id,
-          body,
-          sessionId,
-          avatar,
-          createdAt,
-          gymId,
-          image
-         } = nextProps.notif
-        if (type == 'message' || type == 'sessionMessage' || type == 'gymMessage') {
-          const date = new Date(createdAt)
-          const message = {createdAt: date, _id, text: body, user: {_id: uid, name: username, avatar}, image}
-          if ((type == 'message' && this.friendUid == uid) ||
-            (type == 'sessionMessage' && this.sessionId == sessionId && this.uid != uid) ||
-            (type == 'gymMessage' && this.gymId == gymId && this.uid != uid)) {
-              //check if its a dupe
-              const messages = this.state.messages ? Object.values(this.state.messages) : []
-            if (!messages.some(msg => msg._id == message._id)) {
-              this.setState(previousState => ({
-                  messages: GiftedChat.append(previousState.messages ? Object.values(previousState.messages) : [], message)
-              }))
+      resetNotif();
+      // ignore inital fetch when component mounts
+      const {
+        type,
+        uid,
+        username,
+        _id,
+        body,
+        sessionId: messageSessionId,
+        avatar,
+        createdAt,
+        gymId: messageGymId,
+        image,
+      } = nextProps.notif;
+      if (type === 'message' || type === 'sessionMessage' || type === 'gymMessage') {
+        const date = new Date(createdAt);
+        const message = { createdAt: date, _id, text: body, user: { _id: uid, name: username, avatar }, image };
+        if (
+          (type === 'message' && friendUid === uid) ||
+          (type === 'sessionMessage' && messageSessionId === sessionId && profile.uid !== uid) ||
+          (type === 'gymMessage' && messageGymId === gymId && profile.uid !== uid)
+        ) {
+          // check if its a dupe
+          const messages = stateMessages ? Object.values(stateMessages) : [];
+          if (!messages.some(msg => msg._id === message._id)) {
+            this.setState(previousState => ({
+              messages: GiftedChat.append(previousState.messages ? Object.values(previousState.messages) : [], message),
+            }));
           }
         }
       }
-    //}
+    }
   }
-  // this.listenForNotif = true
-}
 
-  onSend(messages = []) {
-    //make messages database friendly
-    const converted = []
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress());
+    this.keyboardDidShowListener.remove();
+  }
+
+  onBackPress() {
+    const { goBack } = this.props;
+    const { showEmojiKeyboard } = this.state;
+    if (showEmojiKeyboard) {
+      this.setState({ showEmojiKeyboard: false });
+    } else {
+      goBack();
+    }
+    return true;
+  }
+
+  async onSend(messages = []) {
+    const { navigation, gym } = this.props;
+    const { params } = navigation.state;
+    const { friendUid, gymId, session, chatId } = params;
+    // make messages database friendly
+    const converted = [];
     messages.forEach(message => {
-      if (this.session) {
-        const type = this.session.private ? 'privateSessions' : 'sessions'
-        converted.push({...message, createdAt: message.createdAt.toString(), sessionTitle: this.sessionTitle, sessionId: this.sessionId, type})
-      } else if (this.gymId) {
-        converted.push({...message, createdAt: message.createdAt.toString(), gymId: this.gymId, gymName: this.gymName})
+      if (session) {
+        const { key: sessionId, title: sessionTitle } = session;
+        const type = session.private ? 'privateSessions' : 'sessions';
+        converted.push({ ...message, createdAt: message.createdAt.toString(), sessionTitle, sessionId, type });
+      } else if (gymId) {
+        const { name } = gym;
+        converted.push({ ...message, createdAt: message.createdAt.toString(), gymId, gymName: name });
       } else {
-        converted.push({...message, createdAt: message.createdAt.toString(), chatId: this.chatId, friendUid: this.friendUid})
+        converted.push({ ...message, createdAt: message.createdAt.toString(), chatId, friendUid });
       }
-    })
+    });
 
-    let ref = this.session ? firebase.database().ref('sessionChats').child(this.sessionId) :
-    firebase.database().ref('chats').child(this.chatId)
+    let ref = session ? firebase.database().ref('sessionChats').child(session.key) :
+    firebase.database().ref('chats').child(chatId)
 
-    if (this.gymId) {
-      ref = firebase.database().ref('gymChats').child(this.gymId)
+    if (gymId) {
+      ref = firebase.database().ref('gymChats').child(gymId)
     }
 
-    ref.push(...converted)
-    .then(async () => {
+    try {
+      await ref.push(...converted);
       this.setState(previousState => ({
         messages: GiftedChat.append(Object.values(previousState.messages), messages),
       }))
-
 
       if (this.session) {
         this.props.updateLastMessage({ ...converted[0], type: 'sessionMessage' })
@@ -223,41 +211,140 @@ class Messaging extends React.Component {
       else {
         this.props.updateLastMessage({ ...converted[0], type: 'message' })
       }
-      
-    })
-    .catch(e => Alert.alert("Error sending message", e.message))
+    } catch (e) {
+      Alert.alert('Error sending message', e.message)
+    }
 
   }
 
   getRightHandIcon() {
-    if (this.gymId) {
-      return <TouchableOpacity onPress={()=> this.props.goToGym(this.gymId)}>
-        <Icon size={25} name='md-information-circle' style={{color: '#fff'}}/>
-      </TouchableOpacity>
+    const { navigation, goToGym, viewSession } = this.props;
+    const { params } = navigation.state;
+    const { gymId, session } = params;
+    if (gymId) {
+      return (
+        <TouchableOpacity onPress={() => goToGym(gymId)}>
+          <Icon size={25} name="md-information-circle" style={{ color: '#fff' }}/>
+        </TouchableOpacity>
+      );
     }
-    else if (this.sessionId) {
-      return <TouchableOpacity onPress={()=> this.props.viewSession(this.sessionId, this.session.private)}>
-        <Icon size={25} name='md-information-circle' style={{color: '#fff'}}/>
-      </TouchableOpacity>
+    if (session) {
+      const { key, private: isPrivate } = session;
+      return (
+        <TouchableOpacity onPress={() => viewSession(key, isPrivate)}>
+          <Icon size={25} name="md-information-circle" style={{ color: '#fff' }}/>
+        </TouchableOpacity>
+      );
     }
-    else return null
+    return null;
+  }
+
+  static navigationOptions = {
+    header: null,
+  };
+
+  keyboardDidShow() {
+    if (Platform.OS === 'ios') {
+      this.setState({ showEmojiKeyboard: false });
+    }
+  }
+
+  loadMessages(endAt?: string) {
+    const { navigation } = this.props;
+    const { amount } = this.state;
+    const { params } = navigation.state;
+    const { friendUid, gymId, session, chatId } = params;
+    this.setState({ spinner: true });
+    if (session) {
+      const { key, private: isPrivate } = session;
+      this.props.getSessionMessages(key, amount, isPrivate, endAt);
+    } else if (gymId) {
+      this.props.getGymMessages(gymId, amount, endAt);
+    } else {
+      this.props.getMessages(chatId, amount, friendUid, endAt);
+    }
+  }
+
+  showPicker() {
+    const videoOptions = {
+      mediaType: 'video',
+      durationLimit: 30,
+    };
+    const options = {
+      title: null,
+      mediaType: 'photo',
+      // customButtons: [
+      // {name: 'video', title: 'Shoot video (coming soon)'},
+      // {name: 'uploadVideo', title: 'Choose video from library (coming soon)'},
+      // ],
+      noData: true,
+      storageOptions: {
+        skipBackup: true,
+      },
+    };
+    ImagePicker.showImagePicker(options, response => {
+      this.setState({ spinner: true });
+      console.log('Response = ', response);
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+        this.setState({ spinner: false });
+      } else if (response.error) {
+        Alert.alert('Error', response.error);
+        this.setState({ spinner: false });
+      } else if (response.customButton) {
+        if (response.customButton === 'uploadVideo') {
+          ImagePicker.launchImageLibrary(videoOptions, response => {
+            if (response.error) {
+              Alert.alert('Error', response.error);
+              this.setState({ spinner: false });
+            }
+          });
+        } else if (response.customButton === 'video') {
+          ImagePicker.launchCamera(videoOptions, response => {
+            if (response.error) {
+              Alert.alert('Error', response.error);
+              this.setState({ spinner: false });
+            }
+          });
+        }
+      } else {
+        const size = 720;
+        ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then(resized => {
+          this.setState({ spinner: false })
+          this.props.previewFile('image', resized.uri, true, this.state.text)
+        }).catch((e) => {
+          Alert.alert('Error', e.message)
+          this.setState({spinner: false})
+        })
+      }
+    })
+  }
+
+  async openChat(user) {
+    const snapshot = await firebase.database().ref('userChats/' + this.uid).child(user.uid).once('value');
+    if (snapshot.val()) {
+      this.props.onOpenChat(snapshot.val(), user.username, user.uid)
+    }
   }
 
   render() {
-    const { navigation } = this.props
+    const { navigation, gym, profile, friends, users } = this.props;
+    const { amount, messages, showLoadEarlier, spinner } = this.state;
+    const { params } = navigation.state;
+    const { friendUid, friendUsername, gymId, session, chatId } = params;
     return (
-      <View style={{flex: 1, backgroundColor: '#9993'}}>
-      <Header 
-      hasBack
-      title={this.friendUsername || this.sessionTitle || this.gymName}
-      right={this.getRightHandIcon()}
-       />
+      <View style={{ flex: 1, backgroundColor: '#9993' }}>
+        <Header
+          hasBack
+          title={friendUsername || (session && session.title) || (gym && gym.name)}
+          right={this.getRightHandIcon()}
+        />
         <GiftedChat
-          //inverted={false}
+          // inverted={false}
           ref={ref => this.chat = ref}
           text={this.state.text}
-          onInputTextChanged={text => this.setState({text})}
-          messages={this.state.messages ? this.sortByDate(Object.values(this.state.messages)) : []}
+          onInputTextChanged={text => this.setState({ text })}
+          messages={this.state.messages ? sortByCreatedAt(Object.values(messages)) : []}
           onSend={messages => {
             if (this.props.profile.username) {
               this.onSend(messages)
@@ -274,17 +361,17 @@ class Messaging extends React.Component {
             }
           }}
           onPressAvatar={user => this.props.viewProfile(user._id)}
-          onLoadEarlier={()=> {
+          onLoadEarlier={() => {
             this.fetched = false
-            const messages = this.sortByDate(Object.values(this.state.messages))
-            let endAt = messages[messages.length-1].key
-            this.setState({spinner: true} ,()=> this.loadMessages(endAt))
+            const sorted = sortByCreatedAt(Object.values(messages));
+            const endAt = sorted[sorted.length - 1 ].key;
+            this.setState({ spinner: true } ,() => this.loadMessages(endAt))
           }}
-          loadEarlier={this.state.messages && Object.values(this.state.messages).length > 14 && this.state.showLoadEarlier}
+          loadEarlier={messages && Object.values(messages).length > 14 && showLoadEarlier}
           user={{
-            _id: this.uid,
-            name: this.props.profile.username,
-            avatar: this.state.avatar
+            _id: profile.uid,
+            name: profile.username,
+            avatar: profile.avatar,
           }}
           renderBubble={(props) => { return (
             <Bubble {...props}
@@ -329,9 +416,9 @@ class Messaging extends React.Component {
               { pattern: str.mentionRegex, style: linkStyle, onPress: async (mention) => {
                 const name = mention.substring(1)
                 const combined = [
-                  ...Object.values(this.props.friends),
-                  ...Object.values(this.props.users)]
-                if (name == this.props.profile.username) {
+                  ...Object.values(friends),
+                  ...Object.values(users)]
+                if (name === profile.username) {
                   this.props.navigateProfile()
                 }
                 else {
@@ -359,7 +446,7 @@ class Messaging extends React.Component {
                     this.setState({text: this.state.text += emoji.char})
                   }}
 	            />*/}
-        {this.state.spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
+        {spinner && <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center'}}>
           <PulseIndicator color={colors.secondary}/>
         </View>}
       </View>
@@ -367,88 +454,17 @@ class Messaging extends React.Component {
   }
 
 
-  async openChat(user) {
-    const snapshot = await firebase.database().ref('userChats/' + this.uid).child(user.uid).once('value');
-    if (snapshot.val()) {
-      this.props.onOpenChat(snapshot.val(), user.username, user.uid)
-    }
-  }
-
-  showPicker() {
-    let videoOptions = {
-      mediaType: 'video',
-      durationLimit: 30,
-    }
-    let options = {
-      title: null,
-      mediaType: 'photo',
-      // customButtons: [
-      // {name: 'video', title: 'Shoot video (coming soon)'},
-      // {name: 'uploadVideo', title: 'Choose video from library (coming soon)'},
-      // ],
-      noData: true,
-      storageOptions: {
-        skipBackup: true,
-      }
-    }
-    ImagePicker.showImagePicker(options, (response) => {
-      this.setState({spinner: true})
-      console.log('Response = ', response)
-  
-      if (response.didCancel) {
-        console.log('User cancelled image picker')
-        this.setState({spinner: false})
-      }
-      else if (response.error) {
-        Alert.alert('Error', response.error)
-        this.setState({spinner: false})
-      }
-      else if (response.customButton) {
-        if (response.customButton == 'uploadVideo') {
-          ImagePicker.launchImageLibrary(videoOptions, (response)  => {
-            if (response.error) {
-              Alert.alert('Error',response.error)
-              this.setState({spinner: false})
-            }
-          })
-        }
-        else if (response.customButton == 'video') {
-          ImagePicker.launchCamera(videoOptions, (response)  => {
-            if (response.error) {
-              Alert.alert('Error', response.error)
-              this.setState({spinner: false})
-            }
-          })
-  
-        }
-      }
-      else {
-        const size = 720
-        ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100).then((resized) => {
-          this.setState({spinner: false})
-          this.props.previewFile('image', resized.uri, true, this.state.text)
-  
-      }).catch((e) => {
-        Alert.alert('Error', e.message)
-        this.setState({spinner: false})
-      })
-  
-  
-      }
-    })
-  }
-
 }
 
-const fetchId = (params) => {
+const fetchId = params => {
   if (params.session) {
-    return params.session.key
+    return params.session.key;
   }
-  else if (params.gymId) {
-    return params.gymId
+  if (params.gymId) {
+    return params.gymId;
   }
-  else return params.chatId
-}
+  return params.chatId;
+};
 
 const mapStateToProps = ({ friends, profile, chats, sharedInfo }, ownProps) => ({
   friends: friends.friends,
@@ -461,27 +477,27 @@ const mapStateToProps = ({ friends, profile, chats, sharedInfo }, ownProps) => (
   gymChat: chats.gymChat,
   messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)],
   notif: chats.notif,
-  unreadCount: chats.unreadCount
-})
+  unreadCount: chats.unreadCount,
+});
 
 const mapDispatchToProps = dispatch => ({
-  updateLastMessage: (message) => dispatch(updateLastMessage(message)),
-  onRequest: (friendUid)=> dispatch(sendRequest(friendUid)),
-  onAccept: (uid, friendUid)=> dispatch(acceptRequest(uid, friendUid)),
+  updateLastMessage: message => dispatch(updateLastMessage(message)),
+  onRequest: friendUid => dispatch(sendRequest(friendUid)),
+  onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
   onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   getMessages: (id, amount, uid, endAt) => dispatch(fetchMessages(id, amount, uid, endAt)),
   getSessionMessages: (id, amount, isPrivate, endAt) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
   getGymMessages: (id, amount, endAt) => dispatch(fetchGymMessages(id, amount, endAt)),
   resetNotif: () => dispatch(resetNotification()),
   navigateProfile: () => dispatch(navigateProfile()),
-  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
-  goToGym: (gym) => dispatch(navigateGym(gym)),
-  resetMessage: () => dispatch(resetMessage()),
+  viewProfile: uid => dispatch(navigateProfileView(uid)),
+  goToGym: gym => dispatch(navigateGym(gym)),
+  onResetMessage: () => dispatch(resetMessage()),
   previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   goBack: () => dispatch(navigateBack()),
-  resetUnreadCount: (id) => dispatch(resetUnreadCount(id)),
+  onResetUnreadCount: id => dispatch(resetUnreadCount(id)),
   fetchProfile: () => dispatch(fetchProfile()),
   viewSession: (sessionId, isPrivate) => dispatch(navigateSessionInfo(sessionId, isPrivate))
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messaging)
