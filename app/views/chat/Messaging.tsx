@@ -37,7 +37,7 @@ import {
 } from '../../actions/chats';
 import { fetchProfile } from '../../actions/profile';
 import MessagingProps from '../../types/views/Messaging';
-import Message from '../../types/Message';
+import Message, { MessageType } from '../../types/Message';
 import ImagePickerOptions from '../../types/Shared';
 
 interface State {
@@ -56,7 +56,7 @@ class Messaging extends Component<MessagingProps, State> {
     super(props);
     const { messageSession } = this.props;
     this.state = {
-      messages: Object.values(messageSession),
+      messages: messageSession ? Object.values(messageSession) : [],
       spinner: false,
       amount: 15,
       showLoadEarlier: true,
@@ -96,6 +96,7 @@ class Messaging extends Component<MessagingProps, State> {
           name: profile.username,
           avatar: profile.avatar,
         },
+        type: this.getType(),
       };
       this.onSend([message]);
       onResetMessage();
@@ -120,10 +121,19 @@ class Messaging extends Component<MessagingProps, State> {
         createdAt,
         gymId: messageGymId,
         image,
+        sessionType,
       } = nextProps.notif;
       if (type === 'message' || type === 'sessionMessage' || type === 'gymMessage') {
         const date = new Date(createdAt);
-        const message = { createdAt: date, _id, text: body, user: { _id: uid, name: username, avatar }, image };
+        const message = {
+          createdAt: date,
+          _id,
+          text: body,
+          user: { _id: uid, name: username, avatar },
+          image,
+          type,
+          sessionType,
+        };
         if (
           (type === 'message' && friendUid === uid) ||
           (type === 'sessionMessage' && messageSessionId === sessionId && profile.uid !== uid) ||
@@ -163,15 +173,17 @@ class Messaging extends Component<MessagingProps, State> {
     // make messages database friendly
     const converted = [];
     messages.forEach(message => {
+      const createdAt = message.createdAt.toString();
+      const type = this.getType();
       if (session) {
         const { key: sessionId, title: sessionTitle } = session;
-        const type = session.private ? 'privateSessions' : 'sessions';
-        converted.push({ ...message, createdAt: message.createdAt.toString(), sessionTitle, sessionId, type });
+        const sessionType = session.private ? 'privateSessions' : 'sessions';
+        converted.push({ ...message, createdAt, sessionTitle, sessionId, sessionType, type });
       } else if (gymId) {
         const { name } = gym;
-        converted.push({ ...message, createdAt: message.createdAt.toString(), gymId, gymName: name });
+        converted.push({ ...message, createdAt, gymId, gymName: name, type });
       } else {
-        converted.push({ ...message, createdAt: message.createdAt.toString(), chatId, friendUid });
+        converted.push({ ...message, createdAt, chatId, friendUid, type });
       }
     });
 
@@ -193,6 +205,19 @@ class Messaging extends Component<MessagingProps, State> {
     } catch (e) {
       Alert.alert('Error sending message', e.message);
     }
+  }
+
+  getType() {
+    const { navigation } = this.props;
+    const { params } = navigation.state;
+    const { gymId, session } = params;
+    if (session) {
+      return MessageType.SESSION_MESSAGE;
+    }
+    if (gymId) {
+      return MessageType.GYM_MESSAGE;
+    }
+    return MessageType.MESSAGE;
   }
 
   getDbRef() {
