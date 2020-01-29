@@ -116,7 +116,7 @@ export function likesExtractor(item, uid, viewProfile, goToProfile) {
         user_id: like.user_id,
         like_id: like.user_id,
         tap: username => {
-          uid == like.user_id ? goToProfile() : viewProfile(like.user_id);
+          uid === like.user_id ? goToProfile() : viewProfile(like.user_id);
         },
       };
     });

@@ -4,6 +4,7 @@ export default interface Notification {
   uid: string;
   key: string;
   postId?: string;
+}
 
 export enum NotificationType {
   POST_REP = 'postRep',

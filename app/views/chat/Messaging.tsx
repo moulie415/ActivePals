@@ -485,17 +485,7 @@ class Messaging extends Component<MessagingProps, State> {
                 }}
             /> */}
         {spinner && (
-          <View
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+          <View style={globalStyles.indicator}>
             <PulseIndicator color={colors.secondary} />
           </View>
         )}

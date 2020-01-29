@@ -14,6 +14,7 @@ import { navigateBack, navigatePostView, navigateFriends } from '../actions/navi
 import { getNotifications, setNotificationsRead, deleteNotification } from '../actions/home';
 import NotificationsProps from '../types/views/Notifications';
 import { NotificationType } from '../types/Notification';
+import globalStyles from '../styles/globalStyles';
 
 interface State {
   close: boolean;
@@ -34,9 +35,11 @@ class Notifications extends Component<NotificationsProps, State> {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { fetchNotifications, setRead } = this.props;
-    fetchNotifications();
+    this.setState({ spinner: true });
+    await fetchNotifications();
+    this.setState({ spinner: false })
     setRead();
   }
 
@@ -116,94 +119,89 @@ class Notifications extends Component<NotificationsProps, State> {
     header: null,
   };
 
-  renderNotifications() {
-    const { notifications, fetchNotifications, onDelete, goToFriends, viewPost } = this.props;
-    const { fetchAmount, close, showLoadMore, loadingMore } = this.state;
-    return (
-      <FlatList
-        data={sortNotificationsByDate(Object.values(notifications))}
-        renderItem={({ item }) => {
-          const swipeoutBtns = [
-            {
-              text: 'Delete',
-              backgroundColor: 'red',
-              onPress: async () => {
-                await onDelete(item.key);
-                fetchNotifications(fetchAmount);
-                this.setState({ close: true });
-              },
-            },
-          ];
-          return (
-            <Swipeout right={swipeoutBtns} key={item.key} close={close}>
-              <TouchableOpacity
-                onPress={() => {
-                  if (item.postId) {
-                    viewPost(item.postId);
-                  } else if (item.type === 'friendRequest') {
-                    goToFriends();
-                  }
-                }}
-              >
-                <View style={styles.inboxItem}>
-                  {this.getTypeImage(item)}
-                  <View style={{ flex: 8 }}>
-                    <Text style={{ color: '#000', fontSize: 15 }}>{this.getNotificationString(item)}</Text>
-                    <Text style={{ color: '#999', fontSize: 12 }}>{getSimplifiedTime(new Date(item.date))}</Text>
-                  </View>
-                  <Icon
-                    size={25}
-                    name="ios-arrow-forward"
-                    style={{ color: '#999', textAlign: 'right', marginRight: 10, flex: 1 }}
-                  />
-                </View>
-              </TouchableOpacity>
-            </Swipeout>
-          );
-        }}
-        keyExtractor={item => item.key}
-        ListFooterComponent={() => {
-          if (showLoadMore) {
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({ loadingMore: true, fetchAmount: fetchAmount + 10 }, async () => {
-                    await fetchNotifications(fetchAmount);
-                    this.setState({ loadingMore: false });
-                  });
-                }}
-                style={{ backgroundColor: '#fff', paddingVertical: loadingMore ? 0 : 10 }}
-              >
-                {loadingMore ? (
-                  <PulseIndicator color={colors.secondary} style={{ height: 35 }} />
-                ) : (
-                  <Text style={{ color: colors.secondary, textAlign: 'center' }}>Load More</Text>
-                )}
-              </TouchableOpacity>
-            );
-          }
-          return null;
-        }}
-      />
-    );
-  }
-
   render() {
-    const { notifications } = this.props;
-    const { spinner } = this.state;
+    const { notifications, fetchNotifications, onDelete, goToFriends, viewPost } = this.props;
+    const { fetchAmount, close, showLoadMore, loadingMore, spinner } = this.state;
+    const empty = (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ textAlign: 'center', color: '#999', fontSize: 20, marginTop: 10 }}>No notifications yet</Text>
+      </View>
+    );
+
     return (
-      <View style={{ backgroundColor: '#9993' }}>
+      <View style={{ backgroundColor: '#9993', flex: 1 }}>
         <Header hasBack title="Notifications" />
-        {Object.keys(notifications).length > 0 ? (
-          <ScrollView>{this.renderNotifications()}</ScrollView>
-        ) : spinner ? (
-          <View style={styles.indicator}>
+        {spinner ? (
+          <View style={globalStyles.indicator}>
             <PulseIndicator color={colors.secondary} />
           </View>
         ) : (
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ textAlign: 'center', color: '#999', fontSize: 20 }}>No notifications yet</Text>
-          </View>
+          <FlatList
+            data={sortNotificationsByDate(Object.values(notifications))}
+            renderItem={({ item }) => {
+              const swipeoutBtns = [
+                {
+                  text: 'Delete',
+                  backgroundColor: 'red',
+                  onPress: async () => {
+                    await onDelete(item.key);
+                    fetchNotifications(fetchAmount);
+                    this.setState({ close: true });
+                  },
+                },
+              ];
+              return (
+                <Swipeout right={swipeoutBtns} key={item.key} close={close}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (item.postId) {
+                        viewPost(item.postId);
+                      } else if (item.type === 'friendRequest') {
+                        goToFriends();
+                      }
+                    }}
+                  >
+                    <View style={styles.inboxItem}>
+                      {this.getTypeImage(item)}
+                      <View style={{ flex: 8 }}>
+                        <Text style={{ color: '#000', fontSize: 15 }}>{this.getNotificationString(item)}</Text>
+                        <Text style={{ color: '#999', fontSize: 12 }}>{getSimplifiedTime(new Date(item.date))}</Text>
+                      </View>
+                      <Icon
+                        size={25}
+                        name="ios-arrow-forward"
+                        style={{ color: '#999', textAlign: 'right', marginRight: 10, flex: 1 }}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </Swipeout>
+              );
+            }}
+            keyExtractor={item => item.key}
+            ListEmptyComponent={empty}
+            ListFooterComponent={() => {
+              if (showLoadMore) {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState({ loadingMore: true, fetchAmount: fetchAmount + 10 }, async () => {
+                        await fetchNotifications(fetchAmount);
+                        this.setState({ loadingMore: false });
+                      });
+                    }}
+                    style={{ backgroundColor: '#fff', paddingVertical: loadingMore ? 0 : 10 }}
+                  >
+                    {loadingMore ? (
+                      <PulseIndicator color={colors.secondary} style={{ height: 35 }} />
+                    ) : (
+                      <Text style={{ color: colors.secondary, textAlign: 'center' }}>Load More</Text>
+                    )}
+                  </TouchableOpacity>
+                );
+              }
+              return null;
+            }}
+          />
         )}
       </View>
     );

@@ -419,7 +419,7 @@ export class Home extends Component<HomeProps, State> {
               onPress={() => this.setState({ selectedImage: [{ url: item.url }], showImage: true })}
               style={{ marginTop: 10, marginBottom: 10 }}
             >
-              <Image style={{ width: '100%', height: 400 }} resizeMode={'cover'} source={{ uri: item.url }} />
+              <Image style={{ width: '100%', height: 400 }} resizeMode="cover" source={{ uri: item.url }} />
             </TouchableOpacity>
             {this.repCommentCount(item)}
             <View style={{ padding: 10 }}>{this.repsAndComments(item)}</View>
@@ -524,7 +524,7 @@ export class Home extends Component<HomeProps, State> {
           like.user_id === profile.uid ? goToProfile() : viewProfile(like.user_id);
         }}
         style={cStyles.likeButton}
-        key={like.user_id + ''}
+        key={like.user_id}
       >
         <View style={[cStyles.likeContainer]}>
           {like.image ? (
@@ -607,9 +607,35 @@ export class Home extends Component<HomeProps, State> {
 
   render() {
     const scrollRef = React.createRef<ScrollView>();
-    const { profile, friends, users, onNotificationPress, goToProfile, postStatus } = this.props;
+    const {
+      profile,
+      friends,
+      users,
+      onNotificationPress,
+      goToProfile,
+      postStatus,
+      feed,
+      comment,
+      getCommentRepsUsers,
+      getRepsUsers,
+      getReplies,
+      viewProfile,
+      getComments,
+    } = this.props;
     const { uid, username, unreadCount, avatar } = profile;
-    const { status, mentionList, spinner, selectedImage, showImage } = this.state;
+    const {
+      status,
+      mentionList,
+      spinner,
+      selectedImage,
+      showImage,
+      postId,
+      focusCommentInput,
+      showCommentModal,
+      likesModalVisible,
+      repsId,
+      repCount,
+    } = this.state;
 
     const combined = { ...users, ...friends };
 
@@ -657,7 +683,6 @@ export class Home extends Component<HomeProps, State> {
             )}
           </TouchableOpacity>
           <TextInput
-            ref={ref => (this.input = ref)}
             underlineColorAndroid="transparent"
             value={status}
             maxLength={280}
@@ -832,7 +857,7 @@ export class Home extends Component<HomeProps, State> {
             padding: 5,
           }}
           swipeToClose={false}
-          isOpen={this.state.showCommentModal}
+          isOpen={showCommentModal}
           onClosed={() => this.setState({ focusCommentInput: false, showCommentModal: false })}
           backButtonClose
           position="center"
@@ -841,53 +866,47 @@ export class Home extends Component<HomeProps, State> {
             <Icon name="ios-arrow-back" size={30} style={{ color: '#000', padding: 10 }} />
           </TouchableOpacity>
           <Comments
-            data={
-              this.props.feed[this.state.postId]
-                ? this.props.feed[this.state.postId].comments
-                : []
-            }
-            viewingUserName={this.props.profile.username}
+            data={feed[postId] ? feed[postId].comments : []}
+            viewingUserName={profile.username}
             initialDisplayCount={10}
             editMinuteLimit={900}
-            focusCommentInput={this.state.focusCommentInput}
+            focusCommentInput={focusCommentInput}
             childrenPerPage={5}
-            //lastCommentUpdate={this.state.lastCommentUpdate}
+            // clastCommentUpdate={this.state.lastCommentUpdate}
             users={Object.values(combined)}
             usernameTapAction={(username, uid) => {
-              if (uid === this.props.profile.uid) {
-                this.props.goToProfile();
+              if (uid === profile.uid) {
+                goToProfile();
               } else {
-                this.props.viewProfile(uid);
+                viewProfile(uid);
               }
             }}
             childPropName="children"
-            isChild={comment => comment.parentCommentId}
-            parentIdExtractor={comment => comment.key}
+            isChild={c => c.parentCommentId}
+            parentIdExtractor={c => c.key}
             keyExtractor={item => item.comment_id}
             usernameExtractor={item => {
-              if (item.uid === this.props.profile.uid) {
+              if (item.uid === profile.uid) {
                 return 'You';
               }
-              return this.props.friends[item.uid].username || this.props.users[item.uid].username;
+              return friends[item.uid].username || users[item.uid].username;
             }}
             uidExtractor={item => (item.user ? item.user.uid : null)}
             editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
             createdTimeExtractor={item => new Date(item.created_at).toISOString()}
             bodyExtractor={item => item.text}
             imageExtractor={item => {
-              if (item.uid === this.props.profile.uid) {
-                return this.props.profile.avatar;
+              if (item.uid === profile.uid) {
+                return profile.avatar;
               }
-              return this.props.friends[item.uid].avatar || this.props.users[item.uid].avatar;
+              return friends[item.uid].avatar || users[item.uid].avatar;
             }}
             likeExtractor={item => item.rep}
             reportedExtractor={item => item.reported}
-            likesExtractor={item =>
-              likesExtractor(item, this.props.profile.uid, this.props.viewProfile, this.props.goToProfile)
-            }
+            likesExtractor={item => likesExtractor(item, profile.uid, viewProfile, goToProfile)}
             likeCountExtractor={item => item.repCount}
-            commentCount={this.props.feed[this.state.postId] ? this.props.feed[this.state.postId].commentCount : 0}
-            childrenCountExtractor={comment => comment.childrenCount}
+            commentCount={feed[postId] ? feed[postId].commentCount : 0}
+            childrenCountExtractor={c => c.childrenCount}
             timestampExtractor={item => new Date(item.created_at).toISOString()}
             replyAction={offset => {
               scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
@@ -895,35 +914,34 @@ export class Home extends Component<HomeProps, State> {
             saveAction={async (text, parentCommentId) => {
               if (text) {
                 try {
-                await this.props
-                  .comment(this.props.profile.uid, this.state.postId, text, new Date().toString(), parentCommentId)
+                  await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
                 } catch(e) {
                   Alert.alert('Error', e.message)
                 }
               }
             }}
             editAction={(text, comment) =>  console.log(text)}
-            reportAction={comment => console.log(comment)}
-            likeAction={comment => this.props.repComment(comment)}
-            likesTapAction={(comment: Comment) => {
-              this.setState({ likesModalVisible: true, repsId: comment.key, repCount: comment.repCount });
-              this.props.getRepsUsers(comment.key)
+            reportAction={c => console.log(c)}
+            likeAction={c => repComment(c)}
+            likesTapAction={(c: Comment) => {
+              this.setState({ likesModalVisible: true, repsId: c.key, repCount: c.repCount });
+              getRepsUsers(c.key);
             }}
             paginateAction={(fromComment: Comment, direction: string, parentComment: Comment | undefined) => {
               if (parentComment) {
-                this.props.getReplies(parentComment, 10, fromComment.key);
+                getReplies(parentComment, 10, fromComment.key);
               } else {
-                this.props.getComments(this.state.postId, 10, fromComment.key);
+                getComments(postId, 10, fromComment.key);
               }
             }}
-            getCommentRepsUsers={(comment, amount) => this.props.getCommentRepsUsers(comment, amount)}
+            getCommentRepsUsers={(c, amount) => getCommentRepsUsers(c, amount)}
           />
         </ModalBox>
         <RepsModal
           onClosed={() => this.setState({ likesModalVisible: false })}
-          isOpen={this.state.likesModalVisible}
-          id={this.state.repsId}
-          repCount={this.state.repCount}
+          isOpen={likesModalVisible}
+          id={repsId}
+          repCount={repCount}
         />
       </>
     );
