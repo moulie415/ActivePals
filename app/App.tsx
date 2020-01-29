@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Platform, AppState, BackHandler } from 'react-native';
 import { connect } from 'react-redux';
 import { StackNavigator, TabNavigator, addNavigationHelpers, NavigationActions } from 'react-navigation';
@@ -31,6 +31,7 @@ import Welcome from './views/Welcome';
 import Form from './views/Form';
 import { addListener } from '../index';
 import { UserState } from './types/Profile';
+import AppProps from './views/App';
 
 const chats = TabNavigator(
   {
@@ -95,7 +96,7 @@ const tabs = TabNavigator(
       labelStyle: {
         fontSize: 10,
         margin: 0,
-        marginTop: Platform.OS == 'android' ? 5 : 0,
+        marginTop: Platform.OS === 'android' ? 5 : 0,
         padding: 0,
       },
       // showLabel: false,
@@ -123,7 +124,7 @@ export const Stack = StackNavigator({
   Form: { screen: Form, navigationOptions: { header: null } },
 });
 
-class App extends React.Component {
+class App extends Component<AppProps> {
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
     AppState.addEventListener('change', this.handleAppStateChange);

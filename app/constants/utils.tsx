@@ -9,6 +9,7 @@ import { UserState } from '../types/Profile';
 import Comment from '../types/Comment';
 import Post from '../types/Post';
 import Message from '../types/Message';
+import Notification from '../types/Notification';
 
 export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming'];
 
@@ -400,6 +401,12 @@ export const sortSessionsByDistance = sessions => {
     return -100;
   });
 };
+
+export const sortNotificationsByDate = (array: Notification[]) => {
+  return array.sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+}
 
 export const dedupeSortAndAddCommentIds = pipe(dedupeComments, sortComments, addCommentIds);
 export const sortAndAddCommentIds = pipe(sortComments, addCommentIds);

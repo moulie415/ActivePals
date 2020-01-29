@@ -24,12 +24,11 @@ import bgMessaging from './app/bgMessaging';
 import str from './app/constants/strings';
 import { setNotificationCount } from './app/actions/home';
 
-
-const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, (error) => {
+const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
   if (error) {
     console.warn('failed to load the sound', error);
-    return;
-}})
+  }
+});
 
 const firebaseRef = firebase.database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -38,9 +37,6 @@ const reactNavigationMiddleware = store => dispatch => action => {
   switch (action.type) {
     case 'Navigation/NAVIGATE':
       const { routeName } = action
-      // if (routeName == 'Notifications') {
-      //     dispatch(markInboxAsRead())
-      // }
     default:
      return dispatch(action)
   }
@@ -55,7 +51,7 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 export const store = createStore(
   reducer,
   composeEnhancers(applyMiddleware(middleware, reactNavigationMiddleware, thunk))
-  //applyMiddleware(middleware, thunk)
+  // applyMiddleware(middleware, thunk)
 );
 
 const navigateFromNotif = (notif) => {
@@ -103,7 +99,7 @@ const shouldNavigate = (notification) => {
 }
 
 
-export const showLocalNotification = (notif) => {
+export const showLocalNotification = notif => {
   const user = firebase.auth().currentUser;
   if (notif.uid !== user.uid) {
     if (shouldNavigate(notif)) {
@@ -119,7 +115,7 @@ export const showLocalNotification = (notif) => {
         .android.setGroup(notif.group)
         .android.setPriority(firebase.notifications.Android.Priority.Max)
         .android.setChannelId(notif.channel)
-        //.android.setGroupAlertBehaviour(firebase.notifications.Android.GroupAlert.Children)
+        // .android.setGroupAlertBehaviour(firebase.notifications.Android.GroupAlert.Children)
         .setNotificationId(notif.group);
 
       firebase
@@ -155,13 +151,13 @@ export const handleNotification = (notification, showLocal = true) => {
   }
 };
 
-class FitLink extends React.Component {
+class ActivePals extends React.Component {
   async componentDidMount() {
-    //ignore setting a timer warnings
+    // ignore setting a timer warnings
     YellowBox.ignoreWarnings([
       'Setting a timer',
       'Require cycle:',
-      'Received data was not a string, or was not a recognised encoding'
+      'Received data was not a string, or was not a recognised encoding',
     ]);
 
     const channelData = [
@@ -217,17 +213,17 @@ class FitLink extends React.Component {
     });
 
     this.messageListener = firebase.messaging().onMessage(notification => {
-      handleNotification(notification.data)
+      handleNotification(notification.data);
     })
 
     this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed(notification => {
       // Process your notification as required
       // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
-      console.log(notification)
+      console.log(notification);
     })
     this.notificationListener = firebase.notifications().onNotification(notification => {
       // Process your notification as required
-      handleNotification(notification.data)
+      handleNotification(notification.data);
     })
     this.notificationOpenedListener = firebase.notifications().onNotificationOpened(notificationOpen => {
       // Get the action triggered by the notification being opened
@@ -240,7 +236,7 @@ class FitLink extends React.Component {
         handleNotification(notification.data, false)
       }
       if (shouldNavigate(notification.data)) {
-        navigateFromNotif(notification.data)
+        navigateFromNotif(notification.data);
       }
     })
 
@@ -306,5 +302,5 @@ class FitLink extends React.Component {
   }
 }
 
-AppRegistry.registerComponent('Anyone', () => FitLink);
+AppRegistry.registerComponent('Anyone', () => ActivePals);
 AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => bgMessaging);

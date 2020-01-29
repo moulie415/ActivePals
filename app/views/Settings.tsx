@@ -34,6 +34,8 @@ class Settings extends Component<SettingsProps, State> {
   };
 
   render() {
+    const { viewWelcome, viewCredits, profile, onRemoveUser } = this.props;
+    const { spinner, fbModalOpen, showDialog } = this.state;
     return (
       <View style={styles.container}>
         <Header hasBack title="Settings" />
@@ -41,35 +43,25 @@ class Settings extends Component<SettingsProps, State> {
           <TouchableOpacity
             onPress={() => {
               Alert.alert('coming soon');
-              //Linking.openURL('mailto:fitlink-support@gmail.com')
+              // Linking.openURL('mailto:fitlink-support@gmail.com')
             }}
             style={styles.contact}
           >
             <Text>Contact Support</Text>
             <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.viewWelcome(true);
-            }}
-            style={styles.contact}
-          >
+          <TouchableOpacity onPress={() => viewWelcome(true)} style={styles.contact}>
             <Text>View Welcome Swiper</Text>
             <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              this.props.viewCredits();
-            }}
-            style={styles.contact}
-          >
+          <TouchableOpacity onPress={() => viewCredits()} style={styles.contact}>
             <Text>Credits</Text>
             <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
           </TouchableOpacity>
-          {this.props.profile.fb_login && (
+          {profile.fb_login && (
             <TouchableOpacity
               onPress={() => {
-                this.props.profile.username
+                profile.username
                   ? this.setState({ fbModalOpen: true })
                   : Alert.alert('Please set a username before trying to add a pal');
               }}
@@ -90,22 +82,22 @@ class Settings extends Component<SettingsProps, State> {
             <Text style={{ color: 'red' }}>Delete account</Text>
           </TouchableOpacity>
         </ScrollView>
-        {this.state.spinner && (
+        {spinner && (
           <View style={styles.spinner}>
             <PulseIndicator color={colors.secondary} />
           </View>
         )}
-        <FbFriendsModal isOpen={this.state.fbModalOpen} onClosed={() => this.setState({ fbModalOpen: false })} />
+        <FbFriendsModal isOpen={fbModalOpen} onClosed={() => this.setState({ fbModalOpen: false })} />
         <DialogInput
-          isDialogVisible={this.state.showDialog}
-          title={'Enter email to confirm'}
-          message={'All your data will be deleted.'}
-          hintInput={'Enter email'}
+          isDialogVisible={showDialog}
+          title="Enter email to confirm"
+          message="All your data will be deleted."
+          hintInput="Enter email"
           submitInput={async inputText => {
-            if (inputText == this.props.profile.email) {
+            if (inputText === profile.email) {
               this.setState({ spinner: true });
               try {
-                await this.props.removeUser();
+                await onRemoveUser();
                 Alert.alert('Success', 'Account deleted');
                 this.setState({ spinner: false });
               } catch (e) {
@@ -127,7 +119,7 @@ const mapStateToProps = ({ profile }) => ({
 
 const mapDispatchToProps = dispatch => ({
   goBack: () => dispatch(navigateBack()),
-  removeUser: () => dispatch(removeUser()),
+  onRemoveUser: () => dispatch(removeUser()),
   viewWelcome: goBack => dispatch(navigateWelcome(goBack)),
   viewCredits: () => dispatch(navigateCredits()),
 });
