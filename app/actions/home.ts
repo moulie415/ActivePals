@@ -19,10 +19,8 @@ export const SET_REPS_USERS = 'SET_REPS_USERS';
 const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, error => {
   if (error) {
     console.log('failed to load the sound', error);
-    return;
   }
 });
-
 
 const addToFeed = (post, id) => ({
   type: ADD_POST,
@@ -375,53 +373,6 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 	}
 }
 
-export const fetchComments = (key: string, limit = 10, endAt?: string) => {
-  return async (dispatch, getState) => {
-	const userFetches = []
-	const uid = getState().profile.profile.uid
-	const friends = getState().friends.friends
-	const users = getState().sharedInfo.users
-	const ref = endAt ? firebase.database().ref('postComments').child(key).orderByKey().endAt(endAt) :
-	firebase.database().ref('postComments').child(key).orderByKey()
-	const snapshot = await ref.limitToLast(limit).once('value')
-	const comments = await Promise.all(Object.keys(snapshot.val()).map(comment => {
-		return firebase.database().ref("comments").child(comment).once("value")
-	}))
-
-	let commentsArray = []
-	const commentReps = []
-	comments.forEach(comment => {
-		const obj = comment.val()
-		if (!friends[obj.uid] && !users[obj.uid] && !userFetches.includes(obj.uid) && obj.uid !== uid) {
-			userFetches.push(obj.uid)
-		}	
-		commentReps.push(firebase.database().ref("reps/" + obj.key).child(uid).once('value'))
-		commentsArray.push(obj)
-	})
-
-	const reps = await Promise.all(commentReps)
-	reps.forEach((rep, index) => {
-		if (rep.val()) {
-			commentsArray[index].rep = true
-		}
-	})
-
-	const commentsWithReplies = []
-	commentsArray.forEach(comment => {
-		if (comment.childrenCount) {
-			commentsWithReplies.push(comment)
-		}
-	})
-
-	const currentComments = getState().home.feed[key].comments || []
-
-	commentsArray = dedupeSortAndAddCommentIds([...commentsArray, ...currentComments])
-	dispatch(fetchUsers(userFetches))
-	dispatch(setPostComments(key, commentsArray))
-	await Promise.all(commentsWithReplies.map(comment => dispatch(fetchReplies(comment))))
-  }
-}
-
 export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
 	return async (dispatch, getState) => {
 		const key = comment.key
@@ -465,6 +416,72 @@ export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
 		dispatch(setPostComments(comment.postId, postComments))
 		dispatch(fetchUsers(userFetches))
 	}
+}
+
+export const fetchComments = (key: string, limit = 10, endAt?: string) => {
+  return async (dispatch, getState) => {
+    const userFetches = [];
+    const { uid } = getState().profile.profile;
+    const { friends } = getState().friends;
+    const { users } = getState().sharedInfo;
+    const ref = endAt
+      ? firebase
+          .database()
+          .ref('postComments')
+          .child(key)
+          .orderByKey()
+          .endAt(endAt)
+      : firebase
+          .database()
+          .ref('postComments')
+          .child(key)
+          .orderByKey();
+    const snapshot = await ref.limitToLast(limit).once('value');
+    if (!snapshot.val()) {
+      return dispatch(setPostComments(key, []));
+    }
+    const comments = await Promise.all(
+      Object.keys(snapshot.val()).map(comment => {
+        return firebase
+          .database()
+          .ref('comments')
+          .child(comment)
+          .once('value');
+      })
+    );
+
+    let commentsArray = []
+    const commentReps = []
+    comments.forEach(comment => {
+      const obj = comment.val()
+      if (!friends[obj.uid] && !users[obj.uid] && !userFetches.includes(obj.uid) && obj.uid !== uid) {
+        userFetches.push(obj.uid)
+      }	
+      commentReps.push(firebase.database().ref("reps/" + obj.key).child(uid).once('value'))
+      commentsArray.push(obj)
+    })
+
+    const reps = await Promise.all(commentReps)
+    reps.forEach((rep, index) => {
+      if (rep.val()) {
+        commentsArray[index].rep = true
+      }
+    })
+
+    const commentsWithReplies = []
+    commentsArray.forEach(comment => {
+      if (comment.childrenCount) {
+        commentsWithReplies.push(comment)
+      }
+    })
+
+    const currentComments = getState().home.feed[key].comments || []
+
+    commentsArray = dedupeSortAndAddCommentIds([...commentsArray, ...currentComments])
+    dispatch(fetchUsers(userFetches))
+    dispatch(setPostComments(key, commentsArray))
+    await Promise.all(commentsWithReplies.map(comment => dispatch(fetchReplies(comment))))
+  }
 }
 
 export const repComment = (comment: Comment) => {
