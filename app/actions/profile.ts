@@ -2,7 +2,7 @@ import firebase from 'react-native-firebase';
 import { fetchFriends } from './friends';
 import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat, getUnreadCount } from './chats';
 import { fetchPosts } from './home';
-import { fetchSessions, fetchPhotoPath } from './sessions';
+import { fetchSessions, fetchPhotoPath, fetchPrivateSessions } from './sessions';
 import { navigateLogin, navigateHome, navigateWelcome } from './navigation';
 import { UserState } from '../types/Profile';
 
@@ -139,12 +139,18 @@ export const doSetup = profile => {
     }
     dispatch(setHasLoggedIn(true));
     dispatch(getUnreadCount(uid));
-    await dispatch(fetchFriends(uid));
-    dispatch(fetchSessionChats(uid));
-    dispatch(fetchChats(uid));
+    dispatch(fetchFriends(uid));
     profile.gym && dispatch(fetchGymChat(profile.gym));
+  };
+};
+
+export const fetchOther = (uid: string) => {
+  return dispatch => {
+    dispatch(fetchPrivateSessions());
     dispatch(fetchPosts(uid));
     dispatch(fetchSessions());
+    dispatch(fetchSessionChats(uid));
+    dispatch(fetchChats(uid));
   };
 };
 

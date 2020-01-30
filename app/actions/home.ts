@@ -147,91 +147,86 @@ export const fetchPost = key => {
 
 
 export const fetchPosts = (uid, amount = 30, endAt?: string) => {
-	return (dispatch, getState) => {
-		let promises = []
-		return new Promise(resolve => {
-			let ref = endAt ? firebase.database().ref('userPosts/' + uid).orderByKey().endAt(endAt).limitToLast(amount) :
-			firebase.database().ref('userPosts/' + uid).orderByKey().limitToLast(amount)
-			ref.on('value', snapshot => {
-				if (snapshot.val()) {
-					Object.keys(snapshot.val()).forEach(post => {
-						promises.push(firebase.database().ref('posts/' + post).once('value'))
-						const ref = firebase.database().ref('posts/' + post)
-						ref.on('child_changed', child => {
-								if (child.key === 'repCount') {
-									const obj = getState().home.feed[post]
-									if (obj) {
-										obj.repCount = child.val()
-										dispatch(setPost(obj))
-									}
-								}
-								else if (child.key == 'commentCount') {
-									const obj = getState().home.feed[post]
-									if (obj) {
-										obj.commentCount = child.val()
-										dispatch(setPost(obj))
-									}
-								}
-						})
-						ref.on('child_added', child => {
-							if (child.key == 'repCount') {
-								const obj = getState().home.feed[post]
-								if (obj) {
-									obj.repCount = child.val()
-									dispatch(setPost(obj))
-								}
-							}
-							else if (child.key == 'commentCount') {
-								const obj = getState().home.feed[post]
-								if (obj) {
-									obj.commentCount = child.val()
-									dispatch(setPost(obj))
-								}
-							}
+  return (dispatch, getState) => {
+    const promises = [];
+    const ref = endAt ? firebase.database().ref('userPosts/' + uid).orderByKey().endAt(endAt).limitToLast(amount) :
+    firebase.database().ref('userPosts/' + uid).orderByKey().limitToLast(amount)
+    return ref.on('value', snapshot => {
+      if (snapshot.val()) {
+        Object.keys(snapshot.val()).forEach(post => {
+          promises.push(firebase.database().ref('posts/' + post).once('value'))
+          const ref = firebase.database().ref('posts/' + post)
+          ref.on('child_changed', child => {
+            if (child.key === 'repCount') {
+              const obj = getState().home.feed[post]
+              if (obj) {
+                obj.repCount = child.val()
+                dispatch(setPost(obj))
+              }
+            }
+            else if (child.key === 'commentCount') {
+              const obj = getState().home.feed[post]
+              if (obj) {
+                obj.commentCount = child.val()
+                dispatch(setPost(obj))
+              }
+            }
+          })
+          ref.on('child_added', child => {
+            if (child.key === 'repCount') {
+              const obj = getState().home.feed[post]
+              if (obj) {
+                obj.repCount = child.val()
+                dispatch(setPost(obj))
+              }
+            }
+            else if (child.key === 'commentCount') {
+              const obj = getState().home.feed[post]
+              if (obj) {
+                obj.commentCount = child.val()
+                dispatch(setPost(obj))
+              }
+            }
+        })
+        })
+        Promise.all(promises).then(posts => {
+          let feed = {}
+          let reps = []
+          let users = []
+          posts.forEach(post => {
+            let friends = getState().friends.friends
+            if (post.val().uid == uid || friends[post.val().uid] && friends[post.val().uid].status == 'connected') {
+              feed[post.key] = post.val()
+              feed[post.key].key = post.key
+              reps.push(firebase.database().ref('userReps/' + uid).child(post.key).once('value'))
+              users.push(firebase.database().ref('users/' + post.val().uid).once('value'))
+            }
 
-					})
-					})
-					Promise.all(promises).then(posts => {
-						let feed = {}
-						let reps = []
-						let users = []
-						posts.forEach(post => {
-							let friends = getState().friends.friends
-							if (post.val().uid == uid || friends[post.val().uid] && friends[post.val().uid].status == 'connected') {
-								feed[post.key] = post.val()
-								feed[post.key].key = post.key
-								reps.push(firebase.database().ref('userReps/' + uid).child(post.key).once('value'))
-								users.push(firebase.database().ref('users/' + post.val().uid).once('value'))
-							}
-
-						})
-						Promise.all(reps).then(reps => {
-							reps.forEach(rep => {
-								if (rep.val()) {
-									feed[rep.key].rep = true
-								}
-							})
-							Promise.all(users).then(users => {
-								let sharedUsers = {}
-								users.forEach(user => {
-									if (user.val()) {
-										sharedUsers[user.key] = user.val()
-									}
-								})
-								dispatch(updateUsers(sharedUsers))
-								dispatch(setFeed(feed))
-								resolve()
-							})
-						})
-					})
-				}
-				else {
-					dispatch(setFeed({}))
-					resolve()
-				}
-			})
-		})
-	}
+          })
+          Promise.all(reps).then(reps => {
+            reps.forEach(rep => {
+              if (rep.val()) {
+                feed[rep.key].rep = true
+              }
+            })
+            Promise.all(users).then(users => {
+              let sharedUsers = {}
+              users.forEach(user => {
+                if (user.val()) {
+                  sharedUsers[user.key] = user.val()
+                }
+              })
+              dispatch(updateUsers(sharedUsers))
+              dispatch(setFeed(feed))
+            })
+          })
+        })
+      }
+      else {
+        dispatch(setFeed({}))
+      }
+    })
+  }
 }
 
 export const resetFeed = () => {

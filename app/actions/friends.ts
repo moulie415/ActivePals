@@ -3,6 +3,7 @@ import { removeChat, addChat } from './chats';
 import { fetchPrivateSessions } from './sessions';
 import { upUnreadCount, fetchUsers } from './home';
 import { UserState } from '../types/Profile';
+import { fetchOther } from './profile';
 
 export const SET_FRIENDS = 'SET_FRIENDS';
 export const ADD_FRIEND = 'ADD_FRIEND';
@@ -86,8 +87,10 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
             return acc;
           }, {});
           dispatch(setFriends(obj));
+          dispatch(fetchOther(uid));
         } else {
           dispatch(setFriends({}));
+          dispatch(fetchOther(uid));
         }
       });
   };

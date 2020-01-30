@@ -25,7 +25,6 @@ interface State {
   spinner: boolean;
   secure: boolean;
   waitForData?: boolean;
-  secondAuthChange: boolean;
   facebookLoading?: boolean;
   googleLoading?: boolean;
   username?: string;
@@ -33,28 +32,30 @@ interface State {
 }
 
 class Login extends Component<LoginProps, State> {
+  secondAuthChange: boolean;
+
   constructor(props) {
     super(props);
+    this.secondAuthChange = false;
     this.state = {
       spinner: false,
       secure: true,
-      secondAuthChange: false,
     };
   }
 
   componentDidMount() {
     const { logout, onLogin, loggedIn } = this.props;
-    const { waitForData, secondAuthChange } = this.state;
+    const { waitForData } = this.state;
     SplashScreen.hide();
     firebase.auth().onAuthStateChanged(user => {
       if (user && (user.emailVerified || (user.providerData && user.providerData.length > 0)) && !waitForData) {
         /* ios onAuthStateChanged gets called twice so we want to account
         for this so that we don't have unnecessary calls */
-        if (secondAuthChange || Platform.OS !== 'ios') {
+        if (this.secondAuthChange || Platform.OS !== 'ios') {
           this.setState({ spinner: false });
           onLogin();
         } else {
-          this.setState({ secondAuthChange: true });
+          this.secondAuthChange = true;
         }
       } else if (loggedIn) {
         logout();
