@@ -28,3 +28,11 @@ interface StorageOptions {
   cameraRoll?: boolean;
   waitUntilSaved?: boolean;
 }
+
+export interface Navigation {
+  state: State;
+}
+
+interface State {
+  params: any;
+}

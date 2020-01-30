@@ -915,8 +915,8 @@ export class Home extends Component<HomeProps, State> {
               if (text) {
                 try {
                   await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
-                } catch(e) {
-                  Alert.alert('Error', e.message)
+                } catch (e) {
+                  Alert.alert('Error', e.message);
                 }
               }
             }}

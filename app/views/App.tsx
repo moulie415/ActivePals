@@ -1,6 +1,6 @@
-import { NavigationScreenProps } from 'react-navigation';
+import { Navigation } from '../types/Shared';
 
 export default interface AppProps {
   dispatch: any;
-  nav: NavigationScreenProps;
+  nav: Navigation;
 }

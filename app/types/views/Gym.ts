@@ -1,9 +1,9 @@
-import { NavigationScreenProps } from 'react-navigation';
 import Profile from '../Profile';
 import Place from '../Place';
+import { Navigation } from '../Shared';
 
 export default interface GymProps {
-  navigation: NavigationScreenProps;
+  navigation: Navigation;
   friends: { [key: string]: Profile };
   location: { lat: number; lon: number };
   users: { [key: string]: Profile };

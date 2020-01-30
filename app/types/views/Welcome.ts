@@ -1,11 +1,11 @@
-import Profile from "../Profile";
-import { NavigationScreenProps } from 'react-navigation'
+import Profile from '../Profile';
+import { Navigation } from '../Shared';
 
 export default interface WelcomeProps {
-    viewedWelcome: () => void;
-    profile: Profile;
-    navigation: NavigationScreenProps;
-    goBack: () => void;
-    goHome: () => void;
-    onSave: () => void;
+  viewedWelcome: () => void;
+  profile: Profile;
+  navigation: Navigation;
+  goBack: () => void;
+  goHome: () => void;
+  onSave: () => void;
 }

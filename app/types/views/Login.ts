@@ -1,8 +1,8 @@
-import { NavigationScreenProps } from 'react-navigation';
+import { Navigation } from '../Shared';
 
 export default interface LoginProps {
   loggedIn: boolean;
-  navigation: NavigationScreenProps;
+  navigation: Navigation;
   onLogin: () => void;
   logout: () => void;
 }
