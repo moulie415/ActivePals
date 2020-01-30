@@ -1,4 +1,5 @@
 import firebase from 'react-native-firebase';
+import { MessageType } from '../types/Message';
 
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS';
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT';
@@ -91,8 +92,7 @@ export const fetchGymChat = gym => {
         if (lastMessage.val()) {
           const key = Object.keys(lastMessage.val())[0];
           const message = lastMessage.val()[key];
-          const createdAt = new Date(message.createdAt);
-          const chat = { lastMessage: { ...message, createdAt, key }, key: gym };
+          const chat = { lastMessage: { ...message, key }, key: gym };
           dispatch(setGymChat(chat));
         } else {
           dispatch(setGymChat(null));
@@ -103,7 +103,7 @@ export const fetchGymChat = gym => {
 
 export const updateLastMessage = notif => {
   return dispatch => {
-    if (notif.type === 'message') {
+    if (notif.type === MessageType.MESSAGE) {
       return firebase
         .database()
         .ref('chats')
@@ -114,12 +114,11 @@ export const updateLastMessage = notif => {
           if (lastMessage.val()) {
             const key = Object.keys(lastMessage.val())[0];
             const message = lastMessage.val()[key];
-            const createdAt = new Date(message.createdAt);
-            dispatch(updateChat(notif.uid || notif.friendUid, { ...message, key, createdAt }));
+            dispatch(updateChat(notif.uid || notif.friendUid, { ...message, key }));
           }
         });
     }
-    if (notif.type === 'sessionMessage') {
+    if (notif.type === MessageType.SESSION_MESSAGE) {
       return firebase
         .database()
         .ref('sessionChats')
@@ -130,12 +129,12 @@ export const updateLastMessage = notif => {
           if (lastMessage.val()) {
             const key = Object.keys(lastMessage.val())[0];
             const message = lastMessage.val()[key];
-            const createdAt = new Date(message.createdAt);
-            dispatch(updateSessionChat(notif.sessionId, { ...message, key, createdAt }));
+
+            dispatch(updateSessionChat(notif.sessionId, { ...message, key }));
           }
         });
     }
-    if (notif.type === 'gymMessage') {
+    if (notif.type === MessageType.GYM_MESSAGE) {
       dispatch(fetchGymChat(notif.gymId));
     }
   };

@@ -9,7 +9,7 @@ export default interface Message extends IMessage {
   sessionId?: string;
   sessionTitle?: string;
   type: MessageType;
-  sessionType?: 'sessions' | 'privateSessions';
+  sessionType?: SessionType;
   image?: string;
   user: MessageUser;
 }
@@ -25,3 +25,5 @@ export enum MessageType {
   SESSION_MESSAGE = 'sessionMessage',
   GYM_MESSAGE = 'gymMessage',
 }
+
+export type SessionType = 'sessions' | 'privateSessions';

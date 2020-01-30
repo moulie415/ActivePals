@@ -37,7 +37,7 @@ import {
 } from '../../actions/chats';
 import { fetchProfile } from '../../actions/profile';
 import MessagingProps from '../../types/views/Messaging';
-import Message, { MessageType } from '../../types/Message';
+import Message, { MessageType, SessionType } from '../../types/Message';
 import ImagePickerOptions from '../../types/Shared';
 
 interface State {
@@ -171,20 +171,18 @@ class Messaging extends Component<MessagingProps, State> {
     const { params } = navigation.state;
     const { friendUid, gymId, session, chatId } = params;
     // make messages database friendly
-    const converted = [];
-    messages.forEach(message => {
-      const createdAt = message.createdAt.toString();
+    const converted = messages.map(message => {
       const type = this.getType();
       if (session) {
         const { key: sessionId, title: sessionTitle } = session;
-        const sessionType = session.private ? 'privateSessions' : 'sessions';
-        converted.push({ ...message, createdAt, sessionTitle, sessionId, sessionType, type });
-      } else if (gymId) {
-        const { name } = gym;
-        converted.push({ ...message, createdAt, gymId, gymName: name, type });
-      } else {
-        converted.push({ ...message, createdAt, chatId, friendUid, type });
+        const sessionType: SessionType = session.private ? 'privateSessions' : 'sessions';
+        return { ...message, sessionTitle, sessionId, sessionType, type };
       }
+      if (gymId) {
+        const { name } = gym;
+        return { ...message, gymId, gymName: name, type };
+      }
+      return { ...message, chatId, friendUid, type };
     });
 
     const ref = this.getDbRef();
@@ -196,11 +194,11 @@ class Messaging extends Component<MessagingProps, State> {
       }));
 
       if (session) {
-        onUpdateLastMessage({ ...converted[0], type: 'sessionMessage' });
+        onUpdateLastMessage({ ...converted[0] });
       } else if (gymId) {
-        updateLastMessage({ ...converted[0], type: 'gymMessage' });
+        onUpdateLastMessage({ ...converted[0] });
       } else {
-        updateLastMessage({ ...converted[0], type: 'message' });
+        onUpdateLastMessage({ ...converted[0] });
       }
     } catch (e) {
       Alert.alert('Error sending message', e.message);
