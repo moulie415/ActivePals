@@ -406,7 +406,13 @@ export const sortNotificationsByDate = (array: Notification[]) => {
   return array.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
-}
+};
+
+export const pickerItems = array => {
+  return array.map(item => {
+    return { label: item, value: item };
+  });
+};
 
 export const dedupeSortAndAddCommentIds = pipe(dedupeComments, sortComments, addCommentIds);
 export const sortAndAddCommentIds = pipe(sortComments, addCommentIds);

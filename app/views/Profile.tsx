@@ -1,28 +1,36 @@
 import React, { Component } from 'react';
 import { Alert, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
+import DatePicker from 'react-native-datepicker';
+import ImagePicker from 'react-native-image-picker';
+import ImageResizer from 'react-native-image-resizer';
+import RNPickerSelect from 'react-native-picker-select';
 import Image from 'react-native-fast-image';
+import { connect } from 'react-redux';
 import Text, { globalTextStyle } from '../components/Text';
 import styles from '../styles/profileStyles';
 import hStyles from '../styles/homeStyles';
 import colors from '../constants/colors';
-import DatePicker from 'react-native-datepicker';
-var ImagePicker = require('react-native-image-picker');
-import ImageResizer from 'react-native-image-resizer';
-import RNPickerSelect from 'react-native-picker-select';
 import Header from '../components/Header/header';
 import { PulseIndicator } from 'react-native-indicators';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
+import { navigateLogin, navigateSettings } from '../actions/navigation';
+import { fetchProfile, setLoggedOut } from '../actions/profile';
+import { navigateGym } from '../actions/navigation';
+import { pickerItems } from '../constants/utils';
+import str from '../constants/strings';
+import ProfileProps from '../types/views/Profile';
 
-class Profile extends Component {
-  static navigationOptions = {
-    header: null,
-    tabBarLabel: 'Profile',
-    tabBarIcon: ({ tintColor }) => <Icon name="md-person" size={25} style={{ color: tintColor }} />,
-  };
+const activities = ['Bodybuilding', 'Powerlifting', 'Swimming', 'Cycling', 'Running', 'Sprinting'];
+const levels = ['Beginner', 'Intermediate', 'Advanced'];
 
+interface State {
+  spinner: boolean;
+}
+class Profile extends Component<ProfileProps, State> {
   constructor(props) {
     super(props);
     this.profile = this.props.profile;
@@ -50,6 +58,13 @@ class Profile extends Component {
     this.listenForUserChanges(firebase.database().ref('users/' + this.profile.uid));
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.profile) {
+      let profile = nextProps.profile;
+      this.setState({ profile, initialProfile: profile, initialAvatar: profile.avatar });
+    }
+  }
+
   listenForUserChanges(ref) {
     ref.on('value', snapshot => {
       let profile = snapshot.val();
@@ -58,10 +73,165 @@ class Profile extends Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.profile) {
-      let profile = nextProps.profile;
-      this.setState({ profile, initialProfile: profile, initialAvatar: profile.avatar });
+  static navigationOptions = {
+    header: null,
+    tabBarLabel: 'Profile',
+    tabBarIcon: ({ tintColor }) => <Icon name="md-person" size={25} style={{ color: tintColor }} />,
+  };
+
+  logout() {
+    Alert.alert('Log out', 'Are you sure?', [
+      { text: 'Cancel', onPress: () => console.log('Cancel logout'), style: 'cancel' },
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            this.setState({ spinner: true });
+            await firebase
+              .database()
+              .ref('users/' + this.props.profile.uid)
+              .child('state')
+              .remove();
+            await firebase.messaging().deleteToken();
+            await firebase.auth().signOut();
+            this.setState({ spinner: false });
+            this.props.onLogoutPress();
+          } catch (e) {
+            Alert('Error', e.message);
+            this.props.onLogoutPress();
+          }
+        },
+      },
+    ]);
+  }
+
+  selectAvatar(backdrop = false) {
+    var options = {
+      title: backdrop ? 'Select Backdrop' : 'Select Avatar',
+      mediaType: 'photo',
+      noData: true,
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    this.setState({ spinner: true });
+    ImagePicker.showImagePicker(options, response => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+        this.setState({ spinner: false });
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+        this.setState({ spinner: false });
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        this.setState({ spinner: false });
+      } else {
+        let source = { uri: response.uri };
+
+        const size = 640;
+        // You can also display the image using data:
+        // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+        ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100)
+          .then(resized => {
+            // response.uri is the URI of the new image that can now be displayed, uploaded...
+            // response.path is the path of the new image
+            // response.name is the name of the new image with the extension
+            // response.size is the size of the new image
+            this.setState(backdrop ? { backdrop: resized.uri } : { avatar: resized.uri });
+            this.setState({ spinner: false });
+          })
+          .catch(e => {
+            Alert.alert('Error', e.message);
+          });
+      }
+    });
+  }
+
+  uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
+    return new Promise((resolve, reject) => {
+      const imageRef = firebase
+        .storage()
+        .ref('images/' + this.profile.uid)
+        .child(backdrop ? 'backdrop' : 'avatar');
+      return imageRef
+        .putFile(uri, { contentType: mime })
+        .then(() => {
+          return imageRef.getDownloadURL();
+        })
+        .then(url => {
+          resolve(url);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+
+  async checkImages() {
+    try {
+      if (this.state.initialAvatar != this.state.avatar) {
+        const url = await this.uploadImage(this.state.avatar);
+        this.setState({ initialAvatar: url, avatar: url });
+      }
+      if (this.state.initialBackdrop != this.state.backdrop) {
+        const url = await this.uploadImage(this.state.backdrop, true);
+        this.setState({ initialBackdrop: url, backdrop: url });
+      }
+    } catch (e) {
+      Alert.alert('Error', e.message);
+    }
+  }
+
+  hasChanged() {
+    return !(
+      JSON.stringify(this.state.initialProfile) === JSON.stringify(this.state.profile) &&
+      this.state.initialAvatar == this.state.avatar &&
+      this.state.backdrop == this.state.initialBackdrop
+    );
+  }
+
+  async updateUser(initial, profile) {
+    if (!this.hasChanged()) {
+      Alert.alert('No changes');
+    } else {
+      if (!profile.username || profile.username.length < 5 || str.whiteSpaceRegex.test(profile.username)) {
+        Alert.alert('Sorry', 'Username must be at least 5 characters long and cannot contain any spaces');
+      } else {
+        this.setState({ spinner: true });
+        await this.checkImages();
+        delete profile.avatar;
+        firebase
+          .database()
+          .ref('users/' + this.profile.uid)
+          .set({ ...profile })
+          .then(() => {
+            initial.username &&
+              firebase
+                .database()
+                .ref('usernames')
+                .child(initial.username)
+                .remove();
+            firebase
+              .database()
+              .ref('usernames')
+              .child(profile.username)
+              .set(profile.uid)
+              .then(() => {
+                Alert.alert('Success', 'Profile saved');
+                /*we need to make sure the username is saved locally 
+          which is why this calls fetchProfile which saves the username*/
+                this.props.onSave();
+                this.setState({ spinner: false });
+              });
+          })
+          .catch(e => {
+            Alert.alert('Error', 'That username may have already been taken');
+            this.setState({ spinner: false });
+          });
+      }
     }
   }
 
@@ -267,7 +437,7 @@ class Profile extends Component {
           <View style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>Birthday: </Text>
             <DatePicker
-              date={this.getDate(this.state.profile && this.state.profile.birthday)}
+              date={moment(this.state.profile && this.state.profile.birthday)}
               placeholder={(this.state.profile && this.state.profile.birthday) || 'None'}
               maxDate={new Date()}
               confirmBtnText={'Confirm'}
@@ -300,188 +470,8 @@ class Profile extends Component {
       </>
     );
   }
-
-  getDate(date) {
-    if (date) {
-      let formatted = date.replace(/-/g, '/');
-      return new Date(formatted);
-    } else return null;
-  }
-
-  async updateUser(initial, profile) {
-    if (!this.hasChanged()) {
-      Alert.alert('No changes');
-    } else {
-      if (!profile.username || profile.username.length < 5 || str.whiteSpaceRegex.test(profile.username)) {
-        Alert.alert('Sorry', 'Username must be at least 5 characters long and cannot contain any spaces');
-      } else {
-        this.setState({ spinner: true });
-        await this.checkImages();
-        delete profile.avatar;
-        firebase
-          .database()
-          .ref('users/' + this.profile.uid)
-          .set({ ...profile })
-          .then(() => {
-            initial.username &&
-              firebase
-                .database()
-                .ref('usernames')
-                .child(initial.username)
-                .remove();
-            firebase
-              .database()
-              .ref('usernames')
-              .child(profile.username)
-              .set(profile.uid)
-              .then(() => {
-                Alert.alert('Success', 'Profile saved');
-                /*we need to make sure the username is saved locally 
-          which is why this calls fetchProfile which saves the username*/
-                this.props.onSave();
-                this.setState({ spinner: false });
-              });
-          })
-          .catch(e => {
-            Alert.alert('Error', 'That username may have already been taken');
-            this.setState({ spinner: false });
-          });
-      }
-    }
-  }
-
-  hasChanged() {
-    return !(
-      JSON.stringify(this.state.initialProfile) === JSON.stringify(this.state.profile) &&
-      this.state.initialAvatar == this.state.avatar &&
-      this.state.backdrop == this.state.initialBackdrop
-    );
-  }
-
-  async checkImages() {
-    try {
-      if (this.state.initialAvatar != this.state.avatar) {
-        const url = await this.uploadImage(this.state.avatar);
-        this.setState({ initialAvatar: url, avatar: url });
-      }
-      if (this.state.initialBackdrop != this.state.backdrop) {
-        const url = await this.uploadImage(this.state.backdrop, true);
-        this.setState({ initialBackdrop: url, backdrop: url });
-      }
-    } catch (e) {
-      Alert.alert('Error', e.message);
-    }
-  }
-
-  selectAvatar(backdrop = false) {
-    var options = {
-      title: backdrop ? 'Select Backdrop' : 'Select Avatar',
-      mediaType: 'photo',
-      noData: true,
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-    this.setState({ spinner: true });
-    ImagePicker.showImagePicker(options, response => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-        this.setState({ spinner: false });
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-        this.setState({ spinner: false });
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        this.setState({ spinner: false });
-      } else {
-        let source = { uri: response.uri };
-
-        const size = 640;
-        // You can also display the image using data:
-        // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-        ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100)
-          .then(resized => {
-            // response.uri is the URI of the new image that can now be displayed, uploaded...
-            // response.path is the path of the new image
-            // response.name is the name of the new image with the extension
-            // response.size is the size of the new image
-            this.setState(backdrop ? { backdrop: resized.uri } : { avatar: resized.uri });
-            this.setState({ spinner: false });
-          })
-          .catch(e => {
-            Alert.alert('Error', e.message);
-          });
-      }
-    });
-  }
-
-  uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
-    return new Promise((resolve, reject) => {
-      const imageRef = firebase
-        .storage()
-        .ref('images/' + this.profile.uid)
-        .child(backdrop ? 'backdrop' : 'avatar');
-      return imageRef
-        .putFile(uri, { contentType: mime })
-        .then(() => {
-          return imageRef.getDownloadURL();
-        })
-        .then(url => {
-          resolve(url);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  }
-
-  logout() {
-    Alert.alert('Log out', 'Are you sure?', [
-      { text: 'Cancel', onPress: () => console.log('Cancel logout'), style: 'cancel' },
-      {
-        text: 'OK',
-        onPress: async () => {
-          try {
-            this.setState({ spinner: true });
-            await firebase
-              .database()
-              .ref('users/' + this.props.profile.uid)
-              .child('state')
-              .remove();
-            await firebase.messaging().deleteToken();
-            await firebase.auth().signOut();
-            this.setState({ spinner: false });
-            this.props.onLogoutPress();
-          } catch (e) {
-            Alert('Error', e.message);
-            this.props.onLogoutPress();
-          }
-        },
-      },
-    ]);
-  }
+  
 }
-
-const pickerItems = array => {
-  let items = [];
-  array.forEach(item => {
-    items.push({ label: item, value: item });
-  });
-  return items;
-};
-
-const activities = ['Bodybuilding', 'Powerlifting', 'Swimming', 'Cycling', 'Running', 'Sprinting'];
-const levels = ['Beginner', 'Intermediate', 'Advanced'];
-
-import { connect } from 'react-redux';
-import { navigateLogin, navigateSettings } from '../actions/navigation';
-import { fetchProfile, setLoggedOut } from '../actions/profile';
-import { navigateGym } from '../actions/navigation';
-import signUpStyles from '../styles/signUpStyles';
-import str from '../constants/strings';
 
 const mapStateToProps = ({ profile }) => ({
   profile: profile.profile,
