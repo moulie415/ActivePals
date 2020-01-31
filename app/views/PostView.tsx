@@ -52,12 +52,10 @@ const weightDown = require('../../assets/images/weightlifting_down.png');
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 interface State {
-  comments: [];
   likesModalVisible: boolean;
   commentFetchAmount: number;
   userFetchAmount: number;
   showImage: boolean;
-  post?: Post;
   playing?: boolean;
   selectedImage?: { url: string }[];
 }
@@ -65,7 +63,6 @@ class PostView extends Component<PostViewProps, State> {
   constructor(props) {
     super(props);
     this.state = {
-      comments: [],
       likesModalVisible: false,
       commentFetchAmount: 10,
       userFetchAmount: 10,
@@ -78,17 +75,6 @@ class PostView extends Component<PostViewProps, State> {
     const { postId } = navigation.state.params;
     await getPost(postId);
     getComments(postId);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { navigation } = this.props;
-    const { postId } = navigation.state.params;
-    if (nextProps.feed && nextProps.feed[postId] && nextProps.feed[postId].comments) {
-      this.setState({ comments: nextProps.feed[postId].comments });
-    }
-    if (nextProps.feed && nextProps.feed[postId]) {
-      this.setState({ post: nextProps.feed[postId] });
-    }
   }
 
   getUsername(uid) {
@@ -122,10 +108,11 @@ class PostView extends Component<PostViewProps, State> {
   };
 
   renderRepsFooter() {
-    const { post, userFetchAmount } = this.state;
-    const { getRepUsers, navigation } = this.props;
+    const { userFetchAmount } = this.state;
+    const { getRepUsers, navigation, feed } = this.props;
     const { postId } = navigation.state.params;
-    if (post.repCount > userFetchAmount) {
+    const post = feed[postId];
+    if (post && post.repCount > userFetchAmount) {
       return (
         <TouchableOpacity
           style={{ alignItems: 'center' }}
@@ -303,10 +290,13 @@ class PostView extends Component<PostViewProps, State> {
       getComments,
       getCommentRepsUsers,
       onRepComment,
+      feed,
     } = this.props;
     const combined = { ...users, ...friends };
-    const { post, comments, commentFetchAmount, selectedImage, likesModalVisible, showImage } = this.state;
+    const { commentFetchAmount, selectedImage, likesModalVisible, showImage } = this.state;
     const { postId } = navigation.state.params;
+    const post = feed[postId];
+    const comments = post && post.comments ? post.comments : [];
     return post ? (
       <KeyboardAvoidingView
         contentContainerStyle={{ flex: 1 }}
@@ -362,16 +352,10 @@ class PostView extends Component<PostViewProps, State> {
                   comment(profile.uid, postId, text, new Date().toString(), parentCommentId)
                 }
               }}
-              editAction={(text, comment) => {
-                console.log(text)
-              }}
-              reportAction={(comment) => {
-                console.log(comment)
-              }}
-              likeAction={comment => onRepComment(comment)}
-              likesTapAction={(comment) => {
-                return getCommentRepsUsers(comment)
-              }}
+              editAction={(text, comment) => console.log(text)}
+              reportAction={c => console.log(c)}
+              likeAction={c => onRepComment(c)}
+              likesTapAction={c => getCommentRepsUsers(c)}
               paginateAction={
                 post && post.commentCount > commentFetchAmount
                   ? () => {
@@ -410,15 +394,15 @@ class PostView extends Component<PostViewProps, State> {
               <Text style={cStyles.likeHeader}>Users that repped the post</Text>
             </SafeAreaView>
 
-        {likesModalVisible ? (
-          <FlatList
-            initialNumToRender={10}
-            ListFooterComponent={(item) => this.renderRepsFooter()}
-            keyExtractor={item => item.like_id || item.user_id}
-            data={post.repUsers}
-            renderItem={(item) => this.renderRep(item)}
-          />
-        ) : null}
+            {likesModalVisible ? (
+              <FlatList
+                initialNumToRender={10}
+                ListFooterComponent={(item) => this.renderRepsFooter()}
+                keyExtractor={item => item.like_id || item.user_id}
+                data={post.repUsers}
+                renderItem={(item) => this.renderRep(item)}
+              />
+            ) : null}
       </Modal>
       <Modal onRequestClose={()=> null}
         visible={showImage} transparent>
@@ -521,26 +505,31 @@ class PostView extends Component<PostViewProps, State> {
   }
   
 
-    fetchAvatar(uid) {
-      if (this.props.profile.avatar && uid == this.props.profile.uid) {
-        return <TouchableOpacity
-        onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
-        <Image source={{uri: this.props.profile.avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
+  fetchAvatar(uid) {
+    const { profile, friends, users, viewProfile, goToProfile } = this.props;
+    if (profile.avatar && uid === profile.uid) {
+      return (
+        <TouchableOpacity
+          onPress={() => uid !== profile.uid ? viewProfile(uid) : goToProfile()}>
+        <Image source={{ uri: profile.avatar }} style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}/>
         </TouchableOpacity>
-      }
-      else if (this.props.friends[uid] && this.props.friends[uid].avatar) {
-        return <TouchableOpacity
-        onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
-        <Image source={{uri: this.props.friends[uid].avatar}} style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}/>
-        </TouchableOpacity>
-      }
-      else {
-        return <TouchableOpacity
-        onPress={()=> uid != this.props.profile.uid ? this.props.viewProfile(uid) : this.props.goToProfile()}>
-        <Icon name='md-contact'size={45} style={{color: colors.primary, marginRight: 10}}/>
-      </TouchableOpacity>
-      }
+      );
     }
+    if (friends[uid] && friends[uid].avatar) {
+      return (
+        <TouchableOpacity
+        onPress={()=> uid != profile.uid ? viewProfile(uid) : goToProfile()}>
+        <Image source={{uri: friends[uid].avatar}} style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}/>
+        </TouchableOpacity>
+      );
+    }
+    return (
+      <TouchableOpacity
+        onPress={() => uid != profile.uid ? viewProfile(uid) : goToProfile()}>
+        <Icon name='md-contact'size={45} style={{ color: colors.primary, marginRight: 10 }}/>
+      </TouchableOpacity>
+    )
+  }
 }
 
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({

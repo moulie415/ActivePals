@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, RefObject } from 'react';
 import {
   View,
   Alert,
@@ -85,10 +85,10 @@ interface State {
   repsId: string;
   repCount: number;
   showCommentModal: boolean;
-  mentionList: Profile[]
+  mentionList: Profile[];
 }
 export class Home extends Component<HomeProps, State> {
-  players: object;
+  players: { [key: string]: Video };
 
   scrollIndex: number;
 
@@ -265,21 +265,21 @@ export class Home extends Component<HomeProps, State> {
         this.setState({ spinner: false });
       } else if (response.customButton) {
         if (response.customButton === 'uploadVideo') {
-          ImagePicker.launchImageLibrary(videoOptions, response => {
+          ImagePicker.launchImageLibrary(videoOptions, imageResponse => {
             this.setState({ spinner: false });
-            if (response.error) {
-              Alert.alert('Error', response.error);
-            } else if (response.uri) {
-              this.processVideo(response.uri);
+            if (imageResponse.error) {
+              Alert.alert('Error', imageResponse.error);
+            } else if (imageResponse.uri) {
+              this.processVideo(imageResponse.uri);
             }
           });
         } else if (response.customButton === 'video') {
-          ImagePicker.launchCamera(videoOptions, response => {
+          ImagePicker.launchCamera(videoOptions, videoResponse => {
             this.setState({ spinner: false });
-            if (response.error) {
-              Alert.alert('Error', response.error);
-            } else if (response.uri) {
-              this.processVideo(response.uri);
+            if (videoResponse.error) {
+              Alert.alert('Error', videoResponse.error);
+            } else if (videoResponse.uri) {
+              this.processVideo(videoResponse.uri);
             }
           });
         }
@@ -319,8 +319,9 @@ export class Home extends Component<HomeProps, State> {
   }
 
   async sharePost(item) {
+    const { profile } = this.props;
     this.setState({ spinner: true });
-    const { username } = this.props.profile;
+    const { username } = profile;
     const options: Options = {
       message: `${username} shared a post from ActivePals:\n ${item.text ? '"' + item.text + '"' : ''}`,
       title: `Share ${item.type}?`,
@@ -377,6 +378,7 @@ export class Home extends Component<HomeProps, State> {
   }
 
   renderFeedItem(item) {
+    const { playing } = this.state;
     switch (item.type) {
       case PostType.STATUS:
         return (
@@ -445,10 +447,12 @@ export class Home extends Component<HomeProps, State> {
               }}
             >
               <Video
-                ref={ref => (this.players[item.key] = ref)}
+                ref={ref => {
+                  this.players[item.key] = ref;
+                }}
                 source={{ uri: item.url }}
                 style={{ width: '100%', height: 400 }}
-                paused={!this.state.playing[item.key]}
+                paused={!playing[item.key]}
                 ignoreSilentSwitch="ignore"
                 repeat
                 onFullscreenPlayerDidPresent={() => this.setState({ playing: { [item.key]: false } })}
@@ -465,7 +469,7 @@ export class Home extends Component<HomeProps, State> {
                 }}
               />
             </TouchableWithoutFeedback>
-            {!this.state.playing[item.key] && (
+            {!playing[item.key] && (
               <View style={styles.playButtonContainer}>
                 <TouchableOpacity onPress={() => this.setState({ playing: { [item.key]: true } })}>
                   <Icon
@@ -621,6 +625,7 @@ export class Home extends Component<HomeProps, State> {
       getReplies,
       viewProfile,
       getComments,
+      onRepComment,
     } = this.props;
     const { uid, username, unreadCount, avatar } = profile;
     const {
@@ -687,10 +692,10 @@ export class Home extends Component<HomeProps, State> {
             value={status}
             maxLength={280}
             autoCorrect={false}
-            onChangeText={status => {
-              this.setState({ status });
+            onChangeText={input => {
+              this.setState({ status: input });
               const mentionFriends = Object.values(friends);
-              const list = getMentionsList(status, mentionFriends);
+              const list = getMentionsList(input, mentionFriends);
               list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
             }}
             placeholder="Post a status for your pals..."
@@ -913,16 +918,12 @@ export class Home extends Component<HomeProps, State> {
             }}
             saveAction={async (text, parentCommentId) => {
               if (text) {
-                try {
-                  await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
-                } catch (e) {
-                  Alert.alert('Error', e.message);
-                }
+                await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
               }
             }}
             editAction={(text, comment) =>  console.log(text)}
             reportAction={c => console.log(c)}
-            likeAction={c => repComment(c)}
+            likeAction={c => onRepComment(c)}
             likesTapAction={(c: Comment) => {
               this.setState({ likesModalVisible: true, repsId: c.key, repCount: c.repCount });
               getRepsUsers(c.key);
@@ -965,7 +966,7 @@ const mapDispatchToProps = dispatch => ({
   comment: (uid, postId, text, created_at, parentCommentId) =>
     dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key: string, amount?: number, endAt?: string) => dispatch(fetchComments(key, amount, endAt)),
-  repComment: comment => dispatch(repComment(comment)),
+  onRepComment: comment => dispatch(repComment(comment)),
   getPosts: (uid, amount, endAt) => dispatch(fetchPosts(uid, amount, endAt)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepsUsers: (postId: string, limit?: number) => dispatch(fetchRepsUsers(postId, limit)),

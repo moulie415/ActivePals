@@ -17,7 +17,7 @@ export default interface HomeProps {
   previewFile: (type: string, uri: string, message: boolean, text: string) => void;
   comment: (uid, postId, text, created_at, parentCommentId) => void;
   getComments: (key: string, amount?: number, fromComment?: string) => void;
-  repComment: (comment: Comment) => void;
+  onRepComment: (comment: Comment) => void;
   getPosts: (uid: string, amount?: number, endAt?: string) => void;
   getCommentRepsUsers: (comment: Comment, limit?: number) => void;
   getRepsUsers: (postId: string, limit?: number) => void;
