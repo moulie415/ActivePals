@@ -6,7 +6,6 @@ import {
   Alert,
   Modal,
   SafeAreaView,
-  FlatList,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -19,11 +18,9 @@ import RNFetchBlob from 'rn-fetch-blob';
 import Share from 'react-native-share';
 import Video from 'react-native-video';
 import { connect } from 'react-redux';
-import FIcon from 'react-native-vector-icons/FontAwesome';
 import { PulseIndicator } from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import ParsedText from '../components/ParsedText';
-import cStyles from '../components/comments/styles';
 import Text, { globalTextStyle } from '../components/Text';
 import colors from '../constants/colors';
 import Comments from '../components/comments';
@@ -43,7 +40,7 @@ import {
   fetchPost,
   fetchRepsUsers,
 } from '../actions/home';
-import Post from '../types/Post';
+import RepsModal from '../components/RepsModal';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
 
@@ -58,15 +55,25 @@ interface State {
   showImage: boolean;
   playing?: boolean;
   selectedImage?: { url: string }[];
+  focusCommentInput?: boolean;
+  repsId: string;
+  repCount: number;
 }
 class PostView extends Component<PostViewProps, State> {
+  player: Video;
+
+  scrollIndex: number;
+
   constructor(props) {
     super(props);
+    this.scrollIndex = 0;
     this.state = {
       likesModalVisible: false,
       commentFetchAmount: 10,
       userFetchAmount: 10,
       showImage: false,
+      repsId: '',
+      repCount: 0,
     };
   }
 
@@ -107,9 +114,112 @@ class PostView extends Component<PostViewProps, State> {
     header: null,
   };
 
+  async sharePost(item) {
+    const { profile } = this.props;
+    this.setState({ spinner: true });
+    const { username } = profile;
+    const options = {
+      message: `${username} shared a post from ActivePals:\n ${item.text? '"' + item.text + '"' : ''}`,
+      title: `Share ${item.type}?`
+    }
+    if (item.type === 'photo') {
+      try {
+        const resp = await RNFetchBlob.config({ fileCache: false }).fetch('GET', item.url);
+        const base64 = await resp.base64()
+        const dataUrl = `data:image/jpeg;base64,${base64}`;
+        options.url = dataUrl;
+      } catch (e) {
+        Alert.alert('Error', 'There was a problem sharing the photo');
+        this.setState({ spinner: false });
+        return;
+      }
+    }
+    try {
+      await Share.open(options);
+      Alert.alert('Success', 'Post Shared');
+      this.setState({ spinner: false });
+    } catch(e) {
+      this.setState({ spinner: false });
+      console.log(e)
+    }
+  }
+
+  repCommentCount(item) {
+    const { onRepPost, getRepsUsers } = this.props;
+    return (
+      <View style={{ flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999' }}>
+        <View style={{ flex: 1, marginVertical: 10, flexDirection: 'row', alignItems: 'center' }}>
+          {item.type !== 'video' && (
+            <TouchableOpacity
+              onPress={() => this.sharePost(item)}
+              style={{ flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center' }}
+            >
+              <Icon size={25} style={{ color: colors.postIcon }} name="md-share" />
+              {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
+            </TouchableOpacity>
+          )}
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: '#999', textAlign: 'center' }}>
+              {`${item.commentCount || 0} ${item.commentCount === 1 ? ' comment' : ' comments'}`}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => onRepPost(item)}>
+              <SlowImage
+                source={item.rep ? weightUp : weightDown}
+                style={{ width: 25, height: 25, tintColor: item.rep ? colors.secondary : '#616770' }}
+              />
+            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <TouchableOpacity
+                onPress={async () => {
+                  this.setState({ likesModalVisible: true, repsId: item.key, repCount: item.repCount });
+                  await getRepsUsers(item.key);
+                }}
+              >
+                <Text style={{ color: '#999', textAlign: 'center' }}>
+                  {`${item.repCount || 0} ${item.repCount === 1 ? ' rep' : ' reps'}`}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  fetchAvatar(uid) {
+    const { profile, friends, viewProfile, goToProfile } = this.props;
+    if (profile.avatar && uid === profile.uid) {
+      return (
+        <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+          <Image
+            source={{ uri: profile.avatar }}
+            style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
+          />
+        </TouchableOpacity>
+      );
+    }
+    if (friends[uid] && friends[uid].avatar) {
+      return (
+        <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+          <Image
+            source={{ uri: friends[uid].avatar }}
+            style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
+          />
+        </TouchableOpacity>
+      );
+    }
+    return (
+      <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+        <Icon name="md-contact" size={45} style={{ color: colors.primary, marginRight: 10 }} />
+      </TouchableOpacity>
+    );
+  }
+
   renderRepsFooter() {
     const { userFetchAmount } = this.state;
-    const { getRepUsers, navigation, feed } = this.props;
+    const { getRepsUsers, navigation, feed } = this.props;
     const { postId } = navigation.state.params;
     const post = feed[postId];
     if (post && post.repCount > userFetchAmount) {
@@ -118,7 +228,7 @@ class PostView extends Component<PostViewProps, State> {
           style={{ alignItems: 'center' }}
           onPress={() => {
             this.setState({ userFetchAmount: userFetchAmount + 5 }, () => {
-              getRepUsers(postId, userFetchAmount);
+              getRepsUsers(postId, userFetchAmount);
             });
           }}
         >
@@ -127,30 +237,6 @@ class PostView extends Component<PostViewProps, State> {
       );
     }
     return null;
-  }
-
-  renderRep(l) {
-    const { profile, goToProfile, viewProfile } = this.props;
-    const like = l.item;
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          this.setState({ likesModalVisible: false });
-          like.user_id === profile.uid ? goToProfile() : viewProfile(like.user_id);
-        }}
-        style={cStyles.likeButton}
-        key={like.user_id}
-      >
-        <View style={[cStyles.likeContainer]}>
-          {like.image ? (
-            <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
-          ) : (
-            <Icon name="md-contact" size={40} style={{ color: colors.primary }} />
-          )}
-          <Text>{like.username}</Text>
-        </View>
-      </TouchableOpacity>
-    );
   }
 
   renderPost(item) {
@@ -221,7 +307,9 @@ class PostView extends Component<PostViewProps, State> {
                 </View>
               </View>
               <Video
-                ref={(ref) => this.player = ref}
+                ref={ref => {
+                  this.player = ref;
+                }}
                 source={{ uri: item.url }}
                 style={{ width: '100%', height: SCREEN_HEIGHT / 2 - 55 }}
                 paused={!playing}
@@ -290,13 +378,23 @@ class PostView extends Component<PostViewProps, State> {
       getComments,
       getCommentRepsUsers,
       onRepComment,
+      getRepsUsers,
       feed,
     } = this.props;
     const combined = { ...users, ...friends };
-    const { commentFetchAmount, selectedImage, likesModalVisible, showImage } = this.state;
+    const {
+      commentFetchAmount,
+      selectedImage,
+      likesModalVisible,
+      showImage,
+      focusCommentInput,
+      repCount,
+      repsId,
+    } = this.state;
     const { postId } = navigation.state.params;
     const post = feed[postId];
     const comments = post && post.comments ? post.comments : [];
+    const scrollRef = React.createRef<ScrollView>();
     return post ? (
       <KeyboardAvoidingView
         contentContainerStyle={{ flex: 1 }}
@@ -304,7 +402,13 @@ class PostView extends Component<PostViewProps, State> {
         behavior={post && post.type === 'status' ? 'padding' : 'position'}
       >
         <Header hasBack />
-        <ScrollView style={styles.container}>
+        <ScrollView
+          ref={scrollRef}
+          onScroll={event => {
+            this.scrollIndex = event.nativeEvent.contentOffset.y;
+          }}
+          style={styles.container}
+        >
           {post && <View>{this.renderPost(post)}</View>}
           {post && this.repCommentCount(post)}
           {post && (
@@ -312,9 +416,16 @@ class PostView extends Component<PostViewProps, State> {
               data={comments}
               users={Object.values(combined)}
               viewingUserName={profile.username}
-              // initialDisplayCount={10}
-              // editMinuteLimit={900}
-              // childrenPerPage={5}
+              initialDisplayCount={10}
+              editMinuteLimit={900}
+              childrenPerPage={5}
+              focusCommentInput={focusCommentInput}
+              childPropName="children"
+              isChild={c => c.parentCommentId}
+              parentIdExtractor={c => c.key}
+              replyAction={offset => {
+                scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
+              }}
               // lastCommentUpdate={this.state.lastCommentUpdate}
               usernameTapAction={(username, uid) => {
                 if (uid === profile.uid) {
@@ -349,13 +460,16 @@ class PostView extends Component<PostViewProps, State> {
               timestampExtractor={item => new Date(item.created_at).toISOString()}
               saveAction={async (text, parentCommentId) => {
                 if (text) {
-                  comment(profile.uid, postId, text, new Date().toString(), parentCommentId)
+                  comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
                 }
               }}
               editAction={(text, comment) => console.log(text)}
               reportAction={c => console.log(c)}
               likeAction={c => onRepComment(c)}
-              likesTapAction={c => getCommentRepsUsers(c)}
+              likesTapAction={c => {
+                this.setState({ likesModalVisible: true, repsId: c.key, repCount: c.repCount });
+                getRepsUsers(c.key);
+              }}
               paginateAction={
                 post && post.commentCount > commentFetchAmount
                   ? () => {
@@ -368,167 +482,49 @@ class PostView extends Component<PostViewProps, State> {
               getCommentRepsUsers={(key, amount) => getCommentRepsUsers(key, amount)}
             />
           )}
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={likesModalVisible}
-            onRequestClose={() => this.setState({ likesModalVisible: false, userFetchAmount: 10 })}
-          >
-            <TouchableOpacity
-              onPress={() => this.setState({ likesModalVisible: false })}
-              style={{
-                position: 'absolute',
-                width: 100,
-                zIndex: 9,
-                alignSelf: 'flex-end',
-                top: 10,
-              }}
-            >
-              <SafeAreaView>
-                <View style={{ position: 'relative', left: 50, top: 5 }}>
-                  <FIcon name="times" size={40} />
-                </View>
-              </SafeAreaView>
-            </TouchableOpacity>
-            <SafeAreaView>
-              <Text style={cStyles.likeHeader}>Users that repped the post</Text>
-            </SafeAreaView>
-
-            {likesModalVisible ? (
-              <FlatList
-                initialNumToRender={10}
-                ListFooterComponent={(item) => this.renderRepsFooter()}
-                keyExtractor={item => item.like_id || item.user_id}
-                data={post.repUsers}
-                renderItem={(item) => this.renderRep(item)}
-              />
-            ) : null}
-      </Modal>
-      <Modal onRequestClose={()=> null}
-        visible={showImage} transparent>
-      <ImageViewer
-        renderIndicator= {(currentIndex, allSize) => null}
-        loadingRender={()=> <SafeAreaView><Text style={{color: '#fff', fontSize: 20}}>Loading...</Text></SafeAreaView>}
-        renderHeader={()=> {
-          return (<TouchableOpacity style={{position: 'absolute', top: 20, left: 10, padding: 10, zIndex: 9999}}
-            onPress={()=> this.setState({selectedImage: null, showImage: false})}>
-              <View style={{
-                backgroundColor: '#0007',
-                paddingHorizontal: 15,
-                paddingVertical: 2,
-                borderRadius: 10,
-              }}>
-                <Icon size={40} name={'ios-arrow-back'}  style={{color: '#fff'}}/>
-              </View>
-            </TouchableOpacity>)
-        }}
-        imageUrls={selectedImage}
+          <RepsModal
+            onClosed={() => this.setState({ likesModalVisible: false })}
+            isOpen={likesModalVisible}
+            id={repsId}
+            repCount={repCount}
           />
-    </Modal>
-    </ScrollView>
-          </KeyboardAvoidingView>
-          ) : (
-          <View style={sStyles.spinner}><PulseIndicator color={colors.secondary}/></View>
-          )
-  }
-
-  async sharePost(item) {
-    this.setState({ spinner: true })
-      const username = this.props.profile.username
-      const options = {
-        message: `${username} shared a post from ActivePals:\n ${item.text? '"' + item.text + '"' : ''}`,
-        title: `Share ${item.type}?`
-      }
-      if (item.type == 'photo') {
-        try {
-          const resp = await RNFetchBlob.config({ fileCache: false }).fetch('GET', item.url)
-          const base64 = await resp.base64()
-          const dataUrl = `data:image/jpeg;base64,${base64}`
-          options.url = dataUrl
-        } catch(e) {
-          Alert.alert('Error', 'There was a problem sharing the photo')
-          this.setState({ spinner: false })
-          return
-        }
-      }
-      try {
-        await Share.open(options)
-        Alert.alert('Success', 'Post Shared')
-        this.setState({ spinner: false })
-      } catch(e) {
-        this.setState({ spinner: false })
-        console.log(e)
-      }
-  }
-
-  
-  repCommentCount(item) {
-      return (
-      <View style={{flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999'}}>
-        <View style={{flex: 1, marginVertical: 10, flexDirection: 'row', alignItems: 'center'}}>
-        {item.type != 'video' && <TouchableOpacity 
-            onPress={() => this.sharePost(item)}
-            style={{flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
-              <Icon size={25} style={{color: colors.postIcon}} name='md-share'/>
-              {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
-            </TouchableOpacity>}
-          <View style={{flex: 1}}>
-            <Text style={{color: '#999', textAlign: 'center'}}>
-              {`${item.commentCount || 0} ${item.commentCount === 1 ? ' comment' : ' comments'}`}
-            </Text>
-          </View>
-          
-          <View style={{flexDirection: 'row', flex: 1,  alignItems: 'center'}}>
-            <TouchableOpacity
-            onPress={() => {
-              this.props.onRepPost(item)
-            }}
-            >
-            <SlowImage source={item.rep ? weightUp : weightDown}
-            style={{width: 25, height: 25, tintColor: item.rep ? colors.secondary : '#616770'}}/>
-            </TouchableOpacity>
-              <View style={{flex: 1}}>
-                <TouchableOpacity onPress={() => {
-                  this.props.getRepUsers(item.key, this.state.userFetchAmount)
-                  this.setState({likesModalVisible: true})
-                }}>
-                  <Text style={{color: '#999', textAlign: 'center'}}>
-                    {`${item.repCount || 0} ${item.repCount === 1 ? ' rep' : ' reps'}`}
-                  </Text>
-                </TouchableOpacity>
-            </View>
-          </View>
-          </View>
-        </View>
-        )
-
-  }
-  
-
-  fetchAvatar(uid) {
-    const { profile, friends, users, viewProfile, goToProfile } = this.props;
-    if (profile.avatar && uid === profile.uid) {
-      return (
-        <TouchableOpacity
-          onPress={() => uid !== profile.uid ? viewProfile(uid) : goToProfile()}>
-        <Image source={{ uri: profile.avatar }} style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}/>
-        </TouchableOpacity>
-      );
-    }
-    if (friends[uid] && friends[uid].avatar) {
-      return (
-        <TouchableOpacity
-        onPress={()=> uid != profile.uid ? viewProfile(uid) : goToProfile()}>
-        <Image source={{uri: friends[uid].avatar}} style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}/>
-        </TouchableOpacity>
-      );
-    }
-    return (
-      <TouchableOpacity
-        onPress={() => uid != profile.uid ? viewProfile(uid) : goToProfile()}>
-        <Icon name='md-contact'size={45} style={{ color: colors.primary, marginRight: 10 }}/>
-      </TouchableOpacity>
-    )
+          <Modal onRequestClose={() => null} visible={showImage} transparent>
+            <ImageViewer
+              renderIndicator={(currentIndex, allSize) => null}
+              loadingRender={() => (
+                <SafeAreaView>
+                  <Text style={{ color: '#fff', fontSize: 20 }}>Loading...</Text>
+                </SafeAreaView>
+              )}
+              renderHeader={() => {
+                return (
+                  <TouchableOpacity
+                    style={{ position: 'absolute', top: 20, left: 10, padding: 10, zIndex: 9999 }}
+                    onPress={() => this.setState({ selectedImage: null, showImage: false })}
+                  >
+                    <View
+                      style={{
+                        backgroundColor: '#0007',
+                        paddingHorizontal: 15,
+                        paddingVertical: 2,
+                        borderRadius: 10,
+                      }}
+                    >
+                      <Icon size={40} name="ios-arrow-back" style={{ color: '#fff' }} />
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
+              imageUrls={selectedImage}
+            />
+          </Modal>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    ) : (
+      <View style={sStyles.spinner}>
+        <PulseIndicator color={colors.secondary} />
+      </View>
+    );
   }
 }
 
@@ -537,20 +533,21 @@ const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   feed: home.feed,
   friends: friends.friends,
   users: sharedInfo.users,
-})
+});
 
 const mapDispatchToProps = dispatch => ({
   goToProfile: () => dispatch(navigateProfile()),
-  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
-  onRepPost: (item) => dispatch(repPost(item)),
-  comment: (uid, postId, text, created_at, parentCommentId) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
-  onRepComment: (comment) => dispatch(repComment(comment)),
+  viewProfile: uid => dispatch(navigateProfileView(uid)),
+  onRepPost: item => dispatch(repPost(item)),
+  comment: (uid, postId, text, created_at, parentCommentId) =>
+    dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
+  onRepComment: comment => dispatch(repComment(comment)),
   goBack: () => dispatch(navigateBack()),
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
-  getPost: (key) => dispatch(fetchPost(key)),
-  getRepUsers: (postId, limit) => dispatch(fetchRepsUsers(postId, limit)),
+  getPost: key => dispatch(fetchPost(key)),
+  getRepsUsers: (postId, limit) => dispatch(fetchRepsUsers(postId, limit)),
   fullScreenVideo: url => dispatch(navigateFullScreenVideo(url)),
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostView);

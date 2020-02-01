@@ -12,7 +12,7 @@ export default interface PostViewProps {
   viewProfile: (uid: string) => void;
   onRepPost: (item: Post) => void;
   goToProfile: () => void;
-  getRepUsers: (postId: string, limit: number) => void;
+  getRepsUsers: (postId: string, limit?: number) => void;
   getPost: (key: string) => void;
   getComments: (key: string, amount?: number) => void;
   comment: (uid: string, postId: string, text: string, created_at: string, parentCommentId: string) => void;

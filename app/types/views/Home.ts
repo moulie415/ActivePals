@@ -24,6 +24,6 @@ export default interface HomeProps {
   onNotificationPress: () => void;
   getProfile: () => void;
   getFriends: () => void;
-  navigateFullScreenVideo: (uri: string) => void;
+  goToVideo: (uri: string) => void;
   getReplies: (parentComment: Comment, amount: number, key: string) => void;
 }

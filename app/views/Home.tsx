@@ -159,6 +159,7 @@ export class Home extends Component<HomeProps, State> {
   };
 
   repCommentCount(item) {
+    const { getRepsUsers, getComments } = this.props;
     if ((item.repCount && item.repCount > 0) || (item.commentCount && item.commentCount > 0)) {
       return (
         <View>
@@ -169,7 +170,7 @@ export class Home extends Component<HomeProps, State> {
                 style={{ flex: 1 }}
                 onPress={async () => {
                   this.setState({ likesModalVisible: true, repsId: item.key, repCount: item.repCount });
-                  await this.props.getRepsUsers(item.key);
+                  await getRepsUsers(item.key);
                 }}
               >
                 <Text style={{ color: '#999' }}>{`${item.repCount} ${item.repCount > 1 ? ' reps' : ' rep'}`}</Text>
@@ -180,7 +181,7 @@ export class Home extends Component<HomeProps, State> {
                 style={{ alignSelf: 'flex-end', flex: 1 }}
                 onPress={() => {
                   this.setState({ postId: item.key, showCommentModal: true });
-                  this.props.getComments(item.key);
+                  getComments(item.key);
                 }}
               >
                 <Text style={{ color: '#999', textAlign: 'right' }}>
@@ -253,7 +254,7 @@ export class Home extends Component<HomeProps, State> {
         skipBackup: true,
       },
     };
-    ImagePicker.showImagePicker(options, response => {
+    ImagePicker.showImagePicker(options, async response => {
       this.setState({ spinner: true });
       console.log('Response = ', response);
 
@@ -284,21 +285,19 @@ export class Home extends Component<HomeProps, State> {
           });
         }
       } else {
+        const { previewFile } = this.props;
+        const { status } = this.state;
         const size = 720;
-        ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100)
-          .then(resized => {
-            this.setState({ spinner: false });
-            this.props.previewFile('image', resized.uri, false, this.state.status);
-          })
-          .catch(e => {
-            Alert.alert('Error', e.message);
-            this.setState({ spinner: false });
-          });
+        const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100)
+        this.setState({ spinner: false });
+        previewFile('image', resized.uri, false, status);
       }
     });
   }
 
   processVideo(uri) {
+    const { previewFile } = this.props;
+    const { status } = this.state;
     const statURI = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
     // if (Platform.OS ==='ios') {
     // TODO android needs compressing
@@ -307,7 +306,7 @@ export class Home extends Component<HomeProps, State> {
       .then(stats => {
         console.log(stats);
         if (parseInt(stats.size) < MAX_VIDEO_SIZE) {
-          this.props.previewFile('video', uri, false, this.state.status);
+          previewFile('video', uri, false, status);
         } else {
           Alert.alert('Error', 'Sorry the file size is too large');
         }
@@ -379,6 +378,7 @@ export class Home extends Component<HomeProps, State> {
 
   renderFeedItem(item) {
     const { playing } = this.state;
+    const { goToVideo } = this.props;
     switch (item.type) {
       case PostType.STATUS:
         return (
@@ -494,7 +494,7 @@ export class Home extends Component<HomeProps, State> {
                     if (Platform.OS === 'ios') {
                       this.players[item.key].presentFullscreenPlayer();
                     } else {
-                      this.props.navigateFullScreenVideo(item.url);
+                      goToVideo(item.url);
                     }
                   }}
                 >
@@ -516,30 +516,6 @@ export class Home extends Component<HomeProps, State> {
       default:
         return null;
     }
-  }
-
-  renderRep(l) {
-    const { profile, goToProfile, viewProfile } = this.props;
-    const like = l.item;
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          this.setState({ likesModalVisible: false });
-          like.user_id === profile.uid ? goToProfile() : viewProfile(like.user_id);
-        }}
-        style={cStyles.likeButton}
-        key={like.user_id}
-      >
-        <View style={[cStyles.likeContainer]}>
-          {like.image ? (
-            <Image style={[cStyles.likeImage]} source={{ uri: like.image }} />
-          ) : (
-            <Icon name="md-contact" style={{ fontSize: 40, color: colors.primary }} />
-          )}
-          <Text>{like.username}</Text>
-        </View>
-      </TouchableOpacity>
-    );
   }
 
   renderFeed() {
@@ -973,7 +949,7 @@ const mapDispatchToProps = dispatch => ({
   onNotificationPress: () => dispatch(navigateNotifications()),
   getProfile: () => dispatch(fetchProfile()),
   getFriends: (uid, limit?, endAt?) => dispatch(fetchFriends(uid, limit, endAt)),
-  navigateFullScreenVideo: uri => dispatch(navigateFullScreenVideo(uri)),
+  goToVideo: uri => dispatch(navigateFullScreenVideo(uri)),
   getReplies: (fromCommentId: Comment, limit: number, endAt?: string) =>
     dispatch(fetchReplies(fromCommentId, limit, endAt)),
 });

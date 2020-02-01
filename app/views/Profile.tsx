@@ -7,6 +7,7 @@ import DatePicker from 'react-native-datepicker';
 import ImagePicker from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNPickerSelect from 'react-native-picker-select';
+import { PulseIndicator } from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import { connect } from 'react-redux';
 import Text, { globalTextStyle } from '../components/Text';
@@ -14,7 +15,6 @@ import styles from '../styles/profileStyles';
 import hStyles from '../styles/homeStyles';
 import colors from '../constants/colors';
 import Header from '../components/Header/header';
-import { PulseIndicator } from 'react-native-indicators';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
 import { navigateLogin, navigateSettings } from '../actions/navigation';
@@ -23,51 +23,61 @@ import { navigateGym } from '../actions/navigation';
 import { pickerItems } from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
+import ImagePickerOptions from '../types/Shared';
+import Profile from '../types/Profile';
 
 const activities = ['Bodybuilding', 'Powerlifting', 'Swimming', 'Cycling', 'Running', 'Sprinting'];
 const levels = ['Beginner', 'Intermediate', 'Advanced'];
 
 interface State {
   spinner: boolean;
+  email: string;
+  profile: Profile;
+  initialProfile: Profile;
+  initialAvatar: string;
+  avatar: string;
+  backdrop?: string;
+  initialBackdrop?: string;
 }
-class Profile extends Component<ProfileProps, State> {
+class ProfileView extends Component<ProfileProps, State> {
   constructor(props) {
     super(props);
-    this.profile = this.props.profile;
-
-    firebase
-      .storage()
-      .ref('images/' + this.profile.uid)
-      .child('backdrop')
-      .getDownloadURL()
-      .then(backdrop => this.setState({ backdrop, initialBackdrop: backdrop }))
-      .catch(e => console.log(e));
-
-    this.user = null;
+    const { profile } = this.props;
     this.state = {
-      email: this.profile.email,
-      profile: this.profile,
-      initialProfile: this.profile,
+      email: profile.email,
+      profile,
+      initialProfile: profile,
       spinner: false,
-      initialAvatar: this.profile.avatar,
-      avatar: this.profile.avatar,
+      initialAvatar: profile.avatar,
+      avatar: profile.avatar,
     };
   }
 
-  componentDidMount() {
-    this.listenForUserChanges(firebase.database().ref('users/' + this.profile.uid));
+  async componentDidMount() {
+    const { profile } = this.props;
+    try {
+      const backdrop = await firebase
+        .storage()
+        .ref(`images/${profile.uid}`)
+        .child('backdrop')
+        .getDownloadURL();
+      this.setState({ backdrop, initialBackdrop: backdrop });
+    } catch (e) {
+      console.log(e);
+    }
+    this.listenForUserChanges(firebase.database().ref(`users/${profile.uid}`));
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.profile) {
-      let profile = nextProps.profile;
+      const { profile } = nextProps;
       this.setState({ profile, initialProfile: profile, initialAvatar: profile.avatar });
     }
   }
 
   listenForUserChanges(ref) {
     ref.on('value', snapshot => {
-      let profile = snapshot.val();
+      const profile = snapshot.val();
       this.setState({ initialProfile: profile });
       this.setState({ profile });
     });
@@ -80,6 +90,7 @@ class Profile extends Component<ProfileProps, State> {
   };
 
   logout() {
+    const { profile, onLogoutPress } = this.props;
     Alert.alert('Log out', 'Are you sure?', [
       { text: 'Cancel', onPress: () => console.log('Cancel logout'), style: 'cancel' },
       {
@@ -89,24 +100,24 @@ class Profile extends Component<ProfileProps, State> {
             this.setState({ spinner: true });
             await firebase
               .database()
-              .ref('users/' + this.props.profile.uid)
+              .ref(`users/${profile.uid}`)
               .child('state')
               .remove();
             await firebase.messaging().deleteToken();
             await firebase.auth().signOut();
             this.setState({ spinner: false });
-            this.props.onLogoutPress();
+            onLogoutPress();
           } catch (e) {
-            Alert('Error', e.message);
-            this.props.onLogoutPress();
+            Alert.alert('Error', e.message);
+            onLogoutPress();
           }
         },
       },
     ]);
   }
 
-  selectAvatar(backdrop = false) {
-    var options = {
+  async selectAvatar(backdrop = false) {
+    const options: ImagePickerOptions = {
       title: backdrop ? 'Select Backdrop' : 'Select Avatar',
       mediaType: 'photo',
       noData: true,
@@ -116,7 +127,7 @@ class Profile extends Component<ProfileProps, State> {
       },
     };
     this.setState({ spinner: true });
-    ImagePicker.showImagePicker(options, response => {
+    ImagePicker.showImagePicker(options, async response => {
       console.log('Response = ', response);
 
       if (response.didCancel) {
@@ -129,32 +140,28 @@ class Profile extends Component<ProfileProps, State> {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({ spinner: false });
       } else {
-        let source = { uri: response.uri };
+        const source = { uri: response.uri };
 
         const size = 640;
         // You can also display the image using data:
         // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-        ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100)
-          .then(resized => {
-            // response.uri is the URI of the new image that can now be displayed, uploaded...
-            // response.path is the path of the new image
-            // response.name is the name of the new image with the extension
-            // response.size is the size of the new image
-            this.setState(backdrop ? { backdrop: resized.uri } : { avatar: resized.uri });
-            this.setState({ spinner: false });
-          })
-          .catch(e => {
-            Alert.alert('Error', e.message);
-          });
+        const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100)
+        // response.uri is the URI of the new image that can now be displayed, uploaded...
+        // response.path is the path of the new image
+        // response.name is the name of the new image with the extension
+        // response.size is the size of the new image
+        this.setState(backdrop ? { backdrop: resized.uri } : { avatar: resized.uri });
+        this.setState({ spinner: false });
       }
     });
   }
 
   uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
+    const { profile } = this.props;
     return new Promise((resolve, reject) => {
       const imageRef = firebase
         .storage()
-        .ref('images/' + this.profile.uid)
+        .ref(`images/${profile.uid}`)
         .child(backdrop ? 'backdrop' : 'avatar');
       return imageRef
         .putFile(uri, { contentType: mime })
@@ -171,13 +178,14 @@ class Profile extends Component<ProfileProps, State> {
   }
 
   async checkImages() {
+    const { initialAvatar, avatar, backdrop, initialBackdrop } = this.state;
     try {
-      if (this.state.initialAvatar != this.state.avatar) {
-        const url = await this.uploadImage(this.state.avatar);
+      if (initialAvatar !== avatar) {
+        const url = await this.uploadImage(avatar);
         this.setState({ initialAvatar: url, avatar: url });
       }
-      if (this.state.initialBackdrop != this.state.backdrop) {
-        const url = await this.uploadImage(this.state.backdrop, true);
+      if (initialBackdrop !== backdrop) {
+        const url = await this.uploadImage(backdrop, true);
         this.setState({ initialBackdrop: url, backdrop: url });
       }
     } catch (e) {
@@ -186,57 +194,59 @@ class Profile extends Component<ProfileProps, State> {
   }
 
   hasChanged() {
+    const { initialProfile, initialAvatar, avatar, profile, backdrop, initialBackdrop } = this.state;
     return !(
-      JSON.stringify(this.state.initialProfile) === JSON.stringify(this.state.profile) &&
-      this.state.initialAvatar == this.state.avatar &&
-      this.state.backdrop == this.state.initialBackdrop
+      JSON.stringify(initialProfile) === JSON.stringify(profile) &&
+      initialAvatar === avatar &&
+      backdrop === initialBackdrop
     );
   }
 
-  async updateUser(initial, profile) {
+  async updateUser(initial: Profile, newProfile: Profile) {
+    const { onSave, profile } = this.props;
     if (!this.hasChanged()) {
       Alert.alert('No changes');
+    } else if (
+      !newProfile.username ||
+      newProfile.username.length < 5 ||
+      str.whiteSpaceRegex.test(newProfile.username)
+    ) {
+      Alert.alert('Sorry', 'Username must be at least 5 characters long and cannot contain any spaces');
     } else {
-      if (!profile.username || profile.username.length < 5 || str.whiteSpaceRegex.test(profile.username)) {
-        Alert.alert('Sorry', 'Username must be at least 5 characters long and cannot contain any spaces');
-      } else {
-        this.setState({ spinner: true });
-        await this.checkImages();
-        delete profile.avatar;
-        firebase
+      this.setState({ spinner: true });
+      await this.checkImages();
+      delete newProfile.avatar;
+      try {
+        await firebase
           .database()
-          .ref('users/' + this.profile.uid)
-          .set({ ...profile })
-          .then(() => {
-            initial.username &&
-              firebase
-                .database()
-                .ref('usernames')
-                .child(initial.username)
-                .remove();
-            firebase
-              .database()
-              .ref('usernames')
-              .child(profile.username)
-              .set(profile.uid)
-              .then(() => {
-                Alert.alert('Success', 'Profile saved');
-                /*we need to make sure the username is saved locally 
-          which is why this calls fetchProfile which saves the username*/
-                this.props.onSave();
-                this.setState({ spinner: false });
-              });
-          })
-          .catch(e => {
-            Alert.alert('Error', 'That username may have already been taken');
-            this.setState({ spinner: false });
-          });
+          .ref(`users/${profile.uid}`)
+          .set({ ...newProfile });
+        initial.username &&
+          (await firebase
+            .database()
+            .ref('usernames')
+            .child(initial.username)
+            .remove());
+        await firebase
+          .database()
+          .ref('usernames')
+          .child(profile.username)
+          .set(profile.uid);
+        Alert.alert('Success', 'Profile saved');
+        /* we need to make sure the username is saved locally 
+        which is why this calls fetchProfile which saves the username */
+        onSave();
+        this.setState({ spinner: false });
+      } catch (e) {
+        Alert.alert('Error', 'That username may have already been taken');
+        this.setState({ spinner: false });
       }
     }
   }
 
   render() {
-    const { gym } = this.props;
+    const { gym, goToGym, goToSettings } = this.props;
+    const { initialAvatar, initialProfile, initialBackdrop, backdrop, email, profile, avatar, spinner } = this.state;
     return (
       <>
         <Header
@@ -246,9 +256,9 @@ class Profile extends Component<ProfileProps, State> {
                 style={{ position: 'absolute', top: 8, bottom: 0, left: 0, justifyContent: 'center', paddingLeft: 10 }}
                 onPress={() => {
                   this.setState({
-                    profile: this.state.initialProfile,
-                    avatar: this.state.initialAvatar,
-                    backdrop: this.state.initialBackdrop,
+                    profile: initialProfile,
+                    avatar: initialAvatar,
+                    backdrop: initialBackdrop,
                   });
                 }}
               >
@@ -256,12 +266,12 @@ class Profile extends Component<ProfileProps, State> {
               </TouchableOpacity>
             )
           }
-          title={'Profile'}
+          title="Profile"
           right={
             this.hasChanged() && (
               <TouchableOpacity
                 onPress={() => {
-                  this.updateUser(this.state.initialProfile, this.state.profile);
+                  this.updateUser(initialProfile, profile);
                 }}
                 style={{ backgroundColor: 'transparent', elevation: 0 }}
               >
@@ -273,8 +283,8 @@ class Profile extends Component<ProfileProps, State> {
         <ScrollView>
           <View style={{ alignItems: 'center', marginBottom: 10 }}>
             <TouchableOpacity style={{ width: '100%' }} onPress={() => this.selectAvatar(true)}>
-              {this.state.backdrop ? (
-                <Image style={{ height: 150 }} resizeMode="cover" source={{ uri: this.state.backdrop }} />
+              {backdrop ? (
+                <Image style={{ height: 150 }} resizeMode="cover" source={{ uri: backdrop }} />
               ) : (
                 <View style={{ height: 150, backgroundColor: colors.primaryLighter, justifyContent: 'center' }}>
                   <Icon name="ios-add" size={25} style={{ color: '#fff', textAlign: 'center' }} />
@@ -283,9 +293,9 @@ class Profile extends Component<ProfileProps, State> {
             </TouchableOpacity>
 
             <TouchableOpacity style={[{ marginTop: -45 }, globalStyles.shadow]} onPress={() => this.selectAvatar()}>
-              {this.state.avatar ? (
+              {avatar ? (
                 <Image
-                  source={{ uri: this.state.avatar }}
+                  source={{ uri: avatar }}
                   style={{ width: 90, height: 90, alignSelf: 'center', borderWidth: 0.5, borderColor: '#fff' }}
                 />
               ) : (
@@ -307,14 +317,14 @@ class Profile extends Component<ProfileProps, State> {
           <View style={{ flex: 1, marginRight: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
             <View style={{ width: '60%' }}>
               <Text style={{ color: '#999', marginHorizontal: 20 }}>
-                Email: <Text style={{ color: colors.secondary }}>{this.state.email}</Text>
+                Email: <Text style={{ color: colors.secondary }}>{email}</Text>
               </Text>
               <Text style={{ color: '#999', marginHorizontal: 20, marginBottom: gym ? 0 : 10 }}>
                 Account type:{' '}
-                <Text style={{ color: colors.secondary }}>{this.state.profile && this.state.profile.accountType}</Text>
+                <Text style={{ color: colors.secondary }}>{profile && profile.accountType}</Text>
               </Text>
               {gym && (
-                <TouchableOpacity onPress={() => this.props.goToGym(gym.place_id)}>
+                <TouchableOpacity onPress={() => goToGym(gym.place_id)}>
                   <Text style={{ color: '#999', marginHorizontal: 20, marginBottom: 10 }}>
                     {'Gym: '}
                     <Text style={{ color: colors.secondary }}>{gym.name}</Text>
@@ -325,7 +335,7 @@ class Profile extends Component<ProfileProps, State> {
             <View style={{ flex: 1, marginRight: 20 }}>
               <TouchableOpacity
                 style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}
-                onPress={() => this.props.goToSettings()}
+                onPress={() => goToSettings()}
               >
                 <Text style={{ color: colors.secondary, marginRight: 10 }}>Settings</Text>
                 <Icon size={25} name="md-settings" style={{ color: colors.secondary }} />
@@ -335,33 +345,33 @@ class Profile extends Component<ProfileProps, State> {
           <View style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>Username: </Text>
             <TextInput
-              value={this.state.profile && this.state.profile.username}
-              onChangeText={username => this.setState({ profile: { ...this.state.profile, username } })}
+              value={profile && profile.username}
+              onChangeText={username => this.setState({ profile: { ...profile, username } })}
               placeholderTextColor="#fff"
               style={styles.input}
-              autoCapitalize={'none'}
+              autoCapitalize="none"
               autoCorrect={false}
             />
           </View>
           <View style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>First name: </Text>
             <TextInput
-              value={this.state.profile && this.state.profile.first_name}
-              onChangeText={name => this.setState({ profile: { ...this.state.profile, first_name: name } })}
+              value={profile && profile.first_name}
+              onChangeText={name => this.setState({ profile: { ...profile, first_name: name } })}
               placeholderTextColor="#fff"
               style={styles.input}
-              autoCapitalize={'none'}
+              autoCapitalize="none"
               autoCorrect={false}
             />
           </View>
           <View style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>Last name: </Text>
             <TextInput
-              value={this.state.profile && this.state.profile.last_name}
-              onChangeText={name => this.setState({ profile: { ...this.state.profile, last_name: name } })}
+              value={profile && profile.last_name}
+              onChangeText={name => this.setState({ profile: { ...profile, last_name: name } })}
               placeholderTextColor="#fff"
               style={styles.input}
-              autoCapitalize={'none'}
+              autoCapitalize="none"
               autoCorrect={false}
             />
           </View>
@@ -392,14 +402,14 @@ class Profile extends Component<ProfileProps, State> {
               }}
               onValueChange={value => {
                 this.setState({
-                  profile: { ...this.state.profile, activity: value },
+                  profile: { ...profile, activity: value },
                 });
               }}
-              //style={{ ...pickerSelectStyles }}
-              value={this.state.profile ? this.state.profile.activity : null}
+              // style={{ ...pickerSelectStyles }}
+              value={profile ? profile.activity : null}
             />
           </View>
-          {this.state.profile && this.state.profile.activity && (
+          {profile && profile.activity && (
             <View style={styles.inputGrp}>
               <Text style={{ alignSelf: 'center' }}>Level: </Text>
               <RNPickerSelect
@@ -426,23 +436,23 @@ class Profile extends Component<ProfileProps, State> {
                 }}
                 onValueChange={value => {
                   this.setState({
-                    profile: { ...this.state.profile, level: value },
+                    profile: { ...profile, level: value },
                   });
                 }}
-                //style={{ ...pickerSelectStyles }}
-                value={this.state.profile.level}
+                // style={{ ...pickerSelectStyles }}
+                value={profile.level}
               />
             </View>
           )}
           <View style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>Birthday: </Text>
             <DatePicker
-              date={moment(this.state.profile && this.state.profile.birthday)}
-              placeholder={(this.state.profile && this.state.profile.birthday) || 'None'}
+              date={moment(profile && profile.birthday).format('YYYY-MM-DD')}
+              placeholder={(profile && profile.birthday) || 'None'}
               maxDate={new Date()}
-              confirmBtnText={'Confirm'}
-              androidMode={'spinner'}
-              cancelBtnText={'Cancel'}
+              confirmBtnText="Confirm"
+              androidMode="spinner"
+              cancelBtnText="Cancel"
               customStyles={{
                 dateText: {
                   color: '#fff',
@@ -456,12 +466,12 @@ class Profile extends Component<ProfileProps, State> {
                   borderWidth: 0,
                 },
               }}
-              onDateChange={date => this.setState({ profile: { ...this.state.profile, birthday: date } })}
+              onDateChange={date => this.setState({ profile: { ...profile, birthday: date } })}
             />
           </View>
 
           <Button style={styles.logout} text="Log out" onPress={() => this.logout()} />
-          {this.state.spinner && (
+          {spinner && (
             <View style={hStyles.spinner}>
               <PulseIndicator color={colors.secondary} />
             </View>
@@ -470,7 +480,6 @@ class Profile extends Component<ProfileProps, State> {
       </>
     );
   }
-  
 }
 
 const mapStateToProps = ({ profile }) => ({
@@ -488,4 +497,4 @@ const mapDispatchToProps = dispatch => ({
   goToGym: gym => dispatch(navigateGym(gym)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+export default connect(mapStateToProps, mapDispatchToProps)(ProfileView);

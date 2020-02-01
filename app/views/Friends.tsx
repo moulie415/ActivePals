@@ -22,13 +22,17 @@ import {
   updateFriendState,
 } from '../actions/friends';
 import { removeChat, addChat } from '../actions/chats';
+import FriendsProps from '../types/views/Friends';
+import Profile from '../types/Profile';
 
-class Friends extends Component {
+interface State {
+  refreshing: boolean;
+  friends: Profile[];
+}
+class Friends extends Component<FriendsProps, State> {
   constructor(props) {
     super(props);
-    this.nav = this.props.navigation
     this.uid = this.props.profile.uid
-    this.user = null
     this.state = {
       friends: Object.values(this.props.friends),
       refreshing: false,
@@ -49,13 +53,22 @@ class Friends extends Component {
     }
   }
 
+  async remove(friend) {
+    try {
+      await this.props.onRemove(friend);
+      this.refs.modal.close();
+    } catch (e) {
+      Alert.alert('Error', e.message);
+    }
+  }
+
   renderFriends() {
     return (
       <FlatList
         style={{ backgroundColor: colors.bgColor }}
         data={sortByState(Object.values(this.props.friends))}
         keyExtractor={friend => friend.uid}
-        onRefresh={()=> this.refresh()}
+        onRefresh={() => this.refresh()}
         refreshing={this.state.refreshing}
         renderItem={({ item }) => {
           if (item.status === 'outgoing') {
@@ -193,15 +206,6 @@ class Friends extends Component {
           </ScrollView>
       </>
     )
-  }
-
-  async remove(friend) {
-    try {
-      await this.props.onRemove(friend);
-      this.refs.modal.close();
-    } catch (e) {
-      Alert.alert('Error', e.message);
-    }
   }
 
   async sendRequest(username) {
