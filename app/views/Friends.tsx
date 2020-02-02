@@ -56,7 +56,7 @@ class Friends extends Component<FriendsProps, State> {
     const { onRemove } = this.props;
     try {
       await onRemove(friend);
-      this.refs.modal.close();
+      this.setState({ modalOpen: false });
     } catch (e) {
       Alert.alert('Error', e.message);
     }

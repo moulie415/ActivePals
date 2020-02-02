@@ -141,7 +141,7 @@ class PostView extends Component<PostViewProps, State> {
       this.setState({ spinner: false });
     } catch(e) {
       this.setState({ spinner: false });
-      console.log(e)
+      console.log(e);
     }
   }
 
@@ -435,7 +435,6 @@ class PostView extends Component<PostViewProps, State> {
                   viewProfile(uid);
                 }
               }}
-              // childPropName={'children'}
               keyExtractor={item => item.comment_id}
               usernameExtractor={item => {
                 if (item.uid === profile.uid) {
@@ -455,7 +454,7 @@ class PostView extends Component<PostViewProps, State> {
               }}
               likeExtractor={item => item.rep}
               reportedExtractor={item => item.reported}
-              likesExtractor={item => likesExtractor(item, profile.uid, viewProfile, goToProfile )}
+              likesExtractor={item => likesExtractor(item, profile.uid, viewProfile, goToProfile)}
               likeCountExtractor={item => item.repCount}
               childrenCountExtractor={item => item.childrenCount}
               timestampExtractor={item => new Date(item.created_at).toISOString()}
