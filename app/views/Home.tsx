@@ -1,4 +1,4 @@
-import React, { Component, RefObject } from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Alert,
@@ -23,13 +23,12 @@ import { PulseIndicator } from 'react-native-indicators';
 import firebase from 'react-native-firebase';
 import Video from 'react-native-video';
 import Share, { Options } from 'react-native-share';
-import RNFetchBlob, { RNFetchBlobStat } from 'rn-fetch-blob';
+import RNFetchBlob from 'rn-fetch-blob';
 import Image from 'react-native-fast-image';
 import Card from '../components/Card';
 import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
 import sStyles from '../styles/settingsStyles';
-import cStyles from '../components/comments/styles';
 import Text, { globalTextStyle } from '../components/Text';
 import Comments from '../components/comments';
 import Header from '../components/Header/header';
@@ -288,7 +287,7 @@ export class Home extends Component<HomeProps, State> {
         const { previewFile } = this.props;
         const { status } = this.state;
         const size = 720;
-        const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100)
+        const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100);
         this.setState({ spinner: false });
         previewFile('image', resized.uri, false, status);
       }
@@ -305,7 +304,7 @@ export class Home extends Component<HomeProps, State> {
       .stat(statURI)
       .then(stats => {
         console.log(stats);
-        if (parseInt(stats.size) < MAX_VIDEO_SIZE) {
+        if (Number(stats.size) < MAX_VIDEO_SIZE) {
           previewFile('video', uri, false, status);
         } else {
           Alert.alert('Error', 'Sorry the file size is too large');
@@ -321,8 +320,9 @@ export class Home extends Component<HomeProps, State> {
     const { profile } = this.props;
     this.setState({ spinner: true });
     const { username } = profile;
+    const text = item.text ? `"${item.text}"` : '';
     const options: Options = {
-      message: `${username} shared a post from ActivePals:\n ${item.text ? '"' + item.text + '"' : ''}`,
+      message: `${username} shared a post from ActivePals:\n ${text}`,
       title: `Share ${item.type}?`,
     };
     if (item.type === 'photo') {
@@ -897,7 +897,7 @@ export class Home extends Component<HomeProps, State> {
                 await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
               }
             }}
-            editAction={(text, comment) =>  console.log(text)}
+            editAction={(text, comment) => console.log(text)}
             reportAction={c => console.log(c)}
             likeAction={c => onRepComment(c)}
             likesTapAction={(c: Comment) => {

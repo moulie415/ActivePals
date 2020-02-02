@@ -15,6 +15,8 @@ export default interface Profile {
   chats?: { [key: string]: string };
   activity?: string;
   level?: string;
+  state?: UserState;
+  status?: string;
 }
 
 export enum AccountType {

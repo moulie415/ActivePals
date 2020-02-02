@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
-import Share from 'react-native-share';
+import Share, { Options } from 'react-native-share';
 import Video from 'react-native-video';
 import { connect } from 'react-redux';
 import { PulseIndicator } from 'react-native-indicators';
@@ -118,10 +118,11 @@ class PostView extends Component<PostViewProps, State> {
     const { profile } = this.props;
     this.setState({ spinner: true });
     const { username } = profile;
-    const options = {
-      message: `${username} shared a post from ActivePals:\n ${item.text? '"' + item.text + '"' : ''}`,
-      title: `Share ${item.type}?`
-    }
+    const text = item.text ? `"${item.text}"` : '';
+    const options: Options = {
+      message: `${username} shared a post from ActivePals:\n ${text}`,
+      title: `Share ${item.type}?`,
+    };
     if (item.type === 'photo') {
       try {
         const resp = await RNFetchBlob.config({ fileCache: false }).fetch('GET', item.url);

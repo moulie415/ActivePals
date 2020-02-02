@@ -23,18 +23,16 @@ import {
 } from '../actions/friends';
 import { removeChat, addChat } from '../actions/chats';
 import FriendsProps from '../types/views/Friends';
-import Profile from '../types/Profile';
 
 interface State {
   refreshing: boolean;
-  friends: Profile[];
+  modalOpen?: boolean;
+  username?: string;
 }
 class Friends extends Component<FriendsProps, State> {
   constructor(props) {
     super(props);
-    this.uid = this.props.profile.uid
     this.state = {
-      friends: Object.values(this.props.friends),
       refreshing: false,
     };
   }
@@ -46,47 +44,97 @@ class Friends extends Component<FriendsProps, State> {
   };
 
   async refresh() {
-    if (this.props.profile.friends) {
+    const { profile, getFriends } = this.props;
+    if (profile.friends) {
       this.setState({ refreshing: true });
-      await this.props.getFriends(this.props.profile.friends);
+      await getFriends(profile.uid);
       this.setState({ refreshing: false });
     }
   }
 
   async remove(friend) {
+    const { onRemove } = this.props;
     try {
-      await this.props.onRemove(friend);
+      await onRemove(friend);
       this.refs.modal.close();
     } catch (e) {
       Alert.alert('Error', e.message);
     }
   }
 
+  async sendRequest(username) {
+    const { profile, onRequest } = this.props;
+    if (username !== profile.username) {
+      try {
+        const snapshot = await firebase
+          .database()
+          .ref(`usernames/${username}`)
+          .once('value');
+        if (snapshot.val()) {
+          const status = await firebase
+            .database()
+            .ref(`userFriends/${profile.uid}`)
+            .child(snapshot.val())
+            .once('value');
+          if (status.val()) {
+            Alert.alert('Sorry', "You've already added this user as a pal");
+          } else {
+            await onRequest(snapshot.val());
+            Alert.alert('Success', 'Request sent');
+            this.setState({ modalOpen: false });
+          }
+        } else Alert.alert('Sorry', 'Username does not exist');
+      } catch (e) {
+        Alert.alert('Error', e.message);
+      }
+    } else {
+      Alert.alert('Error', 'You cannot add yourself as a pal');
+    }
+  }
+
+  async openChat(uid, username) {
+    const { profile, onOpenChat } = this.props;
+    try {
+      const snapshot = await firebase
+        .database()
+        .ref(`userChats/${profile.uid}`)
+        .child(uid)
+        .once('value');
+      if (snapshot.val()) {
+        onOpenChat(snapshot.val(), username, uid);
+      } else {
+        Alert.alert('Error', 'You should not be seeing this error message, please contact support');
+      }
+    } catch (e) {
+      Alert.alert('Error', e.message);
+    }
+  }
+
   renderFriends() {
+    const { friends, profile, onAccept, viewProfile } = this.props;
+    const { refreshing } = this.state;
     return (
       <FlatList
         style={{ backgroundColor: colors.bgColor }}
-        data={sortByState(Object.values(this.props.friends))}
+        data={sortByState(Object.values(friends))}
         keyExtractor={friend => friend.uid}
         onRefresh={() => this.refresh()}
-        refreshing={this.state.refreshing}
+        refreshing={refreshing}
         renderItem={({ item }) => {
           if (item.status === 'outgoing') {
             return (
-              <View style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
-                <View style={{flexDirection: 'row', height: 40, alignItems: 'center', justifyContent: 'center'}} >
-                  <Text style={{marginHorizontal: 10, flex: 1}}>{item.username + ' request sent'}</Text>
+              <View style={{ padding: 10, backgroundColor: '#fff', marginBottom: 1 }}>
+                <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', justifyContent: 'center' }} >
+                  <Text style={{ marginHorizontal: 10, flex: 1 }}>{`${item.username} request sent`}</Text>
                   <TouchableOpacity
                     style={{ marginTop: Platform.OS === 'ios' ? -5 : 0 }}
                     onPress={() => {
-                      Alert.alert(
-                        'Cancel Pal request', 'Are you sure?',
-                        [
-                          { text: 'Cancel', style: 'cancel' },
-                          { text: 'OK', onPress: () => this.remove(item.uid) },
-                        ],
-                      )
-                    }}>
+                      Alert.alert('Cancel Pal request', 'Are you sure?', [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'OK', onPress: () => this.remove(item.uid) },
+                      ]);
+                    }}
+                  >
                     <Icon name="ios-close" size={50} style={{ color: 'red', paddingHorizontal: 10 }} />
                   </TouchableOpacity>
                 </View>
@@ -95,15 +143,25 @@ class Friends extends Component<FriendsProps, State> {
           }
           if (item.status === 'incoming') {
             return (
-              <View style={{paddingVertical: 20, paddingHorizontal: 15, backgroundColor: '#fff'}}>
-                <View style={{flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between'}} >
-                  <Text style={{marginRight: 5, flex: 4}}>{item.username + ' has sent you a pal request'}</Text>
-                  <View style={{flexDirection: 'row', flex: 1}}>
-                    <TouchableOpacity onPress={()=> this.props.onAccept(this.uid, item.uid)}>
-                    <Icon size={50} name='ios-checkmark' style={{color: 'green', paddingHorizontal: 10, alignSelf: 'center'}}/>
+              <View style={{ paddingVertical: 20, paddingHorizontal: 15, backgroundColor: '#fff' }}>
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', height: 40, justifyContent: 'space-between' }}
+                >
+                  <Text style={{ marginRight: 5, flex: 4 }}>{`${item.username} has sent you a pal request`}</Text>
+                  <View style={{ flexDirection: 'row', flex: 1 }}>
+                    <TouchableOpacity onPress={() => onAccept(profile.uid, item.uid)}>
+                      <Icon
+                        size={50}
+                        name="ios-checkmark"
+                        style={{ color: 'green', paddingHorizontal: 10, alignSelf: 'center' }}
+                      />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={()=> this.remove(item.uid)}>
-                      <Icon size={50} name='ios-close' style={{color: 'red', paddingHorizontal: 10, alignSelf: 'center'}}/>
+                    <TouchableOpacity onPress={() => this.remove(item.uid)}>
+                      <Icon
+                        size={50}
+                        name="ios-close"
+                        style={{ color: 'red', paddingHorizontal: 10, alignSelf: 'center' }}
+                      />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -112,32 +170,48 @@ class Friends extends Component<FriendsProps, State> {
           }
           if (item.status === 'connected') {
             return (
-              <View style={{backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10}}>
-                <View style={{flexDirection: 'row', alignItems: 'center', height: 50, justifyContent: 'space-between'}} >
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  {item.avatar? <Image source={{uri: item.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
-                    <Icon size={65} name='md-contact'  style={{color: colors.primary, marginTop: Platform.OS == 'ios' ? -10 : 0}}/>}
-                    <Text style={{marginHorizontal: 10}}>{item.username}</Text>
+              <View style={{ backgroundColor: '#fff', marginBottom: 1, paddingVertical: 15, paddingHorizontal: 10 }}>
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', height: 50, justifyContent: 'space-between' }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.avatar ? (
+                      <Image source={{ uri: item.avatar }} style={{ height: 50, width: 50, borderRadius: 25 }} />
+                    ) : (
+                      <Icon
+                        size={65}
+                        name="md-contact"
+                        style={{ color: colors.primary, marginTop: Platform.OS === 'ios' ? -10 : 0 }}
+                      />
+                    )}
+                    <Text style={{ marginHorizontal: 10 }}>{item.username}</Text>
                   </View>
-                  <View style={{flexDirection: 'row'}}>
-                  {item.state && <Text style={{color: getStateColor(item.state), alignSelf: 'center', marginRight: 10}}>{item.state}</Text>}
-                  {item.state && <View style={{
-                    width: 10,
-                    height: 10, 
-                    borderRadius: 5,
-                    backgroundColor: getStateColor(item.state),
-                    alignSelf: 'center'
-                    }}/>}
-                  <TouchableOpacity
-                    onPress={()=> this.openChat(item.uid, item.username)}
-                    style={{padding: 5, marginHorizontal: 5}}>
-                    <Icon size={30} name='md-chatboxes' style={{color: colors.secondary}}/>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                  onPress={()=> this.props.viewProfile(item.uid)}
-                  style={{padding: 5, marginHorizontal: 5}}>
-                    <Icon size={30} name='md-person' style={{color: colors.secondary}}/>
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: 'row' }}>
+                    {item.state && (
+                      <Text style={{ color: getStateColor(item.state), alignSelf: 'center', marginRight: 10 }}>
+                        {item.state}
+                      </Text>
+                    )}
+                    {item.state && (
+                      <View
+                        style={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: 5,
+                          backgroundColor: getStateColor(item.state),
+                          alignSelf: 'center',
+                        }}
+                      />
+                    )}
+                    <TouchableOpacity
+                      onPress={() => this.openChat(item.uid, item.username)}
+                      style={{ padding: 5, marginHorizontal: 5 }}
+                    >
+                      <Icon size={30} name="md-chatboxes" style={{ color: colors.secondary }} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => viewProfile(item.uid)} style={{ padding: 5, marginHorizontal: 5 }}>
+                      <Icon size={30} name="md-person" style={{ color: colors.secondary }} />
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -150,105 +224,59 @@ class Friends extends Component<FriendsProps, State> {
   }
 
   render() {
+    const { profile, friends } = this.props;
+    const { username, modalOpen } = this.state;
+    const addButton = (
+      <TouchableOpacity
+        onPress={async () => {
+          const snapshot = await firebase
+            .database()
+            .ref(`users/${profile.uid}`)
+            .child('username')
+            .once('value');
+          snapshot.val()
+            ? this.setState({ modalOpen: true })
+            : Alert.alert('Please set a username before trying to add a pal');
+        }}
+      >
+        <Icon name="md-add" size={25} style={{ color: '#fff', padding: 5 }} />
+      </TouchableOpacity>
+    );
     return (
       <>
-        <Header 
-          title="Pals"
-          right={<TouchableOpacity onPress={() => {
-          firebase.database().ref('users/' + this.uid).child('username')
-            .once('value', snapshot => {
-              snapshot.val()? this.refs.modal.open() : Alert.alert("Please set a username before trying to add a pal")
-            })
-            }}>
-              <Icon name='md-add' size={25} style={{color: '#fff', padding: 5}} />
-            </TouchableOpacity>}
-        />
-        <ScrollView contentContainerStyle={{flex: 1}}>
-        {Object.values(this.props.friends).length > 0 ?
-        this.renderFriends() :
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20}}>
-              <Text style={{color: colors.primary, textAlign: 'center'}}>
-              {"You don't have any pals yet, also please make sure you are connected to the internet"}
-            </Text></View>}
-
-        <Modal
-          backButtonClose
-          backdropPressToClose={false}
-          style={styles.modal}
-          position={"center"}
-          ref={"modal"}>
-            <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
-            Send pal request</Text>
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <Header title="Pals" right={addButton} />
+        <ScrollView contentContainerStyle={{ flex: 1 }}>
+          {Object.values(friends).length > 0 ? (
+            this.renderFriends()
+          ) : (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20 }}>
+              <Text style={{ color: colors.primary, textAlign: 'center' }}>
+                {"You don't have any pals yet, also please make sure you are connected to the internet"}
+              </Text>
+            </View>
+          )}
+          <Modal backButtonClose backdropPressToClose={false} style={styles.modal} position="center" isOpen={modalOpen}>
+            <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>Send pal request</Text>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <TextInput
-              underlineColorAndroid='transparent'
-              style={styles.usernameInput}
-              autoCapitalize={'none'}
-              placeholder={'Enter username'}
-              onChangeText={username => this.username = username}
+                underlineColorAndroid="transparent"
+                style={styles.usernameInput}
+                autoCapitalize="none"
+                placeholder="Enter username"
+                value={username}
+                onChangeText={u => this.setState({ username: u })}
               />
             </View>
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10}}>
-            <Button onPress={()=> {
-              this.refs.modal.close()
-            }}
-            text='Cancel'
-            color='red'/>
-        
-            <Button onPress={()=> {
-              this.sendRequest(this.username)
-            }}
-            text='Submit'/>
-            
+            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10 }}>
+              <Button onPress={() => this.setState({ modalOpen: false })} text="Cancel" color="red" />
+              <Button onPress={() => this.sendRequest(username)} text="Submit" />
             </View>
           </Modal>
-          </ScrollView>
+        </ScrollView>
       </>
-    )
-  }
-
-  async sendRequest(username) {
-    if (username !== this.props.profile.username) {
-      try {
-      const snapshot = await firebase.database().ref('usernames/' + username).once('value')
-        if (snapshot.val()) {
-          const status = await firebase.database().ref('userFriends/' + this.uid).child(snapshot.val()).once('value')
-          if (status.val()) {
-            Alert.alert('Sorry', "You've already added this user as a pal");
-          } else {
-            await this.props.onRequest(snapshot.val());
-            Alert.alert("Success", "Request sent")
-            this.refs.modal.close()
-          }
-      } else Alert.alert('Sorry','Username does not exist')
-     } catch(e) {
-      Alert.alert("Error", e.message)
-     }
-    } else {
-      Alert.alert("Error", "You cannot add yourself as a pal")
-    }
-  }
-
-  async openChat(uid, username) {
-    try {
-      const snapshot = await firebase
-        .database()
-        .ref(`userChats/${this.uid}`)
-        .child(uid)
-        .once('value');
-      if (snapshot.val()) {
-        this.props.onOpenChat(snapshot.val(), username, uid);
-      } else {
-        Alert.alert('Error', 'You should not be seeing this error message, please contact support');
-      }
-    } catch (e) {
-      Alert.alert('Error', e.message);
-    }
+    );
   }
 }
-
-
 
 const mapStateToProps = ({ friends, profile }) => ({
   friends: friends.friends,
@@ -256,7 +284,7 @@ const mapStateToProps = ({ friends, profile }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getFriends: uids => dispatch(fetchFriends(uids)),
+  getFriends: (uid: string, limit?: number, startAt?: string) => dispatch(fetchFriends(uid, limit, startAt)),
   onRequest: friendUid => dispatch(sendRequest(friendUid)),
   onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
   onRemove: uid => dispatch(deleteFriend(uid)),

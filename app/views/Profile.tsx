@@ -17,9 +17,8 @@ import colors from '../constants/colors';
 import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
-import { navigateLogin, navigateSettings } from '../actions/navigation';
+import { navigateLogin, navigateSettings, navigateGym } from '../actions/navigation';
 import { fetchProfile, setLoggedOut } from '../actions/profile';
-import { navigateGym } from '../actions/navigation';
 import { pickerItems } from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
@@ -145,7 +144,7 @@ class ProfileView extends Component<ProfileProps, State> {
         const size = 640;
         // You can also display the image using data:
         // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-        const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100)
+        const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100);
         // response.uri is the URI of the new image that can now be displayed, uploaded...
         // response.path is the path of the new image
         // response.name is the name of the new image with the extension
@@ -156,7 +155,7 @@ class ProfileView extends Component<ProfileProps, State> {
     });
   }
 
-  uploadImage(uri, backdrop = false, mime = 'application/octet-stream') {
+  uploadImage(uri, backdrop = false, mime = 'application/octet-stream'): Promise<string> {
     const { profile } = this.props;
     return new Promise((resolve, reject) => {
       const imageRef = firebase
@@ -317,10 +316,11 @@ class ProfileView extends Component<ProfileProps, State> {
           <View style={{ flex: 1, marginRight: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
             <View style={{ width: '60%' }}>
               <Text style={{ color: '#999', marginHorizontal: 20 }}>
-                Email: <Text style={{ color: colors.secondary }}>{email}</Text>
+                {'Email: '}
+                <Text style={{ color: colors.secondary }}>{email}</Text>
               </Text>
               <Text style={{ color: '#999', marginHorizontal: 20, marginBottom: gym ? 0 : 10 }}>
-                Account type:{' '}
+                {'Account type: '}
                 <Text style={{ color: colors.secondary }}>{profile && profile.accountType}</Text>
               </Text>
               {gym && (
@@ -447,7 +447,7 @@ class ProfileView extends Component<ProfileProps, State> {
           <View style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>Birthday: </Text>
             <DatePicker
-              date={moment(profile && profile.birthday).format('YYYY-MM-DD')}
+              date={moment(profile && profile.birthday)}
               placeholder={(profile && profile.birthday) || 'None'}
               maxDate={new Date()}
               confirmBtnText="Confirm"

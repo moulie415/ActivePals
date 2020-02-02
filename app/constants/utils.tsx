@@ -5,7 +5,7 @@ import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
 import str from './strings';
 import { SessionType } from '../types/Session';
-import { UserState } from '../types/Profile';
+import Profile, { UserState } from '../types/Profile';
 import Comment from '../types/Comment';
 import Post from '../types/Post';
 import Message from '../types/Message';
@@ -210,7 +210,7 @@ const getStateVal = state => {
   }
 };
 
-export const sortByState = friends => {
+export const sortByState = (friends: Profile[]) => {
   return friends.sort((a, b) => {
     const stateA = getStateVal(a.state);
     const stateB = getStateVal(b.state);
