@@ -79,8 +79,7 @@ class Welcome extends Component<WelcomeProps, State> {
           {profile.fb_login && (
             <FbFriendsModal
               style={{ zIndex: 999 }}
-              isOpen={this.state.fbModalOpen}
-              onClosed={() => this.setState({ fbModalOpen: false }, () => this.nav(params))}
+              onClosed={() => this.nav(params)}
             />
           )}
           <Text style={styles.text}>Make sure to set a username so your pals can add you</Text>

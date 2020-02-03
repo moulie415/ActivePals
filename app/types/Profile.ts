@@ -17,6 +17,7 @@ export default interface Profile {
   level?: string;
   state?: UserState;
   status?: string;
+  token?: string;
 }
 
 export enum AccountType {

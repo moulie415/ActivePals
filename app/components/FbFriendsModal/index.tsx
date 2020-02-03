@@ -9,16 +9,24 @@ import colors from '../../constants/colors';
 import Text, { globalTextStyle } from '../Text';
 import Button from '../Button';
 import styles from './styles';
-import { sendRequest, getFbFriends, fetchFbFriends } from '../../actions/friends';
+import { sendRequest, fetchFbFriends } from '../../actions/friends';
 import { getNameString } from '../../constants/utils';
+import FbFriendsModalProps from '../../types/components/FbFriendsModalProps';
+import Profile from '../../types/Profile';
 
-class FbFriendsModal extends Component {
+interface State {
+  selectedFriends: string[];
+  loading: boolean;
+  fbFriends: { [key: string]: Profile };
+}
+
+class FbFriendsModal extends Component<FbFriendsModalProps, State> {
   constructor(props) {
     super(props);
     this.state = {
       selectedFriends: [],
       loading: true,
-      fbFriends: [],
+      fbFriends: {},
     };
   }
 
@@ -32,8 +40,8 @@ class FbFriendsModal extends Component {
     const { selectedFriends } = this.state;
     if (friend.username) {
       const { uid } = friend;
-      if (selectedFriends.some(friend => friend === uid)) {
-        const friends = selectedFriends.filter(friend => friend !== uid);
+      if (selectedFriends.some(f => f === uid)) {
+        const friends = selectedFriends.filter(f => f !== uid);
         this.setState({ selectedFriends: friends });
       } else {
         this.setState({ selectedFriends: [...selectedFriends, uid] });
@@ -41,16 +49,18 @@ class FbFriendsModal extends Component {
     } else {
       Alert.alert('Sorry', 'Please ask your friend to set their username before adding them as a pal');
     }
-  } 
+  }
 
   renderFriendsSelection() {
+    const { fbFriends, selectedFriends } = this.state;
+    const { friends: propsFriends } = this.props;
     const friends = [];
-    if (this.state.fbFriends) {
-      Object.values(this.state.fbFriends).forEach((friend, index) => {
-        const selected = this.state.selectedFriends.some(uid => uid === friend.uid);
-        if (!this.props.friends[friend.uid]) {
+    if (fbFriends) {
+      Object.values(fbFriends).forEach((friend, index) => {
+        const selected = selectedFriends.some(uid => uid === friend.uid);
+        if (!propsFriends[friend.uid]) {
           friends.push(
-            <TouchableOpacity key={friend.uid || friend.id} onPress={() => this.onFriendPress(friend)}>
+            <TouchableOpacity key={friend.uid} onPress={() => this.onFriendPress(friend)}>
               <View
                 style={{
                   backgroundColor: '#fff',
@@ -70,7 +80,7 @@ class FbFriendsModal extends Component {
                       <Icon
                         name="md-contact"
                         size={35}
-                        style={{ color: colors.primary, marginTop: Platform.OS == 'ios' ? -2 : 0 }}
+                        style={{ color: colors.primary, marginTop: Platform.OS === 'ios' ? -2 : 0 }}
                       />
                     )}
                     <Text style={{ marginHorizontal: 10 }}>{getNameString(friend)}</Text>
@@ -95,41 +105,33 @@ class FbFriendsModal extends Component {
     ) : (
       <View style={{ backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ padding: 15, textAlign: 'center' }}>
-          Sorry we couldn't find anymore of your Facebook friends already using ActivePals
+          {"Sorry we couldn't find anymore of your Facebook friends already using ActivePals"}
         </Text>
       </View>
     );
   }
 
   render() {
+    const { onClosed, request, isOpen } = this.props;
+    const { loading, selectedFriends } = this.state;
     return (
-      <Modal
-        ref="fbModal"
-        onClosed={this.props.onClosed}
-        isOpen={this.props.isOpen}
-        style={styles.modal}
-        position="center"
-      >
+      <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center">
         <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>Select Facebook friends</Text>
-        {this.state.loading ? <PulseIndicator color={colors.secondary} /> : this.renderFriendsSelection()}
+        {loading ? <PulseIndicator color={colors.secondary} /> : this.renderFriendsSelection()}
         <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: 10 }}>
-          <Button onPress={() => this.refs.fbModal.close()} color="red" text="Cancel" />
+          <Button onPress={() => onClosed()} color="red" text="Cancel" />
           <Button
-            onPress={() => {
-              const { length } = this.state.selectedFriends;
+            onPress={async () => {
+              const { length } = selectedFriends;
               if (length > 0) {
-                Promise.all(
-                  this.state.selectedFriends.map(friend => {
-                    return this.props.request(friend);
+                await Promise.all(
+                  selectedFriends.map(friend => {
+                    return request(friend);
                   })
-                )
-                  .then(() => {
-                    this.refs.fbModal.close();
-                    Alert.alert('Success', `Pal request${length > 1 ? 's' : ''} sent`);
-                  })
-                  .catch(e => {
-                    Alert.alert('Error', e.message);
-                  });
+                );
+                onClosed();
+                Alert.alert('Success', `Pal request${length > 1 ? 's' : ''} sent`);
+
               } else {
                 Alert.alert('Sorry', 'Please select at least one friend');
               }

@@ -2,7 +2,7 @@ import firebase from 'react-native-firebase';
 import { removeChat, addChat } from './chats';
 import { fetchPrivateSessions } from './sessions';
 import { upUnreadCount, fetchUsers } from './home';
-import { UserState } from '../types/Profile';
+import Profile, { UserState } from '../types/Profile';
 import { fetchOther } from './profile';
 
 export const SET_FRIENDS = 'SET_FRIENDS';
@@ -170,9 +170,8 @@ export const fetchFbFriends = (token: string) => {
         })
       );
       const validUids = uids.filter(uid => uid != null);
-      const users = await dispatch(fetchUsers(validUids)) || {};
-      return Object.values(users);
+      return dispatch(fetchUsers(validUids)) || {};
     }
-    return [];
-  }
+    return {};
+  };
 };
