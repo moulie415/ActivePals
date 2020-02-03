@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Linking, Alert } from 'react-native';
+import { Linking, Alert, View } from 'react-native';
 import { pipe } from 'ramda';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
@@ -11,7 +11,56 @@ import Post from '../types/Post';
 import Message from '../types/Message';
 import Notification from '../types/Notification';
 
-export const types = ['Custom', 'Gym', 'Running', 'Cycling', 'Swimming'];
+const s4 = () => {
+  return Math.floor((1 + Math.random()) * 0x10000)
+    .toString(16)
+    .substring(1);
+};
+
+export const guid = () => {
+  return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
+};
+
+export const types = [
+  SessionType.CUSTOM,
+  SessionType.GYM,
+  SessionType.RUNNING,
+  SessionType.CYCLING,
+  SessionType.RUNNING,
+];
+
+export const getResource = (type: SessionType) => {
+  if (type === SessionType.CYCLING) {
+    return require('../../assets/images/bicycle.png');
+  }
+  if (type === SessionType.GYM) {
+    return require('../../assets/images/dumbbell.png');
+  }
+  if (type === SessionType.RUNNING) {
+    return require('../../assets/images/running.png');
+  }
+  if (type === SessionType.SWIMMING) {
+    return require('../../assets/images/swim.png');
+  }
+  return require('../../assets/images/custom.png');
+};
+
+export const renderImages = () => {
+  return (
+    <View style={{ flexDirection: 'row' }}>
+      {types.map((type, index) => {
+        return (
+          <Image
+            key={guid()}
+            tintColor="#fff"
+            style={{ height: 50, width: 50, margin: 10 }}
+            source={getResource(type)}
+          />
+        );
+      })}
+    </View>
+  );
+};
 
 export function getType(type: SessionType, size: number, tintColor?: string) {
   switch (type) {
@@ -69,36 +118,10 @@ export const getMentionsList = (status, friends) => {
     if (filtered.length > 0) {
       return filtered;
     }
-  } else if (last == '@') {
+  } else if (last === '@') {
     return friends;
   }
 };
-
-function s4() {
-  return Math.floor((1 + Math.random()) * 0x10000)
-    .toString(16)
-    .substring(1);
-}
-
-export function guid() {
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-}
-
-export function getResource(type: SessionType) {
-  if (SessionType.CYCLING) {
-    return require('../../assets/images/bicycle.png');
-  }
-  if (type === SessionType.GYM) {
-    return require('../../assets/images/dumbbell.png');
-  }
-  if (type === SessionType.RUNNING) {
-    return require('../../assets/images/running.png');
-  }
-  if (type === SessionType.SWIMMING) {
-    return require('../../assets/images/swim.png');
-  }
-  return require('../../assets/images/custom.png');
-}
 
 export function calculateAge(birthday) {
   // birthday is a date
@@ -124,23 +147,7 @@ export function likesExtractor(item, uid, viewProfile, goToProfile) {
   return null;
 }
 
-export function formatDateTime(dateTime) {
-  dateTime = dateTime.replace(/-/g, '/');
-  let date = new Date(dateTime);
-  let hours = date.getHours();
-  let minutes = date.getMinutes();
-  let ampm = hours >= 12 ? 'pm' : 'am';
-  hours = hours % 12;
-  hours = hours ? hours : 12;
-  minutes = minutes < 10 ? '0' + minutes : minutes;
-  let strTime = hours + ':' + minutes + ampm;
-  let day = date.getDate();
-  return `${str.days[date.getDay()].toString()} ${day.toString() + nth(day)} ${str.months[
-    date.getMonth()
-  ].toString()} ${strTime}`;
-}
-
-export function nth(d) {
+export const nth = (d: number) => {
   if (d > 3 && d < 21) return 'th';
   switch (d % 10) {
     case 1:
@@ -152,6 +159,22 @@ export function nth(d) {
     default:
       return 'th';
   }
+};
+
+export function formatDateTime(dateTime) {
+  dateTime = dateTime.replace(/-/g, '/');
+  const date = new Date(dateTime);
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'pm' : 'am';
+  hours %= 12;
+  hours = hours || 12;
+  minutes = minutes < 10 ? `0${minutes}` : minutes;
+  const strTime = `${hours}:${minutes}${ampm}`;
+  const day = date.getDate();
+  return `${str.days[date.getDay()].toString()} ${day.toString() + nth(day)} ${str.months[
+    date.getMonth()
+  ].toString()} ${strTime}`;
 }
 
 export const dayDiff = (first, second, round = true) => {
@@ -178,15 +201,15 @@ export const getSimplifiedTime = createdAt => {
     const minsBeforeNow = Math.floor((now.getTime() - timeStamp.getTime()) / (1000 * 60));
     const hoursBeforeNow = Math.floor(minsBeforeNow / 60);
     if (hoursBeforeNow > 0) {
-      dateString = hoursBeforeNow + ' ' + (hoursBeforeNow == 1 ? 'hour' : 'hours') + ' ago';
+      dateString = `${hoursBeforeNow} ${hoursBeforeNow == 1 ? 'hour' : 'hours'} ago`;
     } else if (minsBeforeNow > 0) {
-      dateString = minsBeforeNow + ' ' + (minsBeforeNow == 1 ? 'min' : 'mins') + ' ago';
+      dateString = `${minsBeforeNow} ${minsBeforeNow == 1 ? 'min' : 'mins'} ago`;
     } else {
       dateString = 'Just Now';
     }
   }
   return dateString;
-}
+};
 
 export const getStateColor = (state: UserState) => {
   switch (state) {
@@ -302,7 +325,7 @@ export const calculateDuration = data => {
 export const durationString = session => {
   const minutes = session.durationMinutes;
   const hours = session.duration;
-  let string = ' for ' + hours;
+  let string = ` for ${hours}`;
   hours > 1 ? (string += ' hrs ') : (string += ' hr ');
   if (minutes) {
     string += minutes;
@@ -381,7 +404,7 @@ export const sortMessagesByCreatedAt = (messages: Message[]) => {
   return messages.sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
-}
+};
 
 export const sortSessionsByDateTime = sessions => {
   return sessions.sort((a, b) => {
