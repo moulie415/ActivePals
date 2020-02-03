@@ -1,8 +1,6 @@
 import firebase from 'react-native-firebase';
-import { removeChat, addChat } from './chats';
-import { fetchPrivateSessions } from './sessions';
 import { upUnreadCount, fetchUsers } from './home';
-import Profile, { UserState } from '../types/Profile';
+import { UserState } from '../types/Profile';
 import { fetchOther } from './profile';
 
 export const SET_FRIENDS = 'SET_FRIENDS';
@@ -35,7 +33,6 @@ export const removeFriend = uid => {
       return acc;
     }, {});
     dispatch(setFriends(obj));
-    dispatch(removeChat(uid));
   };
 };
 
@@ -148,7 +145,7 @@ export const deleteFriend = uid => {
     dispatch(removeFriend(uid));
     return firebase
       .database()
-      .ref(`usersFriends/${you}`)
+      .ref(`userFriends/${you}`)
       .child(uid)
       .remove();
   };

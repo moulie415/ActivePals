@@ -54,7 +54,7 @@ class Settings extends Component<SettingsProps, State> {
             <Text>View Welcome Swiper</Text>
             <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => viewCredits()} style={styles.contact}>
+          <TouchableOpacity onPress={viewCredits} style={styles.contact}>
             <Text>Credits</Text>
             <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
           </TouchableOpacity>
