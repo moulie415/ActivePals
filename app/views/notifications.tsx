@@ -39,7 +39,7 @@ class Notifications extends Component<NotificationsProps, State> {
     const { fetchNotifications, setRead } = this.props;
     this.setState({ spinner: true });
     await fetchNotifications();
-    this.setState({ spinner: false })
+    this.setState({ spinner: false });
     setRead();
   }
 

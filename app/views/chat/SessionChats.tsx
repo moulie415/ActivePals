@@ -8,18 +8,11 @@ import { connect } from 'react-redux';
 import Text from '../../components/Text';
 import { getType, getSimplifiedTime, sortChatsByDate } from '../../constants/utils';
 import colors from '../../constants/colors';
-import ChatTabBarIcon from '../../components/ChatTabBarIcon';
-import ChatTabLabel from '../../components/ChatTabLabel';
 import ChatRowCount from '../../components/ChatRowCount';
 import { navigateMessagingSession } from '../../actions/navigation';
 import { fetchSessionChats } from '../../actions/chats';
 
  class SessionChats extends Component {
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: ({tintColor}) => <ChatTabLabel type='Sessions' color={tintColor}/>,
-    tabBarIcon: ({ tintColor }) => <ChatTabBarIcon  color={tintColor} />,
-  }
 
   constructor(props) {
     super(props)

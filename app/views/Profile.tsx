@@ -17,7 +17,7 @@ import colors from '../constants/colors';
 import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
-import { navigateLogin, navigateSettings, navigateGym } from '../actions/navigation';
+import { navigateLogin, navigateGym } from '../actions/navigation';
 import { fetchProfile, setLoggedOut } from '../actions/profile';
 import { pickerItems } from '../constants/utils';
 import str from '../constants/strings';
@@ -245,7 +245,7 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 
   render() {
-    const { gym, goToGym, goToSettings } = this.props;
+    const { gym, goToGym, navigation } = this.props;
     const {
       initialAvatar,
       initialProfile,
@@ -346,7 +346,7 @@ class ProfileView extends Component<ProfileProps, State> {
             <View style={{ flex: 1, marginRight: 20 }}>
               <TouchableOpacity
                 style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}
-                onPress={() => goToSettings()}
+                onPress={() => navigation.navigate('Settings')}
               >
                 <Text style={{ color: colors.secondary, marginRight: 10 }}>Settings</Text>
                 <Icon size={25} name="md-settings" style={{ color: colors.secondary }} />
@@ -491,7 +491,6 @@ const mapDispatchToProps = dispatch => ({
     dispatch(navigateLogin());
   },
   onSave: () => dispatch(fetchProfile()),
-  goToSettings: () => dispatch(navigateSettings()),
   goToGym: gym => dispatch(navigateGym(gym)),
 });
 

@@ -591,7 +591,7 @@ export class Home extends Component<HomeProps, State> {
       profile,
       friends,
       users,
-      onNotificationPress,
+      navigation,
       goToProfile,
       postStatus,
       feed,
@@ -621,7 +621,7 @@ export class Home extends Component<HomeProps, State> {
     const combined = { ...users, ...friends };
 
     const notificationsButton = (
-      <TouchableOpacity onPress={() => onNotificationPress()}>
+      <TouchableOpacity onPress={() => navigation.navigate({ routeName: 'Notifications' })}>
         <View style={{ width: 30, alignItems: 'center' }}>
           <Icon name="ios-notifications" size={25} style={{ color: '#fff', marginLeft: -10 }} />
           {!!unreadCount && unreadCount > 0 && (

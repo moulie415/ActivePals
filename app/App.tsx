@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Platform, AppState, BackHandler, View } from 'react-native';
-import { connect } from 'react-redux';
+import { Platform, AppState, BackHandler } from 'react-native';
 import { NavigationActions, createAppContainer } from 'react-navigation';
-import { createBottomTabNavigator,  createMaterialTopTabNavigator } from 'react-navigation-tabs';
-import { createStackNavigator, HeaderBackButton } from 'react-navigation-stack'
+import { createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation-tabs';
+import { createStackNavigator } from 'react-navigation-stack';
 import firebase from 'react-native-firebase';
 import color from 'color';
 import { isIphoneX } from 'react-native-iphone-x-helper';
@@ -31,23 +30,32 @@ import colors from './constants/colors';
 import FullScreenVideo from './views/FullScreenVideo';
 import Welcome from './views/Welcome';
 import Form from './views/Form';
-//import { addListener } from '../index';
 import { UserState } from './types/Profile';
 import AppProps from './views/App';
+import NavigationService from './actions/navigation';
+import ChatTabBarIcon from './components/ChatTabBarIcon';
+import ChatTabLabel from './components/ChatTabLabel';
 
 const chats = createMaterialTopTabNavigator(
   {
-    SessionChats: { screen: SessionChats },
-    DirectMessages: { screen: DirectMessages },
-    GymChat: { screen: GymChat },
+    SessionChats: {
+      screen: SessionChats,
+      navigationOptions: { tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Sessions" color={tintColor} /> },
+    },
+    DirectMessages: {
+      screen: DirectMessages,
+      navigationOptions: { tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Pals" color={tintColor} /> },
+    },
+    GymChat: {
+      screen: GymChat,
+      navigationOptions: {
+        tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Gym" color={tintColor} />,
+      },
+    },
   },
   {
     tabBarPosition: 'top',
-    swipeEnabled: false,
-    lazyLoad: true,
-    animationEnabled: false,
     tabBarOptions: {
-      showIcon: false,
       showLabel: true,
       labelStyle: {
         fontSize: 15,
@@ -77,12 +85,10 @@ const tabs = createBottomTabNavigator(
     Sessions: { screen: Sessions },
     // PersonalTraining: { screen: PersonalTraining },
     Friends: { screen: Friends },
-    Chat: { screen: chats, navigationOptions: { tabBarLabel: 'Chats' } },
+    Chat: { screen: chats, navigationOptions: { tabBarIcon: ({ tintColor }) => <ChatTabBarIcon color={tintColor} /> } },
     Profile: { screen: Profile },
   },
   {
-    tabBarPosition: 'bottom',
-    animationEnabled: false,
     navigationOptions: {
       gesturesEnabled: false,
     },
@@ -92,9 +98,7 @@ const tabs = createBottomTabNavigator(
         .lighten(0.3)
         .hex(),
       style: { backgroundColor: '#fff' },
-      indicatorStyle: { backgroundColor: colors.primary },
       showIcon: true,
-      upperCaseLabel: false,
       labelStyle: {
         fontSize: 10,
         margin: 0,
@@ -106,29 +110,32 @@ const tabs = createBottomTabNavigator(
   }
 );
 
-export const Stack = createStackNavigator({
-  Login: { screen: Login },
-  SessionDetail: { screen: SessionDetail, navigationOptions: { tabBarVisible: false } },
-  SessionInfo: { screen: SessionInfo, navigationOptions: { headerShown: false } },
-  SignUp: { screen: SignUp },
-  MainNav: { screen: tabs },
-  Messaging: { screen: Messaging },
-  Settings: { screen: Settings },
-  TestScreen: { screen: TestScreen },
-  FilePreview: { screen: FilePreview },
-  ProfileView: { screen: ProfileView },
-  PostView: { screen: PostView },
-  Notifications: { screen: Notifications },
-  Gym: { screen: Gym },
-  Welcome: { screen: Welcome, navigationOptions: { headerShown: false } },
-  Credits: { screen: Credits, navigationOptions: { headerShown: false } },
-  FullScreenVideo: { screen: FullScreenVideo, navigationOptions: { headerShown: false } },
-  Form: { screen: Form, navigationOptions: { headerShown: false } },
-}, {
-  headerMode: 'none'
-});
+export const Stack = createStackNavigator(
+  {
+    Login: { screen: Login },
+    SessionDetail: { screen: SessionDetail },
+    SessionInfo: { screen: SessionInfo },
+    SignUp: { screen: SignUp },
+    MainNav: { screen: tabs },
+    Messaging: { screen: Messaging },
+    Settings: { screen: Settings },
+    TestScreen: { screen: TestScreen },
+    FilePreview: { screen: FilePreview },
+    ProfileView: { screen: ProfileView },
+    PostView: { screen: PostView },
+    Notifications: { screen: Notifications },
+    Gym: { screen: Gym },
+    Welcome: { screen: Welcome },
+    Credits: { screen: Credits },
+    FullScreenVideo: { screen: FullScreenVideo },
+    Form: { screen: Form },
+  },
+  {
+    headerMode: 'none',
+  }
+);
 
-const Navigation = createAppContainer(Stack)
+const Navigation = createAppContainer(Stack);
 
 class App extends Component<AppProps> {
   componentDidMount() {
@@ -170,8 +177,14 @@ class App extends Component<AppProps> {
 
   render() {
     //const { nav, dispatch } = this.props;
-    
-    return <Navigation />;
+
+    return (
+      <Navigation
+        ref={navigatorRef => {
+          NavigationService.setTopLevelNavigator(navigatorRef);
+        }}
+      />
+    );
   }
 }
 

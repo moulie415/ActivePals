@@ -2,10 +2,9 @@ import React, { FunctionComponent } from 'react';
 import { TouchableOpacity, View, StatusBar, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { TabBarBottom } from 'react-navigation';
 import colors from '../../constants/colors';
 import globalStyles from '../../styles/globalStyles';
-import { navigateBack } from '../../actions/navigation';
+import NavigationService from '../../actions/navigation';
 import Text from '../Text';
 import HeaderProps from '../../types/components/Header';
 
@@ -28,7 +27,7 @@ const AppHeader: FunctionComponent<HeaderProps> = ({
             ((hasBack || customBackPress) && (
               <TouchableOpacity
                 style={globalStyles.headerLeft}
-                onPress={customBackPress ? () => customBackPress(onBackPress) : onBackPress}
+                onPress={customBackPress ? () => customBackPress(onBackPress) : NavigationService.goBack}
               >
                 <Icon name="ios-arrow-back" size={25} style={{ color: '#fff', padding: 5 }} />
               </TouchableOpacity>
@@ -52,29 +51,6 @@ const AppHeader: FunctionComponent<HeaderProps> = ({
   );
 };
 
-// Connected Header
-
-const mapHeaderDispatchToProps = { onBackPress: navigateBack }
-const StyledHeader = connect(null, mapHeaderDispatchToProps)(AppHeader)
-
-// Connected Tab Bar
-
-const mapTabStateToProps = ({ settings: { brandInfo }}, { style }) => ({
-  style: { ...style, backgroundColor: colors.primary },
-  inactiveTintColor: 'white',
-})
-const StyledTabBar = connect(mapTabStateToProps)(props => <TabBarBottom {...props} />);
-
-// Connected Header with Connected Tab Bar
-
-const TabBarHeader = props => {
-  return (
-    <View>
-      <StyledHeader {...props} />
-      <StyledTabBar {...props} />
-    </View>
-  );
-};
+const StyledHeader = connect()(AppHeader);
 
 export default StyledHeader;
-export { StyledTabBar, TabBarHeader };

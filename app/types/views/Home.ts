@@ -2,6 +2,7 @@ import Profile from '../Profile';
 import Post from '../Post';
 import Comment from '../Comment';
 import Rep from '../Rep';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface HomeProps {
   profile: Profile;
@@ -26,4 +27,5 @@ export default interface HomeProps {
   getFriends: () => void;
   goToVideo: (uri: string) => void;
   getReplies: (parentComment: Comment, amount: number, key: string) => void;
+  navigation: NavigationStackProp;
 }

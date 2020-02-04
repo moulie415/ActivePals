@@ -262,9 +262,6 @@ class Messaging extends Component<MessagingProps, State> {
     return null;
   }
 
-  static navigationOptions = {
-    headerShown: false,
-  };
 
   keyboardDidShow() {
     if (Platform.OS === 'ios') {

@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, FlatList } from 'react-native';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import Image from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/Ionicons';
 import colors from '../../constants/colors';
 import { getSimplifiedTime, sortChatsByDate } from '../../constants/utils';
-import ChatTabBarIcon from '../../components/ChatTabBarIcon';
-import ChatTabLabel from '../../components/ChatTabLabel';
 import ChatRowCount from '../../components/ChatRowCount';
 import Text from '../../components/Text';
 import { navigateMessaging } from '../../actions/navigation';
@@ -24,12 +22,6 @@ class DirectMessages extends Component {
       refreshing: false,
     };
   }
-
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Pals" color={tintColor} />,
-    tabBarIcon: ({ tintColor }) => <ChatTabBarIcon color={tintColor} />,
-  };
 
   renderChats() {
     return (

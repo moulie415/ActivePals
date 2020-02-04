@@ -34,7 +34,7 @@ class Settings extends Component<SettingsProps, State> {
   };
 
   render() {
-    const { viewWelcome, viewCredits, profile, onRemoveUser } = this.props;
+    const { viewWelcome, viewCredits, profile, onRemoveUser, navigation } = this.props;
     const { spinner, fbModalOpen, showDialog } = this.state;
     return (
       <View style={styles.container}>
@@ -104,7 +104,9 @@ class Settings extends Component<SettingsProps, State> {
                 Alert.alert('Error', e.message);
                 this.setState({ spinner: false });
               }
-            } else Alert.alert('Incorrect email');
+            } else {
+              Alert.alert('Incorrect email');
+            }
           }}
           closeDialog={() => this.setState({ showDialog: false })}
         />

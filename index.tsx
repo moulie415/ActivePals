@@ -4,21 +4,13 @@ import firebase from 'react-native-firebase';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistStore } from 'redux-persist';
-import { createStore, applyMiddleware, compose } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import Sound from 'react-native-sound';
 import thunk from 'redux-thunk';
 import GeoFire from 'geofire';
-import { createReactNavigationReduxMiddleware } from 'react-navigation-redux-helpers';
 import reducer from './app/reducers';
 import App from './app/App';
-import {
-  navigateMessaging,
-  navigateMessagingSession,
-  navigateFriends,
-  navigatePostView,
-  navigateSessionInfo,
-  navigateGymMessaging,
-} from './app/actions/navigation';
+import NavigationService from './app/actions/navigation';
 import { newNotification, updateLastMessage } from './app/actions/chats';
 import bgMessaging from './app/bgMessaging';
 import str from './app/constants/strings';
@@ -33,20 +25,20 @@ const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
 const firebaseRef = firebase.database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
 
-const reactNavigationMiddleware = store => dispatch => action => {
-  switch (action.type) {
-    case 'Navigation/NAVIGATE':
-      const { routeName } = action
-    default:
-     return dispatch(action)
-  }
-}
+// const reactNavigationMiddleware = store => dispatch => action => {
+//   switch (action.type) {
+//     case 'Navigation/NAVIGATE':
+//       const { routeName } = action
+//     default:
+//      return dispatch(action)
+//   }
+// }
 
 //const middleware = createReactNavigationReduxMiddleware('root', state => state.nav);
 
 //export const addListener = createReduxBoundAddListener('root');
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+//const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export const store = createStore(
   reducer,
@@ -54,31 +46,28 @@ export const store = createStore(
   applyMiddleware(/*middleware,*/ thunk)
 );
 
-const navigateFromNotif = (notif) => {
-  const { dispatch } = store;
+const navigateFromNotif = notif => {
   const { type, sessionId, sessionTitle, chatId, uid, username, postId, gymId, isPrivate } = notif;
   if (type === 'sessionMessage') {
     const session = { key: sessionId, title: sessionTitle, private: notif.private === 'privateSessions' };
-    dispatch(navigateMessagingSession(session));
+    NavigationService.navigate('Messaging', { session });
   }
   switch (type) {
     case 'message':
-      dispatch(navigateMessaging(chatId, username, uid));
+      NavigationService.navigate('Messaging', { chatId, username, uid });
       break;
     case 'gymMessage':
-      dispatch(navigateGymMessaging(gymId));
+      NavigationService.navigate('Messaging', { gymId });
       break;
     case 'friendRequest':
-      dispatch(navigateFriends());
-      break;
-    case 'rep':
-      dispatch(navigatePostView(postId));
+      NavigationService.navigate('Friends');
       break;
     case 'comment':
-      dispatch(navigatePostView(postId));
+    case 'rep':
+      NavigationService.navigate('PostView', { postId });
       break;
     case 'addedToSession':
-      dispatch(navigateSessionInfo(sessionId, !!isPrivate));
+      NavigationService.navigate('SessionInfo', { sessionId, isPrivate });
       break;
     default:
       console.log('invalid notif type');
@@ -238,7 +227,7 @@ class ActivePals extends React.Component {
       if (shouldNavigate(notification.data)) {
         navigateFromNotif(notification.data);
       }
-    })
+    });
 
     firebase
       .notifications()
