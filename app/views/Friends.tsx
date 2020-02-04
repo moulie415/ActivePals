@@ -245,34 +245,32 @@ class Friends extends Component<FriendsProps, State> {
     return (
       <>
         <Header title="Pals" right={addButton} />
-        <ScrollView contentContainerStyle={{ flex: 1 }}>
-          {Object.values(friends).length > 0 ? (
-            this.renderFriends()
-          ) : (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20 }}>
-              <Text style={{ color: colors.primary, textAlign: 'center' }}>
-                {"You don't have any pals yet, also please make sure you are connected to the internet"}
-              </Text>
-            </View>
-          )}
-          <Modal backButtonClose backdropPressToClose={false} style={styles.modal} position="center" isOpen={modalOpen}>
-            <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>Send pal request</Text>
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-              <TextInput
-                underlineColorAndroid="transparent"
-                style={styles.usernameInput}
-                autoCapitalize="none"
-                placeholder="Enter username"
-                value={username}
-                onChangeText={u => this.setState({ username: u })}
-              />
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10 }}>
-              <Button onPress={() => this.setState({ modalOpen: false })} text="Cancel" color="red" />
-              <Button onPress={() => this.sendRequest(username)} text="Submit" />
-            </View>
-          </Modal>
-        </ScrollView>
+        {Object.values(friends).length > 0 ? (
+          this.renderFriends()
+        ) : (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20 }}>
+            <Text style={{ color: colors.primary, textAlign: 'center' }}>
+              {"You don't have any pals yet, also please make sure you are connected to the internet"}
+            </Text>
+          </View>
+        )}
+        <Modal backButtonClose backdropPressToClose={false} style={styles.modal} position="center" isOpen={modalOpen}>
+          <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>Send pal request</Text>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <TextInput
+              underlineColorAndroid="transparent"
+              style={styles.usernameInput}
+              autoCapitalize="none"
+              placeholder="Enter username"
+              value={username}
+              onChangeText={u => this.setState({ username: u })}
+            />
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10 }}>
+            <Button onPress={() => this.setState({ modalOpen: false })} text="Cancel" color="red" />
+            <Button onPress={() => this.sendRequest(username)} text="Submit" />
+          </View>
+        </Modal>
       </>
     );
   }

@@ -3,6 +3,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import NumericInput from 'react-native-numeric-input';
 import RadioForm from 'react-native-simple-radio-button';
 import { connect } from 'react-redux';
+import Geolocation from '@react-native-community/geolocation';
 import { Text, View, Alert, TextInput, TouchableOpacity, Platform, Switch, ScrollView } from 'react-native';
 import styles from '../../styles/sessionDetailStyles';
 import Geocoder from 'react-native-geocoder';
@@ -304,7 +305,7 @@ class SessionDetail extends Component {
   }
 
   setLocationAsPosition() {
-    navigator.geolocation.getCurrentPosition(
+    Geolocation.getCurrentPosition(
       position => {
         const coords = { lat: position.coords.latitude, lng: position.coords.longitude };
         this.setLocation(coords, true);

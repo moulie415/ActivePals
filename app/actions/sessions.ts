@@ -1,5 +1,6 @@
 import firebase from 'react-native-firebase';
 import { Alert } from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
 import { geofire } from '../../index';
 import { fetchUsers, updateUsers } from './home';
 import { setGym } from './profile';
@@ -184,8 +185,7 @@ export const fetchSessions = () => {
         }
       });
 
-    // @ts-ignore
-    navigator.geolocation.getCurrentPosition(
+    Geolocation.getCurrentPosition(
       position => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;

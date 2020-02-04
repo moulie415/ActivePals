@@ -22,7 +22,8 @@ const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) 
         parent.setState({ spinner: true });
         const { lat, lng } = details.geometry.location
         if (details && details.types && details.types.includes('gym')) {
-          const gym = await fetchPhotoPath(details);
+          const state = { sharedInfo: { envVars: { GOOGLE_API_KEY: googleApiKey }}};
+          const gym = await fetchPhotoPath(details, state);
           const marker = (
             <Marker
               key={gym.place_id}

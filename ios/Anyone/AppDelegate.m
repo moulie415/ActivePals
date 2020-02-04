@@ -17,8 +17,6 @@
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import "RNSplashScreen.h"
-#import "ReactNativeConfig.h"
-@import GoogleMaps;
 
 
 
@@ -26,6 +24,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  
   [FIRApp configure];
   [RNFirebaseNotifications configure];
   [Fabric with:@[[Crashlytics class]]];
@@ -47,13 +46,9 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   
-  
-  
-  [GMSServices provideAPIKey:@"AIzaSyDIjOw0vXm7e_4JJRbwz3R787WH2xTzmBw"];
-  
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
-  [RNSplashScreen show];
+  //[RNSplashScreen show];
   return YES;
 }
 

@@ -32,7 +32,6 @@ import com.devfd.RNGeocoder.RNGeocoderPackage;
 import com.apsl.versionnumber.RNVersionNumberPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.imagepicker.ImagePickerPackage;
-import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;

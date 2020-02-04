@@ -3,7 +3,7 @@ import { Alert, View, ScrollView, TextInput, TouchableOpacity } from 'react-nati
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
-import DatePicker from 'react-native-datepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import ImagePicker from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNPickerSelect from 'react-native-picker-select';
@@ -446,28 +446,7 @@ class ProfileView extends Component<ProfileProps, State> {
           )}
           <View style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>Birthday: </Text>
-            <DatePicker
-              date={moment(profile && profile.birthday)}
-              placeholder={(profile && profile.birthday) || 'None'}
-              maxDate={new Date()}
-              confirmBtnText="Confirm"
-              androidMode="spinner"
-              cancelBtnText="Cancel"
-              customStyles={{
-                dateText: {
-                  color: '#fff',
-                  fontFamily: 'Montserrat',
-                },
-                placeholderText: {
-                  color: '#fff',
-                  fontFamily: 'Montserrat',
-                },
-                dateInput: {
-                  borderWidth: 0,
-                },
-              }}
-              onDateChange={date => this.setState({ profile: { ...profile, birthday: date } })}
-            />
+            
           </View>
 
           <Button style={styles.logout} text="Log out" onPress={() => this.logout()} />
@@ -476,7 +455,15 @@ class ProfileView extends Component<ProfileProps, State> {
               <PulseIndicator color={colors.secondary} />
             </View>
           )}
+          
         </ScrollView>
+        <DateTimePicker
+          mode="date"
+          value={new Date(profile && profile.birthday)}
+  
+          maximumDate={new Date()}
+          onChange={date => this.setState({ profile: { ...profile, birthday: date } })}
+        />
       </>
     );
   }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { pathOr } from 'ramda';
+import Geolocation from '@react-native-community/geolocation';
 import { Alert, View, FlatList, TouchableOpacity, Platform, Switch, Image as SlowImage } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
@@ -120,7 +121,7 @@ class Sessions extends Component<SessionsProps, State> {
   getPosition() {
     // to watch position:
     // this.watchID = navigator.geolocation.watchPosition((position) => {
-    return navigator.geolocation.getCurrentPosition(
+    return Geolocation.getCurrentPosition(
       async position => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;

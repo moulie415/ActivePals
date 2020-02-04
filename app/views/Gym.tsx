@@ -33,7 +33,6 @@ interface State {
   profile?: Profile;
   popUpVisible: boolean;
   friendsModalOpen?: boolean;
-  spinner?: boolean;
   options?: Options;
 }
 
@@ -103,11 +102,11 @@ class Gym extends Component<GymProps, State> {
     const {
       params: { id },
     } = navigation.state;
-    const { spinner, popUpVisible, options, friendsModalOpen } = this.state;
+    const { popUpVisible, options, friendsModalOpen } = this.state;
     const gym = places[id];
     const yourLat = pathOr(null, ['lat'], location);
     const yourLon = pathOr(null, ['lon'], location);
-    const distance = getDistance(gym, yourLat, yourLon, true).toFixed(2);
+    const distance = gym ? getDistance(gym, yourLat, yourLon, true).toFixed(2) : '';
     const distanceString = location ? `(${distance} km away)` : '';
     const locationString = gym ? `${gym.vicinity} ${distanceString}` : '';
     return (
@@ -311,11 +310,6 @@ class Gym extends Component<GymProps, State> {
             </View>
           </View>
         ) : (
-          <View style={hStyles.spinner}>
-            <PulseIndicator color={colors.secondary} />
-          </View>
-        )}
-        {spinner && (
           <View style={hStyles.spinner}>
             <PulseIndicator color={colors.secondary} />
           </View>
