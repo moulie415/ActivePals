@@ -1,5 +1,6 @@
 import Session from '../Session';
 import Place from '../Place';
+import Profile from '../Profile';
 
 export default interface SessionsProps {
   sessions: { [key: string]: Session };
@@ -15,4 +16,6 @@ export default interface SessionsProps {
   viewSession: (id: string, isPrivate?: boolean) => void;
   places: { [key: string]: Place };
   gym: Place;
+  friends: { [key: string]: Profile };
+  onContinue: (friends?: string[], location?: any) => void;
 }

@@ -4,7 +4,7 @@ import { Alert, View, FlatList, TouchableOpacity, Platform, Switch, Image as Slo
 import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
 import { CheckBox } from 'react-native-elements';
-import { Popup } from 'react-native-map-link';
+import { Popup, Options } from 'react-native-map-link';
 import Permissions from 'react-native-permissions';
 import { AdMobInterstitial } from 'react-native-admob';
 import MapView, { Marker } from 'react-native-maps';
@@ -69,6 +69,8 @@ interface State {
   longitude?: number;
   latitude?: number;
   friendsModalOpen?: boolean;
+  options?: Options;
+  filterModalOpen?: boolean;
 }
 class Sessions extends Component<SessionsProps, State> {
   ActionSheet: ActionSheet;
@@ -181,7 +183,7 @@ class Sessions extends Component<SessionsProps, State> {
 
   markers(sessions: Session[]) {
     const { viewSession } = this.props;
-    return sessions.map((session) => {
+    return sessions.map(session => {
       const { lng } = session.location.position;
       const { lat } = session.location.position;
       return (
@@ -274,8 +276,7 @@ class Sessions extends Component<SessionsProps, State> {
 
   gymFilter(gym) {
     const { yoga, pilates } = this.state;
-    return !(!pilates && gym.name.toLowerCase().includes('pilates')) &&
-    !(!yoga && gym.name.toLowerCase().includes('yoga'))
+    return pilates && !gym.name.toLowerCase().includes('pilates') && yoga && !gym.name.toLowerCase().includes('yoga');
   }
 
   renderLists() {
@@ -491,14 +492,28 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   render() {
-    const { spinner, latitude, longitude, markers, showMap, friendsModalOpen, selectedLocation } = this.state;
-    const { places, viewGym, onContinue } = this.props;
+    const {
+      spinner,
+      latitude,
+      longitude,
+      markers,
+      showMap,
+      friendsModalOpen,
+      selectedLocation,
+      radius,
+      yoga: stateYoga,
+      pilates: statePilates,
+      popUpVisible,
+      options,
+      filterModalOpen,
+    } = this.state;
+    const { places, viewGym, onContinue, friends } = this.props;
     // switch for list view and map view
     // action sheet when pressing
     const left = (
       <TouchableOpacity
         style={{ position: 'absolute', top: 8, bottom: 0, left: 0, justifyContent: 'center', paddingLeft: 10 }}
-        onPress={() => this.refs.filterModal.open()}
+        onPress={() => this.setState({ filterModalOpen: true })}
       >
         <Text style={{ color: '#fff' }}>Filters</Text>
       </TouchableOpacity>
@@ -507,7 +522,7 @@ class Sessions extends Component<SessionsProps, State> {
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={{ color: '#fff' }}>Map: </Text>
         <Switch
-          trackColor={{ true: colors.secondary }}
+          trackColor={{ true: colors.secondary, false: undefined }}
           thumbColor={Platform.select({ android: showMap ? colors.secondary : '#fff' })}
           value={showMap}
           onValueChange={val => {
@@ -569,7 +584,7 @@ class Sessions extends Component<SessionsProps, State> {
             <Button
               style={styles.button}
               onPress={() => {
-                if (Object.keys(this.props.friends).length > 0) {
+                if (Object.keys(friends).length > 0) {
                   this.setState({ selectedLocation: {}, friendsModalOpen: true });
                 } else {
                   Alert.alert('Sorry', 'You must have at least one pal to create a private session');
@@ -581,31 +596,32 @@ class Sessions extends Component<SessionsProps, State> {
           </View>
           <FriendsModal
             onClosed={() => this.setState({ friendsModalOpen: false })}
-            onContinue={friends => {
+            onContinue={f => {
               AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
-              onContinue(friends, selectedLocation);
+              onContinue(f, selectedLocation);
             }}
             isOpen={friendsModalOpen}
           />
           <Modal
             onClosed={async () => {
-              const { radius, fetch, saveRadius } = this.props;
-              if (this.state.radius !== radius) {
+              const { radius: currentRadius, fetch, saveRadius } = this.props;
+              this.setState({ filterModalOpen: false });
+              if (radius !== currentRadius) {
                 this.setState({ refreshing: true });
-                saveRadius(this.state.radius);
-                await fetch(this.state.radius);
+                saveRadius(radius);
+                await fetch(radius);
                 this.setState({ refreshing: false });
               }
             }}
             style={styles.modal}
             position="center"
-            ref="filterModal"
+            isOpen={filterModalOpen}
           >
             <View style={{ flex: 1, borderRadius: 5 }}>
               <Text style={styles.sessionFilterTitle}>Sessions</Text>
               <View style={styles.sessionFilterContainer}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Text style={{ marginRight: 5, fontSize: 12 }}>{`Search radius* ${this.state.radius} km`}</Text>
+                  <Text style={{ marginRight: 5, fontSize: 12 }}>{`Search radius* ${radius} km`}</Text>
                   <Slider
                     maximumValue={50}
                     minimumValue={5}
@@ -613,86 +629,84 @@ class Sessions extends Component<SessionsProps, State> {
                     thumbTintColor={colors.secondary}
                     step={5}
                     style={{ flex: 1 }}
-                    value={this.state.radius}
+                    value={radius}
                     onValueChange={val => this.setState({ radius: val })}
                   />
                 </View>
-              <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-                <Text style={{fontSize: 12, textAlign: 'right', margin: 10}}>*Public only (private sessions should always be visible)</Text>
+                <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+                  <Text style={{ fontSize: 12, textAlign: 'right', margin: 10 }}>
+                    *Public only (private sessions should always be visible)
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View style={{flex: 1}}>
-            <Text style={{
-              fontSize: 20,
-              textAlign: 'center',
-              padding: 10,
-              color: '#000',
-              fontWeight: 'bold'
-              }}>
-              Gyms</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 20, textAlign: 'center', padding: 10, color: '#000', fontWeight: 'bold' }}>
+                Gyms
+              </Text>
               <TouchableOpacity
-              onPress={() => this.setState({yoga: !this.state.yoga})}
-              style={{flexDirection: 'row', alignItems: 'center', borderTopWidth: 0.5, borderTopColor: '#999'}}>
+                onPress={() => this.setState({ yoga: !stateYoga })}
+                style={{ flexDirection: 'row', alignItems: 'center', borderTopWidth: 0.5, borderTopColor: '#999' }}
+              >
                 <CheckBox
-                containerStyle={{backgroundColor: 'transparent', width: 45, borderWidth: 0}}
-                checkedColor={colors.secondary}
-                uncheckedColor={colors.secondary}
-                checked={this.state.yoga}
-                onPress={() => this.setState({yoga: !this.state.yoga})}
+                  containerStyle={{ backgroundColor: 'transparent', width: 45, borderWidth: 0 }}
+                  checkedColor={colors.secondary}
+                  uncheckedColor={colors.secondary}
+                  checked={stateYoga}
+                  onPress={() => this.setState({ yoga: !stateYoga })}
                 />
                 <Text>Show Yoga</Text>
               </TouchableOpacity>
               <TouchableOpacity
-              onPress={() => this.setState({pilates: !this.state.pilates})}
-              style={{flexDirection: 'row', alignItems: 'center'}}>
+                onPress={() => this.setState({ pilates: !statePilates })}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
+              >
                 <CheckBox
-                containerStyle={{backgroundColor: 'transparent', width: 45, borderWidth: 0}}
-                checkedColor={colors.secondary}
-                uncheckedColor={colors.secondary}
-                checked={this.state.pilates}
-                onPress={() => this.setState({pilates: !this.state.pilates})}
+                  containerStyle={{ backgroundColor: 'transparent', width: 45, borderWidth: 0 }}
+                  checkedColor={colors.secondary}
+                  uncheckedColor={colors.secondary}
+                  checked={statePilates}
+                  onPress={() => this.setState({ pilates: !statePilates })}
                 />
                 <Text>Show Pilates</Text>
               </TouchableOpacity>
-          </View>
-        </Modal>
-        <Popup
-          isVisible={this.state.popUpVisible}
-          onCancelPressed={() => this.setState({ popUpVisible: false })}
-          onAppPressed={() => this.setState({ popUpVisible: false })}
-          onBackButtonPressed={() => this.setState({ popUpVisible: false })}
-          modalProps={{ 
-              animationIn: 'slideInUp'
-          }}
-          options={this.state.options}
-          style={{
-            cancelButtonText: {color: colors.secondary},
-          }}
+            </View>
+          </Modal>
+          <Popup
+            isVisible={popUpVisible}
+            onCancelPressed={() => this.setState({ popUpVisible: false })}
+            onAppPressed={() => this.setState({ popUpVisible: false })}
+            onBackButtonPressed={() => this.setState({ popUpVisible: false })}
+            modalProps={{ animationIn: 'slideInUp' }}
+            options={options}
+            style={{
+              cancelButtonText: { color: colors.secondary },
+            }}
+            appsWhiteList={[]}
           />
         </View>
         <ActionSheet
-          ref={ref => this.ActionSheet = ref}
-          title='Create session at location?'
+          ref={ref => {
+            this.ActionSheet = ref;
+          }}
+          title="Create session at location?"
           options={['Create session', 'Create private session', 'Cancel']}
           cancelButtonIndex={2}
-          onPress={(index) => { 
-                if (index == 0) {
-                  AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
-                  this.props.onContinue(null, this.state.selectedLocation)
-                }
-                else if (index == 1) {
-                  if (Object.values(this.props.friends).length > 0) {
-                    this.setState({friendsModalOpen: true})
-                  }
-                  else {
-                    Alert.alert('Sorry', 'You must have at least one pal to create a private session')
-                  }
+          onPress={index => {
+            if (index === 0) {
+              AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+              onContinue(null, selectedLocation);
+            } else if (index === 1) {
+              if (Object.values(friends).length > 0) {
+                this.setState({ friendsModalOpen: true })
+              } else {
+                Alert.alert('Sorry', 'You must have at least one pal to create a private session')
               }
-           }}
+            }
+          }}
         />
       </>
-    )
+    );
   }
 }
 
@@ -707,7 +721,7 @@ const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => (
   places: sessions.places,
   radius: sessions.radius,
   location: profile.location,
-})
+});
 
 const mapDispatchToProps = dispatch => ({
   join: (location) => dispatch(joinGym(location)),
@@ -727,6 +741,6 @@ const mapDispatchToProps = dispatch => ({
   getPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
   saveRadius: (radius) => dispatch(setRadius(radius)),
   viewSession: (sessionId, isPrivate) => dispatch(navigateSessionInfo(sessionId, isPrivate))
-})
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(Sessions)
+export default connect(mapStateToProps, mapDispatchToProps)(Sessions);
