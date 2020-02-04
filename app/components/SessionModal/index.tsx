@@ -64,7 +64,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
         <Text style={{flex: 1}}>
           <Text style={{color: '#000'}}>{session.location.formattedAddress}</Text>
           <Text style={{color: '#999'}}>{' (' + (session.distance ? session.distance.toFixed(2) :
-            getDistance(session, location.lat, location.lon)) + ' km away)'}</Text>
+            getDistance(session, location.lat, location.lon).toFixed(2)) + ' km away)'}</Text>
         </Text>
         <Button onPress={()=> {
           const { lat, lng } = session.location.position

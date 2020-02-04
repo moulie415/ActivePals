@@ -3,6 +3,7 @@ import Place from '../Place';
 
 export default interface SessionsProps {
   sessions: { [key: string]: Session };
+  privateSessions: { [key: string]: Session };
   setYourLocation: ({ lat, lon }) => void;
   getPlaces: (lat: number, lon: number, token: string) => { token: string };
   fetch: (radius: number) => void;

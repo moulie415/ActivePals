@@ -265,7 +265,7 @@ export function deg2rad(deg) {
   return deg * (Math.PI / 180);
 }
 
-export const getDistance = (item, lat1, lon1, gym = false) => {
+export const getDistance = (item, lat1, lon1, gym = false): number => {
   const DEFAULT_DISTANCE = 999999;
   if (lat1 && lon1) {
     let lat2;
@@ -287,8 +287,7 @@ export const getDistance = (item, lat1, lon1, gym = false) => {
       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c;
-    return d.toFixed(2);
+    return R * c;
   }
   return DEFAULT_DISTANCE;
 };

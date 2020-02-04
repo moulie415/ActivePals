@@ -519,7 +519,7 @@ export class Home extends Component<HomeProps, State> {
   }
 
   renderFeed() {
-    const { feed, getFriends, getProfile, getPosts, profile } = this.props;
+    const { feed, getFriends, getProfile, getPosts, profile, viewPost } = this.props;
     const { loadMore, refreshing } = this.state;
     if (Object.values(feed).length > 0) {
       return (

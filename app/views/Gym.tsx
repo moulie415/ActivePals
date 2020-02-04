@@ -107,7 +107,7 @@ class Gym extends Component<GymProps, State> {
     const gym = places[id];
     const yourLat = pathOr(null, ['lat'], location);
     const yourLon = pathOr(null, ['lon'], location);
-    const distance = getDistance(gym, yourLat, yourLon, true);
+    const distance = getDistance(gym, yourLat, yourLon, true).toFixed(2);
     const distanceString = location ? `(${distance} km away)` : '';
     const locationString = gym ? `${gym.vicinity} ${distanceString}` : '';
     return (
