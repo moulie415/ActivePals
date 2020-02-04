@@ -111,7 +111,7 @@ class PostView extends Component<PostViewProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
   };
 
   async sharePost(item) {

@@ -7,7 +7,7 @@ import Button from '../components/Button';
 
 class PersonalTraining extends Component {
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: 'Training',
     tabBarIcon: ({ tintColor }) => (
       <SlowImage

@@ -145,7 +145,7 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: 'Sessions',
     tabBarIcon: ({ tintColor }) => (
       <SlowImage style={{ width: 30, height: 30, tintColor }} source={require('../../../assets/images/dumbbell.png')} />

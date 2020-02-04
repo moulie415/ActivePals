@@ -16,7 +16,7 @@ import { fetchSessionChats } from '../../actions/chats';
 
  class SessionChats extends Component {
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: ({tintColor}) => <ChatTabLabel type='Sessions' color={tintColor}/>,
     tabBarIcon: ({ tintColor }) => <ChatTabBarIcon  color={tintColor} />,
   }

@@ -86,7 +86,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: 'Profile',
     tabBarIcon: ({ tintColor }) => <Icon name="md-person" style={{ color: tintColor }} />,
   };

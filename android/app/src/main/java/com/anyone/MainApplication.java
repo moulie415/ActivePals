@@ -1,116 +1,99 @@
 package com.anyone;
-
-import android.annotation.SuppressLint;
 import android.app.Application;
-
-import com.airbnb.android.react.maps.MapsPackage;
-import com.crashlytics.android.Crashlytics;
-import com.facebook.CallbackManager;
-import com.facebook.appevents.AppEventsLogger;
+import android.content.Context;
+import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.reactnativecommunity.slider.ReactSliderPackage;
-import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import cl.json.RNSharePackage;
-import com.reactnativecommunity.webview.RNCWebViewPackage;
-import com.shahenlibrary.RNVideoProcessingPackage;
-import co.apptailor.googlesignin.RNGoogleSigninPackage;
-import com.zmxv.RNSound.RNSoundPackage;
-import com.brentvatne.react.ReactVideoPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
-
-import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
-import suraj.tiwari.reactnativefbads.FBAdsPackage;
-import com.sbugert.rnadmob.RNAdMobPackage;
-import com.calendarevents.CalendarEventsPackage;
-import io.invertase.firebase.RNFirebasePackage;
-import com.dylanvann.fastimage.FastImageViewPackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
-import org.devio.rn.splashscreen.SplashScreenReactPackage;
-
-import com.devfd.RNGeocoder.RNGeocoderPackage;
-import com.apsl.versionnumber.RNVersionNumberPackage;
-import fr.bamlab.rnimageresizer.ImageResizerPackage;
-import com.imagepicker.ImagePickerPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
+import com.reactnativecommunity.viewpager.RNCViewPagerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import io.fabric.sdk.android.Fabric;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
+import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class MainApplication extends Application implements ReactApplication {
-  private static CallbackManager mCallbackManager = CallbackManager.Factory.create();
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-    @Override
-    public boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
-    }
 
-    @SuppressLint("MissingPermission")
-    @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-              new MainReactPackage(),
-            new ReactSliderPackage(),
-            new AsyncStoragePackage(),
-            new RNSharePackage(),
-            new RNCWebViewPackage(),
-            new ReactNativeConfigPackage(),
-            new RNVideoProcessingPackage(),
-            new RNGoogleSigninPackage(),
-            new RNSoundPackage(),
-            new ReactVideoPackage(),
-            new VectorIconsPackage(),
-              new FBAdsPackage(),
-              new RNAdMobPackage(),
-              new CalendarEventsPackage(),
-              new FastImageViewPackage(),
-              new RNFirebasePackage(),
-              new RNFirebaseNotificationsPackage(),
-              new RNFirebaseDatabasePackage(),
-              new RNFirebaseMessagingPackage(),
-              new RNGeocoderPackage(),
-              new RNFirebaseStoragePackage(),
-              new RNFirebaseAuthPackage(),
-              new SplashScreenReactPackage(),
-              new RNVersionNumberPackage(),
-              new MapsPackage(),
-              new ImageResizerPackage(),
-              new ImagePickerPackage(),
-              new RNFetchBlobPackage(),
-              new RNFirebaseInstanceIdPackage(),
-              new FBSDKPackage(mCallbackManager)
-      );
-    }
+  private final ReactNativeHost mReactNativeHost =
+          new ReactNativeHost(this) {
+            @Override
+            public boolean getUseDeveloperSupport() {
+              return BuildConfig.DEBUG;
+            }
 
-    @Override
-    protected String getJSMainModuleName() {
-      return "index";
-    }
-  };
+            @Override
+            protected List<ReactPackage> getPackages() {
+              @SuppressWarnings("UnnecessaryLocalVariable")
+              List<ReactPackage> packages = new PackageList(this).getPackages();
+              // Packages that cannot be autolinked yet can be added manually here, for example:
+              // packages.add(new MyReactNativePackage());
+               // packages.add(new RNFirebasePackage());
+                packages.add(new RNFirebaseNotificationsPackage());
+                packages.add(new RNFirebaseDatabasePackage());
+                packages.add(new RNFirebaseAuthPackage());
+                packages.add(new RNFirebaseMessagingPackage());
+                //packages.add(new RNFirebaseStoragePackage());
+                packages.add(new RNFirebaseInstanceIdPackage());
+
+
+              return packages;
+            }
+
+            @Override
+            protected String getJSMainModuleName() {
+              return "index";
+            }
+          };
 
   @Override
   public ReactNativeHost getReactNativeHost() {
     return mReactNativeHost;
   }
 
+
   @Override
   public void onCreate() {
     super.onCreate();
-    Fabric.with(this, new Crashlytics());
-    AppEventsLogger.activateApp(this);
     SoLoader.init(this, /* native exopackage */ false);
+    initializeFlipper(this); // Remove this line if you don't want Flipper enabled
   }
-  protected static CallbackManager getCallbackManager() {
-    return mCallbackManager;
+
+  /**
+   * Loads Flipper in React Native templates.
+   *
+   * @param context
+   */
+  private static void initializeFlipper(Context context) {
+    if (BuildConfig.DEBUG) {
+      try {
+        /*
+         We use reflection here to pick up the class that initializes Flipper,
+        since Flipper library is not available in release mode
+        */
+        Class<?> aClass = Class.forName("com.facebook.flipper.ReactNativeFlipper");
+        aClass.getMethod("initializeFlipper", Context.class).invoke(null, context);
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    }
   }
+
 }

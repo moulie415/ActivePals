@@ -60,7 +60,7 @@ class SignUp extends Component<SignUpProps, State> {
   };
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
   };
 
   async signup(email, pass) {

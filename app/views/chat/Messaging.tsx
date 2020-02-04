@@ -263,7 +263,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
   };
 
   keyboardDidShow() {

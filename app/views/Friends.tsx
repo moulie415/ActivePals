@@ -38,7 +38,7 @@ class Friends extends Component<FriendsProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: 'Pals',
     tabBarIcon: ({ tintColor }) => <Icon name="md-people" size={25} style={{ color: tintColor }} />,
   };

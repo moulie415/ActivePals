@@ -51,7 +51,7 @@ class Gym extends Component<GymProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: 'Gym',
   };
 

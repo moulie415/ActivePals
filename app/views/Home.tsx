@@ -152,7 +152,7 @@ export class Home extends Component<HomeProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: 'Home',
     tabBarIcon: ({ tintColor }) => <Icon name="md-home" size={25} style={{ color: tintColor }} />,
   };

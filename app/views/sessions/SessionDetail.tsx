@@ -9,7 +9,7 @@ import styles from '../../styles/sessionDetailStyles';
 import Geocoder from 'react-native-geocoder';
 import firebase from 'react-native-firebase';
 import { geofire } from '../../../index';
-import DatePicker from 'react-native-datepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import colors from '../../constants/colors';
 import RNCalendarEvents from 'react-native-calendar-events';
 import { types, getType } from '../../constants/utils';
@@ -34,7 +34,7 @@ const typeProps = types.map(type => {
 
 class SessionDetail extends Component {
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarIcon: ({ tintColor }) => <Icon size={25} name="md-home" style={{ color: tintColor }} />,
   };
 
@@ -100,7 +100,7 @@ class SessionDetail extends Component {
               alignItems: 'center',
             }}
           >
-            <DatePicker
+            <DateTimePicker
               date={this.state.date}
               placeholder={'Date and time'}
               mode={'datetime'}

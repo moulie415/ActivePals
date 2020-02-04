@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Platform, AppState, BackHandler } from 'react-native';
+import { Platform, AppState, BackHandler, View } from 'react-native';
 import { connect } from 'react-redux';
-import { StackNavigator, TabNavigator, addNavigationHelpers, NavigationActions } from 'react-navigation';
+import { NavigationActions, createAppContainer } from 'react-navigation';
+import { createBottomTabNavigator,  createMaterialTopTabNavigator } from 'react-navigation-tabs';
+import { createStackNavigator, HeaderBackButton } from 'react-navigation-stack'
 import firebase from 'react-native-firebase';
 import color from 'color';
 import { isIphoneX } from 'react-native-iphone-x-helper';
@@ -29,11 +31,11 @@ import colors from './constants/colors';
 import FullScreenVideo from './views/FullScreenVideo';
 import Welcome from './views/Welcome';
 import Form from './views/Form';
-import { addListener } from '../index';
+//import { addListener } from '../index';
 import { UserState } from './types/Profile';
 import AppProps from './views/App';
 
-const chats = TabNavigator(
+const chats = createMaterialTopTabNavigator(
   {
     SessionChats: { screen: SessionChats },
     DirectMessages: { screen: DirectMessages },
@@ -69,7 +71,7 @@ const chats = TabNavigator(
   }
 );
 
-const tabs = TabNavigator(
+const tabs = createBottomTabNavigator(
   {
     Home: { screen: Home },
     Sessions: { screen: Sessions },
@@ -104,10 +106,10 @@ const tabs = TabNavigator(
   }
 );
 
-export const Stack = StackNavigator({
-  Login: { screen: Login, navigationOptions: { header: null } },
+export const Stack = createStackNavigator({
+  Login: { screen: Login },
   SessionDetail: { screen: SessionDetail, navigationOptions: { tabBarVisible: false } },
-  SessionInfo: { screen: SessionInfo, navigationOptions: { header: null } },
+  SessionInfo: { screen: SessionInfo, navigationOptions: { headerShown: false } },
   SignUp: { screen: SignUp },
   MainNav: { screen: tabs },
   Messaging: { screen: Messaging },
@@ -118,11 +120,15 @@ export const Stack = StackNavigator({
   PostView: { screen: PostView },
   Notifications: { screen: Notifications },
   Gym: { screen: Gym },
-  Welcome: { screen: Welcome, navigationOptions: { header: null } },
-  Credits: { screen: Credits, navigationOptions: { header: null } },
-  FullScreenVideo: { screen: FullScreenVideo, navigationOptions: { header: null } },
-  Form: { screen: Form, navigationOptions: { header: null } },
+  Welcome: { screen: Welcome, navigationOptions: { headerShown: false } },
+  Credits: { screen: Credits, navigationOptions: { headerShown: false } },
+  FullScreenVideo: { screen: FullScreenVideo, navigationOptions: { headerShown: false } },
+  Form: { screen: Form, navigationOptions: { headerShown: false } },
+}, {
+  headerMode: 'none'
 });
+
+const Navigation = createAppContainer(Stack)
 
 class App extends Component<AppProps> {
   componentDidMount() {
@@ -136,7 +142,7 @@ class App extends Component<AppProps> {
   }
 
   onBackPress() {
-    const { dispatch, nav } = this.props;
+    //const { dispatch, nav } = this.props;
     if (nav.index !== 1) {
       dispatch(NavigationActions.back());
     }
@@ -163,9 +169,10 @@ class App extends Component<AppProps> {
   };
 
   render() {
-    const { nav, dispatch } = this.props;
-    return <Stack navigation={addNavigationHelpers({ dispatch, state: nav, addListener })} />;
+    //const { nav, dispatch } = this.props;
+    
+    return <Navigation />;
   }
 }
 
-export default connect(({ nav }) => ({ nav }))(App);
+export default App;

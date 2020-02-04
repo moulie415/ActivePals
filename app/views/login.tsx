@@ -21,6 +21,7 @@ import str from '../constants/strings';
 import { doSetup, fetchProfile, setLoggedOut } from '../actions/profile';
 import LoginProps from '../types/views/Login';
 
+
 interface State {
   spinner: boolean;
   secure: boolean;
@@ -47,13 +48,14 @@ class Login extends Component<LoginProps, State> {
     const { logout, onLogin, loggedIn } = this.props;
     const { waitForData } = this.state;
     SplashScreen.hide();
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(async user => {
       if (user && (user.emailVerified || (user.providerData && user.providerData.length > 0)) && !waitForData) {
         /* ios onAuthStateChanged gets called twice so we want to account
         for this so that we don't have unnecessary calls */
         if (this.secondAuthChange || Platform.OS !== 'ios') {
           this.setState({ spinner: false });
-          onLogin();
+          await onLogin();
+          this.goNext()
         } else {
           this.secondAuthChange = true;
         }
@@ -61,6 +63,15 @@ class Login extends Component<LoginProps, State> {
         logout();
       }
     });
+  }
+
+  goNext() {
+    const { hasViewedWelcome, navigation } = this.props;
+    if (hasViewedWelcome) {
+      navigation.navigate('Home');
+    } else {
+      navigation.navigate('Welcome');
+    }
   }
 
   createUser = async (uid, userData, token) => {
@@ -111,7 +122,8 @@ class Login extends Component<LoginProps, State> {
           .child(facebookID)
           .set(uid);
         if (!result.additionalUserInfo.isNewUser) {
-          onLogin();
+          await onLogin();
+          this.goNext();
         } else {
           try {
             const imageRef = firebase
@@ -126,7 +138,8 @@ class Login extends Component<LoginProps, State> {
             console.warn('Error setting user image', e.message);
           }
           await this.createUser(uid, json, token);
-          onLogin();
+          await onLogin();
+          this.goNext()
           this.setState({ facebookLoading: false });
         }
       } catch (e) {
@@ -149,17 +162,17 @@ class Login extends Component<LoginProps, State> {
   async login(email, pass) {
     const { onLogin } = this.props;
     try {
-      await firebase
+      const { user } = await firebase
         .auth()
         .signInWithEmailAndPassword(email, pass)
-        .then(({ user }) => {
           if (user.emailVerified) {
-            onLogin();
+            await onLogin();
+            this.goNext()
           } else {
             this.setState({ spinner: false });
             Alert.alert('Sorry', 'You must first verify your email using the link we sent you before logging in');
           }
-        });
+
       // Navigate to the Home page
     } catch (error) {
       this.setState({ spinner: false });
@@ -226,7 +239,8 @@ class Login extends Component<LoginProps, State> {
       await user.sendEmailVerification();
       Alert.alert('Account created', 'You must now verify your email using the link we sent you before you can login');
     } else {
-      onLogin();
+      await onLogin();
+      this.goNext();
     }
     this.setState({ waitForData: false });
   }
@@ -317,6 +331,7 @@ class Login extends Component<LoginProps, State> {
 
 const mapStateToProps = ({ profile }) => ({
   loggedIn: profile.loggedIn,
+  hasViewedWelcome: profile.hasViewedWelcome,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -325,7 +340,7 @@ const mapDispatchToProps = dispatch => ({
   },
   onLogin: async () => {
     const profile = await dispatch(fetchProfile());
-    dispatch(doSetup(profile));
+    await dispatch(doSetup(profile));
   },
   logout: () => {
     dispatch(navigateLogin());

@@ -62,7 +62,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
   };
 
   previewView() {

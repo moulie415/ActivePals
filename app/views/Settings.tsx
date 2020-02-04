@@ -30,7 +30,7 @@ class Settings extends Component<SettingsProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
   };
 
   render() {

@@ -8,7 +8,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import Sound from 'react-native-sound';
 import thunk from 'redux-thunk';
 import GeoFire from 'geofire';
-import { createReactNavigationReduxMiddleware, createReduxBoundAddListener } from 'react-navigation-redux-helpers';
+import { createReactNavigationReduxMiddleware } from 'react-navigation-redux-helpers';
 import reducer from './app/reducers';
 import App from './app/App';
 import {
@@ -42,16 +42,16 @@ const reactNavigationMiddleware = store => dispatch => action => {
   }
 }
 
-const middleware = createReactNavigationReduxMiddleware('root', state => state.nav);
+//const middleware = createReactNavigationReduxMiddleware('root', state => state.nav);
 
-export const addListener = createReduxBoundAddListener('root');
+//export const addListener = createReduxBoundAddListener('root');
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export const store = createStore(
   reducer,
-  composeEnhancers(applyMiddleware(middleware, reactNavigationMiddleware, thunk))
-  // applyMiddleware(middleware, thunk)
+  //composeEnhancers(applyMiddleware(middleware, reactNavigationMiddleware, thunk))
+  applyMiddleware(/*middleware,*/ thunk)
 );
 
 const navigateFromNotif = (notif) => {

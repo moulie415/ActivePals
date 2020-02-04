@@ -37,6 +37,7 @@ interface State {
   avatar: string;
   backdrop?: string;
   initialBackdrop?: string;
+  showPicker?: boolean;
 }
 class ProfileView extends Component<ProfileProps, State> {
   constructor(props) {
@@ -83,7 +84,7 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: 'Profile',
     tabBarIcon: ({ tintColor }) => <Icon name="md-person" size={25} style={{ color: tintColor }} />,
   };
@@ -245,7 +246,17 @@ class ProfileView extends Component<ProfileProps, State> {
 
   render() {
     const { gym, goToGym, goToSettings } = this.props;
-    const { initialAvatar, initialProfile, initialBackdrop, backdrop, email, profile, avatar, spinner } = this.state;
+    const {
+      initialAvatar,
+      initialProfile,
+      initialBackdrop,
+      backdrop,
+      email,
+      profile,
+      avatar,
+      spinner,
+      showPicker,
+    } = this.state;
     return (
       <>
         <Header
@@ -457,13 +468,13 @@ class ProfileView extends Component<ProfileProps, State> {
           )}
           
         </ScrollView>
-        <DateTimePicker
+        {showPicker && <DateTimePicker
           mode="date"
           value={new Date(profile && profile.birthday)}
   
           maximumDate={new Date()}
           onChange={date => this.setState({ profile: { ...profile, birthday: date } })}
-        />
+        />}
       </>
     );
   }

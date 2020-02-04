@@ -17,7 +17,7 @@ import { GymChatProps } from '../../types/views/chat/GymChat';
 
 class GymChat extends Component<GymChatProps, { refreshing: boolean }> {
   static navigationOptions = {
-    header: null,
+    headerShown: false,
     tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Gym" color={tintColor} />,
     tabBarIcon: ({ tintColor }) => <ChatTabBarIcon color={tintColor} />,
   };
