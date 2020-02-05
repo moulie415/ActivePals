@@ -110,7 +110,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Google-Mobile-Ads-SDK (7.54.0):
+  - Google-Mobile-Ads-SDK (7.55.0):
     - GoogleAppMeasurement (~> 6.0)
   - GoogleAppMeasurement (6.1.6):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
@@ -353,6 +353,8 @@ PODS:
     - React
   - react-native-maps (0.25.0):
     - React
+  - react-native-safe-area-context (0.6.4):
+    - React
   - react-native-slider (2.0.8):
     - React
   - react-native-splash-screen (3.2.0):
@@ -363,6 +365,8 @@ PODS:
     - React
     - react-native-video/Video (= 4.4.4)
   - react-native-video/Video (4.4.4):
+    - React
+  - react-native-viewpager (3.3.0):
     - React
   - react-native-webview (5.12.1):
     - React
@@ -404,11 +408,11 @@ PODS:
   - ReactNativeAdsFacebook (6.3.1):
     - FBAudienceNetwork
     - React
-  - ReactNativePermissions (1.2.1):
-    - React
   - rn-fetch-blob (0.12.0):
     - React-Core
   - RNCAsyncStorage (1.7.1):
+    - React
+  - RNCMaskedView (0.1.6):
     - React
   - RNDateTimePicker (2.2.1):
     - React
@@ -421,8 +425,16 @@ PODS:
     - Fabric
     - Firebase/Core
     - React
+  - RNGestureHandler (1.5.6):
+    - React
   - RNGoogleSignin (3.0.4):
     - GoogleSignIn (~> 5.0.0)
+    - React
+  - RNPermissions (2.0.9):
+    - React
+  - RNReanimated (1.7.0):
+    - React
+  - RNScreens (2.0.0-alpha.34):
     - React
   - RNShare (1.2.1):
     - React
@@ -450,6 +462,7 @@ DEPENDENCIES:
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - Google-Mobile-Ads-SDK
+  - GoogleSignIn (~> 5.0.2)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - React (from `../node_modules/react-native/`)
@@ -470,10 +483,12 @@ DEPENDENCIES:
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-image-resizer (from `../node_modules/react-native-image-resizer`)
   - react-native-maps (from `../node_modules/react-native-maps`)
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-version-number (from `../node_modules/react-native-version-number`)
   - react-native-video (from `../node_modules/react-native-video`)
+  - "react-native-viewpager (from `../node_modules/@react-native-community/viewpager`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -487,12 +502,16 @@ DEPENDENCIES:
   - ReactCommon/jscallinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeAdsFacebook (from `../node_modules/react-native-fbads`)
-  - ReactNativePermissions (from `../node_modules/react-native-permissions`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
+  - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
+  - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-community/google-signin`)"
+  - RNPermissions (from `../node_modules/react-native-permissions`)
+  - RNReanimated (from `../node_modules/react-native-reanimated`)
+  - RNScreens (from `../node_modules/react-native-screens`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNSound (from `../node_modules/react-native-sound`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -580,6 +599,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-resizer"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   react-native-slider:
     :path: "../node_modules/@react-native-community/slider"
   react-native-splash-screen:
@@ -588,6 +609,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-version-number"
   react-native-video:
     :path: "../node_modules/react-native-video"
+  react-native-viewpager:
+    :path: "../node_modules/@react-native-community/viewpager"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -612,18 +635,26 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   ReactNativeAdsFacebook:
     :path: "../node_modules/react-native-fbads"
-  ReactNativePermissions:
-    :path: "../node_modules/react-native-permissions"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
+  RNCMaskedView:
+    :path: "../node_modules/@react-native-community/masked-view"
   RNDateTimePicker:
     :path: "../node_modules/@react-native-community/datetimepicker"
   RNFirebase:
     :path: "../node_modules/react-native-firebase/ios"
+  RNGestureHandler:
+    :path: "../node_modules/react-native-gesture-handler"
   RNGoogleSignin:
     :path: "../node_modules/@react-native-community/google-signin"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
+  RNReanimated:
+    :path: "../node_modules/react-native-reanimated"
+  RNScreens:
+    :path: "../node_modules/react-native-screens"
   RNShare:
     :path: "../node_modules/react-native-share"
   RNSound:
@@ -659,7 +690,7 @@ SPEC CHECKSUMS:
   FirebaseStorage: 93fe2f8190a01bfb2b2c4932df7d679744c4ef1d
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Google-Mobile-Ads-SDK: 8241b4bd0f11b4f03f5dcd4affccb04ca938f050
+  Google-Mobile-Ads-SDK: 09d1c182f144b456fce626f9234ab4d35397ea10
   GoogleAppMeasurement: dfe55efa543e899d906309eaaac6ca26d249862f
   GoogleDataTransport: 0048df6388dab1c254799f2a30365b1dffe20422
   GoogleDataTransportCCTSupport: f880d70972efa2ed1be4e9173a0f4c5f3dc2d176
@@ -688,10 +719,12 @@ SPEC CHECKSUMS:
   react-native-image-picker: e47cbaf230af8902316e4d69dc83f959bde45e23
   react-native-image-resizer: 9dfb844937574db849fd18a56d8e6c607b0a31d8
   react-native-maps: 190c02ca533fddac5bb49cf17bdece3644612107
+  react-native-safe-area-context: 042dfc9d4db17196841df962ba9497f6e7a5bd02
   react-native-slider: b2f361499888302147205f17f6fffa921a7bda70
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-version-number: 15563dc4145a94aabfc1faab2a9af10174a4204e
   react-native-video: 25d5aebb3c9d7cdefe7a909306c7ab40be4a892c
+  react-native-viewpager: 118e65d8c65c56fe48d12a35cdcf1fe7e027a366
   react-native-webview: 21c396687cb983fadc6ccc0751cc74f554131f3f
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
@@ -704,18 +737,22 @@ SPEC CHECKSUMS:
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeAdsFacebook: f26673210344d50687d4c7b1b4242c3b6b48c33f
-  ReactNativePermissions: e7db6c38a2f3fb8f26dbfdcaeb5c5e9364657a6d
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCAsyncStorage: 8539fc80a0075fcc9c8e2dff84cd22dc5bf1dacf
+  RNCMaskedView: e5b99bc191945f157adeede68da9d424462de177
   RNDateTimePicker: 1e20e91177ab5e885aa645666c5490ad99e9a839
   RNFirebase: 37daa9a346d070f9f6ee1f3b4aaf4c8e3b1d5d1c
+  RNGestureHandler: 911d3b110a7a233a34c4f800e7188a84b75319c6
   RNGoogleSignin: a00f87261ea13df9a5cea8deafa6927d6f2c3562
+  RNPermissions: 6db7e0a4d94c9c02390d11020b1d3d187aaf77e5
+  RNReanimated: 031fe8d9ea93c2bd689a40f05320ef9d96f74d7f
+  RNScreens: 9d8a2900cd4f967af70dbfed74b64f77fbb6600a
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
   RNSound: c980916b596cc15c8dcd2f6ecd3b13c4881dbe20
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   SDWebImage: 4d5c027c935438f341ed33dbac53ff9f479922ca
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: dcb02b4170c8952cd9e078da80ebb46d1f73bc12
+PODFILE CHECKSUM: 214788c004f1acb8c906c55e378751dbc574219a
 
 COCOAPODS: 1.8.4

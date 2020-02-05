@@ -11,7 +11,6 @@ import { PulseIndicator } from 'react-native-indicators';
 import { connect } from 'react-redux';
 import { LoginManager, AccessToken } from 'react-native-fbsdk';
 import Button from '../components/Button';
-import { navigateLogin, navigateHome } from '../actions/navigation';
 import { AccountType } from '../types/Profile';
 import styles from '../styles/loginStyles';
 import sStyles from '../styles/settingsStyles';
@@ -20,7 +19,6 @@ import Text, { globalTextStyle } from '../components/Text';
 import str from '../constants/strings';
 import { doSetup, fetchProfile, setLoggedOut } from '../actions/profile';
 import LoginProps from '../types/views/Login';
-
 
 interface State {
   spinner: boolean;
@@ -45,9 +43,8 @@ class Login extends Component<LoginProps, State> {
   }
 
   componentDidMount() {
-    const { logout, onLogin, loggedIn } = this.props;
+    const { onLogin, loggedIn, navigation, loggedOut } = this.props;
     const { waitForData } = this.state;
-    SplashScreen.hide();
     firebase.auth().onAuthStateChanged(async user => {
       if (user && (user.emailVerified || (user.providerData && user.providerData.length > 0)) && !waitForData) {
         /* ios onAuthStateChanged gets called twice so we want to account
@@ -55,13 +52,16 @@ class Login extends Component<LoginProps, State> {
         if (this.secondAuthChange || Platform.OS !== 'ios') {
           this.setState({ spinner: false });
           await onLogin();
-          this.goNext()
+          this.goNext();
         } else {
           this.secondAuthChange = true;
         }
       } else if (loggedIn) {
-        logout();
+        navigation.navigate('Login');
+        loggedOut();
       }
+      SplashScreen.hide();
+      this.setState({ googleLoading: false, facebookLoading: false });
     });
   }
 
@@ -139,7 +139,7 @@ class Login extends Component<LoginProps, State> {
           }
           await this.createUser(uid, json, token);
           await onLogin();
-          this.goNext()
+          this.goNext();
           this.setState({ facebookLoading: false });
         }
       } catch (e) {
@@ -162,16 +162,14 @@ class Login extends Component<LoginProps, State> {
   async login(email, pass) {
     const { onLogin } = this.props;
     try {
-      const { user } = await firebase
-        .auth()
-        .signInWithEmailAndPassword(email, pass)
-          if (user.emailVerified) {
-            await onLogin();
-            this.goNext()
-          } else {
-            this.setState({ spinner: false });
-            Alert.alert('Sorry', 'You must first verify your email using the link we sent you before logging in');
-          }
+      const { user } = await firebase.auth().signInWithEmailAndPassword(email, pass);
+      if (user.emailVerified) {
+        await onLogin();
+        this.goNext();
+      } else {
+        this.setState({ spinner: false });
+        Alert.alert('Sorry', 'You must first verify your email using the link we sent you before logging in');
+      }
 
       // Navigate to the Home page
     } catch (error) {
@@ -197,7 +195,7 @@ class Login extends Component<LoginProps, State> {
         iosClientId: iosClientId.val(),
         webClientId: webClientId.val(),
       });
-      await GoogleSignin.hasPlayServices({ autoResolve: true });
+      await GoogleSignin.hasPlayServices();
       const gUser = await GoogleSignin.signIn();
       console.log(gUser);
       const first_name = gUser.givenName;
@@ -292,7 +290,9 @@ class Login extends Component<LoginProps, State> {
               if (username && pass) {
                 this.setState({ spinner: true, secure: true });
                 this.login(username, pass);
-              } else Alert.alert('Sorry', 'Please enter both your email and your password');
+              } else {
+                Alert.alert('Sorry', 'Please enter both your email and your password');
+              }
             }}
             style={[{ marginRight: 10 }, styles.button]}
           />
@@ -335,18 +335,11 @@ const mapStateToProps = ({ profile }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onLogoutPress: () => {
-    dispatch(navigateLogin());
-  },
   onLogin: async () => {
     const profile = await dispatch(fetchProfile());
     await dispatch(doSetup(profile));
   },
-  logout: () => {
-    dispatch(navigateLogin());
-    dispatch(setLoggedOut());
-  },
-  goHome: () => dispatch(navigateHome()),
+  loggedOut: () => dispatch(setLoggedOut()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

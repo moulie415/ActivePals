@@ -65,11 +65,10 @@ const chats = createMaterialTopTabNavigator(
       inactiveTintColor: colors.secondary,
       tabStyle: {
         justifyContent: isIphoneX() ? 'flex-end' : 'center',
-        marginBottom: Platform.select({ ios: isIphoneX() ? -20 : -10 }),
       },
       style: {
         backgroundColor: colors.primary,
-        height: Platform.select({ ios: isIphoneX() ? 50 : 70 }),
+        height: Platform.select({ ios: isIphoneX() ? 70 : 90 }),
         justifyContent: isIphoneX() ? 'center' : null,
       },
       indicatorStyle: {

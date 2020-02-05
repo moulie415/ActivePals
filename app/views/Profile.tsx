@@ -17,7 +17,7 @@ import colors from '../constants/colors';
 import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
-import { navigateLogin, navigateGym } from '../actions/navigation';
+import { navigateGym } from '../actions/navigation';
 import { fetchProfile, setLoggedOut } from '../actions/profile';
 import { pickerItems } from '../constants/utils';
 import str from '../constants/strings';
@@ -90,7 +90,7 @@ class ProfileView extends Component<ProfileProps, State> {
   };
 
   logout() {
-    const { profile, onLogoutPress } = this.props;
+    const { profile, onLogoutPress, navigation } = this.props;
     Alert.alert('Log out', 'Are you sure?', [
       { text: 'Cancel', onPress: () => console.log('Cancel logout'), style: 'cancel' },
       {
@@ -107,9 +107,11 @@ class ProfileView extends Component<ProfileProps, State> {
             await firebase.auth().signOut();
             this.setState({ spinner: false });
             onLogoutPress();
+            navigation.navigate('Login');
           } catch (e) {
             Alert.alert('Error', e.message);
             onLogoutPress();
+            navigation.navigate('Login');
           }
         },
       },
@@ -486,10 +488,7 @@ const mapStateToProps = ({ profile }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onLogoutPress: () => {
-    dispatch(setLoggedOut());
-    dispatch(navigateLogin());
-  },
+  onLogoutPress: () => dispatch(setLoggedOut()),
   onSave: () => dispatch(fetchProfile()),
   goToGym: gym => dispatch(navigateGym(gym)),
 });

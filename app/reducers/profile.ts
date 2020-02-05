@@ -1,4 +1,3 @@
-import { Platform, PushNotificationIOS } from 'react-native';
 import {
   SET_PROFILE,
   SET_LOGGED_IN,
@@ -57,9 +56,6 @@ export default function(state = initialState, action) {
       };
     }
     case SET_LOGGED_OUT:
-      if (Platform.OS === 'ios') {
-        PushNotificationIOS.setApplicationIconBadgeNumber(0);
-      }
       return { ...initialState, hasViewedWelcome: state.hasViewedWelcome };
     default:
       return state;

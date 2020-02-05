@@ -5,5 +5,5 @@ export default interface LoginProps {
   navigation: NavigationStackProp;
   hasViewedWelcome: boolean;
   onLogin: () => void;
-  logout: () => void;
+  loggedOut: () => void;
 }

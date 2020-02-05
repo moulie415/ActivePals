@@ -98,6 +98,7 @@ class Settings extends Component<SettingsProps, State> {
               this.setState({ spinner: true });
               try {
                 await onRemoveUser();
+                navigation.navigate('Login');
                 Alert.alert('Success', 'Account deleted');
                 this.setState({ spinner: false });
               } catch (e) {

@@ -17,20 +17,6 @@ const navigate = (routeName, params?) => {
 
 const goBack = () => _navigator.dispatch(NavigationActions.back());
 
-export const navigateLogin = () => {
-  return dispatch => {
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      actions: [
-        NavigationActions.navigate({
-          routeName: 'Login',
-        }),
-      ],
-    });
-    dispatch(resetAction);
-  };
-};
-
 export default {
   navigate,
   goBack,

@@ -35,10 +35,12 @@ target 'Anyone' do
   pod 'Firebase/Database', '~> 6.13.0'
   pod 'Firebase/Auth', '~> 6.13.0'
   pod 'Firebase/Storage', '~> 6.13.0'
+  pod 'GoogleSignIn', '~> 5.0.2'
 
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
+
 
   target 'AnyoneTests' do
     inherit! :search_paths

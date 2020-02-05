@@ -102,7 +102,7 @@ class Sessions extends Component<SessionsProps, State> {
     this.setState({ spinner: true });
     // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
     this.setState({ locationPermission: response });
-    if (response !== 'authorized') {
+    if (response !== 'granted') {
       this.alertForLocationPermission();
     } else {
       this.getPosition();

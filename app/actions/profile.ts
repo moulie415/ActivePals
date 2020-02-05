@@ -3,7 +3,6 @@ import { fetchFriends } from './friends';
 import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat, getUnreadCount } from './chats';
 import { fetchPosts } from './home';
 import { fetchSessions, fetchPhotoPath, fetchPrivateSessions } from './sessions';
-import { navigateLogin, navigateHome, navigateWelcome } from './navigation';
 import { UserState } from '../types/Profile';
 
 export const SET_PROFILE = 'SET_PROFILE';
@@ -159,7 +158,6 @@ export const removeUser = () => {
     const user = firebase.auth().currentUser;
     dispatch(setLoggedOut());
     await user.delete();
-    dispatch(navigateLogin());
   };
 };
 
