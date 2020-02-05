@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import { View } from 'react-native';
 import Text from '../Text';
 import styles from './styles';
+import ChatRowCountProps from '../../types/components/ChatRowCount';
 
-const ChatRowCount: FunctionComponent = ({ unreadCount, id }) => {
+const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({ unreadCount, id }) => {
   const count = unreadCount[id];
   if (count && count > 0) {
     return (

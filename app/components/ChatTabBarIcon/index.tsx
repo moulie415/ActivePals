@@ -4,8 +4,9 @@ import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Text from '../Text';
 import styles from './styles';
+import ChatTabBarIconProps from '../../types/components/ChatTabBarIcon';
 
-const ChatTabBarIcon: FunctionComponent = ({ unreadCount, color }) => {
+const ChatTabBarIcon: FunctionComponent<ChatTabBarIconProps> = ({ unreadCount, color }) => {
   let count = 0;
   Object.values(unreadCount).forEach(val => (count += val));
   return (

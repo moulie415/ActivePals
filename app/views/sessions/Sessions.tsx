@@ -328,10 +328,7 @@ class Sessions extends Component<SessionsProps, State> {
                   <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity
                       onPress={() => onOpenGymChat(gym.place_id)}
-                      style={{
-                        justifyContent: 'center',
-                        marginRight: 20,
-                      }}
+                      style={{ justifyContent: 'center', marginRight: 20 }}
                     >
                       <Icon name="md-chatboxes" size={25} style={{ color: colors.secondary }} />
                     </TouchableOpacity>
@@ -699,7 +696,7 @@ class Sessions extends Component<SessionsProps, State> {
               onContinue(null, selectedLocation);
             } else if (index === 1) {
               if (Object.values(friends).length > 0) {
-                this.setState({ friendsModalOpen: true })
+                this.setState({ friendsModalOpen: true });
               } else {
                 Alert.alert('Sorry', 'You must have at least one pal to create a private session')
               }

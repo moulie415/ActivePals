@@ -3,8 +3,16 @@ import { View, Platform } from 'react-native';
 import { connect } from 'react-redux';
 import Text from '../Text';
 import styles from './styles';
+import ChatTabLabelProps from '../../types/components/ChatTabLabel';
 
-const ChatTabLabel: FunctionComponent = ({ unreadCount, color, type, chats, sessionChats, gymChat }) => {
+const ChatTabLabel: FunctionComponent<ChatTabLabelProps> = ({
+  unreadCount,
+  color,
+  type,
+  chats,
+  sessionChats,
+  gymChat,
+}) => {
   let count = 0;
   const chatType = type.toLowerCase();
   Object.keys(unreadCount).forEach(key => {

@@ -4,6 +4,9 @@ import ParsedText from 'react-native-parsed-text';
 import str from '../../constants/strings';
 import colors from '../../constants/colors';
 import firebase from 'react-native-firebase';
+import { connect } from 'react-redux';
+import { navigateProfileView, navigateProfile } from '../../actions/navigation';
+import ParsedTextProps from '../../types/components/ParsedText';
 
 const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
   text,
@@ -26,7 +29,7 @@ const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
             if (!disableOnPress) {
               const name = mention.substring(1);
               const combined = [...Object.values(friends), ...Object.values(users)];
-              if (name == profile.username) {
+              if (name === profile.username) {
                 goToProfile();
               } else {
                 const found = combined.find(friend => friend.username == name);
@@ -58,10 +61,6 @@ const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
     </ParsedText>
   );
 };
-
-import { connect } from 'react-redux';
-import { navigateProfileView, navigateProfile } from '../../actions/navigation';
-import ParsedTextProps from '../../types/components/ParsedText';
 
 const mapStateToProps = ({ profile, friends, sharedInfo }) => ({
   profile: profile.profile,
