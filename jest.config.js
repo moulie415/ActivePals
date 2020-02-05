@@ -6,6 +6,7 @@ module.exports = {
     ],
     collectCoverage: true,
     collectCoverageFrom: ['app/**/*.{ts,tsx}'],
+    coveragePathIgnorePatterns: ['app/types', 'app/styles', 'styles.ts'],
     // setupFilesAfterEnv: [
     //   '<rootDir>/__tests__/__mocks__/firebase.ts',
     //   '<rootDir>/__tests__/__mocks__/@react-native-community/geolocation.ts',
