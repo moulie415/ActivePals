@@ -16,15 +16,6 @@ import Header from '../../components/Header/header';
 import { guid, sortMessagesByCreatedAt } from '../../constants/utils';
 import str from '../../constants/strings';
 // import EmojiInput from 'react-native-emoji-input'
-import {
-  navigateMessaging,
-  navigateProfile,
-  navigateProfileView,
-  navigateGym,
-  navigateFilePreview,
-  navigateBack,
-  navigateSessionInfo,
-} from '../../actions/navigation';
 import { sendRequest, acceptRequest } from '../../actions/friends';
 import {
   fetchMessages,
@@ -35,7 +26,6 @@ import {
   resetUnreadCount,
   updateLastMessage,
 } from '../../actions/chats';
-import { fetchProfile } from '../../actions/profile';
 import MessagingProps from '../../types/views/Messaging';
 import Message, { MessageType, SessionType } from '../../types/Message';
 import ImagePickerOptions from '../../types/Shared';
@@ -156,12 +146,12 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   onBackPress() {
-    const { goBack } = this.props;
+    const { navigation } = this.props;
     const { showEmojiKeyboard } = this.state;
     if (showEmojiKeyboard) {
       this.setState({ showEmojiKeyboard: false });
     } else {
-      goBack();
+      navigation.goBack();
     }
     return true;
   }
@@ -241,12 +231,12 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   getRightHandIcon() {
-    const { navigation, goToGym, viewSession } = this.props;
+    const { navigation } = this.props;
     const { params } = navigation.state;
     const { gymId, session } = params;
     if (gymId) {
       return (
-        <TouchableOpacity onPress={() => goToGym(gymId)}>
+        <TouchableOpacity onPress={() => navigation.navigate('Gym', { id: gymId })}>
           <Icon size={25} name="md-information-circle" style={{ color: '#fff' }} />
         </TouchableOpacity>
       );
@@ -254,14 +244,13 @@ class Messaging extends Component<MessagingProps, State> {
     if (session) {
       const { key, private: isPrivate } = session;
       return (
-        <TouchableOpacity onPress={() => viewSession(key, isPrivate)}>
+        <TouchableOpacity onPress={() => navigation.navigate('SessionInfo', { sessionId: key, isPrivate })}>
           <Icon size={25} name="md-information-circle" style={{ color: '#fff' }} />
         </TouchableOpacity>
       );
     }
     return null;
   }
-
 
   keyboardDidShow() {
     if (Platform.OS === 'ios') {
@@ -286,7 +275,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   showPicker() {
-    const { previewFile } = this.props;
+    const { navigation } = this.props;
     const { text } = this.state;
     const videoOptions: ImagePickerOptions = {
       mediaType: 'video',
@@ -334,7 +323,7 @@ class Messaging extends Component<MessagingProps, State> {
         try {
           const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100);
           this.setState({ spinner: false });
-          previewFile('image', resized.uri, true, text);
+          navigation.navigate('FilePreview', { type: 'image', uri: resized.uri, message: true, text });
         } catch (e) {
           Alert.alert('Error', e.message);
           this.setState({ spinner: false });
@@ -344,19 +333,19 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   async openChat(user) {
-    const { profile, onOpenChat } = this.props;
+    const { profile, navigation } = this.props;
     const snapshot = await firebase
       .database()
       .ref(`userChats/${profile.uid}`)
       .child(user.uid)
       .once('value');
     if (snapshot.val()) {
-      onOpenChat(snapshot.val(), user.username, user.uid);
+      navigation.navigate('Messaging', { chatId: snapshot.val(), friendUsername: user.username, friendUid: user.uid });
     }
   }
 
   render() {
-    const { navigation, gym, profile, friends, users, viewProfile } = this.props;
+    const { navigation, gym, profile, friends, users } = this.props;
     const { messages, showLoadEarlier, spinner, text } = this.state;
     const { params } = navigation.state;
     const { friendUsername, session } = params;
@@ -377,11 +366,11 @@ class Messaging extends Component<MessagingProps, State> {
             } else {
               Alert.alert('Username not set', 'You need a username before sending messages, go to your profile now?', [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'OK', onPress: () => navigateProfile() },
+                { text: 'OK', onPress: () => navigation.navigate('Profile') },
               ]);
             }
           }}
-          onPressAvatar={user => viewProfile(user._id)}
+          onPressAvatar={user => navigation.navigate('ProfileView', { uid: user._id })}
           onLoadEarlier={() => {
             const sorted = sortMessagesByCreatedAt(messages);
             const endAt = sorted[sorted.length - 1].key;
@@ -452,11 +441,11 @@ class Messaging extends Component<MessagingProps, State> {
                 const name = mention.substring(1);
                 const combined = [...Object.values(friends), ...Object.values(users)];
                 if (name === profile.username) {
-                  navigateProfile();
+                  navigation.navigate('Profile');
                 } else {
                   const found = combined.find(friend => friend.username === name);
                   if (found) {
-                    viewProfile(found.uid);
+                    navigation.navigate('ProfileView', { uid: found.uid });
                   } else {
                     try {
                       const snapshot = await firebase
@@ -465,7 +454,7 @@ class Messaging extends Component<MessagingProps, State> {
                         .child(name)
                         .once('value');
                       if (snapshot.val()) {
-                        viewProfile(snapshot.val());
+                        navigation.navigate('ProfileView', { uid: snapshot.val() });
                       }
                     } catch (e) {
                       console.warn(e.message);
@@ -520,20 +509,12 @@ const mapDispatchToProps = dispatch => ({
   onUpdateLastMessage: message => dispatch(updateLastMessage(message)),
   onRequest: friendUid => dispatch(sendRequest(friendUid)),
   onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
-  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   getMessages: (id, amount, uid, endAt) => dispatch(fetchMessages(id, amount, uid, endAt)),
   getSessionMessages: (id, amount, isPrivate, endAt) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
   getGymMessages: (id, amount, endAt) => dispatch(fetchGymMessages(id, amount, endAt)),
   resetNotif: () => dispatch(resetNotification()),
-  goToProfile: () => dispatch(navigateProfile()),
-  viewProfile: uid => dispatch(navigateProfileView(uid)),
-  goToGym: gym => dispatch(navigateGym(gym)),
   onResetMessage: () => dispatch(resetMessage()),
-  previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
-  goBack: () => dispatch(navigateBack()),
   onResetUnreadCount: id => dispatch(resetUnreadCount(id)),
-  fetchProfile: () => dispatch(fetchProfile()),
-  viewSession: (sessionId, isPrivate) => dispatch(navigateSessionInfo(sessionId, isPrivate)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messaging);
