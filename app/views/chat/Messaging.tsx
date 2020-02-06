@@ -92,8 +92,9 @@ class Messaging extends Component<MessagingProps, State> {
       onResetMessage();
     }
     if (nextProps.messageSession) {
-      this.setState({ messages: Object.values(nextProps.messageSession), spinner: false });
-      if (nextProps.messageSession && Object.values(nextProps.messageSession).some(message => message._id === 1)) {
+      const { messageSession }: { [key: string]: Message } = nextProps;
+      this.setState({ messages: Object.values(messageSession), spinner: false });
+      if (messageSession && Object.values(messageSession).some(message => message._id === 1)) {
         this.setState({ showLoadEarlier: false });
       }
     }

@@ -12,6 +12,7 @@ export default interface Message extends IMessage {
   sessionType?: SessionType;
   image?: string;
   user: MessageUser;
+  key?: string;
 }
 
 export interface MessageUser {
