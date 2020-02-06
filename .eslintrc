@@ -14,7 +14,8 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript",
     "plugin:prettier/recommended",
-    "prettier/@typescript-eslint"
+    "prettier/@typescript-eslint",
+    "@react-native-community"
   ],
   "rules": {
     "global-require": 0,
