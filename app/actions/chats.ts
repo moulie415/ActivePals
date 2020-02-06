@@ -163,19 +163,7 @@ export const getUnreadCount = uid => {
         if (snapshot.val()) {
           Object.keys(snapshot.val()).forEach(id => {
             const count = snapshot.val()[id];
-            const { nav } = getState();
-            const { routes } = nav;
-            let route = {};
-            if (routes) {
-              route = routes[nav.index];
-            }
-            if (
-              count !== 0 &&
-              (!route.params ||
-                (route.params.friendUid && route.params.friendUid !== id) ||
-                (route.params.session && route.params.session.key !== id) ||
-                (route.params.gymId && route.params.gymId !== id))
-            ) {
+            if (count !== 0) {
               dispatch(setUnreadCount({ id, count }));
             } else if (count !== 0) {
               dispatch(resetUnreadCount(id));
@@ -269,7 +257,7 @@ export const fetchSessionChats = (uid, limit = 10) => {
 };
 
 export const fetchMessages = (id, amount, uid, endAt) => {
-  return dispatch => {
+  return async dispatch => {
     const ref = endAt
       ? firebase
           .database()
@@ -282,35 +270,35 @@ export const fetchMessages = (id, amount, uid, endAt) => {
           .ref(`chats/${id}`)
           .orderByKey()
           .limitToLast(amount);
-    return ref.once('value', snapshot => {
-      const messages = {};
-      firebase
+    const snapshot = await ref.once('value')
+    const messages = {};
+    try {
+      const url = await firebase
         .storage()
         .ref(`images/${uid}`)
         .child('avatar')
         .getDownloadURL()
-        .then(url => {
-          snapshot.forEach(child => {
-            if (child.val().user && child.val().user._id === uid) {
-              messages[child.key] = {
-                ...child.val(),
-                key: child.key,
-                createdAt: new Date(child.val().createdAt),
-                user: { ...child.val().user, avatar: url },
-              };
-            } else {
-              messages[child.key] = { ...child.val(), key: child.key, createdAt: new Date(child.val().createdAt) };
-            }
-          });
-          dispatch(setMessageSession(id, messages));
-        })
-        .catch(e => {
-          snapshot.forEach(child => {
-            messages[child.key] = { ...child.val(), key: child.key, createdAt: new Date(child.val().createdAt) };
-          });
-          dispatch(setMessageSession(id, messages));
-        });
-    });
+      snapshot.forEach(child => {
+        if (child.val().user && child.val().user._id === uid) {
+          messages[child.key] = {
+            ...child.val(),
+            key: child.key,
+            createdAt: new Date(child.val().createdAt),
+            user: { ...child.val().user, avatar: url },
+          };
+        } else {
+          messages[child.key] = { ...child.val(), key: child.key, createdAt: new Date(child.val().createdAt) };
+        }
+        return false;
+      });
+      dispatch(setMessageSession(id, messages));
+    } catch (e) {
+      snapshot.forEach(child => {
+        messages[child.key] = { ...child.val(), key: child.key, createdAt: new Date(child.val().createdAt) };
+        return false;
+      });
+      dispatch(setMessageSession(id, messages));
+    }
   };
 };
 
@@ -347,6 +335,7 @@ export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
                   .catch(e => resolve({ [child.key]: null }));
               })
             );
+            return false;
           });
           Promise.all(promises).then(array => {
             let avatars = {};
@@ -368,6 +357,7 @@ export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
               } else {
                 messages[child.key] = { ...child.val(), key: child.key, createdAt: new Date(child.val().createdAt) };
               }
+              return false;
             });
             dispatch(setMessageSession(id, messages));
           });
@@ -408,6 +398,7 @@ export const fetchGymMessages = (id, amount, endAt) => {
                   .catch(e => resolve({ [child.key]: null }));
               })
             );
+            return false;
           });
           Promise.all(promises).then(array => {
             let avatars = {};
@@ -429,6 +420,7 @@ export const fetchGymMessages = (id, amount, endAt) => {
               } else {
                 messages[child.key] = { ...child.val(), key: child.key, createdAt: new Date(child.val().createdAt) };
               }
+              return false;
             });
             dispatch(setMessageSession(id, messages));
           });

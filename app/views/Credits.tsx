@@ -6,6 +6,7 @@ import Header from '../components/Header/header';
 import Text from '../components/Text';
 import { getType } from '../constants/utils';
 import colors from '../constants/colors';
+import { SessionType } from '../types/Session';
 
 // football icon made by Christopher Schreiner @infanf http://twitter.com/infanf
 
@@ -44,9 +45,9 @@ class Credits extends Component {
           >
             <Text style={{ textAlign: 'center', fontSize: 30, fontWeight: 'bold', marginTop: 20 }}>Icon designers</Text>
             <View style={{ alignItems: 'center', flexDirection: 'row', alignSelf: 'center' }}>
-              {getType('Gym', 30)}
-              {getType('Running', 30)}
-              {getType('Custom', 30)}
+              {getType(SessionType.GYM, 30)}
+              {getType(SessionType.RUNNING, 30)}
+              {getType(SessionType.CUSTOM, 30)}
             </View>
             <Text style={{ textAlign: 'center', marginHorizontal: 20, marginBottom: 10 }}>
               Icons made by Austin Andrews http://twitter.com/Templarian
@@ -59,7 +60,7 @@ class Credits extends Component {
               {'Icons made by Elias Bikbulatov from \nhttp://okodesign.ru/'}
             </Text>
             <View style={{ alignItems: 'center' }}>
-              {getType('Cycling', 30)}
+              {getType(SessionType.CYCLING, 30)}
               <Text style={{ textAlign: 'center', marginHorizontal: 20, marginBottom: 10 }}>
                 Icon made by http://twitter.com/Google
               </Text>

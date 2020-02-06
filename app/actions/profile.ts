@@ -137,7 +137,7 @@ export const doSetup = profile => {
       // }
     //}
     dispatch(setHasLoggedIn(true));
-    //dispatch(getUnreadCount(uid));
+    dispatch(getUnreadCount(uid));
     dispatch(fetchFriends(uid));
     profile.gym && dispatch(fetchGymChat(profile.gym));
   };

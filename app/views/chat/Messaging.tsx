@@ -147,12 +147,19 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   onBackPress() {
-    const { navigation } = this.props;
+    const { navigation, onResetUnreadCount, unreadCount } = this.props;
+    const { params } = navigation.state;
+    const { gymId, friendUid, sessionId } = params;
     const { showEmojiKeyboard } = this.state;
     if (showEmojiKeyboard) {
       this.setState({ showEmojiKeyboard: false });
     } else {
       navigation.goBack();
+      const id = friendUid || sessionId || gymId;
+      const count = unreadCount[id];
+      if (count && count > 0) {
+        onResetUnreadCount(id);
+      }
     }
     return true;
   }

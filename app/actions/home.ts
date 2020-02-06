@@ -78,7 +78,7 @@ export const addPost = (item) => {
 				firebase.database().ref('userPosts/' + friend).child(key).set(uid)
 			})
 			firebase.database().ref('userPosts/' + uid).child(key).set(uid)
-			dispatch(sendMentionNotifs(item, key))
+			dispatch(sendMentionNotifs(item, key, false, uid))
 			item.key = key
 			dispatch(addToFeed(item, key))
 		})
@@ -88,26 +88,25 @@ export const addPost = (item) => {
 
 const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 	return (dispatch, getState) => {
-		const friends = Object.values(getState().friends.friends)
-		const users = Object.values(getState().sharedInfo.users)
+		const friends: Profile[] = Object.values(getState().friends.friends)
+		const users: Profile[] = Object.values(getState().sharedInfo.users)
 		const combined = [...friends, ...users]
 		if (item.text) {
 			const mentions = item.text.match(str.mentionRegex)
 			if (mentions) {
-				mentions.forEach(mention => {
+				mentions.forEach(async mention => {
 					const username = mention.substring(1)
 					const friend = combined.find(friend => friend.username == username)
 					if (friend && friend.uid != postUid && friend.uid != item.uid) {
 						//add notification for user
 						const id = key + item.uid + 'mention'
 						const type = commentMention ? 'commentMention' : 'postMention'
-						firebase.database().ref('userNotifications/' + friend.uid).child(id).once('value', snapshot => {
-							if (!snapshot.val()) {
-								firebase.database().ref('notifications').child(id).set({date: item.createdAt, uid: item.uid, postId: key, type})
-									.then(()=> firebase.database().ref('userNotifications/' + friend.uid).child(id).set(true))
-									.then(() => upUnreadCount(friend.uid))
-							}
-						})
+						const snapshot = await firebase.database().ref('userNotifications/' + friend.uid).child(id).once('value')
+            if (!snapshot.val()) {
+              await firebase.database().ref('notifications').child(id).set({date: item.createdAt, uid: item.uid, postId: key, type})
+              firebase.database().ref('userNotifications/' + friend.uid).child(id).set(true);
+              upUnreadCount(friend.uid);
+            }
 					}
 				})
 			}
@@ -661,16 +660,14 @@ export const fetchUser = (uid) => {
 export const fetchUsers = (uids: string[]) => {
 	return async (dispatch) => {
 		if (uids.length > 0) {
-			const users: Profile[] = await Promise.all(uids.map(uid => {
-				return new Promise(async resolve => {
+			const users: Profile[] = await Promise.all(uids.map(async uid => {
 					const profile = await firebase.database().ref('users/' + uid).once('value')
 					try {
 						const url = await firebase.storage().ref('images/' + uid).child('avatar').getDownloadURL()
-						resolve({...profile.val(), avatar: url})
+						return {...profile.val(), avatar: url}
 					} catch(e) {
-						resolve(profile.val())
+						return profile.val()
 					}
-				})
 			}))
 			const sharedUsers = {}
 			users.forEach(user => {
