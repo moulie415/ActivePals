@@ -16,13 +16,6 @@ import globalStyles from '../styles/globalStyles';
 import FriendsModal from '../components/friendsModal';
 import Button from '../components/Button';
 import styles from '../styles/gymStyles';
-import {
-  navigateBack,
-  navigateGymMessaging,
-  navigateSessionDetail,
-  navigateProfileView,
-  navigateProfile,
-} from '../actions/navigation';
 import { removeGym, joinGym } from '../actions/profile';
 import { fetchGym } from '../actions/sessions';
 import { muteChat } from '../actions/chats';
@@ -56,10 +49,10 @@ class Gym extends Component<GymProps, State> {
   };
 
   handleUserPress(uid) {
-    const { profile, goToProfile, viewProfile } = this.props;
+    const { profile, navigation } = this.props;
     if (uid === profile.uid) {
-      goToProfile();
-    } else viewProfile(uid);
+      navigation.navigate('Profile');
+    } else navigation.navigate('ProfileView', { uid });
   }
 
   renderUsers(users) {
@@ -88,17 +81,7 @@ class Gym extends Component<GymProps, State> {
   }
 
   render() {
-    const {
-      places,
-      location,
-      navigation,
-      gym: yourGym,
-      join,
-      removeYourGym,
-      onOpenGymChat,
-      createSession,
-      createSessionWithFriends,
-    } = this.props;
+    const { places, location, navigation, gym: yourGym, join, removeYourGym } = this.props;
     const {
       params: { id },
     } = navigation.state;
@@ -165,7 +148,7 @@ class Gym extends Component<GymProps, State> {
                     />
                     <Button
                       text="Chat"
-                      onPress={() => onOpenGymChat(gym.place_id)}
+                      onPress={() => navigation.navigate('Messaging', { gymId: gym.place_id })}
                       style={{ justifyContent: 'center', borderRadius: 5 }}
                     />
                     {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -298,7 +281,7 @@ class Gym extends Component<GymProps, State> {
                 style={{ flex: 1, marginLeft: 5, marginRight: 2, paddingVertical: 15 }}
                 text="Create Session"
                 textStyle={{ textAlign: 'center' }}
-                onPress={() => createSession(gym)}
+                onPress={() => navigation.navigate('SessionDetail', { location: gym })}
               />
               <View style={{ borderRightWidth: 1, borderRightColor: 'transparent' }} />
               <Button
@@ -326,7 +309,7 @@ class Gym extends Component<GymProps, State> {
         />
         <FriendsModal
           onClosed={() => this.setState({ friendsModalOpen: false })}
-          onContinue={friends => createSessionWithFriends(friends, gym)}
+          onContinue={friends => navigation.navigate('SessonDetail', { friends, location: gym })}
           isOpen={friendsModalOpen}
         />
       </>
@@ -345,15 +328,9 @@ const mapStateToProps = ({ friends, sharedInfo, profile, sessions, chats }) => (
 });
 
 const mapDispatchToProps = dispatch => ({
-  goBack: () => dispatch(navigateBack()),
   join: location => dispatch(joinGym(location)),
   removeYourGym: () => dispatch(removeGym()),
-  onOpenGymChat: gymId => dispatch(navigateGymMessaging(gymId)),
-  createSession: location => dispatch(navigateSessionDetail(null, location)),
   getGym: id => dispatch(fetchGym(id)),
-  createSessionWithFriends: (friends, location) => dispatch(navigateSessionDetail(friends, location)),
-  viewProfile: uid => dispatch(navigateProfileView(uid)),
-  goToProfile: () => dispatch(navigateProfile()),
   muteChat: (id, mute) => dispatch(muteChat(id, mute)),
 });
 

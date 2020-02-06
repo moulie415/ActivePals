@@ -39,14 +39,6 @@ import { PostType } from '../types/Post';
 import HomeProps from '../types/views/Home';
 import RepsModal from '../components/RepsModal';
 import {
-  navigateProfile,
-  navigateProfileView,
-  navigateFilePreview,
-  navigateNotifications,
-  navigateFullScreenVideo,
-  navigatePostView,
-} from '../actions/navigation';
-import {
   addPost,
   repPost,
   postComment,
@@ -137,11 +129,11 @@ export class Home extends Component<HomeProps, State> {
   }
 
   getUsernameFormatted(uid) {
-    const { profile, viewProfile, goToProfile } = this.props;
+    const { profile, navigation } = this.props;
     return (
       <TouchableOpacity
         onPress={() => {
-          uid !== profile.uid ? viewProfile(uid) : goToProfile();
+          uid !== profile.uid ? navigation.navigate('ProfileView', { uid }) : navigation.navigate('Profile');
         }}
       >
         <Text style={{ fontWeight: 'bold', color: colors.secondary, flex: 1 }}>
@@ -284,18 +276,18 @@ export class Home extends Component<HomeProps, State> {
           });
         }
       } else {
-        const { previewFile } = this.props;
+        const { navigation } = this.props;
         const { status } = this.state;
         const size = 720;
         const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100);
         this.setState({ spinner: false });
-        previewFile('image', resized.uri, false, status);
+        navigation.navigate('FilePreview', { type: 'image', uri: resized.uri, message: false, text: status });
       }
     });
   }
 
   processVideo(uri) {
-    const { previewFile } = this.props;
+    const { navigation } = this.props;
     const { status } = this.state;
     const statURI = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
     // if (Platform.OS ==='ios') {
@@ -305,7 +297,7 @@ export class Home extends Component<HomeProps, State> {
       .then(stats => {
         console.log(stats);
         if (Number(stats.size) < MAX_VIDEO_SIZE) {
-          previewFile('video', uri, false, status);
+          navigation.navigate('FilePreview', { type: 'video', uri, message: false, text: status });
         } else {
           Alert.alert('Error', 'Sorry the file size is too large');
         }
@@ -348,10 +340,14 @@ export class Home extends Component<HomeProps, State> {
   }
 
   renderAvatar(uid) {
-    const { profile, goToProfile, viewProfile, friends } = this.props;
+    const { profile, friends, navigation } = this.props;
     if (profile.avatar && uid === profile.uid) {
       return (
-        <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+        <TouchableOpacity
+          onPress={() =>
+            uid !== profile.uid ? navigation.navigate('ProfileView', { uid }) : navigation.navigate('Profile')
+          }
+        >
           <Image
             source={{ uri: profile.avatar }}
             style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
@@ -361,7 +357,11 @@ export class Home extends Component<HomeProps, State> {
     }
     if (friends[uid] && friends[uid].avatar) {
       return (
-        <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+        <TouchableOpacity
+          onPress={() =>
+            uid !== profile.uid ? navigation.navigate('ProfileView', { uid }) : navigation.navigate('Profile')
+          }
+        >
           <Image
             source={{ uri: friends[uid].avatar }}
             style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
@@ -370,7 +370,11 @@ export class Home extends Component<HomeProps, State> {
       );
     }
     return (
-      <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+      <TouchableOpacity
+        onPress={() =>
+          uid !== profile.uid ? navigation.navigate('ProfileView', { uid }) : navigation.navigate('Profile')
+        }
+      >
         <Icon name="md-contact" style={{ fontSize: 45, color: colors.primary, marginRight: 10 }} />
       </TouchableOpacity>
     );
@@ -378,7 +382,7 @@ export class Home extends Component<HomeProps, State> {
 
   renderFeedItem(item) {
     const { playing } = this.state;
-    const { goToVideo } = this.props;
+    const { navigation } = this.props;
     switch (item.type) {
       case PostType.STATUS:
         return (
@@ -494,7 +498,7 @@ export class Home extends Component<HomeProps, State> {
                     if (Platform.OS === 'ios') {
                       this.players[item.key].presentFullscreenPlayer();
                     } else {
-                      goToVideo(item.url);
+                      navigation.navigate('FullscreenVideo', { uri: item.url });
                     }
                   }}
                 >
@@ -519,7 +523,7 @@ export class Home extends Component<HomeProps, State> {
   }
 
   renderFeed() {
-    const { feed, getFriends, getProfile, getPosts, profile, viewPost } = this.props;
+    const { feed, getFriends, getProfile, getPosts, profile, navigation } = this.props;
     const { loadMore, refreshing } = this.state;
     if (Object.values(feed).length > 0) {
       return (
@@ -571,7 +575,7 @@ export class Home extends Component<HomeProps, State> {
                 <AdView index={index} />
                 <Card style={{ marginBottom: 10 }}>
                   <TouchableOpacity
-                    onPress={() => viewPost(item.key)}
+                    onPress={() => navigation.navigate('PostView', { id: item.key })}
                     style={{ alignSelf: 'flex-end' }}
                   ></TouchableOpacity>
                   {this.renderFeedItem(item)}
@@ -592,14 +596,12 @@ export class Home extends Component<HomeProps, State> {
       friends,
       users,
       navigation,
-      goToProfile,
       postStatus,
       feed,
       comment,
       getCommentRepsUsers,
       getRepsUsers,
       getReplies,
-      viewProfile,
       getComments,
       onRepComment,
     } = this.props;
@@ -648,7 +650,7 @@ export class Home extends Component<HomeProps, State> {
           }}
         >
           <TouchableOpacity
-            onPress={() => goToProfile()}
+            onPress={() => navigation.navigate('Profile')}
             style={{
               elevation: 4,
               shadowOffset: { width: 5, height: 5 },
@@ -692,7 +694,7 @@ export class Home extends Component<HomeProps, State> {
               } else {
                 Alert.alert('Username not set', 'You need a username before making posts, go to your profile now?', [
                   { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                  { text: 'OK', onPress: () => goToProfile() },
+                  { text: 'OK', onPress: () => navigation.navigate('Profile') },
                 ]);
               }
             }}
@@ -734,7 +736,7 @@ export class Home extends Component<HomeProps, State> {
                 } else {
                   Alert.alert('Username not set', 'You need a username before making posts, go to your profile now?', [
                     { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                    { text: 'OK', onPress: () => goToProfile() },
+                    { text: 'OK', onPress: () => navigation.navigate('Profile') },
                   ]);
                 }
               } else {
@@ -857,9 +859,9 @@ export class Home extends Component<HomeProps, State> {
             users={Object.values(combined)}
             usernameTapAction={(username, uid) => {
               if (uid === profile.uid) {
-                goToProfile();
+                navigation.navigate('Profile');
               } else {
-                viewProfile(uid);
+                navigation.navigate('ProfileView', { uid });
               }
             }}
             childPropName="children"
@@ -884,7 +886,14 @@ export class Home extends Component<HomeProps, State> {
             }}
             likeExtractor={item => item.rep}
             reportedExtractor={item => item.reported}
-            likesExtractor={item => likesExtractor(item, profile.uid, viewProfile, goToProfile)}
+            likesExtractor={item =>
+              likesExtractor(
+                item,
+                profile.uid,
+                (id: string) => navigation.navigate('ProfileView', { uid: id }),
+                () => navigation.navigate('Profile')
+              )
+            }
             likeCountExtractor={item => item.repCount}
             commentCount={feed[postId] ? feed[postId].commentCount : 0}
             childrenCountExtractor={c => c.childrenCount}
@@ -933,12 +942,8 @@ const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  viewPost: id => dispatch(navigatePostView(id)),
-  goToProfile: () => dispatch(navigateProfile()),
-  viewProfile: uid => dispatch(navigateProfileView(uid)),
   postStatus: status => dispatch(addPost(status)),
   onRepPost: item => dispatch(repPost(item)),
-  previewFile: (type, uri, message, text) => dispatch(navigateFilePreview(type, uri, message, text)),
   comment: (uid, postId, text, created_at, parentCommentId) =>
     dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key: string, amount?: number, endAt?: string) => dispatch(fetchComments(key, amount, endAt)),
@@ -946,10 +951,8 @@ const mapDispatchToProps = dispatch => ({
   getPosts: (uid, amount, endAt) => dispatch(fetchPosts(uid, amount, endAt)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepsUsers: (postId: string, limit?: number) => dispatch(fetchRepsUsers(postId, limit)),
-  onNotificationPress: () => dispatch(navigateNotifications()),
   getProfile: () => dispatch(fetchProfile()),
   getFriends: (uid, limit?, endAt?) => dispatch(fetchFriends(uid, limit, endAt)),
-  goToVideo: uri => dispatch(navigateFullScreenVideo(uri)),
   getReplies: (fromCommentId: Comment, limit: number, endAt?: string) =>
     dispatch(fetchReplies(fromCommentId, limit, endAt)),
 });

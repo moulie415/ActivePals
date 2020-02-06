@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, View, TextInput, Platform, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import { Alert, View, TextInput, Platform, FlatList, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
 import Image from 'react-native-fast-image';
@@ -11,7 +11,6 @@ import { getStateColor, sortByState } from '../constants/utils';
 import Header from '../components/Header/header';
 import Text from '../components/Text';
 import Button from '../components/Button';
-import { navigateMessaging, navigateProfileView } from '../actions/navigation';
 import {
   fetchFriends,
   sendRequest,
@@ -21,7 +20,6 @@ import {
   addFriend,
   updateFriendState,
 } from '../actions/friends';
-import { removeChat, addChat } from '../actions/chats';
 import FriendsProps from '../types/views/Friends';
 
 interface State {
@@ -93,7 +91,7 @@ class Friends extends Component<FriendsProps, State> {
   }
 
   async openChat(uid, username) {
-    const { profile, onOpenChat } = this.props;
+    const { profile, navigation } = this.props;
     try {
       const snapshot = await firebase
         .database()
@@ -101,7 +99,7 @@ class Friends extends Component<FriendsProps, State> {
         .child(uid)
         .once('value');
       if (snapshot.val()) {
-        onOpenChat(snapshot.val(), username, uid);
+        navigation.navigate('Messaging', { chatId: snapshot.val(), friendUsername: username, friendUid: uid });
       } else {
         Alert.alert('Error', 'You should not be seeing this error message, please contact support');
       }
@@ -111,7 +109,7 @@ class Friends extends Component<FriendsProps, State> {
   }
 
   renderFriends() {
-    const { friends, profile, onAccept, viewProfile } = this.props;
+    const { friends, profile, onAccept, navigation } = this.props;
     const { refreshing } = this.state;
     return (
       <FlatList
@@ -124,7 +122,7 @@ class Friends extends Component<FriendsProps, State> {
           if (item.status === 'outgoing') {
             return (
               <View style={{ padding: 10, backgroundColor: '#fff', marginBottom: 1 }}>
-                <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', justifyContent: 'center' }} >
+                <View style={{ flexDirection: 'row', height: 40, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ marginHorizontal: 10, flex: 1 }}>{`${item.username} request sent`}</Text>
                   <TouchableOpacity
                     style={{ marginTop: Platform.OS === 'ios' ? -5 : 0 }}
@@ -209,7 +207,10 @@ class Friends extends Component<FriendsProps, State> {
                     >
                       <Icon size={30} name="md-chatboxes" style={{ color: colors.secondary }} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => viewProfile(item.uid)} style={{ padding: 5, marginHorizontal: 5 }}>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('ProfileView', { uids: item.uid })}
+                      style={{ padding: 5, marginHorizontal: 5 }}
+                    >
                       <Icon size={30} name="md-person" style={{ color: colors.secondary }} />
                     </TouchableOpacity>
                   </View>
@@ -250,7 +251,7 @@ class Friends extends Component<FriendsProps, State> {
         ) : (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginHorizontal: 20 }}>
             <Text style={{ color: colors.primary, textAlign: 'center' }}>
-              {"You don't have any pals yet, also please make sure you are connected to the internet"}
+              You don't have any pals yet, also please make sure you are connected to the internet
             </Text>
           </View>
         )}
@@ -287,11 +288,7 @@ const mapDispatchToProps = dispatch => ({
   onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
   onRemove: uid => dispatch(deleteFriend(uid)),
   removeLocal: uid => dispatch(removeFriend(uid)),
-  viewProfile: uid => dispatch(navigateProfileView(uid)),
-  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
   add: friend => dispatch(addFriend(friend)),
-  addChat: chat => dispatch(addChat(chat)),
-  removeChat: chat => dispatch(removeChat(chat)),
   updateFriendState: (uid, state) => dispatch(updateFriendState(uid, state)),
 });
 

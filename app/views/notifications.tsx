@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ScrollView, FlatList, TouchableOpacity, Image as SlowImage } from 'react-native';
+import { View, FlatList, TouchableOpacity, Image as SlowImage } from 'react-native';
 import { PulseIndicator } from 'react-native-indicators';
 import Swipeout from 'react-native-swipeout';
 import { connect } from 'react-redux';
@@ -10,7 +10,6 @@ import styles from '../styles/notificationsStyles';
 import colors from '../constants/colors';
 import { getSimplifiedTime, sortNotificationsByDate } from '../constants/utils';
 import Header from '../components/Header/header';
-import { navigateBack, navigatePostView, navigateFriends } from '../actions/navigation';
 import { getNotifications, setNotificationsRead, deleteNotification } from '../actions/home';
 import NotificationsProps from '../types/views/Notifications';
 import { NotificationType } from '../types/Notification';
@@ -120,7 +119,7 @@ class Notifications extends Component<NotificationsProps, State> {
   };
 
   render() {
-    const { notifications, fetchNotifications, onDelete, goToFriends, viewPost } = this.props;
+    const { notifications, fetchNotifications, onDelete, navigation } = this.props;
     const { fetchAmount, close, showLoadMore, loadingMore, spinner } = this.state;
     const empty = (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -155,9 +154,9 @@ class Notifications extends Component<NotificationsProps, State> {
                   <TouchableOpacity
                     onPress={() => {
                       if (item.postId) {
-                        viewPost(item.postId);
+                        navigation.navigate('PostView', { id: item.postId });
                       } else if (item.type === 'friendRequest') {
-                        goToFriends();
+                        navigation.navigate('Friends');
                       }
                     }}
                   >
@@ -216,11 +215,8 @@ const matchStateToProps = ({ profile, home, friends, sharedInfo }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  goBack: () => dispatch(navigateBack()),
   fetchNotifications: (limit = 10) => dispatch(getNotifications(limit)),
-  viewPost: post => dispatch(navigatePostView(post)),
   setRead: () => dispatch(setNotificationsRead()),
-  goToFriends: () => dispatch(navigateFriends()),
   onDelete: key => dispatch(deleteNotification(key)),
 });
 

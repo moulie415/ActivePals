@@ -9,7 +9,6 @@ import colors from '../constants/colors';
 import Header from '../components/Header/header';
 import sStyles from '../styles/settingsStyles';
 import Button from '../components/Button';
-import { navigateBack } from '../actions/navigation';
 import { AccountType } from '../types/Profile';
 import str from '../constants/strings';
 import SignUpProps from '../types/views/SignUp';
@@ -43,7 +42,7 @@ class SignUp extends Component<SignUpProps, State> {
           token,
           accountType: snapshot.val() ? AccountType.ADMIN : AccountType.STANDARD,
         };
-        //Alert.alert("Success", "Logged in as: " + userData.email)
+        // Alert.alert("Success", "Logged in as: " + userData.email)
         firebase
           .database()
           .ref('users')
@@ -65,38 +64,19 @@ class SignUp extends Component<SignUpProps, State> {
 
   async signup(email, pass) {
     const { username } = this.state;
-    const { goBack } = this.props;
+    const { navigation } = this.props;
     try {
-      await firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, pass)
-        .then(({ user }) => {
-          const userData = { uid: user.uid, email: user.email, username };
-          this.createUser(user.uid, userData, '');
-          user
-            .sendEmailVerification()
-            .then(() => {
-              goBack();
-              Alert.alert(
-                'Account created',
-                'You must now verify your email using the link we sent you before you can login'
-              );
-              this.setState({ spinner: false });
-            })
-            .catch(error => {
-              Alert.alert('Error', error.message);
-              this.setState({ spinner: false });
-            });
-        })
-        .catch(error => {
-          console.log(error);
-          Alert.alert('Error', error.message);
-          this.setState({ spinner: false });
-        });
+      const { user } = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+      const userData = { uid: user.uid, email: user.email, username };
+      this.createUser(user.uid, userData, '');
+      await user.sendEmailVerification();
+      navigation.goBack();
+      Alert.alert('Account created', 'You must now verify your email using the link we sent you before you can login');
+      this.setState({ spinner: false });
     } catch (error) {
       console.log(error.toString());
       this.setState({ spinner: false });
-      Alert.alert(error.toString());
+      Alert.alert('Error', error.message);
     }
   }
 
@@ -191,11 +171,5 @@ class SignUp extends Component<SignUpProps, State> {
     );
   }
 }
-// const mapStateToProps = ({ home, settings, profile }) => ({
-// })
 
-const mapDispatchToProps = dispatch => ({
-  goBack: () => dispatch(navigateBack()),
-});
-
-export default connect(null, mapDispatchToProps)(SignUp);
+export default connect()(SignUp);

@@ -25,15 +25,6 @@ import FriendsModal from '../../components/friendsModal';
 import GymSearch from '../../components/GymSearch';
 import Button from '../../components/Button';
 import PrivateIcon from '../../components/PrivateIcon';
-import {
-  navigateMessagingSession,
-  navigateTestScreen,
-  navigateProfileView,
-  navigateGym,
-  navigateGymMessaging,
-  navigateSessionDetail,
-  navigateSessionInfo,
-} from '../../actions/navigation';
 import { fetchSessionChats } from '../../actions/chats';
 import {
   fetchSessions,
@@ -183,7 +174,7 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   markers(sessions: Session[]) {
-    const { viewSession } = this.props;
+    const { navigation } = this.props;
     return sessions.map(session => {
       const { lng } = session.location.position;
       const { lat } = session.location.position;
@@ -199,15 +190,19 @@ class Sessions extends Component<SessionsProps, State> {
             this.setState({ latitude: lat, longitude: lng }, () => {
               Alert.alert(`View session ${session.title}?`, '', [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'OK', onPress: () => viewSession(session.key, session.private) },
+                {
+                  text: 'OK',
+                  onPress: () =>
+                    navigation.navigate('SessionInfo', { sessionId: session.key, isPrivate: session.private }),
+                },
               ]);
             });
           }}
         >
           {getType(session.type, 40)}
         </Marker>
-      )
-    })
+      );
+    });
   }
 
   // This is a common pattern when asking for permissions.
@@ -247,7 +242,7 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   gymMarkers(results) {
-    const { viewGym } = this.props;
+    const { navigation } = this.props;
     return results.map(result => {
       if (result.geometry) {
         const { lat } = result.geometry.location;
@@ -265,7 +260,7 @@ class Sessions extends Component<SessionsProps, State> {
               this.setState({ selectedLocation: result, latitude: lat, longitude: lng }, () => {
                 Alert.alert(`View gym ${result.name}?`, '', [
                   { text: 'Cancel', style: 'cancel' },
-                  { text: 'OK', onPress: () => viewGym(result.place_id) },
+                  { text: 'OK', onPress: () => navigation.navigate('Gym', { id: result.place_id }) },
                 ]);
               });
             }}
@@ -281,7 +276,7 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   renderLists() {
-    const { gym, location, onOpenGymChat, viewGym, viewSession, places } = this.props;
+    const { gym, location, navigation, places } = this.props;
     const { selectedIndex, refreshing, sessions, token, loadingGyms } = this.state;
     const emptyComponent = (
       <View>
@@ -327,13 +322,13 @@ class Sessions extends Component<SessionsProps, State> {
                   </View>
                   <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity
-                      onPress={() => onOpenGymChat(gym.place_id)}
+                      onPress={() => navigation.navigate('Messaging', { gymId: gym.place_id })}
                       style={{ justifyContent: 'center', marginRight: 20 }}
                     >
                       <Icon name="md-chatboxes" size={25} style={{ color: colors.secondary }} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => viewGym(gym.place_id)}>
-                      <Icon name="md-information-circle" size={25} style={{ color: colors.secondary }}/>
+                    <TouchableOpacity onPress={() => navigation.navigate('Gym', { id: gym.place_id })}>
+                      <Icon name="md-information-circle" size={25} style={{ color: colors.secondary }} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -351,7 +346,9 @@ class Sessions extends Component<SessionsProps, State> {
             data={sessions}
             keyExtractor={item => item.key}
             renderItem={({ item, index }) => (
-              <TouchableOpacity onPress={() => viewSession(item.key, item.private)}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('SessionInfo', { sessionId: item.key, isPrivate: item.private })}
+              >
                 <View style={{ padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index === 0 ? 1 : 0 }}>
                   <View style={{ flexDirection: 'row' }}>
                     <View style={{ alignItems: 'center', marginRight: 10, justifyContent: 'center' }}>
@@ -440,7 +437,7 @@ class Sessions extends Component<SessionsProps, State> {
                   <TouchableOpacity
                     onPress={() => {
                       this.setState({ selectedLocation: item, latitude: lat, longitude: lng }, () =>
-                        viewGym(item.place_id)
+                        navigation.navigate('Gym', { id: item.place_id })
                       );
                     }}
                   >
@@ -505,7 +502,7 @@ class Sessions extends Component<SessionsProps, State> {
       options,
       filterModalOpen,
     } = this.state;
-    const { places, viewGym, onContinue, friends } = this.props;
+    const { places, navigation, friends } = this.props;
     // switch for list view and map view
     // action sheet when pressing
     const left = (
@@ -566,14 +563,14 @@ class Sessions extends Component<SessionsProps, State> {
               {this.gymMarkers(Object.values(places))}
             </MapView>
           )}
-          <GymSearch parent={this} onOpen={id => viewGym(id)} />
+          <GymSearch parent={this} onOpen={id => navigation.navigate('Gym', { id })} />
           <View style={{ flexDirection: 'row', height: 60, backgroundColor: colors.bgColor }}>
             <Button
               style={styles.button}
               onPress={() => {
                 this.setState({ selectedLocation: {} });
                 AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
-                onContinue();
+                navigation.navigate('SessionDetail');
               }}
               text="Create Session"
               textStyle={{ textAlign: 'center', fontSize: 15, textAlignVertical: 'center' }}
@@ -596,7 +593,7 @@ class Sessions extends Component<SessionsProps, State> {
             onClosed={() => this.setState({ friendsModalOpen: false })}
             onContinue={f => {
               AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
-              onContinue(f, selectedLocation);
+              navigation.navigate('SessionDetail', { friends: f, location: selectedLocation });
             }}
             isOpen={friendsModalOpen}
           />
@@ -693,7 +690,7 @@ class Sessions extends Component<SessionsProps, State> {
           onPress={index => {
             if (index === 0) {
               AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
-              onContinue(null, selectedLocation);
+              navigation.navigate('SessionDetail', { location: selectedLocation });
             } else if (index === 1) {
               if (Object.values(friends).length > 0) {
                 this.setState({ friendsModalOpen: true });
@@ -723,22 +720,15 @@ const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => (
 
 const mapDispatchToProps = dispatch => ({
   join: (location) => dispatch(joinGym(location)),
-  viewProfile: (uid) => dispatch(navigateProfileView(uid)),
   removeGym: () => dispatch(removeGym()),
   getChats: (sessions, uid) => dispatch(fetchSessionChats(sessions, uid)),
   remove: (key, type) => dispatch(removeSession(key, type)),
-  onOpenChat: (session) => dispatch(navigateMessagingSession(session)),
-  onContinue: (friends, location) => dispatch(navigateSessionDetail(friends, location)),
   fetch: () => Promise.all([dispatch(fetchSessions()), dispatch(fetchPrivateSessions())]),
-  viewGym: (id) => dispatch(navigateGym(id)),
-  onOpenGymChat: (gymId) => dispatch(navigateGymMessaging(gymId)),
   setYourLocation: (location) => dispatch(setLocation(location)),
-  test: () => dispatch(navigateTestScreen()),
   setPlaces: (places) => dispatch(setPlaces(places)),
   fetchPhotoPaths: () => dispatch(fetchPhotoPaths()),
   getPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
   saveRadius: (radius) => dispatch(setRadius(radius)),
-  viewSession: (sessionId, isPrivate) => dispatch(navigateSessionInfo(sessionId, isPrivate))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions);

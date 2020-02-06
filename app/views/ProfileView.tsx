@@ -14,7 +14,6 @@ import { calculateAge, getFormattedBirthday } from '../constants/utils';
 import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
-import { navigateBack, navigateGym } from '../actions/navigation';
 import { deleteFriend, sendRequest } from '../actions/friends';
 import ProfileViewProps from '../types/views/ProfileView';
 import Profile from '../types/Profile';
@@ -92,7 +91,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
   };
 
   render() {
-    const { remove, request, goBack, goToGym } = this.props;
+    const { remove, request, navigation } = this.props;
     const { loaded, backdrop, avatar, isFriend, gym, showImage, selectedImage } = this.state;
     const profile = pathOr({}, ['profile'], this.state);
     const { username, first_name, last_name, birthday, uid, accountType, activity, level } = profile;
@@ -172,7 +171,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
                         onPress: async () => {
                           try {
                             await request(uid);
-                            goBack();
+                            navigation.goBack();
                             Alert.alert('Success', 'Request sent');
                           } catch (e) {
                             Alert.alert('Error', e.message);
@@ -195,7 +194,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
               )}
 
               {gym && gym.name && isFriend && (
-                <TouchableOpacity onPress={() => goToGym(gym.place_id)}>
+                <TouchableOpacity onPress={() => navigation.navigate('Gym', { id: gym.place_id })}>
                   <Text style={{ color: '#999', marginLeft: 10, marginVertical: 5 }}>
                     Gym:
                     <Text style={{ color: colors.secondary }}>{` ${gym.name}`}</Text>
@@ -239,7 +238,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
                       text: 'Yes',
                       onPress: async () => {
                         await remove(uid);
-                        goBack();
+                        navigation.goBack();
                       },
                       style: 'destructive',
                     },
@@ -295,10 +294,8 @@ const mapStateToProps = ({ friends, sharedInfo, profile }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  goBack: () => dispatch(navigateBack()),
   remove: uid => dispatch(deleteFriend(uid)),
   request: friendUid => dispatch(sendRequest(friendUid)),
-  goToGym: gym => dispatch(navigateGym(gym)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileView);

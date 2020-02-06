@@ -10,22 +10,16 @@ export default interface HomeProps {
   friends: { [key: string]: Profile };
   users: { [key: string]: Profile };
   repsUsers: { [key: string]: Rep };
-  viewPost: (id: string) => void;
-  goToProfile: () => void;
-  viewProfile: (uid: string) => void;
   postStatus: (status: Post) => void;
   onRepPost: (item: Post) => void;
-  previewFile: (type: string, uri: string, message: boolean, text: string) => void;
   comment: (uid, postId, text, created_at, parentCommentId) => void;
   getComments: (key: string, amount?: number, fromComment?: string) => void;
   onRepComment: (comment: Comment) => void;
   getPosts: (uid: string, amount?: number, endAt?: string) => void;
   getCommentRepsUsers: (comment: Comment, limit?: number) => void;
   getRepsUsers: (postId: string, limit?: number) => void;
-  onNotificationPress: () => void;
   getProfile: () => void;
   getFriends: () => void;
-  goToVideo: (uri: string) => void;
   getReplies: (parentComment: Comment, amount: number, key: string) => void;
   navigation: NavigationStackProp;
 }

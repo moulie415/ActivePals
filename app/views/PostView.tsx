@@ -30,7 +30,6 @@ import styles from '../styles/postViewStyles';
 import Header from '../components/Header/header';
 import hStyles from '../styles/homeStyles';
 import PostViewProps from '../types/views/PostView';
-import { navigateBack, navigateProfile, navigateProfileView, navigateFullScreenVideo } from '../actions/navigation';
 import {
   fetchComments,
   fetchCommentRepsUsers,
@@ -96,11 +95,11 @@ class PostView extends Component<PostViewProps, State> {
   }
 
   getUsernameFormatted(uid) {
-    const { profile, viewProfile, goToProfile } = this.props;
+    const { profile, navigation } = this.props;
     return (
       <TouchableOpacity
         onPress={() => {
-          uid !== profile.uid ? viewProfile(uid) : goToProfile();
+          uid !== profile.uid ? navigation.navigate('ProfileView', { uid }) : navigation.navigate('Profile');
         }}
       >
         <Text style={{ fontWeight: 'bold', color: colors.secondary, flex: 1 }}>
@@ -139,7 +138,7 @@ class PostView extends Component<PostViewProps, State> {
       await Share.open(options);
       Alert.alert('Success', 'Post Shared');
       this.setState({ spinner: false });
-    } catch(e) {
+    } catch (e) {
       this.setState({ spinner: false });
       console.log(e);
     }
@@ -190,10 +189,12 @@ class PostView extends Component<PostViewProps, State> {
   }
 
   fetchAvatar(uid) {
-    const { profile, friends, viewProfile, goToProfile } = this.props;
+    const { profile, friends, navigation } = this.props;
+    const navigate = () =>
+      uid !== profile.uid ? navigation.navigate('ProfileView', { uid }) : navigation.navigate('Profile');
     if (profile.avatar && uid === profile.uid) {
       return (
-        <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+        <TouchableOpacity onPress={navigate}>
           <Image
             source={{ uri: profile.avatar }}
             style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
@@ -203,7 +204,7 @@ class PostView extends Component<PostViewProps, State> {
     }
     if (friends[uid] && friends[uid].avatar) {
       return (
-        <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+        <TouchableOpacity onPress={navigate}>
           <Image
             source={{ uri: friends[uid].avatar }}
             style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
@@ -212,7 +213,7 @@ class PostView extends Component<PostViewProps, State> {
       );
     }
     return (
-      <TouchableOpacity onPress={() => (uid !== profile.uid ? viewProfile(uid) : goToProfile())}>
+      <TouchableOpacity onPress={navigate}>
         <Icon name="md-contact" size={45} style={{ color: colors.primary, marginRight: 10 }} />
       </TouchableOpacity>
     );
@@ -242,7 +243,7 @@ class PostView extends Component<PostViewProps, State> {
 
   renderPost(item) {
     const { playing } = this.state;
-    const { fullScreenVideo } = this.props;
+    const { navigation } = this.props;
     switch (item.type) {
       case 'status':
         return (
@@ -323,8 +324,8 @@ class PostView extends Component<PostViewProps, State> {
                   if (e.error && e.error.code) {
                     Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain)
                   } else if (e.message) {
-                    Alert.alert('Error', e.message)
-                  } else Alert.alert('Error', 'Error playing video')
+                    Alert.alert('Error', e.message);
+                  } else Alert.alert('Error', 'Error playing video');
                 }}
               />
               {!playing && (
@@ -351,7 +352,7 @@ class PostView extends Component<PostViewProps, State> {
                       if (Platform.OS === 'ios') {
                         this.player.presentFullscreenPlayer();
                       } else {
-                        fullScreenVideo(item.url);
+                        navigation.navigate('FullScreenVideo', { uri: item.url });
                       }
                     }}
                   >
@@ -372,8 +373,6 @@ class PostView extends Component<PostViewProps, State> {
       users,
       friends,
       profile,
-      goToProfile,
-      viewProfile,
       comment,
       navigation,
       getComments,
@@ -430,9 +429,9 @@ class PostView extends Component<PostViewProps, State> {
               // lastCommentUpdate={this.state.lastCommentUpdate}
               usernameTapAction={(username, uid) => {
                 if (uid === profile.uid) {
-                  goToProfile();
+                  navigation.navigate('Profile');
                 } else {
-                  viewProfile(uid);
+                  navigation.navigate('ProfileView', { uid });
                 }
               }}
               keyExtractor={item => item.comment_id}
@@ -454,7 +453,14 @@ class PostView extends Component<PostViewProps, State> {
               }}
               likeExtractor={item => item.rep}
               reportedExtractor={item => item.reported}
-              likesExtractor={item => likesExtractor(item, profile.uid, viewProfile, goToProfile)}
+              likesExtractor={item =>
+                likesExtractor(
+                  item,
+                  profile.uid,
+                  (uid: string) => navigation.navigate('ProfileView', { uid }),
+                  () => navigation.navigate('Profile')
+                )
+              }
               likeCountExtractor={item => item.repCount}
               childrenCountExtractor={item => item.childrenCount}
               timestampExtractor={item => new Date(item.created_at).toISOString()}
@@ -536,18 +542,14 @@ const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  goToProfile: () => dispatch(navigateProfile()),
-  viewProfile: uid => dispatch(navigateProfileView(uid)),
   onRepPost: item => dispatch(repPost(item)),
   comment: (uid, postId, text, created_at, parentCommentId) =>
     dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   onRepComment: comment => dispatch(repComment(comment)),
-  goBack: () => dispatch(navigateBack()),
   getComments: (key, amount) => dispatch(fetchComments(key, amount)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getPost: key => dispatch(fetchPost(key)),
   getRepsUsers: (postId, limit) => dispatch(fetchRepsUsers(postId, limit)),
-  fullScreenVideo: url => dispatch(navigateFullScreenVideo(url)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostView);

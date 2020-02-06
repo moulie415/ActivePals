@@ -22,7 +22,6 @@ import colors from '../constants/colors';
 import { getMentionsList, guid } from '../constants/utils';
 import sStyles from '../styles/settingsStyles';
 import styles from '../styles/homeStyles';
-import { navigateBack } from '../actions/navigation';
 import { addPost } from '../actions/home';
 import { setMessage } from '../actions/chats';
 import FilePreviewProps from '../types/views/FilePreview';
@@ -125,7 +124,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
 
   async acceptPressed() {
     this.setState({ spinner: true });
-    const { navigation, profile, goBack, postStatus, setPostMessage } = this.props;
+    const { navigation, profile, postStatus, setPostMessage } = this.props;
     const { text } = this.state;
     const { uri, message } = navigation.state.params;
     const { type: paramType } = navigation.state.params;
@@ -135,7 +134,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
       const image = await this.uploadImage(uri);
       const date = new Date().toString();
       if (message) {
-        goBack();
+        navigation.goBack();
         setPostMessage(image.url, text);
       } else {
         firebase
@@ -150,7 +149,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
           uid: profile.uid,
           createdAt: date,
         });
-        goBack();
+        navigation.goBack();
         Alert.alert('Success', 'Post submitted');
         this.setState({ spinner: false });
       }
@@ -161,7 +160,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   renderImage() {
-    const { goBack, navigation, friends } = this.props;
+    const { navigation, friends } = this.props;
     const { uri, message } = navigation.state.params;
     const { mentionList, text, spinner } = this.state;
     return (
@@ -170,7 +169,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
           <SlowImage style={{ flex: 1, resizeMode: 'contain' }} source={{ uri }} />
           <View style={{ position: 'absolute', margin: 20, marginTop: 30 }}>
             <TouchableOpacity
-              onPress={() => goBack()}
+              onPress={() => navigation.goBack()}
               style={{
                 backgroundColor: colors.secondary,
                 opacity: 0.8,
@@ -229,7 +228,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   renderVideo() {
-    const { goBack, navigation, friends } = this.props;
+    const { navigation, friends } = this.props;
     const { paused, mentionList, text, spinner, progress } = this.state;
     const { uri, message } = navigation.state.params;
     return (
@@ -262,7 +261,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
           </View>
           <View style={{ position: 'absolute', margin: 20 }}>
             <TouchableOpacity
-              onPress={() => goBack()}
+              onPress={() => navigation.goBack()}
               style={{ backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5 }}
             >
               <Icon size={30} name="md-close" style={{ color: '#fff' }} />
@@ -362,7 +361,6 @@ const mapStateToProps = ({ profile, friends }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  goBack: () => dispatch(navigateBack()),
   postStatus: status => dispatch(addPost(status)),
   setPostMessage: (url, text) => dispatch(setMessage(url, text)),
 });

@@ -7,6 +7,5 @@ export default interface ProfileProps {
   gym: Place;
   onLogoutPress: () => void;
   onSave: () => void;
-  goToGym: (id: string) => void;
   navigation: NavigationStackProp;
 }

@@ -2,10 +2,9 @@ import React, { FunctionComponent } from 'react';
 import VideoPlayer from 'react-native-video-controls';
 import { connect } from 'react-redux';
 import { StatusBar, View } from 'react-native';
-import { navigateBack } from '../actions/navigation';
 import FullScreenVideoProps from '../types/views/FullScreenVideo';
 
-const FullScreenVideo: FunctionComponent<FullScreenVideoProps> = ({ navigation, goBack }) => {
+const FullScreenVideo: FunctionComponent<FullScreenVideoProps> = ({ navigation }) => {
   const { params } = navigation.state;
   const { uri } = params;
   return (
@@ -16,14 +15,10 @@ const FullScreenVideo: FunctionComponent<FullScreenVideoProps> = ({ navigation, 
         disableVolume
         disableFullscreen
         style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-        onBack={() => goBack()}
+        onBack={() => navigation.goBack()}
       />
     </View>
   );
 };
 
-const mapDispatchToProps = dispatch => ({
-  goBack: () => dispatch(navigateBack()),
-});
-
-export default connect(null, mapDispatchToProps)(FullScreenVideo);
+export default connect()(FullScreenVideo);

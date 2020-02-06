@@ -1,5 +1,6 @@
 import Profile from '../Profile';
 import Notification from '../Notification';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface NotificationsProps {
   profile: Profile;
@@ -9,6 +10,5 @@ export default interface NotificationsProps {
   fetchNotifications: (amount?: number) => void;
   setRead: () => void;
   onDelete: (key: string) => void;
-  goToFriends: () => void;
-  viewPost: (id: string) => void;
+  navigation: NavigationStackProp;
 }

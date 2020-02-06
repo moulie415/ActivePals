@@ -6,8 +6,6 @@ export default interface ProfileViewProps {
   friends: { [key: string]: Profile };
   profile: Profile;
   users: { [key: string]: Profile };
-  goBack: () => void;
   remove: (uid) => void;
   request: (friendUid) => void;
-  goToGym: (gym) => void;
 }

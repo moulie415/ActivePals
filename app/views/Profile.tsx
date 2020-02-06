@@ -17,7 +17,6 @@ import colors from '../constants/colors';
 import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
-import { navigateGym } from '../actions/navigation';
 import { fetchProfile, setLoggedOut } from '../actions/profile';
 import { pickerItems } from '../constants/utils';
 import str from '../constants/strings';
@@ -247,7 +246,7 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 
   render() {
-    const { gym, goToGym, navigation } = this.props;
+    const { gym, navigation } = this.props;
     const {
       initialAvatar,
       initialProfile,
@@ -337,7 +336,7 @@ class ProfileView extends Component<ProfileProps, State> {
                 <Text style={{ color: colors.secondary }}>{profile && profile.accountType}</Text>
               </Text>
               {gym && (
-                <TouchableOpacity onPress={() => goToGym(gym.place_id)}>
+                <TouchableOpacity onPress={() => navigation.navigate('Gym', { id: gym.place_id })}>
                   <Text style={{ color: '#999', marginHorizontal: 20, marginBottom: 10 }}>
                     {'Gym: '}
                     <Text style={{ color: colors.secondary }}>{gym.name}</Text>
@@ -459,24 +458,22 @@ class ProfileView extends Component<ProfileProps, State> {
           )}
           <View style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>Birthday: </Text>
-            
           </View>
-
           <Button style={styles.logout} text="Log out" onPress={() => this.logout()} />
           {spinner && (
             <View style={hStyles.spinner}>
               <PulseIndicator color={colors.secondary} />
             </View>
           )}
-          
         </ScrollView>
-        {showPicker && <DateTimePicker
-          mode="date"
-          value={new Date(profile && profile.birthday)}
-  
-          maximumDate={new Date()}
-          onChange={date => this.setState({ profile: { ...profile, birthday: date } })}
-        />}
+        {showPicker && (
+          <DateTimePicker
+            mode="date"
+            value={new Date(profile && profile.birthday)}
+            maximumDate={new Date()}
+            onChange={date => this.setState({ profile: { ...profile, birthday: date } })}
+          />
+        )}
       </>
     );
   }
@@ -490,7 +487,6 @@ const mapStateToProps = ({ profile }) => ({
 const mapDispatchToProps = dispatch => ({
   onLogoutPress: () => dispatch(setLoggedOut()),
   onSave: () => dispatch(fetchProfile()),
-  goToGym: gym => dispatch(navigateGym(gym)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileView);

@@ -1,6 +1,7 @@
 import Session from '../Session';
 import Place from '../Place';
 import Profile from '../Profile';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface SessionsProps {
   sessions: { [key: string]: Session };
@@ -11,11 +12,8 @@ export default interface SessionsProps {
   radius: number;
   saveRadius: (radius: number) => void;
   location: { lat: number; lon: number };
-  onOpenGymChat: (id: string) => void;
-  viewGym: (id: string) => void;
-  viewSession: (id: string, isPrivate?: boolean) => void;
   places: { [key: string]: Place };
   gym: Place;
   friends: { [key: string]: Profile };
-  onContinue: (friends?: string[], location?: any) => void;
+  navigation: NavigationStackProp
 }

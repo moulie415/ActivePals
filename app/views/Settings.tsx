@@ -10,7 +10,6 @@ import styles from '../styles/settingsStyles';
 import Text, { globalTextStyle } from '../components/Text';
 import Header from '../components/Header/header';
 import FbFriendsModal from '../components/FbFriendsModal';
-import { navigateBack, navigateWelcome, navigateCredits } from '../actions/navigation';
 import { removeUser } from '../actions/profile';
 import SettingsProps from '../types/views/Settings';
 
@@ -34,7 +33,7 @@ class Settings extends Component<SettingsProps, State> {
   };
 
   render() {
-    const { viewWelcome, viewCredits, profile, onRemoveUser, navigation } = this.props;
+    const { profile, onRemoveUser, navigation } = this.props;
     const { spinner, fbModalOpen, showDialog } = this.state;
     return (
       <View style={styles.container}>
@@ -50,11 +49,11 @@ class Settings extends Component<SettingsProps, State> {
             <Text>Contact Support</Text>
             <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => viewWelcome(true)} style={styles.contact}>
+          <TouchableOpacity onPress={() => navigation.navigate('Welcome', { goBack: true })} style={styles.contact}>
             <Text>View Welcome Swiper</Text>
             <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={viewCredits} style={styles.contact}>
+          <TouchableOpacity onPress={() => navigation.navigate('Credits')} style={styles.contact}>
             <Text>Credits</Text>
             <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
           </TouchableOpacity>
@@ -121,10 +120,7 @@ const mapStateToProps = ({ profile }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  goBack: () => dispatch(navigateBack()),
   onRemoveUser: () => dispatch(removeUser()),
-  viewWelcome: goBack => dispatch(navigateWelcome(goBack)),
-  viewCredits: () => dispatch(navigateCredits()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Settings);

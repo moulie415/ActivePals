@@ -1,3 +1,5 @@
+import { NavigationStackProp } from "react-navigation-stack";
+
 export default interface SignUpProps {
-  goBack: () => void;
+  navigation: NavigationStackProp;
 }
