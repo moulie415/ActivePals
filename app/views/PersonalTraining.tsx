@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Image as SlowImage } from 'react-native';
-import { Platform, View, TouchableOpacity } from 'react-native';
+import { Platform, View, Image as SlowImage } from 'react-native';
+import { connect } from 'react-redux';
 import Text, { globalTextStyle } from '../components/Text';
 import Header from '../components/Header/header';
-import Button from '../components/Button';
+import colors from '../constants/colors';
 
 class PersonalTraining extends Component {
   static navigationOptions = {
@@ -16,14 +16,11 @@ class PersonalTraining extends Component {
       />
     ),
   };
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return (
       <View style={{ backgroundColor: colors.bgColor }}>
-        <Header title={'Personal Training'} />
+        <Header title="Personal Training" />
         <Text style={{ padding: 10 }}>Features coming soon</Text>
         {/* {!this.props.profile.trainer && <View>
         <Text style={{color: colors.secondary, margin: 20, textAlign: 'center'}}>
@@ -40,10 +37,6 @@ class PersonalTraining extends Component {
   }
 }
 
-import { connect } from 'react-redux';
-import { navigateForm } from '../actions/navigation';
-import colors from '../constants/colors';
-
 const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   profile: profile.profile,
   feed: home.feed,
@@ -51,8 +44,4 @@ const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
   users: sharedInfo.users,
 });
 
-const mapDispatchToProps = dispatch => ({
-  navigateVerification: () => dispatch(navigateForm(true)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(PersonalTraining);
+export default connect(mapStateToProps, null)(PersonalTraining);

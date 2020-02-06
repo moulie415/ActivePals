@@ -65,15 +65,6 @@ class Login extends Component<LoginProps, State> {
     });
   }
 
-  goNext() {
-    const { hasViewedWelcome, navigation } = this.props;
-    if (hasViewedWelcome) {
-      navigation.navigate('Home');
-    } else {
-      navigation.navigate('Welcome');
-    }
-  }
-
   createUser = async (uid, userData, token) => {
     const snapshot = await firebase
       .database()
@@ -97,6 +88,15 @@ class Login extends Component<LoginProps, State> {
     const credential = provider.credential(token);
     return firebase.auth().signInWithCredential(credential);
   };
+
+  goNext() {
+    const { hasViewedWelcome, navigation } = this.props;
+    if (hasViewedWelcome) {
+      navigation.navigate('Home');
+    } else {
+      navigation.navigate('Welcome');
+    }
+  }
 
   async handleCallBack(callback) {
     const { onLogin } = this.props;
@@ -196,11 +196,10 @@ class Login extends Component<LoginProps, State> {
         webClientId: webClientId.val(),
       });
       await GoogleSignin.hasPlayServices();
-      const gUser = await GoogleSignin.signIn();
-      console.log(gUser);
+      const { user: gUser, idToken, serverAuthCode } = await GoogleSignin.signIn();
       const first_name = gUser.givenName;
       const last_name = gUser.familyName;
-      const credential = firebase.auth.GoogleAuthProvider.credential(gUser.idToken, gUser.accessToken);
+      const credential = firebase.auth.GoogleAuthProvider.credential(idToken, serverAuthCode);
       const result = await firebase.auth().signInAndRetrieveDataWithCredential(credential);
       const { user } = result;
       console.log('user firebase ', user);

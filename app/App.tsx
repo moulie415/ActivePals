@@ -87,9 +87,6 @@ const tabs = createBottomTabNavigator(
     Profile: { screen: Profile },
   },
   {
-    navigationOptions: {
-      gesturesEnabled: false,
-    },
     tabBarOptions: {
       activeTintColor: colors.primary,
       inactiveTintColor: color(colors.secondary)
