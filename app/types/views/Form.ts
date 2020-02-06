@@ -1,5 +1,5 @@
-import { Navigation } from '../Shared';
+import { NavigationStackProp } from "react-navigation-stack";
 
 export default interface FormProps {
-  navigation: Navigation;
+  navigation: NavigationStackProp;
 }

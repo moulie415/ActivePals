@@ -1,10 +1,10 @@
 import Profile from '../Profile';
 import Place from '../Place';
 import Message from '../Message';
-import { Navigation } from '../Shared';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface MessagingProps {
-  navigation: Navigation;
+  navigation: NavigationStackProp;
   profile: Profile;
   unreadCount: { [key: string]: number };
   onResetUnreadCount: (id: string) => void;

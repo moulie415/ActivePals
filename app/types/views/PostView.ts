@@ -1,13 +1,13 @@
 import Profile from '../Profile';
 import Post from '../Post';
 import Comment from '../../components/comments/Comment';
-import { Navigation } from '../Shared';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface PostViewProps {
   friends: { [key: string]: Profile };
   users: { [key: string]: Profile };
   profile: Profile;
-  navigation: Navigation;
+  navigation: NavigationStackProp;
   feed: { [key: string]: Post };
   viewProfile: (uid: string) => void;
   onRepPost: (item: Post) => void;

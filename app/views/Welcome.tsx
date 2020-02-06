@@ -10,7 +10,6 @@ import Text from '../components/Text';
 import str from '../constants/strings';
 import { getResource, renderImages } from '../constants/utils';
 import FbFriendsModal from '../components/FbFriendsModal';
-import { navigateBack, navigateHome } from '../actions/navigation';
 import { setHasViewedWelcome, fetchProfile } from '../actions/profile';
 import WelcomeProps from '../types/views/Welcome';
 import { SessionType } from '../types/Session';
@@ -36,8 +35,8 @@ class Welcome extends Component<WelcomeProps, State> {
   }
 
   nav(params) {
-    const { goBack, goHome } = this.props;
-    params && params.goBack ? goBack() : goHome();
+    const { navigation } = this.props;
+    params && params.goBack ? navigation.goBack() : navigation.navigate('Home');
   }
 
   skip(params) {
@@ -191,8 +190,6 @@ const mapStateToProps = ({ profile }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  goHome: () => dispatch(navigateHome()),
-  goBack: () => dispatch(navigateBack()),
   viewedWelcome: () => dispatch(setHasViewedWelcome()),
   onSave: () => dispatch(fetchProfile()),
 });

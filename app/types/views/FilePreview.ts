@@ -1,8 +1,8 @@
 import Profile from '../Profile';
-import { Navigation } from '../Shared';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface FilePreviewProps {
-  navigation: Navigation;
+  navigation: NavigationStackProp;
   friends: { [key: string]: Profile };
   profile: Profile;
   goBack: () => void;

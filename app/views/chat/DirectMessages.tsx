@@ -7,49 +7,66 @@ import colors from '../../constants/colors';
 import { getSimplifiedTime, sortChatsByDate } from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import Text from '../../components/Text';
-import { navigateMessaging } from '../../actions/navigation';
-import { fetchChats, addChat, removeChat } from '../../actions/chats';
-import { fetchProfile } from '../../actions/profile';
-//import  styles  from './styles/loginStyles'
+import DirectMessagesProps from '../../types/views/chat/DirectMessages';
+// import  styles  from './styles/loginStyles'
 
-class DirectMessages extends Component {
-  constructor(props) {
-    super(props);
-    this.nav = this.props.navigation;
-    this.user = null;
-    this.state = {
-      chats: Object.values(this.props.chats),
-      refreshing: false,
-    };
-  }
-
+class DirectMessages extends Component<DirectMessagesProps> {
   renderChats() {
+    const { navigation, friends, chats, profile } = this.props;
     return (
       <FlatList
         style={{ backgroundColor: colors.bgColor }}
-        data={sortChatsByDate(Object.values(this.props.chats))}
+        data={sortChatsByDate(Object.values(chats))}
         keyExtractor={chat => chat.chatId}
         renderItem={({ item }) => {
-          const friend = this.props.friends[item.uid]
+          const friend = friends[item.uid];
           if (friend) {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  this.props.onOpenChat(item.chatId, friend.username, item.uid)
+                  navigation.navigate('Messaging', {
+                    chatId: item.chatId,
+                    friendUsername: friend.username,
+                    friendUid: item.uid,
+                  });
                 }}
               >
-                <View style={{backgroundColor: '#fff', marginBottom: 1, padding: 10, paddingVertical: friend.avatar ? 10 : 5, flexDirection: 'row', alignItems: 'center'}}>
-                {friend.avatar? <Image source={{uri: friend.avatar}} style={{height: 50, width: 50, borderRadius: 25}}/> :
-                      <Icon size={60} name='md-contact'  style={{color: colors.primary}}/>}
-                  <View style={{marginHorizontal: 10, flex: 1, justifyContent: 'center'}}>
-                    <Text style={{color: '#000'}} numberOfLines={1}>{friend.username}</Text>
-                    {!!item.lastMessage.text && <Text numberOfLines={1} style={{color: '#999'}}>{item.lastMessage.text}</Text>}
-                    {!item.lastMessage.text && item.lastMessage.image && <Text numberOfLines={1} style={{color: '#999', fontStyle: 'italic'}}>
-                    {item.lastMessage.user._id == this.props.profile.uid ? 'you sent an image' : 'sent you an image'}</Text>}
+                <View
+                  style={{
+                    backgroundColor: '#fff',
+                    marginBottom: 1,
+                    padding: 10,
+                    paddingVertical: friend.avatar ? 10 : 5,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  {friend.avatar ? (
+                    <Image source={{ uri: friend.avatar }} style={{ height: 50, width: 50, borderRadius: 25 }} />
+                  ) : (
+                    <Icon size={60} name="md-contact" style={{ color: colors.primary }} />
+                  )}
+                  <View style={{ marginHorizontal: 10, flex: 1, justifyContent: 'center' }}>
+                    <Text style={{ color: '#000' }} numberOfLines={1}>
+                      {friend.username}
+                    </Text>
+                    {!!item.lastMessage.text && (
+                      <Text numberOfLines={1} style={{ color: '#999' }}>
+                        {item.lastMessage.text}
+                      </Text>
+                    )}
+                    {!item.lastMessage.text && item.lastMessage.image && (
+                      <Text numberOfLines={1} style={{ color: '#999', fontStyle: 'italic' }}>
+                        {item.lastMessage.user._id === profile.uid ? 'you sent an image' : 'sent you an image'}
+                      </Text>
+                    )}
                   </View>
-                  {item.lastMessage.createdAt && <View style={{marginHorizontal: 10}}>
-                    <Text style={{color: '#999'}}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text></View>}
-                    <ChatRowCount id={item.uid}/>
+                  {item.lastMessage.createdAt && (
+                    <View style={{ marginHorizontal: 10 }}>
+                      <Text style={{ color: '#999' }}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text>
+                    </View>
+                  )}
+                  <ChatRowCount id={item.uid} />
                 </View>
               </TouchableOpacity>
             );
@@ -61,9 +78,10 @@ class DirectMessages extends Component {
   }
 
   render() {
+    const { chats } = this.props;
     return (
       <>
-        {Object.values(this.props.chats).length > 0 ? (
+        {Object.values(chats).length > 0 ? (
           this.renderChats()
         ) : (
           <View
@@ -91,12 +109,4 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
   chats: chats.chats,
 });
 
-const mapDispatchToProps = dispatch => ({
-  getChats: chats => dispatch(fetchChats(chats)),
-  getProfile: () => dispatch(fetchProfile()),
-  onOpenChat: (chatId, friendUsername, friendUid) => dispatch(navigateMessaging(chatId, friendUsername, friendUid)),
-  add: chat => dispatch(addChat(chat)),
-  remove: chat => dispatch(removeChat(chat)),
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(DirectMessages)
+export default connect(mapStateToProps)(DirectMessages);

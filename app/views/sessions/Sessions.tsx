@@ -109,7 +109,7 @@ class Sessions extends Component<SessionsProps, State> {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.sessions || nextProps.privateSessions) {
       const sessions: Session[] = Object.values(nextProps.sessions);
       const privateSessions: Session[] = Object.values(nextProps.privateSessions);

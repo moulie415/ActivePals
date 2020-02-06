@@ -1,9 +1,9 @@
 import Profile from '../Profile';
 import Place from '../Place';
-import { Navigation } from '../Shared';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface GymProps {
-  navigation: Navigation;
+  navigation: NavigationStackProp;
   friends: { [key: string]: Profile };
   location: { lat: number; lon: number };
   users: { [key: string]: Profile };

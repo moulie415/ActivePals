@@ -31,7 +31,6 @@ import FullScreenVideo from './views/FullScreenVideo';
 import Welcome from './views/Welcome';
 import Form from './views/Form';
 import { UserState } from './types/Profile';
-import AppProps from './views/App';
 import NavigationService from './actions/navigation';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
 import ChatTabLabel from './components/ChatTabLabel';
@@ -136,7 +135,7 @@ export const Stack = createStackNavigator(
 
 const Navigation = createAppContainer(Stack);
 
-class App extends Component<AppProps> {
+class App extends Component {
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
     AppState.addEventListener('change', this.handleAppStateChange);

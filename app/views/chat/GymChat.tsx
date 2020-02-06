@@ -1,27 +1,17 @@
 import React, { Component } from 'react';
 import { View, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { connect } from 'react-redux';
+import Image from 'react-native-fast-image';
 import Text from '../../components/Text';
 import { getType, getSimplifiedTime } from '../../constants/utils';
 import colors from '../../constants/colors';
-import ChatTabBarIcon from '../../components/ChatTabBarIcon';
-import ChatTabLabel from '../../components/ChatTabLabel';
 import ChatRowCount from '../../components/ChatRowCount';
-import Image from 'react-native-fast-image';
 import styles from '../../styles/chatStyles';
 import { SessionType } from '../../types/Session';
-import { connect } from 'react-redux';
-import { navigateGymMessaging } from '../../actions/navigation';
 import { fetchGymChat } from '../../actions/chats';
 import { GymChatProps } from '../../types/views/chat/GymChat';
 
-
 class GymChat extends Component<GymChatProps, { refreshing: boolean }> {
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Gym" color={tintColor} />,
-    tabBarIcon: ({ tintColor }) => <ChatTabBarIcon color={tintColor} />,
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -30,30 +20,25 @@ class GymChat extends Component<GymChatProps, { refreshing: boolean }> {
   }
 
   render() {
-    const gym = this.props.gym;
-    const gymChat = this.props.gymChat;
+    const { gym, gymChat, getChat, navigation } = this.props;
+    const { refreshing } = this.state;
     return (
       <>
-        {this.props.gym ? (
+        {gym ? (
           <ScrollView
             refreshControl={
               <RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={() => {
+                refreshing={refreshing}
+                onRefresh={async () => {
                   this.setState({ refreshing: true });
-                  this.props.getChat(gym.place_id).then(() => {
-                    this.setState({ refreshing: false });
-                  });
+                  await getChat(gym.place_id);
+                  this.setState({ refreshing: false });
                 }}
               />
             }
             style={{ backgroundColor: '#9993' }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                this.props.onOpenChat(gym.place_id);
-              }}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate('Messaging', { gymId: gym.place_id })}>
               <View style={styles.chatRowContainer}>
                 {gym && gym.photo ? (
                   <Image source={{ uri: gym.photo }} style={styles.gymAvatar} />
@@ -99,9 +84,6 @@ const mapStateToProps = ({ friends, profile, chats }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onOpenChat: gymId => {
-    return dispatch(navigateGymMessaging(gymId));
-  },
   getChat: gym => dispatch(fetchGymChat(gym)),
 });
 

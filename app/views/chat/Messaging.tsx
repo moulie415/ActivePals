@@ -77,7 +77,7 @@ class Messaging extends Component<MessagingProps, State> {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { navigation, profile, onResetMessage, resetNotif } = this.props;
     const { params } = navigation.state;
     const { friendUid, gymId } = params;

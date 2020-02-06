@@ -1,11 +1,9 @@
 import Profile from '../Profile';
-import { Navigation } from '../Shared';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface WelcomeProps {
   viewedWelcome: () => void;
   profile: Profile;
-  navigation: Navigation;
-  goBack: () => void;
-  goHome: () => void;
+  navigation: NavigationStackProp;
   onSave: () => void;
 }

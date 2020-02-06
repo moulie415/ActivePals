@@ -68,7 +68,7 @@ class ProfileView extends Component<ProfileProps, State> {
     this.listenForUserChanges(firebase.database().ref(`users/${profile.uid}`));
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.profile) {
       const { profile } = nextProps;
       this.setState({ profile, initialProfile: profile, initialAvatar: profile.avatar });

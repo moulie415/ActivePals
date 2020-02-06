@@ -43,7 +43,7 @@ class Notifications extends Component<NotificationsProps, State> {
     setRead();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { fetchAmount } = this.state;
     this.setState({ spinner: false });
     if (nextProps.notifications) {

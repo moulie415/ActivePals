@@ -10,6 +10,7 @@ import Comment from '../types/Comment';
 import Post from '../types/Post';
 import Message from '../types/Message';
 import Notification from '../types/Notification';
+import Chat from '../types/Chat';
 
 const s4 = () => {
   return Math.floor((1 + Math.random()) * 0x10000)
@@ -387,7 +388,7 @@ export const validatePostcode = code => {
   return regex.test(postcode);
 };
 
-export const sortChatsByDate = array => {
+export const sortChatsByDate = (array: Chat[]): Chat[] => {
   return array.sort((a, b) => {
     return new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime();
   });

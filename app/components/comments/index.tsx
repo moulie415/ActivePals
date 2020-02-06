@@ -69,7 +69,7 @@ export default class Comments extends PureComponent<CommentsProps> {
     this.setState({ editModalVisible: visible });
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.data) {
       this.setState({
         commentsLastUpdated: new Date().getTime(),

@@ -1,6 +1,6 @@
-import { Navigation } from '../Shared';
+import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface FullScreenVideoProps {
   goBack: () => void;
-  navigation: Navigation;
+  navigation: NavigationStackProp;
 }
