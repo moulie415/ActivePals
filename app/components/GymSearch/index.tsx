@@ -68,8 +68,8 @@ const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) 
         types: 'establishment', // default: 'geocode'
       }}
       styles={styles}
-      //currentLocation // Will add a 'Current location' button at the top of the predefined places list
-      //currentLocationLabel="Current location"
+      // currentLocation // Will add a 'Current location' button at the top of the predefined places list
+      // currentLocationLabel="Current location"
       nearbyPlacesAPI="GooglePlacesSearch" // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
       GoogleReverseGeocodingQuery={{
         // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
@@ -79,11 +79,11 @@ const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) 
         rankby: 'distance',
         types: 'gym',
       }}
-      //filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
-      //predefinedPlaces={[homePlace, workPlace]}
+      // filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+      // predefinedPlaces={[homePlace, workPlace]}
       debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
-      //renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
-      //renderRightButton={() => <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 30, alignSelf: 'center', marginRight: 10}}/>}
+      // renderLeftButton={()  => <Image source={require('path/custom/left-icon')} />}
+      // renderRightButton={() => <Icon name="ios-arrow-dropright-circle" style={{color: colors.secondary, fontSize: 30, alignSelf: 'center', marginRight: 10}}/>}
     />
   );
 };

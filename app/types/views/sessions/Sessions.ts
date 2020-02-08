@@ -1,6 +1,6 @@
-import Session from '../Session';
-import Place from '../Place';
-import Profile from '../Profile';
+import Session from '../../Session';
+import Place from '../../Place';
+import Profile from '../../Profile';
 import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface SessionsProps {

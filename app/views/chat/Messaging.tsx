@@ -56,11 +56,11 @@ class Messaging extends Component<MessagingProps, State> {
   componentDidMount() {
     const { navigation, unreadCount, onResetUnreadCount } = this.props;
     const { params } = navigation.state;
-    const { gymId, friendUid, sessionId } = params;
+    const { gymId, friendUid, session } = params;
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this));
     this.loadMessages();
-    const id = friendUid || sessionId || gymId;
+    const id = friendUid || session || gymId;
     const count = unreadCount[id];
     if (count && count > 0) {
       onResetUnreadCount(id);

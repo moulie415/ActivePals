@@ -15,29 +15,117 @@ import styles from '../../styles/sessionStyles';
 import Button from '../../components/Button';
 import PrivateIcon from '../../components/PrivateIcon';
 import FriendsModal from '../../components/friendsModal';
-import {
-  navigateProfileView,
-  navigateGym,
-  navigateProfile,
-  navigateBack,
-  navigateMessagingSession,
-} from '../../actions/navigation';
 import { removeSession, addUser, fetchSession, fetchPrivateSession } from '../../actions/sessions';
 import { muteChat } from '../../actions/chats';
+import SessionInfoProps from '../../types/views/sessions/SessionInfo';
 
-class SessionInfo extends Component {
+interface State {
+  popUpVisible: boolean;
+}
+class SessionInfo extends Component<SessionInfoProps, State> {
   constructor(props) {
     super(props)
     this.params = this.props.navigation.state.params
     this.sessionId = this.params.sessionId
     this.isPrivate  = this.params.isPrivate
     this.state = {
-      popUpVisible: false
+      popUpVisible: false,
     }
   }
 
   componentDidMount() {
     this.isPrivate ? this.props.fetchPrivateSession(this.sessionId) : this.props.fetchSession(this.sessionId)
+  }
+
+  getButtons(host, session) {
+    const { profile, navigation } = this.props;
+    const you = profile.uid;
+    if (session.users[you]) {
+      if (host.uid === you) {
+        return (
+          <View style={styles.infoRowSpaceEvenly}>
+            <Button
+              onPress={() => {
+                Alert.alert(
+                  "Delete session",
+                  "Are you sure?",
+                  [
+                  {text: 'cancel', style: 'cancel'},
+                  {text: 'Yes', onPress: () => {
+                    this.props.remove(this.sessionId, session.private)
+                    navigation.goBack();
+                  },
+                  style: 'destructive'}
+                  ],
+                )
+              }}
+              style={{ alignSelf: 'center' }}
+              color="red"
+              text="Delete"
+            />
+            {this.chatButton(session)}
+            {/* {this.muteButton()} */}
+          </View>
+        )
+      }
+      return (
+        <View style={styles.infoRowSpaceEvenly}>
+          <Button
+            color="red"
+            text="Leave"
+            style={{ alignSelf: 'center' }}
+            onPress={() => {
+              this.props.remove(this.sessionId, session.private);
+              navigation.goBack();
+            }}
+          />
+          {this.chatButton(session)}
+          {/* {this.muteButton()} */}
+        </View>
+      )
+    }
+    return (
+      <View style={styles.infoRowSpaceEvenly}>
+        <Button
+          text="Join"
+          style={{ alignSelf: 'center' }}
+          onPress={async () => {
+            try {
+              await this.props.addUser(this.sessionid, session.private, this.props.profile.uid);
+              Alert.alert('Session joined', 'You should now see this session in your session chats');
+            } catch (e) {
+              Alert.alert('Error', e.message);
+            }
+          }}
+        />
+      </View>
+    );
+  }
+
+  handleUserPress(uid) {
+    const { navigation, profile } = this.props;
+    if (uid === profile.uid) {
+      navigation.navigate('Profile');
+    } else navigation.navigate('ProfileView', { uid });
+  }
+
+  chatButton(session) {
+    const { navigation } = this.props;
+    return <Button text="Chat" onPress={() => navigation.navigate('Messaging', { session })} />;
+  }
+
+  muteButton() {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Text>Mute </Text>
+        <Switch
+          trackColor={{ true: colors.secondary }}
+          thumbColor={Platform.select({ android: this.props.muted[this.sessionId] ? colors.secondary : '#fff' })}
+          value={this.props.muted[this.sessionId]}
+          onValueChange={val => this.props.muteChat(this.sessionId, val)}
+        />
+      </View>
+    );
   }
 
   renderUsers(users) {
@@ -65,6 +153,7 @@ class SessionInfo extends Component {
   }
 
   render() {
+    const { navigation } = this.props;
     const session = this.props.sessions[this.sessionId] || this.props.privateSessions[this.sessionId];
 
     let host
@@ -194,7 +283,7 @@ class SessionInfo extends Component {
                 </View>
                 {gym && (
                   <TouchableOpacity
-                    onPress={() => this.props.viewGym(gym.place_id)}
+                    onPress={() => navigation.navigate('Gym', { id: gym.place_id })}
                     style={[styles.infoRowContainer, styles.userRow]}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
@@ -274,95 +363,6 @@ class SessionInfo extends Component {
         />
       </>
     )};
-
-  handleUserPress(uid) {
-    if (uid === this.props.profile.uid) {
-      this.props.goToProfile()
-    }
-    else this.props.viewProfile(uid)
-  }
-
-  chatButton(session) {
-    return <Button text="Chat" onPress={() => this.props.openSessionChat(session)} />;
-  }
-
-  muteButton() {
-    return (
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text>Mute </Text>
-        <Switch
-          trackColor={{ true: colors.secondary }}
-          thumbColor={Platform.select({ android: this.props.muted[this.sessionId] ? colors.secondary : '#fff' })}
-          value={this.props.muted[this.sessionId]}
-          onValueChange={val => this.props.muteChat(this.sessionId, val)}
-        />
-      </View>
-    );
-  }
-
-  getButtons(host, session) {
-    const you = this.props.profile.uid
-    if (session.users[you]) {
-      if (host.uid === you) {
-        return (
-          <View style={styles.infoRowSpaceEvenly}>
-            <Button
-              onPress={() => {
-                Alert.alert(
-                  "Delete session",
-                  "Are you sure?",
-                  [
-                  {text: 'cancel', style: 'cancel'},
-                  {text: 'Yes', onPress: ()=> {
-                    this.props.remove(this.sessionId, session.private)
-                    this.props.goBack()
-                  },
-                  style: 'destructive'}
-                  ],
-                )
-              }}
-              style={{ alignSelf: 'center' }}
-              color="red"
-              text="Delete"
-            />
-            {this.chatButton(session)}
-            {/* {this.muteButton()} */}
-          </View>
-        )
-      }
-      return (
-        <View style={styles.infoRowSpaceEvenly}>
-          <Button
-            color="red"
-            text="Leave"
-            style={{ alignSelf: 'center' }}
-            onPress={() => {
-              this.props.remove(this.sessionId, session.private);
-              this.props.goBack();
-            }}
-          />
-          {this.chatButton(session)}
-          {/* {this.muteButton()} */}
-        </View>
-      )
-    }
-    return (
-      <View style={styles.infoRowSpaceEvenly}>
-        <Button
-          text="Join"
-          style={{ alignSelf: 'center' }}
-          onPress={async () => {
-            try {
-              await this.props.addUser(this.sessionid, session.private, this.props.profile.uid);
-              Alert.alert('Session joined', 'You should now see this session in your session chats');
-            } catch (e) {
-              Alert.alert('Error', e.message);
-            }
-          }}
-        />
-      </View>
-    );
-  }
 }
 
 const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => ({
@@ -377,15 +377,10 @@ const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => (
 });
 
 const mapDispatchToProps = dispatch => ({
-  viewProfile: uid => dispatch(navigateProfileView(uid)),
-  viewGym: id => dispatch(navigateGym(id)),
-  goToProfile: () => dispatch(navigateProfile()),
-  goBack: () => dispatch(navigateBack()),
   remove: (key, type) => dispatch(removeSession(key, type)),
   addUser: (session, isPrivate, uid) => dispatch(addUser(session, isPrivate, uid)),
   fetchSession: id => dispatch(fetchSession(id)),
   fetchPrivateSession: id => dispatch(fetchPrivateSession(id)),
-  openSessionChat: session => dispatch(navigateMessagingSession(session)),
   muteChat: (id, mute) => dispatch(muteChat(id, mute)),
 });
 

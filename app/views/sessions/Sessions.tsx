@@ -36,7 +36,7 @@ import {
   setRadius,
 } from '../../actions/sessions';
 import { removeGym, joinGym, setLocation } from '../../actions/profile';
-import SessionsProps from '../../types/views/Sessions';
+import SessionsProps from '../../types/views/sessions/Sessions';
 import Session from '../../types/Session';
 import Place from '../../types/Place';
 
