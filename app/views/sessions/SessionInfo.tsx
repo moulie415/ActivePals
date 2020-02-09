@@ -5,7 +5,7 @@ import RNCalendarEvents from 'react-native-calendar-events';
 import Image from 'react-native-fast-image';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Popup } from 'react-native-map-link';
+import { Popup, Options } from 'react-native-map-link';
 import Header from '../../components/Header/header';
 import Text from '../../components/Text';
 import colors from '../../constants/colors';
@@ -18,27 +18,31 @@ import FriendsModal from '../../components/friendsModal';
 import { removeSession, addUser, fetchSession, fetchPrivateSession } from '../../actions/sessions';
 import { muteChat } from '../../actions/chats';
 import SessionInfoProps from '../../types/views/sessions/SessionInfo';
+import { SessionType } from '../../types/Session';
 
 interface State {
   popUpVisible: boolean;
+  friendsModalOpen?: boolean;
+  options?: Options;
 }
 class SessionInfo extends Component<SessionInfoProps, State> {
   constructor(props) {
-    super(props)
-    this.params = this.props.navigation.state.params
-    this.sessionId = this.params.sessionId
-    this.isPrivate  = this.params.isPrivate
+    super(props);
     this.state = {
       popUpVisible: false,
-    }
+    };
   }
 
   componentDidMount() {
-    this.isPrivate ? this.props.fetchPrivateSession(this.sessionId) : this.props.fetchSession(this.sessionId)
+    const { navigation, getPrivateSession, getSession } = this.props;
+    const isPrivate = navigation.getParam('isPrivate');
+    const sessionId = navigation.getParam('sessionId');
+    isPrivate ? getPrivateSession(sessionId) : getSession(sessionId);
   }
 
   getButtons(host, session) {
-    const { profile, navigation } = this.props;
+    const { profile, navigation, remove, onAddUser } = this.props;
+    const sessionId = navigation.getParam('sessionId');
     const you = profile.uid;
     if (session.users[you]) {
       if (host.uid === you) {
@@ -46,18 +50,17 @@ class SessionInfo extends Component<SessionInfoProps, State> {
           <View style={styles.infoRowSpaceEvenly}>
             <Button
               onPress={() => {
-                Alert.alert(
-                  "Delete session",
-                  "Are you sure?",
-                  [
-                  {text: 'cancel', style: 'cancel'},
-                  {text: 'Yes', onPress: () => {
-                    this.props.remove(this.sessionId, session.private)
-                    navigation.goBack();
+                Alert.alert('Delete session', 'Are you sure?', [
+                  { text: 'cancel', style: 'cancel' },
+                  {
+                    text: 'Yes',
+                    onPress: () => {
+                      remove(sessionId, session.private);
+                      navigation.goBack();
+                    },
+                    style: 'destructive',
                   },
-                  style: 'destructive'}
-                  ],
-                )
+                ]);
               }}
               style={{ alignSelf: 'center' }}
               color="red"
@@ -66,7 +69,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
             {this.chatButton(session)}
             {/* {this.muteButton()} */}
           </View>
-        )
+        );
       }
       return (
         <View style={styles.infoRowSpaceEvenly}>
@@ -75,14 +78,14 @@ class SessionInfo extends Component<SessionInfoProps, State> {
             text="Leave"
             style={{ alignSelf: 'center' }}
             onPress={() => {
-              this.props.remove(this.sessionId, session.private);
+              remove(sessionId, session.private);
               navigation.goBack();
             }}
           />
           {this.chatButton(session)}
           {/* {this.muteButton()} */}
         </View>
-      )
+      );
     }
     return (
       <View style={styles.infoRowSpaceEvenly}>
@@ -91,7 +94,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
           style={{ alignSelf: 'center' }}
           onPress={async () => {
             try {
-              await this.props.addUser(this.sessionid, session.private, this.props.profile.uid);
+              await onAddUser(sessionId, session.private, profile.uid);
               Alert.alert('Session joined', 'You should now see this session in your session chats');
             } catch (e) {
               Alert.alert('Error', e.message);
@@ -115,23 +118,26 @@ class SessionInfo extends Component<SessionInfoProps, State> {
   }
 
   muteButton() {
+    const { muted, onMuteChat, navigation } = this.props;
+    const sessionId = navigation.getParam('sessionId');
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text>Mute </Text>
         <Switch
           trackColor={{ true: colors.secondary }}
-          thumbColor={Platform.select({ android: this.props.muted[this.sessionId] ? colors.secondary : '#fff' })}
-          value={this.props.muted[this.sessionId]}
-          onValueChange={val => this.props.muteChat(this.sessionId, val)}
+          thumbColor={Platform.select({ android: muted[sessionId] ? colors.secondary : '#fff' })}
+          value={muted[sessionId]}
+          onValueChange={val => onMuteChat(sessionId, val)}
         />
       </View>
     );
   }
 
   renderUsers(users) {
+    const { profile, friends, users: propsUsers } = this.props;
     return Object.keys(users).map(user => {
-      let userItem = this.props.friends[user] || this.props.users[user]
-      if (user === this.props.profile.uid) userItem = this.props.profile
+      let userItem = friends[user] || propsUsers[user];
+      if (user === profile.uid) userItem = profile;
       if (userItem) {
         return (
           <TouchableOpacity
@@ -153,18 +159,21 @@ class SessionInfo extends Component<SessionInfoProps, State> {
   }
 
   render() {
-    const { navigation } = this.props;
-    const session = this.props.sessions[this.sessionId] || this.props.privateSessions[this.sessionId];
+    const { navigation, sessions, privateSessions, profile, friends, users, places, location } = this.props;
+    const { friendsModalOpen, options, popUpVisible } = this.state;
+    const sessionId = navigation.getParam('sessionId');
+    const isPrivate = navigation.getParam('isPrivate');
+    const session = sessions[sessionId] || privateSessions[sessionId];
 
-    let host
-    if (session && session.host === this.props.profile.uid) {
-      host = this.props.profile
-    } else if (session && session.host){
-      host = this.props.friends[session.host] || this.props.users[session.host];
+    let host;
+    if (session && session.host === profile.uid) {
+      host = profile;
+    } else if (session && session.host) {
+      host = friends[session.host] || users[session.host];
     }
-    let gym
+    let gym;
     if (session && session.gym) {
-      gym = this.props.places[session.gym.place_id]
+      gym = places[session.gym.place_id];
     }
 
     return (
@@ -194,7 +203,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
               <View style={{ backgroundColor: '#fff', ...globalStyles.sectionShadow }}>
                 {session && host && this.getButtons(host, session)}
                 <TouchableOpacity
-                  onPress={()=> Alert.alert('Details', session.details)}
+                  onPress={() => Alert.alert('Details', session.details)}
                   style={[styles.infoRowContainer, styles.rowSpaceBetween]}
                 >
                   <View>
@@ -203,7 +212,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                       {session.details}
                     </Text>
                   </View>
-                  {this.isPrivate && <PrivateIcon />}
+                  {isPrivate && <PrivateIcon />}
                   <View>
                     <Text style={{ fontSize: 18 }}>Gender</Text>
                     <Text style={{ color: '#999' }}>{session.gender}</Text>
@@ -261,19 +270,19 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                       {session.location.formattedAddress}
                     </Text>
                   </TouchableOpacity>
-                  {this.props.location && (
+                  {location && (
                     <View style={{ flex: 2 }}>
                       <Button
                         onPress={() => {
                           const { lat, lng } = session.location.position;
-                          const options = {
+                          const newOptions: Options = {
                             latitude: lat,
                             longitude: lng,
                             cancelText: 'Cancel',
-                            sourceLatitude: this.props.location.latitude,
-                            sourceLongitude: this.props.location.longitude,
+                            sourceLatitude: location.lat,
+                            sourceLongitude: location.lon,
                           };
-                          this.setState({ popUpVisible: true, options });
+                          this.setState({ popUpVisible: true, options: newOptions });
                         }}
                         text="Directions"
                         style={{ alignSelf: 'flex-end' }}
@@ -290,12 +299,12 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                       {gym.photo ? (
                         <Image source={{ uri: gym.photo }} style={{ height: 40, width: 40, borderRadius: 25 }} />
                       ) : (
-                        getType('gym', 40)
+                        getType(SessionType.GYM, 40)
                       )}
                     </View>
                     <View>
                       <Text style={{ fontSize: 18 }}>Gym</Text>
-                      <Text style={{vcolor: '#999' }}>{gym.name}</Text>
+                      <Text style={{ color: '#999' }}>{gym.name}</Text>
                     </View>
                   </TouchableOpacity>
                 )}
@@ -318,10 +327,10 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                   </TouchableOpacity>
                 )}
               </View>
-              <View style={{ backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop:  20 }}>
+              <View style={{ backgroundColor: '#fff', ...globalStyles.sectionShadow, marginTop: 20 }}>
                 <View style={[styles.rowSpaceBetween, { padding: 5, paddingHorizontal: 10 }]}>
                   <Text style={{ fontSize: 18 }}>Users</Text>
-                  {(!this.isPrivate || (host && this.props.profile.uid === host.uid)) && (
+                  {(!isPrivate || (host && profile.uid === host.uid)) && (
                     <TouchableOpacity onPress={() => this.setState({ friendsModalOpen: true })}>
                       <Icon size={40} style={{ color: colors.secondary, marginRight: 10 }} name="ios-add" />
                     </TouchableOpacity>
@@ -334,35 +343,37 @@ class SessionInfo extends Component<SessionInfoProps, State> {
             <PulseIndicator color={colors.secondary} />
           )}
           <Popup
-            isVisible={this.state.popUpVisible}
+            isVisible={popUpVisible}
             onCancelPressed={() => this.setState({ popUpVisible: false })}
             onAppPressed={() => this.setState({ popUpVisible: false })}
             onBackButtonPressed={() => this.setState({ popUpVisible: false })}
             modalProps={{ animationIn: 'slideInUp' }}
-            options={this.state.options}
+            options={options}
             style={{
               cancelButtonText: { color: colors.secondary },
             }}
+            appsWhiteList={[]}
           />
         </ScrollView>
         <FriendsModal
           title="Add Pals to Session"
           onClosed={() => this.setState({ friendsModalOpen: false })}
           onContinue={async friends => {
-            const invites = []
+            const invites = [];
             friends.forEach(friend => {
-              if (!Object.values(session.users).some(user => friend == user)) {
-                invites.push(this.props.addUser(session.key, session.private, friend))
+              if (!Object.values(session.users).some(user => friend === user)) {
+                invites.push(addUser(session.key, session.private, friend));
               }
-            })
-            await Promise.all(invites)
-            Alert.alert('Success', (friends.length > 1  ? 'Pals' : 'Pal') + ' added')
-            this.setState({friendsModalOpen: false})
+            });
+            await Promise.all(invites);
+            Alert.alert('Success', `${friends.length > 1 ? 'Pals' : 'Pal'} added`);
+            this.setState({ friendsModalOpen: false });
           }}
-          isOpen={this.state.friendsModalOpen}
+          isOpen={friendsModalOpen}
         />
       </>
-    )};
+    );
+  }
 }
 
 const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => ({
@@ -378,10 +389,10 @@ const mapStateToProps = ({ profile, sharedInfo, friends, sessions, chats }) => (
 
 const mapDispatchToProps = dispatch => ({
   remove: (key, type) => dispatch(removeSession(key, type)),
-  addUser: (session, isPrivate, uid) => dispatch(addUser(session, isPrivate, uid)),
-  fetchSession: id => dispatch(fetchSession(id)),
-  fetchPrivateSession: id => dispatch(fetchPrivateSession(id)),
-  muteChat: (id, mute) => dispatch(muteChat(id, mute)),
+  onAddUser: (session, isPrivate, uid) => dispatch(addUser(session, isPrivate, uid)),
+  getSession: id => dispatch(fetchSession(id)),
+  getPrivateSession: id => dispatch(fetchPrivateSession(id)),
+  onMuteChat: (id, mute) => dispatch(muteChat(id, mute)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo);

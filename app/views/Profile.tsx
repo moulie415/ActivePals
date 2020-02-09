@@ -456,9 +456,9 @@ class ProfileView extends Component<ProfileProps, State> {
               />
             </View>
           )}
-          <View style={styles.inputGrp}>
+          <TouchableOpacity onPress={() => this.setState({ showPicker: true })} style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>Birthday: </Text>
-          </View>
+          </TouchableOpacity>
           <Button style={styles.logout} text="Log out" onPress={() => this.logout()} />
           {spinner && (
             <View style={hStyles.spinner}>
@@ -469,9 +469,11 @@ class ProfileView extends Component<ProfileProps, State> {
         {showPicker && (
           <DateTimePicker
             mode="date"
-            value={new Date(profile && profile.birthday)}
+            value={profile.birthday ? new Date(profile.birthday) : new Date()}
             maximumDate={new Date()}
-            onChange={date => this.setState({ profile: { ...profile, birthday: date } })}
+            onChange={(event, selectedDate) => {
+              this.setState({ profile: { ...profile, birthday: selectedDate.toString() } });
+            }}
           />
         )}
       </>

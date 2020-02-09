@@ -6,7 +6,7 @@ import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
 import { CheckBox } from 'react-native-elements';
 import { Popup, Options } from 'react-native-map-link';
-import Permissions from 'react-native-permissions';
+import Permissions, { PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { AdMobInterstitial } from 'react-native-admob';
 import MapView, { Marker } from 'react-native-maps';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
@@ -42,6 +42,9 @@ import Place from '../../types/Place';
 
 AdMobInterstitial.setAdUnitID(str.admobInterstitial);
 AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
+
+const LOCATION_PERMISSION =
+  Platform.OS === 'ios' ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
 
 interface State {
   radius: number;
@@ -89,11 +92,11 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   async componentDidMount() {
-    const response = await Permissions.check('location');
+    const response = await Permissions.check(LOCATION_PERMISSION);
     this.setState({ spinner: true });
     // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
     this.setState({ locationPermission: response });
-    if (response !== 'granted') {
+    if (response !== RESULTS.GRANTED) {
       this.alertForLocationPermission();
     } else {
       this.getPosition();
@@ -219,26 +222,25 @@ class Sessions extends Component<SessionsProps, State> {
         onPress: () => console.log('Permission denied'),
         style: 'cancel',
       },
-      locationPermission === 'undetermined'
+      locationPermission === RESULTS.BLOCKED
         ? { text: 'OK', onPress: this.locationPermission() }
         : { text: 'Open Settings', onPress: Permissions.openSettings },
     ]);
   }
 
-  locationPermission() {
-    Permissions.request('location').then(response => {
-      // Returns once the user has chosen to 'allow' or to 'not allow' access
-      // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
-      this.setState({ locationPermission: response });
-      if (response === 'authorized') {
-        this.getPosition();
-      } else {
-        Alert.alert(
-          'Sorry',
-          'The app does not have access to your location, some functionality may not work as a result'
-        );
-      }
-    });
+  async locationPermission() {
+    const response = await Permissions.request(LOCATION_PERMISSION);
+    // Returns once the user has chosen to 'allow' or to 'not allow' access
+    // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
+    this.setState({ locationPermission: response });
+    if (response === RESULTS.GRANTED) {
+      this.getPosition();
+    } else {
+      Alert.alert(
+        'Sorry',
+        'The app does not have access to your location, some functionality may not work as a result'
+      );
+    }
   }
 
   gymMarkers(results) {
@@ -385,7 +387,7 @@ class Sessions extends Component<SessionsProps, State> {
                           });
                         }}
                       >
-                        <Icon name="ios-pin" size={40} style={{ color: colors.secondary }}/>
+                        <Icon name="ios-pin" size={40} style={{ color: colors.secondary }} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -465,7 +467,9 @@ class Sessions extends Component<SessionsProps, State> {
                           <Text style={{ flex: 2, color: '#000' }} numberOfLines={1}>
                             {item.vicinity}
                           </Text>
-                          <Text style={{ color: '#999' }}>{` (${getDistance(item, yourLat, yourLon, true).toFixed(2)} km away)`}</Text>
+                          <Text style={{ color: '#999' }}>{` (${getDistance(item, yourLat, yourLon, true).toFixed(
+                            2
+                          )} km away)`}</Text>
                         </View>
                         <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
                           <TouchableOpacity
@@ -525,10 +529,10 @@ class Sessions extends Component<SessionsProps, State> {
               if (latitude && longitude) {
                 this.setState({ showMap: val });
               } else {
-                Alert.alert('Error', 'Sorry your location could not be found')
+                Alert.alert('Error', 'Sorry your location could not be found');
               }
             } else {
-              this.setState({ showMap: val })
+              this.setState({ showMap: val });
             }
           }}
         />
@@ -569,7 +573,7 @@ class Sessions extends Component<SessionsProps, State> {
               style={styles.button}
               onPress={() => {
                 this.setState({ selectedLocation: {} });
-                AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+                !__DEV__ && AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
                 navigation.navigate('SessionDetail');
               }}
               text="Create Session"
@@ -689,13 +693,13 @@ class Sessions extends Component<SessionsProps, State> {
           cancelButtonIndex={2}
           onPress={index => {
             if (index === 0) {
-              AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+              !__DEV__ && AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
               navigation.navigate('SessionDetail', { location: selectedLocation });
             } else if (index === 1) {
               if (Object.values(friends).length > 0) {
                 this.setState({ friendsModalOpen: true });
               } else {
-                Alert.alert('Sorry', 'You must have at least one pal to create a private session')
+                Alert.alert('Sorry', 'You must have at least one pal to create a private session');
               }
             }
           }}
@@ -719,16 +723,16 @@ const mapStateToProps = ({ friends, profile, chats, sessions, sharedInfo }) => (
 });
 
 const mapDispatchToProps = dispatch => ({
-  join: (location) => dispatch(joinGym(location)),
+  join: location => dispatch(joinGym(location)),
   removeGym: () => dispatch(removeGym()),
   getChats: (sessions, uid) => dispatch(fetchSessionChats(sessions, uid)),
   remove: (key, type) => dispatch(removeSession(key, type)),
   fetch: () => Promise.all([dispatch(fetchSessions()), dispatch(fetchPrivateSessions())]),
-  setYourLocation: (location) => dispatch(setLocation(location)),
-  setPlaces: (places) => dispatch(setPlaces(places)),
+  setYourLocation: location => dispatch(setLocation(location)),
+  setPlaces: places => dispatch(setPlaces(places)),
   fetchPhotoPaths: () => dispatch(fetchPhotoPaths()),
   getPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
-  saveRadius: (radius) => dispatch(setRadius(radius)),
+  saveRadius: radius => dispatch(setRadius(radius)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions);

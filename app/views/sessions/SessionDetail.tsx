@@ -36,7 +36,7 @@ const typeProps = types.map(type => {
 interface State {
   gender: string;
   formattedAddress: string;
-  date: string;
+  date: Date;
   duration: number;
   durationMinutes: number;
   addToCalendar: boolean;
@@ -48,6 +48,7 @@ interface State {
   searchOpen?: boolean;
   calendarId?: string;
   gym?: Place;
+  showDatePicker?: boolean;
 }
 class SessionDetail extends Component<SessionDetailProps, State> {
   constructor(props) {
@@ -57,7 +58,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
     this.state = {
       gender: 'Unspecified',
       formattedAddress: 'none',
-      date: null,
+      date: new Date(),
       duration: 1,
       durationMinutes: 0,
       addToCalendar: false,
@@ -221,6 +222,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
       addToCalendar,
       mapOpen,
       searchOpen,
+      showDatePicker,
     } = this.state;
     return (
       <>
@@ -250,19 +252,9 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               alignItems: 'center',
             }}
           >
-            <DateTimePicker
-              date={date}
-              placeholder="Date and time"
-              mode="datetime"
-              androidMode="spinner"
-              onDateChange={date => {
-                this.setState({ date });
-                console.log(date);
-              }}
-              confirmBtnText="Confirm"
-              cancelBtnText="Cancel"
-              minDate={new Date().toISOString()}
-            />
+            <TouchableOpacity onPress={() => this.setState({ showDatePicker: true })}>
+              <Text>Date and Time</Text>
+            </TouchableOpacity>
             <View style={{ flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10 }}>
               <Text style={{ marginRight: 5 }}>Add to calendar</Text>
               <Switch
@@ -316,7 +308,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               leftButtonBackgroundColor={colors.secondary}
               rightButtonBackgroundColor={colors.secondary}
             />
-            <Text style={{ color: '#999', width: 40, textAlign: 'center' }}>{duration == 1 ? 'hr' : 'hrs'}</Text>
+            <Text style={{ color: '#999', width: 40, textAlign: 'center' }}>{duration === 1 ? 'hr' : 'hrs'}</Text>
             <NumericInput
               value={durationMinutes}
               onChange={durationMinutes => this.setState({ durationMinutes })}
@@ -335,7 +327,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               rightButtonBackgroundColor={colors.secondary}
             />
             <Text style={{ color: '#999', width: 40, textAlign: 'center' }}>
-              {durationMinutes == 1 ? 'min' : 'mins'}
+              {durationMinutes === 1 ? 'min' : 'mins'}
             </Text>
           </View>
 
@@ -380,9 +372,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
             buttonColor={colors.secondary}
             selectedButtonColor={colors.secondary}
             labelStyle={{ marginRight: 20 }}
-            onPress={value => {
-              this.setState({ type: value });
-            }}
+            onPress={value => this.setState({ type: value })}
           />
           <Button
             style={{ alignSelf: 'center', marginVertical: 20 }}
@@ -423,6 +413,16 @@ class SessionDetail extends Component<SessionDetailProps, State> {
           onClosed={() => this.setState({ searchOpen: false })}
           isOpen={searchOpen}
         />
+        {showDatePicker && (
+          <DateTimePicker
+            value={date}
+            mode="datetime"
+            onChange={(event, selectedDate) => {
+              this.setState({ date: selectedDate });
+            }}
+            minimumDate={new Date()}
+          />
+        )}
       </>
     );
   }

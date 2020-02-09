@@ -34,16 +34,16 @@ export const geofire = new GeoFire(firebaseRef);
 //   }
 // }
 
-//const middleware = createReactNavigationReduxMiddleware('root', state => state.nav);
+// const middleware = createReactNavigationReduxMiddleware('root', state => state.nav);
 
-//export const addListener = createReduxBoundAddListener('root');
+// export const addListener = createReduxBoundAddListener('root');
 
-//const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+// const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export const store = createStore(
   reducer,
-  //composeEnhancers(applyMiddleware(middleware, reactNavigationMiddleware, thunk))
-  applyMiddleware(/*middleware,*/ thunk)
+  // composeEnhancers(applyMiddleware(middleware, reactNavigationMiddleware, thunk))
+  applyMiddleware(/* middleware, */ thunk)
 );
 
 const navigateFromNotif = notif => {

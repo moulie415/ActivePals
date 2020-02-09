@@ -1,4 +1,5 @@
 import Location from './Location';
+import Place from './Place';
 
 export default interface Session {
   key: string;
@@ -15,6 +16,7 @@ export default interface Session {
   users: { [key: string]: boolean };
   inProgress?: boolean;
   distance?: number;
+  gym?: Place;
 }
 
 export enum Gender {
