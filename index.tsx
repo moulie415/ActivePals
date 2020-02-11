@@ -54,7 +54,7 @@ const navigateFromNotif = notif => {
   }
   switch (type) {
     case 'message':
-      NavigationService.navigate('Messaging', { chatId, username, uid });
+      NavigationService.navigate('Messaging', { chatId, friendUsername: username, friendUid: uid });
       break;
     case 'gymMessage':
       NavigationService.navigate('Messaging', { gymId });
@@ -75,17 +75,8 @@ const navigateFromNotif = notif => {
 };
 
 const shouldNavigate = (notification) => {
-  const { nav } = store.getState();
-  const { routes } = nav;
-  let route = {};
-  if (routes) {
-    route = routes[nav.index];
-  }
-  return  (!route.params || 
-    (route.params.chatId && route.params.chatId != notification.chatId ||
-     route.params.session && route.params.session.key != notification.sessionId ||
-     route.params.gymId && route.params.gymId != notification.gymId)) 
-}
+  return true;
+};
 
 
 export const showLocalNotification = notif => {

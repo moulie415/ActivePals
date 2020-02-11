@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
-import { Platform, AppState, BackHandler } from 'react-native';
-import { NavigationActions, createAppContainer } from 'react-navigation';
-import { createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation-tabs';
+import React, { Component, FunctionComponent } from 'react';
+import { Platform, AppState, SafeAreaView } from 'react-native';
+import { createAppContainer } from 'react-navigation';
+import { createBottomTabNavigator, createMaterialTopTabNavigator, MaterialTopTabBar } from 'react-navigation-tabs';
 import { createStackNavigator } from 'react-navigation-stack';
 import firebase from 'react-native-firebase';
+import { MaterialTabBarProps } from 'react-navigation-tabs/lib/typescript/src/types';
 import color from 'color';
-import { isIphoneX } from 'react-native-iphone-x-helper';
 import Login from './views/login';
 import SignUp from './views/SignUp';
 import Home from './views/Home';
@@ -35,6 +35,12 @@ import NavigationService from './actions/navigation';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
 import ChatTabLabel from './components/ChatTabLabel';
 
+const SafeAreaMaterialTopTabBar: FunctionComponent<MaterialTabBarProps> = ({ ...props }) => (
+  <SafeAreaView style={{ backgroundColor: colors.primary }}>
+    <MaterialTopTabBar {...props} />
+  </SafeAreaView>
+);
+
 const chats = createMaterialTopTabNavigator(
   {
     SessionChats: {
@@ -53,6 +59,7 @@ const chats = createMaterialTopTabNavigator(
     },
   },
   {
+    tabBarComponent: props => <SafeAreaMaterialTopTabBar {...props} />,
     tabBarPosition: 'top',
     tabBarOptions: {
       showLabel: true,
@@ -62,13 +69,8 @@ const chats = createMaterialTopTabNavigator(
       },
       activeTintColor: '#fff',
       inactiveTintColor: colors.secondary,
-      tabStyle: {
-        justifyContent: isIphoneX() ? 'flex-end' : 'center',
-      },
       style: {
         backgroundColor: colors.primary,
-        height: Platform.select({ ios: isIphoneX() ? 70 : 90 }),
-        justifyContent: isIphoneX() ? 'center' : null,
       },
       indicatorStyle: {
         backgroundColor: '#fff',
@@ -134,21 +136,11 @@ const Navigation = createAppContainer(Stack);
 
 class App extends Component {
   componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
     AppState.addEventListener('change', this.handleAppStateChange);
   }
 
   componentWillUnmount() {
     AppState.removeEventListener('change', this.handleAppStateChange);
-    BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress());
-  }
-
-  onBackPress() {
-    //const { dispatch, nav } = this.props;
-    if (nav.index !== 1) {
-      dispatch(NavigationActions.back());
-    }
-    return true;
   }
 
   handleAppStateChange = nextAppState => {
@@ -171,7 +163,7 @@ class App extends Component {
   };
 
   render() {
-    //const { nav, dispatch } = this.props;
+    // const { nav, dispatch } = this.props;
 
     return (
       <Navigation

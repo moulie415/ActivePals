@@ -11,15 +11,7 @@ import { getStateColor, sortByState } from '../constants/utils';
 import Header from '../components/Header/header';
 import Text from '../components/Text';
 import Button from '../components/Button';
-import {
-  fetchFriends,
-  sendRequest,
-  acceptRequest,
-  deleteFriend,
-  removeFriend,
-  addFriend,
-  updateFriendState,
-} from '../actions/friends';
+import { fetchFriends, sendRequest, acceptRequest, deleteFriend } from '../actions/friends';
 import FriendsProps from '../types/views/Friends';
 
 interface State {
@@ -287,9 +279,6 @@ const mapDispatchToProps = dispatch => ({
   onRequest: friendUid => dispatch(sendRequest(friendUid)),
   onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
   onRemove: uid => dispatch(deleteFriend(uid)),
-  removeLocal: uid => dispatch(removeFriend(uid)),
-  add: friend => dispatch(addFriend(friend)),
-  updateFriendState: (uid, state) => dispatch(updateFriendState(uid, state)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends);

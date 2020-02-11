@@ -57,6 +57,7 @@ interface State {
   focusCommentInput?: boolean;
   repsId: string;
   repCount: number;
+  spinner?: boolean;
 }
 class PostView extends Component<PostViewProps, State> {
   player: Video;
@@ -125,7 +126,7 @@ class PostView extends Component<PostViewProps, State> {
     if (item.type === 'photo') {
       try {
         const resp = await RNFetchBlob.config({ fileCache: false }).fetch('GET', item.url);
-        const base64 = await resp.base64()
+        const base64 = await resp.base64();
         const dataUrl = `data:image/jpeg;base64,${base64}`;
         options.url = dataUrl;
       } catch (e) {
@@ -320,13 +321,7 @@ class PostView extends Component<PostViewProps, State> {
                 onFullscreenPlayerDidPresent={() => this.setState({ playing: false })}
                 resizeMode="contain"
                 onBuffer={() => console.log('buffering')} // Callback when remote video is buffering
-                onError={e => {
-                  if (e.error && e.error.code) {
-                    Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain)
-                  } else if (e.message) {
-                    Alert.alert('Error', e.message);
-                  } else Alert.alert('Error', 'Error playing video');
-                }}
+                onError={e => Alert.alert('Error', e.error.errorString)}
               />
               {!playing && (
                 <View style={hStyles.playButtonContainer}>
@@ -390,6 +385,7 @@ class PostView extends Component<PostViewProps, State> {
       focusCommentInput,
       repCount,
       repsId,
+      spinner,
     } = this.state;
     const { postId } = navigation.state.params;
     const post = feed[postId];
@@ -442,7 +438,7 @@ class PostView extends Component<PostViewProps, State> {
                 return friends[item.uid].username || users[item.uid].username;
               }}
               uidExtractor={item => (item.user ? item.user.uid : null)}
-              editTimeExtractor={item => item => item.updated_at || new Date(item.created_at).toISOString()}
+              editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
               createdTimeExtractor={item => new Date(item.created_at).toISOString()}
               bodyExtractor={item => item.text}
               imageExtractor={item => {
@@ -525,6 +521,11 @@ class PostView extends Component<PostViewProps, State> {
             />
           </Modal>
         </ScrollView>
+        {spinner && (
+          <View style={sStyles.spinner}>
+            <PulseIndicator color={colors.secondary} />
+          </View>
+        )}
       </KeyboardAvoidingView>
     ) : (
       <View style={sStyles.spinner}>

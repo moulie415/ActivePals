@@ -2,37 +2,30 @@
  * Created by tino on 6/6/17.
  */
 import React, { PureComponent } from 'react';
-import {
-  View,
-  FlatList,
-  ActivityIndicator,
-  TouchableHighlight,
-  Modal,
-  Alert,
-  TouchableOpacity
-} from "react-native";
+import { View, Alert, TouchableOpacity, Image as SlowImage } from 'react-native';
+import Image from 'react-native-fast-image';
+import firebase from 'react-native-firebase';
+import ParsedText from 'react-native-parsed-text';
+import TimeAgo from 'react-native-timeago';
+import styles from './styles';
+import colors from '../../constants/colors';
+import str from '../../constants/strings';
+import CommentProps from '../../types/components/CommentProps';
+import Text, { globalTextStyle } from '../Text';
 
-import Image from 'react-native-fast-image'
-import Text, { globalTextStyle } from '../Text'
-import TimeAgo from "react-native-timeago";
-import Icon from "react-native-vector-icons/FontAwesome";
-import styles from "./styles";
-import colors from '../../constants/colors'
-import Collapsible from "react-native-collapsible";
-import {Image as SlowImage } from 'react-native'
-import str from '../../constants/strings'
-import firebase from 'react-native-firebase'
+const weightUp = require('../../../assets/images/weightlifting_up.png');
+const weightDown = require('../../../assets/images/weightlifting_down.png');
 
-const weightUp = require('Anyone/assets/images/weightlifting_up.png')
-const weightDown = require('Anyone/assets/images/weightlifting_down.png')
-import ParsedText from 'react-native-parsed-text'
+interface State {
+  menuVisible: boolean;
+}
 
-export default class Comment extends PureComponent {
+export default class Comment extends PureComponent<CommentProps, State> {
   constructor(props) {
     super(props);
 
     this.state = {
-      menuVisible: false
+      menuVisible: false,
     };
 
     this.handleReport = this.handleReport.bind(this);
@@ -44,82 +37,120 @@ export default class Comment extends PureComponent {
     this.handleLikesTap = this.handleLikesTap.bind(this);
   }
 
+  setModalVisible() {
+    const { menuVisible: mVisible } = this.state;
+    this.setState({ menuVisible: !mVisible });
+  }
+
+  handleLikesTap() {
+    const { likesTapAction, data } = this.props;
+    likesTapAction(data);
+  }
+
+  handleUsernameTap() {
+    const { usernameTapAction, uid, username } = this.props;
+    if (usernameTapAction) {
+      usernameTapAction(username, uid);
+    }
+  }
+
   handleReport() {
-    Alert.alert(
-      "Confirm report",
-      "Are you sure you want to report?",
-      [
-        {
-          text: "Yes",
-          onPress: () => this.props.reportAction(this.props.data)
-        },
-        { text: "No", onPress: () => null }
-      ],
-      true
-    );
+    const { data, reportAction } = this.props;
+    Alert.alert('Confirm report', 'Are you sure you want to report?', [
+      {
+        text: 'Yes',
+        onPress: () => reportAction(data),
+      },
+      { text: 'No', onPress: () => null },
+    ]);
   }
+
   handleReply() {
-    this.props.replyAction(this.props.data);
+    const { data, replyAction } = this.props;
+    replyAction(data);
   }
+
   handleLike() {
-    this.props.likeAction(this.props.data);
+    const { data, likeAction } = this.props;
+    likeAction(data);
   }
+
   handleEdit() {
-    this.props.editComment(this.props.data);
+    const { data, editComment } = this.props;
+    editComment(data);
   }
 
   handleDelete() {
-    Alert.alert(
-      "Confirm delete",
-      "Are you sure you want to delete?",
-      [
-        {
-          text: "Yes",
-          onPress: () => this.props.deleteAction(this.props.data)
-        },
-        { text: "No", onPress: () => null }
-      ],
-      true
-    );
-  }
-  handleUsernameTap() {
-    if (this.props.usernameTapAction) {
-      this.props.usernameTapAction(this.props.username, this.props.uid);
-    }
-  }
-  handleLikesTap() {
-    this.props.likesTapAction(this.props.data);
+    const { data, deleteAction } = this.props;
+    Alert.alert('Confirm delete', 'Are you sure you want to delete?', [
+      {
+        text: 'Yes',
+        onPress: () => deleteAction(data),
+      },
+      { text: 'No', onPress: () => null },
+    ]);
   }
 
-  setModalVisible() {
-    this.setState({ menuVisible: !this.state.menuVisible });
+  handleUsernamePress(n) {
+    const name = n.substring(1);
+    const { users, viewingUserName, usernameTapAction } = this.props;
+    if (name === viewingUserName) {
+      // this.props.goToProfile()
+    } else {
+      if (users) {
+        const found = users.find(user => user.username === name);
+        if (found) {
+          usernameTapAction(name, found.uid);
+        } else {
+          this.fetchUser(name);
+        }
+      } else {
+        this.fetchUser(name);
+      }
+    }
+  }
+
+  async fetchUser(name) {
+    const { usernameTapAction } = this.props;
+    const snapshot = await firebase
+      .database()
+      .ref('usernames')
+      .child(name)
+      .once('value');
+    if (snapshot.val()) {
+      usernameTapAction(name, snapshot.val());
+    }
   }
 
   render() {
+    const { menuVisible } = this.state;
+    const {
+      image,
+      likesNr,
+      username,
+      body,
+      likeAction,
+      updatedAt,
+      liked,
+      replyAction,
+      canEdit,
+      reportAction,
+      reported,
+    } = this.props;
     return (
       <View style={styles.commentContainer}>
         <View style={styles.left}>
           <TouchableOpacity onPress={this.handleUsernameTap}>
-            <View style={{ alignItems: "center" }}>
+            <View style={{ alignItems: 'center' }}>
               <Image
-                style={[
-                  styles.image,
-                  { width: 30, height: 30, borderRadius: 15 }
-                ]}
-                source={
-                  typeof this.props.image === "string"
-                    ? { uri: this.props.image }
-                    : this.props.image
-                }
+                style={[styles.image, { width: 30, height: 30, borderRadius: 15 }]}
+                source={typeof image === 'string' ? { uri: image } : image}
               />
-              {this.props.likesNr && this.props.likeAction ? (
-                <TouchableOpacity
-                  style={[styles.actionButton, { paddingTop: 5 }]}
-                  onPress={this.handleLikesTap}
-                >
-                  <View style={{ flexDirection: "row" }}>
-                    <SlowImage source={weightUp}  style={{width: 15, height: 15, tintColor: colors.secondary}}/>
-                    <Text style={styles.likeNr}> {this.props.likesNr}</Text>
+              {likesNr && likeAction ? (
+                <TouchableOpacity style={{ paddingTop: 5 }} onPress={this.handleLikesTap}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <SlowImage source={weightUp} style={{ width: 15, height: 15, tintColor: colors.secondary }} />
+                    <Text style={styles.likeNr}> {likesNr}</Text>
                   </View>
                 </TouchableOpacity>
               ) : null}
@@ -134,83 +165,59 @@ export default class Comment extends PureComponent {
           <View style={styles.rightContent}>
             <View style={styles.rightContentTop}>
               <TouchableOpacity onPress={this.handleUsernameTap}>
-                <Text style={styles.name}>{this.props.username}</Text>
+                <Text style={styles.name}>{username}</Text>
               </TouchableOpacity>
             </View>
-            <ParsedText 
-            parse={
-              [
-                {pattern: str.mentionRegex, style: {color: colors.secondary}, onPress: this.handleUsernamePress.bind(this) }
-              ]
-            }
-            style={styles.body}>{this.props.body}</ParsedText>
+            <ParsedText
+              parse={[
+                {
+                  pattern: str.mentionRegex,
+                  style: { color: colors.secondary },
+                  onPress: this.handleUsernamePress.bind(this),
+                },
+              ]}
+              style={styles.body}
+            >
+              {body}
+            </ParsedText>
           </View>
           <View style={styles.rightActionBar}>
-            <TimeAgo style={styles.time} time={this.props.updatedAt} />
-            {this.props.likeAction ? (
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={()=> {
-                  this.handleLike()
-                  }}
-              >
-                <View style={{ flexDirection: "row" , marginTop: 2}}>
-                  <Text
-                    style={[
-                      styles.actionText,
-                      { color: this.props.liked ? "#4DB2DF" : '#999' }
-                    ]}
-                  >
-                  </Text>
-                    <SlowImage source={this.props.liked ? weightUp : weightDown}  
-                    style={{width: 25, height: 25, tintColor: this.props.liked? colors.secondary : '#999'}}/>
+            <TimeAgo style={styles.time} time={updatedAt} />
+            {likeAction ? (
+              <TouchableOpacity onPress={() => this.handleLike()}>
+                <View style={{ flexDirection: 'row', marginTop: 2 }}>
+                  <Text style={[styles.actionText, { color: liked ? '#4DB2DF' : '#999' }]} />
+                  source={liked ? weightUp : weightDown}
+                  style={{ width: 25, height: 25, tintColor: liked ? colors.secondary : '#999' }}
+                  />
                 </View>
               </TouchableOpacity>
             ) : null}
-            {this.props.replyAction ? (
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={this.handleReply}
-              >
+            {replyAction ? (
+              <TouchableOpacity style={styles.actionButton} onPress={this.handleReply}>
                 <Text style={styles.actionText}>Reply</Text>
               </TouchableOpacity>
             ) : null}
           </View>
         </TouchableOpacity>
-        {this.state.menuVisible ? (
+        {menuVisible ? (
           <View style={styles.menu}>
-            {this.props.canEdit ? (
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={this.handleEdit}
-              >
+            {canEdit ? (
+              <TouchableOpacity style={styles.menuItem} onPress={this.handleEdit}>
                 <Text style={styles.menuText}>Edit</Text>
               </TouchableOpacity>
             ) : null}
-            {this.props.reportAction ? (
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={this.handleReport}
-              >
-                {this.props.reported ? (
-                  <Text
-                    style={[
-                      styles.menuText,
-                      { fontStyle: "italic", fontSize: 11}
-                    ]}
-                  >
-                    Reported
-                  </Text>
+            {reportAction ? (
+              <TouchableOpacity style={styles.menuItem} onPress={this.handleReport}>
+                {reported ? (
+                  <Text style={[styles.menuText, { fontStyle: 'italic', fontSize: 11 }]}>Reported</Text>
                 ) : (
                   <Text style={styles.menuText}>Report</Text>
                 )}
               </TouchableOpacity>
             ) : null}
-            {this.props.canEdit ? (
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={this.handleDelete}
-              >
+            {canEdit ? (
+              <TouchableOpacity style={styles.menuItem} onPress={this.handleDelete}>
                 <Text style={styles.menuText}>Delete</Text>
               </TouchableOpacity>
             ) : null}
@@ -218,36 +225,5 @@ export default class Comment extends PureComponent {
         ) : null}
       </View>
     );
-  }
-
-  handleUsernamePress(name) {
-    name = name.substring(1)
-    let users = this.props.users
-    if (name == this.props.viewingUserName) {
-      //this.props.goToProfile()
-    }
-    else {
-      if (users) {
-        let found = users.find(user => user.username == name)
-        if (found) {
-          this.props.usernameTapAction(name, found.uid);
-        }
-        else {
-          this.fetchUser(name)
-        }
-      }
-      else {
-        this.fetchUser(name)
-      }
-     
-    }
-  }
-  fetchUser(name) {
-    firebase.database().ref('usernames').child(name).once('value', snapshot => {
-      if (snapshot.val()) {
-        this.props.usernameTapAction(name, snapshot.val())
-      }
-    })
-    .catch(e => console.log(e))
   }
 }

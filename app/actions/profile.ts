@@ -113,8 +113,8 @@ export const fetchProfile = () => {
 export const doSetup = profile => {
   return async (dispatch, getState) => {
     const { uid } = profile;
-    setupPresence(uid);
     try {
+      setupPresence(uid);
       const fcmToken = await firebase.messaging().getToken();
       if (fcmToken) {
         firebase

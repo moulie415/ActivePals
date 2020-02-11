@@ -12,6 +12,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image as SlowImage,
+  BackHandler,
 } from 'react-native';
 import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
@@ -115,6 +116,17 @@ export class Home extends Component<HomeProps, State> {
       .catch(error => {
         console.log('messaging permission denied');
       });
+
+    BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress());
+  }
+
+  onBackPress() {
+    const { navigation } = this.props;
+    Alert.alert(navigation.state.routeName);
   }
 
   getUsername(uid) {
@@ -464,13 +476,7 @@ export class Home extends Component<HomeProps, State> {
                 onBuffer={() => {
                   console.log('buffering');
                 }} // Callback when remote video is buffering
-                onError={e => {
-                  if (e.error && e.error.code) {
-                    Alert.alert('Error', 'code ' + e.error.code + '\n' + e.error.domain);
-                  } else if (e.message) {
-                    Alert.alert('Error', e.message);
-                  } else Alert.alert('Error', 'Error playing video');
-                }}
+                onError={e => Alert.alert('Error', e.error.errorString)}
               />
             </TouchableWithoutFeedback>
             {!playing[item.key] && (

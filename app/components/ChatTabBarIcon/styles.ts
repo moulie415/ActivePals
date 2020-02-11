@@ -12,8 +12,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    top: Platform.select({android: -3, ios: 0}),
-    right: -5
+    top: 0,
+    right: 19,
   },
   unreadCount: { 
     fontSize: 10,

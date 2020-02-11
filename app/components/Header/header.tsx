@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { TouchableOpacity, View, StatusBar, SafeAreaView } from 'react-native';
+import { TouchableOpacity, View, StatusBar, SafeAreaView, Platform } from 'react-native';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import colors from '../../constants/colors';
@@ -21,7 +21,12 @@ const AppHeader: FunctionComponent<HeaderProps> = ({
   return (
     <>
       <StatusBar backgroundColor={backgroundColor || colors.primary} />
-      <SafeAreaView style={{ backgroundColor: backgroundColor || colors.primary, height: 90 }}>
+      <SafeAreaView
+        style={{
+          backgroundColor: backgroundColor || colors.primary,
+          height: Platform.select({ ios: 90, android: 50 }),
+        }}
+      >
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           {left ||
             ((hasBack || customBackPress) && (

@@ -7,8 +7,7 @@ import styles from './styles';
 import ChatTabBarIconProps from '../../types/components/ChatTabBarIcon';
 
 const ChatTabBarIcon: FunctionComponent<ChatTabBarIconProps> = ({ unreadCount, color }) => {
-  let count = 0;
-  Object.values(unreadCount).forEach(val => (count += val));
+  const count = Object.keys(unreadCount).reduce((sum, key) => sum + (unreadCount[key] || 0), 0);
   return (
     <>
       <Icon name="md-chatboxes" size={25} style={{ color }} />
