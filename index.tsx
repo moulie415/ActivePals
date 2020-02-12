@@ -194,26 +194,27 @@ class ActivePals extends React.Component {
 
     this.messageListener = firebase.messaging().onMessage(notification => {
       handleNotification(notification.data);
-    })
+    });
 
     this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed(notification => {
       // Process your notification as required
       // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
       console.log(notification);
-    })
+    });
+
     this.notificationListener = firebase.notifications().onNotification(notification => {
       // Process your notification as required
       handleNotification(notification.data);
-    })
+    });
+
     this.notificationOpenedListener = firebase.notifications().onNotificationOpened(notificationOpen => {
       // Get the action triggered by the notification being opened
-      const action = notificationOpen.action
       // Get information about the notification that was opened
-      const notification = notificationOpen.notification
+      const { action, notification } = notificationOpen;
 
-      const state = AppState.currentState
+      const state = AppState.currentState;
       if (state !== 'active') {
-        handleNotification(notification.data, false)
+        handleNotification(notification.data, false);
       }
       if (shouldNavigate(notification.data)) {
         navigateFromNotif(notification.data);
@@ -227,9 +228,8 @@ class ActivePals extends React.Component {
         if (notificationOpen) {
           // App was opened by a notification
           // Get the action triggered by the notification being opened
-          const action = notificationOpen.action
           // Get information about the notification that was opened
-          const notification = notificationOpen.notification
+          const { action, notification } = notificationOpen;
         }
       })
 
