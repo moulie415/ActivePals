@@ -62,3 +62,7 @@ export
 .vscode
 # CocoaPods
 /ios/Pods/
+
+.jest
+coverage
+*.hprof
