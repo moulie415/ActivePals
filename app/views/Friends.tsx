@@ -200,7 +200,7 @@ class Friends extends Component<FriendsProps, State> {
                       <Icon size={30} name="md-chatboxes" style={{ color: colors.secondary }} />
                     </TouchableOpacity>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate('ProfileView', { uids: item.uid })}
+                      onPress={() => navigation.navigate('ProfileView', { uid: item.uid })}
                       style={{ padding: 5, marginHorizontal: 5 }}
                     >
                       <Icon size={30} name="md-person" style={{ color: colors.secondary }} />
