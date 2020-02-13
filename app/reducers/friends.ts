@@ -1,4 +1,4 @@
-import { SET_FRIENDS, ADD_FRIEND, UPDATE_FRIEND_STATE } from '../actions/friends';
+import { SET_FRIENDS, ADD_FRIEND, UPDATE_FRIEND_STATE, SET_FRIEND } from '../actions/friends';
 import { SET_LOGGED_OUT } from '../actions/profile';
 
 const initialState = {
@@ -13,6 +13,11 @@ export default function(state = initialState, action) {
         ...state,
         friends: action.friends,
       };
+    case SET_FRIEND:
+      return {
+        ...state,
+        friends: { ...state.friends, [action.friend.uid]: action.friend },
+      }
     case ADD_FRIEND:
       return {
         ...state,

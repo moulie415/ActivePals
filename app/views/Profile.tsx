@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Alert, View, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import moment from 'moment';
+import { equals } from 'ramda';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -196,11 +197,7 @@ class ProfileView extends Component<ProfileProps, State> {
 
   hasChanged() {
     const { initialProfile, initialAvatar, avatar, profile, backdrop, initialBackdrop } = this.state;
-    return !(
-      JSON.stringify(initialProfile) === JSON.stringify(profile) &&
-      initialAvatar === avatar &&
-      backdrop === initialBackdrop
-    );
+    return !(equals(initialProfile, profile) && initialAvatar === avatar && backdrop === initialBackdrop);
   }
 
   async updateUser(initial: Profile, newProfile: Profile) {
@@ -257,6 +254,7 @@ class ProfileView extends Component<ProfileProps, State> {
       avatar,
       spinner,
       showPicker,
+      selectedDate,
     } = this.state;
     return (
       <>
@@ -476,16 +474,29 @@ class ProfileView extends Component<ProfileProps, State> {
               value={profile.birthday ? new Date(profile.birthday) : new Date()}
               maximumDate={new Date()}
               onChange={(event, selectedDate) => {
-                this.setState({ profile: { ...profile, birthday: selectedDate.toString() } });
+                if (selectedDate) {
+                  this.setState({
+                    profile: { ...profile, birthday: selectedDate.toString() },
+                    showPicker: Platform.OS === 'ios',
+                  });
+                }
               }}
             />
             {Platform.OS === 'ios' && (
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <TouchableOpacity>
-                  <Text>Cancel</Text>
+                <TouchableOpacity
+                  style={{ padding: 10 }}
+                  onPress={() =>
+                    this.setState({
+                      showPicker: false,
+                      profile: { ...profile, birthday: initialProfile.birthday },
+                    })
+                  }
+                >
+                  <Text style={{ fontSize: 16 }}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
-                  <Text>Confirm</Text>
+                <TouchableOpacity style={{ padding: 10 }} onPress={() => this.setState({ showPicker: false })}>
+                  <Text style={{ color: colors.secondary, fontSize: 16 }}>Confirm</Text>
                 </TouchableOpacity>
               </View>
             )}

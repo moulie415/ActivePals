@@ -4,6 +4,7 @@ import { UserState } from '../types/Profile';
 import { fetchOther } from './profile';
 
 export const SET_FRIENDS = 'SET_FRIENDS';
+export const SET_FRIEND = 'SET_FRIEND';
 export const ADD_FRIEND = 'ADD_FRIEND';
 export const UPDATE_FRIEND_STATE = 'UPDATE_FRIEND_STATE';
 
@@ -11,6 +12,11 @@ const setFriends = friends => ({
   type: SET_FRIENDS,
   friends,
 });
+
+const setFriend = friend => ({
+  type: SET_FRIEND,
+  friend,
+})
 
 const addToFriends = (uid, friend) => ({
   type: ADD_FRIEND,
@@ -52,19 +58,19 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
       .database()
       .ref('userFriends')
       .child(uid)
-      .orderByChild('state')
       .limitToLast(limit)
       .on('value', async snapshot => {
         if (snapshot.val()) {
           const uids = Object.keys(snapshot.val());
-          const friends = await Promise.all(
-            uids.map(async friendUid => {
+          await Promise.all(
+            uids.map(friendUid => {
+              return new Promise(resolve => {
               const status = snapshot.val()[friendUid];
-              const profile = await firebase
+             firebase
                 .database()
                 .ref('users')
                 .child(friendUid)
-                .once('value');
+                .on('value', async profile => {
               const { state } = profile.val();
               const userState = getStateString(state);
               try {
@@ -73,17 +79,15 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
                   .ref(`images/${friendUid}`)
                   .child('avatar')
                   .getDownloadURL();
-                return { ...profile.val(), state: userState, avatar, status };
+                dispatch(setFriend({ ...profile.val(), state: userState, avatar, status }));
               } catch (e) {
-                return { ...profile.val(), state: userState, status };
+                dispatch(setFriend({ ...profile.val(), state: userState, status }));
               }
+              resolve()
+                })
+            })
             })
           );
-          const obj = friends.reduce((acc, cur) => {
-            acc[cur.uid] = cur;
-            return acc;
-          }, {});
-          dispatch(setFriends(obj));
           dispatch(fetchOther(uid));
         } else {
           dispatch(setFriends({}));
