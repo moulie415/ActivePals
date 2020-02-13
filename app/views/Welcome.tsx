@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, SafeAreaView, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
+import { StackActions, NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Swiper from 'react-native-swiper';
 import { connect } from 'react-redux';
@@ -36,7 +37,11 @@ class Welcome extends Component<WelcomeProps, State> {
 
   nav(params) {
     const { navigation } = this.props;
-    params && params.goBack ? navigation.goBack() : navigation.navigate('Home');
+    params && params.goBack
+      ? navigation.goBack()
+      : navigation.dispatch(
+          StackActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: 'MainNav' })] })
+        );
   }
 
   skip(params) {
@@ -150,7 +155,7 @@ class Welcome extends Component<WelcomeProps, State> {
                     .child('username')
                     .set(username),
                 ]);
-                /* we need to make sure the username is saved locally 
+                /* we need to make sure the username is saved locally
                     which is why this calls fetchProfile which saves the username */
                 try {
                   onSave();

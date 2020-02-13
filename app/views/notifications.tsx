@@ -5,7 +5,7 @@ import Swipeout from 'react-native-swipeout';
 import { connect } from 'react-redux';
 import Image from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Text, { globalTextStyle } from '../components/Text';
+import Text from '../components/Text';
 import styles from '../styles/notificationsStyles';
 import colors from '../constants/colors';
 import { getSimplifiedTime, sortNotificationsByDate } from '../constants/utils';

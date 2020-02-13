@@ -9,7 +9,7 @@ import ImageResizer from 'react-native-image-resizer';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { GiftedChat, Bubble, MessageText } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
-import Text, { globalTextStyle } from '../../components/Text';
+import Text from '../../components/Text';
 import colors from '../../constants/colors';
 import globalStyles from '../../styles/globalStyles';
 import Header from '../../components/Header/header';

@@ -6,7 +6,7 @@ import Image from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/Ionicons';
 import colors from '../../constants/colors';
 import styles from './styles';
-import Text, { globalTextStyle } from '../Text';
+import Text from '../Text';
 import Button from '../Button';
 import FriendsModalProps from '../../types/components/FriendsModal';
 

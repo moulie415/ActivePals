@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, View, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
@@ -10,7 +10,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { PulseIndicator } from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import { connect } from 'react-redux';
-import Text, { globalTextStyle } from '../components/Text';
+import Text from '../components/Text';
 import styles from '../styles/profileStyles';
 import hStyles from '../styles/homeStyles';
 import colors from '../constants/colors';
@@ -234,7 +234,7 @@ class ProfileView extends Component<ProfileProps, State> {
           .child(profile.username)
           .set(profile.uid);
         Alert.alert('Success', 'Profile saved');
-        /* we need to make sure the username is saved locally 
+        /* we need to make sure the username is saved locally
         which is why this calls fetchProfile which saves the username */
         onSave();
         this.setState({ spinner: false });
@@ -457,7 +457,10 @@ class ProfileView extends Component<ProfileProps, State> {
             </View>
           )}
           <TouchableOpacity onPress={() => this.setState({ showPicker: true })} style={styles.inputGrp}>
-            <Text style={{ alignSelf: 'center' }}>Birthday: </Text>
+            <Text style={{ alignSelf: 'center' }}>
+              <Text>Birthday: </Text>
+              <Text style={styles.input}>{profile.birthday ? moment(profile.birthday).format('DD-MM-YYYY') : ''}</Text>
+            </Text>
           </TouchableOpacity>
           <Button style={styles.logout} text="Log out" onPress={() => this.logout()} />
           {spinner && (
@@ -467,14 +470,26 @@ class ProfileView extends Component<ProfileProps, State> {
           )}
         </ScrollView>
         {showPicker && (
-          <DateTimePicker
-            mode="date"
-            value={profile.birthday ? new Date(profile.birthday) : new Date()}
-            maximumDate={new Date()}
-            onChange={(event, selectedDate) => {
-              this.setState({ profile: { ...profile, birthday: selectedDate.toString() } });
-            }}
-          />
+          <>
+            <DateTimePicker
+              mode="date"
+              value={profile.birthday ? new Date(profile.birthday) : new Date()}
+              maximumDate={new Date()}
+              onChange={(event, selectedDate) => {
+                this.setState({ profile: { ...profile, birthday: selectedDate.toString() } });
+              }}
+            />
+            {Platform.OS === 'ios' && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <TouchableOpacity>
+                  <Text>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <Text>Confirm</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
         )}
       </>
     );

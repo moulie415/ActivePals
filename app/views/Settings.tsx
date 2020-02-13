@@ -7,7 +7,7 @@ import { PulseIndicator } from 'react-native-indicators';
 import { connect } from 'react-redux';
 import colors from '../constants/colors';
 import styles from '../styles/settingsStyles';
-import Text, { globalTextStyle } from '../components/Text';
+import Text  from '../components/Text';
 import Header from '../components/Header/header';
 import FbFriendsModal from '../components/FbFriendsModal';
 import { removeUser } from '../actions/profile';

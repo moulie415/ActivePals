@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import { View, ScrollView, Platform, Alert, TouchableOpacity } from 'react-native';
 import colors from '../../constants/colors';
-import Text, { globalTextStyle } from '../Text';
+import Text  from '../Text';
 import Button from '../Button';
 import styles from './styles';
 import { sendRequest, fetchFbFriends } from '../../actions/friends';

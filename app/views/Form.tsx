@@ -1,7 +1,7 @@
 import React, { Component, createRef } from 'react';
 import { View, FlatList, TextInput, Platform, KeyboardAvoidingView } from 'react-native';
 import { connect } from 'react-redux';
-import Text, { globalTextStyle } from '../components/Text';
+import Text from '../components/Text';
 import styles from '../styles/formStyles';
 import Header from '../components/Header/header';
 import FormProps from '../types/views/Form';

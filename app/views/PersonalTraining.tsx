@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Platform, View, Image as SlowImage } from 'react-native';
 import { connect } from 'react-redux';
-import Text, { globalTextStyle } from '../components/Text';
+import Text from '../components/Text';
 import Header from '../components/Header/header';
 import colors from '../constants/colors';
 

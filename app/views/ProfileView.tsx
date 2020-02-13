@@ -7,7 +7,7 @@ import { PulseIndicator } from 'react-native-indicators';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Image from 'react-native-fast-image';
 import firebase from 'react-native-firebase';
-import Text, { globalTextStyle } from '../components/Text';
+import Text from '../components/Text';
 import hStyles from '../styles/homeStyles';
 import colors from '../constants/colors';
 import { calculateAge, getFormattedBirthday } from '../constants/utils';

@@ -7,7 +7,7 @@ import Hyperlink from 'react-native-hyperlink';
 import { Popup, Options } from 'react-native-map-link';
 import { connect } from 'react-redux';
 import { PulseIndicator } from 'react-native-indicators';
-import Text, { globalTextStyle } from '../components/Text';
+import Text from '../components/Text';
 import hStyles from '../styles/homeStyles';
 import colors from '../constants/colors';
 import { getDistance } from '../constants/utils';

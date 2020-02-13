@@ -3,6 +3,7 @@ import { Alert, View, ImageBackground, Platform, TextInput, TouchableOpacity } f
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
 import { GoogleSignin } from '@react-native-community/google-signin';
+import { StackActions, NavigationActions } from 'react-navigation';
 import VersionNumber from 'react-native-version-number';
 import SplashScreen from 'react-native-splash-screen';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -15,7 +16,7 @@ import { AccountType } from '../types/Profile';
 import styles from '../styles/loginStyles';
 import sStyles from '../styles/settingsStyles';
 import colors from '../constants/colors';
-import Text, { globalTextStyle } from '../components/Text';
+import Text from '../components/Text';
 import str from '../constants/strings';
 import { doSetup, fetchProfile, setLoggedOut } from '../actions/profile';
 import LoginProps from '../types/views/Login';
@@ -92,7 +93,9 @@ class Login extends Component<LoginProps, State> {
   goNext() {
     const { hasViewedWelcome, navigation } = this.props;
     if (hasViewedWelcome) {
-      navigation.navigate('Home');
+      navigation.dispatch(
+        StackActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: 'MainNav' })] })
+      );
     } else {
       navigation.navigate('Welcome');
     }

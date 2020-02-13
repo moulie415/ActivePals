@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Slider from '@react-native-community/slider';
 import { PulseIndicator } from 'react-native-indicators';
 import Image from 'react-native-fast-image';
-import Text, { globalTextStyle } from '../../components/Text';
+import Text from '../../components/Text';
 import styles from '../../styles/sessionStyles';
 import colors from '../../constants/colors';
 import { getType, formatDateTime, getDistance, sortSessionsByDistance } from '../../constants/utils';

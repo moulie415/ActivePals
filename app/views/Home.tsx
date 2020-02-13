@@ -12,7 +12,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image as SlowImage,
-  BackHandler,
 } from 'react-native';
 import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
@@ -30,7 +29,7 @@ import Card from '../components/Card';
 import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
 import sStyles from '../styles/settingsStyles';
-import Text, { globalTextStyle } from '../components/Text';
+import Text from '../components/Text';
 import Comments from '../components/comments';
 import Header from '../components/Header/header';
 import { likesExtractor, getSimplifiedTime, getMentionsList, sortPostsByDate } from '../constants/utils';
@@ -116,17 +115,6 @@ export class Home extends Component<HomeProps, State> {
       .catch(error => {
         console.log('messaging permission denied');
       });
-
-    BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
-  }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress());
-  }
-
-  onBackPress() {
-    const { navigation } = this.props;
-    Alert.alert(navigation.state.routeName);
   }
 
   getUsername(uid) {

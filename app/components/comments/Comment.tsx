@@ -11,7 +11,7 @@ import styles from './styles';
 import colors from '../../constants/colors';
 import str from '../../constants/strings';
 import CommentProps from '../../types/components/CommentProps';
-import Text, { globalTextStyle } from '../Text';
+import Text from '../Text';
 
 const weightUp = require('../../../assets/images/weightlifting_up.png');
 const weightDown = require('../../../assets/images/weightlifting_down.png');

@@ -16,7 +16,7 @@ import Image from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Collapsible from 'react-native-collapsible';
 import IIcon from 'react-native-vector-icons/Ionicons';
-import Text, { globalTextStyle } from '../Text';
+import Text from '../Text';
 import styles from './styles';
 import colors from '../../constants/colors';
 import { getMentionsList } from '../../constants/utils';

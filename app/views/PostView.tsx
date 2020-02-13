@@ -21,7 +21,7 @@ import { connect } from 'react-redux';
 import { PulseIndicator } from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import ParsedText from '../components/ParsedText';
-import Text, { globalTextStyle } from '../components/Text';
+import Text  from '../components/Text';
 import colors from '../constants/colors';
 import Comments from '../components/comments';
 import sStyles from '../styles/settingsStyles';
