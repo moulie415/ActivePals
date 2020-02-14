@@ -22,7 +22,8 @@ import colors from '../../constants/colors';
 import { getMentionsList } from '../../constants/utils';
 import CommentsProps from '../../types/components/Comments';
 import Profile from '../../types/Profile';
-import Comment from '../../types/Comment';
+import CommentType from '../../types/Comment';
+import Comment from './Comment';
 
 const screen = Dimensions.get('screen');
 
@@ -38,7 +39,7 @@ interface State {
 export default class Comments extends PureComponent<CommentsProps, State> {
   inputMain: TextInput;
 
-  textInputs: string[];
+  textInputs: TextInput[];
 
   newCommentText: string;
 
@@ -46,11 +47,12 @@ export default class Comments extends PureComponent<CommentsProps, State> {
 
   editCommentText: string;
 
-  editingComment: Comment;
+  editingComment: CommentType;
 
   constructor(props) {
     super(props);
     this.state = {
+      // loadingComments: !(props.data && props.data.length),
       loadingComments: !(props.data && props.data.length),
       editModalVisible: false,
       commentsLastUpdated: null,
@@ -215,6 +217,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
       reportedExtractor,
       likeAction,
       likesTapAction,
+      isChild,
     } = this.props;
     return (
       <Comment
@@ -231,7 +234,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         updatedAt={editTimeExtractor(c)}
         replyAction={replyAction ? this.handleReply : null}
         image={imageExtractor(c)}
-        child
+        child={isChild(c)}
         reportAction={reportAction ? this.handleReport : null}
         liked={likeExtractor ? likeExtractor(c) : null}
         reported={reportedExtractor ? reportedExtractor(c) : null}
@@ -279,7 +282,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
   renderChildren(items) {
     const { keyExtractor } = this.props;
     if (!items || !items.length) return;
-    return items.map(function(c) {
+    return items.map(c => {
       return <View key={keyExtractor(c) + Math.random()}>{this.generateComment(c)}</View>;
     });
   }
@@ -405,7 +408,16 @@ export default class Comments extends PureComponent<CommentsProps, State> {
   }
 
   render() {
-    const { users, saveAction, data, initialDisplayCount, keyExtractor, commentCount, editAction } = this.props;
+    const {
+      users,
+      saveAction,
+      data,
+      initialDisplayCount,
+      keyExtractor,
+      commentCount,
+      editAction,
+      paginateAction,
+    } = this.props;
     const { text, mentionList, loadingComments, commentsLastUpdated, editModalVisible } = this.state;
     return (
       <View style={{ flex: 1 }}>
@@ -541,7 +553,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         <Modal
           animationType="slide"
           onShow={() => {
-            this.textInputs.editCommentInput.focus();
+            this.textInputs['editCommentInput'].focus();
           }}
           transparent
           visible={editModalVisible}
@@ -554,7 +566,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
             <View style={styles.editModal}>
               <TextInput
                 ref={input => {
-                  this.textInputs.editCommentInput = input;
+                  this.textInputs['editCommentInput'] = input;
                 }}
                 style={styles.input}
                 multiline

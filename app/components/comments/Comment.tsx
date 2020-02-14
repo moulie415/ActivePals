@@ -187,14 +187,15 @@ export default class Comment extends PureComponent<CommentProps, State> {
               <TouchableOpacity onPress={() => this.handleLike()}>
                 <View style={{ flexDirection: 'row', marginTop: 2 }}>
                   <Text style={[styles.actionText, { color: liked ? '#4DB2DF' : '#999' }]} />
-                  source={liked ? weightUp : weightDown}
-                  style={{ width: 25, height: 25, tintColor: liked ? colors.secondary : '#999' }}
+                  <SlowImage
+                    source={liked ? weightUp : weightDown}
+                    style={{ width: 25, height: 25, tintColor: liked ? colors.secondary : '#999' }}
                   />
                 </View>
               </TouchableOpacity>
             ) : null}
             {replyAction ? (
-              <TouchableOpacity style={styles.actionButton} onPress={this.handleReply}>
+              <TouchableOpacity onPress={this.handleReply}>
                 <Text style={styles.actionText}>Reply</Text>
               </TouchableOpacity>
             ) : null}

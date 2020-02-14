@@ -21,4 +21,7 @@ export default interface CommentProps {
   deleteAction: (comment: Comment) => void;
   users: Profile[];
   viewingUserName: string;
+  id: string;
+  child: boolean;
+  editAction: (comment: Comment) => void;
 }
