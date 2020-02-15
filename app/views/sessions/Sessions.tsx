@@ -521,7 +521,7 @@ class Sessions extends Component<SessionsProps, State> {
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={{ color: '#fff' }}>Map: </Text>
         <Switch
-          trackColor={{ true: colors.secondary, false: undefined }}
+          trackColor={{ true: colors.secondary, false: null }}
           thumbColor={Platform.select({ android: showMap ? colors.secondary : '#fff' })}
           value={showMap}
           onValueChange={val => {

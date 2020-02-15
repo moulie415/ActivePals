@@ -124,7 +124,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text>Mute </Text>
         <Switch
-          trackColor={{ true: colors.secondary }}
+          trackColor={{ true: colors.secondary, false: null }}
           thumbColor={Platform.select({ android: muted[sessionId] ? colors.secondary : '#fff' })}
           value={muted[sessionId]}
           onValueChange={val => onMuteChat(sessionId, val)}

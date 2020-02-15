@@ -258,7 +258,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
             <View style={{ flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10 }}>
               <Text style={{ marginRight: 5 }}>Add to calendar</Text>
               <Switch
-                trackColor={{ true: colors.secondary }}
+                trackColor={{ true: colors.secondary, false: null }}
                 thumbColor={Platform.select({ android: addToCalendar ? colors.secondary : '#fff' })}
                 value={addToCalendar}
                 onValueChange={async val => {

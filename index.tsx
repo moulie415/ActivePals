@@ -4,7 +4,7 @@ import firebase from 'react-native-firebase';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistStore } from 'redux-persist';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import Sound from 'react-native-sound';
 import thunk from 'redux-thunk';
 import GeoFire from 'geofire';
@@ -25,26 +25,9 @@ const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
 const firebaseRef = firebase.database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
 
-// const reactNavigationMiddleware = store => dispatch => action => {
-//   switch (action.type) {
-//     case 'Navigation/NAVIGATE':
-//       const { routeName } = action
-//     default:
-//      return dispatch(action)
-//   }
-// }
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-// const middleware = createReactNavigationReduxMiddleware('root', state => state.nav);
-
-// export const addListener = createReduxBoundAddListener('root');
-
-// const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-
-export const store = createStore(
-  reducer,
-  // composeEnhancers(applyMiddleware(middleware, reactNavigationMiddleware, thunk))
-  applyMiddleware(/* middleware, */ thunk)
-);
+export const store = createStore(reducer, composeEnhancers(applyMiddleware(thunk)));
 
 const navigateFromNotif = notif => {
   const { type, sessionId, sessionTitle, chatId, uid, username, postId, gymId, isPrivate } = notif;
@@ -74,10 +57,9 @@ const navigateFromNotif = notif => {
   }
 };
 
-const shouldNavigate = (notification) => {
+const shouldNavigate = notification => {
   return true;
 };
-
 
 export const showLocalNotification = notif => {
   const user = firebase.auth().currentUser;
@@ -106,7 +88,7 @@ export const showLocalNotification = notif => {
       notifSound.play();
     }
   }
-}
+};
 
 export const persistor = persistStore(store);
 
@@ -231,7 +213,7 @@ class ActivePals extends React.Component {
           // Get information about the notification that was opened
           const { action, notification } = notificationOpen;
         }
-      })
+      });
 
     this.unsubscriber = firebase.auth().onAuthStateChanged(async user => {
       if (user) {
