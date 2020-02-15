@@ -26,7 +26,7 @@ class MapModal extends Component<MapModalProps, State> {
     this.state = {
       text: 'Select location on map',
       latitude: location && location.lat,
-      longitude: location && location.lng,
+      longitude: location && location.lon,
     };
   }
 

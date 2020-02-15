@@ -4,7 +4,7 @@ import NumericInput from 'react-native-numeric-input';
 import RadioForm from 'react-native-simple-radio-button';
 import { connect } from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import { Text, View, Alert, TextInput, TouchableOpacity, Platform, Switch, ScrollView } from 'react-native';
+import { Text, View, Alert, TextInput, TouchableOpacity, Platform, Switch, ScrollView, SafeAreaView } from 'react-native';
 import Geocoder from 'react-native-geocoder';
 import firebase from 'react-native-firebase';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -36,6 +36,7 @@ const typeProps = types.map(type => {
 interface State {
   gender: string;
   formattedAddress: string;
+  selectedDate?: Date;
   date: Date;
   duration: number;
   durationMinutes: number;
@@ -117,7 +118,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
   };
 
   async createSession() {
-    const { navigation, fetchSessions, profile } = this.props;
+    const { navigation, getSessions, profile } = this.props;
     const friends = navigation.getParam('friends');
     const {
       title,
@@ -165,7 +166,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
         const { key } = ref;
         await ref.set(session);
         Alert.alert('Success', 'Session created');
-        fetchSessions();
+        getSessions();
         navigation.navigate('Sessions');
         if (friends) {
           friends.forEach(friend => {
@@ -223,6 +224,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
       mapOpen,
       searchOpen,
       showDatePicker,
+      selectedDate,
     } = this.state;
     return (
       <>
@@ -255,7 +257,9 @@ class SessionDetail extends Component<SessionDetailProps, State> {
             <TouchableOpacity onPress={() => this.setState({ showDatePicker: true })}>
               <Text>Date and Time</Text>
             </TouchableOpacity>
-            <View style={{ flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10 }}>
+            <View
+              style={{ flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10, alignItems: 'center' }}
+            >
               <Text style={{ marginRight: 5 }}>Add to calendar</Text>
               <Switch
                 trackColor={{ true: colors.secondary, false: null }}
@@ -377,7 +381,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
           <Button
             style={{ alignSelf: 'center', marginVertical: 20 }}
             textStyle={{ fontSize: 20 }}
-            onPress={() => this.createSession()}
+            onPress={this.createSession}
             text="Create Session"
           />
         </ScrollView>
@@ -414,14 +418,44 @@ class SessionDetail extends Component<SessionDetailProps, State> {
           isOpen={searchOpen}
         />
         {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="datetime"
-            onChange={(event, selectedDate) => {
-              this.setState({ date: selectedDate });
-            }}
-            minimumDate={new Date()}
-          />
+          <SafeAreaView>
+            <DateTimePicker
+              value={date}
+              mode="datetime"
+              onChange={(event, selectedDate) => {
+                this.setState({ date: selectedDate });
+                if (selectedDate && Platform.OS === 'android') {
+                  this.setState({
+                    date: selectedDate,
+                    showDatePicker: false,
+                  });
+                } else if (selectedDate) {
+                  this.setState({ selectedDate });
+                }
+              }}
+              minimumDate={new Date()}
+            />
+            {Platform.OS === 'ios' && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <TouchableOpacity
+                  style={{ padding: 10 }}
+                  onPress={() =>
+                    this.setState({
+                      showDatePicker: false,
+                    })
+                  }
+                >
+                  <Text style={{ fontSize: 16 }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ padding: 10 }}
+                  onPress={() => this.setState({ showDatePicker: false, date: selectedDate })}
+                >
+                  <Text style={{ color: colors.secondary, fontSize: 16 }}>Confirm</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </SafeAreaView>
         )}
       </>
     );
@@ -434,7 +468,7 @@ const mapStateToProps = ({ profile }) => ({
 
 const mapDispatchToProps = dispatch => ({
   createPost: post => dispatch(addPost(post)),
-  fetchSessions: () => dispatch(fetchSessions()),
+  getSessions: () => dispatch(fetchSessions()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionDetail);

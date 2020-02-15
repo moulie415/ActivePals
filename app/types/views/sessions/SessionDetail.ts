@@ -4,5 +4,5 @@ import Profile from "../../Profile";
 export default interface SessionDetailProps {
   navigation: NavigationStackProp;
   profile: Profile;
-  fetchSessions: () => void;
+  getSessions: () => void;
 }

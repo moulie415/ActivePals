@@ -27,7 +27,7 @@ export const types = [
   SessionType.GYM,
   SessionType.RUNNING,
   SessionType.CYCLING,
-  SessionType.RUNNING,
+  SessionType.SWIMMING,
 ];
 
 export const getResource = (type: SessionType) => {
