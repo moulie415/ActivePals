@@ -4,7 +4,17 @@ import NumericInput from 'react-native-numeric-input';
 import RadioForm from 'react-native-simple-radio-button';
 import { connect } from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import { Text, View, Alert, TextInput, TouchableOpacity, Platform, Switch, ScrollView, SafeAreaView } from 'react-native';
+import {
+  Text,
+  View,
+  Alert,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+  Switch,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
 import Geocoder from 'react-native-geocoder';
 import firebase from 'react-native-firebase';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -308,6 +318,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               textColor={colors.secondary}
               maxValue={24}
               minValue={0}
+              // @ts-ignore
               iconStyle={{ color: 'white' }}
               leftButtonBackgroundColor={colors.secondary}
               rightButtonBackgroundColor={colors.secondary}
@@ -326,6 +337,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               textColor={colors.secondary}
               maxValue={59}
               minValue={0}
+              // @ts-ignore
               iconStyle={{ color: 'white' }}
               leftButtonBackgroundColor={colors.secondary}
               rightButtonBackgroundColor={colors.secondary}

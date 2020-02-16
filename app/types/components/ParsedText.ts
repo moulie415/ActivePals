@@ -1,12 +1,12 @@
 import Profile from "../Profile";
+import { NavigationStackProp } from "react-navigation-stack";
 
 export default interface ParsedTextProps {
     text: string;
     friends: { [key: string]: Profile };
     users: { [key: string]: Profile };
     profile: Profile;
-    goToProfile: () => void;
-    viewProfile: (uid: string) => void;
+    navigation: NavigationStackProp;
     disableOnPress: boolean;
     color: string;
 }

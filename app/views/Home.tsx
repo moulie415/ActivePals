@@ -845,6 +845,7 @@ export class Home extends Component<HomeProps, State> {
           <Comments
             data={feed[postId] ? feed[postId].comments : []}
             viewingUserName={profile.username}
+            deleteAction={c => console.log('delete comment')}
             initialDisplayCount={10}
             editMinuteLimit={900}
             focusCommentInput={focusCommentInput}
@@ -900,7 +901,7 @@ export class Home extends Component<HomeProps, State> {
                 await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
               }
             }}
-            editAction={(text, comment) => console.log(text)}
+            editAction={(text, c) => console.log(text)}
             reportAction={c => console.log(c)}
             likeAction={c => onRepComment(c)}
             likesTapAction={(c: Comment) => {

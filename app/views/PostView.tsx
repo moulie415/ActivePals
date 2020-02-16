@@ -21,7 +21,7 @@ import { connect } from 'react-redux';
 import { PulseIndicator } from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import ParsedText from '../components/ParsedText';
-import Text  from '../components/Text';
+import Text from '../components/Text';
 import colors from '../constants/colors';
 import Comments from '../components/comments';
 import sStyles from '../styles/settingsStyles';
@@ -38,8 +38,10 @@ import {
   repComment,
   fetchPost,
   fetchRepsUsers,
+  fetchReplies,
 } from '../actions/home';
 import RepsModal from '../components/RepsModal';
+import Comment from '../types/Comment';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
 
@@ -374,6 +376,7 @@ class PostView extends Component<PostViewProps, State> {
       getCommentRepsUsers,
       onRepComment,
       getRepsUsers,
+      getReplies,
       feed,
     } = this.props;
     const combined = { ...users, ...friends };
@@ -410,19 +413,14 @@ class PostView extends Component<PostViewProps, State> {
           {post && (
             <Comments
               data={comments}
-              users={Object.values(combined)}
               viewingUserName={profile.username}
+              deleteAction={c => console.log('delete comment')}
               initialDisplayCount={10}
               editMinuteLimit={900}
-              childrenPerPage={5}
               focusCommentInput={focusCommentInput}
-              childPropName="children"
-              isChild={c => c.parentCommentId}
-              parentIdExtractor={c => c.key}
-              replyAction={offset => {
-                scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
-              }}
-              // lastCommentUpdate={this.state.lastCommentUpdate}
+              childrenPerPage={5}
+              // clastCommentUpdate={this.state.lastCommentUpdate}
+              users={Object.values(combined)}
               usernameTapAction={(username, uid) => {
                 if (uid === profile.uid) {
                   navigation.navigate('Profile');
@@ -430,6 +428,9 @@ class PostView extends Component<PostViewProps, State> {
                   navigation.navigate('ProfileView', { uid });
                 }
               }}
+              childPropName="children"
+              isChild={c => c.parentCommentId}
+              parentIdExtractor={c => c.key}
               keyExtractor={item => item.comment_id}
               usernameExtractor={item => {
                 if (item.uid === profile.uid) {
@@ -453,35 +454,37 @@ class PostView extends Component<PostViewProps, State> {
                 likesExtractor(
                   item,
                   profile.uid,
-                  (uid: string) => navigation.navigate('ProfileView', { uid }),
+                  (id: string) => navigation.navigate('ProfileView', { uid: id }),
                   () => navigation.navigate('Profile')
                 )
               }
               likeCountExtractor={item => item.repCount}
-              childrenCountExtractor={item => item.childrenCount}
+              commentCount={feed[postId] ? feed[postId].commentCount : 0}
+              childrenCountExtractor={c => c.childrenCount}
               timestampExtractor={item => new Date(item.created_at).toISOString()}
+              replyAction={offset => {
+                scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
+              }}
               saveAction={async (text, parentCommentId) => {
                 if (text) {
-                  comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
+                  await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
                 }
               }}
-              editAction={(text, comment) => console.log(text)}
+              editAction={(text, c) => console.log(text)}
               reportAction={c => console.log(c)}
               likeAction={c => onRepComment(c)}
-              likesTapAction={c => {
+              likesTapAction={(c: Comment) => {
                 this.setState({ likesModalVisible: true, repsId: c.key, repCount: c.repCount });
                 getRepsUsers(c.key);
               }}
-              paginateAction={
-                post && post.commentCount > commentFetchAmount
-                  ? () => {
-                      this.setState({ commentFetchAmount: commentFetchAmount + 5 }, () => {
-                        getComments(postId, commentFetchAmount);
-                      });
-                    }
-                  : null
-              }
-              getCommentRepsUsers={(key, amount) => getCommentRepsUsers(key, amount)}
+              paginateAction={(fromComment: Comment, direction: string, parentComment: Comment | undefined) => {
+                if (parentComment) {
+                  getReplies(parentComment, 10, fromComment.key);
+                } else {
+                  getComments(postId, 10, fromComment.key);
+                }
+              }}
+              getCommentRepsUsers={(c, amount) => getCommentRepsUsers(c, amount)}
             />
           )}
           <RepsModal
@@ -547,10 +550,12 @@ const mapDispatchToProps = dispatch => ({
   comment: (uid, postId, text, created_at, parentCommentId) =>
     dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   onRepComment: comment => dispatch(repComment(comment)),
-  getComments: (key, amount) => dispatch(fetchComments(key, amount)),
+  getComments: (key: string, amount?: number, endAt?: string) => dispatch(fetchComments(key, amount, endAt)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getPost: key => dispatch(fetchPost(key)),
   getRepsUsers: (postId, limit) => dispatch(fetchRepsUsers(postId, limit)),
+  getReplies: (fromCommentId: Comment, limit: number, endAt?: string) =>
+    dispatch(fetchReplies(fromCommentId, limit, endAt)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostView);

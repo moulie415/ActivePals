@@ -394,6 +394,7 @@ class Messaging extends Component<MessagingProps, State> {
             return (
               <Bubble
                 {...props}
+                // @ts-ignore
                 wrapperStyle={{
                   right: {
                     backgroundColor: colors.secondary,
@@ -401,18 +402,20 @@ class Messaging extends Component<MessagingProps, State> {
                   },
                   left: {
                     ...globalStyles.bubbleShadow,
-                  }
+                  },
                 }}
               />
             );
           }}
           renderMessageText={props => {
+            // @ts-ignore
+            const { previousMessage, currentMessage, position } = props;
             return (
               <View>
-                {((props.previousMessage.user &&
-                  props.position === 'left' &&
-                  props.previousMessage.user._id !== props.currentMessage.user._id) ||
-                  (!props.previousMessage.user && props.currentMessage.user && props.position === 'left')) && (
+                {((previousMessage.user &&
+                  position === 'left' &&
+                  previousMessage.user._id !== currentMessage.user._id) ||
+                  (!previousMessage.user && currentMessage.user && position === 'left')) && (
                   <Text style={{ color: colors.secondary, fontSize: 12, padding: 10, paddingBottom: 0 }}>
                     {props.currentMessage.user.name}
                   </Text>
@@ -441,6 +444,7 @@ class Messaging extends Component<MessagingProps, State> {
               </View>
             );
           }}
+          // @ts-ignore
           parsePatterns={linkStyle => [
             {
               pattern: str.mentionRegex,

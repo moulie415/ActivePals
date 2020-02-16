@@ -11,7 +11,7 @@ export default interface Comment {
   children?: Comment[];
   repCount?: number;
   rep?: boolean;
-  comment_id: number;
+  comment_id: string;
   updated_at?: string;
   user: Profile;
   reported?: boolean;

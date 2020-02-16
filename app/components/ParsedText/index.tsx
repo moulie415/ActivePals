@@ -1,11 +1,10 @@
 import React, { FunctionComponent } from 'react';
 import { Alert } from 'react-native';
 import ParsedText from 'react-native-parsed-text';
-import str from '../../constants/strings';
-import colors from '../../constants/colors';
 import firebase from 'react-native-firebase';
 import { connect } from 'react-redux';
-import { navigateProfileView, navigateProfile } from '../../actions/navigation';
+import str from '../../constants/strings';
+import colors from '../../constants/colors';
 import ParsedTextProps from '../../types/components/ParsedText';
 
 const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
@@ -13,8 +12,7 @@ const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
   friends,
   users,
   profile,
-  goToProfile,
-  viewProfile,
+  navigation,
   disableOnPress,
   color,
 }) => {
@@ -30,11 +28,11 @@ const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
               const name = mention.substring(1);
               const combined = [...Object.values(friends), ...Object.values(users)];
               if (name === profile.username) {
-                goToProfile();
+                navigation.navigate('Profile');
               } else {
-                const found = combined.find(friend => friend.username == name);
+                const found = combined.find(friend => friend.username === name);
                 if (found) {
-                  viewProfile(found.uid);
+                  navigation.navigate('ProfileView', { uid: found.uid });
                 } else {
                   try {
                     const snapshot = await firebase
@@ -43,7 +41,7 @@ const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
                       .child(name)
                       .once('value');
                     if (snapshot.val()) {
-                      viewProfile(snapshot.val());
+                      navigation.navigate('ProfileView', { uid: snapshot.val() });
                     } else {
                       Alert.alert('Sorry', 'A user with that username could not be found');
                     }
@@ -68,9 +66,4 @@ const mapStateToProps = ({ profile, friends, sharedInfo }) => ({
   users: sharedInfo.users,
 });
 
-const mapDispatchToProps = dispatch => ({
-  viewProfile: uid => dispatch(navigateProfileView(uid)),
-  goToProfile: () => dispatch(navigateProfile()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(CustomParsedText);
+export default connect(mapStateToProps)(CustomParsedText);
