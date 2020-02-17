@@ -4,6 +4,7 @@ import NumericInput from 'react-native-numeric-input';
 import RadioForm from 'react-native-simple-radio-button';
 import { connect } from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
+import moment from 'moment';
 import {
   Text,
   View,
@@ -46,7 +47,7 @@ const typeProps = types.map(type => {
 interface State {
   gender: Gender;
   formattedAddress: string;
-  selectedDate?: Date;
+  selectedDate: Date;
   date: Date;
   duration: number;
   durationMinutes: number;
@@ -70,6 +71,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
       gender: Gender.UNSPECIFIED,
       formattedAddress: 'none',
       date: new Date(),
+      selectedDate: new Date(),
       duration: 1,
       durationMinutes: 0,
       addToCalendar: false,
@@ -264,9 +266,10 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               alignItems: 'center',
             }}
           >
-            <TouchableOpacity onPress={() => this.setState({ showDatePicker: true })}>
-              <Text>Date and Time</Text>
-            </TouchableOpacity>
+            <Button
+              onPress={() => this.setState({ showDatePicker: true })}
+              text={moment(date).format('MMMM Do YYYY, h:mm')}
+            />
             <View
               style={{ flexDirection: 'row', marginLeft: 10, marginBottom: 20, marginTop: 10, alignItems: 'center' }}
             >
@@ -393,7 +396,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
           <Button
             style={{ alignSelf: 'center', marginVertical: 20 }}
             textStyle={{ fontSize: 20 }}
-            onPress={this.createSession}
+            onPress={() => this.createSession()}
             text="Create Session"
           />
         </ScrollView>
@@ -432,17 +435,17 @@ class SessionDetail extends Component<SessionDetailProps, State> {
         {showDatePicker && (
           <SafeAreaView>
             <DateTimePicker
-              value={date}
+              value={selectedDate}
               mode="datetime"
-              onChange={(event, selectedDate) => {
-                this.setState({ date: selectedDate });
+              onChange={(event, newDate) => {
                 if (selectedDate && Platform.OS === 'android') {
                   this.setState({
+                    selectedDate: newDate,
                     date: selectedDate,
                     showDatePicker: false,
                   });
                 } else if (selectedDate) {
-                  this.setState({ selectedDate });
+                  this.setState({ selectedDate: newDate });
                 }
               }}
               minimumDate={new Date()}
