@@ -13,4 +13,5 @@ export enum NotificationType {
   FRIEND_REQUEST = 'friendRequest',
   COMMENT_MENTION = 'commentMention',
   POST_MENTION = 'postMention',
+  ADDED_TO_SESSION = 'addedToSession'
 }

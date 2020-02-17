@@ -160,7 +160,7 @@ export const fetchFbFriends = (token: string) => {
     const response = await fetch(`https://graph.facebook.com/v5.0/me?fields=friends&access_token=${token}`);
     const json = await response.json();
     if (json.friends && json.friends.data) {
-      const uids = await Promise.all(
+      const uids: string[] = await Promise.all(
         json.friends.data.map(async friend => {
           const snapshot = await firebase
             .database()

@@ -1,6 +1,6 @@
 import Profile from '../Profile';
 import Post from '../Post';
-import Comment from '../../components/comments/Comment';
+import Comment from '../Comment';
 import { NavigationStackProp } from 'react-navigation-stack';
 
 export default interface PostViewProps {

@@ -15,6 +15,8 @@ import { newNotification, updateLastMessage } from './app/actions/chats';
 import bgMessaging from './app/bgMessaging';
 import str from './app/constants/strings';
 import { setNotificationCount } from './app/actions/home';
+import { MessageType } from './app/types/Message';
+import { NotificationType } from './app/types/Notification';
 
 const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
   if (error) {
@@ -95,25 +97,46 @@ export const persistor = persistStore(store);
 export const handleNotification = (notification, showLocal = true) => {
   const { dispatch, getState } = store;
   const { type } = notification;
-  const localTypes = ['message', 'sessionMessage', 'gymMessage', 'friendRequest', 'addedToSession'];
+  const localTypes = [
+    MessageType.GYM_MESSAGE,
+    MessageType.SESSION_MESSAGE,
+    MessageType.GYM_MESSAGE,
+    NotificationType.FRIEND_REQUEST,
+    NotificationType.ADDED_TO_SESSION,
+  ];
   if (localTypes.includes(type)) {
     dispatch(newNotification(notification));
-    dispatch(updateLastMessage(notification));
+    if (type === MessageType.GYM_MESSAGE || type === MessageType.SESSION_MESSAGE || type === MessageType.MESSAGE) {
+      // @ts-ignore
+      dispatch(updateLastMessage(notification));
+    }
     showLocal && showLocalNotification(notification);
   }
   if (
-    type === 'rep' ||
-    type === 'comment' ||
-    type === 'friendRequest' ||
-    type === 'commentMention' ||
-    type === 'postMention'
+    type === NotificationType.POST_REP ||
+    type === NotificationType.COMMENT ||
+    type === NotificationType.FRIEND_REQUEST ||
+    type === NotificationType.COMMENT_MENTION ||
+    type === NotificationType.POST_MENTION
   ) {
     const count = getState().profile.profile.unreadCount || 0;
     dispatch(setNotificationCount(count + 1));
   }
 };
 
-class ActivePals extends React.Component {
+export default class ActivePals extends React.Component {
+  messageListener: () => void;
+
+  notificationDisplayedListener: () => void;
+
+  notificationListener: () => void;
+
+  notificationOpenedListener: () => void;
+
+  onTokenRefreshListener: () => void;
+
+  unsubscriber: () => void;
+
   async componentDidMount() {
     // ignore setting a timer warnings
     YellowBox.ignoreWarnings([

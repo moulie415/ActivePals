@@ -152,7 +152,11 @@ class ProfileView extends Component<ProfileProps, State> {
         // response.path is the path of the new image
         // response.name is the name of the new image with the extension
         // response.size is the size of the new image
-        this.setState(backdrop ? { backdrop: resized.uri } : { avatar: resized.uri });
+        if (backdrop) {
+          this.setState({ backdrop: resized.uri });
+        } else {
+          this.setState({ avatar: resized.uri });
+        }
         this.setState({ spinner: false });
       }
     });
@@ -254,7 +258,6 @@ class ProfileView extends Component<ProfileProps, State> {
       avatar,
       spinner,
       showPicker,
-      selectedDate,
     } = this.state;
     return (
       <>
