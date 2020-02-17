@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Alert, View, ImageBackground, KeyboardAvoidingView, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
 import { PulseIndicator } from 'react-native-indicators';
 import firebase from 'react-native-firebase';
-import { connect } from 'react-redux';
 import styles from '../styles/signUpStyles';
 import colors from '../constants/colors';
 import Header from '../components/Header/header';

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { View, Image, ScrollView } from 'react-native';
-import { connect } from 'react-redux';
 import Hyperlink from 'react-native-hyperlink';
 import Header from '../components/Header/header';
 import Text from '../components/Text';
@@ -89,4 +88,4 @@ class Credits extends Component {
   }
 }
 
-export default connect(null, null)(Credits);
+export default Credits;
