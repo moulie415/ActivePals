@@ -438,7 +438,7 @@ class PostView extends Component<PostViewProps, State> {
                 }
                 return friends[item.uid].username || users[item.uid].username;
               }}
-              uidExtractor={item => (item.user ? item.user.uid : null)}
+              uidExtractor={item => item.uid}
               editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
               createdTimeExtractor={item => new Date(item.created_at).toISOString()}
               bodyExtractor={item => item.text}

@@ -30,13 +30,13 @@ import Button from '../../components/Button';
 import { addPost } from '../../actions/home';
 import { fetchSessions } from '../../actions/sessions';
 import SessionDetailProps from '../../types/views/sessions/SessionDetail';
-import { SessionType } from '../../types/Session';
+import Session, { SessionType, Gender } from '../../types/Session';
 import Place from '../../types/Place';
 
 const genderProps = [
-  { label: 'Unspecified', value: 'Unspecified' },
-  { label: 'Male', value: 'Male' },
-  { label: 'Female', value: 'Female' },
+  { label: Gender.UNSPECIFIED, value: Gender.UNSPECIFIED },
+  { label: Gender.MALE, value: Gender.MALE },
+  { label: Gender.FEMALE, value: Gender.FEMALE },
 ];
 
 const typeProps = types.map(type => {
@@ -44,7 +44,7 @@ const typeProps = types.map(type => {
 });
 
 interface State {
-  gender: string;
+  gender: Gender;
   formattedAddress: string;
   selectedDate?: Date;
   date: Date;
@@ -67,7 +67,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
     const { navigation } = this.props;
     const location = navigation.getParam('location');
     this.state = {
-      gender: 'Unspecified',
+      gender: Gender.UNSPECIFIED,
       formattedAddress: 'none',
       date: new Date(),
       duration: 1,
@@ -144,7 +144,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
       addToCalendar,
     } = this.state;
     if (location && title && details && date) {
-      const session = {
+      const session: Session = {
         location,
         gym,
         title,
@@ -152,7 +152,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
         gender,
         type,
         host: profile.uid,
-        dateTime: date,
+        dateTime: date.toString(),
         duration,
         durationMinutes,
         users: {},

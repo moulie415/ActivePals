@@ -853,6 +853,7 @@ export class Home extends Component<HomeProps, State> {
             // clastCommentUpdate={this.state.lastCommentUpdate}
             users={Object.values(combined)}
             usernameTapAction={(username, uid) => {
+              debugger;
               if (uid === profile.uid) {
                 navigation.navigate('Profile');
               } else {
@@ -869,7 +870,7 @@ export class Home extends Component<HomeProps, State> {
               }
               return friends[item.uid].username || users[item.uid].username;
             }}
-            uidExtractor={item => (item.user ? item.user.uid : null)}
+            uidExtractor={item => item.uid}
             editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
             createdTimeExtractor={item => new Date(item.created_at).toISOString()}
             bodyExtractor={item => item.text}

@@ -2,7 +2,7 @@ import Location from './Location';
 import Place from './Place';
 
 export default interface Session {
-  key: string;
+  key?: string;
   dateTime: string;
   details: string;
   duration: number;

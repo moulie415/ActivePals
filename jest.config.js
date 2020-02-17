@@ -1,7 +1,7 @@
 module.exports = {
   preset: 'react-native',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
-  setupFiles: ['<rootDir>/jest/setup.js'],
+  setupFiles: ['<rootDir>/jest/setup.js', './node_modules/react-native-gesture-handler/jestSetup.js'],
   collectCoverage: true,
   collectCoverageFrom: ['app/**/*.{ts,tsx}'],
   coveragePathIgnorePatterns: ['app/types', 'app/styles', 'styles.ts'],

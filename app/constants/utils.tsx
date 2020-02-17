@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Linking, Alert, View } from 'react-native';
 import { pipe } from 'ramda';
+import moment from 'moment';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
 import str from './strings';
-import { SessionType } from '../types/Session';
+import Session, { SessionType } from '../types/Session';
 import Profile, { UserState } from '../types/Profile';
 import Comment from '../types/Comment';
 import Post from '../types/Post';
@@ -109,18 +110,20 @@ export function getType(type: SessionType, size: number, tintColor?: string) {
 }
 
 export const getMentionsList = (status, friends) => {
-  const split = status.split(' ');
-  const last = split[split.length - 1];
-  const reduced = last.substring(1);
-  if (status && last && str.mentionRegex.test(last)) {
-    const filtered = friends.filter(friend => {
-      return friend.username && friend.username.toLowerCase().includes(reduced.toLowerCase());
-    });
-    if (filtered.length > 0) {
-      return filtered;
+  if (status) {
+    const split = status.split(' ');
+    const last = split[split.length - 1];
+    const reduced = last.substring(1);
+    if (status && last && str.mentionRegex.test(last)) {
+      const filtered = friends.filter(friend => {
+        return friend.username && friend.username.toLowerCase().includes(reduced.toLowerCase());
+      });
+      if (filtered.length > 0) {
+        return filtered;
+      }
+    } else if (last === '@') {
+      return friends;
     }
-  } else if (last === '@') {
-    return friends;
   }
 };
 
@@ -176,7 +179,7 @@ export const formatDateTime = (dt: string) => {
   return `${str.days[date.getDay()].toString()} ${day.toString() + nth(day)} ${str.months[
     date.getMonth()
   ].toString()} ${strTime}`;
-}
+};
 
 export const dayDiff = (first, second, round = true) => {
   const start = new Date(first);
@@ -293,7 +296,7 @@ export const getDistance = (item, lat1, lon1, gym = false): number => {
   return DEFAULT_DISTANCE;
 };
 
-export const addSessionToCalendar = (calendarId, session) => {
+export const addSessionToCalendar = (calendarId: string, session: Session) => {
   const date = new Date(session.dateTime.replace(/-/g, '/'));
   const startDate = Date.UTC(
     date.getUTCFullYear(),
@@ -310,7 +313,7 @@ export const addSessionToCalendar = (calendarId, session) => {
     calendarId,
     startDate: new Date(startDate).toISOString(),
     endDate: endDate.toISOString(),
-    location: session.formattedAddress,
+    location: session.location.formattedAddress,
     notes: session.details,
     description: session.details,
   });
@@ -322,7 +325,7 @@ export const calculateDuration = data => {
   return (minutes + hours) * 60 * 60 * 1000;
 };
 
-export const durationString = session => {
+export const durationString = (session: Session) => {
   const minutes = session.durationMinutes;
   const hours = session.duration;
   let string = ` for ${hours}`;
@@ -406,15 +409,13 @@ export const sortMessagesByCreatedAt = (messages: Message[]) => {
   });
 };
 
-export const sortSessionsByDateTime = sessions => {
+export const sortSessionsByDateTime = (sessions: Session[]) => {
   return sessions.sort((a, b) => {
-    const aDate = a.dateTime.replace(/-/g, '/');
-    const bDate = b.dateTime.replace(/-/g, '/');
-    return new Date(aDate).getTime() - new Date(bDate).getTime();
+    return moment(a.dateTime).unix() - moment(b.dateTime).unix();
   });
 };
 
-export const sortSessionsByDistance = sessions => {
+export const sortSessionsByDistance = (sessions: Session[]) => {
   return sessions.sort((a, b) => {
     if (a.distance && b.distance) {
       const aDistance = a.distance;

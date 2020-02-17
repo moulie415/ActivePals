@@ -13,6 +13,6 @@ export default interface Comment {
   rep?: boolean;
   comment_id: string;
   updated_at?: string;
-  user: Profile;
+  //user: Profile;
   reported?: boolean;
 }

@@ -381,7 +381,7 @@ export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
 		const snapshot = await ref.limitToLast(limit).once('value')
 		const currentChildren = comment.children || []
 
-		const newReplies = Object.values(snapshot.val())
+		const newReplies: Comment[] = Object.values(snapshot.val())
 
 		const reps = await Promise.all(newReplies.map((reply: Comment) => {
 			return firebase.database().ref("reps/" + reply.key).child(uid).once('value')

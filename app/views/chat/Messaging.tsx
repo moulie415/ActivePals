@@ -114,7 +114,7 @@ class Messaging extends Component<MessagingProps, State> {
         image,
         sessionType,
       } = nextProps.notif;
-      if (type === 'message' || type === 'sessionMessage' || type === 'gymMessage') {
+      if (type === MessageType.MESSAGE || type === MessageType.SESSION_MESSAGE || type === MessageType.GYM_MESSAGE) {
         const date = new Date(createdAt);
         const message = {
           createdAt: date,
@@ -126,9 +126,9 @@ class Messaging extends Component<MessagingProps, State> {
           sessionType,
         };
         if (
-          (type === 'message' && friendUid === uid) ||
-          (type === 'sessionMessage' && messageSessionId === sessionId && profile.uid !== uid) ||
-          (type === 'gymMessage' && messageGymId === gymId && profile.uid !== uid)
+          (type === MessageType.MESSAGE && friendUid === uid) ||
+          (type === MessageType.SESSION_MESSAGE && messageSessionId === sessionId && profile.uid !== uid) ||
+          (type === MessageType.GYM_MESSAGE && messageGymId === gymId && profile.uid !== uid)
         ) {
           // check if its a dupe
           if (!messages.some(msg => msg._id === message._id)) {
