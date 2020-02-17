@@ -5,6 +5,7 @@ import { geofire } from '../../index';
 import { fetchUsers, updateUsers } from './home';
 import { setGym } from './profile';
 import { calculateDuration } from '../constants/utils';
+import Session from '../types/Session';
 
 export const SET_SESSIONS = 'SET_SESSIONS';
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS';
@@ -72,10 +73,10 @@ const checkHost = (host, state) => {
 export const removeSession = (key, isPrivate, force = false) => {
   return (dispatch, getState) => {
     const { uid } = getState().profile.profile;
-    const sessions = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions;
+    const sessions: { [key: string]: Session } = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions;
     const session = sessions[key];
     const type = isPrivate ? 'privateSessions' : 'sessions';
-    if (session && session.host.uid === uid) {
+    if (session && session.host === uid) {
       firebase
         .database()
         .ref(`${type}/${key}`)
@@ -108,7 +109,7 @@ export const removeSession = (key, isPrivate, force = false) => {
         .remove();
     }
     let obj;
-    if (session && (isPrivate || session.host.uid === uid || force)) {
+    if (session && (isPrivate || session.host === uid || force)) {
       const sessionsArr = Object.values(sessions).filter(session => session.key !== key);
       obj = sessionsArr.reduce((acc, cur, i) => {
         if (cur) {

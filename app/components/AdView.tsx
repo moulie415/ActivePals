@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent } from 'react';
 import {
   AdIconView,
   MediaView,
@@ -8,63 +8,68 @@ import {
   AdSettings,
   NativeAdsManager,
   NativeAd,
-} from 'react-native-fbads'
-import {
-    View,
-} from 'react-native'
-import Text from './Text'
-import {
-  AdMobBanner
-} from 'react-native-admob'
-import str from '../constants/strings'
-import Card from "./Card"
+} from 'react-native-fbads';
+import { View } from 'react-native';
+import { AdMobBanner } from 'react-native-admob';
+import Text from './Text';
+import str from '../constants/strings';
+import Card from './Card';
 // AdSettings.clearTestDevices()
 // AdSettings.setLogLevel('none')
 // AdSettings.addTestDevice(AdSettings.currentDeviceHash)
-const adsManager = new NativeAdsManager(str.nativePlacementId)
+// const adsManager = new NativeAdsManager(str.nativePlacementId);
 
-  const fbAd: FunctionComponent<{nativeAd: NativeAd}> = ({nativeAd}) => {
-    return <View style={{padding: 10, margin: 5}}>
-      <AdChoicesView/>
-      <TriggerableView> 
-        <Text style={{
-          color: '#999',
-          fontStyle: 'italic',
-          marginBottom: 10,
-          textAlign: 'right',
-          }}>{nativeAd.sponsoredTranslation}</Text>
+const fbAd: FunctionComponent<{ nativeAd: NativeAd }> = ({ nativeAd }) => {
+  return (
+    <View style={{ padding: 10, margin: 5 }}>
+      <AdChoicesView />
+      <TriggerableView>
+        <Text
+          style={{
+            color: '#999',
+            fontStyle: 'italic',
+            marginBottom: 10,
+            textAlign: 'right',
+          }}
+        >
+          {nativeAd.sponsoredTranslation}
+        </Text>
       </TriggerableView>
-      <View style={{flexDirection: 'row', marginTop: 10}}>
-        <AdIconView style={{ width: 40, height: 40, marginRight: 10, alignSelf: 'center'}} />
-        <TriggerableView style={{marginRight: 10, flex: 1, flexWrap: 'wrap'}}>
-          <Text numberOfLines={1} style={{color: '#000'}}>{nativeAd.advertiserName + '\n'}</Text>          
-          <Text numberOfLines={2} style={{color: '#999'}}>{nativeAd.bodyText}</Text>
+      <View style={{ flexDirection: 'row', marginTop: 10 }}>
+        <AdIconView style={{ width: 40, height: 40, marginRight: 10, alignSelf: 'center' }} />
+        <TriggerableView style={{ marginRight: 10, flex: 1, flexWrap: 'wrap' }}>
+          <Text numberOfLines={1} style={{ color: '#000' }}>
+            {`${nativeAd.advertiserName}\n`}
+          </Text>
+          <Text numberOfLines={2} style={{ color: '#999' }}>
+            {nativeAd.bodyText}
+          </Text>
         </TriggerableView>
-
-        </View>
-        <MediaView style={{ width: '100%', height: 300, marginTop: 10 }} />
       </View>
-  }
+      <MediaView style={{ width: '100%', height: 300, marginTop: 10 }} />
+    </View>
+  );
+};
 
-  //TODO: add fb ads back in
-  const FbAd = withNativeAd(fbAd)
+// TODO: add fb ads back in
+// const FbAd = withNativeAd(fbAd);
 
-  
-  const AdComponent: FunctionComponent<{index: number}> = ({index}) => {
-    if (index > 0 && index % 4 == 0) {
-        return <Card style={{padding: 10, marginBottom: 10}}>
-          <AdMobBanner
+const AdComponent: FunctionComponent<{ index: number }> = ({ index }) => {
+  if (index > 0 && index % 4 === 0) {
+    return (
+      <Card style={{ padding: 10, marginBottom: 10 }}>
+        <AdMobBanner
           adSize="largeBanner"
-          style={{alignSelf: 'center'}}
+          style={{ alignSelf: 'center' }}
           adUnitID={str.admobBanner}
           testDevices={str.testDevices}
           onAdFailedToLoad={error => {
-            console.log(error)
+            console.log(error);
           }}
-          />
-        </Card>
-    }
-    else return null
-  }
-  
-  export default AdComponent
+        />
+      </Card>
+    );
+  } else return null;
+};
+
+export default AdComponent;

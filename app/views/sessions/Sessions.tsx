@@ -223,7 +223,7 @@ class Sessions extends Component<SessionsProps, State> {
         style: 'cancel',
       },
       locationPermission === RESULTS.BLOCKED
-        ? { text: 'OK', onPress: this.locationPermission() }
+        ? { text: 'OK', onPress: this.locationPermission }
         : { text: 'Open Settings', onPress: Permissions.openSettings },
     ]);
   }

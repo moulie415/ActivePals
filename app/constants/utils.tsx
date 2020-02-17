@@ -162,15 +162,15 @@ export const nth = (d: number) => {
   }
 };
 
-export function formatDateTime(dateTime) {
-  dateTime = dateTime.replace(/-/g, '/');
+export const formatDateTime = (dt: string) => {
+  const dateTime = dt.replace(/-/g, '/');
   const date = new Date(dateTime);
   let hours = date.getHours();
-  let minutes = date.getMinutes();
+  const mins = date.getMinutes();
   const ampm = hours >= 12 ? 'pm' : 'am';
   hours %= 12;
   hours = hours || 12;
-  minutes = minutes < 10 ? `0${minutes}` : minutes;
+  const minutes = mins < 10 ? `0${mins}` : mins;
   const strTime = `${hours}:${minutes}${ampm}`;
   const day = date.getDate();
   return `${str.days[date.getDay()].toString()} ${day.toString() + nth(day)} ${str.months[

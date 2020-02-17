@@ -115,7 +115,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
     return expanded.indexOf(id) !== -1;
   }
 
-  toggleExpand(c, focus) {
+  toggleExpand(c, focus?: boolean) {
     const { expanded } = this.state;
     const { keyExtractor } = this.props;
     const id = keyExtractor(c);
@@ -368,7 +368,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                   </TouchableOpacity>
                 ) : null} */}
 
-                {this.renderChildren(item[childPropName], keyExtractor(item))}
+                {this.renderChildren(item[childPropName])}
 
                 {item[childPropName] && childrenCountExtractor(item) > item[childPropName].length && paginateAction ? (
                   <TouchableOpacity onPress={() => this.paginate(item[childPropName], 'up')}>
@@ -557,10 +557,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
           }}
           transparent
           visible={editModalVisible}
-          onRequestClose={() => {
-            this.setEditModalVisible(false);
-            this.setState({ editModalData: null });
-          }}
+          onRequestClose={() => this.setEditModalVisible(false)}
         >
           <View style={styles.editModalContainer}>
             <View style={styles.editModal}>

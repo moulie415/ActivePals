@@ -6,8 +6,9 @@ import { connect } from 'react-redux';
 import colors from '../../constants/colors';
 import { fetchPhotoPath } from '../../actions/sessions';
 import styles from './styles';
+import GymSearchProps from '../../types/components/GymSearch';
 
-const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) => {
+const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({ parent, onOpen, googleApiKey }) => {
   return (
     <GooglePlacesAutocomplete
       style={{ flex: 0 }}
@@ -18,11 +19,12 @@ const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) 
       listViewDisplayed="auto" // true/false/undefined
       fetchDetails
       renderDescription={row => row.description} // custom description render
-      onPress={async (data, details) => { // 'details' is provided when fetchDetails = true
+      // 'details' is provided when fetchDetails = true
+      onPress={async (data, details) => {
         parent.setState({ spinner: true });
-        const { lat, lng } = details.geometry.location
+        const { lat, lng } = details.geometry.location;
         if (details && details.types && details.types.includes('gym')) {
-          const state = { sharedInfo: { envVars: { GOOGLE_API_KEY: googleApiKey }}};
+          const state = { sharedInfo: { envVars: { GOOGLE_API_KEY: googleApiKey } } };
           const gym = await fetchPhotoPath(details, state);
           const marker = (
             <Marker
@@ -56,8 +58,9 @@ const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) 
             () => onOpen(gym.place_id)
           );
         } else {
-          Alert.alert('Location selected not recognised as a gym, please contact support if you think this is incorrect')
-          parent.setState({latitude: location.lat, longitude: location.lng})
+          Alert.alert(
+            'Location selected not recognised as a gym, please contact support if you think this is incorrect'
+          );
         }
       }}
       getDefaultValue={() => ''}
@@ -71,9 +74,11 @@ const GooglePlacesInput: FunctionComponent = ({ parent, onOpen, googleApiKey }) 
       // currentLocation // Will add a 'Current location' button at the top of the predefined places list
       // currentLocationLabel="Current location"
       nearbyPlacesAPI="GooglePlacesSearch" // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
-      GoogleReverseGeocodingQuery={{
-        // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
-      }}
+      GoogleReverseGeocodingQuery={
+        {
+          // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+        }
+      }
       GooglePlacesSearchQuery={{
         // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
         rankby: 'distance',

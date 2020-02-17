@@ -33,7 +33,7 @@ export default interface CommentsProps {
     reportAction: (item: Comment) => void;
     likeAction: (item: Comment) => void;
     likesTapAction: (item: Comment) => void;
-    paginateAction: (fromComment: Comment, direction: string, parentComment: Comment | undefined) => void;
+    paginateAction: (fromComment: Comment, direction: string, parentComment?: Comment) => void;
     getCommentRepsUsers: (comment: Comment, amount: number) => void;
     deleteAction: (comment: Comment) => void;
 }

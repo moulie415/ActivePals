@@ -1,6 +1,6 @@
 import firebase from 'react-native-firebase';
 import { upUnreadCount, fetchUsers } from './home';
-import { UserState } from '../types/Profile';
+import Profile, { UserState } from '../types/Profile';
 import { fetchOther } from './profile';
 
 export const SET_FRIENDS = 'SET_FRIENDS';
@@ -32,7 +32,7 @@ export const updateFriendState = (uid, state) => ({
 
 export const removeFriend = uid => {
   return (dispatch, getState) => {
-    const { friends } = getState().friends;
+    const { friends }: { [key: string]: Profile } = getState().friends;
     const friendArr = Object.values(friends).filter(friend => friend.uid !== uid);
     const obj = friendArr.reduce((acc, cur, i) => {
       acc[cur.uid] = cur;

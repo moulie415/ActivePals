@@ -370,9 +370,9 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
 	return async (dispatch, getState) => {
 		const key = comment.key
-		const uid = getState().profile.profile.uid
-		const friends = getState().friends.friends
-		const users = getState().sharedInfo.users
+		const { uid } = getState().profile.profile;
+		const { friends } = getState().friends;
+		const { users } = getState().sharedInfo;
 		const currentComments = getState().home.feed[comment.postId].comments
 		const filtered = currentComments.filter(c => c.key !== key)
 		const userFetches = []

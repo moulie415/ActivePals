@@ -477,7 +477,7 @@ class PostView extends Component<PostViewProps, State> {
                 this.setState({ likesModalVisible: true, repsId: c.key, repCount: c.repCount });
                 getRepsUsers(c.key);
               }}
-              paginateAction={(fromComment: Comment, direction: string, parentComment: Comment | undefined) => {
+              paginateAction={(fromComment: Comment, direction: string, parentComment?: Comment) => {
                 if (parentComment) {
                   getReplies(parentComment, 10, fromComment.key);
                 } else {

@@ -9,10 +9,11 @@ export default interface SessionModalProps {
     viewGym: (id: string) => void;
     location: { lat: string; lon: string };
     openChat: (session: Session) => void;
-    viewDirections: () => void;
+    viewDirections: (options) => void;
     viewProfile: (uid: string) => void;
     join: (key: string, isPrivate: boolean) => void;
     remove: (key: string, isPrivate: boolean) => void 
     close: () => void;
-    users: { [key: string]: Profile }
+    users: { [key: string]: Profile },
+    friends: { [key: string]: Profile }
 }
