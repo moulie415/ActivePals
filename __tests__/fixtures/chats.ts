@@ -7,6 +7,7 @@ const chat1: Chat = {
   lastMessage: {
     _id: 'qwerty',
     text: 'hello world',
+    image: 'avatar.png',
     user: {
       _id: 'qwerty',
       name: 'Henry Moule'
