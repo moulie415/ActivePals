@@ -35,6 +35,9 @@ export default jest.mock('react-navigation', () => {
       dark: {
         bodyContent: ""
       }
-    }
+    },
+    TabRouter: jest.fn(),
+    createNavigator: jest.fn(),
+    StackRouter: jest.fn(),
   };
 });

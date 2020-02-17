@@ -49,7 +49,6 @@ export default class Comment extends PureComponent<CommentProps, State> {
 
   handleUsernameTap() {
     const { usernameTapAction, uid, username } = this.props;
-    debugger;
     if (usernameTapAction) {
       usernameTapAction(username, uid);
     }

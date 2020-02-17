@@ -853,7 +853,6 @@ export class Home extends Component<HomeProps, State> {
             // clastCommentUpdate={this.state.lastCommentUpdate}
             users={Object.values(combined)}
             usernameTapAction={(username, uid) => {
-              debugger;
               if (uid === profile.uid) {
                 navigation.navigate('Profile');
               } else {
