@@ -1,10 +1,14 @@
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions, NavigationContainer } from 'react-navigation';
 
 let _navigator;
 
 const setTopLevelNavigator = navigatorRef => {
   _navigator = navigatorRef;
 };
+
+const getNavigator = (): NavigationContainer => {
+  return _navigator;
+}
 
 const navigate = (routeName, params?) => {
   _navigator.dispatch(
@@ -21,4 +25,5 @@ export default {
   navigate,
   goBack,
   setTopLevelNavigator,
+  getNavigator
 };

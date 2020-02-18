@@ -60,6 +60,16 @@ const navigateFromNotif = notif => {
 };
 
 const shouldNavigate = notification => {
+  const { nav } = NavigationService.getNavigator().state;
+  if (nav.routes.length > 0) {
+    const route = nav.routes[nav.index];
+    const { chatId, session, gymId } = route.params;
+    return (
+      (chatId && notification.chatId === chatId) ||
+      (session && session.key === notification.sessionId) ||
+      (gymId && gymId === notification.gymId)
+    );
+  }
   return true;
 };
 
