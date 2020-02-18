@@ -167,17 +167,19 @@ export const fetchSessions = () => {
           );
           const obj = {};
           sessions.forEach(session => {
-            const { host } = session.val();
-            if (!checkHost(host, getState())) {
-              userFetches.push(host);
-            }
-            const duration = calculateDuration(session.val());
-            const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
-            const current = new Date().getTime();
-            if (time + duration < current) {
-              dispatch(expirationAlert(session, false));
-            }
-            obj[session.key] = { ...session.val(), host, key: session.key };
+            if (session) {
+              const { host } = session.val();
+              if (!checkHost(host, getState())) {
+                userFetches.push(host);
+              }
+              const duration = calculateDuration(session.val());
+              const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
+              const current = new Date().getTime();
+              if (time + duration < current) {
+                dispatch(expirationAlert(session, false));
+              }
+              obj[session.key] = { ...session.val(), host, key: session.key };
+          }
           });
           dispatch(updateSessions(obj));
           dispatch(fetchUsers(userFetches));
@@ -259,18 +261,20 @@ export const fetchPrivateSessions = () => {
             })
           );
           const privateSessions = sessions.map(session => {
-            const duration = calculateDuration(session.val());
-            const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
-            const current = new Date().getTime();
-            if (time + duration < current) {
-              dispatch(expirationAlert(session, true));
+            if (session) {
+              const duration = calculateDuration(session.val());
+              const time = new Date(session.val().dateTime.replace(/-/g, '/')).getTime();
+              const current = new Date().getTime();
+              if (time + duration < current) {
+                dispatch(expirationAlert(session, true));
+              }
+              const inProgress = time + duration > current && time < current;
+              const { host } = session.val();
+              if (!checkHost(host, getState())) {
+                userFetches.push(host);
+              }
+              return { ...session.val(), key: session.key, inProgress, host };
             }
-            const inProgress = time + duration > current && time < current;
-            const { host } = session.val();
-            if (!checkHost(host, getState())) {
-              userFetches.push(host);
-            }
-            return { ...session.val(), key: session.key, inProgress, host };
           });
 
           const obj = privateSessions.reduce((acc, cur, i) => {
