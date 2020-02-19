@@ -8,7 +8,7 @@
     "build-android-prod": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
     "firebase-android": "npm run build-android-prod && ./firebase-android.sh",
     "firebase-ios": "ENV=production ENVFILE=.env.prod ./envscript.sh && ./firebase-ios.sh",
-    "postinstall": "npx jetify && npm run remove-uneeded",
+    "postinstall": "npx jetify && npm run remove-uneeded && cp -rf react-native-fast-image/android node_modules/react-native-fast-image",
     "prestart": "npm run remove-uneeded",
     "remove-uneeded": "rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-parsed-text && rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-video",
     "test": "jest --coverage",
