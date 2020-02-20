@@ -770,6 +770,20 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNFirebase;
 		};
+		0ABDD30B23FE79AE004B85D9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 11C24EA25460DA1CF59AF70D747DA5EF;
+			remoteInfo = "Permission-LocationAlways";
+		};
+		0ABDD30D23FE79AE004B85D9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A710801FF4681D52F3948DD170856943;
+			remoteInfo = "Permission-LocationWhenInUse";
+		};
 		0ABF963C21A9807A00D9EE84 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 751D61DAD92C4FD8938F3025 /* RNAdMobManager.xcodeproj */;
@@ -1311,6 +1325,8 @@
 				0A7CEE902118B2AF00F09932 /* libGTMSessionFetcher.a */,
 				0A45FE3323E99DD400198859 /* libleveldb-library.a */,
 				0A988CAC210E2795006C6974 /* libnanopb.a */,
+				0ABDD30C23FE79AE004B85D9 /* libPermission-LocationAlways.a */,
+				0ABDD30E23FE79AE004B85D9 /* libPermission-LocationWhenInUse.a */,
 				0A1F2121210A8E1800896D4A /* libPods-Anyone.a */,
 				0A45FD4A23E9993D00198859 /* libPods-Anyone-tvOS.a */,
 				0A45FD4C23E9993D00198859 /* libPods-Anyone-tvOSTests.a */,
@@ -1750,7 +1766,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 27RJG57PEM;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -2606,6 +2622,20 @@
 			remoteRef = 0AB463672113AB24003C51E2 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		0ABDD30C23FE79AE004B85D9 /* libPermission-LocationAlways.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libPermission-LocationAlways.a";
+			remoteRef = 0ABDD30B23FE79AE004B85D9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0ABDD30E23FE79AE004B85D9 /* libPermission-LocationWhenInUse.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libPermission-LocationWhenInUse.a";
+			remoteRef = 0ABDD30D23FE79AE004B85D9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		0ABF963D21A9807A00D9EE84 /* libRNAdMobManager.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -3224,7 +3254,7 @@
 				CODE_SIGN_ENTITLEMENTS = Anyone/Anyone.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 27RJG57PEM;
@@ -3258,7 +3288,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.FitLink;
 				PRODUCT_NAME = Anyone;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = Development;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -3271,7 +3301,7 @@
 				CODE_SIGN_ENTITLEMENTS = Anyone/Anyone.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 27RJG57PEM;
@@ -3305,7 +3335,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.FitLink;
 				PRODUCT_NAME = Anyone;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = Development;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
