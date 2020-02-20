@@ -3,9 +3,18 @@ import { Platform, AppState, SafeAreaView } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createBottomTabNavigator, createMaterialTopTabNavigator, MaterialTopTabBar } from 'react-navigation-tabs';
 import { createStackNavigator } from 'react-navigation-stack';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/lib/integration/react';
+import { persistStore } from 'redux-persist';
+import { createStore, applyMiddleware, compose } from 'redux';
 import firebase from 'react-native-firebase';
+import Sound from 'react-native-sound';
+import GeoFire from 'geofire';
+import thunk from 'redux-thunk';
 import { MaterialTabBarProps } from 'react-navigation-tabs/lib/typescript/src/types';
 import color from 'color';
+import reducer from './reducers';
+import str from './constants/strings';
 import Login from './views/login';
 import SignUp from './views/SignUp';
 import Home from './views/Home';
@@ -34,6 +43,126 @@ import { UserState } from './types/Profile';
 import NavigationService from './actions/navigation';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
 import ChatTabLabel from './components/ChatTabLabel';
+import { MessageType } from './types/Message';
+import { NotificationType } from './types/Notification';
+import { setNotificationCount } from './actions/home';
+import { newNotification, updateLastMessage } from './actions/chats';
+
+const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
+  if (error) {
+    console.warn('failed to load the sound', error);
+  }
+});
+
+const firebaseRef = firebase.database().ref('locations');
+export const geofire = new GeoFire(firebaseRef);
+
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+export const store = createStore(reducer, composeEnhancers(applyMiddleware(thunk)));
+
+const navigateFromNotif = notif => {
+  const { type, sessionId, sessionTitle, chatId, uid, username, postId, gymId, isPrivate } = notif;
+  if (type === 'sessionMessage') {
+    const session = { key: sessionId, title: sessionTitle, private: notif.private === 'privateSessions' };
+    NavigationService.navigate('Messaging', { session });
+  }
+  switch (type) {
+    case 'message':
+      NavigationService.navigate('Messaging', { chatId, friendUsername: username, friendUid: uid });
+      break;
+    case 'gymMessage':
+      NavigationService.navigate('Messaging', { gymId });
+      break;
+    case 'friendRequest':
+      NavigationService.navigate('Friends');
+      break;
+    case 'comment':
+    case 'rep':
+      NavigationService.navigate('PostView', { postId });
+      break;
+    case 'addedToSession':
+      NavigationService.navigate('SessionInfo', { sessionId, isPrivate });
+      break;
+    default:
+      console.log('invalid notif type');
+  }
+};
+
+const shouldNavigate = notification => {
+  const { nav } = NavigationService.getNavigator().state;
+  if (nav.routes.length > 0) {
+    const route = nav.routes[nav.index];
+    const { chatId, session, gymId } = route.params;
+    return (
+      (chatId && notification.chatId === chatId) ||
+      (session && session.key === notification.sessionId) ||
+      (gymId && gymId === notification.gymId)
+    );
+  }
+  return true;
+};
+
+export const showLocalNotification = notif => {
+  const user = firebase.auth().currentUser;
+  if (notif.uid !== user.uid) {
+    if (shouldNavigate(notif)) {
+      const notification = new firebase.notifications.Notification()
+        .setTitle(notif.title)
+        .setBody(notif.body)
+        .setData(notif)
+        .setSound(str.notifSound)
+        .android.setSmallIcon('ic_notification')
+        // .android.setLargeIcon('ic_notification_large')
+        .android.setAutoCancel(true)
+        .android.setGroupSummary(true)
+        .android.setGroup(notif.group)
+        .android.setPriority(firebase.notifications.Android.Priority.Max)
+        .android.setChannelId(notif.channel)
+        // .android.setGroupAlertBehaviour(firebase.notifications.Android.GroupAlert.Children)
+        .setNotificationId(notif.group);
+
+      firebase
+        .notifications()
+        .displayNotification(notification)
+        .catch(err => console.error(err));
+    } else {
+      notifSound.play();
+    }
+  }
+};
+
+export const persistor = persistStore(store);
+
+export const handleNotification = (notification, showLocal = true) => {
+  const { dispatch, getState } = store;
+  const { type } = notification;
+  const localTypes = [
+    MessageType.GYM_MESSAGE,
+    MessageType.SESSION_MESSAGE,
+    MessageType.GYM_MESSAGE,
+    NotificationType.FRIEND_REQUEST,
+    NotificationType.ADDED_TO_SESSION,
+  ];
+  if (localTypes.includes(type)) {
+    dispatch(newNotification(notification));
+    if (type === MessageType.GYM_MESSAGE || type === MessageType.SESSION_MESSAGE || type === MessageType.MESSAGE) {
+      // @ts-ignore
+      dispatch(updateLastMessage(notification));
+    }
+    showLocal && showLocalNotification(notification);
+  }
+  if (
+    type === NotificationType.POST_REP ||
+    type === NotificationType.COMMENT ||
+    type === NotificationType.FRIEND_REQUEST ||
+    type === NotificationType.COMMENT_MENTION ||
+    type === NotificationType.POST_MENTION
+  ) {
+    const count = getState().profile.profile.unreadCount || 0;
+    dispatch(setNotificationCount(count + 1));
+  }
+};
 
 const SafeAreaMaterialTopTabBar: FunctionComponent<MaterialTabBarProps> = ({ ...props }) => (
   <SafeAreaView style={{ backgroundColor: colors.primary }}>
@@ -135,12 +264,151 @@ export const Stack = createStackNavigator(
 const Navigation = createAppContainer(Stack);
 
 class App extends Component {
-  componentDidMount() {
+  messageListener: () => void;
+
+  notificationDisplayedListener: () => void;
+
+  notificationListener: () => void;
+
+  notificationOpenedListener: () => void;
+
+  onTokenRefreshListener: () => void;
+
+  unsubscriber: () => void;
+
+  async componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
+
+    const channelData = [
+      {
+        id: 'REQUEST',
+        name: 'Pal requests',
+        description: 'Channel for pal requests',
+      },
+      {
+        id: 'DIRECT_MESSAGES',
+        name: 'Direct messages',
+        description: 'Channel for direct messages from pals',
+      },
+      {
+        id: 'SESSION_MESSAGES',
+        name: 'Session messages',
+        description: 'Channel for session messages',
+      },
+      {
+        id: 'GYM_MESSAGES',
+        name: 'Gym messages',
+        description: 'Channel for gym messages',
+      },
+      {
+        id: 'COMMENT',
+        name: 'Comment',
+        description: 'Channel for comments on posts',
+      },
+      {
+        id: 'REP',
+        name: 'Rep',
+        description: 'Channel for reps',
+      },
+      {
+        id: 'ADDED_TO_SESSION',
+        name: 'Added to session',
+        description: 'Channel for when you get added to a session',
+      },
+    ];
+
+    const channels = channelData.map(channel => {
+      return new firebase.notifications.Android.Channel(
+        channel.id,
+        channel.name,
+        firebase.notifications.Android.Importance.Max
+      )
+        .setDescription(channel.description)
+        .setSound(str.notifSound);
+    });
+
+    channels.forEach(channel => {
+      firebase.notifications().android.createChannel(channel);
+    });
+
+    this.messageListener = firebase.messaging().onMessage(notification => {
+      handleNotification(notification.data);
+    });
+
+    this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed(notification => {
+      // Process your notification as required
+      // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
+      console.log(notification);
+    });
+
+    this.notificationListener = firebase.notifications().onNotification(notification => {
+      // Process your notification as required
+      handleNotification(notification.data);
+    });
+
+    this.notificationOpenedListener = firebase.notifications().onNotificationOpened(notificationOpen => {
+      // Get the action triggered by the notification being opened
+      // Get information about the notification that was opened
+      const { action, notification } = notificationOpen;
+
+      const state = AppState.currentState;
+      if (state !== 'active') {
+        handleNotification(notification.data, false);
+      }
+      if (shouldNavigate(notification.data)) {
+        navigateFromNotif(notification.data);
+      }
+    });
+
+    firebase
+      .notifications()
+      .getInitialNotification()
+      .then(notificationOpen => {
+        if (notificationOpen) {
+          // App was opened by a notification
+          // Get the action triggered by the notification being opened
+          // Get information about the notification that was opened
+          const { action, notification } = notificationOpen;
+        }
+      });
+
+    this.unsubscriber = firebase.auth().onAuthStateChanged(async user => {
+      if (user) {
+        const fcmToken = await firebase.messaging().getToken();
+        if (fcmToken) {
+          firebase
+            .database()
+            .ref(`users/${user.uid}`)
+            .child('FCMToken')
+            .set(fcmToken);
+          console.log(`fcm token: ${fcmToken}`);
+        } else {
+          console.log('no token');
+        }
+      }
+    });
+
+    this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(fcmToken => {
+      // Process your token as required
+      const user = firebase.auth().currentUser;
+      if (user) {
+        firebase
+          .database()
+          .ref(`users/${user.uid}`)
+          .child('FCMToken')
+          .set(fcmToken);
+      } else console.log('no user to set token on');
+    });
   }
 
   componentWillUnmount() {
     AppState.removeEventListener('change', this.handleAppStateChange);
+    this.notificationDisplayedListener();
+    this.notificationListener();
+    this.notificationOpenedListener();
+    this.onTokenRefreshListener();
+    this.messageListener();
+    this.unsubscriber();
   }
 
   handleAppStateChange = nextAppState => {
@@ -166,11 +434,15 @@ class App extends Component {
     // const { nav, dispatch } = this.props;
 
     return (
-      <Navigation
-        ref={navigatorRef => {
-          NavigationService.setTopLevelNavigator(navigatorRef);
-        }}
-      />
+      <PersistGate persistor={persistor}>
+        <Provider store={store}>
+          <Navigation
+            ref={navigatorRef => {
+              NavigationService.setTopLevelNavigator(navigatorRef);
+            }}
+          />
+        </Provider>
+      </PersistGate>
     );
   }
 }

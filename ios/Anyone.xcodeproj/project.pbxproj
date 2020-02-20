@@ -112,13 +112,6 @@
 			remoteGlobalIDString = A287971D1DE0C0A60081BDFA;
 			remoteInfo = FastImage;
 		};
-		0A03A8AE22D16578005A2609 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DF63376066E2275FF26820B3A512A9B;
-			remoteInfo = "react-native-webview";
-		};
 		0A0A502722DA379E00CC692E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0A0A502322DA379E00CC692E /* AirMaps.xcodeproj */;
@@ -1354,7 +1347,6 @@
 				0A45FD6623E9993D00198859 /* libreact-native-version-number.a */,
 				0A1FA0AA21C08115002DE30F /* libreact-native-video.a */,
 				0A8E3A6523EA3F2C003A8D3E /* libreact-native-viewpager.a */,
-				0A03A8AF22D16578005A2609 /* libreact-native-webview.a */,
 				0A45FD6823E9993D00198859 /* libReact-RCTActionSheet.a */,
 				0AFFAC5A23E9A0E500A1E512 /* libReact-RCTAnimation.a */,
 				0A45FD6C23E9993D00198859 /* libReact-RCTBlob.a */,
@@ -1969,13 +1961,6 @@
 			fileType = archive.ar;
 			path = libFastImage.a;
 			remoteRef = 0A03A88322D16578005A2609 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		0A03A8AF22D16578005A2609 /* libreact-native-webview.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libreact-native-webview.a";
-			remoteRef = 0A03A8AE22D16578005A2609 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0A0A502822DA379E00CC692E /* libAirMaps.a */ = {
@@ -2922,7 +2907,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		0A19E5072051A9950036DFF2 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
