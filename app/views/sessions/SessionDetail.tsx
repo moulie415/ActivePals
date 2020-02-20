@@ -20,7 +20,7 @@ import Geocoder from 'react-native-geocoder';
 import firebase from 'react-native-firebase';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import RNCalendarEvents from 'react-native-calendar-events';
-import { geofire } from '../../../index';
+import { geofire } from '../../app';
 import colors from '../../constants/colors';
 import styles from '../../styles/sessionDetailStyles';
 import { types, getType, addSessionToCalendar } from '../../constants/utils';

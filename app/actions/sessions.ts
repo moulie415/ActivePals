@@ -1,7 +1,7 @@
 import firebase from 'react-native-firebase';
 import { Alert } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import { geofire } from '../../index';
+import { geofire } from '../App';
 import { fetchUsers, updateUsers } from './home';
 import { setGym } from './profile';
 import { calculateDuration } from '../constants/utils';
