@@ -47,6 +47,8 @@ import { MessageType } from './types/Message';
 import { NotificationType } from './types/Notification';
 import { setNotificationCount } from './actions/home';
 import { newNotification, updateLastMessage, resetUnreadCount } from './actions/chats';
+import { createChannels } from './helpers/notifications';
+import { shouldNavigate, navigateFromNotif } from './helpers/navigation';
 
 const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
   if (error) {
@@ -60,50 +62,6 @@ export const geofire = new GeoFire(firebaseRef);
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export const store = createStore(reducer, composeEnhancers(applyMiddleware(thunk)));
-
-const navigateFromNotif = notif => {
-  const { type, sessionId, sessionTitle, chatId, uid, username, postId, gymId, isPrivate } = notif;
-  if (type === 'sessionMessage') {
-    const session = { key: sessionId, title: sessionTitle, private: notif.private === 'privateSessions' };
-    NavigationService.navigate('Messaging', { session });
-  }
-  switch (type) {
-    case 'message':
-      NavigationService.navigate('Messaging', { chatId, friendUsername: username, friendUid: uid });
-      break;
-    case 'gymMessage':
-      NavigationService.navigate('Messaging', { gymId });
-      break;
-    case 'friendRequest':
-      NavigationService.navigate('Friends');
-      break;
-    case 'comment':
-    case 'rep':
-      NavigationService.navigate('PostView', { postId });
-      break;
-    case 'addedToSession':
-      NavigationService.navigate('SessionInfo', { sessionId, isPrivate });
-      break;
-    default:
-      console.log('invalid notif type');
-  }
-};
-
-const shouldNavigate = notification => {
-  const { nav } = NavigationService.getNavigator().state;
-  if (nav.routes.length > 0) {
-    const route = nav.routes[nav.index];
-    if (route.params) {
-      const { chatId, session, gymId } = route.params;
-      return (
-        !(chatId && notification.chatId === chatId) &&
-        !(session && session.key === notification.sessionId) &&
-        !(gymId && gymId === notification.gymId)
-      );
-    }
-  }
-  return true;
-};
 
 export const showLocalNotification = notif => {
   const user = firebase.auth().currentUser;
@@ -287,57 +245,7 @@ class App extends Component {
   async componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
 
-    const channelData = [
-      {
-        id: 'REQUEST',
-        name: 'Pal requests',
-        description: 'Channel for pal requests',
-      },
-      {
-        id: 'DIRECT_MESSAGES',
-        name: 'Direct messages',
-        description: 'Channel for direct messages from pals',
-      },
-      {
-        id: 'SESSION_MESSAGES',
-        name: 'Session messages',
-        description: 'Channel for session messages',
-      },
-      {
-        id: 'GYM_MESSAGES',
-        name: 'Gym messages',
-        description: 'Channel for gym messages',
-      },
-      {
-        id: 'COMMENT',
-        name: 'Comment',
-        description: 'Channel for comments on posts',
-      },
-      {
-        id: 'REP',
-        name: 'Rep',
-        description: 'Channel for reps',
-      },
-      {
-        id: 'ADDED_TO_SESSION',
-        name: 'Added to session',
-        description: 'Channel for when you get added to a session',
-      },
-    ];
-
-    const channels = channelData.map(channel => {
-      return new firebase.notifications.Android.Channel(
-        channel.id,
-        channel.name,
-        firebase.notifications.Android.Importance.Max
-      )
-        .setDescription(channel.description)
-        .setSound(str.notifSound);
-    });
-
-    channels.forEach(channel => {
-      firebase.notifications().android.createChannel(channel);
-    });
+    createChannels();
 
     this.messageListener = firebase.messaging().onMessage(notification => {
       handleNotification(notification.data);
@@ -437,8 +345,6 @@ class App extends Component {
   };
 
   render() {
-    // const { nav, dispatch } = this.props;
-
     return (
       <PersistGate persistor={persistor}>
         <Provider store={store}>
