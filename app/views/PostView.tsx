@@ -411,81 +411,83 @@ class PostView extends Component<PostViewProps, State> {
           {post && <View>{this.renderPost(post)}</View>}
           {post && this.repCommentCount(post)}
           {post && (
-            <Comments
-              data={comments}
-              viewingUserName={profile.username}
-              deleteAction={c => console.log('delete comment')}
-              initialDisplayCount={10}
-              editMinuteLimit={900}
-              focusCommentInput={focusCommentInput}
-              childrenPerPage={5}
-              // clastCommentUpdate={this.state.lastCommentUpdate}
-              users={Object.values(combined)}
-              usernameTapAction={(username, uid) => {
-                if (uid === profile.uid) {
-                  navigation.navigate('Profile');
-                } else {
-                  navigation.navigate('ProfileView', { uid });
+            <SafeAreaView>
+              <Comments
+                data={comments}
+                viewingUserName={profile.username}
+                deleteAction={c => console.log('delete comment')}
+                initialDisplayCount={10}
+                editMinuteLimit={900}
+                focusCommentInput={focusCommentInput}
+                childrenPerPage={5}
+                // clastCommentUpdate={this.state.lastCommentUpdate}
+                users={Object.values(combined)}
+                usernameTapAction={(username, uid) => {
+                  if (uid === profile.uid) {
+                    navigation.navigate('Profile');
+                  } else {
+                    navigation.navigate('ProfileView', { uid });
+                  }
+                }}
+                childPropName="children"
+                isChild={c => c.parentCommentId}
+                parentIdExtractor={c => c.key}
+                keyExtractor={item => item.comment_id}
+                usernameExtractor={item => {
+                  if (item.uid === profile.uid) {
+                    return 'You';
+                  }
+                  return friends[item.uid].username || users[item.uid].username;
+                }}
+                uidExtractor={item => item.uid}
+                editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
+                createdTimeExtractor={item => new Date(item.created_at).toISOString()}
+                bodyExtractor={item => item.text}
+                imageExtractor={item => {
+                  if (item.uid === profile.uid) {
+                    return profile.avatar;
+                  }
+                  return friends[item.uid].avatar || users[item.uid].avatar;
+                }}
+                likeExtractor={item => item.rep}
+                reportedExtractor={item => item.reported}
+                likesExtractor={item =>
+                  likesExtractor(
+                    item,
+                    profile.uid,
+                    (id: string) => navigation.navigate('ProfileView', { uid: id }),
+                    () => navigation.navigate('Profile')
+                  )
                 }
-              }}
-              childPropName="children"
-              isChild={c => c.parentCommentId}
-              parentIdExtractor={c => c.key}
-              keyExtractor={item => item.comment_id}
-              usernameExtractor={item => {
-                if (item.uid === profile.uid) {
-                  return 'You';
-                }
-                return friends[item.uid].username || users[item.uid].username;
-              }}
-              uidExtractor={item => item.uid}
-              editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
-              createdTimeExtractor={item => new Date(item.created_at).toISOString()}
-              bodyExtractor={item => item.text}
-              imageExtractor={item => {
-                if (item.uid === profile.uid) {
-                  return profile.avatar;
-                }
-                return friends[item.uid].avatar || users[item.uid].avatar;
-              }}
-              likeExtractor={item => item.rep}
-              reportedExtractor={item => item.reported}
-              likesExtractor={item =>
-                likesExtractor(
-                  item,
-                  profile.uid,
-                  (id: string) => navigation.navigate('ProfileView', { uid: id }),
-                  () => navigation.navigate('Profile')
-                )
-              }
-              likeCountExtractor={item => item.repCount}
-              commentCount={feed[postId] ? feed[postId].commentCount : 0}
-              childrenCountExtractor={c => c.childrenCount}
-              timestampExtractor={item => new Date(item.created_at).toISOString()}
-              replyAction={offset => {
-                scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
-              }}
-              saveAction={async (text, parentCommentId) => {
-                if (text) {
-                  await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
-                }
-              }}
-              editAction={(text, c) => console.log(text)}
-              reportAction={c => console.log(c)}
-              likeAction={c => onRepComment(c)}
-              likesTapAction={(c: Comment) => {
-                this.setState({ likesModalVisible: true, repsId: c.key, repCount: c.repCount });
-                getRepsUsers(c.key);
-              }}
-              paginateAction={(fromComment: Comment, direction: string, parentComment?: Comment) => {
-                if (parentComment) {
-                  getReplies(parentComment, 10, fromComment.key);
-                } else {
-                  getComments(postId, 10, fromComment.key);
-                }
-              }}
-              getCommentRepsUsers={(c, amount) => getCommentRepsUsers(c, amount)}
-            />
+                likeCountExtractor={item => item.repCount}
+                commentCount={feed[postId] ? feed[postId].commentCount : 0}
+                childrenCountExtractor={c => c.childrenCount}
+                timestampExtractor={item => new Date(item.created_at).toISOString()}
+                replyAction={offset => {
+                  scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
+                }}
+                saveAction={async (text, parentCommentId) => {
+                  if (text) {
+                    await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
+                  }
+                }}
+                editAction={(text, c) => console.log(text)}
+                reportAction={c => console.log(c)}
+                likeAction={c => onRepComment(c)}
+                likesTapAction={(c: Comment) => {
+                  this.setState({ likesModalVisible: true, repsId: c.key, repCount: c.repCount });
+                  getRepsUsers(c.key);
+                }}
+                paginateAction={(fromComment: Comment, direction: string, parentComment?: Comment) => {
+                  if (parentComment) {
+                    getReplies(parentComment, 10, fromComment.key);
+                  } else {
+                    getComments(postId, 10, fromComment.key);
+                  }
+                }}
+                getCommentRepsUsers={(c, amount) => getCommentRepsUsers(c, amount)}
+              />
+            </SafeAreaView>
           )}
           <RepsModal
             onClosed={() => this.setState({ likesModalVisible: false })}

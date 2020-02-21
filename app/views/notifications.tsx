@@ -154,7 +154,7 @@ class Notifications extends Component<NotificationsProps, State> {
                   <TouchableOpacity
                     onPress={() => {
                       if (item.postId) {
-                        navigation.navigate('PostView', { id: item.postId });
+                        navigation.navigate('PostView', { postId: item.postId });
                       } else if (item.type === 'friendRequest') {
                         navigation.navigate('Friends');
                       }

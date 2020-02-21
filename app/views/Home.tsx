@@ -569,7 +569,7 @@ export class Home extends Component<HomeProps, State> {
                 <AdView index={index} />
                 <Card style={{ marginBottom: 10 }}>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate('PostView', { id: item.key })}
+                    onPress={() => navigation.navigate('PostView', { postId: item.key })}
                     style={{ alignSelf: 'flex-end' }}
                   ></TouchableOpacity>
                   {this.renderFeedItem(item)}
