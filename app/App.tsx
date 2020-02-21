@@ -46,7 +46,7 @@ import ChatTabLabel from './components/ChatTabLabel';
 import { MessageType } from './types/Message';
 import { NotificationType } from './types/Notification';
 import { setNotificationCount } from './actions/home';
-import { newNotification, updateLastMessage } from './actions/chats';
+import { newNotification, updateLastMessage, resetUnreadCount } from './actions/chats';
 
 const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
   if (error) {
@@ -93,12 +93,14 @@ const shouldNavigate = notification => {
   const { nav } = NavigationService.getNavigator().state;
   if (nav.routes.length > 0) {
     const route = nav.routes[nav.index];
-    const { chatId, session, gymId } = route.params;
-    return (
-      (chatId && notification.chatId === chatId) ||
-      (session && session.key === notification.sessionId) ||
-      (gymId && gymId === notification.gymId)
-    );
+    if (route.params) {
+      const { chatId, session, gymId } = route.params;
+      return (
+        !(chatId && notification.chatId === chatId) &&
+        !(session && session.key === notification.sessionId) &&
+        !(gymId && gymId === notification.gymId)
+      );
+    }
   }
   return true;
 };
@@ -128,6 +130,12 @@ export const showLocalNotification = notif => {
         .catch(err => console.error(err));
     } else {
       notifSound.play();
+      const { type, gymId, sessionId, uid } = notif;
+      if (type === MessageType.GYM_MESSAGE || type === MessageType.SESSION_MESSAGE || type === MessageType.MESSAGE) {
+        const id = gymId || sessionId || uid;
+        // @ts-ignore
+        store.dispatch(resetUnreadCount(id));
+      }
     }
   }
 };
@@ -138,7 +146,7 @@ export const handleNotification = (notification, showLocal = true) => {
   const { dispatch, getState } = store;
   const { type } = notification;
   const localTypes = [
-    MessageType.GYM_MESSAGE,
+    MessageType.MESSAGE,
     MessageType.SESSION_MESSAGE,
     MessageType.GYM_MESSAGE,
     NotificationType.FRIEND_REQUEST,
@@ -355,9 +363,7 @@ class App extends Component {
       if (state !== 'active') {
         handleNotification(notification.data, false);
       }
-      if (shouldNavigate(notification.data)) {
-        navigateFromNotif(notification.data);
-      }
+      navigateFromNotif(notification.data);
     });
 
     firebase

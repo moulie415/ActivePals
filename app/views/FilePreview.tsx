@@ -9,6 +9,7 @@ import {
   Alert,
   FlatList,
   TouchableOpacity,
+  SafeAreaView,
   Image as SlowImage,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -25,6 +26,7 @@ import styles from '../styles/homeStyles';
 import { addPost } from '../actions/home';
 import { setMessage } from '../actions/chats';
 import FilePreviewProps from '../types/views/FilePreview';
+import { TaskEvent, TaskState } from '../types/Shared';
 import Profile from '../types/Profile';
 
 interface State {
@@ -94,15 +96,15 @@ class FilePreview extends Component<FilePreviewProps, State> {
         .child(id);
 
       imageRef.putFile(uri, { contentType: mimeType }).on(
-        RNFirebase.storage.TaskEvent.STATE_CHANGED,
+        TaskEvent.STATE_CHANGED,
         snapshot => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           this.setState({ progress });
           switch (snapshot.state) {
-            case RNFirebase.storage.TaskState.SUCCESS: // or 'success'
+            case TaskState.SUCCESS: // or 'success'
               console.log('Upload is complete');
               break;
-            case RNFirebase.storage.TaskState.RUNNING: // or 'running'
+            case TaskState.RUNNING: // or 'running'
               console.log('Upload is running');
               break;
             default:
@@ -164,66 +166,68 @@ class FilePreview extends Component<FilePreviewProps, State> {
     const { uri, message } = navigation.state.params;
     const { mentionList, text, spinner } = this.state;
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
-          <SlowImage style={{ flex: 1, resizeMode: 'contain' }} source={{ uri }} />
-          <View style={{ position: 'absolute', margin: 20, marginTop: 30 }}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={{
-                backgroundColor: colors.secondary,
-                opacity: 0.8,
-                padding: 10,
-                paddingHorizontal: 15,
-                borderRadius: 5,
-              }}
-            >
-              <Icon size={30} name="md-close" style={{ color: '#fff' }} />
-            </TouchableOpacity>
-          </View>
-          <View style={{ position: 'absolute', margin: 20, marginTop: 30, right: 0 }}>
-            <TouchableOpacity
-              onPress={() => this.acceptPressed()}
-              style={{
-                backgroundColor: colors.secondary,
-                opacity: 0.8,
-                padding: 10,
-                paddingHorizontal: 15,
-                borderRadius: 5,
-              }}
-            >
-              <Icon size={30} name="md-checkmark" style={{ color: '#fff' }} />
-            </TouchableOpacity>
-          </View>
-          {mentionList && !message && this.renderMentionList()}
-          <TextInput
-            style={{
-              height: 50,
-              paddingLeft: 10,
-              width: '100%',
-              fontSize: 18,
-              backgroundColor: '#fff',
-            }}
-            maxLength={280}
-            underlineColorAndroid="transparent"
-            onChangeText={input => {
-              this.setState({ text: input });
-              const mentionFriends = Object.values(friends);
-              const list = getMentionsList(input, mentionFriends);
-              list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
-            }}
-            value={text}
-            multiline={false}
-            autoCorrect
-            placeholder="Add comment..."
-          />
-          {spinner && (
-            <View style={sStyles.spinner}>
-              <PulseIndicator color={colors.secondary} />
+      <SafeAreaView style={{ flex: 1 }}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+          <View style={{ flex: 1 }}>
+            <SlowImage style={{ flex: 1, resizeMode: 'contain' }} source={{ uri }} />
+            <View style={{ position: 'absolute', margin: 20, marginTop: 30 }}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{
+                  backgroundColor: colors.secondary,
+                  opacity: 0.8,
+                  padding: 10,
+                  paddingHorizontal: 15,
+                  borderRadius: 5,
+                }}
+              >
+                <Icon size={30} name="md-close" style={{ color: '#fff' }} />
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
-      </TouchableWithoutFeedback>
+            <View style={{ position: 'absolute', margin: 20, marginTop: 30, right: 0 }}>
+              <TouchableOpacity
+                onPress={() => this.acceptPressed()}
+                style={{
+                  backgroundColor: colors.secondary,
+                  opacity: 0.8,
+                  padding: 10,
+                  paddingHorizontal: 15,
+                  borderRadius: 5,
+                }}
+              >
+                <Icon size={30} name="md-checkmark" style={{ color: '#fff' }} />
+              </TouchableOpacity>
+            </View>
+            {mentionList && !message && this.renderMentionList()}
+            <TextInput
+              style={{
+                height: 50,
+                paddingLeft: 10,
+                width: '100%',
+                fontSize: 18,
+                backgroundColor: '#fff',
+              }}
+              maxLength={280}
+              underlineColorAndroid="transparent"
+              onChangeText={input => {
+                this.setState({ text: input });
+                const mentionFriends = Object.values(friends);
+                const list = getMentionsList(input, mentionFriends);
+                list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
+              }}
+              value={text}
+              multiline={false}
+              autoCorrect
+              placeholder="Add comment..."
+            />
+            {spinner && (
+              <View style={sStyles.spinner}>
+                <PulseIndicator color={colors.secondary} />
+              </View>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+      </SafeAreaView>
     );
   }
 
@@ -232,78 +236,80 @@ class FilePreview extends Component<FilePreviewProps, State> {
     const { paused, mentionList, text, spinner, progress } = this.state;
     const { uri, message } = navigation.state.params;
     return (
-      <TouchableWithoutFeedback
-        onPress={() => {
-          this.setState({ paused: true });
-          Keyboard.dismiss();
-        }}
-      >
-        <View style={{ flex: 1 }}>
-          <Video
-            ref={this.player}
-            source={{ uri }}
-            style={{ flex: 1 }}
-            paused={paused}
-            ignoreSilentSwitch="ignore"
-            repeat
-            resizeMode="cover"
-          />
-          <View style={styles.playButtonContainer}>
-            <TouchableOpacity onPress={() => this.setState({ paused: false })}>
-              {paused && (
-                <Icon
-                  name="md-play"
-                  size={75}
-                  style={{ color: '#fff', backgroundColor: 'transparent', opacity: 0.8 }}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
-          <View style={{ position: 'absolute', margin: 20 }}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={{ backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5 }}
-            >
-              <Icon size={30} name="md-close" style={{ color: '#fff' }} />
-            </TouchableOpacity>
-          </View>
-          <View style={{ position: 'absolute', margin: 20, right: 0 }}>
-            <TouchableOpacity
-              onPress={() => this.acceptPressed()}
-              style={{ backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5 }}
-            >
-              <Icon size={30} name="md-checkmark" style={{ color: '#fff' }} />
-            </TouchableOpacity>
-          </View>
-          {mentionList && !message && this.renderMentionList()}
-          <TextInput
-            style={{
-              height: 50,
-              paddingLeft: 10,
-              width: '100%',
-              fontSize: 18,
-              backgroundColor: '#fff',
-            }}
-            underlineColorAndroid="transparent"
-            onChangeText={newText => {
-              this.setState({ text: newText });
-              const newFriends = Object.values(friends);
-              const list = getMentionsList(newText, newFriends);
-              list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
-            }}
-            value={text}
-            multiline={false}
-            autoCorrect
-            placeholder="Add comment..."
-          />
-          {spinner && (
-            <View style={sStyles.spinner}>
-              <PulseIndicator color={colors.secondary} />
-              {!!progress && <Text style={{ color: '#fff' }}>{`${progress}%`}</Text>}
+      <SafeAreaView style={{ flex: 1 }}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            this.setState({ paused: true });
+            Keyboard.dismiss();
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            <Video
+              ref={this.player}
+              source={{ uri }}
+              style={{ flex: 1 }}
+              paused={paused}
+              ignoreSilentSwitch="ignore"
+              repeat
+              resizeMode="cover"
+            />
+            <View style={styles.playButtonContainer}>
+              <TouchableOpacity onPress={() => this.setState({ paused: false })}>
+                {paused && (
+                  <Icon
+                    name="md-play"
+                    size={75}
+                    style={{ color: '#fff', backgroundColor: 'transparent', opacity: 0.8 }}
+                  />
+                )}
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
-      </TouchableWithoutFeedback>
+            <View style={{ position: 'absolute', margin: 20 }}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{ backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5 }}
+              >
+                <Icon size={30} name="md-close" style={{ color: '#fff' }} />
+              </TouchableOpacity>
+            </View>
+            <View style={{ position: 'absolute', margin: 20, right: 0 }}>
+              <TouchableOpacity
+                onPress={() => this.acceptPressed()}
+                style={{ backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5 }}
+              >
+                <Icon size={30} name="md-checkmark" style={{ color: '#fff' }} />
+              </TouchableOpacity>
+            </View>
+            {mentionList && !message && this.renderMentionList()}
+            <TextInput
+              style={{
+                height: 50,
+                paddingLeft: 10,
+                width: '100%',
+                fontSize: 18,
+                backgroundColor: '#fff',
+              }}
+              underlineColorAndroid="transparent"
+              onChangeText={newText => {
+                this.setState({ text: newText });
+                const newFriends = Object.values(friends);
+                const list = getMentionsList(newText, newFriends);
+                list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
+              }}
+              value={text}
+              multiline={false}
+              autoCorrect
+              placeholder="Add comment..."
+            />
+            {spinner && (
+              <View style={sStyles.spinner}>
+                <PulseIndicator color={colors.secondary} />
+                {!!progress && <Text style={{ color: '#fff' }}>{`${progress}%`}</Text>}
+              </View>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+      </SafeAreaView>
     );
   }
 

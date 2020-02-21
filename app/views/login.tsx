@@ -50,7 +50,7 @@ class Login extends Component<LoginProps, State> {
       if (user && (user.emailVerified || (user.providerData && user.providerData.length > 0)) && !waitForData) {
         /* ios onAuthStateChanged gets called twice so we want to account
         for this so that we don't have unnecessary calls */
-        if (this.secondAuthChange || Platform.OS !== 'ios') {
+        if (this.secondAuthChange) {
           this.setState({ spinner: false });
           await onLogin();
           this.goNext();

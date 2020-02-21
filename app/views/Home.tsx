@@ -417,7 +417,7 @@ export class Home extends Component<HomeProps, State> {
                 <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
               </TouchableOpacity>
             </View>
-            <View style={{ marginBottom: 5 }}>
+            <View style={{ margin: 5, marginHorizontal: 10 }}>
               <ParsedText text={item.text} />
             </View>
             <TouchableOpacity
