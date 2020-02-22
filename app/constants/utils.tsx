@@ -1,7 +1,7 @@
 import React from 'react';
 import { Linking, Alert, View } from 'react-native';
 import { pipe } from 'ramda';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
 import str from './strings';
@@ -12,6 +12,8 @@ import Post from '../types/Post';
 import Message from '../types/Message';
 import Notification from '../types/Notification';
 import Chat from '../types/Chat';
+
+const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
 const s4 = () => {
   return Math.floor((1 + Math.random()) * 0x10000)
@@ -317,6 +319,16 @@ export const addSessionToCalendar = (calendarId: string, session: Session) => {
     notes: session.details,
     description: session.details,
   });
+};
+
+export const getBirthdayDate = (birthday: string): Moment => {
+  if (!birthday) return null;
+  for (let i = 0; i < formats.length; i++) {
+    if (moment(birthday, formats[i]).isValid()) {
+      return moment(birthday, formats[i]);
+    }
+  }
+  return moment(birthday);
 };
 
 export const calculateDuration = data => {

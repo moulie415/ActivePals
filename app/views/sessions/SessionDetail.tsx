@@ -438,13 +438,13 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               value={selectedDate}
               mode="datetime"
               onChange={(event, newDate) => {
-                if (selectedDate && Platform.OS === 'android') {
+                if (newDate && Platform.OS === 'android') {
                   this.setState({
                     selectedDate: newDate,
-                    date: selectedDate,
+                    date: newDate,
                     showDatePicker: false,
                   });
-                } else if (selectedDate) {
+                } else if (newDate) {
                   this.setState({ selectedDate: newDate });
                 }
               }}

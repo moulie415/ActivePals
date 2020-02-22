@@ -19,7 +19,7 @@ import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
 import Button from '../components/Button';
 import { fetchProfile, setLoggedOut } from '../actions/profile';
-import { pickerItems } from '../constants/utils';
+import { pickerItems, getBirthdayDate } from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
 import Profile from '../types/Profile';
@@ -258,6 +258,8 @@ class ProfileView extends Component<ProfileProps, State> {
       spinner,
       showPicker,
     } = this.state;
+    const birthday = getBirthdayDate(profile.birthday);
+    const birthdayString = birthday ? moment(birthday).format('DD/MM/YYYY') : '';
     return (
       <>
         <Header
@@ -459,7 +461,7 @@ class ProfileView extends Component<ProfileProps, State> {
           <TouchableOpacity onPress={() => this.setState({ showPicker: true })} style={styles.inputGrp}>
             <Text style={{ alignSelf: 'center' }}>
               <Text>Birthday: </Text>
-              <Text style={styles.input}>{profile.birthday ? moment(profile.birthday).format('DD-MM-YYYY') : ''}</Text>
+              <Text style={styles.input}>{birthdayString}</Text>
             </Text>
           </TouchableOpacity>
           <Button style={styles.logout} text="Log out" onPress={() => this.logout()} />
@@ -473,12 +475,12 @@ class ProfileView extends Component<ProfileProps, State> {
           <>
             <DateTimePicker
               mode="date"
-              value={profile.birthday ? new Date(profile.birthday) : new Date()}
+              value={birthday ? birthday.toDate() : new Date()}
               maximumDate={new Date()}
               onChange={(event, selectedDate) => {
                 if (selectedDate) {
                   this.setState({
-                    profile: { ...profile, birthday: selectedDate.toString() },
+                    profile: { ...profile, birthday: moment(selectedDate).format('DD/MM/YYYY') },
                     showPicker: Platform.OS === 'ios',
                   });
                 }

@@ -80,7 +80,7 @@ class Settings extends Component<SettingsProps, State> {
             <Text style={{ color: colors.primary, fontWeight: 'bold' }}>{VersionNumber.appVersion}</Text>
           </View>
           <TouchableOpacity
-            style={{ padding: 10, backgroundColor: '#fff' }}
+            style={{ padding: 15, backgroundColor: '#fff' }}
             onPress={() => this.setState({ showDialog: true })}
           >
             <Text style={{ color: 'red' }}>Delete account</Text>
