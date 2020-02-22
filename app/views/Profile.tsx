@@ -5,7 +5,7 @@ import { equals } from 'ramda';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import ImagePicker from 'react-native-image-picker';
+import ImagePicker, { ImagePickerOptions } from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNPickerSelect from 'react-native-picker-select';
 import { PulseIndicator } from 'react-native-indicators';
@@ -22,7 +22,6 @@ import { fetchProfile, setLoggedOut } from '../actions/profile';
 import { pickerItems } from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
-import ImagePickerOptions from '../types/Shared';
 import Profile from '../types/Profile';
 
 const activities = ['Bodybuilding', 'Powerlifting', 'Swimming', 'Cycling', 'Running', 'Sprinting'];

@@ -79,6 +79,8 @@
 	<string>1959322104333437</string>
 	<key>FacebookDisplayName</key>
 	<string>ActivePals</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-7885763333661292~1337916108</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>comgooglemaps</string>
@@ -171,7 +173,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-  <key>GADApplicationIdentifier</key>
-  <string>ca-app-pub-7885763333661292~1337916108</string>
 </dict>
 </plist>

@@ -14,7 +14,7 @@ import {
   Image as SlowImage,
 } from 'react-native';
 import { connect } from 'react-redux';
-import ImagePicker from 'react-native-image-picker';
+import ImagePicker, { ImagePickerOptions } from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import ModalBox from 'react-native-modalbox';
@@ -25,6 +25,7 @@ import Video from 'react-native-video';
 import Share, { Options } from 'react-native-share';
 import RNFetchBlob from 'rn-fetch-blob';
 import Image from 'react-native-fast-image';
+import VideoCompress from 'react-native-video-compressor';
 import Card from '../components/Card';
 import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
@@ -52,7 +53,6 @@ import {
 import { fetchProfile } from '../actions/profile';
 import { fetchFriends } from '../actions/friends';
 import Comment from '../types/Comment';
-import ImagePickerOptions from '../types/Shared';
 import Profile from '../types/Profile';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
@@ -228,84 +228,62 @@ export class Home extends Component<HomeProps, State> {
   }
 
   showPicker() {
-    const videoOptions: ImagePickerOptions = {
-      mediaType: 'video',
-      durationLimit: 30,
-      videoQuality: Platform.OS === 'ios' ? 'medium' : 'low',
-    };
     const options: ImagePickerOptions = {
       title: null,
-      mediaType: 'photo',
-      customButtons: [
-        { name: 'video', title: 'Shoot video...' },
-        { name: 'uploadVideo', title: 'Choose video from library...' },
-      ],
+      mediaType: 'mixed',
       noData: true,
       storageOptions: {
         skipBackup: true,
       },
+      durationLimit: 60,
+      allowsEditing: true,
+      takePhotoButtonTitle: 'Take photo/video',
     };
     ImagePicker.showImagePicker(options, async response => {
       this.setState({ spinner: true });
       console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled image picker');
         this.setState({ spinner: false });
       } else if (response.error) {
         Alert.alert('Error', response.error);
         this.setState({ spinner: false });
-      } else if (response.customButton) {
-        if (response.customButton === 'uploadVideo') {
-          ImagePicker.launchImageLibrary(videoOptions, imageResponse => {
-            this.setState({ spinner: false });
-            if (imageResponse.error) {
-              Alert.alert('Error', imageResponse.error);
-            } else if (imageResponse.uri) {
-              this.processVideo(imageResponse.uri);
-            }
-          });
-        } else if (response.customButton === 'video') {
-          ImagePicker.launchCamera(videoOptions, videoResponse => {
-            this.setState({ spinner: false });
-            if (videoResponse.error) {
-              Alert.alert('Error', videoResponse.error);
-            } else if (videoResponse.uri) {
-              this.processVideo(videoResponse.uri);
-            }
-          });
-        }
       } else {
         const { navigation } = this.props;
         const { status } = this.state;
-        const size = 720;
-        const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100);
-        this.setState({ spinner: false });
-        navigation.navigate('FilePreview', { type: 'image', uri: resized.uri, message: false, text: status });
+        if (response.type && response.type.includes('image')) {
+          const size = 720;
+          const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100);
+          this.setState({ spinner: false });
+          navigation.navigate('FilePreview', { type: 'image', uri: resized.uri, message: false, text: status });
+        } else {
+          await this.processVideo(response.uri);
+          this.setState({ spinner: false });
+        }
       }
     });
   }
 
-  processVideo(uri) {
+  async processVideo(uri) {
     const { navigation } = this.props;
     const { status } = this.state;
-    const statURI = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-    // if (Platform.OS ==='ios') {
-    // TODO android needs compressing
-    RNFetchBlob.fs
-      .stat(statURI)
-      .then(stats => {
-        console.log(stats);
-        if (Number(stats.size) < MAX_VIDEO_SIZE) {
-          navigation.navigate('FilePreview', { type: 'video', uri, message: false, text: status });
-        } else {
-          Alert.alert('Error', 'Sorry the file size is too large');
-        }
-      })
-      .catch(err => {
-        Alert.alert('Error', err.message);
-      });
+    // @TODO compress android
+    // if (Platform.OS === 'android') {
+    //   const data = await VideoCompress.compress(uri);
+    //   console.log(data);
     // }
+    const statURI = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+    try {
+      const stats = await RNFetchBlob.fs.stat(statURI);
+      console.log(stats);
+      if (Number(stats.size) < MAX_VIDEO_SIZE) {
+        navigation.navigate('FilePreview', { type: 'video', uri, message: false, text: status });
+      } else {
+        Alert.alert('Error', 'Sorry the file size is too large');
+      }
+    } catch (e) {
+      Alert.alert('Error', e.message);
+    }
   }
 
   async sharePost(item) {
@@ -444,7 +422,9 @@ export class Home extends Component<HomeProps, State> {
                 <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
               </TouchableOpacity>
             </View>
-            <ParsedText style={{ marginVertical: 10 }} text={item.text} />
+            <View style={{ margin: 5, marginHorizontal: 10 }}>
+              <ParsedText text={item.text} />
+            </View>
             <TouchableWithoutFeedback
               onPress={() => {
                 this.setState({ playing: { [item.uid]: false } });
@@ -492,7 +472,7 @@ export class Home extends Component<HomeProps, State> {
                     if (Platform.OS === 'ios') {
                       this.players[item.key].presentFullscreenPlayer();
                     } else {
-                      navigation.navigate('FullscreenVideo', { uri: item.url });
+                      navigation.navigate('FullScreenVideo', { uri: item.url });
                     }
                   }}
                 >
@@ -571,7 +551,7 @@ export class Home extends Component<HomeProps, State> {
                   <TouchableOpacity
                     onPress={() => navigation.navigate('PostView', { postId: item.key })}
                     style={{ alignSelf: 'flex-end' }}
-                  ></TouchableOpacity>
+                  />
                   {this.renderFeedItem(item)}
                 </Card>
               </View>
@@ -719,7 +699,7 @@ export class Home extends Component<HomeProps, State> {
                             uid,
                             username,
                             createdAt: new Date().toString(),
-                          })
+                          });
                           this.setState({ status: '' });
                         } catch (e) {
                           Alert.alert('Error', e.message);

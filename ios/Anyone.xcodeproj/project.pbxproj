@@ -714,6 +714,13 @@
 			remoteGlobalIDString = 778C1572AE22EE933ACA12594B6DF949;
 			remoteInfo = RNPermissions;
 		};
+		0A96BB36240152E9002671A7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9F9925AE8ED6DB0BBB32D63967AD303D;
+			remoteInfo = "instabug-reactnative";
+		};
 		0A988CAB210E2795006C6974 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
@@ -1316,6 +1323,7 @@
 				0A8E1F6F227E19890087827C /* libGoogleUtilities.a */,
 				0A45FD4823E9993D00198859 /* libGTMAppAuth.a */,
 				0A7CEE902118B2AF00F09932 /* libGTMSessionFetcher.a */,
+				0A96BB37240152E9002671A7 /* libinstabug-reactnative.a */,
 				0A45FE3323E99DD400198859 /* libleveldb-library.a */,
 				0A988CAC210E2795006C6974 /* libnanopb.a */,
 				0ABDD30C23FE79AE004B85D9 /* libPermission-LocationAlways.a */,
@@ -2559,6 +2567,13 @@
 			remoteRef = 0A8E3B8323EA47D5003A8D3E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		0A96BB37240152E9002671A7 /* libinstabug-reactnative.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libinstabug-reactnative.a";
+			remoteRef = 0A96BB36240152E9002671A7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		0A988CAC210E2795006C6974 /* libnanopb.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -3284,7 +3299,7 @@
 				INFOPLIST_PREFIX_HEADER = "";
 				INFOPLIST_PREPROCESS = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.2.4;
+				MARKETING_VERSION = 0.3.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -3331,7 +3346,7 @@
 				INFOPLIST_PREFIX_HEADER = "";
 				INFOPLIST_PREPROCESS = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.2.4;
+				MARKETING_VERSION = 0.3.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

@@ -4,7 +4,7 @@ import { pathOr } from 'ramda';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { PulseIndicator } from 'react-native-indicators';
 import firebase from 'react-native-firebase';
-import ImagePicker from 'react-native-image-picker';
+import ImagePicker, { ImagePickerOptions } from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { GiftedChat, Bubble, MessageText } from 'react-native-gifted-chat';
@@ -28,7 +28,6 @@ import {
 } from '../../actions/chats';
 import MessagingProps from '../../types/views/Messaging';
 import Message, { MessageType, SessionType } from '../../types/Message';
-import ImagePickerOptions from '../../types/Shared';
 
 interface State {
   spinner: boolean;
