@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, View, ImageBackground, Platform, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, View, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firebase from 'react-native-firebase';
 import { GoogleSignin } from '@react-native-community/google-signin';
@@ -29,6 +29,7 @@ interface State {
   googleLoading?: boolean;
   username?: string;
   pass?: string;
+  navigating: boolean;
 }
 
 class Login extends Component<LoginProps, State> {
@@ -40,6 +41,7 @@ class Login extends Component<LoginProps, State> {
     this.state = {
       spinner: false,
       secure: true,
+      navigating: false,
     };
   }
 
@@ -92,12 +94,17 @@ class Login extends Component<LoginProps, State> {
 
   goNext() {
     const { hasViewedWelcome, navigation } = this.props;
-    if (hasViewedWelcome) {
-      navigation.dispatch(
-        StackActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: 'MainNav' })] })
-      );
-    } else {
-      navigation.navigate('Welcome');
+    const { navigating } = this.state;
+    if (!navigating) {
+      this.setState({ navigating: true }, () => {
+        if (hasViewedWelcome) {
+          navigation.dispatch(
+            StackActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: 'MainNav' })] })
+          );
+        } else {
+          navigation.navigate('Welcome');
+        }
+      });
     }
   }
 

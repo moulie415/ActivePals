@@ -4,10 +4,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import VersionNumber from 'react-native-version-number';
 import DialogInput from 'react-native-dialog-input';
 import { PulseIndicator } from 'react-native-indicators';
+import Instabug from 'instabug-reactnative';
 import { connect } from 'react-redux';
 import colors from '../constants/colors';
 import styles from '../styles/settingsStyles';
-import Text  from '../components/Text';
+import Text from '../components/Text';
 import Header from '../components/Header/header';
 import FbFriendsModal from '../components/FbFriendsModal';
 import { removeUser } from '../actions/profile';
@@ -70,6 +71,10 @@ class Settings extends Component<SettingsProps, State> {
               <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
             </TouchableOpacity>
           )}
+          <TouchableOpacity onPress={Instabug.show} style={styles.contact}>
+            <Text>Report a problem</Text>
+            <Icon name="ios-bug" size={25} style={{ color: colors.primary }} />
+          </TouchableOpacity>
           <View style={styles.contact}>
             <Text>Version no: </Text>
             <Text style={{ color: colors.primary, fontWeight: 'bold' }}>{VersionNumber.appVersion}</Text>

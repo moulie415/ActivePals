@@ -3,14 +3,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.reactnativecommunity.rnpermissions.RNPermissionsPackage;
-import com.swmansion.rnscreens.RNScreensPackage;
-import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
-import com.swmansion.reanimated.ReanimatedPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
-import org.reactnative.maskedview.RNCMaskedViewPackage;
-import com.reactnativecommunity.viewpager.RNCViewPagerPackage;
+import com.instabug.reactlibrary.RNInstabugReactnativePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
@@ -18,7 +11,6 @@ import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
@@ -70,6 +62,13 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this); // Remove this line if you don't want Flipper enabled
+    new RNInstabugReactnativePackage
+      .Builder("804c8f8e35fa17bdafb82e6778629dd4", MainApplication.this)
+      .setInvocationEvent("shake")
+      .setPrimaryColor("#1D82DC")
+      .setFloatingEdge("left")
+      .setFloatingButtonOffsetFromTop(250)
+      .build();
   }
 
   /**

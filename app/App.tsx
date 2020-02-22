@@ -13,6 +13,7 @@ import GeoFire from 'geofire';
 import thunk from 'redux-thunk';
 import { MaterialTabBarProps } from 'react-navigation-tabs/lib/typescript/src/types';
 import color from 'color';
+import Instabug from 'instabug-reactnative';
 import reducer from './reducers';
 import str from './constants/strings';
 import Login from './views/login';
@@ -241,6 +242,11 @@ class App extends Component {
   onTokenRefreshListener: () => void;
 
   unsubscriber: () => void;
+
+  constructor(props) {
+    super(props);
+    Instabug.startWithToken('804c8f8e35fa17bdafb82e6778629dd4', [Instabug.invocationEvent.shake]);
+  }
 
   async componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);

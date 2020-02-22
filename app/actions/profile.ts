@@ -129,14 +129,6 @@ export const doSetup = profile => {
     } catch (e) {
       console.warn(e);
     }
-    //if (getState().nav.index === 0) {
-      // if (getState().profile.hasViewedWelcome) {
-      //   dispatch(navigateHome());
-      // } else {
-      //   dispatch(navigateWelcome());
-      // }
-    //}
-    dispatch(setHasLoggedIn(true));
     dispatch(getUnreadCount(uid));
     dispatch(fetchFriends(uid));
     profile.gym && dispatch(fetchGymChat(profile.gym));
