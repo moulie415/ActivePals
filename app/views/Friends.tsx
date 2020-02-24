@@ -221,13 +221,8 @@ class Friends extends Component<FriendsProps, State> {
     const { username, modalOpen } = this.state;
     const addButton = (
       <TouchableOpacity
-        onPress={async () => {
-          const snapshot = await firebase
-            .database()
-            .ref(`users/${profile.uid}`)
-            .child('username')
-            .once('value');
-          snapshot.val()
+        onPress={() => {
+          profile.username
             ? this.setState({ modalOpen: true })
             : Alert.alert('Please set a username before trying to add a pal');
         }}

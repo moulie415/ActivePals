@@ -53,8 +53,7 @@ class Login extends Component<LoginProps, State> {
         /* ios onAuthStateChanged gets called twice so we want to account
         for this so that we don't have unnecessary calls */
         if (this.secondAuthChange) {
-          this.setState({ spinner: false });
-          await onLogin();
+          loggedIn ? await onLogin() : onLogin();
           this.goNext();
         } else {
           this.secondAuthChange = true;
@@ -62,9 +61,12 @@ class Login extends Component<LoginProps, State> {
       } else if (loggedIn) {
         navigation.navigate('Login');
         loggedOut();
+        SplashScreen.hide();
+        this.setState({ googleLoading: false, facebookLoading: false });
+      } else {
+        SplashScreen.hide();
+        this.setState({ googleLoading: false, facebookLoading: false });
       }
-      SplashScreen.hide();
-      this.setState({ googleLoading: false, facebookLoading: false });
     });
   }
 
@@ -99,11 +101,16 @@ class Login extends Component<LoginProps, State> {
       this.setState({ navigating: true }, () => {
         if (hasViewedWelcome) {
           navigation.dispatch(
-            StackActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: 'MainNav' })] })
+            StackActions.reset({
+              index: 0,
+              actions: [NavigationActions.navigate({ routeName: 'MainNav' })],
+            })
           );
         } else {
           navigation.navigate('Welcome');
         }
+        SplashScreen.hide();
+        this.setState({ spinner: false });
       });
     }
   }
