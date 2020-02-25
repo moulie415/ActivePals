@@ -24,9 +24,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "Anyone.app"
-               BlueprintName = "Anyone"
-               ReferencedContainer = "container:Anyone.xcodeproj">
+               BuildableName = "ActivePals.app"
+               BlueprintName = "ActivePals"
+               ReferencedContainer = "container:ActivePals.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -56,9 +56,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "AnyoneTests.xctest"
-               BlueprintName = "AnyoneTests"
-               ReferencedContainer = "container:Anyone.xcodeproj">
+               BuildableName = "ActivePalsTests.xctest"
+               BlueprintName = "ActivePalsTests"
+               ReferencedContainer = "container:ActivePals.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -78,9 +78,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Anyone.app"
-            BlueprintName = "Anyone"
-            ReferencedContainer = "container:Anyone.xcodeproj">
+            BuildableName = "ActivePals.app"
+            BlueprintName = "ActivePals"
+            ReferencedContainer = "container:ActivePals.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -95,9 +95,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Anyone.app"
-            BlueprintName = "Anyone"
-            ReferencedContainer = "container:Anyone.xcodeproj">
+            BuildableName = "ActivePals.app"
+            BlueprintName = "ActivePals"
+            ReferencedContainer = "container:ActivePals.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

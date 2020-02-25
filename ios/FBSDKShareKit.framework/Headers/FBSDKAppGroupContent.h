@@ -27,9 +27,9 @@
  */
 typedef NS_ENUM(NSUInteger, FBSDKAppGroupPrivacy)
 {
-  /** Anyone can see the group, who's in it and what members post. */
+  /** ActivePals can see the group, who's in it and what members post. */
   FBSDKAppGroupPrivacyOpen = 0,
-  /** Anyone can see the group and who's in it, but only members can see posts. */
+  /** ActivePals can see the group and who's in it, but only members can see posts. */
   FBSDKAppGroupPrivacyClosed,
 };
 

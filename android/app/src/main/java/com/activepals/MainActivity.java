@@ -1,4 +1,4 @@
-package com.anyone;
+package com.activepals;
 
 import android.content.Intent;
 import android.os.Bundle;
