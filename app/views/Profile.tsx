@@ -204,7 +204,7 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 
   async updateUser(initial: Profile, newProfile: Profile) {
-    const { onSave, profile } = this.props;
+    const { onSave } = this.props;
     if (!this.hasChanged()) {
       Alert.alert('No changes');
     } else if (
@@ -220,7 +220,7 @@ class ProfileView extends Component<ProfileProps, State> {
       try {
         await firebase
           .database()
-          .ref(`users/${profile.uid}`)
+          .ref(`users/${newProfile.uid}`)
           .set({ ...newProfile });
         initial.username &&
           (await firebase
@@ -231,8 +231,8 @@ class ProfileView extends Component<ProfileProps, State> {
         await firebase
           .database()
           .ref('usernames')
-          .child(profile.username)
-          .set(profile.uid);
+          .child(newProfile.username)
+          .set(newProfile.uid);
         Alert.alert('Success', 'Profile saved');
         /* we need to make sure the username is saved locally
         which is why this calls fetchProfile which saves the username */

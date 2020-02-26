@@ -30,8 +30,8 @@ platform :ios do
 
   lane :beta do
      build_app(
-	scheme: "Anyone",
-	workspace: "Anyone.xcworkspace",
+	scheme: "ActivePals",
+	workspace: "ActivePals.xcworkspace",
 	export_method: "development"
      )
       crashlytics(api_token: "02b81ce5d7bf283724b7770acab0ff9fbf69990e",

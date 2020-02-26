@@ -1,4 +1,4 @@
-rootProject.name = 'Anyone'
+rootProject.name = 'ActivePals'
 include ':react-native-video-compressor'
 project(':react-native-video-compressor').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-video-compressor/android')
 include ':instabug-reactnative'

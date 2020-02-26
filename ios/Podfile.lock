@@ -152,7 +152,7 @@ PODS:
   - GTMSessionFetcher/Core (1.3.1)
   - GTMSessionFetcher/Full (1.3.1):
     - GTMSessionFetcher/Core (= 1.3.1)
-  - instabug-reactnative (9.0.6):
+  - instabug-reactnative (8.5.6):
     - React
   - leveldb-library (1.22)
   - nanopb (0.3.9011):
@@ -353,7 +353,7 @@ PODS:
     - React
   - react-native-geolocation (2.0.2):
     - React
-  - react-native-image-picker (0.27.2):
+  - react-native-image-picker (2.3.0):
     - React
   - react-native-image-resizer (1.1.0):
     - React
@@ -708,7 +708,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 06eb53bb579efe7099152735900dd04bf09e7275
   GTMAppAuth: 4deac854479704f348309e7b66189e604cf5e01e
   GTMSessionFetcher: cea130bbfe5a7edc8d06d3f0d17288c32ffe9925
-  instabug-reactnative: 2afe6b4bac04a73c141596c64cdc0f91e468c566
+  instabug-reactnative: 43e5d918329c7bb592c04f327de2eec6b5d01cc6
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   Permission-LocationAlways: f10e3c82c2cfa38137ba0a41e132630578a8018f
@@ -729,7 +729,7 @@ SPEC CHECKSUMS:
   react-native-fbsdk: c35d42169e64aaf66f01713c1e18d0674f7f6519
   react-native-geocoder: 757427682892bb256f3b3745858cc90eba148a8e
   react-native-geolocation: cbd9d6bd06bac411eed2671810f454d4908484a8
-  react-native-image-picker: e47cbaf230af8902316e4d69dc83f959bde45e23
+  react-native-image-picker: e0b118c84e76f590a9d918baf06b0b043cbc5212
   react-native-image-resizer: 9dfb844937574db849fd18a56d8e6c607b0a31d8
   react-native-maps: 190c02ca533fddac5bb49cf17bdece3644612107
   react-native-safe-area-context: 042dfc9d4db17196841df962ba9497f6e7a5bd02
@@ -765,6 +765,6 @@ SPEC CHECKSUMS:
   SDWebImage: 4d5c027c935438f341ed33dbac53ff9f479922ca
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: cbddaad467fcd0624282b7e7bb578e7ddad66801
+PODFILE CHECKSUM: 66988f5377b79b58e62e37ed2ffb639efb7edc11
 
 COCOAPODS: 1.8.4

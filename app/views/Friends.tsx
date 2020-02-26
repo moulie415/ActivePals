@@ -242,7 +242,14 @@ class Friends extends Component<FriendsProps, State> {
             </Text>
           </View>
         )}
-        <Modal backButtonClose backdropPressToClose={false} style={styles.modal} position="center" isOpen={modalOpen}>
+        <Modal
+          backButtonClose
+          backdropPressToClose={false}
+          style={styles.modal}
+          position="center"
+          isOpen={modalOpen}
+          key={modalOpen ? 1 : 2}
+        >
           <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>Send pal request</Text>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <TextInput

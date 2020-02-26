@@ -143,18 +143,16 @@ class Welcome extends Component<WelcomeProps, State> {
               } else if (username.length < 5 || str.whiteSpaceRegex.test(username)) {
                 Alert.alert('Sorry', 'Username must be at least 5 characters long and cannot contain any spaces');
               } else {
-                await Promise.all([
-                  firebase
-                    .database()
-                    .ref('usernames')
-                    .child(username)
-                    .set(profile.uid),
-                  firebase
-                    .database()
-                    .ref(`users/${profile.uid}`)
-                    .child('username')
-                    .set(username),
-                ]);
+                await firebase
+                  .database()
+                  .ref(`users/${profile.uid}`)
+                  .child('username')
+                  .set(username);
+                await firebase
+                  .database()
+                  .ref('usernames')
+                  .child(username)
+                  .set(profile.uid);
                 /* we need to make sure the username is saved locally
                     which is why this calls fetchProfile which saves the username */
                 try {
