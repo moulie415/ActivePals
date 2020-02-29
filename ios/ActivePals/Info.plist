@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -81,6 +83,8 @@
 	<string>ActivePals</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-7885763333661292~1337916108</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>comgooglemaps</string>
@@ -173,5 +177,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+  <key>NSLocationAlwaysUsageDescription</key>
+  <string>We need your location to view nearby sessions and gyms</string>
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>We need your location to view nearby sessions and gyms</string>
 </dict>
 </plist>
