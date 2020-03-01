@@ -34,7 +34,14 @@ class MapModal extends Component<MapModalProps, State> {
     const { onClosed, isOpen, places, handlePress } = this.props;
     const { text, latitude, longitude, location } = this.state;
     return (
-      <Modal position="center" style={styles.modal} onClosed={onClosed} isOpen={isOpen} swipeToClose={false}>
+      <Modal
+        position="center"
+        style={styles.modal}
+        onClosed={onClosed}
+        isOpen={isOpen}
+        swipeToClose={false}
+        key={isOpen ? 1 : 2}
+      >
         <Text numberOfLines={1} style={{ padding: 10, alignSelf: 'center', fontSize: 20 }}>
           {text}
         </Text>

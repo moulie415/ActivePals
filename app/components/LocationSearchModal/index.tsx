@@ -9,7 +9,7 @@ import LocationSearchModalProps from '../../types/components/LocationSearchModal
 const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({ isOpen, onPress, onClosed, googleApiKey }) => {
   const ref = useRef<GooglePlacesAutocomplete>();
   return (
-    <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center">
+    <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center" key={isOpen ? 1 : 2}>
       <GooglePlacesAutocomplete
         ref={ref}
         placeholder="Search..."

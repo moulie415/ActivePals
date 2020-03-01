@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import { View, ScrollView, Platform, Alert, TouchableOpacity } from 'react-native';
 import colors from '../../constants/colors';
-import Text  from '../Text';
+import Text from '../Text';
 import Button from '../Button';
 import styles from './styles';
 import { sendRequest, fetchFbFriends } from '../../actions/friends';
@@ -115,7 +115,7 @@ class FbFriendsModal extends Component<FbFriendsModalProps, State> {
     const { onClosed, request, isOpen } = this.props;
     const { loading, selectedFriends } = this.state;
     return (
-      <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center">
+      <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center" key={isOpen ? 1 : 2}>
         <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>Select Facebook friends</Text>
         {loading ? <PulseIndicator color={colors.secondary} /> : this.renderFriendsSelection()}
         <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: 10 }}>

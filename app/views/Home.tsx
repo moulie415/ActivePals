@@ -818,6 +818,7 @@ export class Home extends Component<HomeProps, State> {
           onClosed={() => this.setState({ focusCommentInput: false, showCommentModal: false })}
           backButtonClose
           position="center"
+          key={showCommentModal ? 1 : 2}
         >
           <TouchableOpacity onPress={() => this.setState({ showCommentModal: false })}>
             <Icon name="ios-arrow-back" size={30} style={{ color: '#000', padding: 10 }} />

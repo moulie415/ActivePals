@@ -25,7 +25,7 @@ const RepsModal: FunctionComponent<RepsModalProps> = ({
 }) => {
   const uids = repsUsers[id] ? Object.keys(repsUsers[id]) : [];
   return (
-    <ModalBox isOpen={isOpen} onClosed={() => onClosed()} style={styles.container}>
+    <ModalBox isOpen={isOpen} onClosed={() => onClosed()} style={styles.container} key={isOpen ? 1 : 2}>
       <Text style={styles.likeHeader}>Users that repped the comment</Text>
       <FlatList
         keyExtractor={item => item}

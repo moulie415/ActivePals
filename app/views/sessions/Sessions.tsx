@@ -615,6 +615,7 @@ class Sessions extends Component<SessionsProps, State> {
             style={styles.modal}
             position="center"
             isOpen={filterModalOpen}
+            key={filterModalOpen ? 1 : 2}
           >
             <View style={{ flex: 1, borderRadius: 5 }}>
               <Text style={styles.sessionFilterTitle}>Sessions</Text>

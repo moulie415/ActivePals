@@ -93,7 +93,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
     const { onClosed, isOpen, title, onContinue } = this.props;
     const { selectedFriends } = this.state;
     return (
-      <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center">
+      <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center" key={isOpen ? 1 : 2}>
         <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>{title || 'Select Pals'}</Text>
         {this.renderFriendsSelection()}
         <View style={{ marginVertical: 10, flexDirection: 'row', justifyContent: 'space-evenly' }}>
