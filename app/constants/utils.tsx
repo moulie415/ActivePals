@@ -16,9 +16,11 @@ import Chat from '../types/Chat';
 
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
+// @ts-ignore
 const advert = firebase.admob().interstitial(str.admobInterstitial);
 
 export const showAdmobInterstitial = () => {
+  // @ts-ignore
   const { AdRequest } = firebase.admob;
   const request = new AdRequest();
   advert.loadAd(request.build());

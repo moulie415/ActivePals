@@ -56,7 +56,9 @@ const fbAd: FunctionComponent<{ nativeAd: NativeAd }> = ({ nativeAd }) => {
 
 const AdComponent: FunctionComponent<{ index: number }> = ({ index }) => {
   if (index > 0 && index % 4 === 0) {
+    // @ts-ignore
     const { Banner } = firebase.admob;
+    // @ts-ignore
     const { AdRequest } = firebase.admob;
     const request = new AdRequest();
     return (
