@@ -34,5 +34,7 @@
 	<string>1:623262962635:ios:656bf5879c8bad806cdc4e</string>
 	<key>DATABASE_URL</key>
 	<string>https://activepals-prod.firebaseio.com</string>
+	<key>ADMOB_APP_ID</key>
+	<string>ca-app-pub-7885763333661292~1337916108</string>
 </dict>
 </plist>
