@@ -7,7 +7,6 @@ import Modal from 'react-native-modalbox';
 import { CheckBox } from 'react-native-elements';
 import { Popup, Options } from 'react-native-map-link';
 import Permissions, { PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { AdMobInterstitial } from 'react-native-admob';
 import MapView, { Marker } from 'react-native-maps';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { connect } from 'react-redux';
@@ -18,8 +17,13 @@ import Image from 'react-native-fast-image';
 import Text from '../../components/Text';
 import styles from '../../styles/sessionStyles';
 import colors from '../../constants/colors';
-import { getType, formatDateTime, getDistance, sortSessionsByDistance } from '../../constants/utils';
-import str from '../../constants/strings';
+import {
+  getType,
+  formatDateTime,
+  getDistance,
+  sortSessionsByDistance,
+  showAdmobInterstitial,
+} from '../../constants/utils';
 import Header from '../../components/Header/header';
 import FriendsModal from '../../components/friendsModal';
 import GymSearch from '../../components/GymSearch';
@@ -39,9 +43,6 @@ import { removeGym, joinGym, setLocation } from '../../actions/profile';
 import SessionsProps from '../../types/views/sessions/Sessions';
 import Session from '../../types/Session';
 import Place from '../../types/Place';
-
-AdMobInterstitial.setAdUnitID(str.admobInterstitial);
-AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
 
 const LOCATION_PERMISSION =
   Platform.OS === 'ios' ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
@@ -573,7 +574,7 @@ class Sessions extends Component<SessionsProps, State> {
               style={styles.button}
               onPress={() => {
                 this.setState({ selectedLocation: {} });
-                !__DEV__ && AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+                showAdmobInterstitial();
                 navigation.navigate('SessionDetail');
               }}
               text="Create Session"
@@ -596,7 +597,7 @@ class Sessions extends Component<SessionsProps, State> {
           <FriendsModal
             onClosed={() => this.setState({ friendsModalOpen: false })}
             onContinue={f => {
-              AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+              showAdmobInterstitial();
               navigation.navigate('SessionDetail', { friends: f, location: selectedLocation });
             }}
             isOpen={friendsModalOpen}
@@ -694,7 +695,7 @@ class Sessions extends Component<SessionsProps, State> {
           cancelButtonIndex={2}
           onPress={index => {
             if (index === 0) {
-              !__DEV__ && AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd());
+              showAdmobInterstitial();
               navigation.navigate('SessionDetail', { location: selectedLocation });
             } else if (index === 1) {
               if (Object.values(friends).length > 0) {

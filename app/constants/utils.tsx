@@ -1,6 +1,7 @@
 import React from 'react';
 import { Linking, Alert, View } from 'react-native';
 import { pipe } from 'ramda';
+import firebase from 'react-native-firebase';
 import moment, { Moment } from 'moment';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
@@ -15,6 +16,16 @@ import Chat from '../types/Chat';
 
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
+const advert = firebase.admob().interstitial(str.admobInterstitial);
+
+export const showAdmobInterstitial = () => {
+  const { AdRequest } = firebase.admob;
+  const request = new AdRequest();
+  advert.loadAd(request.build());
+  advert.on('onAdLoaded', () => {
+    advert.show();
+  });
+};
 const s4 = () => {
   return Math.floor((1 + Math.random()) * 0x10000)
     .toString(16)

@@ -5,6 +5,12 @@ const str = {
   days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   appName: 'ActivePals',
   appNameFormatted: 'A C T I V E \nP A L S',
+  admobAppId: __DEV__
+    ? 'ca-app-pub-3940256099942544~3347511713'
+    : Platform.select({
+        ios: 'ca-app-pub-7885763333661292~1337916108',
+        android: 'ca-app-pub-7885763333661292~3960210018',
+      }),
   nativePlacementId: Platform.select({
     ios: '729584164091813_729677854082444',
     android: '729584164091813_729677580749138',

@@ -10,7 +10,7 @@ import {
   NativeAd,
 } from 'react-native-fbads';
 import { View } from 'react-native';
-import { AdMobBanner } from 'react-native-admob';
+import firebase from 'react-native-firebase';
 import Text from './Text';
 import str from '../constants/strings';
 import Card from './Card';
@@ -56,16 +56,19 @@ const fbAd: FunctionComponent<{ nativeAd: NativeAd }> = ({ nativeAd }) => {
 
 const AdComponent: FunctionComponent<{ index: number }> = ({ index }) => {
   if (index > 0 && index % 4 === 0) {
+    const { Banner } = firebase.admob;
+    const { AdRequest } = firebase.admob;
+    const request = new AdRequest();
     return (
-      <Card style={{ padding: 10, marginBottom: 10 }}>
-        <AdMobBanner
-          adSize="largeBanner"
-          style={{ alignSelf: 'center' }}
-          adUnitID={str.admobBanner}
-          testDevices={str.testDevices}
-          onAdFailedToLoad={error => {
-            console.log(error);
+      <Card style={{ padding: 10, marginBottom: 10, alignItems: 'center' }}>
+        <Banner
+          size="LARGE_BANNER"
+          request={request.build()}
+          onAdLoaded={() => {
+            console.log('Advert loaded');
           }}
+          onAdFailedToLoad={e => console.log('admob banner error', e)}
+          unitId={str.admobBanner}
         />
       </Card>
     );
