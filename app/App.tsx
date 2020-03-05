@@ -111,6 +111,7 @@ export const handleNotification = (notification, showLocal = true) => {
     MessageType.GYM_MESSAGE,
     NotificationType.FRIEND_REQUEST,
     NotificationType.ADDED_TO_SESSION,
+    NotificationType.FRIEND_REQUEST,
   ];
   if (localTypes.includes(type)) {
     dispatch(newNotification(notification));

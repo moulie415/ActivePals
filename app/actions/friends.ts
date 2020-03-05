@@ -16,7 +16,7 @@ const setFriends = friends => ({
 const setFriend = friend => ({
   type: SET_FRIEND,
   friend,
-})
+});
 
 const addToFriends = (uid, friend) => ({
   type: ADD_FRIEND,
@@ -30,7 +30,7 @@ export const updateFriendState = (uid, state) => ({
   state,
 });
 
-export const removeFriend = uid => {
+export const removeFriend = (uid: string) => {
   return (dispatch, getState) => {
     const { friends }: { [key: string]: Profile } = getState().friends;
     const friendArr = Object.values(friends).filter(friend => friend.uid !== uid);
@@ -54,46 +54,49 @@ const getStateString = state => {
 
 export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
   return async dispatch => {
-    await firebase
+    const ref = firebase
       .database()
       .ref('userFriends')
       .child(uid)
-      .limitToLast(limit)
-      .on('value', async snapshot => {
-        if (snapshot.val()) {
-          const uids = Object.keys(snapshot.val());
-          await Promise.all(
-            uids.map(friendUid => {
-              return new Promise(resolve => {
+      .limitToLast(limit);
+    await ref.on('value', async snapshot => {
+      if (snapshot.val()) {
+        const uids = Object.keys(snapshot.val());
+        await Promise.all(
+          uids.map(friendUid => {
+            return new Promise(resolve => {
               const status = snapshot.val()[friendUid];
-             firebase
+              firebase
                 .database()
                 .ref('users')
                 .child(friendUid)
                 .on('value', async profile => {
-              const { state } = profile.val();
-              const userState = getStateString(state);
-              try {
-                const avatar = await firebase
-                  .storage()
-                  .ref(`images/${friendUid}`)
-                  .child('avatar')
-                  .getDownloadURL();
-                dispatch(setFriend({ ...profile.val(), state: userState, avatar, status }));
-              } catch (e) {
-                dispatch(setFriend({ ...profile.val(), state: userState, status }));
-              }
-              resolve()
-                })
-            })
-            })
-          );
-          dispatch(fetchOther(uid));
-        } else {
-          dispatch(setFriends({}));
-          dispatch(fetchOther(uid));
-        }
-      });
+                  const { state } = profile.val();
+                  const userState = getStateString(state);
+                  try {
+                    const avatar = await firebase
+                      .storage()
+                      .ref(`images/${friendUid}`)
+                      .child('avatar')
+                      .getDownloadURL();
+                    dispatch(setFriend({ ...profile.val(), state: userState, avatar, status }));
+                  } catch (e) {
+                    dispatch(setFriend({ ...profile.val(), state: userState, status }));
+                  }
+                  resolve();
+                });
+            });
+          })
+        );
+        dispatch(fetchOther(uid));
+      } else {
+        dispatch(setFriends({}));
+        dispatch(fetchOther(uid));
+      }
+    });
+    ref.on('child_removed', snapshot => {
+      dispatch(removeFriend(snapshot.key));
+    });
   };
 };
 
