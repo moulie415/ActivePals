@@ -66,7 +66,7 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
           if (!snapshot.val()[friend]) {
             dispatch(removeFriend(friend));
           }
-        })
+        });
         const uids = Object.keys(snapshot.val());
         await Promise.all(
           uids.map(friendUid => {
@@ -77,19 +77,21 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
                 .ref('users')
                 .child(friendUid)
                 .on('value', async profile => {
-                  const { state } = profile.val();
-                  const userState = getStateString(state);
-                  try {
-                    const avatar = await firebase
-                      .storage()
-                      .ref(`images/${friendUid}`)
-                      .child('avatar')
-                      .getDownloadURL();
-                    dispatch(setFriend({ ...profile.val(), state: userState, avatar, status }));
-                  } catch (e) {
-                    dispatch(setFriend({ ...profile.val(), state: userState, status }));
+                  if (profile.val()) {
+                    const { state } = profile.val();
+                    const userState = getStateString(state);
+                    try {
+                      const avatar = await firebase
+                        .storage()
+                        .ref(`images/${friendUid}`)
+                        .child('avatar')
+                        .getDownloadURL();
+                      dispatch(setFriend({ ...profile.val(), state: userState, avatar, status }));
+                    } catch (e) {
+                      dispatch(setFriend({ ...profile.val(), state: userState, status }));
+                    }
+                    resolve();
                   }
-                  resolve();
                 });
             });
           })
