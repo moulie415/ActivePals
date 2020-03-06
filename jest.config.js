@@ -1,6 +1,7 @@
 module.exports = {
   preset: 'react-native',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
+  setupFilesAfterEnv: ['<rootDir>/__tests__/__mocks__/react-native-firebase.ts'],
   setupFiles: ['<rootDir>/jest/setup.js', './node_modules/react-native-gesture-handler/jestSetup.js'],
   collectCoverage: true,
   collectCoverageFrom: ['app/**/*.{ts,tsx}'],
