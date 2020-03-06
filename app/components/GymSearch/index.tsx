@@ -2,13 +2,14 @@ import React, { FunctionComponent } from 'react';
 import { Alert } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Marker } from 'react-native-maps';
+import { GOOGLE_API_KEY } from 'react-native-dotenv';
 import { connect } from 'react-redux';
 import colors from '../../constants/colors';
 import { fetchPhotoPath } from '../../actions/sessions';
 import styles from './styles';
 import GymSearchProps from '../../types/components/GymSearch';
 
-const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({ parent, onOpen, googleApiKey }) => {
+const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({ parent, onOpen }) => {
   return (
     <GooglePlacesAutocomplete
       style={{ flex: 0 }}
@@ -24,8 +25,7 @@ const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({ parent, onOpen, 
         parent.setState({ spinner: true });
         const { lat, lng } = details.geometry.location;
         if (details && details.types && details.types.includes('gym')) {
-          const state = { sharedInfo: { envVars: { GOOGLE_API_KEY: googleApiKey } } };
-          const gym = await fetchPhotoPath(details, state);
+          const gym = await fetchPhotoPath(details);
           const marker = (
             <Marker
               key={gym.place_id}
@@ -66,7 +66,7 @@ const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({ parent, onOpen, 
       getDefaultValue={() => ''}
       query={{
         // available options: https://developers.google.com/places/web-service/autocomplete
-        key: googleApiKey,
+        key: GOOGLE_API_KEY,
         language: 'en', // language of the results
         types: 'establishment', // default: 'geocode'
       }}
@@ -93,8 +93,4 @@ const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({ parent, onOpen, 
   );
 };
 
-const mapStateToProps = ({ sharedInfo }) => ({
-  googleApiKey: sharedInfo.envVars.GOOGLE_API_KEY,
-});
-
-export default connect(mapStateToProps)(GooglePlacesInput);
+export default connect()(GooglePlacesInput);

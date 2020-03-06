@@ -4,5 +4,4 @@ export default interface LocationSearchModalProps {
   onPress: (gym: Place) => void;
   onClosed: () => void;
   isOpen: boolean;
-  googleApiKey: string;
 }

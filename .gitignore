@@ -66,3 +66,6 @@ export
 .jest
 coverage
 *.hprof
+
+.env
+.env.production

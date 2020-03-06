@@ -73,7 +73,7 @@ const fetchGym = profile => {
         .database()
         .ref(`gyms/${profile.gym}`)
         .once('value');
-      const gym = await fetchPhotoPath(snapshot.val(), getState());
+      const gym = await fetchPhotoPath(snapshot.val());
       dispatch(setGym(gym));
     }
   };
@@ -82,13 +82,6 @@ const fetchGym = profile => {
 export const fetchProfile = () => {
   return async dispatch => {
     const user = firebase.auth().currentUser;
-    const envVar = await firebase
-      .database()
-      .ref('ENV_VARS')
-      .child('GOOGLE_API_KEY')
-      .once('value');
-    const GOOGLE_API_KEY = envVar.val();
-    dispatch(setEnvVar('GOOGLE_API_KEY', GOOGLE_API_KEY));
     const snapshot = await firebase
       .database()
       .ref(`users/${user.uid}`)

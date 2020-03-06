@@ -1,6 +1,7 @@
 import firebase from 'react-native-firebase';
 import { Alert } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
+import { GOOGLE_API_KEY } from 'react-native-dotenv';
 import { geofire } from '../App';
 import { fetchUsers, updateUsers } from './home';
 import { setGym } from './profile';
@@ -292,8 +293,7 @@ export const fetchPrivateSessions = () => {
   };
 };
 
-export const fetchPhotoPath = async (result, state) => {
-  const { GOOGLE_API_KEY } = state.sharedInfo.envVars;
+export const fetchPhotoPath = async (result) => {
   if (result.photos && result.photos[0].photo_reference) {
     const url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
     const fullUrl = `${url}${result.photos[0].photo_reference}&key=${GOOGLE_API_KEY}`;
@@ -309,11 +309,10 @@ export const fetchPhotoPath = async (result, state) => {
 
 export const fetchGym = id => {
   return (dispatch, getState) => {
-    const { GOOGLE_API_KEY } = getState().sharedInfo.envVars;
     const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${GOOGLE_API_KEY}`;
     return fetch(url)
       .then(response => response.json())
-      .then(json => fetchPhotoPath(json.result, getState()))
+      .then(json => fetchPhotoPath(json.result))
       .then(async gym => {
         const users = await firebase
           .database()
@@ -431,8 +430,7 @@ const mapIdsToPlaces = places => {
 };
 
 export const fetchPlaces = (lat, lon, token) => {
-  return (dispatch, getState) => {
-    const { GOOGLE_API_KEY } = getState().sharedInfo.envVars;
+  return (dispatch) => {
     return new Promise(resolve => {
       const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?';
       const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${GOOGLE_API_KEY}`;

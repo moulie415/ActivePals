@@ -11,6 +11,7 @@ import SpinnerButton from 'react-native-spinner-button';
 import { PulseIndicator } from 'react-native-indicators';
 import { connect } from 'react-redux';
 import { LoginManager, AccessToken } from 'react-native-fbsdk';
+import { GOOGLE_IOS_ID, GOOGLE_WEB_ID } from 'react-native-dotenv';
 import Button from '../components/Button';
 import { AccountType } from '../types/Profile';
 import styles from '../styles/loginStyles';
@@ -198,19 +199,9 @@ class Login extends Component<LoginProps, State> {
   async gLogin() {
     this.setState({ waitForData: true });
     try {
-      const iosClientId = await firebase
-        .database()
-        .ref('ENV_VARS')
-        .child('GOOGLE_IOS_ID')
-        .once('value');
-      const webClientId = await firebase
-        .database()
-        .ref('ENV_VARS')
-        .child('GOOGLE_WEB_ID')
-        .once('value');
       await GoogleSignin.configure({
-        iosClientId: iosClientId.val(),
-        webClientId: webClientId.val(),
+        iosClientId: GOOGLE_IOS_ID,
+        webClientId: GOOGLE_WEB_ID,
       });
       await GoogleSignin.hasPlayServices();
       const { user: gUser, idToken, serverAuthCode } = await GoogleSignin.signIn();
