@@ -14,6 +14,7 @@ import Header from '../components/Header/header';
 import FbFriendsModal from '../components/FbFriendsModal';
 import { removeUser } from '../actions/profile';
 import SettingsProps from '../types/views/Settings';
+import { AccountType } from '../types/Profile';
 
 interface State {
   spinner: boolean;
@@ -72,7 +73,7 @@ class Settings extends Component<SettingsProps, State> {
               <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
             </TouchableOpacity>
           )}
-          {profile.email === 'hen10@hotmail.co.uk' && (
+          {profile.accountType === AccountType.ADMIN && (
             <TouchableOpacity onPress={() => firebase.crashlytics().crash()} style={styles.contact}>
               <Text>Force crash</Text>
               <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />

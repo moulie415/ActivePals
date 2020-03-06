@@ -53,7 +53,7 @@ const getStateString = state => {
 };
 
 export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     const ref = firebase
       .database()
       .ref('userFriends')
@@ -61,6 +61,12 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
       .limitToLast(limit);
     await ref.on('value', async snapshot => {
       if (snapshot.val()) {
+        const { friends } = getState().friends;
+        Object.keys(friends).forEach(friend => {
+          if (!snapshot.val()[friend]) {
+            dispatch(removeFriend(friend));
+          }
+        })
         const uids = Object.keys(snapshot.val());
         await Promise.all(
           uids.map(friendUid => {
@@ -93,9 +99,6 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
         dispatch(setFriends({}));
         dispatch(fetchOther(uid));
       }
-    });
-    ref.on('child_removed', snapshot => {
-      dispatch(removeFriend(snapshot.key));
     });
   };
 };
