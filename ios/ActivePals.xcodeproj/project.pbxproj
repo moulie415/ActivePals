@@ -392,13 +392,6 @@
 			remoteGlobalIDString = 2577F299FCB0A19824FE989BE77B8E8F;
 			remoteInfo = "React-jsinspector";
 		};
-		0A45FD5F23E9993D00198859 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 46786D020A1E12E475C0A328E14A5725;
-			remoteInfo = "react-native-admob";
-		};
 		0A45FD6123E9993D00198859 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
@@ -1340,7 +1333,6 @@
 				0A45FD5A23E9993D00198859 /* libReact-jsi.a */,
 				0A45FD5C23E9993D00198859 /* libReact-jsiexecutor.a */,
 				0A45FD5E23E9993D00198859 /* libReact-jsinspector.a */,
-				0A45FD6023E9993D00198859 /* libreact-native-admob.a */,
 				0A45FD6223E9993D00198859 /* libreact-native-calendar-events.a */,
 				0A45FD6423E9993D00198859 /* libreact-native-fast-image.a */,
 				0AA22B6F22BE93B000D5E50D /* libreact-native-fbsdk.a */,
@@ -2245,13 +2237,6 @@
 			remoteRef = 0A45FD5D23E9993D00198859 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		0A45FD6023E9993D00198859 /* libreact-native-admob.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libreact-native-admob.a";
-			remoteRef = 0A45FD5F23E9993D00198859 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		0A45FD6223E9993D00198859 /* libreact-native-calendar-events.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2936,7 +2921,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Fabric/run\" 02b81ce5d7bf283724b7770acab0ff9fbf69990e a7b73c4c3ae1f288f81d101b26bb014cdd224a67eff5e331e3babd33c6bd7a85";
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" 02b81ce5d7bf283724b7770acab0ff9fbf69990e a7b73c4c3ae1f288f81d101b26bb014cdd224a67eff5e331e3babd33c6bd7a85\n";
 		};
 		2991D9DBCF314D07627DF75B /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3299,7 +3284,7 @@
 				INFOPLIST_PREFIX_HEADER = "";
 				INFOPLIST_PREPROCESS = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.3.4;
+				MARKETING_VERSION = 0.3.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -3346,7 +3331,7 @@
 				INFOPLIST_PREFIX_HEADER = "";
 				INFOPLIST_PREPROCESS = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.3.4;
+				MARKETING_VERSION = 0.3.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

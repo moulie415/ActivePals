@@ -51,6 +51,7 @@ import { newNotification, updateLastMessage, resetUnreadCount } from './actions/
 import { createChannels } from './helpers/notifications';
 import { shouldNavigate, navigateFromNotif } from './helpers/navigation';
 
+firebase.crashlytics().enableCrashlyticsCollection();
 
 const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
   if (error) {

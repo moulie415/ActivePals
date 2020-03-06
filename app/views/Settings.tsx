@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import firebase from 'react-native-firebase';
 import VersionNumber from 'react-native-version-number';
 import DialogInput from 'react-native-dialog-input';
 import { PulseIndicator } from 'react-native-indicators';
@@ -68,6 +69,12 @@ class Settings extends Component<SettingsProps, State> {
               style={styles.contact}
             >
               <Text>Import Facebook friends</Text>
+              <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
+            </TouchableOpacity>
+          )}
+          {profile.email === 'hen10@hotmail.co.uk' && (
+            <TouchableOpacity onPress={() => firebase.crashlytics().crash()} style={styles.contact}>
+              <Text>Force crash</Text>
               <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
             </TouchableOpacity>
           )}
