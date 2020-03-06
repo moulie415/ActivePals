@@ -12,7 +12,6 @@ export const SET_GYM = 'SET_GYM';
 export const REMOVE_GYM = 'REMOVE_GYM';
 export const SET_LOCATION = 'SET_LOCATION';
 export const SET_HAS_VIEWED_WELCOME = 'SET_HAS_VIEWED_WELCOME';
-export const SET_ENV_VAR = 'SET_ENV_VAR';
 
 const setProfile = profile => ({
   type: SET_PROFILE,
@@ -44,12 +43,6 @@ export const setLocation = location => ({
 
 export const setHasViewedWelcome = () => ({
   type: SET_HAS_VIEWED_WELCOME,
-});
-
-const setEnvVar = (key, value) => ({
-  type: SET_ENV_VAR,
-  key,
-  value,
 });
 
 const setupPresence = uid => {

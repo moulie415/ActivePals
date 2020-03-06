@@ -1,9 +1,8 @@
-import { SET_LOGGED_OUT, SET_ENV_VAR } from '../actions/profile';
+import { SET_LOGGED_OUT } from '../actions/profile';
 import { SET_USER, UPDATE_USERS } from '../actions/home';
 
 const initialState = {
   users: {},
-  envVars: {},
 };
 
 export default function(state = initialState, action) {
@@ -17,11 +16,6 @@ export default function(state = initialState, action) {
       return {
         ...state,
         users: { ...state.users, [action.user.uid]: action.user },
-      };
-    case SET_ENV_VAR:
-      return {
-        ...state,
-        envVars: { ...state.envVars, [action.key]: action.value },
       };
     case SET_LOGGED_OUT: {
       return initialState;
