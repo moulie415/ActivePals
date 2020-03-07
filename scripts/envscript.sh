@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+cd ..
 if [ "$ENV" == "production"  ];
 then
   echo "Switching to Firebase Production environment"

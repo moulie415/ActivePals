@@ -413,7 +413,7 @@ export const addUser = (key, isPrivate, uid) => {
 export const fetchPhotoPaths = () => {
   return async (dispatch, getState) => {
     const obj = getState().sessions.places;
-    const places = await Promise.all(Object.values(obj).map(place => fetchPhotoPath(place, getState())));
+    const places = await Promise.all(Object.values(obj).map(place => fetchPhotoPath(place)));
     places.forEach(place => {
       obj[place.place_id] = place;
     });

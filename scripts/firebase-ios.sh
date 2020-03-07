@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+cd ..
 cd ios
 # Builds the app into an archive  
 xcodebuild -workspace ActivePals.xcworkspace -scheme ActivePals -configuration Release -archivePath "~/personal_projects/ActivePals/export/ActivePals.xcarchive" archive  
