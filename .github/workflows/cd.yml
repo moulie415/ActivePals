@@ -16,6 +16,7 @@ jobs:
           npm test
       - name: Build android apk
         run: |
+          npm run remove-uneeded
           touch .env
           echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env
           echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env
