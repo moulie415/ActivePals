@@ -16,7 +16,10 @@ jobs:
           npm test
       - name: Build android apk
         run: |
-          cd scripts && ./buildEnv.sh
+          touch .env
+          echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env
+          echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env
           ENV=production cd scripts && ./envscript.sh 
           cd android && ./gradlew assembleRelease - 
             MYAPP_RELEASE_KEY_ALIAS='${{ secrets.MYAPP_RELEASE_KEY_ALIAS}}' - 
