@@ -34,5 +34,5 @@ jobs:
         with:
           appId: ${{secrets.FIREBASE_ANDROID_ID}}
           token: ${{secrets.FIREBASE_TOKEN}}
-          #groups: testers
+          groups: activepals
           file: android/app/build/outputs/apk/release/app-release.apk
