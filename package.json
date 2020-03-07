@@ -3,13 +3,12 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "ENV=development ./envscript.sh && ENVFILE=.env.dev node node_modules/react-native/local-cli/cli.js start",
-    "start-prod": "ENV=production ./envscript.sh && npm run prestart && ENVFILE=.env.prod node node_modules/react-native/local-cli/cli.js start",
-    "build-android-prod": "ENV=production ENVFILE=.env.prod ./envscript.sh && cd android && ./gradlew assembleRelease && cd ..",
-    "firebase-android": "npm run build-android-prod && ./firebase-android.sh",
-    "firebase-ios": "ENV=production ENVFILE=.env.prod ./envscript.sh && ./firebase-ios.sh",
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "start-prod": "ENV=production npm run prestart && node node_modules/react-native/local-cli/cli.js start",
+    "firebase-android": "cd scripts && ENV=production ./envscript.sh && ./firebase-android.sh",
+    "firebase-ios": "ENV=production ./envscript.sh && ./firebase-ios.sh",
     "postinstall": "npx jetify && npm run remove-uneeded && cp -rf react-native-fast-image/android node_modules/react-native-fast-image",
-    "prestart": "npm run remove-uneeded",
+    "prestart": "npm run remove-uneeded && cd scripts && ./envscript.sh",
     "remove-uneeded": "rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-parsed-text && rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-video",
     "test": "jest --coverage",
     "clean": "react-native-clean-project"
