@@ -22,7 +22,7 @@ jobs:
           echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env
           echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env
           cd scripts && ENV=production ./envscript.sh
-          cd .. && cd android && ./gradlew assembleRelease -MYAPP_RELEASE_KEY_ALIAS='${{ secrets.MYAPP_RELEASE_KEY_ALIAS}}' -MYAPP_RELEASE_STORE_FILE='my-release-key.keystore' -MYAPP_RELEASE_STORE_PASSWORD='${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }}' -MYAPP_RELEASE_KEY_PASSWORD='${{ secrets.MYAPP_RELEASE_KEY_PASSWORD }}'
+          cd .. && cd android && ./gradlew assembleRelease -MYAPP_RELEASE_KEY_ALIAS='${{ secrets.MYAPP_RELEASE_KEY_ALIAS}}' -MYAPP_RELEASE_STORE_FILE=my-release-key.keystore -MYAPP_RELEASE_STORE_PASSWORD='${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }}' -MYAPP_RELEASE_KEY_PASSWORD='${{ secrets.MYAPP_RELEASE_KEY_PASSWORD }}'
       - name: upload artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.1.1
         with:
