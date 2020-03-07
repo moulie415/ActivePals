@@ -22,8 +22,7 @@ jobs:
           echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env
           echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env
           cd scripts && ENV=production ./envscript.sh
-          ls
-          cd android && ./gradlew assembleRelease - 
+          cd .. && cd android && ./gradlew assembleRelease - 
             MYAPP_RELEASE_KEY_ALIAS='${{ secrets.MYAPP_RELEASE_KEY_ALIAS}}' - 
             MYAPP_RELEASE_STORE_FILE='${{ secrets.MYAPP_RELEASE_STORE_FILE }}' - 
             MYAPP_RELEASE_STORE_PASSWORD='${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }}' - 
