@@ -20,7 +20,7 @@ jobs:
           echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env
           echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env
           echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env
-          ENV=production cd scripts && ./envscript.sh 
+          cd scripts && ENV=production ./envscript.sh 
           cd android && ./gradlew assembleRelease - 
             MYAPP_RELEASE_KEY_ALIAS='${{ secrets.MYAPP_RELEASE_KEY_ALIAS}}' - 
             MYAPP_RELEASE_STORE_FILE='${{ secrets.MYAPP_RELEASE_STORE_FILE }}' - 
@@ -32,4 +32,4 @@ jobs:
           appId: ${{secrets.FIREBASE_ANDROID_ID}}
           token: ${{secrets.FIREBASE_TOKEN}}
           #groups: testers
-          file: android/app/build/outputs/apk/release/app-release.apk
+          file: app/build/outputs/apk/release/app-release.apk
