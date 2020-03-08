@@ -11,6 +11,7 @@ export default interface Post {
   comments?: Comment[];
   repUsers?: string[];
   key?: string;
+  url?: string;
 }
 
 export enum PostType {

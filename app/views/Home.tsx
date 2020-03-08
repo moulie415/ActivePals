@@ -37,7 +37,7 @@ import Header from '../components/Header/header';
 import { likesExtractor, getSimplifiedTime, getMentionsList, sortPostsByDate } from '../constants/utils';
 import ParsedText from '../components/ParsedText';
 import AdView from '../components/AdView';
-import { PostType } from '../types/Post';
+import Post, { PostType } from '../types/Post';
 import HomeProps from '../types/views/Home';
 import RepsModal from '../components/RepsModal';
 import {
@@ -362,7 +362,7 @@ export class Home extends Component<HomeProps, State> {
     );
   }
 
-  renderFeedItem(item) {
+  renderFeedItem(item: Post) {
     const { playing } = this.state;
     const { navigation } = this.props;
     switch (item.type) {
