@@ -26,6 +26,7 @@ import Share, { Options } from 'react-native-share';
 import RNFetchBlob from 'rn-fetch-blob';
 import Image from 'react-native-fast-image';
 import VideoCompress from 'react-native-video-compressor';
+import ActionSheet from 'react-native-actionsheet';
 import Card from '../components/Card';
 import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
@@ -77,8 +78,11 @@ interface State {
   repCount: number;
   showCommentModal: boolean;
   mentionList: Profile[];
+  selectedPost?: string;
 }
 export class Home extends Component<HomeProps, State> {
+  ActionSheet: ActionSheet;
+
   players: { [key: string]: Video };
 
   scrollIndex: number;
@@ -371,7 +375,9 @@ export class Home extends Component<HomeProps, State> {
                 {this.getUsernameFormatted(item.uid)}
                 <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => this.setState({ selectedPost: item.key }, () => this.ActionSheet.show())}
+              >
                 <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
               </TouchableOpacity>
             </View>
@@ -391,7 +397,9 @@ export class Home extends Component<HomeProps, State> {
                 {this.getUsernameFormatted(item.uid)}
                 <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => this.setState({ selectedPost: item.key }, () => this.ActionSheet.show())}
+              >
                 <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
               </TouchableOpacity>
             </View>
@@ -418,7 +426,9 @@ export class Home extends Component<HomeProps, State> {
                 {this.getUsernameFormatted(item.uid)}
                 <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => this.setState({ selectedPost: item.key }, () => this.ActionSheet.show())}
+              >
                 <Icon style={{ paddingHorizontal: 10 }} name="ios-more" size={20} />
               </TouchableOpacity>
             </View>
@@ -545,16 +555,10 @@ export class Home extends Component<HomeProps, State> {
           refreshing={refreshing}
           renderItem={({ item, index }) => {
             return (
-              <View>
+              <>
                 <AdView index={index} />
-                <Card style={{ marginBottom: 10 }}>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('PostView', { postId: item.key })}
-                    style={{ alignSelf: 'flex-end' }}
-                  />
-                  {this.renderFeedItem(item)}
-                </Card>
-              </View>
+                <Card style={{ marginBottom: 10 }}>{this.renderFeedItem(item)}</Card>
+              </>
             );
           }}
         />
@@ -592,6 +596,7 @@ export class Home extends Component<HomeProps, State> {
       likesModalVisible,
       repsId,
       repCount,
+      selectedPost,
     } = this.state;
 
     const combined = { ...users, ...friends };
@@ -904,6 +909,20 @@ export class Home extends Component<HomeProps, State> {
           isOpen={likesModalVisible}
           id={repsId}
           repCount={repCount}
+        />
+        <ActionSheet
+          ref={ref => {
+            this.ActionSheet = ref;
+          }}
+          options={['View full post', 'Report post', 'Cancel']}
+          cancelButtonIndex={2}
+          onPress={index => {
+            if (index === 0) {
+              navigation.navigate('PostView', { postId: selectedPost });
+            } else if (index === 1) {
+              console.log('report post');
+            }
+          }}
         />
       </>
     );
