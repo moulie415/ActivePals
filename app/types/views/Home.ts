@@ -18,8 +18,6 @@ export default interface HomeProps {
   getPosts: (uid: string, amount?: number, endAt?: string) => void;
   getCommentRepsUsers: (comment: Comment, limit?: number) => void;
   getRepsUsers: (postId: string, limit?: number) => void;
-  getProfile: () => void;
-  getFriends: () => void;
   getReplies: (parentComment: Comment, amount: number, key: string) => void;
   navigation: NavigationStackProp;
 }

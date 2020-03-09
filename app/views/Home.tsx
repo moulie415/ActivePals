@@ -51,8 +51,6 @@ import {
   fetchRepsUsers,
   fetchReplies,
 } from '../actions/home';
-import { fetchProfile } from '../actions/profile';
-import { fetchFriends } from '../actions/friends';
 import Comment from '../types/Comment';
 import Profile from '../types/Profile';
 
@@ -507,7 +505,7 @@ export class Home extends Component<HomeProps, State> {
   }
 
   renderFeed() {
-    const { feed, getFriends, getProfile, getPosts, profile, navigation } = this.props;
+    const { feed, getPosts, profile } = this.props;
     const { loadMore, refreshing } = this.state;
     if (Object.values(feed).length > 0) {
       return (
@@ -516,8 +514,6 @@ export class Home extends Component<HomeProps, State> {
           keyExtractor={item => item.key}
           onRefresh={async () => {
             this.setState({ refreshing: true });
-            getFriends();
-            getProfile();
             await getPosts(profile.uid, 30);
             this.setState({ refreshing: false });
           }}
@@ -946,8 +942,6 @@ const mapDispatchToProps = dispatch => ({
   getPosts: (uid, amount, endAt) => dispatch(fetchPosts(uid, amount, endAt)),
   getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepsUsers: (postId: string, limit?: number) => dispatch(fetchRepsUsers(postId, limit)),
-  getProfile: () => dispatch(fetchProfile()),
-  getFriends: (uid, limit?, endAt?) => dispatch(fetchFriends(uid, limit, endAt)),
   getReplies: (fromCommentId: Comment, limit: number, endAt?: string) =>
     dispatch(fetchReplies(fromCommentId, limit, endAt)),
 });
