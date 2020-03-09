@@ -5,6 +5,7 @@ import firebase from 'react-native-firebase';
 import moment, { Moment } from 'moment';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
+import Instabug from 'instabug-reactnative';
 import str from './strings';
 import Session, { SessionType } from '../types/Session';
 import Profile, { UserState } from '../types/Profile';
@@ -26,6 +27,10 @@ export const showAdmobInterstitial = () => {
   advert.loadAd(request.build());
   advert.on('onAdLoaded', () => {
     advert.show();
+  });
+  advert.on('onAdFailedToLoad', e => {
+    Instabug.logError(e.message);
+    firebase.crashlytics().recordError(e.code, e.message);
   });
 };
 const s4 = () => {

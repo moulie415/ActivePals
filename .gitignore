@@ -68,3 +68,6 @@ coverage
 
 .env
 .env.production
+
+android-sourcemap.json
+android-sourcemap.zip

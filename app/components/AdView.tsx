@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import Instabug from 'instabug-reactnative';
 import {
   AdIconView,
   MediaView,
@@ -69,7 +70,10 @@ const AdComponent: FunctionComponent<{ index: number }> = ({ index }) => {
           onAdLoaded={() => {
             console.log('Advert loaded');
           }}
-          onAdFailedToLoad={e => console.log('admob banner error', e)}
+          onAdFailedToLoad={e => {
+            firebase.crashlytics().recordError(e.code, e.message);
+            Instabug.logError(e.message);
+          }}
           unitId={str.admobBanner}
         />
       </Card>
