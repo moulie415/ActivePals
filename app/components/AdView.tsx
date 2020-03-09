@@ -71,7 +71,7 @@ const AdComponent: FunctionComponent<{ index: number }> = ({ index }) => {
             console.log('Advert loaded');
           }}
           onAdFailedToLoad={e => {
-            firebase.crashlytics().recordError(e.code, e.message);
+            firebase.crashlytics().recordError(0, e.message);
             Instabug.logError(e.message);
           }}
           unitId={str.admobBanner}

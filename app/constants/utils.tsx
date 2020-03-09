@@ -30,7 +30,7 @@ export const showAdmobInterstitial = () => {
   });
   advert.on('onAdFailedToLoad', e => {
     Instabug.logError(e.message);
-    firebase.crashlytics().recordError(e.code, e.message);
+    firebase.crashlytics().recordError(0, e.message);
   });
 };
 const s4 = () => {

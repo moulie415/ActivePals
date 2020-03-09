@@ -1,6 +1,8 @@
 package com.activepals;
 import android.app.Application;
 import android.content.Context;
+
+import com.crashlytics.android.Crashlytics;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.google.android.gms.ads.MobileAds;
@@ -12,6 +14,7 @@ import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import io.fabric.sdk.android.Fabric;
 import io.invertase.firebase.admob.RNFirebaseAdMobPackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
@@ -65,6 +68,7 @@ public class MainApplication extends Application implements ReactApplication {
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this); // Remove this line if you don't want Flipper enabled
       MobileAds.initialize(this, "ca-app-pub-7885763333661292~3960210018");
+    Fabric.with(this, new Crashlytics());
     new RNInstabugReactnativePackage
       .Builder("804c8f8e35fa17bdafb82e6778629dd4", MainApplication.this)
       .setInvocationEvent("shake")
