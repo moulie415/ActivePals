@@ -50,10 +50,15 @@ const setupPresence = uid => {
     .database()
     .ref(`users/${uid}`)
     .child('state');
+  const lastChange = firebase
+    .database()
+    .ref(`users/${uid}`)
+    .child('lastChange');
   const connectedRef = firebase.database().ref('.info/connected');
   connectedRef.on('value', snap => {
     if (snap.val() === true) {
       ref.onDisconnect().remove();
+      lastChange.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP)
       ref.set(UserState.ONLINE);
     }
   });
