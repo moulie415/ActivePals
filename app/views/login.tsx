@@ -190,9 +190,9 @@ class Login extends Component<LoginProps, State> {
       }
 
       // Navigate to the Home page
-    } catch (error) {
+    } catch (e) {
       this.setState({ spinner: false });
-      Alert.alert(error.toString());
+      Alert.alert('Error', e.message);
     }
   }
 

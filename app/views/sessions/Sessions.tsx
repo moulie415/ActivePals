@@ -318,7 +318,7 @@ class Sessions extends Component<SessionsProps, State> {
                 />
               )}
               <View style={{ flex: 1 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                   <View>
                     <Text style={{ color: colors.secondary }}>Your gym:</Text>
                     <Text>{gym.name}</Text>
