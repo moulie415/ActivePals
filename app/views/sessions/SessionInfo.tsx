@@ -15,7 +15,7 @@ import styles from '../../styles/sessionStyles';
 import Button from '../../components/Button';
 import PrivateIcon from '../../components/PrivateIcon';
 import FriendsModal from '../../components/friendsModal';
-import { removeSession, addUser, fetchSession, fetchPrivateSession } from '../../actions/sessions';
+import { removeSession, addUser, fetchSession, fetchPrivateSession, fetchGym } from '../../actions/sessions';
 import { muteChat } from '../../actions/chats';
 import SessionInfoProps from '../../types/views/sessions/SessionInfo';
 import { SessionType } from '../../types/Session';
@@ -173,7 +173,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
     }
     let gym;
     if (session && session.gym) {
-      gym = places[session.gym.place_id];
+      gym = places[session.gym];
     }
 
     return (

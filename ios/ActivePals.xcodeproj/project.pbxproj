@@ -847,6 +847,27 @@
 			remoteGlobalIDString = 8998273719FDD789E6F9C7541AFD0B33;
 			remoteInfo = RNVectorIcons;
 		};
+		0AFECE0B241983CE002A03F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 86375444C196BA272DDBB8165BF64A15;
+			remoteInfo = FirebaseCrashlytics;
+		};
+		0AFECE0D241983CE002A03F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 13C8C8B254851998F9289F71229B28A2;
+			remoteInfo = FirebaseInstallations;
+		};
+		0AFECE0F241983CE002A03F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3347A1AB6546F0A3977529B8F199DC41;
+			remoteInfo = PromisesObjC;
+		};
 		0AFFAC5923E9A0E500A1E512 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0AB3819620099F9900BCD283 /* Pods.xcodeproj */;
@@ -1305,7 +1326,9 @@
 				0A45FE2B23E99DD400198859 /* libFirebaseAuth.a */,
 				0A3E956C2113C8FB00BCD60F /* libFirebaseCore.a */,
 				0A45FD3C23E9993D00198859 /* libFirebaseCoreDiagnostics.a */,
+				0AFECE0C241983CE002A03F9 /* libFirebaseCrashlytics.a */,
 				0A45FE2D23E99DD400198859 /* libFirebaseDatabase.a */,
+				0AFECE0E241983CE002A03F9 /* libFirebaseInstallations.a */,
 				0A0A511C22DA588600CC692E /* libFirebaseInstanceID.a */,
 				0A45FE2F23E99DD400198859 /* libFirebaseMessaging.a */,
 				0A45FE3123E99DD400198859 /* libFirebaseStorage.a */,
@@ -1325,6 +1348,7 @@
 				0A45FD4A23E9993D00198859 /* libPods-ActivePals-tvOS.a */,
 				0A45FD4C23E9993D00198859 /* libPods-ActivePals-tvOSTests.a */,
 				0A45FD4E23E9993D00198859 /* libPods-ActivePalsTests.a */,
+				0AFECE10241983CE002A03F9 /* libPromisesObjC.a */,
 				0A45FE3523E99DD400198859 /* libProtobuf.a */,
 				0A45FD5223E9993D00198859 /* libRCTTypeSafety.a */,
 				0A45FD5423E9993D00198859 /* libReact-Core.a */,
@@ -2685,6 +2709,27 @@
 			remoteRef = 0AF263D62376E5B80025C4E5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		0AFECE0C241983CE002A03F9 /* libFirebaseCrashlytics.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFirebaseCrashlytics.a;
+			remoteRef = 0AFECE0B241983CE002A03F9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0AFECE0E241983CE002A03F9 /* libFirebaseInstallations.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFirebaseInstallations.a;
+			remoteRef = 0AFECE0D241983CE002A03F9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0AFECE10241983CE002A03F9 /* libPromisesObjC.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libPromisesObjC.a;
+			remoteRef = 0AFECE0F241983CE002A03F9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		0AFFAC5A23E9A0E500A1E512 /* libReact-RCTAnimation.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -3284,7 +3329,7 @@
 				INFOPLIST_PREFIX_HEADER = "";
 				INFOPLIST_PREPROCESS = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.3.5;
+				MARKETING_VERSION = 0.3.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -3331,7 +3376,7 @@
 				INFOPLIST_PREFIX_HEADER = "";
 				INFOPLIST_PREPROCESS = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.3.5;
+				MARKETING_VERSION = 0.3.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

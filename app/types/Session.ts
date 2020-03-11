@@ -16,7 +16,7 @@ export default interface Session {
   users: { [key: string]: boolean };
   inProgress?: boolean;
   distance?: number;
-  gym?: Place;
+  gym?: string;
 }
 
 export enum Gender {

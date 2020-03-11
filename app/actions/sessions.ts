@@ -74,7 +74,9 @@ const checkHost = (host, state) => {
 export const removeSession = (key, isPrivate, force = false) => {
   return (dispatch, getState) => {
     const { uid } = getState().profile.profile;
-    const sessions: { [key: string]: Session } = isPrivate ? getState().sessions.privateSessions : getState().sessions.sessions;
+    const sessions: { [key: string]: Session } = isPrivate
+      ? getState().sessions.privateSessions
+      : getState().sessions.sessions;
     const session = sessions[key];
     const type = isPrivate ? 'privateSessions' : 'sessions';
     if (session && session.host === uid) {
@@ -180,7 +182,7 @@ export const fetchSessions = () => {
                 dispatch(expirationAlert(session, false));
               }
               obj[session.key] = { ...session.val(), host, key: session.key };
-          }
+            }
           });
           dispatch(updateSessions(obj));
           dispatch(fetchUsers(userFetches));
@@ -293,7 +295,7 @@ export const fetchPrivateSessions = () => {
   };
 };
 
-export const fetchPhotoPath = async (result) => {
+export const fetchPhotoPath = async result => {
   if (result.photos && result.photos[0].photo_reference) {
     const url = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
     const fullUrl = `${url}${result.photos[0].photo_reference}&key=${GOOGLE_API_KEY}`;
@@ -307,35 +309,33 @@ export const fetchPhotoPath = async (result) => {
   return result;
 };
 
-export const fetchGym = id => {
-  return (dispatch, getState) => {
+export const fetchGym = (id: string) => {
+  return async (dispatch, getState) => {
     const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${GOOGLE_API_KEY}`;
-    return fetch(url)
-      .then(response => response.json())
-      .then(json => fetchPhotoPath(json.result))
-      .then(async gym => {
-        const users = await firebase
-          .database()
-          .ref(`gyms/${id}/users`)
-          .once('value');
-        if (users && users.val()) {
-          gym.users = users.val();
-          const unfetched = Object.keys(users.val()).filter(user => {
-            return !(getState().friends.friends[user] && getState().sharedInfo.users[user]);
-          });
-          dispatch(fetchUsers(unfetched));
-        }
-
-        dispatch(setPlace(gym));
-        const yourGym = getState().profile.gym;
-        if (yourGym && yourGym.place_id === gym.place_id) {
-          dispatch(setGym(gym));
-        }
+    const response = await fetch(url);
+    const json = await response.json();
+    const gym = await fetchPhotoPath(json.result);
+    const users = await firebase
+      .database()
+      .ref(`gyms/${id}/users`)
+      .once('value');
+    if (users && users.val()) {
+      gym.users = users.val();
+      const unfetched = Object.keys(users.val()).filter(user => {
+        return !(getState().friends.friends[user] && getState().sharedInfo.users[user]);
       });
+      dispatch(fetchUsers(unfetched));
+    }
+
+    dispatch(setPlace(gym));
+    const yourGym = getState().profile.gym;
+    if (yourGym && yourGym.place_id === gym.place_id) {
+      dispatch(setGym(gym));
+    }
   };
 };
 
-export const fetchSession = id => {
+export const fetchSession = (id: string) => {
   return async (dispatch, getState) => {
     let distance;
     // check if session exists and use existing distance value
@@ -350,7 +350,7 @@ export const fetchSession = id => {
       .child(id)
       .once('value');
     if (session.val().gym) {
-      dispatch(fetchGym(session.val().gym.place_id));
+      dispatch(fetchGym(session.val().gym));
     }
     if (session.val().users) {
       const unfetched = Object.keys(session.val().users).filter(user => {
@@ -374,7 +374,7 @@ export const fetchPrivateSession = id => {
       .child(id)
       .once('value');
     if (session.val().gym) {
-      dispatch(fetchGym(session.val().gym.place_id));
+      dispatch(fetchGym(session.val().gym));
     }
     if (session.val().users) {
       const unfetched = Object.keys(session.val().users).filter(user => {
@@ -430,7 +430,7 @@ const mapIdsToPlaces = places => {
 };
 
 export const fetchPlaces = (lat, lon, token) => {
-  return (dispatch) => {
+  return dispatch => {
     return new Promise(resolve => {
       const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?';
       const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${GOOGLE_API_KEY}`;

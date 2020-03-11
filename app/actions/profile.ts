@@ -4,6 +4,7 @@ import { fetchSessionChats, fetchChats, fetchGymChat, setGymChat, getUnreadCount
 import { fetchPosts } from './home';
 import { fetchSessions, fetchPhotoPath, fetchPrivateSessions } from './sessions';
 import { UserState } from '../types/Profile';
+import Place from '../types/Place';
 
 export const SET_PROFILE = 'SET_PROFILE';
 export const SET_LOGGED_IN = 'SET_LOGGED_IN';
@@ -174,7 +175,7 @@ export const removeGym = () => {
   };
 };
 
-export const joinGym = location => {
+export const joinGym = (location: Place) => {
   return async (dispatch, getState) => {
     const { uid } = getState().profile.profile;
     if (getState().profile.gym) {

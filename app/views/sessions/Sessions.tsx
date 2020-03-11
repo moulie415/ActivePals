@@ -35,7 +35,6 @@ import {
   fetchPrivateSessions,
   removeSession,
   setPlaces,
-  fetchPhotoPaths,
   fetchPlaces,
   setRadius,
 } from '../../actions/sessions';
@@ -732,7 +731,6 @@ const mapDispatchToProps = dispatch => ({
   fetch: () => Promise.all([dispatch(fetchSessions()), dispatch(fetchPrivateSessions())]),
   setYourLocation: location => dispatch(setLocation(location)),
   setPlaces: places => dispatch(setPlaces(places)),
-  fetchPhotoPaths: () => dispatch(fetchPhotoPaths()),
   getPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
   saveRadius: radius => dispatch(setRadius(radius)),
 });
