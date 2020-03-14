@@ -125,7 +125,7 @@ class Friends extends Component<FriendsProps, State> {
                       ]);
                     }}
                   >
-                    <Icon name="ios-close" size={50} style={{ color: 'red', paddingHorizontal: 10 }} />
+                    <Icon name="ios-close" size={50} style={{ color: colors.appRed, paddingHorizontal: 10 }} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -150,7 +150,7 @@ class Friends extends Component<FriendsProps, State> {
                       <Icon
                         size={50}
                         name="ios-close"
-                        style={{ color: 'red', paddingHorizontal: 10, alignSelf: 'center' }}
+                        style={{ color: colors.appRed, paddingHorizontal: 10, alignSelf: 'center' }}
                       />
                     </TouchableOpacity>
                   </View>
@@ -262,7 +262,7 @@ class Friends extends Component<FriendsProps, State> {
             />
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10 }}>
-            <Button onPress={() => this.setState({ modalOpen: false })} text="Cancel" color="red" />
+            <Button onPress={() => this.setState({ modalOpen: false })} text="Cancel" color={colors.appRed} />
             <Button onPress={() => this.sendRequest(username)} text="Submit" />
           </View>
         </Modal>

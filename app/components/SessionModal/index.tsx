@@ -68,14 +68,14 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
               ]);
             }}
             style={{ alignSelf: 'center' }}
-            color="red"
+            color={colors.appRed}
             text="Delete"
           />
         );
       } else {
         return (
           <Button
-            color="red"
+            color={colors.appRed}
             text="Leave"
             style={{ alignSelf: 'center' }}
             onPress={() => {
@@ -172,9 +172,9 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
               />
             </View>
             {session.gym && (
-              <TouchableOpacity onPress={() => viewGym(session.gym.place_id)}>
+              <TouchableOpacity onPress={() => viewGym(session.gym)}>
                 <Text style={{ color: '#999', marginVertical: 10 }}>
-                  Gym: <Text style={{ color: colors.secondary, fontWeight: 'bold' }}>{session.gym.name}</Text>
+                  Gym: <Text style={{ color: colors.secondary, fontWeight: 'bold' }}>{session.gym}</Text>
                 </Text>
               </TouchableOpacity>
             )}

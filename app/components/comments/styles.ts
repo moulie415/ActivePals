@@ -38,7 +38,7 @@ export default StyleSheet.create({
   },
   body: {
     paddingBottom: 10,
-    color: '#000',
+    color: colors.textGrey,
   },
   rightActionBar: {
     flexDirection: 'row',

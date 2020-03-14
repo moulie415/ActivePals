@@ -105,7 +105,7 @@ class FbFriendsModal extends Component<FbFriendsModalProps, State> {
     ) : (
       <View style={{ backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ padding: 15, textAlign: 'center' }}>
-          {"Sorry we couldn't find anymore of your Facebook friends already using ActivePals"}
+          Sorry we couldn't find anymore of your Facebook friends already using ActivePals
         </Text>
       </View>
     );
@@ -119,7 +119,7 @@ class FbFriendsModal extends Component<FbFriendsModalProps, State> {
         <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>Select Facebook friends</Text>
         {loading ? <PulseIndicator color={colors.secondary} /> : this.renderFriendsSelection()}
         <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: 10 }}>
-          <Button onPress={() => onClosed()} color="red" text="Cancel" />
+          <Button onPress={() => onClosed()} color={colors.appRed} text="Cancel" />
           <Button
             onPress={async () => {
               const { length } = selectedFriends;
@@ -131,7 +131,6 @@ class FbFriendsModal extends Component<FbFriendsModalProps, State> {
                 );
                 onClosed();
                 Alert.alert('Success', `Pal request${length > 1 ? 's' : ''} sent`);
-
               } else {
                 Alert.alert('Sorry', 'Please select at least one friend');
               }

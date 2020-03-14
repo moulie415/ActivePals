@@ -51,7 +51,7 @@ export default StyleSheet.create({
         paddingBottom: 6
     },
     listCellInputRequired: {
-        borderColor: 'red',
+        borderColor: colors.appRed,
         borderWidth: 1, 
     },
     listCellInputLarge: {

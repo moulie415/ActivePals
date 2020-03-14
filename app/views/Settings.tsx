@@ -91,7 +91,7 @@ class Settings extends Component<SettingsProps, State> {
             style={{ padding: 15, backgroundColor: '#fff' }}
             onPress={() => this.setState({ showDialog: true })}
           >
-            <Text style={{ color: 'red' }}>Delete account</Text>
+            <Text style={{ color: colors.appRed }}>Delete account</Text>
           </TouchableOpacity>
         </ScrollView>
         {spinner && (

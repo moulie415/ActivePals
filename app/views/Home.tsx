@@ -380,7 +380,7 @@ export class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{ marginBottom: 5 }}>
-              <ParsedText text={item.text} />
+              <ParsedText text={item.text} style={{ color: colors.textGrey }} />
             </View>
             {this.repCommentCount(item)}
             {this.repsAndComments(item)}
@@ -402,7 +402,7 @@ export class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{ margin: 5, marginHorizontal: 10 }}>
-              <ParsedText text={item.text} />
+              <ParsedText text={item.text} style={{ color: colors.textGrey }} />
             </View>
             <TouchableOpacity
               activeOpacity={1}
@@ -431,7 +431,7 @@ export class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{ margin: 10 }}>
-              <ParsedText text={item.text} />
+              <ParsedText text={item.text} style={{ color: colors.textGrey }} />
             </View>
             <TouchableWithoutFeedback
               onPress={() => {

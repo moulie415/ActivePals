@@ -141,7 +141,7 @@ class Notifications extends Component<NotificationsProps, State> {
               const swipeoutBtns = [
                 {
                   text: 'Delete',
-                  backgroundColor: 'red',
+                  backgroundColor: colors.appRed,
                   onPress: async () => {
                     await onDelete(item.key);
                     fetchNotifications(fetchAmount);

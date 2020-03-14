@@ -77,7 +77,7 @@ const GymModal = (
                   ]);
                 }}
                 text="Leave"
-                color="red"
+                color={colors.appRed}
                 style={{ alignSelf: 'center', marginBottom: 5 }}
               />
             </View>

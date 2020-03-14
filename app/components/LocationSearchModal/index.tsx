@@ -6,6 +6,7 @@ import { GOOGLE_API_KEY } from 'react-native-dotenv';
 import styles, { locationSearch } from './styles';
 import Button from '../Button';
 import LocationSearchModalProps from '../../types/components/LocationSearchModal';
+import colors from '../../constants/colors';
 
 const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({ isOpen, onPress, onClosed }) => {
   const ref = useRef<GooglePlacesAutocomplete>();
@@ -31,7 +32,12 @@ const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({ isOpen, o
         nearbyPlacesAPI="GooglePlacesSearch"
         GooglePlacesSearchQuery={{ rankby: 'distance', types: 'gym' }}
       />
-      <Button text="Cancel" onPress={onClosed} style={{ alignSelf: 'center', marginBottom: 10 }} color="red" />
+      <Button
+        text="Cancel"
+        onPress={onClosed}
+        style={{ alignSelf: 'center', marginBottom: 10 }}
+        color={colors.appRed}
+      />
     </Modal>
   );
 };

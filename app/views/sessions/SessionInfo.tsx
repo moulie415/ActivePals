@@ -63,7 +63,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                 ]);
               }}
               style={{ alignSelf: 'center' }}
-              color="red"
+              color={colors.appRed}
               text="Delete"
             />
             {this.chatButton(session)}
@@ -74,7 +74,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
       return (
         <View style={styles.infoRowSpaceEvenly}>
           <Button
-            color="red"
+            color={colors.appRed}
             text="Leave"
             style={{ alignSelf: 'center' }}
             onPress={() => {

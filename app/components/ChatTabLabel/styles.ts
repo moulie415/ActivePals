@@ -2,6 +2,7 @@ import {
   StyleSheet,
   Platform
 } from 'react-native'
+import colors from '../../constants/colors'
 
 
 const styles = StyleSheet.create({
@@ -16,7 +17,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: 'red',
+    backgroundColor: colors.appRed,
     alignItems: 'center',
     justifyContent: 'center'
   },

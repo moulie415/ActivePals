@@ -14,6 +14,7 @@ import Post from '../types/Post';
 import Message from '../types/Message';
 import Notification from '../types/Notification';
 import Chat from '../types/Chat';
+import colors from './colors';
 
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
@@ -242,7 +243,7 @@ export const getStateColor = (state: UserState) => {
     case UserState.AWAY:
       return '#F9BD49';
     default:
-      return 'red';
+      return colors.appRed;
   }
 };
 

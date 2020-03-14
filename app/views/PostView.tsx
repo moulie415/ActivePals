@@ -258,7 +258,7 @@ class PostView extends Component<PostViewProps, State> {
                   {this.getUsernameFormatted(item.uid)}
                   <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                <ParsedText text={item.text} />
+                <ParsedText text={item.text} style={{ color: colors.textGrey }} />
               </View>
             </View>
           </View>
@@ -273,7 +273,7 @@ class PostView extends Component<PostViewProps, State> {
                   {this.getUsernameFormatted(item.uid)}
                   <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                <ParsedText text={item.text} />
+                <ParsedText text={item.text} style={{ color: colors.textGrey }} />
               </View>
             </View>
             <TouchableOpacity
@@ -308,7 +308,7 @@ class PostView extends Component<PostViewProps, State> {
                     {this.getUsernameFormatted(item.uid)}
                     <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
                   </View>
-                  <ParsedText text={item.text} />
+                  <ParsedText text={item.text} style={{ color: colors.textGrey }} />
                 </View>
               </View>
               <Video

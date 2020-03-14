@@ -18,7 +18,7 @@ const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
 }) => {
   return (
     <ParsedText
-      style={{ color: color || '#000' }}
+      style={{ color: color || colors.textGrey }}
       parse={[
         {
           pattern: str.mentionRegex,

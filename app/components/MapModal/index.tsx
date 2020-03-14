@@ -7,7 +7,6 @@ import { Alert, View } from 'react-native';
 import styles from './styles';
 import Text from '../Text';
 import Button from '../Button';
-
 import colors from '../../constants/colors';
 import MapModalProps from '../../types/components/MapsModal';
 import Place from '../../types/Place';
@@ -102,7 +101,12 @@ class MapModal extends Component<MapModalProps, State> {
           })}
         </MapView>
         <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-          <Button style={{ alignSelf: 'center', marginVertical: 10 }} color="red" text="Cancel" onPress={onClosed} />
+          <Button
+            style={{ alignSelf: 'center', marginVertical: 10 }}
+            color={colors.appRed}
+            text="Cancel"
+            onPress={onClosed}
+          />
           {location && (
             <Button
               style={{ alignSelf: 'center', marginVertical: 10 }}

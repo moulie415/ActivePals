@@ -97,7 +97,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
         <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>{title || 'Select Pals'}</Text>
         {this.renderFriendsSelection()}
         <View style={{ marginVertical: 10, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-          <Button onPress={onClosed} color="red" text="Cancel" />
+          <Button onPress={onClosed} color={colors.appRed} text="Cancel" />
           <Button
             onPress={() => {
               const { length } = selectedFriends;

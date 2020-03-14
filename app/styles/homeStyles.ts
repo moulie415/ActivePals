@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import colors from '../constants/colors';
 
 export default StyleSheet.create({
   spinner: {
@@ -18,7 +19,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    backgroundColor: 'red',
+    backgroundColor: colors.appRed,
   },
   mentionList: {
     position: 'absolute',

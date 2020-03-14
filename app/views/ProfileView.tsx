@@ -228,7 +228,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
 
             {isFriend && (
               <Button
-                color="red"
+                color={colors.appRed}
                 text="Remove pal"
                 style={{ alignSelf: 'center', margin: 10 }}
                 onPress={() => {

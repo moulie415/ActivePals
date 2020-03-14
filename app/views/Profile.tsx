@@ -95,6 +95,8 @@ class ProfileView extends Component<ProfileProps, State> {
       {
         text: 'OK',
         onPress: async () => {
+          navigation.navigate('Login');
+          onLogoutPress();
           try {
             this.setState({ spinner: true });
             await firebase
@@ -105,12 +107,8 @@ class ProfileView extends Component<ProfileProps, State> {
             await firebase.messaging().deleteToken();
             await firebase.auth().signOut();
             this.setState({ spinner: false });
-            onLogoutPress();
-            navigation.navigate('Login');
           } catch (e) {
             Alert.alert('Error', e.message);
-            onLogoutPress();
-            navigation.navigate('Login');
           }
         },
       },

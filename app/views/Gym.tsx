@@ -144,7 +144,7 @@ class Gym extends Component<GymProps, State> {
                       }}
                       style={{ alignSelf: 'flex-start' }}
                       text="Leave"
-                      color="red"
+                      color={colors.appRed}
                     />
                     <Button
                       text="Chat"
