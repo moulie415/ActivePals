@@ -9,7 +9,8 @@ export default StyleSheet.create({
     top: 0,
     bottom: 0,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    zIndex: 999,
   },
   map: {
     flex: 1

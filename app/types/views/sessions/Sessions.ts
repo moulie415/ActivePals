@@ -7,7 +7,7 @@ export default interface SessionsProps {
   sessions: { [key: string]: Session };
   privateSessions: { [key: string]: Session };
   setYourLocation: ({ lat, lon }) => void;
-  getPlaces: (lat: number, lon: number, token: string) => { token: string };
+  getPlaces: (lat: number, lon: number, token: string) => { token: string, loadMore: boolean };
   fetch: (radius: number) => void;
   radius: number;
   saveRadius: (radius: number) => void;

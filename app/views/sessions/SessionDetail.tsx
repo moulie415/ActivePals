@@ -148,7 +148,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
     if (location && title && details && date) {
       const session: Session = {
         location,
-        gym: gym.place_id,
+        gym: gym && gym.place_id,
         title,
         details,
         gender,

@@ -42,6 +42,7 @@ import { removeGym, joinGym, setLocation } from '../../actions/profile';
 import SessionsProps from '../../types/views/sessions/Sessions';
 import Session from '../../types/Session';
 import Place from '../../types/Place';
+import globalStyles from '../../styles/globalStyles';
 
 const LOCATION_PERMISSION =
   Platform.OS === 'ios' ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
@@ -57,7 +58,6 @@ interface State {
   popUpVisible: boolean;
   pilates: boolean;
   yoga: boolean;
-  loadingGyms: boolean;
   selectedLocation: {};
   locationPermission?: string;
   token?: string;
@@ -66,6 +66,7 @@ interface State {
   friendsModalOpen?: boolean;
   options?: Options;
   filterModalOpen?: boolean;
+  loadMoreGyms: boolean;
 }
 class Sessions extends Component<SessionsProps, State> {
   ActionSheet: ActionSheet;
@@ -86,8 +87,8 @@ class Sessions extends Component<SessionsProps, State> {
       popUpVisible: false,
       pilates: true,
       yoga: true,
-      loadingGyms: false,
       selectedLocation: {},
+      loadMoreGyms: true,
     };
   }
 
@@ -279,7 +280,7 @@ class Sessions extends Component<SessionsProps, State> {
 
   renderLists() {
     const { gym, location, navigation, places } = this.props;
-    const { selectedIndex, refreshing, sessions, token, loadingGyms } = this.state;
+    const { selectedIndex, refreshing, sessions, token, spinner, loadMoreGyms } = this.state;
     const emptyComponent = (
       <View>
         <Text style={{ color: colors.primary, textAlign: 'center', marginHorizontal: 20 }}>
@@ -351,7 +352,18 @@ class Sessions extends Component<SessionsProps, State> {
               <TouchableOpacity
                 onPress={() => navigation.navigate('SessionInfo', { sessionId: item.key, isPrivate: item.private })}
               >
-                <View style={{ padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index === 0 ? 1 : 0 }}>
+                <View
+                  style={{
+                    padding: 10,
+                    backgroundColor: '#fff',
+                    marginTop: 10,
+                    marginHorizontal: 10,
+                    borderRadius: 5,
+                    borderWidth: 1,
+                    borderColor: colors.secondary,
+                    // ...globalStyles.bubbleShadow,
+                  }}
+                >
                   <View style={{ flexDirection: 'row' }}>
                     <View style={{ alignItems: 'center', marginRight: 10, justifyContent: 'center' }}>
                       {getType(item.type, 40)}
@@ -399,36 +411,15 @@ class Sessions extends Component<SessionsProps, State> {
           <FlatList
             data={this.sortPlacesByDistance(Object.values(places))}
             refreshing={refreshing}
-            ListFooterComponent={
-              Object.values(places).length > 0 &&
-              token && (
-                <TouchableOpacity
-                  disabled={loadingGyms}
-                  onPress={async () => {
-                    this.setState({ loadingGyms: true });
-                    const { getPlaces } = this.props;
-                    const { token: newToken } = await getPlaces(yourLat, yourLon, token);
-                    this.setState({ loadingGyms: false, token: newToken });
-                  }}
-                >
-                  {!loadingGyms && !refreshing ? (
-                    <Text
-                      style={{
-                        color: colors.secondary,
-                        textAlign: 'center',
-                        backgroundColor: '#fff',
-                        fontSize: 20,
-                        paddingVertical: 5,
-                      }}
-                    >
-                      Load more gyms
-                    </Text>
-                  ) : (
-                    <PulseIndicator color={colors.secondary} />
-                  )}
-                </TouchableOpacity>
-              )
-            }
+            onEndReached={async () => {
+              if (!spinner && loadMoreGyms) {
+                this.setState({ spinner: true });
+                const { getPlaces } = this.props;
+                const { token: newToken, loadMore } = await getPlaces(yourLat, yourLon, token);
+                this.setState({ spinner: false, token: newToken, loadMoreGyms: loadMore });
+              }
+            }}
+            onEndReachedThreshold={0.1}
             onRefresh={() => this.handleRefresh()}
             style={{ backgroundColor: '#9993' }}
             keyExtractor={item => item.place_id}
@@ -444,7 +435,16 @@ class Sessions extends Component<SessionsProps, State> {
                     }}
                   >
                     <View
-                      style={{ padding: 10, backgroundColor: '#fff', marginBottom: 1, marginTop: index === 0 ? 1 : 0 }}
+                      style={{
+                        padding: 10,
+                        backgroundColor: '#fff',
+                        marginTop: 10,
+                        marginHorizontal: 10,
+                        borderRadius: 5,
+                        borderWidth: 1,
+                        borderColor: colors.secondary,
+                        // ...globalStyles.bubbleShadow,
+                      }}
                     >
                       <View style={{ flexDirection: 'row' }}>
                         {item.photo ? (
