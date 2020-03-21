@@ -2,7 +2,7 @@ name: Deploy android to firebase
 on:
   push:
     branches-ignore:
-      - '**'
+      - master
     branches:
       - master
 jobs:

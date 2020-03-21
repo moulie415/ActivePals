@@ -31,11 +31,11 @@ jobs:
           ./gradlew bundleRelease
       - name: upload bundle to Google Play
         uses: r0adkll/upload-google-play@v1
-          with:
-            serviceAccountJson: ${{ SERVICE_ACCOUNT_JSON }}
-            packageName: com.activepals
-            releaseFile: android/app/build/outputs/bundle/release/app-release.aab
-            track: alpha
-            #userFraction: 0.33
-            whatsNewDirectory: whatsnew
-            #mappingFile: /app/build/outputs/mapping/release/mapping.txt
+        with:
+          serviceAccountJson: ${{ SERVICE_ACCOUNT_JSON }}
+          packageName: com.activepals
+          releaseFile: android/app/build/outputs/bundle/release/app-release.aab
+          track: alpha
+          #userFraction: 0.33
+          whatsNewDirectory: whatsnew
+          #mappingFile: /app/build/outputs/mapping/release/mapping.txt
