@@ -1,8 +1,6 @@
-name: Deploy android to firebase
+name: Deploy android to Google Play
 on:
   push:
-    branches-ignore:
-      - '**'
     branches:
       - master
 jobs:
@@ -30,11 +28,14 @@ jobs:
           echo "MYAPP_RELEASE_STORE_PASSWORD=${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }}" >> gradle.properties
           echo "MYAPP_RELEASE_KEY_PASSWORD=${{ secrets.MYAPP_RELEASE_KEY_PASSWORD }}" >> gradle.properties
           echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-          ./gradlew assembleRelease
-      - name: upload artifact to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1.1.1
-        with:
-          appId: ${{secrets.FIREBASE_ANDROID_ID}}
-          token: ${{secrets.FIREBASE_TOKEN}}
-          groups: activepals
-          file: android/app/build/outputs/apk/release/app-release.apk
+          ./gradlew bundleRelease
+      - name: upload bundle to Google Play
+        uses: r0adkll/upload-google-play@v1
+          with:
+            serviceAccountJson: ${{ SERVICE_ACCOUNT_JSON }}
+            packageName: com.activepals
+            releaseFile: android/app/build/outputs/bundle/release/app-release.aab
+            track: alpha
+            #userFraction: 0.33
+            whatsNewDirectory: whatsnew
+            #mappingFile: /app/build/outputs/mapping/release/mapping.txt
