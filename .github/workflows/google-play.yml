@@ -14,7 +14,7 @@ jobs:
       - name: Run tests
         run: |
           npm test
-      - name: Build android apk
+      - name: Build android aab
         run: |
           npm run remove-uneeded
           touch .env
@@ -29,12 +29,18 @@ jobs:
           echo "MYAPP_RELEASE_KEY_PASSWORD=${{ secrets.MYAPP_RELEASE_KEY_PASSWORD }}" >> gradle.properties
           echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
           ./gradlew bundleRelease
+          cd app/build/outputs
+          ls
+          cd bundle
+          ls
+          cd release
+          ls
       - name: upload bundle to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.activepals
-          releaseFile: app/build/outputs/bundle/release/app-release.aab
+          releaseFile: android/app/build/outputs/bundle/release/app-release.aab
           track: alpha
           #userFraction: 0.33
           whatsNewDirectory: whatsnew
