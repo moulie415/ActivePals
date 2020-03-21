@@ -32,7 +32,7 @@ jobs:
       - name: upload bundle to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
           packageName: com.activepals
           releaseFile: android/app/build/outputs/bundle/release/app.aab
           track: alpha
