@@ -329,7 +329,7 @@ class Login extends Component<LoginProps, State> {
           </SpinnerButton>
         </View>
         <Text style={{ color: colors.primary, textAlign: 'center', position: 'absolute', bottom: 10 }}>
-          {`v${VersionNumber.appVersion}`}
+          {`v${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}
         </Text>
       </ImageBackground>
     );

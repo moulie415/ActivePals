@@ -85,7 +85,9 @@ class Settings extends Component<SettingsProps, State> {
           </TouchableOpacity>
           <View style={styles.contact}>
             <Text>Version no: </Text>
-            <Text style={{ color: colors.primary, fontWeight: 'bold' }}>{VersionNumber.appVersion}</Text>
+            <Text
+              style={{ color: colors.primary, fontWeight: 'bold' }}
+            >{`${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}</Text>
           </View>
           <TouchableOpacity
             style={{ padding: 15, backgroundColor: '#fff' }}
