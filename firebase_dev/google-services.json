@@ -56,10 +56,10 @@
               "client_type": 3
             },
             {
-              "client_id": "680139677816-66m6mk2dr31df6ovaog39fcsluj8tnnk.apps.googleusercontent.com",
+              "client_id": "680139677816-vcncq0ghn0tlc0svdc5fm8rpbb84o2ni.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "org.reactjs.native.example.Anyone"
+                "bundle_id": "com.activepals"
               }
             }
           ]
