@@ -11,7 +11,7 @@ import SpinnerButton from 'react-native-spinner-button';
 import { PulseIndicator } from 'react-native-indicators';
 import { connect } from 'react-redux';
 import { LoginManager, AccessToken } from 'react-native-fbsdk';
-import { GOOGLE_IOS_ID, GOOGLE_WEB_ID } from 'react-native-dotenv';
+import { GOOGLE_IOS_ID, GOOGLE_WEB_ID, GOOGLE_API_KEY } from 'react-native-dotenv';
 import Button from '../components/Button';
 import { AccountType } from '../types/Profile';
 import styles from '../styles/loginStyles';
@@ -21,6 +21,7 @@ import Text from '../components/Text';
 import str from '../constants/strings';
 import { doSetup, fetchProfile, setLoggedOut } from '../actions/profile';
 import LoginProps from '../types/views/Login';
+import { logEvent } from '../helpers/logging';
 
 interface State {
   spinner: boolean;
@@ -133,6 +134,7 @@ class Login extends Component<LoginProps, State> {
         const facebookID = json.id;
         const fbImage = `https://graph.facebook.com/${facebookID}/picture?height=${imageSize}`;
         const result = await this.authenticate(data.accessToken);
+        logEvent('facebook_login');
         const { uid } = result.user;
         firebase
           .database()
@@ -183,6 +185,7 @@ class Login extends Component<LoginProps, State> {
       const { user } = await firebase.auth().signInWithEmailAndPassword(email, pass);
       if (user.emailVerified) {
         await onLogin();
+        logEvent('login');
         this.goNext();
       } else {
         this.setState({ spinner: false });
@@ -209,6 +212,7 @@ class Login extends Component<LoginProps, State> {
       const last_name = gUser.familyName;
       const credential = firebase.auth.GoogleAuthProvider.credential(idToken, serverAuthCode);
       const result = await firebase.auth().signInAndRetrieveDataWithCredential(credential);
+      logEvent('google_login', { GOOGLE_IOS_ID, GOOGLE_WEB_ID, GOOGLE_API_KEY })
       const { user } = result;
       console.log('user firebase ', user);
       const userData = { uid: user.uid, email: user.email, token: credential.token, last_name, first_name };
