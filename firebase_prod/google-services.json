@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "623262962635-dtbdjspv83ui0j7p78vp5ohv4rt8brl3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.activepals",
+            "certificate_hash": "5a98a39fb24f2245e131fdf4dd52ff63af7fccb2"
+          }
+        },
+        {
           "client_id": "623262962635-2nsvnkni27jh7qfvf4k89rhkvrvboofp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
