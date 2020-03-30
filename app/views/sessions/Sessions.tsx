@@ -93,14 +93,17 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   async componentDidMount() {
-    const response = await Permissions.check(LOCATION_PERMISSION);
-    this.setState({ spinner: true });
-    // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
-    this.setState({ locationPermission: response });
-    if (response !== RESULTS.GRANTED) {
-      this.alertForLocationPermission();
+    if (Platform.OS === 'ios') {
+      this.locationPermission();
     } else {
-      this.getPosition();
+      const response = await Permissions.check(LOCATION_PERMISSION);
+      // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
+      this.setState({ locationPermission: response, spinner: true });
+      if (response !== RESULTS.GRANTED) {
+        this.alertForLocationPermission();
+      } else {
+        this.getPosition();
+      }
     }
   }
 
