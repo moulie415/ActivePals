@@ -66,7 +66,7 @@ export
 coverage
 *.hprof
 
-.env
+.env*
 .env.production
 
 android-sourcemap.json
