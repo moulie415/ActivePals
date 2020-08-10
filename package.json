@@ -6,30 +6,44 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "start-prod": "ENV=production npm run prestart && react-native start",
-    "firebase-android": "cd scripts && ENV=production ./envscript.sh && ./firebase-android.sh",
-    "firebase-ios": "ENV=production ./envscript.sh && ./firebase-ios.sh",
-    "postinstall": "npm run remove-uneeded && cp -rf react-native-fast-image/android node_modules/react-native-fast-image",
-    "prestart": "npm run remove-uneeded && cd scripts && ./envscript.sh",
-    "remove-uneeded": "rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-parsed-text && rm -rf node_modules/react-native-gifted-chat/node_modules/react-native-video",
-    "test": "jest --coverage",
-    "lint": "eslint ."
+    "test": "jest",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@eva-design/eva": "2.0.0",
+    "@ui-kitten/components": "5.0.0",
+    "@ui-kitten/eva-icons": "5.0.0",
     "react": "16.11.0",
-    "react-native": "0.62.2"
+    "react-native": "0.62.2",
+    "react-native-svg": "^12.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/runtime": "^7.6.2",
-    "@react-native-community/eslint-config": "^0.0.5",
+    "@react-native-community/eslint-config": "^1.0.0",
+    "@types/jest": "^24.0.24",
+    "@types/react-native": "^0.62.0",
+    "@types/react-test-renderer": "16.9.2",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
+    "@ui-kitten/metro-config": "5.0.0",
     "babel-jest": "^24.9.0",
     "eslint": "^6.5.1",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.58.0",
-    "react-test-renderer": "16.11.0"
+    "react-test-renderer": "16.11.0",
+    "prettier": "^2.0.2",
+    "typescript": "^3.8.3"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }
