@@ -29,10 +29,10 @@ import LoginProps from '../types/views/Login';
 import styles from '../styles/loginStyles';
 import {Layout, Icon, Button, Input, Text} from '@ui-kitten/components';
 import globalStyles from '../styles/globalStyles';
-import env from 'react-native-dotenv';
+import {GOOGLE_WEB_ID} from 'react-native-dotenv';
 
 GoogleSignin.configure({
-  webClientId: env.GOOGLE_WEB_ID, // From Firebase Console Settings
+  webClientId: GOOGLE_WEB_ID, // From Firebase Console Settings
 });
 
 const Login: FunctionComponent<LoginProps> = ({
