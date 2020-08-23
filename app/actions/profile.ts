@@ -12,7 +12,7 @@ import {
 } from './chats';
 import {fetchPosts} from './home';
 import {fetchSessions, fetchPhotoPath, fetchPrivateSessions} from './sessions';
-import {UserState} from '../types/Profile';
+import Profile, {UserState} from '../types/Profile';
 import Place from '../types/Place';
 import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
 
@@ -89,13 +89,37 @@ export const setHasViewedWelcome = () => ({
   type: SET_HAS_VIEWED_WELCOME,
 });
 
-export const doSetup = (): MyThunkResult<Promise<void>> => {
-  return async (dispatch: MyThunkDispatch) => {
-    console.log('do setup');
+// export const doSetup = (): MyThunkResult<Promise<void>> => {
+//   return async (dispatch: MyThunkDispatch) => {
+//     console.log('do setup');
+//   };
+// };
+
+export const doSetup = (profile: Profile): MyThunkResult<Promise<void>> => {
+  return async (dispatch, getState) => {
+    const {uid} = profile;
+    try {
+      setupPresence(uid);
+      //   const fcmToken = await messaging().getToken();
+      //   if (fcmToken) {
+      //     database()
+      //       .ref(`users/${uid}`)
+      //       .child('FCMToken')
+      //       .set(fcmToken);
+      //     console.log(fcmToken);
+      //   } else {
+      //     console.warn('no token');
+      //   }
+    } catch (e) {
+      console.warn(e);
+    }
+    dispatch(getUnreadCount(uid));
+    dispatch(fetchFriends(uid));
+    profile.gym && dispatch(fetchGymChat(profile.gym));
   };
 };
 
-const setupPresence = (uid) => {
+const setupPresence = (uid: string) => {
   const ref = database().ref(`users/${uid}`).child('state');
   const lastChange = database().ref(`users/${uid}`).child('lastChange');
   const connectedRef = database().ref('.info/connected');
@@ -108,7 +132,7 @@ const setupPresence = (uid) => {
   });
 };
 
-const fetchGym = (profile): MyThunkResult<Promise<void>> => {
+const fetchGym = (profile: Profile): MyThunkResult<Promise<void>> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     if (profile.gym) {
       const snapshot = await database()
@@ -123,19 +147,21 @@ const fetchGym = (profile): MyThunkResult<Promise<void>> => {
 export const fetchProfile = () => {
   return async (dispatch: MyThunkDispatch) => {
     const user = auth().currentUser;
-    const snapshot = await database().ref(`users/${user.uid}`).once('value');
-    try {
-      const url = await storage()
-        .ref(`images/${user.uid}`)
-        .child('avatar')
-        .getDownloadURL();
-      dispatch(setProfile({...snapshot.val(), avatar: url}));
-      dispatch(fetchGym(snapshot.val()));
-      return {...snapshot.val(), avatar: url};
-    } catch (e) {
-      dispatch(setProfile(snapshot.val()));
-      dispatch(fetchGym(snapshot.val()));
-      return snapshot.val();
+    if (user) {
+      const snapshot = await database().ref(`users/${user.uid}`).once('value');
+      try {
+        const url = await storage()
+          .ref(`images/${user.uid}`)
+          .child('avatar')
+          .getDownloadURL();
+        dispatch(SetProfile({...snapshot.val(), avatar: url}));
+        dispatch(fetchGym(snapshot.val()));
+        return {...snapshot.val(), avatar: url};
+      } catch (e) {
+        dispatch(SetProfile(snapshot.val()));
+        dispatch(fetchGym(snapshot.val()));
+        return snapshot.val();
+      }
     }
   };
 };

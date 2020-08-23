@@ -5,9 +5,10 @@ import {
   SET_HAS_VIEWED_WELCOME,
   ProfileActionTypes,
 } from '../actions/profile';
+import Profile from '../types/Profile';
 
 export interface ProfileState {
-  profile: any;
+  profile: Profile;
   loggedIn: boolean;
   hasViewedWelcome: boolean;
 }

@@ -20,12 +20,15 @@
 //   token?: string;
 // }
 
-export default interface Profile {
-  email: string;
-  uid: string;
-  avatar?: string;
-};
+// export default interface Profile {
+//   email: string;
+//   uid: string;
+//   avatar?: string;
+// };
 
+export default interface Profile {
+  [key: string]: any;
+}
 
 export enum AccountType {
   STANDARD = 'standard',

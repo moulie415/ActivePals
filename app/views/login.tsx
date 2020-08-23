@@ -61,12 +61,14 @@ const Login: FunctionComponent<LoginProps> = ({
         const doc = await userRef.get();
         if (doc.exists) {
           setProfile(doc.data());
+          setup(doc.data());
         } else {
           const avatar = getProfileImage(user);
           userRef.set({uid: user.uid, email: user.email, avatar});
           setProfile({uid: user.uid, email: user.email});
+          setup({uid: user.uid, email: user.email});
         }
-        setup();
+
         if (hasViewedWelcome) {
           navigation.dispatch(
             CommonActions.reset({
@@ -282,8 +284,8 @@ const mapStateToProps = ({profile}: MyRootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  setProfile: (profile: {[key: string]: any}) => dispatch(SetProfile(profile)),
-  setup: () => dispatch(doSetup()),
+  setProfile: (profile: Profile) => dispatch(SetProfile(profile)),
+  setup: (profile: Profile) => dispatch(doSetup(profile)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

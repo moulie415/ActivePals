@@ -45,6 +45,8 @@
 		00E356EE1AD99517003FC87E /* ActivePalsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ActivePalsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* ActivePalsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ActivePalsTests.m; sourceTree = "<group>"; };
+		0A58F54C24F2FB6B00C9A400 /* ActivePalsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ActivePalsDebug.entitlements; path = ActivePals/ActivePalsDebug.entitlements; sourceTree = "<group>"; };
+		0A58F54D24F2FB7400C9A400 /* ActivePals.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ActivePals.entitlements; path = ActivePals/ActivePals.entitlements; sourceTree = "<group>"; };
 		0AA86ECE24F2D141008068B6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0C4321C54EFD9BE7F60EF189 /* Pods-ActivePals-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ActivePals-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-ActivePals-tvOSTests/Pods-ActivePals-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		1317D477E373D241CD384A3F /* libPods-ActivePals-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ActivePals-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -127,6 +129,8 @@
 		13B07FAE1A68108700A75B9A /* ActivePals */ = {
 			isa = PBXGroup;
 			children = (
+				0A58F54D24F2FB7400C9A400 /* ActivePals.entitlements */,
+				0A58F54C24F2FB6B00C9A400 /* ActivePalsDebug.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -300,7 +304,9 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = 27RJG57PEM;
 						LastSwiftMigration = 1120;
+						ProvisioningStyle = Manual;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -742,7 +748,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ActivePals/ActivePalsDebug.entitlements;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 27RJG57PEM;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -755,8 +764,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.activepals;
 				PRODUCT_NAME = ActivePals;
+				PROVISIONING_PROFILE_SPECIFIER = Development;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -769,7 +779,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ActivePals/ActivePals.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 27RJG57PEM;
 				INFOPLIST_FILE = ActivePals/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -777,8 +791,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.activepals;
 				PRODUCT_NAME = ActivePals;
+				PROVISIONING_PROFILE_SPECIFIER = Distribution;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
