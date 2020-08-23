@@ -11,6 +11,10 @@ import {
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+
+const Stack = createStackNavigator();
 
 const HeartIcon = (
   props?: Partial<ImageProps>,
@@ -29,23 +33,25 @@ const App = (): React.ReactFragment => {
       <ThemeContext.Provider value={{theme, toggleTheme}}>
         {/* @ts-ignore */}
         <ApplicationProvider {...eva} theme={eva[theme]}>
-          <Layout style={styles.container}>
-            <Text style={styles.text} category="h1">
-              Welcome to UI Kitten 😻
-            </Text>
-            <Text style={styles.text} category="s1">
-              Start with editing App.js to configure your App
-            </Text>
-            <Text style={styles.text} appearance="hint">
-              For example, try changing theme to Dark by using eva.dark
-            </Text>
-            <Button
-              style={styles.likeButton}
-              onPress={toggleTheme}
-              accessoryLeft={HeartIcon}>
-              LIKE
-            </Button>
-          </Layout>
+          <NavigationContainer>
+            <Layout style={styles.container}>
+              <Text style={styles.text} category="h1">
+                Welcome to UI Kitten 😻
+              </Text>
+              <Text style={styles.text} category="s1">
+                Start with editing App.js to configure your App
+              </Text>
+              <Text style={styles.text} appearance="hint">
+                For example, try changing theme to Dark by using eva.dark
+              </Text>
+              <Button
+                style={styles.likeButton}
+                onPress={toggleTheme}
+                accessoryLeft={HeartIcon}>
+                LIKE
+              </Button>
+            </Layout>
+          </NavigationContainer>
         </ApplicationProvider>
       </ThemeContext.Provider>
     </>
