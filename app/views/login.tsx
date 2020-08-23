@@ -167,65 +167,68 @@ const Login: FunctionComponent<LoginProps> = ({
   };
 
   return (
-    <Layout>
+    <Layout style={{flex: 1, justifyContent: 'center', padding: 20}} level="4">
       {spinner && (
         <View style={globalStyles.indicator}>
           <ActivityIndicator />
         </View>
       )}
 
-      <View>
-        <Icon size={25} name="envelope" solid />
-        <Input
-          placeholder="Email"
-          onChangeText={(u) => setUsername(u)}
-          placeholderTextColor="#fff"
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="email-address"
-        />
-      </View>
-      <View>
-        <Icon size={25} name="unlock" solid />
-        <Input
-          placeholder="Password"
-          secureTextEntry={secure}
-          placeholderTextColor="#fff"
-          onChangeText={(p) => setPass(p)}
-          style={styles.input}
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
-        <TouchableOpacity onPress={() => setSecure(!secure)}>
-          <Icon size={30} name={secure ? 'eye' : 'eye-slash'} solid />
-        </TouchableOpacity>
-      </View>
+      <Input
+        placeholder="Email"
+        onChangeText={(u) => setUsername(u)}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="email-address"
+        accessoryLeft={(props) => <Icon {...props} name="email-outline" />}
+      />
+
+      <Input
+        placeholder="Password"
+        secureTextEntry={secure}
+        onChangeText={(p) => setPass(p)}
+        autoCorrect={false}
+        autoCapitalize="none"
+        accessoryLeft={(props) => <Icon {...props} name="unlock" />}
+        accessoryRight={(props) => (
+          <TouchableOpacity onPress={() => setSecure(!secure)}>
+            <Icon {...props} name={secure ? 'eye' : 'eye-off'} />
+          </TouchableOpacity>
+        )}
+      />
       <View
-        style={{flexDirection: 'row', marginVertical: 10, marginBottom: 30}}>
+        style={{
+          flexDirection: 'row',
+          marginVertical: 10,
+          marginBottom: 30,
+          justifyContent: 'space-evenly',
+        }}>
         <Button
           onPress={async () => {
             if (username && pass) {
               setSpinner(true);
               setSecure(true);
-              const {user} = await signIn(username, pass);
-              if (!user.emailVerified) {
+              const credentials = await signIn(username, pass);
+              if (credentials) {
+                if (!credentials.user.emailVerified) {
+                  Alert.alert(
+                    'Sorry',
+                    'You must first verify your email using the link we sent you before logging in',
+                  );
+                }
+              } else {
                 Alert.alert(
                   'Sorry',
-                  'You must first verify your email using the link we sent you before logging in',
+                  'Please enter both your email and your password',
                 );
               }
-            } else {
-              Alert.alert(
-                'Sorry',
-                'Please enter both your email and your password',
-              );
             }
           }}>
           Sign in
         </Button>
         <Button onPress={() => navigation.navigate('SignUp')}>Sign Up</Button>
       </View>
-      <View>
+      <View style={{alignItems: 'center'}}>
         {Platform.OS === 'ios' && (
           <AppleButton
             buttonStyle={AppleButton.Style.WHITE}
@@ -243,8 +246,8 @@ const Login: FunctionComponent<LoginProps> = ({
           spinnerType="MaterialIndicator"
           buttonStyle={[{backgroundColor: '#3b5998'}, styles.spinnerButton]}>
           <Icon
-            size={20}
-            style={{color: '#fff', marginRight: 10}}
+            fill="#fff"
+            style={{marginRight: 10, width: 25, height: 25}}
             name="facebook"
           />
           <Text style={styles.spinnerButtonText}>Sign in with Facebook</Text>
@@ -258,14 +261,17 @@ const Login: FunctionComponent<LoginProps> = ({
           }}
           buttonStyle={[{backgroundColor: '#ea4335'}, styles.spinnerButton]}>
           <Icon
-            size={20}
-            style={{marginLeft: -15, color: '#fff', marginRight: 10}}
+            fill="#fff"
+            style={{marginLeft: -15, width: 20, height: 20, marginRight: 10}}
             name="google"
           />
           <Text style={styles.spinnerButtonText}>Sign in with Google</Text>
         </SpinnerButton>
       </View>
-      <Text>{`v${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}</Text>
+      <Text
+        style={{
+          alignSelf: 'center',
+        }}>{`v${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}</Text>
     </Layout>
   );
 };
@@ -276,7 +282,7 @@ const mapStateToProps = ({profile}: MyRootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  setProfile: (profile: Profile) => dispatch(SetProfile(profile)),
+  setProfile: (profile: {[key: string]: any}) => dispatch(SetProfile(profile)),
   setup: () => dispatch(doSetup()),
 });
 

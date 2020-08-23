@@ -82,8 +82,7 @@ export const setUnreadCount = ({id, count}) => ({
 
 export const fetchGymChat = (gym) => {
   return (dispatch) => {
-    return firebase
-      .database()
+    return database()
       .ref('gymChats')
       .child(gym)
       .orderByKey()
@@ -146,15 +145,14 @@ export const resetUnreadCount = (id) => {
   return (dispatch, getState) => {
     const count = 0;
     const {uid} = getState().profile.profile;
-    firebase.database().ref(`unreadCount/${uid}`).child(id).set(count);
+    database().ref(`unreadCount/${uid}`).child(id).set(count);
     dispatch(setUnreadCount({id, count}));
   };
 };
 
 export const getUnreadCount = (uid) => {
   return (dispatch, getState) => {
-    firebase
-      .database()
+    database()
       .ref('unreadCount')
       .child(uid)
       .on('value', (snapshot) => {
@@ -174,8 +172,7 @@ export const getUnreadCount = (uid) => {
 
 export const fetchChats = (uid, limit = 10) => {
   return async (dispatch) => {
-    return firebase
-      .database()
+    return database()
       .ref('userChats')
       .child(uid)
       .limitToFirst(limit)
@@ -213,8 +210,7 @@ export const fetchChats = (uid, limit = 10) => {
 
 export const fetchSessionChats = (uid, limit = 10) => {
   return async (dispatch) => {
-    return firebase
-      .database()
+    return database()
       .ref('userSessions')
       .child(uid)
       .limitToFirst(limit)
@@ -266,7 +262,7 @@ export const fetchMessages = (id, amount, uid, endAt) => {
           .orderByKey()
           .endAt(endAt)
           .limitToLast(amount)
-      : firebase.database().ref(`chats/${id}`).orderByKey().limitToLast(amount);
+      : database().ref(`chats/${id}`).orderByKey().limitToLast(amount);
     const snapshot = await ref.once('value');
     const messages = {};
     try {
@@ -385,7 +381,7 @@ export const fetchGymMessages = (id, amount, endAt) => {
           .ref(`gymChats/${id}`)
           .endAt(endAt)
           .limitToLast(amount)
-      : firebase.database().ref(`gymChats/${id}`).limitToLast(amount);
+      : database().ref(`gymChats/${id}`).limitToLast(amount);
     return ref.once('value', (snapshot) => {
       const messages = {};
       const promises = [];
@@ -447,6 +443,6 @@ export const muteChat = (id, mute) => {
   return (dispatch, getState) => {
     const {uid} = getState().profile.profile;
     dispatch(setMute(id, mute));
-    firebase.database().ref(`muted/${uid}`).child(id).set(mute);
+    database().ref(`muted/${uid}`).child(id).set(mute);
   };
 };

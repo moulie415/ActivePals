@@ -86,17 +86,17 @@ export const removeSession = (key, isPrivate, force = false) => {
     const session = sessions[key];
     const type = isPrivate ? 'privateSessions' : 'sessions';
     if (session && session.host === uid) {
-      firebase.database().ref(`${type}/${key}`).remove();
+      database().ref(`${type}/${key}`).remove();
       Object.keys(session.users).forEach((user) =>
-        firebase.database().ref(`userSessions/${user}`).child(key).remove(),
+        database().ref(`userSessions/${user}`).child(key).remove(),
       );
-      firebase.database().ref('sessionChats').child(key).remove();
+      database().ref('sessionChats').child(key).remove();
       if (!isPrivate) {
         geofire.remove(key);
       }
     } else {
-      firebase.database().ref(`userSessions/${uid}`).child(key).remove();
-      firebase.database().ref(`${type}/${key}/users`).child(uid).remove();
+      database().ref(`userSessions/${uid}`).child(key).remove();
+      database().ref(`${type}/${key}/users`).child(uid).remove();
     }
     let obj;
     if (session && (isPrivate || session.host === uid || force)) {
@@ -153,8 +153,7 @@ export const fetchSessions = () => {
     const {radius} = getState().sessions;
     const {uid} = getState().profile.profile;
     const userFetches = [];
-    firebase
-      .database()
+    database()
       .ref('userSessions')
       .child(uid)
       .on('value', async (snapshot) => {
@@ -268,8 +267,7 @@ export const fetchPrivateSessions = () => {
   return async (dispatch, getState) => {
     const {uid} = getState().profile.profile;
     const userFetches = [];
-    return firebase
-      .database()
+    return database()
       .ref('userSessions')
       .child(uid)
       .on('value', async (snapshot) => {
@@ -340,10 +338,7 @@ export const fetchGym = (id: string) => {
     const response = await fetch(url);
     const json = await response.json();
     const gym = await fetchPhotoPath(json.result);
-    const users = await firebase
-      .database()
-      .ref(`gyms/${id}/users`)
-      .once('value');
+    const users = await database().ref(`gyms/${id}/users`).once('value');
     if (users && users.val()) {
       gym.users = users.val();
       const unfetched = Object.keys(users.val()).filter((user) => {
@@ -371,11 +366,7 @@ export const fetchSession = (id: string) => {
       distance = currentSession.distance;
     }
 
-    const session = await firebase
-      .database()
-      .ref('sessions')
-      .child(id)
-      .once('value');
+    const session = await database().ref('sessions').child(id).once('value');
     if (session.val().gym) {
       dispatch(fetchGym(session.val().gym));
     }
@@ -399,8 +390,7 @@ export const fetchSession = (id: string) => {
 
 export const fetchPrivateSession = (id) => {
   return async (dispatch, getState) => {
-    const session = await firebase
-      .database()
+    const session = await database()
       .ref('privateSessions')
       .child(id)
       .once('value');
@@ -428,12 +418,11 @@ export const fetchPrivateSession = (id) => {
 export const addUser = (key, isPrivate, uid) => {
   return async (dispatch, getState) => {
     const type = isPrivate ? 'privateSessions/' : 'sessions/';
-    await firebase
-      .database()
+    await database()
       .ref(`userSessions/${uid}`)
       .child(key)
       .set(isPrivate ? 'private' : true);
-    await firebase.database().ref(`${type}${key}/users`).child(uid).set(true);
+    await database().ref(`${type}${key}/users`).child(uid).set(true);
     const sessions = isPrivate
       ? getState().sessions.privateSessions
       : getState().sessions.sessions;

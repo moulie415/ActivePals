@@ -1,175 +1,147 @@
-import React, { Component } from 'react';
-import { Alert, View, ImageBackground, KeyboardAvoidingView, TextInput } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { connect } from 'react-redux';
-import { PulseIndicator } from 'react-native-indicators';
-import firebase from 'react-native-firebase';
-import styles from '../styles/signUpStyles';
-import colors from '../constants/colors';
-import Header from '../components/Header/header';
-import sStyles from '../styles/settingsStyles';
-import Button from '../components/Button';
-import { AccountType } from '../types/Profile';
+import React, {FunctionComponent, useState} from 'react';
+import {
+  Alert,
+  View,
+  KeyboardAvoidingView,
+  ActivityIndicator,
+} from 'react-native';
+import {connect} from 'react-redux';
+import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
+import {AccountType} from '../types/Profile';
 import str from '../constants/strings';
 import SignUpProps from '../types/views/SignUp';
+import {Layout, Button, Input, Icon} from '@ui-kitten/components';
+import globalStyles from '../styles/globalStyles';
+import styles from '../styles/signUpStyles';
 
-const background = require('../../assets/images/Running-background.jpg');
+const SignUp: FunctionComponent<SignUpProps> = ({navigation}) => {
+  const [spinner, setSpinner] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
+  const [confirm, setConfirm] = useState('');
 
-interface State {
-  spinner: boolean;
-  username?: string;
-  email?: string;
-  pass?: string;
-  confirm?: string;
-}
-class SignUp extends Component<SignUpProps, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      spinner: false,
-    };
-  }
-
-  createUser = (uid, userData, token) => {
-    const { username } = this.state;
-    firebase
-      .database()
+  const createUser = (uid: string, userData: any, token: string) => {
+    database()
       .ref('admins')
       .child(uid)
-      .once('value', snapshot => {
+      .once('value', (snapshot) => {
         const defaults = {
           uid,
           token,
-          accountType: snapshot.val() ? AccountType.ADMIN : AccountType.STANDARD,
+          accountType: snapshot.val()
+            ? AccountType.ADMIN
+            : AccountType.STANDARD,
         };
-        // Alert.alert("Success", "Logged in as: " + userData.email)
-        firebase
-          .database()
+        database()
           .ref('users')
           .child(uid)
-          .update({ ...userData, ...defaults });
+          .update({...userData, ...defaults});
         if (username) {
-          firebase
-            .database()
-            .ref('usernames')
-            .child(username)
-            .set(uid);
+          database().ref('usernames').child(username).set(uid);
         }
       });
   };
 
-  static navigationOptions = {
-    headerShown: false,
-  };
-
-  async signup(email, pass) {
-    const { username } = this.state;
-    const { navigation } = this.props;
+  const signup = async () => {
     try {
-      const { user } = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-      const userData = { uid: user.uid, email: user.email, username };
-      this.createUser(user.uid, userData, '');
+      const {user} = await auth().createUserWithEmailAndPassword(email, pass);
+      const userData = {uid: user.uid, email: user.email, username};
+      createUser(user.uid, userData, '');
       await user.sendEmailVerification();
       navigation.goBack();
-      Alert.alert('Account created', 'You must now verify your email using the link we sent you before you can login');
-      this.setState({ spinner: false });
+      Alert.alert(
+        'Account created',
+        'You must now verify your email using the link we sent you before you can login',
+      );
+      setSpinner(false);
     } catch (error) {
       console.log(error.toString());
-      this.setState({ spinner: false });
+      setSpinner(false);
       Alert.alert('Error', error.message);
     }
-  }
+  };
 
-  render() {
-    const { username, email, pass, confirm, spinner } = this.state;
-    return (
-      <ImageBackground style={styles.container} source={background}>
-        <Header hasBack title="Sign up" />
-        {spinner && (
-          <View style={sStyles.spinner}>
-            <PulseIndicator color={colors.secondary} />
-          </View>
-        )}
-        <KeyboardAvoidingView behavior="padding" style={{ justifyContent: 'center', flex: 1 }}>
-          <View style={styles.inputGrp}>
-            <Icon size={25} name="ios-person" style={{ color: '#fff', marginRight: 5 }} />
-            <TextInput
-              placeholder="Username"
-              onChangeText={u => this.setState({ username: u })}
-              value={username}
-              placeholderTextColor="#FFF"
-              style={styles.input}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-            />
-          </View>
-          <View style={styles.inputGrp}>
-            <Icon size={25} name="md-mail" style={styles.icon} />
-            <TextInput
-              placeholder="Email"
-              onChangeText={e => this.setState({ email: e })}
-              value={email}
-              placeholderTextColor="#FFF"
-              style={styles.input}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-            />
-          </View>
-          <View style={styles.inputGrp}>
-            <Icon size={25} name="md-unlock" style={styles.icon} />
-            <TextInput
-              placeholder="Password"
-              secureTextEntry
-              placeholderTextColor="#FFF"
-              onChangeText={p => this.setState({ pass: p })}
-              value={pass}
-              style={styles.input}
-            />
-          </View>
-          <View style={styles.inputGrp}>
-            <Icon size={25} name="md-unlock" style={styles.icon} />
-            <TextInput
-              placeholder="Confirm Password"
-              secureTextEntry
-              placeholderTextColor="#FFF"
-              onChangeText={p => this.setState({ confirm: p })}
-              value={confirm}
-              style={styles.input}
-            />
-          </View>
-          <Button
-            style={{ paddingHorizontal: 20, alignSelf: 'center' }}
-            onPress={async () => {
-              if (pass === confirm) {
-                this.setState({ spinner: true });
-                if (username && username.length > 5 && !str.whiteSpaceRegex.test(username)) {
-                  const snapshot = await firebase
-                    .database()
-                    .ref(`/usernames/${username}`)
-                    .once('value');
-                  if (snapshot.val()) {
-                    Alert.alert('Sorry', 'That username is already in use');
-                    this.setState({ spinner: false });
-                  } else {
-                    this.signup(email, pass);
-                  }
-                } else {
-                  Alert.alert('Sorry', 'Username must be at least 5 characters long and cannot contain any spaces');
-                  this.setState({ spinner: false });
-                }
+  return (
+    <Layout style={{flex: 1, justifyContent: 'center', padding: 20}} level="4">
+      {spinner && (
+        <View style={globalStyles.indicator}>
+          <ActivityIndicator />
+        </View>
+      )}
+
+      <Input
+        style={styles.input}
+        placeholder="Username"
+        onChangeText={(u) => setUsername(u)}
+        value={username}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="email-address"
+        accessoryLeft={(props) => <Icon {...props} name="person" />}
+      />
+      <Input
+        style={styles.input}
+        placeholder="Email"
+        onChangeText={(e) => setEmail(e)}
+        value={email}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="email-address"
+        accessoryLeft={(props) => <Icon {...props} name="email-outline" />}
+      />
+      <Input
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        onChangeText={(p) => setPass(p)}
+        value={pass}
+        accessoryLeft={(props) => <Icon {...props} name="unlock" />}
+      />
+      <Input
+        style={styles.input}
+        placeholder="Confirm Password"
+        secureTextEntry
+        onChangeText={(p) => setConfirm(p)}
+        value={confirm}
+        accessoryLeft={(props) => <Icon {...props} name="unlock" />}
+      />
+      <Button
+        style={{paddingHorizontal: 20, alignSelf: 'center'}}
+        onPress={async () => {
+          if (pass === confirm) {
+            setSpinner(true);
+            if (
+              username &&
+              username.length > 5 &&
+              !str.whiteSpaceRegex.test(username)
+            ) {
+              const snapshot = await database()
+                .ref(`/usernames/${username}`)
+                .once('value');
+              if (snapshot.val()) {
+                Alert.alert('Sorry', 'That username is already in use');
+                setSpinner(false);
               } else {
-                Alert.alert('Please try again', 'Passwords do not match');
-                this.setState({ spinner: false });
+                signup();
               }
-            }}
-            text="Sign up"
-          />
-        </KeyboardAvoidingView>
-      </ImageBackground>
-    );
-  }
-}
+            } else {
+              Alert.alert(
+                'Sorry',
+                'Username must be at least 5 characters long and cannot contain any spaces',
+              );
+              setSpinner(false);
+            }
+          } else {
+            Alert.alert('Please try again', 'Passwords do not match');
+            setSpinner(false);
+          }
+        }}>
+        Sign up
+      </Button>
+    </Layout>
+  );
+};
 
 export default connect()(SignUp);

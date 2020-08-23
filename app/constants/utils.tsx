@@ -1,7 +1,6 @@
 import React from 'react';
 import {Linking, Alert, View} from 'react-native';
 import {pipe} from 'ramda';
-import database from '@react-native-firebase/database';
 import admob from '@react-native-firebase/admob';
 import crashlytics from '@react-native-firebase/crashlytics';
 import moment, {Moment} from 'moment';
@@ -20,12 +19,11 @@ import colors from './colors';
 
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
-// @ts-ignore
-const advert = firebase.admob().interstitial(str.admobInterstitial);
-
 export const showAdmobInterstitial = () => {
   // @ts-ignore
-  const {AdRequest} = firebase.admob;
+  const advert = admob().interstitial(str.admobInterstitial);
+  // @ts-ignore
+  const {AdRequest} = admob;
   const request = new AdRequest();
   advert.loadAd(request.build());
   advert.on('onAdLoaded', () => {
@@ -33,7 +31,7 @@ export const showAdmobInterstitial = () => {
   });
   advert.on('onAdFailedToLoad', (e) => {
     Instabug.logError(e.message);
-    firebase.crashlytics().recordError(0, e.message);
+    crashlytics().recordError(0, e.message);
   });
 };
 const s4 = () => {

@@ -57,10 +57,10 @@ export const ViewedWelcome = (): ViewedWelcomeAction => ({
   type: SET_HAS_VIEWED_WELCOME,
 });
 
-const setProfile = (profile) => ({
-  type: SET_PROFILE,
-  profile,
-});
+// const setProfile = (profile) => ({
+//   type: SET_PROFILE,
+//   profile,
+// });
 
 export const setHasLoggedIn = (loggedIn) => ({
   type: SET_LOGGED_IN,

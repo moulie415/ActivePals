@@ -1,6 +1,6 @@
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 import {Action} from 'redux';
-import { ProfileState } from '../reducers/profile';
+import {ProfileState} from '../reducers/profile';
 
 export enum TaskEvent {
   STATE_CHANGED = 'state_changed',
