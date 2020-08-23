@@ -13,8 +13,15 @@ import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import Login from './views/Login';
 
-const Stack = createStackNavigator();
+export type StackParamList = {
+  Login: undefined;
+};
+
+const Stack = createStackNavigator<StackParamList>();
+const Tab = createBottomTabNavigator<StackParamList>();
 
 const HeartIcon = (
   props?: Partial<ImageProps>,
@@ -34,7 +41,10 @@ const App = (): React.ReactFragment => {
         {/* @ts-ignore */}
         <ApplicationProvider {...eva} theme={eva[theme]}>
           <NavigationContainer>
-            <Layout style={styles.container}>
+            <Stack.Navigator>
+              <Stack.Screen name="Login" component={Login} />
+            </Stack.Navigator>
+            {/* <Layout style={styles.container}>
               <Text style={styles.text} category="h1">
                 Welcome to UI Kitten 😻
               </Text>
@@ -50,7 +60,7 @@ const App = (): React.ReactFragment => {
                 accessoryLeft={HeartIcon}>
                 LIKE
               </Button>
-            </Layout>
+            </Layout> */}
           </NavigationContainer>
         </ApplicationProvider>
       </ThemeContext.Provider>
