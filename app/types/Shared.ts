@@ -14,6 +14,8 @@ export enum TaskState {
   SUCCESS = 'success',
 }
 
+export type Theme = 'dark' | 'light';
+
 export type MyRootState = {
   profile: ProfileState;
 };

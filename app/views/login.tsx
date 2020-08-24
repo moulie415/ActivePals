@@ -1,10 +1,11 @@
-import React, {FunctionComponent, useState, useEffect} from 'react';
+import React, {FunctionComponent, useState, useEffect, useContext} from 'react';
 import {
   Alert,
   View,
   TouchableOpacity,
   Platform,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import VersionNumber from 'react-native-version-number';
 import SpinnerButton from 'react-native-spinner-button';
@@ -27,9 +28,10 @@ import {getProfileImage} from '../helpers/images';
 import {setupNotifications} from '../helpers/notifications';
 import LoginProps from '../types/views/Login';
 import styles from '../styles/loginStyles';
-import {Layout, Icon, Button, Input, Text} from '@ui-kitten/components';
+import {Layout, Icon, Button, Input, Text, Toggle} from '@ui-kitten/components';
 import globalStyles from '../styles/globalStyles';
 import {GOOGLE_WEB_ID} from 'react-native-dotenv';
+import {ThemeContext} from '../context/themeContext';
 
 GoogleSignin.configure({
   webClientId: GOOGLE_WEB_ID, // From Firebase Console Settings
@@ -47,6 +49,8 @@ const Login: FunctionComponent<LoginProps> = ({
   const [secure, setSecure] = useState(true);
   const [username, setUsername] = useState('');
   const [pass, setPass] = useState('');
+
+  const {theme, toggleTheme} = useContext(ThemeContext);
 
   useEffect(() => {
     // listen for auth state changes
@@ -175,7 +179,11 @@ const Login: FunctionComponent<LoginProps> = ({
           <ActivityIndicator />
         </View>
       )}
-
+      <Toggle
+        checked={theme === 'dark'}
+        onChange={toggleTheme}
+        style={{position: 'absolute', top: 40, right: 20}}
+      />
       <Input
         placeholder="Email"
         onChangeText={(u) => setUsername(u)}
@@ -184,7 +192,6 @@ const Login: FunctionComponent<LoginProps> = ({
         keyboardType="email-address"
         accessoryLeft={(props) => <Icon {...props} name="email-outline" />}
       />
-
       <Input
         placeholder="Password"
         secureTextEntry={secure}

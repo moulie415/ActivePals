@@ -22,7 +22,7 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-  <key>CFBundleURLTypes</key>
+  <!-- <key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLSchemes</key>
@@ -36,6 +36,45 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.48631950986-8hrquvsh6n7krak0s1hirg23qlr98bdi</string>
+			</array>
+		</dict>
+	</array> -->
+  <key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1959322104333437</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.googleusercontent.apps.680139677816-3eoc0cs830fbns898khlh01e6f685k1u</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.680139677816-3eoc0cs830fbns898khlh01e6f685k1u</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.activepals</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.activepals</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.googleusercontent.apps.623262962635-ge0nvpthqdjhl22icvtgtvit4e6ihbv0</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.623262962635-ge0nvpthqdjhl22icvtgtvit4e6ihbv0</string>
 			</array>
 		</dict>
 	</array>

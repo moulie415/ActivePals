@@ -1,11 +1,11 @@
 import {
   SET_PROFILE,
-  SET_LOGGED_IN,
   SET_LOGGED_OUT,
   SET_HAS_VIEWED_WELCOME,
   ProfileActionTypes,
 } from '../actions/profile';
 import Profile from '../types/Profile';
+import {Theme} from '../types/Shared';
 
 export interface ProfileState {
   profile: Profile;
@@ -26,11 +26,6 @@ const reducer = (state = initialState, action: ProfileActionTypes) => {
         ...state,
         profile: action.profile,
       };
-    // case SET_LOGGED_IN:
-    //   return {
-    //     ...state,
-    //     loggedIn: action.loggedIn,
-    //   };
     case SET_HAS_VIEWED_WELCOME: {
       return {
         ...state,

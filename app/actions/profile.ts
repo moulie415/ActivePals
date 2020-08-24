@@ -14,7 +14,7 @@ import {fetchPosts} from './home';
 import {fetchSessions, fetchPhotoPath, fetchPrivateSessions} from './sessions';
 import Profile, {UserState} from '../types/Profile';
 import Place from '../types/Place';
-import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
+import {MyThunkDispatch, MyThunkResult, Theme} from '../types/Shared';
 
 export const SET_PROFILE = 'SET_PROFILE';
 export const SET_LOGGED_IN = 'SET_LOGGED_IN';
