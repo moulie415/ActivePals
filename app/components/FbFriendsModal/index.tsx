@@ -34,7 +34,6 @@ const FbFriendsModal: FunctionComponent<FbFriendsModalProps> = ({
   useEffect(() => {
     const getFriends = async () => {
       const fbFriends = await getFbFriends(profile.token);
-      debugger;
       setFbFriends(fbFriends);
       setLoading(false);
     };

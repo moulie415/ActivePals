@@ -87,7 +87,7 @@ export const setHasViewedWelcome = () => ({
 export const doSetup = (): MyThunkResult<Promise<void>> => {
   return async (dispatch, getState) => {
     //const {uid} = profile;
-    const {uid, gym} = getState().profile;
+    const {uid, gym} = getState().profile.profile;
     try {
       setupPresence(uid);
 
@@ -104,11 +104,11 @@ export const doSetup = (): MyThunkResult<Promise<void>> => {
     } catch (e) {
       console.warn(e);
     }
-    //dispatch(getUnreadCount(uid));
+    dispatch(getUnreadCount(uid));
 
-    //dispatch(fetchFriends(uid));
+    dispatch(fetchFriends(uid));
 
-    //gym && dispatch(fetchGymChat(gym));
+    gym && dispatch(fetchGymChat(gym));
   };
 };
 

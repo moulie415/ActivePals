@@ -63,7 +63,6 @@ const Login: FunctionComponent<LoginProps> = ({
         ((user && user.emailVerified) ||
           (user.providerData && user.providerData.length > 0))
       ) {
-        debugger;
         const userRef = db().collection('users').doc(user.uid);
         const doc = await userRef.get();
         if (doc.exists) {

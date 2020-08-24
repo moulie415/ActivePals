@@ -7,6 +7,7 @@ const ThemedIcon: FunctionComponent<ThemedIconProps> = ({
   eva,
   name,
   style,
+  fill,
 }) => {
   return (
     <Icon
@@ -17,7 +18,7 @@ const ThemedIcon: FunctionComponent<ThemedIconProps> = ({
         },
         style,
       ]}
-      fill={eva.theme['background-alternative-color-1']}
+      fill={fill || eva.theme['background-alternative-color-1']}
       name={name}
     />
   );

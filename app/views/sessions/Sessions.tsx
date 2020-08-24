@@ -300,7 +300,7 @@ class Sessions extends Component<SessionsProps, State> {
           }}
           tabsContainerStyle={{ marginHorizontal: 8, marginVertical: 5 }}
           tabStyle={{ borderColor: colors.secondary }}
-          tabTextStyle={{ color: colors.secondary, fontFamily: 'Montserrat' }}
+          tabTextStyle={{ color: colors.secondary }}
           activeTabStyle={{ backgroundColor: colors.secondary }}
         />
         {gym && selectedIndex === 1 && (

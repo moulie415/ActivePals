@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {
   View,
   Alert,
-  TextInput,
   FlatList,
   Modal,
   SafeAreaView,
@@ -18,7 +17,6 @@ import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import ModalBox from 'react-native-modalbox';
-
 import {PulseIndicator} from 'react-native-indicators';
 import database from '@react-native-firebase/database';
 import Video from 'react-native-video';
@@ -27,7 +25,6 @@ import RNFetchBlob from 'rn-fetch-blob';
 import Image from 'react-native-fast-image';
 import VideoCompress from 'react-native-video-compressor';
 import ActionSheet from 'react-native-actionsheet';
-import Card from '../components/Card';
 import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
 import sStyles from '../styles/settingsStyles';
@@ -56,8 +53,9 @@ import {
 } from '../actions/home';
 import Comment from '../types/Comment';
 import Profile from '../types/Profile';
-import {Icon, Text} from '@ui-kitten/components';
+import {Icon, Text, Card, Input} from '@ui-kitten/components';
 import {MyRootState} from '../types/Shared';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
 const weightDown = require('../../assets/images/weightlifting_down.png');
@@ -83,14 +81,14 @@ interface State {
   mentionList: Profile[];
   selectedPost?: string;
 }
-export class Home extends Component<HomeProps, State> {
+class Home extends Component<HomeProps, State> {
   ActionSheet: ActionSheet;
 
   players: {[key: string]: Video};
 
   scrollIndex: number;
 
-  input: TextInput;
+  input: Input;
 
   constructor(props) {
     super(props);
@@ -143,7 +141,7 @@ export class Home extends Component<HomeProps, State> {
     headerShown: false,
     tabBarLabel: 'Home',
     tabBarIcon: ({tintColor}) => (
-      <Icon name="md-home" size={25} style={{color: tintColor}} />
+      <ThemedIcon name="home" size={25} fill={tintColor} />
     ),
   };
 
@@ -225,7 +223,7 @@ export class Home extends Component<HomeProps, State> {
               paddingHorizontal: 25,
               alignItems: 'center',
             }}>
-            <Icon size={25} style={{color: colors.postIcon}} name="md-share" />
+            <ThemedIcon size={25} name="share" />
             {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
           </TouchableOpacity>
         )}
@@ -260,11 +258,7 @@ export class Home extends Component<HomeProps, State> {
             paddingHorizontal: 25,
             alignItems: 'center',
           }}>
-          <Icon
-            name="md-chatboxes"
-            size={25}
-            style={{color: colors.postIcon}}
-          />
+          <ThemedIcon name="message-square" size={25} />
           {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Comment</Text> */}
         </TouchableOpacity>
       </View>
@@ -419,10 +413,7 @@ export class Home extends Component<HomeProps, State> {
             ? navigation.navigate('ProfileView', {uid})
             : navigation.navigate('Profile')
         }>
-        <Icon
-          name="md-contact"
-          style={{fontSize: 45, color: colors.primary, marginRight: 10}}
-        />
+        <ThemedIcon name="person" size={45} style={{marginRight: 10}} />
       </TouchableOpacity>
     );
   }
@@ -448,9 +439,9 @@ export class Home extends Component<HomeProps, State> {
                     this.ActionSheet.show(),
                   )
                 }>
-                <Icon
+                <ThemedIcon
                   style={{paddingHorizontal: 10}}
-                  name="ios-more"
+                  name="more-horzontal"
                   size={20}
                 />
               </TouchableOpacity>
@@ -479,9 +470,9 @@ export class Home extends Component<HomeProps, State> {
                     this.ActionSheet.show(),
                   )
                 }>
-                <Icon
+                <ThemedIcon
                   style={{paddingHorizontal: 10}}
-                  name="ios-more"
+                  name="more-horizontal"
                   size={20}
                 />
               </TouchableOpacity>
@@ -526,9 +517,9 @@ export class Home extends Component<HomeProps, State> {
                     this.ActionSheet.show(),
                   )
                 }>
-                <Icon
+                <ThemedIcon
                   style={{paddingHorizontal: 10}}
-                  name="ios-more"
+                  name="more-horizontal"
                   size={20}
                 />
               </TouchableOpacity>
@@ -563,9 +554,9 @@ export class Home extends Component<HomeProps, State> {
               <View style={styles.playButtonContainer}>
                 <TouchableOpacity
                   onPress={() => this.setState({playing: {[item.key]: true}})}>
-                  <Icon
+                  <ThemedIcon
                     size={50}
-                    name="md-play"
+                    name="play-circle"
                     style={{
                       color: '#fff',
                       backgroundColor: 'transparent',
@@ -595,12 +586,12 @@ export class Home extends Component<HomeProps, State> {
                       navigation.navigate('FullScreenVideo', {uri: item.url});
                     }
                   }}>
-                  <Icon
-                    name="md-expand"
+                  <ThemedIcon
+                    name="expand"
                     size={30}
+                    fill="#fff"
                     style={{
                       backgroundColor: 'transparent',
-                      color: '#fff',
                     }}
                   />
                 </TouchableOpacity>
@@ -662,7 +653,7 @@ export class Home extends Component<HomeProps, State> {
           renderItem={({item, index}) => {
             return (
               <>
-                <AdView index={index} />
+                {/* <AdView index={index} /> */}
                 <Card style={{marginBottom: 10}}>
                   {this.renderFeedItem(item)}
                 </Card>
@@ -723,11 +714,7 @@ export class Home extends Component<HomeProps, State> {
       <TouchableOpacity
         onPress={() => navigation.navigate({routeName: 'Notifications'})}>
         <View style={{width: 30, alignItems: 'center'}}>
-          <Icon
-            name="ios-notifications"
-            size={25}
-            style={{color: '#fff', marginLeft: -10}}
-          />
+          <ThemedIcon name="bell" size={25} style={{marginLeft: -10}} />
           {!!unreadCount && unreadCount > 0 && (
             <View style={styles.unreadBadge}>
               <Text
@@ -743,7 +730,7 @@ export class Home extends Component<HomeProps, State> {
     );
     return (
       <>
-        <Header title="Feed" right={notificationsButton} />
+        {/* <Header title="Feed" right={notificationsButton} /> */}
         <View
           style={{
             flexDirection: 'row',
@@ -768,15 +755,10 @@ export class Home extends Component<HomeProps, State> {
                 style={{height: 50, width: 50, borderRadius: 25}}
               />
             ) : (
-              <Icon
-                name="md-contact"
-                size={60}
-                style={{color: colors.primary}}
-              />
+              <ThemedIcon name="person" size={60} />
             )}
           </TouchableOpacity>
-          <TextInput
-            underlineColorAndroid="transparent"
+          <Input
             value={status}
             maxLength={280}
             autoCorrect={false}
@@ -789,15 +771,6 @@ export class Home extends Component<HomeProps, State> {
                 : this.setState({mentionList: null});
             }}
             placeholder="Post a status for your pals..."
-            style={{
-              flex: 1,
-              borderColor: '#999',
-              borderWidth: 0.5,
-              marginHorizontal: 10,
-              height: 40,
-              padding: 5,
-              fontFamily: 'Montserrat',
-            }}
           />
           <TouchableOpacity
             onPress={() => {
@@ -818,11 +791,10 @@ export class Home extends Component<HomeProps, State> {
                 );
               }
             }}>
-            <Icon
-              name="ios-camera"
+            <ThemedIcon
+              name="camera"
               size={40}
               style={{
-                color: colors.secondary,
                 marginLeft: 5,
                 marginRight: 10,
               }}
@@ -873,11 +845,10 @@ export class Home extends Component<HomeProps, State> {
                 // alert no status
               }
             }}>
-            <Icon
-              name="md-return-right"
+            <ThemedIcon
+              name="corner-down-right"
               size={40}
               style={{
-                color: colors.secondary,
                 paddingTop: 5,
               }}
             />
@@ -925,10 +896,7 @@ export class Home extends Component<HomeProps, State> {
                             style={{height: 30, width: 30, borderRadius: 15}}
                           />
                         ) : (
-                          <Icon
-                            name="md-contact"
-                            style={{fontSize: 35, color: colors.primary}}
-                          />
+                          <ThemedIcon name="person" size={35} />
                         )}
                         <Text style={{marginLeft: 10}}>{item.username}</Text>
                       </TouchableOpacity>
@@ -974,11 +942,7 @@ export class Home extends Component<HomeProps, State> {
                       paddingVertical: 2,
                       borderRadius: 10,
                     }}>
-                    <Icon
-                      name="ios-arrow-back"
-                      size={40}
-                      style={{color: '#fff'}}
-                    />
+                    <ThemedIcon name="arrow-ios-back" size={40} />
                   </View>
                 </TouchableOpacity>
               );
@@ -1004,11 +968,7 @@ export class Home extends Component<HomeProps, State> {
           key={showCommentModal ? 1 : 2}>
           <TouchableOpacity
             onPress={() => this.setState({showCommentModal: false})}>
-            <Icon
-              name="ios-arrow-back"
-              size={30}
-              style={{color: '#000', padding: 10}}
-            />
+            <ThemedIcon name="arrow-ios-back" size={30} style={{padding: 10}} />
           </TouchableOpacity>
           <Comments
             data={feed[postId] ? feed[postId].comments : []}

@@ -19,7 +19,7 @@ import {Theme} from './types/Shared';
 import AsyncStorage from '@react-native-community/async-storage';
 import Welcome from './views/Welcome';
 import {GeoFire} from 'geofire';
-import {Home} from './views/Home';
+import Home from './views/Home';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);

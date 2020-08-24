@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native"
-import colors from '../constants/colors'
+import {StyleSheet} from 'react-native';
+import colors from '../constants/colors';
 
 export default StyleSheet.create({
   spinner: {
@@ -13,11 +13,10 @@ export default StyleSheet.create({
     zIndex: 999,
   },
   map: {
-    flex: 1
+    flex: 1,
   },
   container: {
-    backgroundColor: colors.primary
-
+    backgroundColor: colors.primary,
   },
   button: {
     borderRadius: 5,
@@ -35,22 +34,21 @@ export default StyleSheet.create({
     paddingVertical: 10,
   },
   modalText: {
-    color: "black",
-    fontSize: 22
+    color: 'black',
+    fontSize: 22,
   },
-    btn: {
+  btn: {
     margin: 10,
-    backgroundColor: "#3B5998",
-    color: "white",
-    padding: 10
+    backgroundColor: '#3B5998',
+    color: 'white',
+    padding: 10,
   },
   title: {
     fontWeight: 'bold',
     color: '#000',
-    flex: 2
+    flex: 2,
   },
   date: {
-    fontFamily: 'Montserrat',
     paddingVertical: 5,
   },
   sessionFilterTitle: {
@@ -58,7 +56,7 @@ export default StyleSheet.create({
     textAlign: 'center',
     paddingBottom: 10,
     color: '#000',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   sessionFilterContainer: {
     flex: 1,
@@ -66,7 +64,7 @@ export default StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#999',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#999'
+    borderBottomColor: '#999',
   },
   infoRowContainer: {
     padding: 10,
@@ -77,7 +75,7 @@ export default StyleSheet.create({
   rowSpaceBetween: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   infoRowSpaceEvenly: {
     padding: 10,
@@ -90,7 +88,6 @@ export default StyleSheet.create({
   userRow: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    alignItems: 'center'
-  }
-
-})
+    alignItems: 'center',
+  },
+});

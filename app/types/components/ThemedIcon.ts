@@ -6,4 +6,5 @@ export default interface ThemeImageProps {
   eva?: ThemeType;
   name: string;
   style?: ViewStyle;
+  fill?: string;
 };
