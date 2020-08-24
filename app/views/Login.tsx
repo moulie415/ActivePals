@@ -63,7 +63,7 @@ const Login: FunctionComponent<LoginProps> = ({
         ((user && user.emailVerified) ||
           (user.providerData && user.providerData.length > 0))
       ) {
-        debugger
+        debugger;
         const userRef = db().collection('users').doc(user.uid);
         const doc = await userRef.get();
         if (doc.exists) {
@@ -77,16 +77,16 @@ const Login: FunctionComponent<LoginProps> = ({
         await getProfile();
         await setup();
 
-        // if (hasViewedWelcome) {
-        //   navigation.dispatch(
-        //     CommonActions.reset({
-        //       index: 0,
-        //       routes: [{name: 'Tabs'}],
-        //     }),
-        //   );
-        // } else {
-        navigation.navigate('Welcome', {goBack: false});
-        // }
+        if (hasViewedWelcome) {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: 'Tabs'}],
+            }),
+          );
+        } else {
+          navigation.navigate('Welcome', {goBack: false});
+        }
         setupNotifications(user.uid);
       }
     });
@@ -155,6 +155,10 @@ const Login: FunctionComponent<LoginProps> = ({
       );
       // Sign-in the user with the credential
       const credentials = await auth().signInWithCredential(facebookCredential);
+      await database()
+        .ref('users')
+        .child(credentials.user.uid)
+        .update({token: data.accessToken});
       setFacebookLoading(false);
       return credentials;
     } catch (e) {

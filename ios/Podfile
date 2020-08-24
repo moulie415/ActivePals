@@ -54,6 +54,7 @@ target 'ActivePals' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'GoogleSignIn', '~> 5.0.2'
+  pod 'FBAudienceNetwork', '~> 5.1.0'
 
   target 'ActivePalsTests' do
     inherit! :complete

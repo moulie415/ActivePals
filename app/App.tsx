@@ -19,6 +19,7 @@ import {Theme} from './types/Shared';
 import AsyncStorage from '@react-native-community/async-storage';
 import Welcome from './views/Welcome';
 import {GeoFire} from 'geofire';
+import {Home} from './views/Home';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -38,10 +39,20 @@ export type StackParamList = {
   Login: undefined;
   SignUp: undefined;
   Welcome: {goBack?: boolean};
+  Home: undefined;
+  Tabs: undefined;
 };
 
 const Stack = createStackNavigator<StackParamList>();
 const Tab = createBottomTabNavigator<StackParamList>();
+
+const Tabs = () => {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Home" component={Home} />
+    </Tab.Navigator>
+  );
+};
 
 const key = '@theme';
 
@@ -87,6 +98,7 @@ const App = () => {
                   component={Welcome}
                   options={() => ({headerShown: false})}
                 />
+                <Stack.Screen name="Tabs" component={Tabs} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>

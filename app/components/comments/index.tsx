@@ -1,7 +1,7 @@
 /**
  * Created by tino on 6/6/17.
  */
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import {
   View,
   FlatList,
@@ -13,17 +13,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Image from 'react-native-fast-image';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import Collapsible from 'react-native-collapsible';
-import IIcon from 'react-native-vector-icons/Ionicons';
-import Text from '../Text';
 import styles from './styles';
 import colors from '../../constants/colors';
-import { getMentionsList } from '../../constants/utils';
+import {getMentionsList} from '../../constants/utils';
 import CommentsProps from '../../types/components/Comments';
 import Profile from '../../types/Profile';
 import CommentType from '../../types/Comment';
 import Comment from './Comment';
+import {Icon, Text} from '@ui-kitten/components';
 
 const screen = Dimensions.get('screen');
 
@@ -86,15 +84,17 @@ export default class Comments extends PureComponent<CommentsProps, State> {
   }
 
   setEditModalVisible(visible) {
-    this.setState({ editModalVisible: visible });
+    this.setState({editModalVisible: visible});
   }
 
   /**
    * Returns first child id
    * */
   getFirstChildCommentId(item) {
-    const { childPropName, keyExtractor } = this.props;
-    if (!item) return;
+    const {childPropName, keyExtractor} = this.props;
+    if (!item) {
+      return;
+    }
     const items = item[childPropName];
 
     return keyExtractor(items[0]);
@@ -104,20 +104,22 @@ export default class Comments extends PureComponent<CommentsProps, State> {
    * Returns last child id
    * */
   getLastChildCommentId(item) {
-    const { childPropName, keyExtractor } = this.props;
-    if (!item) return;
+    const {childPropName, keyExtractor} = this.props;
+    if (!item) {
+      return;
+    }
     const items = item[childPropName];
     return keyExtractor(items[items.length - 1]);
   }
 
   isExpanded(id) {
-    const { expanded } = this.state;
+    const {expanded} = this.state;
     return expanded.indexOf(id) !== -1;
   }
 
   toggleExpand(c, focus?: boolean) {
-    const { expanded } = this.state;
-    const { keyExtractor } = this.props;
+    const {expanded} = this.state;
+    const {keyExtractor} = this.props;
     const id = keyExtractor(c);
 
     const index = expanded.indexOf(id);
@@ -128,14 +130,14 @@ export default class Comments extends PureComponent<CommentsProps, State> {
       expanded.splice(index, 1);
     }
     this.forceUpdate();
-    this.setState({ expanded });
+    this.setState({expanded});
     if (focus && index === -1) {
       this.focusOnReplyInput(id);
     }
   }
 
   handleReport(c) {
-    const { reportAction } = this.props;
+    const {reportAction} = this.props;
     reportAction(c);
   }
 
@@ -144,7 +146,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
     const input = this.textInputs[`input${id}`];
 
     input.measure((x, y, width, height, pageX, pageY) => {
-      const { replyAction } = this.props;
+      const {replyAction} = this.props;
       console.log(pageY);
       input.focus();
       replyAction(pageY);
@@ -152,8 +154,10 @@ export default class Comments extends PureComponent<CommentsProps, State> {
   }
 
   handleReply(c) {
-    const { isChild, keyExtractor } = this.props;
-    if (!isChild) return;
+    const {isChild, keyExtractor} = this.props;
+    if (!isChild) {
+      return;
+    }
     if (!isChild(c)) {
       this.toggleExpand(c, true);
     } else {
@@ -162,37 +166,37 @@ export default class Comments extends PureComponent<CommentsProps, State> {
   }
 
   handleLike(c) {
-    const { likeAction } = this.props;
+    const {likeAction} = this.props;
     likeAction(c);
   }
 
   handleDelete(c) {
-    const { deleteAction } = this.props;
+    const {deleteAction} = this.props;
     deleteAction(c);
   }
 
   handleEdit(c) {
-    const { bodyExtractor } = this.props;
-    const { editModalVisible } = this.state;
+    const {bodyExtractor} = this.props;
+    const {editModalVisible} = this.state;
     this.editCommentText = bodyExtractor(c);
     this.editingComment = c;
     this.setEditModalVisible(!editModalVisible);
   }
 
   handleUsernameTap(username, uid) {
-    const { usernameTapAction } = this.props;
+    const {usernameTapAction} = this.props;
     if (usernameTapAction) {
       usernameTapAction(username, uid);
     }
   }
 
   handleLikesTap(c) {
-    const { likesTapAction } = this.props;
+    const {likesTapAction} = this.props;
     likesTapAction(c);
   }
 
   handleEditAction(c) {
-    const { editAction } = this.props;
+    const {editAction} = this.props;
     editAction(this.editCommentText, c);
   }
 
@@ -251,9 +255,16 @@ export default class Comments extends PureComponent<CommentsProps, State> {
    * Can user edit a comment
    * */
   canUserEdit(item) {
-    const { viewingUserName, usernameExtractor, editMinuteLimit, createdTimeExtractor } = this.props;
+    const {
+      viewingUserName,
+      usernameExtractor,
+      editMinuteLimit,
+      createdTimeExtractor,
+    } = this.props;
     if (viewingUserName === usernameExtractor(item)) {
-      if (!editMinuteLimit) return true;
+      if (!editMinuteLimit) {
+        return true;
+      }
       const created = new Date(createdTimeExtractor(item)).getTime() / 1000;
       return new Date().getTime() / 1000 - created < editMinuteLimit * 60;
     }
@@ -264,12 +275,17 @@ export default class Comments extends PureComponent<CommentsProps, State> {
    * Does a pagination action
    * */
   paginate(comments, direction) {
-    const { data, paginateAction } = this.props;
-    this.setState({ loadingComments: true });
-    const sortedComments = comments.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    const {data, paginateAction} = this.props;
+    this.setState({loadingComments: true});
+    const sortedComments = comments.sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
     const fromComment = sortedComments[0];
     if (fromComment.parentCommentId) {
-      const parentComment = data.find(comment => comment.key === fromComment.parentCommentId);
+      const parentComment = data.find(
+        (comment) => comment.key === fromComment.parentCommentId,
+      );
       paginateAction(fromComment, direction, parentComment);
       return;
     }
@@ -280,10 +296,16 @@ export default class Comments extends PureComponent<CommentsProps, State> {
    * Renders comments children
    * */
   renderChildren(items) {
-    const { keyExtractor } = this.props;
-    if (!items || !items.length) return;
-    return items.map(c => {
-      return <View key={keyExtractor(c) + Math.random()}>{this.generateComment(c)}</View>;
+    const {keyExtractor} = this.props;
+    if (!items || !items.length) {
+      return;
+    }
+    return items.map((c) => {
+      return (
+        <View key={keyExtractor(c) + Math.random()}>
+          {this.generateComment(c)}
+        </View>
+      );
     });
   }
 
@@ -295,13 +317,16 @@ export default class Comments extends PureComponent<CommentsProps, State> {
           this.handleUsernameTap(like.username, like.user_id);
         }}
         style={styles.likeButton}
-        key={like.user_id}
-      >
+        key={like.user_id}>
         <View style={[styles.likeContainer]}>
           {like.image ? (
-            <Image style={[styles.likeImage]} source={{ uri: like.image }} />
+            <Image style={[styles.likeImage]} source={{uri: like.image}} />
           ) : (
-            <IIcon name="md-contact" size={40} style={{ color: colors.primary }} />
+            <IIcon
+              name="md-contact"
+              size={40}
+              style={{color: colors.primary}}
+            />
           )}
           <Text>{like.name || like.username}</Text>
         </View>
@@ -313,7 +338,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
    * Renders a comment with pagination
    * */
   renderComment(c) {
-    const { item } = c;
+    const {item} = c;
     const {
       childPropName,
       imageExtractor,
@@ -327,8 +352,10 @@ export default class Comments extends PureComponent<CommentsProps, State> {
     return (
       <View>
         {this.generateComment(item)}
-        <View style={{ marginLeft: 40 }}>
-          {item.childrenCount && item[childPropName] && item[childPropName][0] ? (
+        <View style={{marginLeft: 40}}>
+          {item.childrenCount &&
+          item[childPropName] &&
+          item[childPropName][0] ? (
             <TouchableOpacity onPress={() => this.toggleExpand(item)}>
               <View style={styles.repliedSection}>
                 <Image
@@ -337,7 +364,10 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                     uri: imageExtractor(item[childPropName][0]),
                   }}
                 />
-                <Text style={styles.repliedUsername}> {usernameExtractor(item[childPropName][0])} </Text>
+                <Text style={styles.repliedUsername}>
+                  {' '}
+                  {usernameExtractor(item[childPropName][0])}{' '}
+                </Text>
                 <Text style={styles.repliedText}>replied</Text>
                 <Text style={styles.repliedCount}>
                   {' '}
@@ -347,7 +377,10 @@ export default class Comments extends PureComponent<CommentsProps, State> {
               </View>
             </TouchableOpacity>
           ) : null}
-          <Collapsible easing="easeOutCubic" duration={400} collapsed={!this.isExpanded(keyExtractor(item))}>
+          <Collapsible
+            easing="easeOutCubic"
+            duration={400}
+            collapsed={!this.isExpanded(keyExtractor(item))}>
             {childrenCountExtractor(item) && paginateAction ? (
               <View>
                 {/* {this.props.childPropName &&
@@ -370,21 +403,31 @@ export default class Comments extends PureComponent<CommentsProps, State> {
 
                 {this.renderChildren(item[childPropName])}
 
-                {item[childPropName] && childrenCountExtractor(item) > item[childPropName].length && paginateAction ? (
-                  <TouchableOpacity onPress={() => this.paginate(item[childPropName], 'up')}>
-                    <Text style={{ textAlign: 'center', paddingTop: 15, color: colors.secondary }}>Show more...</Text>
+                {item[childPropName] &&
+                childrenCountExtractor(item) > item[childPropName].length &&
+                paginateAction ? (
+                  <TouchableOpacity
+                    onPress={() => this.paginate(item[childPropName], 'up')}>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        paddingTop: 15,
+                        color: colors.secondary,
+                      }}>
+                      Show more...
+                    </Text>
                   </TouchableOpacity>
                 ) : null}
               </View>
             ) : null}
             <View style={styles.inputSection}>
               <TextInput
-                ref={input => {
+                ref={(input) => {
                   this.textInputs[`input${keyExtractor(item)}`] = input;
                 }}
                 style={styles.input}
                 multiline
-                onChangeText={text => {
+                onChangeText={(text) => {
                   this.replyCommentText = text;
                 }}
                 placeholder="Write comment"
@@ -396,9 +439,13 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                   this.replyCommentText = null;
                   this.textInputs[`input${keyExtractor(item)}`].clear();
                   Keyboard.dismiss();
-                }}
-              >
-                <IIcon style={styles.submit} name="md-return-right" size={40} color="#000" />
+                }}>
+                <IIcon
+                  style={styles.submit}
+                  name="md-return-right"
+                  size={40}
+                  color="#000"
+                />
               </TouchableOpacity>
             </View>
           </Collapsible>
@@ -418,24 +465,32 @@ export default class Comments extends PureComponent<CommentsProps, State> {
       editAction,
       paginateAction,
     } = this.props;
-    const { text, mentionList, loadingComments, commentsLastUpdated, editModalVisible } = this.state;
+    const {
+      text,
+      mentionList,
+      loadingComments,
+      commentsLastUpdated,
+      editModalVisible,
+    } = this.state;
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
         <View style={styles.inputSection}>
           <TextInput
             style={styles.input}
-            ref={input => {
+            ref={(input) => {
               this.inputMain = input;
             }}
             multiline
             value={text}
             maxLength={280}
-            onChangeText={input => {
+            onChangeText={(input) => {
               this.newCommentText = input;
-              this.setState({ text: input });
-              this.inputMain.setNativeProps({ text: input });
+              this.setState({text: input});
+              this.inputMain.setNativeProps({text: input});
               const list = getMentionsList(text, users);
-              list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
+              list
+                ? this.setState({mentionList: list})
+                : this.setState({mentionList: null});
             }}
             placeholder="Write comment..."
             numberOfLines={3}
@@ -444,12 +499,16 @@ export default class Comments extends PureComponent<CommentsProps, State> {
             onPress={() => {
               saveAction(this.newCommentText, null);
               this.newCommentText = null;
-              this.setState({ text: null });
+              this.setState({text: null});
               this.inputMain.clear();
               Keyboard.dismiss();
-            }}
-          >
-            <IIcon style={styles.submit} name="md-return-right" size={30} color="#000" />
+            }}>
+            <IIcon
+              style={styles.submit}
+              name="md-return-right"
+              size={30}
+              color="#000"
+            />
           </TouchableOpacity>
         </View>
         {mentionList && (
@@ -457,27 +516,41 @@ export default class Comments extends PureComponent<CommentsProps, State> {
             <FlatList
               keyboardShouldPersistTaps="handled"
               data={mentionList}
-              style={{ backgroundColor: '#fff' }}
-              keyExtractor={item => item.uid}
-              renderItem={({ item, index }) => {
+              style={{backgroundColor: '#fff'}}
+              keyExtractor={(item) => item.uid}
+              renderItem={({item, index}) => {
                 if (index < 10) {
                   return (
                     <TouchableOpacity
                       onPress={() => {
                         const split = text.split(' ');
                         split[split.length - 1] = `@${item.username} `;
-                        this.setState({ text: split.join(' '), mentionList: null }, () => {
-                          this.newCommentText = text;
-                        });
+                        this.setState(
+                          {text: split.join(' '), mentionList: null},
+                          () => {
+                            this.newCommentText = text;
+                          },
+                        );
                       }}
-                      style={{ backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5 }}
-                    >
+                      style={{
+                        backgroundColor: '#fff',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        padding: 5,
+                      }}>
                       {item.avatar ? (
-                        <Image source={{ uri: item.avatar }} style={{ height: 30, width: 30, borderRadius: 15 }} />
+                        <Image
+                          source={{uri: item.avatar}}
+                          style={{height: 30, width: 30, borderRadius: 15}}
+                        />
                       ) : (
-                        <IIcon name="md-contact" size={35} style={{ color: colors.primary }} />
+                        <IIcon
+                          name="md-contact"
+                          size={35}
+                          style={{color: colors.primary}}
+                        />
                       )}
-                      <Text style={{ marginLeft: 10 }}>{item.username}</Text>
+                      <Text style={{marginLeft: 10}}>{item.username}</Text>
                     </TouchableOpacity>
                   );
                 }
@@ -486,7 +559,9 @@ export default class Comments extends PureComponent<CommentsProps, State> {
             />
           </View>
         )}
-        {!loadingComments && !data ? <Text style={{ textAlign: 'center' }}>No comments yet</Text> : null}
+        {!loadingComments && !data ? (
+          <Text style={{textAlign: 'center'}}>No comments yet</Text>
+        ) : null}
 
         {/* !this.state.loadingComments &&
         this.props.data &&
@@ -508,11 +583,11 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         {data ? (
           <FlatList
             keyboardShouldPersistTaps="always"
-            style={{ backgroundColor: 'white' }}
+            style={{backgroundColor: 'white'}}
             data={data}
             extraData={commentsLastUpdated}
             initialNumToRender={initialDisplayCount || 999}
-            keyExtractor={item => keyExtractor(item)}
+            keyExtractor={(item) => keyExtractor(item)}
             renderItem={this.renderComment}
           />
         ) : null}
@@ -525,8 +600,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
               bottom: 0,
               height: 60,
               backgroundColor: 'rgba(255,255,255, 0.9)',
-            }}
-          >
+            }}>
             <ActivityIndicator
               animating
               style={{
@@ -540,42 +614,47 @@ export default class Comments extends PureComponent<CommentsProps, State> {
           </View>
         ) : null}
 
-        {!loadingComments && data && data.length < commentCount && paginateAction ? (
+        {!loadingComments &&
+        data &&
+        data.length < commentCount &&
+        paginateAction ? (
           <TouchableOpacity
-            style={{ height: 70 }}
+            style={{height: 70}}
             onPress={() => {
               this.paginate(data, 'up');
-            }}
-          >
-            <Text style={{ textAlign: 'center', color: colors.secondary }}>Show more</Text>
+            }}>
+            <Text style={{textAlign: 'center', color: colors.secondary}}>
+              Show more
+            </Text>
           </TouchableOpacity>
         ) : null}
         <Modal
           animationType="slide"
           onShow={() => {
-            this.textInputs['editCommentInput'].focus();
+            this.textInputs.editCommentInput.focus();
           }}
           transparent
           visible={editModalVisible}
-          onRequestClose={() => this.setEditModalVisible(false)}
-        >
+          onRequestClose={() => this.setEditModalVisible(false)}>
           <View style={styles.editModalContainer}>
             <View style={styles.editModal}>
               <TextInput
-                ref={input => {
-                  this.textInputs['editCommentInput'] = input;
+                ref={(input) => {
+                  this.textInputs.editCommentInput = input;
                 }}
                 style={styles.input}
                 multiline
                 defaultValue={this.editCommentText}
-                onChangeText={text => {
+                onChangeText={(text) => {
                   this.editCommentText = text;
                 }}
                 placeholder="Edit comment"
                 numberOfLines={3}
               />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                <TouchableOpacity onPress={() => this.setEditModalVisible(false)}>
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+                <TouchableOpacity
+                  onPress={() => this.setEditModalVisible(false)}>
                   <View style={styles.editButtons}>
                     <Text>Cancel</Text>
                     <Icon name="times" size={20} />
@@ -585,8 +664,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                   onPress={() => {
                     editAction(this.editCommentText, this.editingComment);
                     this.setEditModalVisible(!editModalVisible);
-                  }}
-                >
+                  }}>
                   <View style={styles.editButtons}>
                     <Text>Save</Text>
                     <Icon name="send" size={20} />

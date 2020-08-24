@@ -18,7 +18,7 @@ import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import ModalBox from 'react-native-modalbox';
-import Icon from 'react-native-vector-icons/Ionicons';
+
 import {PulseIndicator} from 'react-native-indicators';
 import database from '@react-native-firebase/database';
 import Video from 'react-native-video';
@@ -31,9 +31,7 @@ import Card from '../components/Card';
 import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
 import sStyles from '../styles/settingsStyles';
-import Text from '../components/Text';
 import Comments from '../components/comments';
-import Header from '../components/Header/header';
 import {
   likesExtractor,
   getSimplifiedTime,
@@ -58,6 +56,8 @@ import {
 } from '../actions/home';
 import Comment from '../types/Comment';
 import Profile from '../types/Profile';
+import {Icon, Text} from '@ui-kitten/components';
+import {MyRootState} from '../types/Shared';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
 const weightDown = require('../../assets/images/weightlifting_down.png');
@@ -110,18 +110,6 @@ export class Home extends Component<HomeProps, State> {
       showCommentModal: false,
       mentionList: [],
     };
-  }
-
-  componentDidMount() {
-    firebase
-      .messaging()
-      .requestPermission()
-      .then(() => {
-        console.log('messaging permission granted');
-      })
-      .catch((error) => {
-        console.log('messaging permission denied');
-      });
   }
 
   getUsername(uid) {
@@ -1147,7 +1135,12 @@ export class Home extends Component<HomeProps, State> {
   }
 }
 
-const mapStateToProps = ({profile, home, friends, sharedInfo}) => ({
+const mapStateToProps = ({
+  profile,
+  home,
+  friends,
+  sharedInfo,
+}: MyRootState) => ({
   profile: profile.profile,
   feed: home.feed,
   friends: friends.friends,
