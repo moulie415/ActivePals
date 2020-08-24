@@ -1,5 +1,5 @@
 import React, {FunctionComponent, useState, useEffect} from 'react';
-import {SafeAreaView, TouchableOpacity, Image, Alert} from 'react-native';
+import {SafeAreaView, TouchableOpacity, Alert} from 'react-native';
 import {CommonActions} from '@react-navigation/native';
 import Swiper from 'react-native-swiper';
 import {connect} from 'react-redux';
@@ -13,7 +13,10 @@ import {setHasViewedWelcome, fetchProfile} from '../actions/profile';
 import WelcomeProps from '../types/views/Welcome';
 import {SessionType} from '../types/Session';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
-import {Layout, Icon, Input, Text} from '@ui-kitten/components';
+import {Layout, Icon, Input, Text, Button} from '@ui-kitten/components';
+import Logo from '../components/Logo/Logo';
+import ThemedImage from '../components/ThemedImage/ThemedImage';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
 const Welcome: FunctionComponent<WelcomeProps> = ({
   profile,
@@ -39,12 +42,12 @@ const Welcome: FunctionComponent<WelcomeProps> = ({
           }),
         );
   };
-  const skip = () => {
+  const Skip = () => {
     return (
       <SafeAreaView
         style={{padding: 10, position: 'absolute', top: 5, right: 10}}>
         <TouchableOpacity onPress={() => nav()}>
-          <Text style={{color: '#fff', fontSize: 20}}>Skip</Text>
+          <Text>Skip</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -56,59 +59,51 @@ const Welcome: FunctionComponent<WelcomeProps> = ({
       showsButtons
       loop={false}
       activeDotColor={colors.secondary}
-      nextButton={<Text style={styles.buttonText}>›</Text>}
-      prevButton={<Text style={styles.buttonText}>‹</Text>}>
-      <Layout style={styles.slide1}>
-        {skip()}
-        <Text style={styles.text}>{`Welcome \n to \n ${str.appName}`}</Text>
-        <Image
-          style={{tintColor: '#fff', width: 100, height: 100}}
-          source={require('../../assets/images/logo.png')}
-        />
+      nextButton={<ThemedIcon name="arrow-ios-forward" size={50} />}
+      prevButton={<ThemedIcon name="arrow-ios-back" size={50} />}>
+      <Layout style={styles.slide} level="1">
+        <Skip />
+        <Text category="h1" style={styles.text}>
+          {`Welcome \n to \n ${str.appName}`}
+        </Text>
+        <Logo size={100} />
       </Layout>
-      <Layout style={styles.slide2}>
-        {skip()}
-        <Text style={styles.text}>
+      <Layout style={styles.slide} level="1">
+        <Skip />
+        <Text category="h3" style={styles.text}>
           Create and join sessions with people in your area
         </Text>
         {renderImages()}
-        <Text style={styles.text}>
+        <Text category="h3" style={styles.text}>
           Or create private sessions for you and your pals
         </Text>
-        <Icon size={50} name="ios-lock" style={{color: '#fff'}} />
+        <ThemedIcon size={50} name="lock" />
       </Layout>
-      <Layout style={styles.slide2}>
-        {skip()}
-
-        <Text style={styles.text}>Search for and join your local Gym</Text>
-        <Image
-          style={{
-            tintColor: '#fff',
-            height: 50,
-            width: 50,
-            marginHorizontal: 10,
-          }}
-          source={getResource(SessionType.GYM)}
-        />
-        <Text style={styles.text}>
+      <Layout style={styles.slide} level="1">
+        <Skip />
+        <Text category="h3" style={styles.text}>
+          Search for and join your local Gym
+        </Text>
+        <ThemedImage size={50} source={getResource(SessionType.GYM)} />
+        <Text category="h3" style={styles.text}>
           {
             'Are you a personal trainer? \nWhy not get verified? \n(coming soon)'
           }
         </Text>
-        <Image
+        <ThemedImage
           source={require('../../assets/images/muscle.png')}
-          style={{tintColor: '#fff', height: 50, width: 50, margin: 10}}
+          size={50}
         />
       </Layout>
-      <Layout style={styles.slide2}>
-        {skip()}
-        <Text style={styles.text}>
+      <Layout style={styles.slide} level="1">
+        <Skip />
+        <Text category="h3" style={styles.text}>
           Participate in chats with your pals, in sessions and with members of
           your gym!!
         </Text>
-        <Icon name="md-chatboxes" style={{color: '#fff', fontSize: 50}} />
+        <ThemedIcon name="message-square-outline" size={50} />
       </Layout>
-      <Layout style={styles.slide3}>
+      <Layout style={styles.slide} level="4">
         {profile.fb_login && (
           <FbFriendsModal
             style={{zIndex: 999}}
@@ -119,22 +114,18 @@ const Welcome: FunctionComponent<WelcomeProps> = ({
             }}
           />
         )}
-        <Text style={styles.text}>
+        <Text category="h5" style={styles.text}>
           Make sure to set a username so your pals can add you
         </Text>
         <Input
+          style={{marginVertical: 20}}
           value={username}
           onChangeText={(input) => setUsername(input)}
           autoCapitalize="none"
           autoCorrect={false}
         />
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: colors.secondary,
-            padding: 10,
-            borderRadius: 5,
-          }}
+        <Button
           onPress={async () => {
             if (username && username === profile.username) {
               nav();
@@ -189,8 +180,8 @@ const Welcome: FunctionComponent<WelcomeProps> = ({
               }
             }
           }}>
-          <Text>Finish</Text>
-        </TouchableOpacity>
+          Finish
+        </Button>
       </Layout>
     </Swiper>
   );

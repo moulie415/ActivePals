@@ -16,6 +16,8 @@ import Message from '../types/Message';
 import Notification from '../types/Notification';
 import Chat from '../types/Chat';
 import colors from './colors';
+import {Source} from 'react-native-fast-image';
+import ThemedImage from '../components/ThemedImage/ThemedImage';
 
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
@@ -52,7 +54,7 @@ export const types = [
   SessionType.SWIMMING,
 ];
 
-export const getResource = (type: SessionType) => {
+export const getResource = (type: SessionType): Source => {
   if (type === SessionType.CYCLING) {
     return require('../../assets/images/bicycle.png');
   }
@@ -71,12 +73,12 @@ export const getResource = (type: SessionType) => {
 export const renderImages = () => {
   return (
     <View style={{flexDirection: 'row'}}>
-      {types.map((type, index) => {
+      {types.map((type) => {
         return (
-          <Image
+          <ThemedImage
+            style={{marginRight: 10}}
             key={guid()}
-            tintColor="#fff"
-            style={{height: 50, width: 50, margin: 10}}
+            size={50}
             source={getResource(type)}
           />
         );

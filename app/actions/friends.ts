@@ -1,4 +1,5 @@
 import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 import {upUnreadCount, fetchUsers} from './home';
 import Profile, {UserState} from '../types/Profile';
 import {fetchOther} from './profile';
@@ -70,8 +71,7 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
           uids.map((friendUid) => {
             return new Promise((resolve) => {
               const status = snapshot.val()[friendUid];
-              firebase
-                .database()
+              database()
                 .ref('users')
                 .child(friendUid)
                 .on('value', async (profile) => {
@@ -79,8 +79,7 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
                     const {state} = profile.val();
                     const userState = getStateString(state);
                     try {
-                      const avatar = await firebase
-                        .storage()
+                      const avatar = await storage()
                         .ref(`images/${friendUid}`)
                         .child('avatar')
                         .getDownloadURL();
@@ -134,7 +133,7 @@ export const sendRequest = (friendUid) => {
 };
 
 export const acceptRequest = (uid, friendUid) => {
-  return (dispatch) => {
+  return () => {
     const promise1 = database()
       .ref(`userFriends/${uid}`)
       .child(friendUid)
@@ -164,8 +163,7 @@ export const fetchFbFriends = (token: string) => {
     if (json.friends && json.friends.data) {
       const uids: string[] = await Promise.all(
         json.friends.data.map(async (friend) => {
-          const snapshot = await firebase
-            .database()
+          const snapshot = await database()
             .ref('fbusers')
             .child(friend.id)
             .once('value');

@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
+import database from '@react-native-firebase/database';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
@@ -17,6 +18,10 @@ import SignUp from './views/SignUp';
 import {Theme} from './types/Shared';
 import AsyncStorage from '@react-native-community/async-storage';
 import Welcome from './views/Welcome';
+import {GeoFire} from 'geofire';
+
+const firebaseRef = database().ref('locations');
+export const geofire = new GeoFire(firebaseRef);
 
 const composeEnhancers =
   // @ts-ignore

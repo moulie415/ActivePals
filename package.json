@@ -39,6 +39,7 @@
     "@types/react-redux": "^7.1.9",
     "@ui-kitten/components": "5.0.0",
     "@ui-kitten/eva-icons": "5.0.0",
+    "geofire": "^5.0.1",
     "instabug-reactnative": "^9.1.7",
     "moment": "^2.27.0",
     "ramda": "^0.27.1",

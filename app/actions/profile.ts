@@ -57,11 +57,6 @@ export const ViewedWelcome = (): ViewedWelcomeAction => ({
   type: SET_HAS_VIEWED_WELCOME,
 });
 
-// const setProfile = (profile) => ({
-//   type: SET_PROFILE,
-//   profile,
-// });
-
 export const setHasLoggedIn = (loggedIn) => ({
   type: SET_LOGGED_IN,
   loggedIn,
@@ -89,17 +84,13 @@ export const setHasViewedWelcome = () => ({
   type: SET_HAS_VIEWED_WELCOME,
 });
 
-// export const doSetup = (): MyThunkResult<Promise<void>> => {
-//   return async (dispatch: MyThunkDispatch) => {
-//     console.log('do setup');
-//   };
-// };
-
-export const doSetup = (profile: Profile): MyThunkResult<Promise<void>> => {
+export const doSetup = (): MyThunkResult<Promise<void>> => {
   return async (dispatch, getState) => {
-    const {uid} = profile;
+    //const {uid} = profile;
+    const {uid, gym} = getState().profile;
     try {
       setupPresence(uid);
+
       //   const fcmToken = await messaging().getToken();
       //   if (fcmToken) {
       //     database()
@@ -113,9 +104,11 @@ export const doSetup = (profile: Profile): MyThunkResult<Promise<void>> => {
     } catch (e) {
       console.warn(e);
     }
-    dispatch(getUnreadCount(uid));
-    dispatch(fetchFriends(uid));
-    profile.gym && dispatch(fetchGymChat(profile.gym));
+    //dispatch(getUnreadCount(uid));
+
+    //dispatch(fetchFriends(uid));
+
+    //gym && dispatch(fetchGymChat(gym));
   };
 };
 

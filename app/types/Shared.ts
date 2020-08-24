@@ -1,6 +1,7 @@
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 import {Action} from 'redux';
 import {ProfileState} from '../reducers/profile';
+import {FriendsState} from '../reducers/friends';
 
 export enum TaskEvent {
   STATE_CHANGED = 'state_changed',
@@ -18,6 +19,7 @@ export type Theme = 'dark' | 'light';
 
 export type MyRootState = {
   profile: ProfileState;
+  friends: FriendsState;
 };
 type MyExtraArg = undefined;
 

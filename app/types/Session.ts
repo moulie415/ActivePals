@@ -13,11 +13,11 @@ export default interface Session {
   private?: boolean;
   title: string;
   type: SessionType;
-  users: { [key: string]: boolean };
+  users: {[key: string]: boolean};
   inProgress?: boolean;
   distance?: number;
   gym?: string;
-}
+};
 
 export enum Gender {
   UNSPECIFIED = 'Unspecified',

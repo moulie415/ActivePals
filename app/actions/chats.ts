@@ -1,4 +1,5 @@
 import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 import {MessageType} from '../types/Message';
 
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS';
@@ -103,8 +104,7 @@ export const fetchGymChat = (gym) => {
 export const updateLastMessage = (notif) => {
   return (dispatch) => {
     if (notif.type === MessageType.MESSAGE) {
-      return firebase
-        .database()
+      return database()
         .ref('chats')
         .child(notif.chatId)
         .orderByKey()
@@ -120,8 +120,7 @@ export const updateLastMessage = (notif) => {
         });
     }
     if (notif.type === MessageType.SESSION_MESSAGE) {
-      return firebase
-        .database()
+      return database()
         .ref('sessionChats')
         .child(notif.sessionId)
         .orderByKey()
@@ -181,8 +180,7 @@ export const fetchChats = (uid, limit = 10) => {
           const chats = await Promise.all(
             Object.keys(snapshot.val()).map(async (chat) => {
               const chatId = snapshot.val()[chat];
-              const lastMessage = await firebase
-                .database()
+              const lastMessage = await database()
                 .ref('chats')
                 .child(chatId)
                 .orderByKey()
@@ -222,12 +220,10 @@ export const fetchSessionChats = (uid, limit = 10) => {
                 userSessions.val()[session] === 'private'
                   ? 'privateSessions'
                   : 'sessions';
-              const snapshot = await firebase
-                .database()
+              const snapshot = await database()
                 .ref(`${type}/${session}`)
                 .once('value');
-              const lastMessage = await firebase
-                .database()
+              const lastMessage = await database()
                 .ref('sessionChats')
                 .child(session)
                 .orderByKey()
@@ -256,8 +252,7 @@ export const fetchSessionChats = (uid, limit = 10) => {
 export const fetchMessages = (id, amount, uid, endAt) => {
   return async (dispatch) => {
     const ref = endAt
-      ? firebase
-          .database()
+      ? database()
           .ref(`chats/${id}`)
           .orderByKey()
           .endAt(endAt)
@@ -266,8 +261,7 @@ export const fetchMessages = (id, amount, uid, endAt) => {
     const snapshot = await ref.once('value');
     const messages = {};
     try {
-      const url = await firebase
-        .storage()
+      const url = await storage()
         .ref(`images/${uid}`)
         .child('avatar')
         .getDownloadURL();
@@ -307,28 +301,24 @@ export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
   return (dispatch) => {
     const type = isPrivate ? 'privateSessions' : 'sessions';
     const ref = endAt
-      ? firebase
-          .database()
+      ? database()
           .ref('sessionChats/' + id)
           .endAt(endAt)
           .limitToLast(amount)
-      : firebase
-          .database()
+      : database()
           .ref('sessionChats/' + id)
           .limitToLast(amount);
     return ref.once('value', (snapshot) => {
       const messages = {};
       const promises = [];
-      firebase
-        .database()
+      database()
         .ref(type + '/' + id)
         .child('users')
         .once('value', (users) => {
           users.forEach((child) => {
             promises.push(
               new Promise((resolve) => {
-                firebase
-                  .storage()
+                storage()
                   .ref('images/' + child.key)
                   .child('avatar')
                   .getDownloadURL()

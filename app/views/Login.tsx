@@ -10,7 +10,7 @@ import VersionNumber from 'react-native-version-number';
 import SpinnerButton from 'react-native-spinner-button';
 import auth from '@react-native-firebase/auth';
 import {connect} from 'react-redux';
-import {SetProfile, doSetup} from '../actions/profile';
+import {SetProfile, doSetup, fetchProfile} from '../actions/profile';
 import Profile from '../types/Profile';
 import {MyThunkDispatch, MyRootState} from '../types/Shared';
 import {CommonActions} from '@react-navigation/native';
@@ -21,6 +21,7 @@ import appleAuth, {
   AppleAuthRequestScope,
 } from '@invertase/react-native-apple-authentication';
 import db from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
 import {GoogleSignin} from '@react-native-community/google-signin';
 import {getProfileImage} from '../helpers/images';
@@ -42,6 +43,7 @@ const Login: FunctionComponent<LoginProps> = ({
   setProfile,
   hasViewedWelcome,
   setup,
+  getProfile,
 }) => {
   const [spinner, setSpinner] = useState(false);
   const [facebookLoading, setFacebookLoading] = useState(false);
@@ -64,31 +66,32 @@ const Login: FunctionComponent<LoginProps> = ({
         const userRef = db().collection('users').doc(user.uid);
         const doc = await userRef.get();
         if (doc.exists) {
-          setProfile(doc.data());
-          setup(doc.data());
+          // setProfile(doc.data());
         } else {
           const avatar = getProfileImage(user);
           userRef.set({uid: user.uid, email: user.email, avatar});
-          setProfile({uid: user.uid, email: user.email});
-          setup({uid: user.uid, email: user.email});
+          // setProfile({uid: user.uid, email: user.email});
         }
 
-        if (hasViewedWelcome) {
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{name: 'Tabs'}],
-            }),
-          );
-        } else {
+        await getProfile();
+        await setup();
+
+        // if (hasViewedWelcome) {
+        //   navigation.dispatch(
+        //     CommonActions.reset({
+        //       index: 0,
+        //       routes: [{name: 'Tabs'}],
+        //     }),
+        //   );
+        // } else {
           navigation.navigate('Welcome');
-        }
+       // }
         setupNotifications(user.uid);
       }
     });
     // unsubscribe to the listener when unmounting
     return () => unsubscribe();
-  }, [setProfile, navigation, hasViewedWelcome, setup]);
+  }, [setProfile, navigation, hasViewedWelcome, setup, getProfile]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -295,7 +298,8 @@ const mapStateToProps = ({profile}: MyRootState) => ({
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   setProfile: (profile: Profile) => dispatch(SetProfile(profile)),
-  setup: (profile: Profile) => dispatch(doSetup(profile)),
+  setup: () => dispatch(doSetup()),
+  getProfile: () => dispatch(fetchProfile()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
