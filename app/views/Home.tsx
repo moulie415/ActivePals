@@ -53,7 +53,7 @@ import {
 } from '../actions/home';
 import Comment from '../types/Comment';
 import Profile from '../types/Profile';
-import {Icon, Text, Card, Input} from '@ui-kitten/components';
+import {Icon, Text, Card, Input, Layout} from '@ui-kitten/components';
 import {MyRootState} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
@@ -441,7 +441,7 @@ class Home extends Component<HomeProps, State> {
                 }>
                 <ThemedIcon
                   style={{paddingHorizontal: 10}}
-                  name="more-horzontal"
+                  name="more-horizontal"
                   size={20}
                 />
               </TouchableOpacity>
@@ -557,8 +557,8 @@ class Home extends Component<HomeProps, State> {
                   <ThemedIcon
                     size={50}
                     name="play-circle"
+                    fill="#fff"
                     style={{
-                      color: '#fff',
                       backgroundColor: 'transparent',
                       opacity: 0.8,
                     }}
@@ -731,14 +731,12 @@ class Home extends Component<HomeProps, State> {
     return (
       <>
         {/* <Header title="Feed" right={notificationsButton} /> */}
-        <View
+        <Layout
           style={{
             flexDirection: 'row',
-            backgroundColor: '#fff',
             padding: 10,
             alignItems: 'center',
             borderBottomWidth: 0.5,
-            borderColor: '#999',
           }}>
           <TouchableOpacity
             onPress={() => navigation.navigate('Profile')}
@@ -853,7 +851,7 @@ class Home extends Component<HomeProps, State> {
               }}
             />
           </TouchableOpacity>
-        </View>
+        </Layout>
 
         <ScrollView
           contentContainerStyle={{
