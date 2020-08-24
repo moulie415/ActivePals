@@ -63,6 +63,7 @@ const Login: FunctionComponent<LoginProps> = ({
         ((user && user.emailVerified) ||
           (user.providerData && user.providerData.length > 0))
       ) {
+        debugger
         const userRef = db().collection('users').doc(user.uid);
         const doc = await userRef.get();
         if (doc.exists) {
@@ -84,8 +85,8 @@ const Login: FunctionComponent<LoginProps> = ({
         //     }),
         //   );
         // } else {
-          navigation.navigate('Welcome');
-       // }
+        navigation.navigate('Welcome', {goBack: false});
+        // }
         setupNotifications(user.uid);
       }
     });

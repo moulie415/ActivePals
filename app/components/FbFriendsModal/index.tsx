@@ -27,20 +27,21 @@ const FbFriendsModal: FunctionComponent<FbFriendsModalProps> = ({
   request,
   isOpen,
 }) => {
-  const [selectedFriends, setSelectdFriends] = useState([]);
+  const [selectedFriends, setSelectdFriends] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [fbFriends, setFbFriends] = useState({});
 
   useEffect(() => {
     const getFriends = async () => {
       const fbFriends = await getFbFriends(profile.token);
+      debugger;
       setFbFriends(fbFriends);
       setLoading(false);
     };
     getFriends();
   }, [getFbFriends, profile.token]);
 
-  const onFriendPress = (friend) => {
+  const onFriendPress = (friend: Profile) => {
     if (friend.username) {
       const {uid} = friend;
       if (selectedFriends.some((f) => f === uid)) {

@@ -3,6 +3,7 @@ import storage from '@react-native-firebase/storage';
 import {upUnreadCount, fetchUsers} from './home';
 import Profile, {UserState} from '../types/Profile';
 import {fetchOther} from './profile';
+import { MyThunkDispatch } from '../types/Shared';
 
 export const SET_FRIENDS = 'SET_FRIENDS';
 export const SET_FRIEND = 'SET_FRIEND';
@@ -155,11 +156,12 @@ export const deleteFriend = (uid) => {
 };
 
 export const fetchFbFriends = (token: string) => {
-  return async (dispatch) => {
+  return async (dispatch: MyThunkDispatch) => {
     const response = await fetch(
       `https://graph.facebook.com/v5.0/me?fields=friends&access_token=${token}`,
     );
     const json = await response.json();
+    debugger;
     if (json.friends && json.friends.data) {
       const uids: string[] = await Promise.all(
         json.friends.data.map(async (friend) => {
