@@ -31,6 +31,7 @@ import {Layout, Icon, Button, Input, Text, Toggle} from '@ui-kitten/components';
 import globalStyles from '../styles/globalStyles';
 import {GOOGLE_WEB_ID} from 'react-native-dotenv';
 import {ThemeContext} from '../context/themeContext';
+import Logo from '../components/Logo/Logo';
 
 GoogleSignin.configure({
   webClientId: GOOGLE_WEB_ID, // From Firebase Console Settings
@@ -183,6 +184,9 @@ const Login: FunctionComponent<LoginProps> = ({
         onChange={toggleTheme}
         style={{position: 'absolute', top: 40, right: 20}}
       />
+      <View style={{alignItems: 'center', margin: 30}}>
+        <Logo size={100} />
+      </View>
       <Input
         placeholder="Email"
         onChangeText={(u) => setUsername(u)}
