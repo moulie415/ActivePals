@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
-  SafeAreaView,
 } from 'react-native';
 import VersionNumber from 'react-native-version-number';
 import SpinnerButton from 'react-native-spinner-button';
