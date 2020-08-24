@@ -13,7 +13,7 @@ import {setHasViewedWelcome, fetchProfile} from '../actions/profile';
 import WelcomeProps from '../types/views/Welcome';
 import {SessionType} from '../types/Session';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
-import {Layout, Icon, Input, Text, Button} from '@ui-kitten/components';
+import {Layout, Input, Text, Button} from '@ui-kitten/components';
 import Logo from '../components/Logo/Logo';
 import ThemedImage from '../components/ThemedImage/ThemedImage';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
