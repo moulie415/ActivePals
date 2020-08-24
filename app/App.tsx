@@ -1,20 +1,10 @@
-import React, {FunctionComponent} from 'react';
-import {ImageProps, StyleSheet} from 'react-native';
-import {
-  ApplicationProvider,
-  Button,
-  Icon,
-  IconRegistry,
-  Layout,
-  Text,
-  TopNavigation,
-  TopNavigationAction,
-} from '@ui-kitten/components';
+import React, {FunctionComponent, useEffect} from 'react';
+import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator, Header} from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Login from './views/Login';
 import {Provider} from 'react-redux';
@@ -24,6 +14,8 @@ import {createStore, applyMiddleware, compose} from 'redux';
 import thunk from 'redux-thunk';
 import reducer from './reducers';
 import SignUp from './views/SignUp';
+import {Theme} from './types/Shared';
+import AsyncStorage from '@react-native-community/async-storage';
 
 // @ts-ignore
 const composeEnhancers =
@@ -45,13 +37,30 @@ export type StackParamList = {
 const Stack = createStackNavigator<StackParamList>();
 const Tab = createBottomTabNavigator<StackParamList>();
 
+const key = '@theme';
+
 const App = () => {
-  const [theme, setTheme] = React.useState('light');
+  const [theme, setTheme] = React.useState<Theme>('light');
 
   const toggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
   };
+
+  useEffect(() => {
+    const getTheme = async () => {
+      const currentTheme = await AsyncStorage.getItem(key);
+      if (currentTheme) {
+        //@ts-ignore
+        setTheme(currentTheme);
+      }
+    };
+    getTheme();
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.setItem(key, theme);
+  }, [theme]);
   return (
     <PersistGate persistor={persistor}>
       <Provider store={store}>
