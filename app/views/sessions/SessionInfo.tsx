@@ -8,15 +8,10 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import {PulseIndicator} from 'react-native-indicators';
 import RNCalendarEvents from 'react-native-calendar-events';
 import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {Popup, Options} from 'react-native-map-link';
-import Header from '../../components/Header/header';
-import Text from '../../components/Text';
-
 import {
   getType,
   formatDateTime,
@@ -25,7 +20,6 @@ import {
 } from '../../constants/utils';
 import globalStyles from '../../styles/globalStyles';
 import styles from '../../styles/sessionStyles';
-import Button from '../../components/Button';
 import PrivateIcon from '../../components/PrivateIcon';
 import FriendsModal from '../../components/friendsModal';
 import {
@@ -38,6 +32,9 @@ import {
 import {muteChat} from '../../actions/chats';
 import SessionInfoProps from '../../types/views/sessions/SessionInfo';
 import {SessionType} from '../../types/Session';
+import {Icon, Text, Button, Layout} from '@ui-kitten/components';
+import {MyRootState, MyThunkDispatch} from '../../types/Shared';
+import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 
 interface State {
   popUpVisible: boolean;
@@ -53,15 +50,14 @@ class SessionInfo extends Component<SessionInfoProps, State> {
   }
 
   componentDidMount() {
-    const {navigation, getPrivateSession, getSession} = this.props;
-    const isPrivate = navigation.getParam('isPrivate');
-    const sessionId = navigation.getParam('sessionId');
+    const {navigation, route, getPrivateSession, getSession} = this.props;
+    const {isPrivate, sessionId} = route.params;
     isPrivate ? getPrivateSession(sessionId) : getSession(sessionId);
   }
 
   getButtons(host, session) {
-    const {profile, navigation, remove, onAddUser} = this.props;
-    const sessionId = navigation.getParam('sessionId');
+    const {profile, navigation, remove, onAddUser, route} = this.props;
+    const {sessionId} = route.params;
     const you = profile.uid;
     if (session.users[you]) {
       if (host.uid === you) {
@@ -109,7 +105,6 @@ class SessionInfo extends Component<SessionInfoProps, State> {
     return (
       <View style={styles.infoRowSpaceEvenly}>
         <Button
-          text="Join"
           style={{alignSelf: 'center'}}
           onPress={async () => {
             try {
@@ -121,8 +116,9 @@ class SessionInfo extends Component<SessionInfoProps, State> {
             } catch (e) {
               Alert.alert('Error', e.message);
             }
-          }}
-        />
+          }}>
+          Join
+        </Button>
       </View>
     );
   }
@@ -139,16 +135,15 @@ class SessionInfo extends Component<SessionInfoProps, State> {
   chatButton(session) {
     const {navigation} = this.props;
     return (
-      <Button
-        text="Chat"
-        onPress={() => navigation.navigate('Messaging', {session})}
-      />
+      <Button onPress={() => navigation.navigate('Messaging', {session})}>
+        Chat
+      </Button>
     );
   }
 
   muteButton() {
-    const {muted, onMuteChat, navigation} = this.props;
-    const sessionId = navigation.getParam('sessionId');
+    const {muted, onMuteChat, navigation, route} = this.props;
+    const {sessionId} = route.params;
     return (
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Text>Mute </Text>
@@ -183,7 +178,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                 style={{height: 40, width: 40, borderRadius: 25}}
               />
             ) : (
-              <Icon size={50} name="person" />
+              <ThemedIcon size={50} name="person" />
             )}
             <Text style={{marginLeft: 10}}>{userItem.username}</Text>
           </TouchableOpacity>
@@ -203,10 +198,10 @@ class SessionInfo extends Component<SessionInfoProps, State> {
       users,
       places,
       location,
+      route,
     } = this.props;
     const {friendsModalOpen, options, popUpVisible} = this.state;
-    const sessionId = navigation.getParam('sessionId');
-    const isPrivate = navigation.getParam('isPrivate');
+    const {sessionId, isPrivate} = route.params;
     const session = sessions[sessionId] || privateSessions[sessionId];
 
     let host;
@@ -222,10 +217,9 @@ class SessionInfo extends Component<SessionInfoProps, State> {
 
     return (
       <>
-        <Header hasBack title={session ? session.title : ''} />
-        <ScrollView style={{backgroundColor: '#9993'}}>
+        <ScrollView>
           {session ? (
-            <View>
+            <Layout>
               <View style={{marginBottom: 20}}>
                 {gym && gym.photo ? (
                   <Image
@@ -244,16 +238,12 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                   style={{
                     alignSelf: 'center',
                     marginTop: -40,
-                    ...globalStyles.shadow,
                     padding: 5,
                   }}>
                   {getType(session.type, 80)}
                 </View>
               </View>
-              <View
-                style={{
-                  ...globalStyles.sectionShadow,
-                }}>
+              <View>
                 {session && host && this.getButtons(host, session)}
                 <TouchableOpacity
                   onPress={() => Alert.alert('Details', session.details)}
@@ -323,9 +313,9 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                           },
                         },
                       ]);
-                    }}
-                    text="Add to calendar"
-                  />
+                    }}>
+                    Add to calendar
+                  </Button>
                 </View>
                 <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
                   <TouchableOpacity
@@ -408,7 +398,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                           style={{height: 40, width: 40, borderRadius: 25}}
                         />
                       ) : (
-                        <Icon size={50} name="person" />
+                        <ThemedIcon size={50} name="person" />
                       )}
                     </View>
                     <View style={{marginRight: 10}}>
@@ -420,7 +410,6 @@ class SessionInfo extends Component<SessionInfoProps, State> {
               </View>
               <View
                 style={{
-                  ...globalStyles.sectionShadow,
                   marginTop: 20,
                 }}>
                 <View
@@ -432,17 +421,17 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                   {(!isPrivate || (host && profile.uid === host.uid)) && (
                     <TouchableOpacity
                       onPress={() => this.setState({friendsModalOpen: true})}>
-                      <Icon
+                      <ThemedIcon
                         size={40}
                         style={{marginRight: 10}}
-                        name="ios-add"
+                        name="plus"
                       />
                     </TouchableOpacity>
                   )}
                 </View>
                 {session && this.renderUsers(session.users)}
               </View>
-            </View>
+            </Layout>
           ) : (
             <ActivityIndicator />
           )}
@@ -482,7 +471,13 @@ class SessionInfo extends Component<SessionInfoProps, State> {
   }
 }
 
-const mapStateToProps = ({profile, sharedInfo, friends, sessions, chats}) => ({
+const mapStateToProps = ({
+  profile,
+  sharedInfo,
+  friends,
+  sessions,
+  chats,
+}: MyRootState) => ({
   profile: profile.profile,
   users: sharedInfo.users,
   friends: friends.friends,
@@ -493,7 +488,7 @@ const mapStateToProps = ({profile, sharedInfo, friends, sessions, chats}) => ({
   muted: chats.muted,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   remove: (key, type) => dispatch(removeSession(key, type)),
   onAddUser: (session, isPrivate, uid) =>
     dispatch(addUser(session, isPrivate, uid)),

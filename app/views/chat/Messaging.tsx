@@ -9,21 +9,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {pathOr} from 'ramda';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {PulseIndicator} from 'react-native-indicators';
 import database from '@react-native-firebase/database';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import {isIphoneX} from 'react-native-iphone-x-helper';
 import {GiftedChat, Bubble, MessageText} from 'react-native-gifted-chat';
 import {connect} from 'react-redux';
-import Text from '../../components/Text';
-
 import globalStyles from '../../styles/globalStyles';
-import Header from '../../components/Header/header';
 import {guid, sortMessagesByCreatedAt} from '../../constants/utils';
 import str from '../../constants/strings';
-// import EmojiInput from 'react-native-emoji-input'
 import {sendRequest, acceptRequest} from '../../actions/friends';
 import {
   fetchMessages,
@@ -36,11 +30,13 @@ import {
 } from '../../actions/chats';
 import MessagingProps from '../../types/views/Messaging';
 import Message, {MessageType, SessionType} from '../../types/Message';
+import {Text} from '@ui-kitten/components';
+import {MyRootState, MyThunkDispatch} from '../../types/Shared';
+import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 
 interface State {
   spinner: boolean;
   showLoadEarlier: boolean;
-  showEmojiKeyboard?: boolean;
   messages: Message[];
   amount: number;
   text?: string;
@@ -61,9 +57,9 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   componentDidMount() {
-    const {navigation, unreadCount, onResetUnreadCount} = this.props;
-    const {params} = navigation.state;
-    const {gymId, friendUid, session} = params;
+    const {navigation, unreadCount, onResetUnreadCount, route} = this.props;
+
+    const {gymId, friendUid, session} = route.params;
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
     this.keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -78,10 +74,10 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {navigation, profile, onResetMessage, resetNotif} = this.props;
-    const {params} = navigation.state;
-    const {friendUid, gymId} = params;
-    const session = pathOr({}, ['session'], params);
+    const {navigation, profile, onResetMessage, resetNotif, route} = this.props;
+
+    const {friendUid, gymId} = route.params;
+    const session = pathOr({}, ['session'], route.params);
     const {key: sessionId} = session;
     const {messages} = this.state;
     // message it populated when an attachment is sent
@@ -172,27 +168,22 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   onBackPress() {
-    const {navigation, onResetUnreadCount, unreadCount} = this.props;
-    const {params} = navigation.state;
-    const {gymId, friendUid, sessionId} = params;
-    const {showEmojiKeyboard} = this.state;
-    if (showEmojiKeyboard) {
-      this.setState({showEmojiKeyboard: false});
-    } else {
-      navigation.goBack();
-      const id = friendUid || sessionId || gymId;
-      const count = unreadCount[id];
-      if (count && count > 0) {
-        onResetUnreadCount(id);
-      }
+    const {navigation, onResetUnreadCount, unreadCount, route} = this.props;
+    const {gymId, friendUid, sessionId} = route.params;
+
+    navigation.goBack();
+    const id = friendUid || sessionId || gymId;
+    const count = unreadCount[id];
+    if (count && count > 0) {
+      onResetUnreadCount(id);
     }
+
     return true;
   }
 
   async onSend(messages: Message[] = []) {
-    const {navigation, gym, onUpdateLastMessage} = this.props;
-    const {params} = navigation.state;
-    const {friendUid, gymId, session, chatId} = params;
+    const {navigation, gym, onUpdateLastMessage, route} = this.props;
+    const {friendUid, gymId, session, chatId} = route.params;
     // make messages database friendly
     const converted = messages.map((message) => {
       const type = this.getType();
@@ -232,8 +223,7 @@ class Messaging extends Component<MessagingProps, State> {
 
   getType() {
     const {navigation} = this.props;
-    const {params} = navigation.state;
-    const {gymId, session} = params;
+    const {gymId, session} = route.params;
     if (session) {
       return MessageType.SESSION_MESSAGE;
     }
@@ -244,31 +234,27 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   getDbRef() {
-    const {navigation} = this.props;
-    const {params} = navigation.state;
-    const {gymId, session, chatId} = params;
-    if (session) {
+    const {navigation, route} = this.props;
+    const {gymId, session, chatId} = route.params;
+    if (session && session.key) {
       return database().ref('sessionChats').child(session.key);
     }
     if (gymId) {
       return database().ref('gymChats').child(gymId);
     }
-    return database().ref('chats').child(chatId);
+    if (chatId) {
+      return database().ref('chats').child(chatId);
+    }
   }
 
   getRightHandIcon() {
-    const {navigation} = this.props;
-    const {params} = navigation.state;
-    const {gymId, session} = params;
+    const {navigation, route} = this.props;
+    const {gymId, session} = route.params;
     if (gymId) {
       return (
         <TouchableOpacity
           onPress={() => navigation.navigate('Gym', {id: gymId})}>
-          <Icon
-            size={25}
-            name="md-information-circle"
-            style={{color: '#fff'}}
-          />
+          <ThemedIcon size={25} name="info" />
         </TouchableOpacity>
       );
     }
@@ -279,21 +265,11 @@ class Messaging extends Component<MessagingProps, State> {
           onPress={() =>
             navigation.navigate('SessionInfo', {sessionId: key, isPrivate})
           }>
-          <Icon
-            size={25}
-            name="md-information-circle"
-            style={{color: '#fff'}}
-          />
+          <ThemedIcon size={25} name="info" />
         </TouchableOpacity>
       );
     }
     return null;
-  }
-
-  keyboardDidShow() {
-    if (Platform.OS === 'ios') {
-      this.setState({showEmojiKeyboard: false});
-    }
   }
 
   loadMessages(endAt?: string) {
@@ -302,10 +278,10 @@ class Messaging extends Component<MessagingProps, State> {
       getSessionMessages,
       getGymMessages,
       getMessages,
+      route,
     } = this.props;
     const {amount} = this.state;
-    const {params} = navigation.state;
-    const {friendUid, gymId, session, chatId} = params;
+    const {friendUid, gymId, session, chatId} = route.params;
     this.setState({spinner: true});
     if (session) {
       const {key, private: isPrivate} = session;
@@ -402,19 +378,11 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   render() {
-    const {navigation, gym, profile, friends, users} = this.props;
+    const {navigation, gym, profile, friends, users, route} = this.props;
     const {messages, showLoadEarlier, spinner, text} = this.state;
-    const {params} = navigation.state;
-    const {friendUsername, session} = params;
+    const {friendUsername, session} = route.params;
     return (
       <View style={{flex: 1, backgroundColor: '#9993'}}>
-        <Header
-          hasBack
-          title={
-            friendUsername || (session && session.title) || (gym && gym.name)
-          }
-          right={this.getRightHandIcon()}
-        />
         <GiftedChat
           text={text}
           onInputTextChanged={(input) => this.setState({text: input})}
@@ -448,20 +416,7 @@ class Messaging extends Component<MessagingProps, State> {
             avatar: profile.avatar,
           }}
           renderBubble={(props) => {
-            return (
-              <Bubble
-                {...props}
-                // @ts-ignore
-                wrapperStyle={{
-                  right: {
-                    ...globalStyles.bubbleShadow,
-                  },
-                  left: {
-                    ...globalStyles.bubbleShadow,
-                  },
-                }}
-              />
-            );
+            return <Bubble {...props} />;
           }}
           renderMessageText={(props) => {
             // @ts-ignore
@@ -489,26 +444,9 @@ class Messaging extends Component<MessagingProps, State> {
           }}
           renderActions={() => {
             return (
-              <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity
-                  onPress={() => this.showPicker()}
-                  style={{
-                    marginLeft: isIphoneX() ? 10 : 0,
-                    padding: 5,
-                    paddingLeft: 15,
-                    paddingRight: 10,
-                  }}>
-                  <Icon size={25} name="ios-attach" />
-                </TouchableOpacity>
-                {/* <TouchableOpacity
-                style={{padding: 5}}
-                onPress={() => {
-                  this.setState({showEmojiKeyboard: !this.state.showEmojiKeyboard})
-                  Keyboard.dismiss()
-                  }}>
-                  <Icon name="md-happy" style={{color: colors.secondary, marginTop: Platform.OS == 'ios' ? 0 : -1}}/>
-                </TouchableOpacity> */}
-              </View>
+              <TouchableOpacity onPress={() => this.showPicker()}>
+                <ThemedIcon size={25} name="attach-2" />
+              </TouchableOpacity>
             );
           }}
           // @ts-ignore
@@ -550,12 +488,6 @@ class Messaging extends Component<MessagingProps, State> {
             },
           ]}
         />
-        {/* this.state.showEmojiKeyboard &&  <EmojiInput
-          enableSearch={Platform.OS == 'android'}
-              onEmojiSelected={(emoji) => {
-                  this.setState({text: this.state.text += emoji.char})
-                }}
-            /> */}
         {spinner && (
           <View style={globalStyles.indicator}>
             <ActivityIndicator />
@@ -576,7 +508,10 @@ const fetchId = (params) => {
   return params.chatId;
 };
 
-const mapStateToProps = ({friends, profile, chats, sharedInfo}, ownProps) => ({
+const mapStateToProps = (
+  {friends, profile, chats, sharedInfo}: MyRootState,
+  ownProps,
+) => ({
   friends: friends.friends,
   users: sharedInfo.users,
   profile: profile.profile,
@@ -585,13 +520,12 @@ const mapStateToProps = ({friends, profile, chats, sharedInfo}, ownProps) => ({
   chats: chats.chats,
   message: chats.message,
   gymChat: chats.gymChat,
-  messageSession:
-    chats.messageSessions[fetchId(ownProps.navigation.state.params)],
+  messageSession: chats.messageSessions[fetchId(ownProps.route.params)],
   notif: chats.notif,
   unreadCount: chats.unreadCount,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onUpdateLastMessage: (message) => dispatch(updateLastMessage(message)),
   onRequest: (friendUid) => dispatch(sendRequest(friendUid)),
   onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),

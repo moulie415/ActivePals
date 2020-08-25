@@ -42,6 +42,10 @@ import {SafeAreaView, TouchableOpacity, View} from 'react-native';
 import ThemedIcon from './components/ThemedIcon/ThemedIcon';
 import NotificationsButton from './components/NotificationsButton/NotificationsButton';
 import notifications from './views/notifications';
+import SessionInfo from './views/sessions/SessionInfo';
+import Gym from './views/Gym';
+import Messaging from './views/chat/Messaging';
+import Session from './types/Session';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -72,6 +76,15 @@ export type StackParamList = {
   Profile: undefined;
   Settings: undefined;
   Notifications: undefined;
+  SessionInfo: {sessionId: string; isPrivate: boolean};
+  Gym: {id: string};
+  Messaging: {
+    session?: Session;
+    gymId?: string;
+    chatId?: string;
+    friendUsername?: string;
+    friendUid?: string;
+  };
 };
 
 const Stack = createStackNavigator<StackParamList>();
@@ -195,6 +208,9 @@ const App = () => {
                 <Stack.Screen name="Tabs" component={Tabs} />
                 <Stack.Screen name="Settings" component={Settings} />
                 <Stack.Screen name="Notifications" component={notifications} />
+                <Stack.Screen name="SessionInfo" component={SessionInfo} />
+                <Stack.Screen name="Gym" component={Gym} />
+                <Stack.Screen name="Messaging" component={Messaging} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>

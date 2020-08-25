@@ -9,26 +9,22 @@ import {
   Image as SlowImage,
   ActivityIndicator,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Image from 'react-native-fast-image';
 import Hyperlink from 'react-native-hyperlink';
 import {Popup, Options} from 'react-native-map-link';
 import {connect} from 'react-redux';
-import {PulseIndicator} from 'react-native-indicators';
-import Text from '../components/Text';
 import hStyles from '../styles/homeStyles';
-
 import {getDistance} from '../constants/utils';
-import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
 import FriendsModal from '../components/friendsModal';
-import Button from '../components/Button';
 import styles from '../styles/gymStyles';
 import {removeGym, joinGym} from '../actions/profile';
 import {fetchGym} from '../actions/sessions';
 import {muteChat} from '../actions/chats';
 import GymProps from '../types/views/Gym';
 import Profile from '../types/Profile';
+import {Icon, Button, Text, Layout} from '@ui-kitten/components';
+import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
 interface State {
   profile?: Profile;
@@ -46,17 +42,12 @@ class Gym extends Component<GymProps, State> {
   }
 
   componentDidMount() {
-    const {navigation, getGym} = this.props;
-    const {params} = navigation.state;
-    getGym(params.id);
+    const {route, getGym} = this.props;
+    const {id} = route.params;
+    getGym(id);
   }
 
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: 'Gym',
-  };
-
-  handleUserPress(uid) {
+  handleUserPress(uid: string) {
     const {profile, navigation} = this.props;
     if (uid === profile.uid) {
       navigation.navigate('Profile');
@@ -106,10 +97,11 @@ class Gym extends Component<GymProps, State> {
       gym: yourGym,
       join,
       removeYourGym,
+      route,
     } = this.props;
     const {
       params: {id},
-    } = navigation.state;
+    } = route;
     const {popUpVisible, options, friendsModalOpen} = this.state;
     const gym = places[id];
     const yourLat = pathOr(null, ['lat'], location);
@@ -121,9 +113,8 @@ class Gym extends Component<GymProps, State> {
     const locationString = gym ? `${gym.vicinity} ${distanceString}` : '';
     return (
       <>
-        <Header hasBack title={gym && gym.name} />
         {gym ? (
-          <View style={{flex: 1}}>
+          <Layout style={{flex: 1}}>
             <ScrollView>
               <View style={{alignItems: 'center', marginBottom: 20}}>
                 {gym && gym.photo ? (
@@ -141,7 +132,7 @@ class Gym extends Component<GymProps, State> {
                     }}
                   />
                 )}
-                <View style={globalStyles.shadow}>
+                <View>
                   <SlowImage
                     style={{
                       width: 80,
@@ -154,10 +145,7 @@ class Gym extends Component<GymProps, State> {
                   />
                 </View>
               </View>
-              <View
-                style={{
-                  ...globalStyles.sectionShadow,
-                }}>
+              <View>
                 {yourGym && yourGym.place_id === id ? (
                   <View
                     style={[
@@ -210,9 +198,9 @@ class Gym extends Component<GymProps, State> {
                           join(gym);
                         }
                       }}
-                      style={{alignSelf: 'center'}}
-                      text="Join"
-                    />
+                      style={{alignSelf: 'center'}}>
+                      Join
+                    </Button>
                   </View>
                 )}
                 <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
@@ -248,9 +236,9 @@ class Gym extends Component<GymProps, State> {
                       marginLeft: 20,
                       marginRight: 10,
                       alignSelf: 'flex-start',
-                    }}
-                    text="Directions"
-                  />
+                    }}>
+                    Directions
+                  </Button>
                 </View>
                 {gym.website && (
                   <TouchableOpacity
@@ -334,7 +322,6 @@ class Gym extends Component<GymProps, State> {
               {gym && gym.users && (
                 <View
                   style={{
-                    ...globalStyles.sectionShadow,
                     marginTop: 20,
                   }}>
                   <View style={[styles.rowSpaceBetween, {padding: 10}]}>
@@ -356,12 +343,11 @@ class Gym extends Component<GymProps, State> {
                   marginRight: 2,
                   paddingVertical: 15,
                 }}
-                text="Create Session"
-                textStyle={{textAlign: 'center'}}
                 onPress={() =>
                   navigation.navigate('SessionDetail', {location: gym})
-                }
-              />
+                }>
+                Create Session
+              </Button>
               <View
                 style={{borderRightWidth: 1, borderRightColor: 'transparent'}}
               />
@@ -372,12 +358,11 @@ class Gym extends Component<GymProps, State> {
                   marginLeft: 2,
                   paddingVertical: 15,
                 }}
-                textStyle={{textAlign: 'center'}}
-                text="Create Private Session"
-                onPress={() => this.setState({friendsModalOpen: true})}
-              />
+                onPress={() => this.setState({friendsModalOpen: true})}>
+                Create Private Session
+              </Button>
             </View>
-          </View>
+          </Layout>
         ) : (
           <View style={hStyles.spinner}>
             <ActivityIndicator />
@@ -404,7 +389,13 @@ class Gym extends Component<GymProps, State> {
   }
 }
 
-const mapStateToProps = ({friends, sharedInfo, profile, sessions, chats}) => ({
+const mapStateToProps = ({
+  friends,
+  sharedInfo,
+  profile,
+  sessions,
+  chats,
+}: MyRootState) => ({
   friends: friends.friends,
   users: sharedInfo.users,
   profile: profile.profile,
@@ -414,7 +405,7 @@ const mapStateToProps = ({friends, sharedInfo, profile, sessions, chats}) => ({
   muted: chats.muted,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   join: (location) => dispatch(joinGym(location)),
   removeYourGym: () => dispatch(removeGym()),
   getGym: (id) => dispatch(fetchGym(id)),

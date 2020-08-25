@@ -616,6 +616,7 @@ class Sessions extends Component<SessionsProps, State> {
             style={{
               flexDirection: 'row',
               height: 60,
+              justifyContent: 'space-evenly'
             }}>
             <Button
               style={styles.button}
@@ -626,7 +627,7 @@ class Sessions extends Component<SessionsProps, State> {
               }}>
               Create Session
             </Button>
-            <View style={{borderRightWidth: 1}} />
+            {/* <View style={{borderRightWidth: 1}} /> */}
             <Button
               style={styles.button}
               onPress={() => {
