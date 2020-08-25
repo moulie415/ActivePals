@@ -537,8 +537,7 @@ class Messaging extends Component<MessagingProps, State> {
                     navigation.navigate('ProfileView', {uid: found.uid});
                   } else {
                     try {
-                      const snapshot = await firebase
-                        .database()
+                      const snapshot = await database()
                         .ref('usernames')
                         .child(name)
                         .once('value');

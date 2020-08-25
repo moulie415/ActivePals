@@ -7,7 +7,6 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import database from '@react-native-firebase/database';
 import Image from 'react-native-fast-image';
 import Modal from 'react-native-modalbox';
@@ -15,9 +14,6 @@ import {connect} from 'react-redux';
 import colors from '../constants/colors';
 import styles from '../styles/friendsStyles';
 import {getStateColor, sortByState} from '../constants/utils';
-import Header from '../components/Header/header';
-import Text from '../components/Text';
-import Button from '../components/Button';
 import {
   fetchFriends,
   sendRequest,
@@ -25,6 +21,7 @@ import {
   deleteFriend,
 } from '../actions/friends';
 import FriendsProps from '../types/views/Friends';
+import {Icon, Button, Text} from '@ui-kitten/components';
 
 interface State {
   refreshing: boolean;
@@ -39,13 +36,6 @@ class Friends extends Component<FriendsProps, State> {
     };
   }
 
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: 'Pals',
-    tabBarIcon: ({tintColor}) => (
-      <Icon name="md-people" size={25} style={{color: tintColor}} />
-    ),
-  };
 
   async refresh() {
     const {profile, getFriends} = this.props;
@@ -70,13 +60,11 @@ class Friends extends Component<FriendsProps, State> {
     const {profile, onRequest} = this.props;
     if (username !== profile.username) {
       try {
-        const snapshot = await firebase
-          .database()
+        const snapshot = await database()
           .ref(`usernames/${username}`)
           .once('value');
         if (snapshot.val()) {
-          const status = await firebase
-            .database()
+          const status = await database()
             .ref(`userFriends/${profile.uid}`)
             .child(snapshot.val())
             .once('value');
@@ -101,8 +89,7 @@ class Friends extends Component<FriendsProps, State> {
   async openChat(uid, username) {
     const {profile, navigation} = this.props;
     try {
-      const snapshot = await firebase
-        .database()
+      const snapshot = await database()
         .ref(`userChats/${profile.uid}`)
         .child(uid)
         .once('value');
@@ -158,11 +145,7 @@ class Friends extends Component<FriendsProps, State> {
                         {text: 'OK', onPress: () => this.remove(item.uid)},
                       ]);
                     }}>
-                    <Icon
-                      name="ios-close"
-                      size={50}
-                      style={{color: colors.appRed, paddingHorizontal: 10}}
-                    />
+                    <Icon name="close" size={50} status="danger" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -191,26 +174,10 @@ class Friends extends Component<FriendsProps, State> {
                   <View style={{flexDirection: 'row', flex: 1}}>
                     <TouchableOpacity
                       onPress={() => onAccept(profile.uid, item.uid)}>
-                      <Icon
-                        size={50}
-                        name="ios-checkmark"
-                        style={{
-                          color: 'green',
-                          paddingHorizontal: 10,
-                          alignSelf: 'center',
-                        }}
-                      />
+                      <Icon size={50} name="checkmark" status="positive" />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => this.remove(item.uid)}>
-                      <Icon
-                        size={50}
-                        name="ios-close"
-                        style={{
-                          color: colors.appRed,
-                          paddingHorizontal: 10,
-                          alignSelf: 'center',
-                        }}
-                      />
+                      <Icon size={50} name="close" status="danger" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -242,7 +209,7 @@ class Friends extends Component<FriendsProps, State> {
                     ) : (
                       <Icon
                         size={65}
-                        name="md-contact"
+                        name="person"
                         style={{
                           color: colors.primary,
                           marginTop: Platform.OS === 'ios' ? -10 : 0,
@@ -276,22 +243,14 @@ class Friends extends Component<FriendsProps, State> {
                     <TouchableOpacity
                       onPress={() => this.openChat(item.uid, item.username)}
                       style={{padding: 5, marginHorizontal: 5}}>
-                      <Icon
-                        size={30}
-                        name="md-chatboxes"
-                        style={{color: colors.secondary}}
-                      />
+                      <Icon size={30} name="message-square" />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('ProfileView', {uid: item.uid})
                       }
                       style={{padding: 5, marginHorizontal: 5}}>
-                      <Icon
-                        size={30}
-                        name="md-person"
-                        style={{color: colors.secondary}}
-                      />
+                      <Icon size={30} name="person" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -314,12 +273,11 @@ class Friends extends Component<FriendsProps, State> {
             ? this.setState({modalOpen: true})
             : Alert.alert('Please set a username before trying to add a pal');
         }}>
-        <Icon name="md-add" size={25} style={{color: '#fff', padding: 5}} />
+        <Icon name="person-add" size={25} style={{color: '#fff', padding: 5}} />
       </TouchableOpacity>
     );
     return (
       <>
-        <Header title="Pals" right={addButton} />
         {Object.values(friends).length > 0 ? (
           this.renderFriends()
         ) : (

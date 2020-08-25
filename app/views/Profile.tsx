@@ -123,13 +123,12 @@ class ProfileView extends Component<ProfileProps, State> {
           onLogoutPress();
           try {
             this.setState({spinner: true});
-            await firebase
-              .database()
+            await database()
               .ref(`users/${profile.uid}`)
               .child('state')
               .remove();
-            await firebase.messaging().deleteToken();
-            await firebase.auth().signOut();
+            // await firebase.messaging().deleteToken();
+            await auth().signOut();
             this.setState({spinner: false});
           } catch (e) {
             Alert.alert('Error', e.message);
@@ -264,18 +263,12 @@ class ProfileView extends Component<ProfileProps, State> {
       await this.checkImages();
       delete newProfile.avatar;
       try {
-        await firebase
-          .database()
+        await database()
           .ref(`users/${newProfile.uid}`)
           .set({...newProfile});
         initial.username &&
-          (await firebase
-            .database()
-            .ref('usernames')
-            .child(initial.username)
-            .remove());
-        await firebase
-          .database()
+          (await database().ref('usernames').child(initial.username).remove());
+        await database()
           .ref('usernames')
           .child(newProfile.username)
           .set(newProfile.uid);

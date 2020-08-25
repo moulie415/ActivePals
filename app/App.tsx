@@ -1,5 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
+import {
+  ApplicationProvider,
+  IconRegistry,
+  BottomNavigation,
+  BottomNavigationTab,
+  Icon,
+  TabBar,
+  Tab,
+} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import database from '@react-native-firebase/database';
 import * as eva from '@eva-design/eva';
@@ -7,6 +15,7 @@ import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Login from './views/Login';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/lib/integration/react';
@@ -20,6 +29,11 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Welcome from './views/Welcome';
 import {GeoFire} from 'geofire';
 import Home from './views/Home';
+import Sessions from './views/sessions/Sessions';
+import Friends from './views/Friends';
+import SessionChats from './views/chat/SessionChats';
+import DirectMessages from './views/chat/DirectMessages';
+import GymChat from './views/chat/GymChat';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -41,16 +55,60 @@ export type StackParamList = {
   Welcome: {goBack?: boolean};
   Home: undefined;
   Tabs: undefined;
+  Sessions: undefined;
+  Friends: undefined;
+  Chats: undefined;
+  DirectMessages: undefined;
+  SessionChats: undefined;
+  GymChat: undefined;
 };
 
 const Stack = createStackNavigator<StackParamList>();
-const Tab = createBottomTabNavigator<StackParamList>();
+const TabNav = createBottomTabNavigator<StackParamList>();
+const TopTab = createMaterialTopTabNavigator<StackParamList>();
+
+const TopTabBar = ({navigation, state}) => (
+  <TabBar
+    selectedIndex={state.index}
+    onSelect={(index) => navigation.navigate(state.routeNames[index])}>
+    <Tab title="Session Chats" />
+    <Tab title="Direct Messages" />
+    <Tab title="Gym Chat" />
+  </TabBar>
+);
+
+const Chats = () => (
+  <TopTab.Navigator tabBar={(props) => <TopTabBar {...props} />}>
+    <TopTab.Screen name="SessionChats" component={SessionChats} />
+    <TopTab.Screen name="DirectMessages" component={DirectMessages} />
+    <TopTab.Screen name="GymChat" component={GymChat} />
+  </TopTab.Navigator>
+);
+
+const HomeIcon = (props) => <Icon {...props} name="home" />;
+const FriendsIcon = (props) => <Icon {...props} name="people" />;
+const ChatsIcon = (props) => <Icon {...props} name="message-square" />;
+
+const BottomTabBar = ({navigation, state}) => (
+  <BottomNavigation
+    style={{marginVertical: 8}}
+    selectedIndex={state.index}
+    onSelect={(index) => navigation.navigate(state.routeNames[index])}>
+    <BottomNavigationTab title="Home" icon={HomeIcon} />
+    <BottomNavigationTab title="Sessions" />
+    <BottomNavigationTab title="Friends" icon={FriendsIcon} />
+    <BottomNavigationTab title="Chats" icon={ChatsIcon} />
+  </BottomNavigation>
+);
 
 const Tabs = () => {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={Home} />
-    </Tab.Navigator>
+    <TabNav.Navigator tabBar={(props) => <BottomTabBar {...props} />}>
+      <TabNav.Screen name="Home" component={Home} />
+      <TabNav.Screen name="Sessions" component={Sessions} />
+      <TabNav.Screen name="Friends" component={Friends} />
+      <TabNav.Screen name="Chats" component={Chats} />
+    </TabNav.Navigator>
   );
 };
 

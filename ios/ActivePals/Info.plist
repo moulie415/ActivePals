@@ -133,5 +133,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+  <string>ActivePals requires you location to find nearby sessions</string>
 </dict>
 </plist>

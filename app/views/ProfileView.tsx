@@ -77,8 +77,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
       .once('value', (user) => {
         this.setState({profile: user.val()});
         if (user.val().gym) {
-          firebase
-            .database()
+         database()
             .ref(`gyms/${user.val().gym}`)
             .once('value', (gym) => {
               this.setState({gym: gym.val(), loaded: true});

@@ -4,6 +4,8 @@ import profile from './profile';
 import friends from './friends';
 import home from './home';
 import sharedInfo from './sharedInfo';
+import chats from './chats';
+import sessions from './sessions';
 
 const config = {
   key: 'root',
@@ -16,4 +18,6 @@ export default persistCombineReducers(config, {
   friends,
   home,
   sharedInfo,
+  chats,
+  sessions,
 });

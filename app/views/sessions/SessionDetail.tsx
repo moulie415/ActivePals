@@ -192,23 +192,11 @@ class SessionDetail extends Component<SessionDetailProps, State> {
         navigation.navigate('Sessions');
         if (friends) {
           friends.forEach((friend) => {
-            firebase
-              .database()
-              .ref(`userSessions/${friend}`)
-              .child(key)
-              .set(val);
+            database().ref(`userSessions/${friend}`).child(key).set(val);
           });
         }
-        firebase
-          .database()
-          .ref(`${type}/${key}/users`)
-          .child(profile.uid)
-          .set(true);
-        firebase
-          .database()
-          .ref(`userSessions/${profile.uid}`)
-          .child(key)
-          .set(val);
+        database().ref(`${type}/${key}/users`).child(profile.uid).set(true);
+        database().ref(`userSessions/${profile.uid}`).child(key).set(val);
         const coords = location.position;
         if (type === 'sessions') {
           geofire.set(key, [coords.lat, coords.lng]);

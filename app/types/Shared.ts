@@ -4,6 +4,8 @@ import {ProfileState} from '../reducers/profile';
 import {FriendsState} from '../reducers/friends';
 import {HomeState} from '../reducers/home';
 import {SharedInfoState} from '../reducers/sharedInfo';
+import {ChatsState} from '../reducers/chats';
+import {SessionsState} from '../reducers/sessions';
 
 export enum TaskEvent {
   STATE_CHANGED = 'state_changed',
@@ -24,6 +26,8 @@ export type MyRootState = {
   friends: FriendsState;
   home: HomeState;
   sharedInfo: SharedInfoState;
+  chats: ChatsState;
+  sessions: SessionsState;
 };
 type MyExtraArg = undefined;
 

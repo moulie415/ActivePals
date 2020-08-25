@@ -161,11 +161,7 @@ export const fetchSessions = () => {
           const sessions = await Promise.all(
             Object.keys(snapshot.val()).map(async (key) => {
               if (snapshot.val()[key] !== 'private') {
-                return firebase
-                  .database()
-                  .ref('sessions')
-                  .child(key)
-                  .once('value');
+                return database().ref('sessions').child(key).once('value');
               }
             }),
           );
@@ -213,8 +209,7 @@ export const fetchSessions = () => {
           console.log(
             `${key} entered query at ${location} (${distance} km from center)`,
           );
-          firebase
-            .database()
+          database()
             .ref(`sessions/${key}`)
             .once('value', (snapshot) => {
               if (snapshot.val()) {
@@ -225,8 +220,7 @@ export const fetchSessions = () => {
                 const current = new Date().getTime();
                 if (time + duration > current) {
                   const inProgress = time < current;
-                  firebase
-                    .database()
+                  database()
                     .ref(`users/${snapshot.val().host}`)
                     .once('value', (host) => {
                       dispatch(
@@ -275,8 +269,7 @@ export const fetchPrivateSessions = () => {
           const sessions = await Promise.all(
             Object.keys(snapshot.val()).map((key) => {
               if (snapshot.val()[key] === 'private') {
-                return firebase
-                  .database()
+                return database()
                   .ref('privateSessions')
                   .child(key)
                   .once('value');

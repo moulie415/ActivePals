@@ -93,14 +93,12 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
           text="Join"
           style={{alignSelf: 'center'}}
           onPress={async () => {
-            await firebase
-              .database()
+            await database()
               .ref(`userSession/${uid}`)
               .child(session.key)
               .set(true);
             join(session.key, session.private);
-            firebase
-              .database()
+            database()
               .ref(`sessions/${session.key}/users`)
               .child(uid)
               .set(true);

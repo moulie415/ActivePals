@@ -137,14 +137,6 @@ class Home extends Component<HomeProps, State> {
     );
   }
 
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: 'Home',
-    tabBarIcon: ({tintColor}) => (
-      <ThemedIcon name="home" size={25} fill={tintColor} />
-    ),
-  };
-
   repCommentCount(item) {
     const {getRepsUsers, getComments} = this.props;
     if (

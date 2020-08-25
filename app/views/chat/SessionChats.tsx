@@ -1,23 +1,28 @@
-import React, { Component } from 'react';
-import { View, TouchableOpacity, FlatList } from 'react-native';
-import { connect } from 'react-redux';
-import Text from '../../components/Text';
-import { getType, getSimplifiedTime, sortChatsByDate } from '../../constants/utils';
+import React, {Component} from 'react';
+import {View, TouchableOpacity, FlatList} from 'react-native';
+import {connect} from 'react-redux';
+import {
+  getType,
+  getSimplifiedTime,
+  sortChatsByDate,
+} from '../../constants/utils';
 import colors from '../../constants/colors';
 import ChatRowCount from '../../components/ChatRowCount';
 import SessionChatsProps from '../../types/views/chat/SessionChats';
+import {Text} from '@ui-kitten/components';
 
 class SessionChats extends Component<SessionChatsProps> {
   renderChats() {
-    const { chats, navigation } = this.props;
+    const {chats, navigation} = this.props;
     return (
       <FlatList
-        style={{ backgroundColor: colors.bgColor }}
+        style={{backgroundColor: colors.bgColor}}
         data={sortChatsByDate(Object.values(chats))}
-        keyExtractor={chat => chat.key}
-        renderItem={({ item }) => {
+        keyExtractor={(chat) => chat.key}
+        renderItem={({item}) => {
           return (
-            <TouchableOpacity onPress={() => navigation.navigate('Messaging', { session: item })}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Messaging', {session: item})}>
               <View
                 style={{
                   backgroundColor: '#fff',
@@ -25,22 +30,28 @@ class SessionChats extends Component<SessionChatsProps> {
                   padding: 10,
                   flexDirection: 'row',
                   alignItems: 'center',
-                }}
-              >
+                }}>
                 <View>{getType(item.type, 50)}</View>
-                <View style={{ marginHorizontal: 10, flex: 1, justifyContent: 'center' }}>
-                  <Text style={{ color: '#000' }} numberOfLines={1}>
+                <View
+                  style={{
+                    marginHorizontal: 10,
+                    flex: 1,
+                    justifyContent: 'center',
+                  }}>
+                  <Text style={{color: '#000'}} numberOfLines={1}>
                     {item.title}
                   </Text>
                   {!!item.lastMessage.text && (
-                    <Text numberOfLines={1} style={{ color: '#999' }}>
+                    <Text numberOfLines={1} style={{color: '#999'}}>
                       {item.lastMessage.text}
                     </Text>
                   )}
                 </View>
                 {item.lastMessage.createdAt && (
-                  <View style={{ marginHorizontal: 10 }}>
-                    <Text style={{ color: '#999' }}>{getSimplifiedTime(item.lastMessage.createdAt)}</Text>
+                  <View style={{marginHorizontal: 10}}>
+                    <Text style={{color: '#999'}}>
+                      {getSimplifiedTime(item.lastMessage.createdAt)}
+                    </Text>
                   </View>
                 )}
                 <ChatRowCount id={item.key} />
@@ -53,16 +64,28 @@ class SessionChats extends Component<SessionChatsProps> {
   }
 
   render() {
-    const { chats } = this.props;
+    const {chats} = this.props;
     return (
       <>
         {Object.values(chats).length > 0 && Object.values(chats)[0].type ? (
           this.renderChats()
         ) : (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bgColor }}>
-            <Text style={{ color: colors.primary, textAlign: 'center', marginHorizontal: 20 }}>
-              You haven't joined any sessions yet, join a session to start a session chat also please make sure you are
-              connected to the internet
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: colors.bgColor,
+            }}>
+            <Text
+              style={{
+                color: colors.primary,
+                textAlign: 'center',
+                marginHorizontal: 20,
+              }}>
+              You haven't joined any sessions yet, join a session to start a
+              session chat also please make sure you are connected to the
+              internet
             </Text>
           </View>
         )}
@@ -71,7 +94,7 @@ class SessionChats extends Component<SessionChatsProps> {
   }
 }
 
-const mapStateToProps = ({ friends, profile, chats }) => ({
+const mapStateToProps = ({friends, profile, chats}) => ({
   friends: friends.friends,
   profile: profile.profile,
   chats: chats.sessionChats,

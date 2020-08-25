@@ -139,8 +139,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
         navigation.goBack();
         setPostMessage(image.url, text);
       } else {
-        firebase
-          .database()
+        database()
           .ref(ref + profile.uid)
           .child(image.id)
           .set({ createdAt: date, url: image.url });

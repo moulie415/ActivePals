@@ -14,8 +14,7 @@ import {View} from 'react-native';
 import admob from '@react-native-firebase/admob';
 import crashlytics from '@react-native-firebase/crashlytics';
 import str from '../constants/strings';
-import Card from './Card';
-import {Text} from '@ui-kitten/components';
+import {Text, Card} from '@ui-kitten/components';
 // AdSettings.clearTestDevices()
 // AdSettings.setLogLevel('none')
 // AdSettings.addTestDevice(AdSettings.currentDeviceHash)

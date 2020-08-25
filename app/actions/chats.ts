@@ -366,25 +366,19 @@ export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
 export const fetchGymMessages = (id, amount, endAt) => {
   return (dispatch) => {
     const ref = endAt
-      ? firebase
-          .database()
-          .ref(`gymChats/${id}`)
-          .endAt(endAt)
-          .limitToLast(amount)
+      ? database().ref(`gymChats/${id}`).endAt(endAt).limitToLast(amount)
       : database().ref(`gymChats/${id}`).limitToLast(amount);
     return ref.once('value', (snapshot) => {
       const messages = {};
       const promises = [];
-      firebase
-        .database()
+      database()
         .ref(`gyms/${id}`)
         .child('users')
         .once('value', (users) => {
           users.forEach((child) => {
             promises.push(
               new Promise((resolve) => {
-                firebase
-                  .storage()
+                storage()
                   .ref(`images/${child.key}`)
                   .child('avatar')
                   .getDownloadURL()

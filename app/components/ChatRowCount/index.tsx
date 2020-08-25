@@ -1,11 +1,14 @@
-import React, { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { View } from 'react-native';
-import Text from '../Text';
+import React, {FunctionComponent} from 'react';
+import {connect} from 'react-redux';
+import {View} from 'react-native';
 import styles from './styles';
 import ChatRowCountProps from '../../types/components/ChatRowCount';
+import {Text} from '@ui-kitten/components';
 
-const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({ unreadCount, id }) => {
+const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({
+  unreadCount,
+  id,
+}) => {
   const count = unreadCount[id];
   if (count && count > 0) {
     return (
@@ -17,7 +20,7 @@ const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({ unreadCount, id })
   return null;
 };
 
-const mapStateToProps = ({ chats }) => ({
+const mapStateToProps = ({chats}) => ({
   unreadCount: chats.unreadCount,
 });
 

@@ -56,6 +56,10 @@ target 'ActivePals' do
   pod 'GoogleSignIn', '~> 5.0.2'
   pod 'FBAudienceNetwork', '~> 5.1.0'
 
+  permissions_path = '../node_modules/react-native-permissions/ios'
+
+  pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse.podspec"
+
   target 'ActivePalsTests' do
     inherit! :complete
     # Pods for testing
