@@ -8,7 +8,6 @@ import moment from 'moment';
 import {
   View,
   Alert,
-  TextInput,
   TouchableOpacity,
   Platform,
   ScrollView,
@@ -19,7 +18,6 @@ import database from '@react-native-firebase/database';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import RNCalendarEvents from 'react-native-calendar-events';
 import {geofire} from '../../App';
-
 import {types, getType, addSessionToCalendar} from '../../constants/utils';
 import MapModal from '../../components/MapModal';
 import LocationSearchModal from '../../components/LocationSearchModal';
@@ -35,19 +33,11 @@ import {
   Radio,
   RadioGroup,
   Toggle,
+  Input,
 } from '@ui-kitten/components';
-
-const genderProps = [
-  {label: Gender.UNSPECIFIED, value: Gender.UNSPECIFIED},
-  {label: Gender.MALE, value: Gender.MALE},
-  {label: Gender.FEMALE, value: Gender.FEMALE},
-];
+import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 
 const genders = [Gender.UNSPECIFIED, Gender.MALE, Gender.FEMALE];
-
-const typeProps = types.map((type) => {
-  return {label: type, value: type};
-});
 
 interface State {
   gender: Gender;
@@ -234,34 +224,23 @@ class SessionDetail extends Component<SessionDetailProps, State> {
       searchOpen,
       showDatePicker,
       selectedDate,
+      details,
+      title,
+      location,
     } = this.state;
     return (
       <Layout style={{flex: 1}}>
         <ScrollView style={{flex: 1}}>
-          <TextInput
-            style={{
-              padding: 5,
-              borderWidth: 0.5,
-              borderColor: '#999',
-              flex: 1,
-              margin: 10,
-              height: 50,
-            }}
+          <Input
             underlineColorAndroid="transparent"
             onChangeText={(input) => this.setState({title: input})}
             placeholder="Title"
           />
 
-          <TextInput
-            style={{
-              padding: 5,
-              borderWidth: 0.5,
-              borderColor: '#999',
-              height: 100,
-              margin: 10,
-            }}
+          <Input
             placeholder="Details..."
             textAlignVertical="top"
+            textStyle={{minHeight: 64}}
             multiline
             underlineColorAndroid="transparent"
             onChangeText={(input) => this.setState({details: input})}
@@ -274,10 +253,9 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               marginBottom: 10,
               alignItems: 'center',
             }}>
-            <Button
-              onPress={() => this.setState({showDatePicker: true})}
-              text={moment(date).format('MMMM Do YYYY, h:mm')}
-            />
+            <Button onPress={() => this.setState({showDatePicker: true})}>
+              {moment(date).format('MMMM Do YYYY, h:mm')}
+            </Button>
             <View
               style={{
                 flexDirection: 'row',
@@ -365,7 +343,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               // @ts-ignore
               iconStyle={{color: 'white'}}
             /> */}
-            <Text style={{color: '#999', width: 40, textAlign: 'center'}}>
+            <Text style={{textAlign: 'center'}}>
               {durationMinutes === 1 ? 'min' : 'mins'}
             </Text>
           </View>
@@ -377,9 +355,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               borderBottomWidth: 0.5,
               borderColor: '#999',
             }}>
-            <Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>
-              Location
-            </Text>
+            <Text style={{margin: 10}}>Location</Text>
             <TouchableOpacity
               style={{
                 padding: 10,
@@ -398,16 +374,16 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               }}>
               <Button
                 style={{margin: 10}}
-                onPress={() => this.setLocationAsPosition()}
-                text="Use my location"
-              />
+                onPress={() => this.setLocationAsPosition()}>
+                Use my location
+              </Button>
               <Button
                 style={{margin: 10}}
-                onPress={() => this.setState({mapOpen: true})}
-                text="Select from map"
-              />
+                onPress={() => this.setState({mapOpen: true})}>
+                Select from map
+              </Button>
             </View>
-            <Text style={{alignSelf: 'center', margin: 10, fontSize: 15}}>
+            <Text style={{alignSelf: 'center', margin: 10}}>
               {`Selected location:  ${gym ? gym.name : formattedAddress}`}
             </Text>
           </View>
@@ -417,31 +393,32 @@ class SessionDetail extends Component<SessionDetailProps, State> {
 
               justifyContent: 'space-evenly',
             }}>
-            <Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>
-              Gender
-            </Text>
+            <Text style={{margin: 10}}>Gender</Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>
-                Type
-              </Text>
-              {getType(type, 20)}
+              <Text style={{margin: 10}}>Type</Text>
+              {getType(types[this.state.selectedType], 20)}
             </View>
           </View>
 
           <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-            <RadioGroup selectedIndex={this.state.selectedGender}>
+            <RadioGroup
+              onChange={(index) => this.setState({selectedGender: index})}
+              selectedIndex={this.state.selectedGender}>
               {genders.map((gender) => (
                 <Radio>{gender}</Radio>
               ))}
             </RadioGroup>
 
-            <RadioGroup selectedIndex={this.state.selectedType}>
+            <RadioGroup
+              onChange={(index) => this.setState({selectedType: index})}
+              selectedIndex={this.state.selectedType}>
               {types.map((type) => (
                 <Radio>{type}</Radio>
               ))}
             </RadioGroup>
           </View>
           <Button
+            disabled={!(location && title && details && date)}
             style={{alignSelf: 'center', marginVertical: 20}}
             onPress={() => this.createSession()}>
             Create Session
@@ -509,7 +486,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
                       showDatePicker: false,
                     })
                   }>
-                  <Text style={{fontSize: 16}}>Cancel</Text>
+                  <Text>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{padding: 10}}
@@ -527,11 +504,11 @@ class SessionDetail extends Component<SessionDetailProps, State> {
   }
 }
 
-const mapStateToProps = ({profile}) => ({
+const mapStateToProps = ({profile}: MyRootState) => ({
   profile: profile.profile,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   createPost: (post) => dispatch(addPost(post)),
   getSessions: () => dispatch(fetchSessions()),
 });
