@@ -3,33 +3,29 @@ import {
   Alert,
   View,
   ScrollView,
-  TextInput,
   TouchableOpacity,
   Platform,
 } from 'react-native';
 import moment from 'moment';
 import {equals} from 'ramda';
-import Icon from 'react-native-vector-icons/Ionicons';
 import database from '@react-native-firebase/database';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNPickerSelect from 'react-native-picker-select';
-import {PulseIndicator} from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
-import Text from '../components/Text';
 import styles from '../styles/profileStyles';
 import hStyles from '../styles/homeStyles';
 import colors from '../constants/colors';
-import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
-import Button from '../components/Button';
 import {fetchProfile, setLoggedOut} from '../actions/profile';
 import {pickerItems, getBirthdayDate} from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
 import Profile from '../types/Profile';
+import {Text, Button, Input, Icon} from '@ui-kitten/components';
+import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
 const activities = [
   'Bodybuilding',
@@ -99,14 +95,6 @@ class ProfileView extends Component<ProfileProps, State> {
       this.setState({profile});
     });
   }
-
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: 'Profile',
-    tabBarIcon: ({tintColor}) => (
-      <Icon name="md-person" size={25} style={{color: tintColor}} />
-    ),
-  };
 
   logout() {
     const {profile, onLogoutPress, navigation} = this.props;
@@ -303,7 +291,7 @@ class ProfileView extends Component<ProfileProps, State> {
       : '';
     return (
       <>
-        <Header
+        {/* <Header
           left={
             this.hasChanged() && (
               <TouchableOpacity
@@ -338,7 +326,7 @@ class ProfileView extends Component<ProfileProps, State> {
               </TouchableOpacity>
             )
           }
-        />
+        /> */}
         <ScrollView>
           <View style={{alignItems: 'center', marginBottom: 10}}>
             <TouchableOpacity
@@ -357,11 +345,7 @@ class ProfileView extends Component<ProfileProps, State> {
                     backgroundColor: colors.primaryLighter,
                     justifyContent: 'center',
                   }}>
-                  <Icon
-                    name="ios-add"
-                    size={25}
-                    style={{color: '#fff', textAlign: 'center'}}
-                  />
+                  <Icon name="plus" size={25} />
                 </View>
               )}
             </TouchableOpacity>
@@ -390,7 +374,7 @@ class ProfileView extends Component<ProfileProps, State> {
                     justifyContent: 'center',
                   }}>
                   <Icon
-                    name="ios-add"
+                    name="plus"
                     size={25}
                     style={{color: '#fff', textAlign: 'center'}}
                   />
@@ -450,17 +434,13 @@ class ProfileView extends Component<ProfileProps, State> {
                 <Text style={{color: colors.secondary, marginRight: 10}}>
                   Settings
                 </Text>
-                <Icon
-                  size={25}
-                  name="md-settings"
-                  style={{color: colors.secondary}}
-                />
+                <Icon size={25} name="settings" />
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Username: </Text>
-            <TextInput
+            <Input
               value={profile && profile.username}
               onChangeText={(username) =>
                 this.setState({profile: {...profile, username}})
@@ -473,7 +453,7 @@ class ProfileView extends Component<ProfileProps, State> {
           </View>
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>First name: </Text>
-            <TextInput
+            <Input
               value={profile && profile.first_name}
               onChangeText={(name) =>
                 this.setState({profile: {...profile, first_name: name}})
@@ -486,7 +466,7 @@ class ProfileView extends Component<ProfileProps, State> {
           </View>
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Last name: </Text>
-            <TextInput
+            <Input
               value={profile && profile.last_name}
               onChangeText={(name) =>
                 this.setState({profile: {...profile, last_name: name}})
@@ -632,12 +612,12 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 }
 
-const mapStateToProps = ({profile}) => ({
+const mapStateToProps = ({profile}: MyRootState) => ({
   profile: profile.profile,
   gym: profile.gym,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onLogoutPress: () => dispatch(setLoggedOut()),
   onSave: () => dispatch(fetchProfile()),
 });

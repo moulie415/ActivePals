@@ -34,6 +34,8 @@ import Friends from './views/Friends';
 import SessionChats from './views/chat/SessionChats';
 import DirectMessages from './views/chat/DirectMessages';
 import GymChat from './views/chat/GymChat';
+import Profile from './views/Profile';
+import ThemedImage from './components/ThemedImage/ThemedImage';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -61,6 +63,7 @@ export type StackParamList = {
   DirectMessages: undefined;
   SessionChats: undefined;
   GymChat: undefined;
+  Profile: undefined;
 };
 
 const Stack = createStackNavigator<StackParamList>();
@@ -71,9 +74,9 @@ const TopTabBar = ({navigation, state}) => (
   <TabBar
     selectedIndex={state.index}
     onSelect={(index) => navigation.navigate(state.routeNames[index])}>
-    <Tab title="Session Chats" />
-    <Tab title="Direct Messages" />
-    <Tab title="Gym Chat" />
+    <Tab title="Sessions" />
+    <Tab title="Pals" />
+    <Tab title="Gym" />
   </TabBar>
 );
 
@@ -86,8 +89,19 @@ const Chats = () => (
 );
 
 const HomeIcon = (props) => <Icon {...props} name="home" />;
+const SessionsIcon = ({style}) => {
+  return (
+    <ThemedImage
+      size={24}
+      fill={style.tintColor}
+      style={{marginVertical: style.marginVertical}}
+      source={require('../assets/images/dumbbell.png')}
+    />
+  );
+};
 const FriendsIcon = (props) => <Icon {...props} name="people" />;
 const ChatsIcon = (props) => <Icon {...props} name="message-square" />;
+const ProfileIcon = (props) => <Icon {...props} name="person" />;
 
 const BottomTabBar = ({navigation, state}) => (
   <BottomNavigation
@@ -95,9 +109,10 @@ const BottomTabBar = ({navigation, state}) => (
     selectedIndex={state.index}
     onSelect={(index) => navigation.navigate(state.routeNames[index])}>
     <BottomNavigationTab title="Home" icon={HomeIcon} />
-    <BottomNavigationTab title="Sessions" />
+    <BottomNavigationTab title="Sessions" icon={SessionsIcon} />
     <BottomNavigationTab title="Friends" icon={FriendsIcon} />
     <BottomNavigationTab title="Chats" icon={ChatsIcon} />
+    <BottomNavigationTab title="Profile" icon={ProfileIcon} />
   </BottomNavigation>
 );
 
@@ -108,6 +123,7 @@ const Tabs = () => {
       <TabNav.Screen name="Sessions" component={Sessions} />
       <TabNav.Screen name="Friends" component={Friends} />
       <TabNav.Screen name="Chats" component={Chats} />
+      <TabNav.Screen name="Profile" component={Profile} />
     </TabNav.Navigator>
   );
 };

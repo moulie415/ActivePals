@@ -8,6 +8,7 @@ const ThemedImage: FunctionComponent<ThemedImageProps> = ({
   eva,
   source,
   style,
+  fill,
 }) => {
   return (
     <Image
@@ -18,7 +19,7 @@ const ThemedImage: FunctionComponent<ThemedImageProps> = ({
         },
         style,
       ]}
-      tintColor={eva.theme['background-alternative-color-1']}
+      tintColor={fill || eva.theme['background-alternative-color-1']}
       source={source}
     />
   );
