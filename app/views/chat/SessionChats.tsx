@@ -44,7 +44,7 @@ class SessionChats extends Component<SessionChatsProps> {
   render() {
     const {chats} = this.props;
     return (
-      <Layout>
+      <Layout style={{flex: 1}}>
         {Object.values(chats).length > 0 && Object.values(chats)[0].type ? (
           this.renderChats()
         ) : (

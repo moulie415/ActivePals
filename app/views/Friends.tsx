@@ -24,7 +24,7 @@ import {
   Avatar,
 } from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
-import { MyRootState, MyThunkDispatch } from '../types/Shared';
+import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
 interface State {
   refreshing: boolean;
@@ -237,7 +237,7 @@ class Friends extends Component<FriendsProps, State> {
       </TouchableOpacity>
     );
     return (
-      <Layout>
+      <Layout style={{flex: 1}}>
         {Object.values(friends).length > 0 ? (
           this.renderFriends()
         ) : (

@@ -75,7 +75,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
   render() {
     const {chats} = this.props;
     return (
-      <Layout>
+      <Layout style={{ flex: 1}}>
         {Object.values(chats).length > 0 ? (
           this.renderChats()
         ) : (

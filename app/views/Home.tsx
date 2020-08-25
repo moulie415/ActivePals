@@ -725,7 +725,7 @@ class Home extends Component<HomeProps, State> {
       </TouchableOpacity>
     );
     return (
-      <>
+      <Layout style={{ flex: 1}}>
         {/* <Header title="Feed" right={notificationsButton} /> */}
         <Layout
           style={{
@@ -1083,7 +1083,7 @@ class Home extends Component<HomeProps, State> {
             }
           }}
         />
-      </>
+      </Layout>
     );
   }
 }

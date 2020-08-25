@@ -23,7 +23,7 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
     const gym = places[profile.gym];
     console.log({gym});
     return (
-      <Layout>
+      <Layout style={{flex: 1}}>
         {gym ? (
           <ScrollView
             refreshControl={

@@ -130,7 +130,7 @@ const ProfileIcon = (props) => <Icon {...props} name="person" />;
 
 const BottomTabBar = ({navigation, state}) => (
   <BottomNavigation
-    style={{marginVertical: 8}}
+    style={{paddingVertical: 8}}
     selectedIndex={state.index}
     onSelect={(index) => navigation.navigate(state.routeNames[index])}>
     <BottomNavigationTab title="Home" icon={HomeIcon} />
