@@ -52,7 +52,7 @@ import {
 import Comment from '../types/Comment';
 import Profile from '../types/Profile';
 import {Icon, Text, Card, Input, Layout, List} from '@ui-kitten/components';
-import {MyRootState} from '../types/Shared';
+import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
@@ -1092,7 +1092,7 @@ const mapStateToProps = ({
   users: sharedInfo.users,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   postStatus: (status) => dispatch(addPost(status)),
   onRepPost: (item) => dispatch(repPost(item)),
   comment: (uid, postId, text, created_at, parentCommentId) =>

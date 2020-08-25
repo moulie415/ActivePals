@@ -1,17 +1,32 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity, FlatList} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {connect} from 'react-redux';
 import Image from 'react-native-fast-image';
 import {getSimplifiedTime, sortChatsByDate} from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import DirectMessagesProps from '../../types/views/chat/DirectMessages';
-import {Text, List, Layout} from '@ui-kitten/components';
+import {Text, List, Layout, ListItem, Avatar} from '@ui-kitten/components';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
+import Message from '../../types/Message';
 // import  styles  from './styles/loginStyles'
 
 class DirectMessages extends Component<DirectMessagesProps> {
   renderChats() {
     const {navigation, friends, chats, profile} = this.props;
+
+    const getLastMessageText = (lastMessage: Message) => {
+      if (lastMessage.text) {
+        return lastMessage.text;
+      }
+      if (!lastMessage.text && lastMessage.image) {
+        if (lastMessage.user._id === profile.uid) {
+          return 'you sent an image';
+        } else {
+          return 'sent you an image';
+        }
+      }
+      return '';
+    };
     return (
       <List
         data={sortChatsByDate(Object.values(chats))}
@@ -20,64 +35,34 @@ class DirectMessages extends Component<DirectMessagesProps> {
           const friend = friends[item.uid];
           if (friend) {
             return (
-              <TouchableOpacity
-                onPress={() => {
+              <ListItem
+                onPress={() =>
                   navigation.navigate('Messaging', {
                     chatId: item.chatId,
                     friendUsername: friend.username,
                     friendUid: item.uid,
-                  });
-                }}>
-                <View
-                  style={{
-                    marginBottom: 1,
-                    padding: 10,
-                    paddingVertical: friend.avatar ? 10 : 5,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}>
-                  {friend.avatar ? (
-                    <Image
-                      source={{uri: friend.avatar}}
-                      style={{height: 50, width: 50, borderRadius: 25}}
-                    />
+                  })
+                }
+                title={friend.username}
+                description={getLastMessageText(item.lastMessage)}
+                accessoryLeft={() =>
+                  friend.avatar ? (
+                    <Avatar source={{uri: friend.avatar}} size="large" />
                   ) : (
                     <ThemedIcon size={60} name="md-contact" />
-                  )}
-                  <View
-                    style={{
-                      marginHorizontal: 10,
-                      flex: 1,
-                      justifyContent: 'center',
-                    }}>
-                    <Text style={{color: '#000'}} numberOfLines={1}>
-                      {friend.username}
-                    </Text>
-                    {!!item.lastMessage.text && (
-                      <Text numberOfLines={1} style={{color: '#999'}}>
-                        {item.lastMessage.text}
-                      </Text>
-                    )}
-                    {!item.lastMessage.text && item.lastMessage.image && (
-                      <Text
-                        numberOfLines={1}
-                        style={{color: '#999', fontStyle: 'italic'}}>
-                        {item.lastMessage.user._id === profile.uid
-                          ? 'you sent an image'
-                          : 'sent you an image'}
-                      </Text>
-                    )}
-                  </View>
-                  {item.lastMessage.createdAt && (
-                    <View style={{marginHorizontal: 10}}>
-                      <Text style={{color: '#999'}}>
+                  )
+                }
+                accessoryRight={() => (
+                  <View style={{flexDirection: 'row'}}>
+                    {item.lastMessage.createdAt && (
+                      <Text>
                         {getSimplifiedTime(item.lastMessage.createdAt)}
                       </Text>
-                    </View>
-                  )}
-                  <ChatRowCount id={item.uid} />
-                </View>
-              </TouchableOpacity>
+                    )}
+                    <ChatRowCount id={item.key} />
+                  </View>
+                )}
+              />
             );
           }
           return null;
@@ -93,7 +78,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
         {Object.values(chats).length > 0 ? (
           this.renderChats()
         ) : (
-          <View
+          <Layout
             style={{
               flex: 1,
               justifyContent: 'center',
@@ -105,7 +90,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
                 "You haven't started any chats yet, also please make sure you are connected to the internet"
               }
             </Text>
-          </View>
+          </Layout>
         )}
       </Layout>
     );

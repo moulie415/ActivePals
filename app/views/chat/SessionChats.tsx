@@ -8,7 +8,8 @@ import {
 } from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import SessionChatsProps from '../../types/views/chat/SessionChats';
-import {Text, Layout, List} from '@ui-kitten/components';
+import {Text, Layout, List, ListItem} from '@ui-kitten/components';
+import {MyRootState} from '../../types/Shared';
 
 class SessionChats extends Component<SessionChatsProps> {
   renderChats() {
@@ -19,41 +20,20 @@ class SessionChats extends Component<SessionChatsProps> {
         keyExtractor={(chat) => chat.key}
         renderItem={({item}) => {
           return (
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Messaging', {session: item})}>
-              <View
-                style={{
-                  marginBottom: 1,
-                  padding: 10,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <View>{getType(item.type, 50)}</View>
-                <View
-                  style={{
-                    marginHorizontal: 10,
-                    flex: 1,
-                    justifyContent: 'center',
-                  }}>
-                  <Text style={{color: '#000'}} numberOfLines={1}>
-                    {item.title}
-                  </Text>
-                  {!!item.lastMessage.text && (
-                    <Text numberOfLines={1} style={{color: '#999'}}>
-                      {item.lastMessage.text}
-                    </Text>
+            <ListItem
+              onPress={() => navigation.navigate('Messaging', {session: item})}
+              title={item.title}
+              description={item.lastMessage.text}
+              accessoryLeft={() => getType(item.type, 50)}
+              accessoryRight={() => (
+                <View style={{flexDirection: 'row'}}>
+                  {item.lastMessage.createdAt && (
+                    <Text>{getSimplifiedTime(item.lastMessage.createdAt)}</Text>
                   )}
+                  <ChatRowCount id={item.key} />
                 </View>
-                {item.lastMessage.createdAt && (
-                  <View style={{marginHorizontal: 10}}>
-                    <Text style={{color: '#999'}}>
-                      {getSimplifiedTime(item.lastMessage.createdAt)}
-                    </Text>
-                  </View>
-                )}
-                <ChatRowCount id={item.key} />
-              </View>
-            </TouchableOpacity>
+              )}
+            />
           );
         }}
       />
@@ -67,7 +47,7 @@ class SessionChats extends Component<SessionChatsProps> {
         {Object.values(chats).length > 0 && Object.values(chats)[0].type ? (
           this.renderChats()
         ) : (
-          <View
+          <Layout
             style={{
               flex: 1,
               justifyContent: 'center',
@@ -82,14 +62,14 @@ class SessionChats extends Component<SessionChatsProps> {
               session chat also please make sure you are connected to the
               internet
             </Text>
-          </View>
+          </Layout>
         )}
       </Layout>
     );
   }
 }
 
-const mapStateToProps = ({friends, profile, chats}) => ({
+const mapStateToProps = ({friends, profile, chats}: MyRootState) => ({
   friends: friends.friends,
   profile: profile.profile,
   chats: chats.sessionChats,

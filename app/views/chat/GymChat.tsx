@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
-import {View, ScrollView, TouchableOpacity, RefreshControl} from 'react-native';
+import {View, ScrollView, RefreshControl} from 'react-native';
 import {connect} from 'react-redux';
-import Image from 'react-native-fast-image';
 import {getType, getSimplifiedTime} from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
-import styles from '../../styles/chatStyles';
 import {SessionType} from '../../types/Session';
 import {fetchGymChat} from '../../actions/chats';
 import {GymChatProps} from '../../types/views/chat/GymChat';
-import {Text, Layout} from '@ui-kitten/components';
+import {Text, Layout, ListItem, Avatar} from '@ui-kitten/components';
+import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 
 class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
   constructor(props) {
@@ -19,8 +18,10 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
   }
 
   render() {
-    const {gym, gymChat, getChat, navigation} = this.props;
+    const {gymChat, getChat, navigation, places, profile} = this.props;
     const {refreshing} = this.state;
+    const gym = places[profile.gym];
+    console.log({gym});
     return (
       <Layout>
         {gym ? (
@@ -35,48 +36,33 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
                 }}
               />
             }>
-            <TouchableOpacity
+            <ListItem
               onPress={() =>
                 navigation.navigate('Messaging', {gymId: gym.place_id})
-              }>
-              <View style={styles.chatRowContainer}>
-                {gym && gym.photo ? (
-                  <Image source={{uri: gym.photo}} style={styles.gymAvatar} />
+              }
+              title={gym.name}
+              description={gymChat.lastMessage.text}
+              accessoryLeft={() =>
+                gym && gym.photo ? (
+                  <Avatar source={{uri: gym.photo}} size="large" />
                 ) : (
-                  <View>{getType(SessionType.GYM, 50)}</View>
-                )}
-                <View
-                  style={{
-                    marginHorizontal: 10,
-                    flex: 1,
-                    justifyContent: 'center',
-                  }}>
-                  <Text style={{color: '#000'}} numberOfLines={1}>
-                    {gym.name}
-                  </Text>
-                  {gymChat &&
-                    gymChat.lastMessage &&
-                    !!gymChat.lastMessage.text && (
-                      <Text numberOfLines={1} style={{color: '#999'}}>
-                        {gymChat.lastMessage.text}
-                      </Text>
-                    )}
-                </View>
-                {gymChat &&
-                  gymChat.lastMessage &&
-                  gymChat.lastMessage.createdAt && (
-                    <View style={{marginHorizontal: 10}}>
-                      <Text style={{color: '#999'}}>
-                        {getSimplifiedTime(gymChat.lastMessage.createdAt)}
-                      </Text>
-                    </View>
+                  getType(SessionType.GYM, 50)
+                )
+              }
+              accessoryRight={() => (
+                <View style={{flexDirection: 'row'}}>
+                  {gymChat?.lastMessage?.createdAt && (
+                    <Text>
+                      {getSimplifiedTime(gymChat.lastMessage.createdAt)}
+                    </Text>
                   )}
-                <ChatRowCount id={gym.place_id} />
-              </View>
-            </TouchableOpacity>
+                  <ChatRowCount id={gym.place_id} />
+                </View>
+              )}
+            />
           </ScrollView>
         ) : (
-          <View
+          <Layout
             style={{
               flex: 1,
               justifyContent: 'center',
@@ -91,21 +77,21 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
                 "You haven't joined a Gym, please join a Gym if you want to participate in Gym chat"
               }
             </Text>
-          </View>
+          </Layout>
         )}
       </Layout>
     );
   }
 }
 
-const mapStateToProps = ({friends, profile, chats}) => ({
+const mapStateToProps = ({friends, profile, chats, sessions}: MyRootState) => ({
   friends: friends.friends,
   profile: profile.profile,
-  gym: profile.gym,
   gymChat: chats.gymChat,
+  places: sessions.places,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   getChat: (gym) => dispatch(fetchGymChat(gym)),
 });
 

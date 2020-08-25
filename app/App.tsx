@@ -7,13 +7,14 @@ import {
   Icon,
   TabBar,
   Tab,
+  Text,
 } from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import database from '@react-native-firebase/database';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createStackNavigator, Header} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Login from './views/Login';
@@ -37,6 +38,10 @@ import GymChat from './views/chat/GymChat';
 import Profile from './views/Profile';
 import ThemedImage from './components/ThemedImage/ThemedImage';
 import Settings from './views/Settings';
+import {SafeAreaView, TouchableOpacity, View} from 'react-native';
+import ThemedIcon from './components/ThemedIcon/ThemedIcon';
+import NotificationsButton from './components/NotificationsButton/NotificationsButton';
+import notifications from './views/notifications';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -66,6 +71,7 @@ export type StackParamList = {
   GymChat: undefined;
   Profile: undefined;
   Settings: undefined;
+  Notifications: undefined;
 };
 
 const Stack = createStackNavigator<StackParamList>();
@@ -162,7 +168,19 @@ const App = () => {
           {/* @ts-ignore */}
           <ApplicationProvider {...eva} theme={eva[theme]}>
             <NavigationContainer>
-              <Stack.Navigator>
+              <Stack.Navigator
+                screenOptions={({navigation, route}) => ({
+                  headerTitle: '',
+                  headerRight: () => {
+                    console.log({navigation, route});
+                    if (
+                      (!route.state || route.state.index === 0) &&
+                      route.name === 'Tabs'
+                    ) {
+                      return <NotificationsButton navigation={navigation} />;
+                    }
+                  },
+                })}>
                 <Stack.Screen
                   options={() => ({headerShown: false})}
                   name="Login"
@@ -176,6 +194,7 @@ const App = () => {
                 />
                 <Stack.Screen name="Tabs" component={Tabs} />
                 <Stack.Screen name="Settings" component={Settings} />
+                <Stack.Screen name="Notifications" component={notifications} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>

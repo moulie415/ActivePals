@@ -1,11 +1,6 @@
 import React, {FunctionComponent} from 'react';
 import ModalBox from 'react-native-modalbox';
-import {
-  FlatList,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-} from 'react-native';
+import {TouchableOpacity, View, ActivityIndicator} from 'react-native';
 import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
 import {fetchRepsUsers} from '../../actions/home';

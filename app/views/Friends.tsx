@@ -13,7 +13,18 @@ import {
   deleteFriend,
 } from '../actions/friends';
 import FriendsProps from '../types/views/Friends';
-import {Icon, Button, Text, Layout, List} from '@ui-kitten/components';
+import {
+  Icon,
+  Button,
+  Text,
+  Layout,
+  List,
+  Divider,
+  ListItem,
+  Avatar,
+} from '@ui-kitten/components';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
+import { MyRootState, MyThunkDispatch } from '../types/Shared';
 
 interface State {
   refreshing: boolean;
@@ -107,25 +118,16 @@ class Friends extends Component<FriendsProps, State> {
     return (
       <List
         data={sortByState(Object.values(friends))}
+        ItemSeparatorComponent={Divider}
         keyExtractor={(friend) => friend.uid}
         onRefresh={() => this.refresh()}
         refreshing={refreshing}
         renderItem={({item}) => {
           if (item.status === 'outgoing') {
             return (
-              <View style={{padding: 10, marginBottom: 1}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    height: 40,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Text
-                    style={{
-                      marginHorizontal: 10,
-                      flex: 1,
-                    }}>{`${item.username} request sent`}</Text>
+              <ListItem
+                title={`${item.username} request sent`}
+                accessoryRight={() => (
                   <TouchableOpacity
                     style={{marginTop: Platform.OS === 'ios' ? -5 : 0}}
                     onPress={() => {
@@ -134,31 +136,17 @@ class Friends extends Component<FriendsProps, State> {
                         {text: 'OK', onPress: () => this.remove(item.uid)},
                       ]);
                     }}>
-                    <Icon name="close" size={50} status="danger" />
+                    <ThemedIcon name="close" size={50} status="danger" />
                   </TouchableOpacity>
-                </View>
-              </View>
+                )}
+              />
             );
           }
           if (item.status === 'incoming') {
             return (
-              <View
-                style={{
-                  paddingVertical: 20,
-                  paddingHorizontal: 15,
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    height: 40,
-                    justifyContent: 'space-between',
-                  }}>
-                  <Text
-                    style={{
-                      marginRight: 5,
-                      flex: 4,
-                    }}>{`${item.username} has sent you a pal request`}</Text>
+              <ListItem
+                title={`${item.username} has sent you a pal request`}
+                accessoryRight={() => (
                   <View style={{flexDirection: 'row', flex: 1}}>
                     <TouchableOpacity
                       onPress={() => onAccept(profile.uid, item.uid)}>
@@ -168,42 +156,28 @@ class Friends extends Component<FriendsProps, State> {
                       <Icon size={50} name="close" status="danger" />
                     </TouchableOpacity>
                   </View>
-                </View>
-              </View>
+                )}
+              />
             );
           }
           if (item.status === 'connected') {
             return (
-              <View
-                style={{
-                  marginBottom: 1,
-                  paddingVertical: 15,
-                  paddingHorizontal: 10,
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    height: 50,
-                    justifyContent: 'space-between',
-                  }}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    {item.avatar ? (
-                      <Image
-                        source={{uri: item.avatar}}
-                        style={{height: 50, width: 50, borderRadius: 25}}
-                      />
-                    ) : (
-                      <Icon
-                        size={65}
-                        name="person"
-                        style={{
-                          marginTop: Platform.OS === 'ios' ? -10 : 0,
-                        }}
-                      />
-                    )}
-                    <Text style={{marginHorizontal: 10}}>{item.username}</Text>
-                  </View>
+              <ListItem
+                title={item.username}
+                accessoryLeft={() =>
+                  item.avatar ? (
+                    <Avatar source={{uri: item.avatar}} size="large" />
+                  ) : (
+                    <Icon
+                      size={65}
+                      name="person"
+                      style={{
+                        marginTop: Platform.OS === 'ios' ? -10 : 0,
+                      }}
+                    />
+                  )
+                }
+                accessoryRight={() => (
                   <View style={{flexDirection: 'row'}}>
                     {item.state && (
                       <Text
@@ -228,19 +202,19 @@ class Friends extends Component<FriendsProps, State> {
                     )}
                     <TouchableOpacity
                       onPress={() => this.openChat(item.uid, item.username)}
-                      style={{padding: 5, marginHorizontal: 5}}>
-                      <Icon size={30} name="message-square" />
+                      style={{padding: 5, marginLeft: 10}}>
+                      <ThemedIcon size={30} name="message-square" />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('ProfileView', {uid: item.uid})
                       }
-                      style={{padding: 5, marginHorizontal: 5}}>
-                      <Icon size={30} name="person" />
+                      style={{padding: 5}}>
+                      <ThemedIcon size={30} name="person" />
                     </TouchableOpacity>
                   </View>
-                </View>
-              </View>
+                )}
+              />
             );
           }
           return null;
@@ -259,7 +233,7 @@ class Friends extends Component<FriendsProps, State> {
             ? this.setState({modalOpen: true})
             : Alert.alert('Please set a username before trying to add a pal');
         }}>
-        <Icon name="person-add" size={25} style={{color: '#fff', padding: 5}} />
+        <ThemedIcon name="person-add" size={25} style={{padding: 5}} />
       </TouchableOpacity>
     );
     return (
@@ -290,7 +264,7 @@ class Friends extends Component<FriendsProps, State> {
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
             Send pal request
           </Text>
-          <View
+          <Layout
             style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <TextInput
               underlineColorAndroid="transparent"
@@ -300,8 +274,8 @@ class Friends extends Component<FriendsProps, State> {
               value={username}
               onChangeText={(u) => this.setState({username: u})}
             />
-          </View>
-          <View
+          </Layout>
+          <Layout
             style={{
               flexDirection: 'row',
               justifyContent: 'space-evenly',
@@ -313,19 +287,19 @@ class Friends extends Component<FriendsProps, State> {
               Cancel
             </Button>
             <Button onPress={() => this.sendRequest(username)}>Submit</Button>
-          </View>
+          </Layout>
         </Modal>
       </Layout>
     );
   }
 }
 
-const mapStateToProps = ({friends, profile}) => ({
+const mapStateToProps = ({friends, profile}: MyRootState) => ({
   friends: friends.friends,
   profile: profile.profile,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   getFriends: (uid: string, limit?: number, startAt?: string) =>
     dispatch(fetchFriends(uid, limit, startAt)),
   onRequest: (friendUid) => dispatch(sendRequest(friendUid)),

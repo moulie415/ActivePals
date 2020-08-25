@@ -4,7 +4,6 @@
 import React, {PureComponent} from 'react';
 import {
   View,
-  FlatList,
   Modal,
   Dimensions,
   ActivityIndicator,

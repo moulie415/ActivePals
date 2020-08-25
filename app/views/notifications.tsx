@@ -5,7 +5,6 @@ import {
   Image as SlowImage,
   ActivityIndicator,
 } from 'react-native';
-import {PulseIndicator} from 'react-native-indicators';
 import Swipeout from 'react-native-swipeout';
 import {connect} from 'react-redux';
 import Image from 'react-native-fast-image';
@@ -20,7 +19,9 @@ import {
 import NotificationsProps from '../types/views/Notifications';
 import {NotificationType} from '../types/Notification';
 import globalStyles from '../styles/globalStyles';
-import {Icon, Text, List} from '@ui-kitten/components';
+import {Text, List, Layout, ListItem, Divider} from '@ui-kitten/components';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
+import {MyThunkDispatch, MyRootState} from '../types/Shared';
 
 interface State {
   close: boolean;
@@ -66,17 +67,17 @@ class Notifications extends Component<NotificationsProps, State> {
     switch (item.type) {
       case NotificationType.COMMENT:
         return (
-          <Icon
+          <ThemedIcon
             size={25}
-            name="md-chatboxes"
+            name="message-square"
             style={{marginRight: 15, marginLeft: 5}}
           />
         );
       case NotificationType.FRIEND_REQUEST:
         return (
-          <Icon
+          <ThemedIcon
             size={25}
-            name="md-people"
+            name="person-add"
             style={{marginRight: 15, marginLeft: 5}}
           />
         );
@@ -96,12 +97,14 @@ class Notifications extends Component<NotificationsProps, State> {
               />
             );
           }
-          return <Icon size={35} name="md-contact" style={{marginRight: 15}} />;
+          return (
+            <ThemedIcon size={35} name="person" style={{marginRight: 15}} />
+          );
         }
         return (
-          <Icon
+          <ThemedIcon
             size={25}
-            name="md-chatboxes"
+            name="message-square"
             style={{marginRight: 15, marginLeft: 5}}
           />
         );
@@ -174,8 +177,7 @@ class Notifications extends Component<NotificationsProps, State> {
     );
 
     return (
-      <View style={{flex: 1}}>
-        <Header hasBack title="Notifications" />
+      <Layout style={{flex: 1}}>
         {spinner ? (
           <View style={globalStyles.indicator}>
             <ActivityIndicator />
@@ -183,6 +185,7 @@ class Notifications extends Component<NotificationsProps, State> {
         ) : (
           <List
             data={sortNotificationsByDate(Object.values(notifications))}
+            ItemSeparatorComponent={Divider}
             renderItem={({item}) => {
               const swipeoutBtns = [
                 {
@@ -196,7 +199,23 @@ class Notifications extends Component<NotificationsProps, State> {
               ];
               return (
                 <Swipeout right={swipeoutBtns} key={item.key} close={close}>
-                  <TouchableOpacity
+                  <ListItem
+                    title={this.getNotificationString(item)}
+                    description={getSimplifiedTime(new Date(item.date))}
+                    accessoryLeft={() => this.getTypeImage(item)}
+                    accessoryRight={() => (
+                      <ThemedIcon
+                        size={25}
+                        name="arrow-ios-forward"
+                        style={{
+                          textAlign: 'right',
+                          marginRight: 10,
+                          flex: 1,
+                        }}
+                      />
+                    )}
+                  />
+                  {/* <TouchableOpacity
                     onPress={() => {
                       if (item.postId) {
                         navigation.navigate('PostView', {postId: item.postId});
@@ -214,9 +233,9 @@ class Notifications extends Component<NotificationsProps, State> {
                           {getSimplifiedTime(new Date(item.date))}
                         </Text>
                       </View>
-                      <Icon
+                      <ThemedIcon
                         size={25}
-                        name="ios-arrow-forward"
+                        name="arrow-ios-forward"
                         style={{
                           color: '#999',
                           textAlign: 'right',
@@ -225,7 +244,7 @@ class Notifications extends Component<NotificationsProps, State> {
                         }}
                       />
                     </View>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </Swipeout>
               );
             }}
@@ -259,19 +278,24 @@ class Notifications extends Component<NotificationsProps, State> {
             }}
           />
         )}
-      </View>
+      </Layout>
     );
   }
 }
 
-const matchStateToProps = ({profile, home, friends, sharedInfo}) => ({
+const matchStateToProps = ({
+  profile,
+  home,
+  friends,
+  sharedInfo,
+}: MyRootState) => ({
   profile: profile.profile,
   notifications: home.notifications,
   friends: friends.friends,
   users: sharedInfo.users,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   fetchNotifications: (limit = 10) => dispatch(getNotifications(limit)),
   setRead: () => dispatch(setNotificationsRead()),
   onDelete: (key) => dispatch(deleteNotification(key)),

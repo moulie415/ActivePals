@@ -173,7 +173,7 @@ export const removeUser = (): MyThunkResult<Promise<void>> => {
   return async (dispatch: MyThunkDispatch) => {
     const user = auth().currentUser;
     dispatch(setLoggedOut());
-    await user.delete();
+    await user?.delete();
   };
 };
 
