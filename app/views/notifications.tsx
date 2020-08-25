@@ -150,9 +150,6 @@ class Notifications extends Component<NotificationsProps, State> {
     }
   }
 
-  static navigationOptions = {
-    headerShown: false,
-  };
 
   render() {
     const {

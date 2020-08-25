@@ -46,6 +46,8 @@ import SessionInfo from './views/sessions/SessionInfo';
 import Gym from './views/Gym';
 import Messaging from './views/chat/Messaging';
 import Session from './types/Session';
+import ProfileView from './views/ProfileView';
+import SessionDetail from './views/sessions/SessionDetail';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -74,6 +76,7 @@ export type StackParamList = {
   SessionChats: undefined;
   GymChat: undefined;
   Profile: undefined;
+  ProfileView: {uid: string};
   Settings: undefined;
   Notifications: undefined;
   SessionInfo: {sessionId: string; isPrivate: boolean};
@@ -85,6 +88,7 @@ export type StackParamList = {
     friendUsername?: string;
     friendUid?: string;
   };
+  SessionDetail: {};
 };
 
 const Stack = createStackNavigator<StackParamList>();
@@ -185,7 +189,6 @@ const App = () => {
                 screenOptions={({navigation, route}) => ({
                   headerTitle: '',
                   headerRight: () => {
-                    console.log({navigation, route});
                     if (
                       (!route.state || route.state.index === 0) &&
                       route.name === 'Tabs'
@@ -211,6 +214,8 @@ const App = () => {
                 <Stack.Screen name="SessionInfo" component={SessionInfo} />
                 <Stack.Screen name="Gym" component={Gym} />
                 <Stack.Screen name="Messaging" component={Messaging} />
+                <Stack.Screen name="ProfileView" component={ProfileView} />
+                <Stack.Screen name="SessionDetail" component={SessionDetail} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>

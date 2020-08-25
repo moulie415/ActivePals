@@ -4,8 +4,8 @@ import {connect} from 'react-redux';
 import Modal from 'react-native-modalbox';
 import {GOOGLE_API_KEY} from 'react-native-dotenv';
 import styles, {locationSearch} from './styles';
-import Button from '../Button';
 import LocationSearchModalProps from '../../types/components/LocationSearchModal';
+import {Button} from '@ui-kitten/components';
 
 const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({
   isOpen,

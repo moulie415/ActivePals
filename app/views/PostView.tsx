@@ -114,10 +114,6 @@ class PostView extends Component<PostViewProps, State> {
     );
   }
 
-  static navigationOptions = {
-    headerShown: false,
-  };
-
   async sharePost(item) {
     const {profile} = this.props;
     this.setState({spinner: true});

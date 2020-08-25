@@ -5,22 +5,6 @@ import Text from '../components/Text';
 import Header from '../components/Header/header';
 
 class PersonalTraining extends Component {
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: 'Training',
-    tabBarIcon: ({tintColor}) => (
-      <SlowImage
-        style={{
-          width: 30,
-          height: 30,
-          tintColor,
-          marginBottom: Platform.OS == 'android' ? -7 : 0,
-        }}
-        source={require('../../assets/images/muscle.png')}
-      />
-    ),
-  };
-
   render() {
     return (
       <View>

@@ -622,8 +622,8 @@ class Sessions extends Component<SessionsProps, State> {
               style={styles.button}
               onPress={() => {
                 this.setState({selectedLocation: {}});
-                showAdmobInterstitial();
-                navigation.navigate('SessionDetail');
+                //showAdmobInterstitial();
+                navigation.navigate('SessionDetail', {});
               }}>
               Create Session
             </Button>
@@ -646,7 +646,7 @@ class Sessions extends Component<SessionsProps, State> {
           <FriendsModal
             onClosed={() => this.setState({friendsModalOpen: false})}
             onContinue={(f) => {
-              showAdmobInterstitial();
+              //showAdmobInterstitial();
               navigation.navigate('SessionDetail', {
                 friends: f,
                 location: selectedLocation,
@@ -749,7 +749,7 @@ class Sessions extends Component<SessionsProps, State> {
           cancelButtonIndex={2}
           onPress={(index) => {
             if (index === 0) {
-              showAdmobInterstitial();
+              //showAdmobInterstitial();
               navigation.navigate('SessionDetail', {
                 location: selectedLocation,
               });

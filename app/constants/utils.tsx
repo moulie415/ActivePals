@@ -21,9 +21,9 @@ import ThemedImage from '../components/ThemedImage/ThemedImage';
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
 export const showAdmobInterstitial = () => {
-  // @ts-ignore
+
   const advert = admob().interstitial(str.admobInterstitial);
-  // @ts-ignore
+ 
   const {AdRequest} = admob;
   const request = new AdRequest();
   advert.loadAd(request.build());

@@ -10,22 +10,20 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {PulseIndicator} from 'react-native-indicators';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Image from 'react-native-fast-image';
 import database from '@react-native-firebase/database';
-import Text from '../components/Text';
+import storage from '@react-native-firebase/storage';
 import hStyles from '../styles/homeStyles';
-
 import {calculateAge, getFormattedBirthday} from '../constants/utils';
-import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
-import Button from '../components/Button';
 import {deleteFriend, sendRequest} from '../actions/friends';
 import ProfileViewProps from '../types/views/ProfileView';
 import Profile from '../types/Profile';
 import Place from '../types/Place';
+import {Button, Text} from '@ui-kitten/components';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
+import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
 interface State {
   profile?: Profile;
@@ -51,22 +49,18 @@ class ProfileView extends Component<ProfileViewProps, State> {
     // TODO update friend in redux
     const {
       friends,
-      navigation: {
-        state: {
-          params: {uid},
-        },
+      route: {
+        params: {uid},
       },
     } = this.props;
-    firebase
-      .storage()
+    storage()
       .ref(`images/${uid}`)
       .child('backdrop')
       .getDownloadURL()
       .then((backdrop) => this.setState({backdrop}))
       .catch((e) => console.log(e));
 
-    firebase
-      .storage()
+    storage()
       .ref(`images/${uid}`)
       .child('avatar')
       .getDownloadURL()
@@ -92,14 +86,6 @@ class ProfileView extends Component<ProfileViewProps, State> {
       });
   }
 
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: 'Profile',
-    tabBarIcon: ({tintColor}) => (
-      <Icon name="md-person" style={{color: tintColor}} />
-    ),
-  };
-
   render() {
     const {remove, request, navigation} = this.props;
     const {
@@ -124,7 +110,6 @@ class ProfileView extends Component<ProfileViewProps, State> {
     } = profile;
     return (
       <>
-        <Header hasBack title={username || 'Profile'} />
         {loaded ? (
           <View style={{flex: 1, justifyContent: 'space-between'}}>
             <View>
@@ -175,8 +160,8 @@ class ProfileView extends Component<ProfileViewProps, State> {
                     />
                   </TouchableOpacity>
                 ) : (
-                  <Icon
-                    name="md-contact"
+                  <ThemedIcon
+                    name="person"
                     size={80}
                     style={{
                       marginTop: -45,
@@ -227,9 +212,9 @@ class ProfileView extends Component<ProfileViewProps, State> {
                       },
                     ]);
                   }}
-                  text="Send pal request"
-                  style={{margin: 10, alignSelf: 'center'}}
-                />
+                  style={{margin: 10, alignSelf: 'center'}}>
+                  Send pal request
+                </Button>
               )}
 
               {accountType && isFriend && (
@@ -332,10 +317,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
                       paddingVertical: 2,
                       borderRadius: 10,
                     }}>
-                    <Icon
-                      name="ios-arrow-back"
-                      style={{color: '#fff', fontSize: 40}}
-                    />
+                    <ThemedIcon name="arrow-ios-back" size={40} />
                   </View>
                 </TouchableOpacity>
               );
@@ -348,15 +330,15 @@ class ProfileView extends Component<ProfileViewProps, State> {
   }
 }
 
-const mapStateToProps = ({friends, sharedInfo, profile}) => ({
+const mapStateToProps = ({friends, sharedInfo, profile}: MyRootState) => ({
   friends: friends.friends,
   users: sharedInfo.users,
   profile: profile.profile,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  remove: (uid) => dispatch(deleteFriend(uid)),
-  request: (friendUid) => dispatch(sendRequest(friendUid)),
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
+  remove: (uid: string) => dispatch(deleteFriend(uid)),
+  request: (friendUid: string) => dispatch(sendRequest(friendUid)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileView);

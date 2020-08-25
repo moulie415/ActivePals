@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   View,
   BackHandler,
-  Keyboard,
   ActivityIndicator,
 } from 'react-native';
 import {pathOr} from 'ramda';
@@ -43,7 +42,6 @@ interface State {
 }
 
 class Messaging extends Component<MessagingProps, State> {
-  keyboardDidShowListener;
 
   constructor(props) {
     super(props);
@@ -61,10 +59,6 @@ class Messaging extends Component<MessagingProps, State> {
 
     const {gymId, friendUid, session} = route.params;
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
-    this.keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      this.keyboardDidShow.bind(this),
-    );
     this.loadMessages();
     const id = friendUid || session || gymId;
     const count = unreadCount[id];
@@ -164,7 +158,6 @@ class Messaging extends Component<MessagingProps, State> {
     BackHandler.removeEventListener('hardwareBackPress', () =>
       this.onBackPress(),
     );
-    this.keyboardDidShowListener.remove();
   }
 
   onBackPress() {

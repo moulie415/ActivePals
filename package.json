@@ -70,6 +70,7 @@
     "react-native-map-link": "^2.7.17",
     "react-native-maps": "^0.27.1",
     "react-native-modalbox": "^2.0.0",
+    "react-native-numeric-input": "^1.8.3",
     "react-native-parsed-text": "^0.0.22",
     "react-native-permissions": "^2.1.5",
     "react-native-picker-select": "^8.0.0",

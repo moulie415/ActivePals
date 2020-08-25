@@ -1,18 +1,16 @@
 import React, {Component} from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
-import NumericInput from 'react-native-numeric-input';
-import RadioForm from 'react-native-simple-radio-button';
+
+// import NumericInput from 'react-native-numeric-input';
+
 import {connect} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
 import moment from 'moment';
 import {
-  Text,
   View,
   Alert,
   TextInput,
   TouchableOpacity,
   Platform,
-  Switch,
   ScrollView,
   SafeAreaView,
 } from 'react-native';
@@ -22,23 +20,30 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import RNCalendarEvents from 'react-native-calendar-events';
 import {geofire} from '../../App';
 
-import styles from '../../styles/sessionDetailStyles';
 import {types, getType, addSessionToCalendar} from '../../constants/utils';
-import Header from '../../components/Header/header';
 import MapModal from '../../components/MapModal';
 import LocationSearchModal from '../../components/LocationSearchModal';
-import Button from '../../components/Button';
 import {addPost} from '../../actions/home';
 import {fetchSessions} from '../../actions/sessions';
 import SessionDetailProps from '../../types/views/sessions/SessionDetail';
 import Session, {SessionType, Gender} from '../../types/Session';
 import Place from '../../types/Place';
+import {
+  Button,
+  Text,
+  Layout,
+  Radio,
+  RadioGroup,
+  Toggle,
+} from '@ui-kitten/components';
 
 const genderProps = [
   {label: Gender.UNSPECIFIED, value: Gender.UNSPECIFIED},
   {label: Gender.MALE, value: Gender.MALE},
   {label: Gender.FEMALE, value: Gender.FEMALE},
 ];
+
+const genders = [Gender.UNSPECIFIED, Gender.MALE, Gender.FEMALE];
 
 const typeProps = types.map((type) => {
   return {label: type, value: type};
@@ -61,12 +66,14 @@ interface State {
   calendarId?: string;
   gym?: Place;
   showDatePicker?: boolean;
+  selectedGender: number;
+  selectedType: number;
 }
 class SessionDetail extends Component<SessionDetailProps, State> {
   constructor(props) {
     super(props);
-    const {navigation} = this.props;
-    const location = navigation.getParam('location');
+    const {navigation, route} = this.props;
+    const {location} = route.params;
     this.state = {
       gender: Gender.UNSPECIFIED,
       formattedAddress: 'none',
@@ -77,6 +84,8 @@ class SessionDetail extends Component<SessionDetailProps, State> {
       addToCalendar: false,
       type: SessionType.CUSTOM,
       location,
+      selectedGender: 0,
+      selectedType: 0,
     };
   }
 
@@ -135,16 +144,9 @@ class SessionDetail extends Component<SessionDetailProps, State> {
     );
   }
 
-  static navigationOptions = {
-    headerShown: false,
-    tabBarIcon: ({tintColor}) => (
-      <Icon size={25} name="md-home" style={{color: tintColor}} />
-    ),
-  };
-
   async createSession() {
-    const {navigation, getSessions, profile} = this.props;
-    const friends = navigation.getParam('friends');
+    const {navigation, getSessions, profile, route} = this.props;
+    const {friends} = route.params;
     const {
       title,
       location,
@@ -234,8 +236,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
       selectedDate,
     } = this.state;
     return (
-      <>
-        <Header title="Enter details" hasBack />
+      <Layout style={{flex: 1}}>
         <ScrollView style={{flex: 1}}>
           <TextInput
             style={{
@@ -286,9 +287,9 @@ class SessionDetail extends Component<SessionDetailProps, State> {
                 alignItems: 'center',
               }}>
               <Text style={{marginRight: 5}}>Add to calendar</Text>
-              <Switch
-                value={addToCalendar}
-                onValueChange={async (val) => {
+              <Toggle
+                checked={addToCalendar}
+                onChange={async (val) => {
                   this.setState({addToCalendar: val});
                   try {
                     if (val) {
@@ -331,7 +332,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
             <Text style={{color: '#999', textAlign: 'center', width: 40}}>
               For
             </Text>
-            <NumericInput
+            {/* <NumericInput
               value={duration}
               onChange={(duration) => this.setState({duration})}
               onLimitReached={(isMax, msg) => console.log(isMax, msg)}
@@ -345,11 +346,11 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               minValue={0}
               // @ts-ignore
               iconStyle={{color: 'white'}}
-            />
+            /> */}
             <Text style={{color: '#999', width: 40, textAlign: 'center'}}>
               {duration === 1 ? 'hr' : 'hrs'}
             </Text>
-            <NumericInput
+            {/* <NumericInput
               value={durationMinutes}
               onChange={(durationMinutes) => this.setState({durationMinutes})}
               onLimitReached={(isMax, msg) => console.log(isMax, msg)}
@@ -363,7 +364,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               minValue={0}
               // @ts-ignore
               iconStyle={{color: 'white'}}
-            />
+            /> */}
             <Text style={{color: '#999', width: 40, textAlign: 'center'}}>
               {durationMinutes === 1 ? 'min' : 'mins'}
             </Text>
@@ -410,42 +411,39 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               {`Selected location:  ${gym ? gym.name : formattedAddress}`}
             </Text>
           </View>
-          <Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>
-            Gender
-          </Text>
-          <RadioForm
-            formHorizontal
-            radio_props={genderProps}
-            initial={0}
-            style={{padding: 10, borderBottomWidth: 0.5, borderColor: '#999'}}
-            labelStyle={{marginRight: 20}}
-            onPress={(value) => {
-              this.setState({gender: value});
-            }}
-          />
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>
-              Type
-            </Text>
-            {getType(type, 20)}
-          </View>
-          <RadioForm
-            formHorizontal
-            radio_props={typeProps}
-            initial={0}
+          <View
             style={{
-              padding: 10,
-              borderBottomWidth: 0.5,
-              borderColor: '#999',
-              flexWrap: 'wrap',
-            }}
-            labelStyle={{marginRight: 20}}
-            onPress={(value) => this.setState({type: value})}
-          />
+              flexDirection: 'row',
+
+              justifyContent: 'space-evenly',
+            }}>
+            <Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>
+              Gender
+            </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontSize: 20, margin: 10, fontWeight: 'bold'}}>
+                Type
+              </Text>
+              {getType(type, 20)}
+            </View>
+          </View>
+
+          <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+            <RadioGroup selectedIndex={this.state.selectedGender}>
+              {genders.map((gender) => (
+                <Radio>{gender}</Radio>
+              ))}
+            </RadioGroup>
+
+            <RadioGroup selectedIndex={this.state.selectedType}>
+              {types.map((type) => (
+                <Radio>{type}</Radio>
+              ))}
+            </RadioGroup>
+          </View>
           <Button
             style={{alignSelf: 'center', marginVertical: 20}}
-            onPress={() => this.createSession()}
-            text="Create Session">
+            onPress={() => this.createSession()}>
             Create Session
           </Button>
         </ScrollView>
@@ -524,7 +522,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
             )}
           </SafeAreaView>
         )}
-      </>
+      </Layout>
     );
   }
 }
