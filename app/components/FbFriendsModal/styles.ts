@@ -1,7 +1,4 @@
-import {
-  StyleSheet
-} from 'react-native'
-import colors from '../../constants/colors'
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   modal: {
@@ -11,11 +8,10 @@ export default StyleSheet.create({
   },
   button: {
     color: '#fff',
-    backgroundColor: colors.secondary,
     alignSelf: 'center',
     padding: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
-    marginVertical: 5
+    marginVertical: 5,
   },
-})
+});

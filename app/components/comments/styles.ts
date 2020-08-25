@@ -1,5 +1,4 @@
-import { StyleSheet, PixelRatio, Platform } from 'react-native';
-import colors from '../../constants/colors';
+import {StyleSheet, PixelRatio, Platform} from 'react-native';
 
 export default StyleSheet.create({
   commentContainer: {
@@ -38,7 +37,6 @@ export default StyleSheet.create({
   },
   body: {
     paddingBottom: 10,
-    color: colors.textGrey,
   },
   rightActionBar: {
     flexDirection: 'row',
@@ -84,7 +82,6 @@ export default StyleSheet.create({
   },
   submit: {
     padding: 10,
-    color: colors.secondary,
   },
   input: {
     flex: 1,

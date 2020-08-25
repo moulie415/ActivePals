@@ -8,7 +8,6 @@ import database from '@react-native-firebase/database';
 import ParsedText from 'react-native-parsed-text';
 import TimeAgo from 'react-native-timeago';
 import styles from './styles';
-import colors from '../../constants/colors';
 import str from '../../constants/strings';
 import CommentProps from '../../types/components/CommentProps';
 import {Text} from '@ui-kitten/components';
@@ -158,7 +157,6 @@ export default class Comment extends PureComponent<CommentProps, State> {
                       style={{
                         width: 15,
                         height: 15,
-                        tintColor: colors.secondary,
                       }}
                     />
                     <Text style={styles.likeNr}> {likesNr}</Text>
@@ -182,7 +180,6 @@ export default class Comment extends PureComponent<CommentProps, State> {
               parse={[
                 {
                   pattern: str.mentionRegex,
-                  style: {color: colors.secondary},
                   onPress: this.handleUsernamePress.bind(this),
                 },
               ]}
@@ -206,7 +203,6 @@ export default class Comment extends PureComponent<CommentProps, State> {
                     style={{
                       width: 25,
                       height: 25,
-                      tintColor: liked ? colors.secondary : '#999',
                     }}
                   />
                 </View>

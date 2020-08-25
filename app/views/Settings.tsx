@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity, Alert, ScrollView} from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import crashlytics from '@react-native-firebase/crashlytics';
 import VersionNumber from 'react-native-version-number';
@@ -7,7 +13,7 @@ import DialogInput from 'react-native-dialog-input';
 import {PulseIndicator} from 'react-native-indicators';
 import Instabug from 'instabug-reactnative';
 import {connect} from 'react-redux';
-import colors from '../constants/colors';
+
 import styles from '../styles/settingsStyles';
 import Text from '../components/Text';
 import Header from '../components/Header/header';
@@ -49,31 +55,19 @@ class Settings extends Component<SettingsProps, State> {
             }}
             style={styles.contact}>
             <Text>Contact Support</Text>
-            <Icon
-              name="ios-arrow-forward"
-              size={25}
-              style={{color: colors.primary}}
-            />
+            <Icon name="ios-arrow-forward" size={25} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('Welcome', {goBack: true})}
             style={styles.contact}>
             <Text>View Welcome Swiper</Text>
-            <Icon
-              name="ios-arrow-forward"
-              size={25}
-              style={{color: colors.primary}}
-            />
+            <Icon name="ios-arrow-forward" size={25} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('Credits')}
             style={styles.contact}>
             <Text>Credits</Text>
-            <Icon
-              name="ios-arrow-forward"
-              size={25}
-              style={{color: colors.primary}}
-            />
+            <Icon name="ios-arrow-forward" size={25} />
           </TouchableOpacity>
           {profile.fb_login && (
             <TouchableOpacity
@@ -86,11 +80,7 @@ class Settings extends Component<SettingsProps, State> {
               }}
               style={styles.contact}>
               <Text>Import Facebook friends</Text>
-              <Icon
-                name="ios-arrow-forward"
-                size={25}
-                style={{color: colors.primary}}
-              />
+              <Icon name="ios-arrow-forward" size={25} />
             </TouchableOpacity>
           )}
           {profile.accountType === AccountType.ADMIN && (
@@ -98,34 +88,29 @@ class Settings extends Component<SettingsProps, State> {
               onPress={() => crashlytics().crash()}
               style={styles.contact}>
               <Text>Force crash</Text>
-              <Icon
-                name="ios-arrow-forward"
-                size={25}
-                style={{color: colors.primary}}
-              />
+              <Icon name="ios-arrow-forward" size={25} />
             </TouchableOpacity>
           )}
           <TouchableOpacity onPress={Instabug.show} style={styles.contact}>
             <Text>Report a problem</Text>
-            <Icon name="ios-bug" size={25} style={{color: colors.primary}} />
+            <Icon name="ios-bug" size={25} />
           </TouchableOpacity>
           <View style={styles.contact}>
             <Text>Version no: </Text>
             <Text
               style={{
-                color: colors.primary,
                 fontWeight: 'bold',
               }}>{`${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}</Text>
           </View>
           <TouchableOpacity
             style={{padding: 15, backgroundColor: '#fff'}}
             onPress={() => this.setState({showDialog: true})}>
-            <Text style={{color: colors.appRed}}>Delete account</Text>
+            <Text style={{color: 'red'}}>Delete account</Text>
           </TouchableOpacity>
         </ScrollView>
         {spinner && (
           <View style={styles.spinner}>
-            <PulseIndicator color={colors.secondary} />
+            <ActivityIndicator />
           </View>
         )}
         <FbFriendsModal

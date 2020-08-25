@@ -21,7 +21,7 @@ import database from '@react-native-firebase/database';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import RNCalendarEvents from 'react-native-calendar-events';
 import {geofire} from '../../App';
-import colors from '../../constants/colors';
+
 import styles from '../../styles/sessionDetailStyles';
 import {types, getType, addSessionToCalendar} from '../../constants/utils';
 import Header from '../../components/Header/header';
@@ -287,10 +287,6 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               }}>
               <Text style={{marginRight: 5}}>Add to calendar</Text>
               <Switch
-                trackColor={{true: colors.secondary, false: null}}
-                thumbColor={Platform.select({
-                  android: addToCalendar ? colors.secondary : '#fff',
-                })}
                 value={addToCalendar}
                 onValueChange={async (val) => {
                   this.setState({addToCalendar: val});
@@ -345,13 +341,10 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               step={1}
               valueType="integer"
               rounded
-              textColor={colors.secondary}
               maxValue={24}
               minValue={0}
               // @ts-ignore
               iconStyle={{color: 'white'}}
-              leftButtonBackgroundColor={colors.secondary}
-              rightButtonBackgroundColor={colors.secondary}
             />
             <Text style={{color: '#999', width: 40, textAlign: 'center'}}>
               {duration === 1 ? 'hr' : 'hrs'}
@@ -366,13 +359,10 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               step={1}
               valueType="integer"
               rounded
-              textColor={colors.secondary}
               maxValue={59}
               minValue={0}
               // @ts-ignore
               iconStyle={{color: 'white'}}
-              leftButtonBackgroundColor={colors.secondary}
-              rightButtonBackgroundColor={colors.secondary}
             />
             <Text style={{color: '#999', width: 40, textAlign: 'center'}}>
               {durationMinutes === 1 ? 'min' : 'mins'}
@@ -428,8 +418,6 @@ class SessionDetail extends Component<SessionDetailProps, State> {
             radio_props={genderProps}
             initial={0}
             style={{padding: 10, borderBottomWidth: 0.5, borderColor: '#999'}}
-            buttonColor={colors.secondary}
-            selectedButtonColor={colors.secondary}
             labelStyle={{marginRight: 20}}
             onPress={(value) => {
               this.setState({gender: value});
@@ -451,17 +439,15 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               borderColor: '#999',
               flexWrap: 'wrap',
             }}
-            buttonColor={colors.secondary}
-            selectedButtonColor={colors.secondary}
             labelStyle={{marginRight: 20}}
             onPress={(value) => this.setState({type: value})}
           />
           <Button
             style={{alignSelf: 'center', marginVertical: 20}}
-            textStyle={{fontSize: 20}}
             onPress={() => this.createSession()}
-            text="Create Session"
-          />
+            text="Create Session">
+            Create Session
+          </Button>
         </ScrollView>
 
         <MapModal
@@ -532,9 +518,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
                   onPress={() =>
                     this.setState({showDatePicker: false, date: selectedDate})
                   }>
-                  <Text style={{color: colors.secondary, fontSize: 16}}>
-                    Confirm
-                  </Text>
+                  <Text>Confirm</Text>
                 </TouchableOpacity>
               </View>
             )}

@@ -1,9 +1,10 @@
-import React, { FunctionComponent } from 'react';
-import { View, Platform } from 'react-native';
-import { connect } from 'react-redux';
-import Text from '../Text';
+import React, {FunctionComponent} from 'react';
+import {View, Platform} from 'react-native';
+import {connect} from 'react-redux';
 import styles from './styles';
 import ChatTabLabelProps from '../../types/components/ChatTabLabel';
+import {MyRootState} from '../../types/Shared';
+import {Text} from '@ui-kitten/components';
 
 const ChatTabLabel: FunctionComponent<ChatTabLabelProps> = ({
   unreadCount,
@@ -15,7 +16,7 @@ const ChatTabLabel: FunctionComponent<ChatTabLabelProps> = ({
 }) => {
   let count = 0;
   const chatType = type.toLowerCase();
-  Object.keys(unreadCount).forEach(key => {
+  Object.keys(unreadCount).forEach((key) => {
     switch (chatType) {
       case 'pals':
         if (chats[key]) {
@@ -36,7 +37,9 @@ const ChatTabLabel: FunctionComponent<ChatTabLabelProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={{ color }}>{Platform.select({ ios: type, android: type.toUpperCase() })}</Text>
+      <Text style={{color}}>
+        {Platform.select({ios: type, android: type.toUpperCase()})}
+      </Text>
       {count > 0 && (
         <View style={styles.countContainer}>
           <Text style={styles.count}>{count > 9 ? '9+' : count}</Text>
@@ -46,7 +49,7 @@ const ChatTabLabel: FunctionComponent<ChatTabLabelProps> = ({
   );
 };
 
-const mapStateToProps = ({ chats }) => ({
+const mapStateToProps = ({chats}: MyRootState) => ({
   unreadCount: chats.unreadCount,
   chats: chats.chats,
   sessionChats: chats.sessionChats,

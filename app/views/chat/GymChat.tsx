@@ -3,7 +3,6 @@ import {View, ScrollView, TouchableOpacity, RefreshControl} from 'react-native';
 import {connect} from 'react-redux';
 import Image from 'react-native-fast-image';
 import {getType, getSimplifiedTime} from '../../constants/utils';
-import colors from '../../constants/colors';
 import ChatRowCount from '../../components/ChatRowCount';
 import styles from '../../styles/chatStyles';
 import {SessionType} from '../../types/Session';
@@ -87,7 +86,6 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
             }}>
             <Text
               style={{
-                color: colors.primary,
                 textAlign: 'center',
                 marginHorizontal: 20,
               }}>

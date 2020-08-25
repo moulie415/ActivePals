@@ -1,11 +1,10 @@
-import { StyleSheet } from "react-native";
-import colors from "../../constants/colors";
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
-    card: {
-        backgroundColor: '#fff',
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderTopWidth: StyleSheet.hairlineWidth,
-        borderColor: '#999'
-    }
-})
+  card: {
+    backgroundColor: '#fff',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderColor: '#999',
+  },
+});

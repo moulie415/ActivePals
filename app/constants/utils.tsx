@@ -15,7 +15,6 @@ import Post from '../types/Post';
 import Message from '../types/Message';
 import Notification from '../types/Notification';
 import Chat from '../types/Chat';
-import colors from './colors';
 import {Source} from 'react-native-fast-image';
 import ThemedImage from '../components/ThemedImage/ThemedImage';
 
@@ -258,11 +257,11 @@ export const getStateColor = (state: UserState) => {
     case UserState.AWAY:
       return '#F9BD49';
     default:
-      return colors.appRed;
+      return 'red';
   }
 };
 
-const getStateVal = (state) => {
+const getStateVal = (state: UserState) => {
   switch (state) {
     case UserState.ONLINE:
       return 3;

@@ -4,7 +4,6 @@ import ParsedText from 'react-native-parsed-text';
 import database from '@react-native-firebase/database';
 import {connect} from 'react-redux';
 import str from '../../constants/strings';
-import colors from '../../constants/colors';
 import ParsedTextProps from '../../types/components/ParsedText';
 
 const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
@@ -18,11 +17,11 @@ const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
 }) => {
   return (
     <ParsedText
-      style={{color: color || colors.textGrey}}
+      style={{color: color}}
       parse={[
         {
           pattern: str.mentionRegex,
-          style: {color: colors.secondary},
+
           onPress: async (mention) => {
             if (!disableOnPress) {
               const name = mention.substring(1);

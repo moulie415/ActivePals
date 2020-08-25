@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Image from 'react-native-fast-image';
-import colors from '../../constants/colors';
 import styles from './styles';
 
 import FriendsModalProps from '../../types/components/FriendsModal';
@@ -73,7 +72,6 @@ class FriendsModal extends Component<FriendsModalProps, State> {
                       name="md-contact"
                       size={35}
                       style={{
-                        color: colors.primary,
                         marginTop: Platform.OS === 'ios' ? -2 : 0,
                       }}
                     />
@@ -84,7 +82,6 @@ class FriendsModal extends Component<FriendsModalProps, State> {
                       size={25}
                       name="ios-checkmark-circle"
                       style={{
-                        color: colors.primary,
                         textAlign: 'right',
                         flex: 1,
                       }}
@@ -136,7 +133,9 @@ class FriendsModal extends Component<FriendsModalProps, State> {
             flexDirection: 'row',
             justifyContent: 'space-evenly',
           }}>
-          <Button onPress={onClosed} color={colors.appRed} text="Cancel" />
+          <Button onPress={onClosed} status="danger">
+            Cancel
+          </Button>
           <Button
             onPress={() => {
               const {length} = selectedFriends;
@@ -145,9 +144,9 @@ class FriendsModal extends Component<FriendsModalProps, State> {
               } else {
                 Alert.alert('Sorry', 'Please select at least one friend');
               }
-            }}
-            text="Continue"
-          />
+            }}>
+            Continue
+          </Button>
         </View>
       </Modal>
     );

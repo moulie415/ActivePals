@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
-import colors from '../../constants/colors';
 import {fetchRepsUsers} from '../../actions/home';
 import RepsModalProps from '../../types/components/RepsModal';
 import styles from '../../styles/components/RepsModal';
@@ -75,7 +74,7 @@ const RepsModal: FunctionComponent<RepsModalProps> = ({
               onPress={() => {
                 getRepUsers(id, 10, uids[uids.length - 1]);
               }}>
-              <Text style={{color: colors.secondary}}>Show more</Text>
+              <Text>Show more</Text>
             </TouchableOpacity>
           ) : null
         }

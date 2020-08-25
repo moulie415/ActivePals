@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native'
-import colors from '../constants/colors'
+import {StyleSheet} from 'react-native';
+
 
 export default StyleSheet.create({
   gymAvatar: {
@@ -13,6 +13,6 @@ export default StyleSheet.create({
     marginBottom: 1,
     padding: 10,
     flexDirection: 'row',
-    alignItems: 'center'
-  }
-})
+    alignItems: 'center',
+  },
+});

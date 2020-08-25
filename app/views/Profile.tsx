@@ -5,10 +5,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import moment from 'moment';
 import {equals} from 'ramda';
 import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
@@ -17,7 +20,6 @@ import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
 import styles from '../styles/profileStyles';
 import hStyles from '../styles/homeStyles';
-import colors from '../constants/colors';
 import globalStyles from '../styles/globalStyles';
 import {fetchProfile, setLoggedOut} from '../actions/profile';
 import {pickerItems, getBirthdayDate} from '../constants/utils';
@@ -26,6 +28,7 @@ import ProfileProps from '../types/views/Profile';
 import Profile from '../types/Profile';
 import {Text, Button, Input, Icon} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
 const activities = [
   'Bodybuilding',
@@ -65,8 +68,7 @@ class ProfileView extends Component<ProfileProps, State> {
   async componentDidMount() {
     const {profile} = this.props;
     try {
-      const backdrop = await firebase
-        .storage()
+      const backdrop = await storage()
         .ref(`images/${profile.uid}`)
         .child('backdrop')
         .getDownloadURL();
@@ -183,8 +185,7 @@ class ProfileView extends Component<ProfileProps, State> {
   ): Promise<string> {
     const {profile} = this.props;
     return new Promise((resolve, reject) => {
-      const imageRef = firebase
-        .storage()
+      const imageRef = storage()
         .ref(`images/${profile.uid}`)
         .child(backdrop ? 'backdrop' : 'avatar');
       return imageRef
@@ -342,10 +343,9 @@ class ProfileView extends Component<ProfileProps, State> {
                 <View
                   style={{
                     height: 150,
-                    backgroundColor: colors.primaryLighter,
                     justifyContent: 'center',
                   }}>
-                  <Icon name="plus" size={25} />
+                  <ThemedIcon name="plus" size={25} />
                 </View>
               )}
             </TouchableOpacity>
@@ -370,13 +370,12 @@ class ProfileView extends Component<ProfileProps, State> {
                     width: 80,
                     height: 80,
                     alignSelf: 'center',
-                    backgroundColor: colors.secondary,
                     justifyContent: 'center',
                   }}>
-                  <Icon
+                  <ThemedIcon
                     name="plus"
                     size={25}
-                    style={{color: '#fff', textAlign: 'center'}}
+                    style={{textAlign: 'center'}}
                   />
                 </View>
               )}
@@ -391,18 +390,17 @@ class ProfileView extends Component<ProfileProps, State> {
               justifyContent: 'space-between',
             }}>
             <View style={{width: '60%'}}>
-              <Text style={{color: '#999', marginHorizontal: 20}}>
+              <Text>
                 {'Email: '}
-                <Text style={{color: colors.secondary}}>{email}</Text>
+                <Text>{email}</Text>
               </Text>
               <Text
                 style={{
-                  color: '#999',
                   marginHorizontal: 20,
                   marginBottom: gym ? 0 : 10,
                 }}>
                 {'Account type: '}
-                <Text style={{color: colors.secondary}}>
+                <Text>
                   {profile && profile.accountType}
                 </Text>
               </Text>
@@ -413,12 +411,11 @@ class ProfileView extends Component<ProfileProps, State> {
                   }>
                   <Text
                     style={{
-                      color: '#999',
                       marginHorizontal: 20,
                       marginBottom: 10,
                     }}>
                     {'Gym: '}
-                    <Text style={{color: colors.secondary}}>{gym.name}</Text>
+                    <Text>{gym.name}</Text>
                   </Text>
                 </TouchableOpacity>
               )}
@@ -431,52 +428,43 @@ class ProfileView extends Component<ProfileProps, State> {
                   alignItems: 'center',
                 }}
                 onPress={() => navigation.navigate('Settings')}>
-                <Text style={{color: colors.secondary, marginRight: 10}}>
+                <Text style={{ marginRight: 10}}>
                   Settings
                 </Text>
-                <Icon size={25} name="settings" />
+                <ThemedIcon size={25} name="settings" />
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>Username: </Text>
-            <Input
-              value={profile && profile.username}
-              onChangeText={(username) =>
-                this.setState({profile: {...profile, username}})
-              }
-              placeholderTextColor="#fff"
-              style={styles.input}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-          <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>First name: </Text>
-            <Input
-              value={profile && profile.first_name}
-              onChangeText={(name) =>
-                this.setState({profile: {...profile, first_name: name}})
-              }
-              placeholderTextColor="#fff"
-              style={styles.input}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-          <View style={styles.inputGrp}>
-            <Text style={{alignSelf: 'center'}}>Last name: </Text>
-            <Input
-              value={profile && profile.last_name}
-              onChangeText={(name) =>
-                this.setState({profile: {...profile, last_name: name}})
-              }
-              placeholderTextColor="#fff"
-              style={styles.input}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
+          <Input
+            value={profile && profile.username}
+            onChangeText={(username) =>
+              this.setState({profile: {...profile, username}})
+            }
+            placeholder="Username"
+            style={styles.input}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+
+          <Input
+            value={profile && profile.first_name}
+            onChangeText={(name) =>
+              this.setState({profile: {...profile, first_name: name}})
+            }
+            placeholder="First name"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+
+          <Input
+            value={profile && profile.last_name}
+            onChangeText={(name) =>
+              this.setState({profile: {...profile, last_name: name}})
+            }
+            placeholder="Last name"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
 
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Preferred activity: </Text>
@@ -554,14 +542,12 @@ class ProfileView extends Component<ProfileProps, State> {
               <Text style={styles.input}>{birthdayString}</Text>
             </Text>
           </TouchableOpacity>
-          <Button
-            style={styles.logout}
-            text="Log out"
-            onPress={() => this.logout()}
-          />
+          <Button status="danger" onPress={() => this.logout()}>
+            Log out
+          </Button>
           {spinner && (
             <View style={hStyles.spinner}>
-              <PulseIndicator color={colors.secondary} />
+              <ActivityIndicator />
             </View>
           )}
         </ScrollView>
@@ -599,7 +585,7 @@ class ProfileView extends Component<ProfileProps, State> {
                 <TouchableOpacity
                   style={{padding: 10}}
                   onPress={() => this.setState({showPicker: false})}>
-                  <Text style={{color: colors.secondary, fontSize: 16}}>
+                  <Text style={{fontSize: 16}}>
                     Confirm
                   </Text>
                 </TouchableOpacity>

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Platform,
   Image as SlowImage,
+  ActivityIndicator,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
@@ -17,10 +18,8 @@ import MapView, {Marker} from 'react-native-maps';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import {connect} from 'react-redux';
 import Slider from '@react-native-community/slider';
-import {PulseIndicator} from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import styles from '../../styles/sessionStyles';
-import colors from '../../constants/colors';
 import {
   getType,
   formatDateTime,
@@ -280,7 +279,6 @@ class Sessions extends Component<SessionsProps, State> {
               latitude: lat,
               longitude: lng,
             }}
-            pinColor={colors.secondary}
             onPress={(event) => {
               event.stopPropagation();
               this.setState(
@@ -327,7 +325,6 @@ class Sessions extends Component<SessionsProps, State> {
       <View>
         <Text
           style={{
-            color: colors.primary,
             textAlign: 'center',
             marginHorizontal: 20,
           }}>
@@ -347,9 +344,6 @@ class Sessions extends Component<SessionsProps, State> {
             this.setState({selectedIndex: index});
           }}
           tabsContainerStyle={{marginHorizontal: 8, marginVertical: 5}}
-          tabStyle={{borderColor: colors.secondary}}
-          tabTextStyle={{color: colors.secondary}}
-          activeTabStyle={{backgroundColor: colors.secondary}}
         />
         {gym && selectedIndex === 1 && (
           <View
@@ -357,7 +351,6 @@ class Sessions extends Component<SessionsProps, State> {
               padding: 10,
               backgroundColor: '#fff',
               borderWidth: 1,
-              borderColor: colors.secondary,
             }}>
             <View style={{flexDirection: 'row'}}>
               {gym.photo ? (
@@ -390,7 +383,7 @@ class Sessions extends Component<SessionsProps, State> {
                     alignItems: 'center',
                   }}>
                   <View>
-                    <Text style={{color: colors.secondary}}>Your gym:</Text>
+                    <Text>Your gym:</Text>
                     <Text>{gym.name}</Text>
                   </View>
                   <View style={{flexDirection: 'row'}}>
@@ -441,7 +434,7 @@ class Sessions extends Component<SessionsProps, State> {
                     marginHorizontal: 10,
                     borderRadius: 5,
                     borderWidth: 1,
-                    borderColor: colors.secondary,
+
                     // ...globalStyles.bubbleShadow,
                   }}>
                   <View style={{flexDirection: 'row'}}>
@@ -476,15 +469,7 @@ class Sessions extends Component<SessionsProps, State> {
                           justifyContent: 'space-between',
                           alignItems: 'center',
                         }}>
-                        <Text
-                          style={[
-                            styles.date,
-                            {
-                              color: item.inProgress
-                                ? colors.secondary
-                                : '#999',
-                            },
-                          ]}>
+                        <Text style={[styles.date]}>
                           {item.inProgress
                             ? 'In progress'
                             : formatDateTime(item.dateTime)}
@@ -560,7 +545,6 @@ class Sessions extends Component<SessionsProps, State> {
                         marginHorizontal: 10,
                         borderRadius: 5,
                         borderWidth: 1,
-                        borderColor: colors.secondary,
                         // ...globalStyles.bubbleShadow,
                       }}>
                       <View style={{flexDirection: 'row'}}>
@@ -693,9 +677,7 @@ class Sessions extends Component<SessionsProps, State> {
     );
     return (
       <>
-        {spinner && (
-          <PulseIndicator color={colors.secondary} style={styles.spinner} />
-        )}
+        {spinner && <ActivityIndicator style={styles.spinner} />}
         <View style={{flex: 1}}>
           {!showMap && this.renderLists()}
           {showMap && (
@@ -728,7 +710,6 @@ class Sessions extends Component<SessionsProps, State> {
             style={{
               flexDirection: 'row',
               height: 60,
-              backgroundColor: colors.bgColor,
             }}>
             <Button
               style={styles.button}
@@ -745,7 +726,7 @@ class Sessions extends Component<SessionsProps, State> {
               }}
             />
             <View
-              style={{borderRightWidth: 1, borderRightColor: colors.bgColor}}
+              style={{borderRightWidth: 1}}
             />
             <Button
               style={styles.button}
@@ -805,8 +786,6 @@ class Sessions extends Component<SessionsProps, State> {
                   <Slider
                     maximumValue={50}
                     minimumValue={5}
-                    minimumTrackTintColor={colors.secondary}
-                    thumbTintColor={colors.secondary}
                     step={5}
                     style={{flex: 1}}
                     value={radius}
@@ -840,13 +819,6 @@ class Sessions extends Component<SessionsProps, State> {
                   borderTopColor: '#999',
                 }}>
                 <CheckBox
-                  containerStyle={{
-                    backgroundColor: 'transparent',
-                    width: 45,
-                    borderWidth: 0,
-                  }}
-                  checkedColor={colors.secondary}
-                  uncheckedColor={colors.secondary}
                   checked={stateYoga}
                   onPress={() => this.setState({yoga: !stateYoga})}
                 />
@@ -856,13 +828,6 @@ class Sessions extends Component<SessionsProps, State> {
                 onPress={() => this.setState({pilates: !statePilates})}
                 style={{flexDirection: 'row', alignItems: 'center'}}>
                 <CheckBox
-                  containerStyle={{
-                    backgroundColor: 'transparent',
-                    width: 45,
-                    borderWidth: 0,
-                  }}
-                  checkedColor={colors.secondary}
-                  uncheckedColor={colors.secondary}
                   checked={statePilates}
                   onPress={() => this.setState({pilates: !statePilates})}
                 />
@@ -877,9 +842,6 @@ class Sessions extends Component<SessionsProps, State> {
             onBackButtonPressed={() => this.setState({popUpVisible: false})}
             modalProps={{animationIn: 'slideInUp'}}
             options={options}
-            style={{
-              cancelButtonText: {color: colors.secondary},
-            }}
             appsWhiteList={[]}
           />
         </View>

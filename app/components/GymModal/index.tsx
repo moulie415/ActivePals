@@ -1,14 +1,11 @@
 import React from 'react';
 import Modal from 'react-native-modalbox';
 import Image from 'react-native-fast-image';
-import { View, TouchableOpacity, Alert } from 'react-native';
-import { connect } from 'react-redux';
-import Icon from 'react-native-vector-icons/Ionicons';
-import Text from '../Text';
-import colors from '../../constants/colors';
-import { getDistance } from '../../constants/utils';
-import Button from '../Button';
+import {View, TouchableOpacity, Alert} from 'react-native';
+import {connect} from 'react-redux';
+import {getDistance} from '../../constants/utils';
 import styles from './styles';
+import {MyRootState} from '../../types/Shared';
 
 const GymModal = (
   gym,
@@ -21,31 +18,47 @@ const GymModal = (
   viewGym,
   openFriends,
   onContinue,
-  close
+  close,
 ) => {
-  const { vicinity, name, geometry, place_id, photo } = gym;
+  const {vicinity, name, geometry, place_id, photo} = gym;
   return (
-    <Modal style={[styles.modal, { height: null }]} position="center">
+    <Modal style={[styles.modal, {height: null}]} position="center">
       <View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Text style={{ fontSize: 20, padding: 10, color: '#000' }}>{name}</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+          }}>
+          <Text style={{fontSize: 20, padding: 10, color: '#000'}}>{name}</Text>
           <TouchableOpacity onPress={() => viewGym(place_id)}>
-            <Icon size={40} name="md-information-circle" style={{ color: colors.secondary }} />
+            <Icon size={40} name="md-information-circle" />
           </TouchableOpacity>
         </View>
-        <View style={{ margin: 10 }}>
-          <View style={{ flexDirection: 'row', marginVertical: 10, justifyContent: 'space-between' }}>
-            <View style={{ flex: 1 }}>
+        <View style={{margin: 10}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginVertical: 10,
+              justifyContent: 'space-between',
+            }}>
+            <View style={{flex: 1}}>
               <Text>
                 <Text>{vicinity}</Text>
-                <Text style={{ color: '#999' }}>
-                  {` (${getDistance(gym, location.lat, location.lon, true).toFixed(2)} km away)`}
+                <Text style={{color: '#999'}}>
+                  {` (${getDistance(
+                    gym,
+                    location.lat,
+                    location.lon,
+                    true,
+                  ).toFixed(2)} km away)`}
                 </Text>
               </Text>
             </View>
             <Button
               onPress={() => {
-                const { lat, lng } = geometry && geometry.location;
+                const {lat, lng} = geometry && geometry.location;
                 const options = {
                   latitude: lat,
                   longitude: lng,
@@ -56,67 +69,95 @@ const GymModal = (
                 };
                 openPopUp(options);
               }}
-              style={{ marginLeft: 10, alignSelf: 'flex-start' }}
+              style={{marginLeft: 10, alignSelf: 'flex-start'}}
               text="Directions"
             />
           </View>
           {yourGym && yourGym.place_id === gym.place_id ? (
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-              <Text style={{ fontWeight: 'bold', color: colors.secondary, alignSelf: 'center' }}>Your active gym</Text>
+            <View
+              style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+              <Text
+                style={{
+                  fontWeight: 'bold',
+                  alignSelf: 'center',
+                }}>
+                Your active gym
+              </Text>
               <TouchableOpacity
                 onPress={() => onOpenGymChat(place_id)}
-                style={{ justifyContent: 'center', marginRight: 20 }}
-              >
-                <Icon size={40} name="md-chatboxes" style={{ color: colors.secondary }} />
+                style={{justifyContent: 'center', marginRight: 20}}>
+                <Icon
+                  size={40}
+                  name="md-chatboxes"
+                />
               </TouchableOpacity>
               <Button
                 onPress={() => {
                   Alert.alert('Leave', 'Are you sure?', [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Yes', onPress: () => removeGym(), style: 'destructive' },
+                    {text: 'Cancel', style: 'cancel'},
+                    {
+                      text: 'Yes',
+                      onPress: () => removeGym(),
+                      style: 'destructive',
+                    },
                   ]);
                 }}
                 text="Leave"
-                color={colors.appRed}
-                style={{ alignSelf: 'center', marginBottom: 5 }}
-              />
+                status="danger"
+                style={{alignSelf: 'center', marginBottom: 5}}
+              >Leave</Button>
             </View>
           ) : (
             <Button
               onPress={() => {
                 if (yourGym) {
                   Alert.alert('Join', 'This will leave your current Gym?', [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Yes', onPress: () => join(gym) },
+                    {text: 'Cancel', style: 'cancel'},
+                    {text: 'Yes', onPress: () => join(gym)},
                   ]);
-                } else join(gym);
+                } else {
+                  join(gym);
+                }
               }}
-              style={{ paddingHorizontal: 15, alignSelf: 'center', marginBottom: 10 }}
-              text="Join"
-            />
+              style={{
+                paddingHorizontal: 15,
+                alignSelf: 'center',
+                marginBottom: 10,
+              }}
+            >Join</Button>
           )}
           {photo && (
             <Image
-              style={{ height: 200, width: '90%', alignSelf: 'center', marginVertical: 10 }}
+              style={{
+                height: 200,
+                width: '90%',
+                alignSelf: 'center',
+                marginVertical: 10,
+              }}
               resizeMode="contain"
-              source={{ uri: photo }}
+              source={{uri: photo}}
             />
           )}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Button
               text="Create Session"
-              textStyle={{ fontSize: 13 }}
+              textStyle={{fontSize: 13}}
               onPress={() => onContinue(null, gym)}
-              style={{ flex: 1, marginRight: 10, alignItems: 'center', paddingVertical: 15 }}
+              style={{
+                flex: 1,
+                marginRight: 10,
+                alignItems: 'center',
+                paddingVertical: 15,
+              }}
             />
             <Button
               onPress={() => {
                 close();
                 openFriends();
               }}
-              textStyle={{ fontSize: 13 }}
+              textStyle={{fontSize: 13}}
               text="Create Private Session"
-              style={{ flex: 1, alignItems: 'center', paddingVertical: 15 }}
+              style={{flex: 1, alignItems: 'center', paddingVertical: 15}}
             />
           </View>
         </View>
@@ -125,7 +166,7 @@ const GymModal = (
   );
 };
 
-const mapStateToProps = ({ profile }) => ({
+const mapStateToProps = ({profile}: MyRootState) => ({
   location: profile.location,
   yourGym: profile.gym,
 });

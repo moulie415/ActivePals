@@ -1,31 +1,25 @@
-import {
-  StyleSheet,
-  Platform
-} from 'react-native'
-import colors from '../../constants/colors'
-
+import {StyleSheet, Platform} from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: Platform.select({android: 10})
+    paddingVertical: Platform.select({android: 10}),
   },
   countContainer: {
     marginLeft: 5,
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: colors.appRed,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   count: {
     color: '#fff',
     fontSize: 10,
-    fontWeight: 'bold'
-  }
-})
+    fontWeight: 'bold',
+  },
+});
 
-export default styles
+export default styles;

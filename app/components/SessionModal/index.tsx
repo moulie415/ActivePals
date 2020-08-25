@@ -5,7 +5,7 @@ import database from '@react-native-firebase/database';
 import Hyperlink from 'react-native-hyperlink';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Text from '../Text';
-import colors from '../../constants/colors';
+
 import PrivateIcon from '../PrivateIcon';
 import {getDistance, formatDateTime} from '../../constants/utils';
 import Button from '../Button';
@@ -35,16 +35,14 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
     if (friends[host]) {
       return (
         <TouchableOpacity onPress={() => viewProfile(host)}>
-          <Text style={{color: colors.secondary}}>
-            {friends[host].username}
-          </Text>
+          <Text>{friends[host].username}</Text>
         </TouchableOpacity>
       );
     }
     if (users[host]) {
       return (
         <TouchableOpacity onPress={() => viewProfile(host)}>
-          <Text style={{color: colors.secondary}}>{users[host].username}</Text>
+          <Text>{users[host].username}</Text>
         </TouchableOpacity>
       );
     }
@@ -70,27 +68,26 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
               ]);
             }}
             style={{alignSelf: 'center'}}
-            color={colors.appRed}
-            text="Delete"
-          />
+            status="danger">
+            Delete
+          </Button>
         );
       } else {
         return (
           <Button
-            color={colors.appRed}
-            text="Leave"
+            status="danger"
             style={{alignSelf: 'center'}}
             onPress={() => {
               remove(session.key, session.private);
               close();
-            }}
-          />
+            }}>
+            Leave
+          </Button>
         );
       }
     } else {
       return (
         <Button
-          text="Join"
           style={{alignSelf: 'center'}}
           onPress={async () => {
             await database()
@@ -108,7 +105,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
               'You should now see this session in your session chats',
             );
           }}
-        />
+        >Join</Button>
       );
     }
   };
@@ -138,7 +135,6 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
               <Icon
                 size={40}
                 name="md-information-circle"
-                style={{color: colors.secondary}}
               />
             </TouchableOpacity>
           </View>
@@ -159,13 +155,13 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
                   <Icon
                     size={25}
                     name="md-chatboxes"
-                    style={{color: colors.secondary, paddingHorizontal: 10}}
+                    style={{ paddingHorizontal: 10}}
                   />
                 </TouchableOpacity>
               )}
               {session.private && <PrivateIcon />}
             </View>
-            <Hyperlink linkStyle={{color: colors.secondary}} linkDefault>
+            <Hyperlink linkDefault>
               <Text style={{marginVertical: 5, color: '#999'}}>
                 Details: <Text style={{color: '#000'}}>{session.details}</Text>
               </Text>
@@ -219,7 +215,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
               <TouchableOpacity onPress={() => viewGym(session.gym)}>
                 <Text style={{color: '#999', marginVertical: 10}}>
                   Gym:{' '}
-                  <Text style={{color: colors.secondary, fontWeight: 'bold'}}>
+                  <Text style={{ fontWeight: 'bold'}}>
                     {session.gym}
                   </Text>
                 </Text>

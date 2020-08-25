@@ -15,7 +15,6 @@ import {
 import Image from 'react-native-fast-image';
 import Collapsible from 'react-native-collapsible';
 import styles from './styles';
-import colors from '../../constants/colors';
 import {getMentionsList} from '../../constants/utils';
 import CommentsProps from '../../types/components/Comments';
 import Profile from '../../types/Profile';
@@ -322,11 +321,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
           {like.image ? (
             <Image style={[styles.likeImage]} source={{uri: like.image}} />
           ) : (
-            <IIcon
-              name="md-contact"
-              size={40}
-              style={{color: colors.primary}}
-            />
+            <IIcon name="md-contact" size={40} />
           )}
           <Text>{like.name || like.username}</Text>
         </View>
@@ -412,7 +407,6 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                       style={{
                         textAlign: 'center',
                         paddingTop: 15,
-                        color: colors.secondary,
                       }}>
                       Show more...
                     </Text>
@@ -547,7 +541,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                         <IIcon
                           name="md-contact"
                           size={35}
-                          style={{color: colors.primary}}
+      
                         />
                       )}
                       <Text style={{marginLeft: 10}}>{item.username}</Text>
@@ -623,7 +617,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
             onPress={() => {
               this.paginate(data, 'up');
             }}>
-            <Text style={{textAlign: 'center', color: colors.secondary}}>
+            <Text style={{textAlign: 'center'}}>
               Show more
             </Text>
           </TouchableOpacity>

@@ -5,7 +5,6 @@ import Swiper from 'react-native-swiper';
 import {connect} from 'react-redux';
 import database from '@react-native-firebase/database';
 import styles from '../styles/welcomeStyles';
-import colors from '../constants/colors';
 import str from '../constants/strings';
 import {getResource, renderImages} from '../constants/utils';
 import FbFriendsModal from '../components/FbFriendsModal';
@@ -58,7 +57,7 @@ const Welcome: FunctionComponent<WelcomeProps> = ({
       style={styles.wrapper}
       showsButtons
       loop={false}
-      activeDotColor={colors.secondary}
+      //activeDotColor={colors.secondary}
       nextButton={<ThemedIcon name="arrow-ios-forward" size={50} />}
       prevButton={<ThemedIcon name="arrow-ios-back" size={50} />}>
       <Layout style={styles.slide} level="1">

@@ -1,17 +1,25 @@
-import React, { FunctionComponent, useRef } from 'react';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { connect } from 'react-redux';
+import React, {FunctionComponent, useRef} from 'react';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import {connect} from 'react-redux';
 import Modal from 'react-native-modalbox';
-import { GOOGLE_API_KEY } from 'react-native-dotenv';
-import styles, { locationSearch } from './styles';
+import {GOOGLE_API_KEY} from 'react-native-dotenv';
+import styles, {locationSearch} from './styles';
 import Button from '../Button';
 import LocationSearchModalProps from '../../types/components/LocationSearchModal';
-import colors from '../../constants/colors';
 
-const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({ isOpen, onPress, onClosed }) => {
+const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({
+  isOpen,
+  onPress,
+  onClosed,
+}) => {
   const ref = useRef<GooglePlacesAutocomplete>();
   return (
-    <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center" key={isOpen ? 1 : 2}>
+    <Modal
+      onClosed={onClosed}
+      isOpen={isOpen}
+      style={styles.modal}
+      position="center"
+      key={isOpen ? 1 : 2}>
       <GooglePlacesAutocomplete
         ref={ref}
         placeholder="Search..."
@@ -27,17 +35,17 @@ const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({ isOpen, o
           }
         }}
         styles={locationSearch}
-        query={{ key: GOOGLE_API_KEY, language: 'en', types: 'establishment' }}
+        query={{key: GOOGLE_API_KEY, language: 'en', types: 'establishment'}}
         debounce={200}
         nearbyPlacesAPI="GooglePlacesSearch"
-        GooglePlacesSearchQuery={{ rankby: 'distance', types: 'gym' }}
+        GooglePlacesSearchQuery={{rankby: 'distance', types: 'gym'}}
       />
       <Button
-        text="Cancel"
         onPress={onClosed}
-        style={{ alignSelf: 'center', marginBottom: 10 }}
-        color={colors.appRed}
-      />
+        status="danger"
+        style={{alignSelf: 'center', marginBottom: 10}}>
+        Cancel
+      </Button>
     </Modal>
   );
 };

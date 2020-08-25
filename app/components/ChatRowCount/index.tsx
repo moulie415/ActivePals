@@ -4,6 +4,7 @@ import {View} from 'react-native';
 import styles from './styles';
 import ChatRowCountProps from '../../types/components/ChatRowCount';
 import {Text} from '@ui-kitten/components';
+import { MyRootState } from '../../types/Shared';
 
 const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({
   unreadCount,
@@ -20,7 +21,7 @@ const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({
   return null;
 };
 
-const mapStateToProps = ({chats}) => ({
+const mapStateToProps = ({chats}: MyRootState) => ({
   unreadCount: chats.unreadCount,
 });
 

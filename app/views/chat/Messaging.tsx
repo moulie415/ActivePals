@@ -6,6 +6,7 @@ import {
   View,
   BackHandler,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import {pathOr} from 'ramda';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -17,7 +18,7 @@ import {isIphoneX} from 'react-native-iphone-x-helper';
 import {GiftedChat, Bubble, MessageText} from 'react-native-gifted-chat';
 import {connect} from 'react-redux';
 import Text from '../../components/Text';
-import colors from '../../constants/colors';
+
 import globalStyles from '../../styles/globalStyles';
 import Header from '../../components/Header/header';
 import {guid, sortMessagesByCreatedAt} from '../../constants/utils';
@@ -453,7 +454,6 @@ class Messaging extends Component<MessagingProps, State> {
                 // @ts-ignore
                 wrapperStyle={{
                   right: {
-                    backgroundColor: colors.secondary,
                     ...globalStyles.bubbleShadow,
                   },
                   left: {
@@ -476,7 +476,6 @@ class Messaging extends Component<MessagingProps, State> {
                     position === 'left')) && (
                   <Text
                     style={{
-                      color: colors.secondary,
                       fontSize: 12,
                       padding: 10,
                       paddingBottom: 0,
@@ -499,11 +498,7 @@ class Messaging extends Component<MessagingProps, State> {
                     paddingLeft: 15,
                     paddingRight: 10,
                   }}>
-                  <Icon
-                    size={25}
-                    name="ios-attach"
-                    style={{color: colors.secondary}}
-                  />
+                  <Icon size={25} name="ios-attach" />
                 </TouchableOpacity>
                 {/* <TouchableOpacity
                 style={{padding: 5}}
@@ -563,7 +558,7 @@ class Messaging extends Component<MessagingProps, State> {
             /> */}
         {spinner && (
           <View style={globalStyles.indicator}>
-            <PulseIndicator color={colors.secondary} />
+            <ActivityIndicator />
           </View>
         )}
       </View>

@@ -2,11 +2,11 @@ import React, {Component} from 'react';
 import {View, TouchableOpacity, FlatList} from 'react-native';
 import {connect} from 'react-redux';
 import Image from 'react-native-fast-image';
-import colors from '../../constants/colors';
 import {getSimplifiedTime, sortChatsByDate} from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import DirectMessagesProps from '../../types/views/chat/DirectMessages';
 import {Text, Icon} from '@ui-kitten/components';
+import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 // import  styles  from './styles/loginStyles'
 
 class DirectMessages extends Component<DirectMessagesProps> {
@@ -14,7 +14,6 @@ class DirectMessages extends Component<DirectMessagesProps> {
     const {navigation, friends, chats, profile} = this.props;
     return (
       <FlatList
-        style={{backgroundColor: colors.bgColor}}
         data={sortChatsByDate(Object.values(chats))}
         keyExtractor={(chat) => chat.chatId}
         renderItem={({item}) => {
@@ -31,7 +30,6 @@ class DirectMessages extends Component<DirectMessagesProps> {
                 }}>
                 <View
                   style={{
-                    backgroundColor: '#fff',
                     marginBottom: 1,
                     padding: 10,
                     paddingVertical: friend.avatar ? 10 : 5,
@@ -44,11 +42,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
                       style={{height: 50, width: 50, borderRadius: 25}}
                     />
                   ) : (
-                    <Icon
-                      size={60}
-                      name="md-contact"
-                      style={{color: colors.primary}}
-                    />
+                    <ThemedIcon size={60} name="md-contact" />
                   )}
                   <View
                     style={{
@@ -105,9 +99,8 @@ class DirectMessages extends Component<DirectMessagesProps> {
               justifyContent: 'center',
               alignItems: 'center',
               paddingHorizontal: 20,
-              backgroundColor: colors.bgColor,
             }}>
-            <Text style={{color: colors.primary, textAlign: 'center'}}>
+            <Text style={{textAlign: 'center'}}>
               {
                 "You haven't started any chats yet, also please make sure you are connected to the internet"
               }

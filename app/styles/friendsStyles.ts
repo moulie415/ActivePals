@@ -1,5 +1,4 @@
-import { StyleSheet } from "react-native"
-import colors from '../constants/colors'
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   modal: {
@@ -8,8 +7,8 @@ export default StyleSheet.create({
     borderRadius: 10,
   },
   modalText: {
-    color: "black",
-    fontSize: 22
+    color: 'black',
+    fontSize: 22,
   },
   usernameInput: {
     borderColor: '#999',
@@ -22,12 +21,10 @@ export default StyleSheet.create({
   },
   button: {
     color: '#fff',
-    backgroundColor: colors.secondary,
     alignSelf: 'center',
     padding: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
-    marginVertical: 5
+    marginVertical: 5,
   },
-
-})
+});

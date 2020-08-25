@@ -1,5 +1,4 @@
 import {StyleSheet} from 'react-native';
-import colors from '../constants/colors';
 
 export default StyleSheet.create({
   shadow: {
@@ -41,5 +40,4 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
 });

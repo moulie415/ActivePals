@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import colors from '../../constants/colors';
 import styles from './styles';
 import {sendRequest, fetchFbFriends} from '../../actions/friends';
 import {getNameString} from '../../constants/utils';
@@ -92,7 +91,6 @@ const FbFriendsModal: FunctionComponent<FbFriendsModalProps> = ({
                         name="md-contact"
                         size={35}
                         style={{
-                          color: colors.primary,
                           marginTop: Platform.OS === 'ios' ? -2 : 0,
                         }}
                       />
@@ -105,7 +103,6 @@ const FbFriendsModal: FunctionComponent<FbFriendsModalProps> = ({
                         size={25}
                         name="ios-checkmark-circle"
                         style={{
-                          color: colors.primary,
                           textAlign: 'right',
                           flex: 1,
                         }}

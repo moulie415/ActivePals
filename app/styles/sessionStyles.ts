@@ -1,5 +1,4 @@
 import {StyleSheet} from 'react-native';
-import colors from '../constants/colors';
 
 export default StyleSheet.create({
   spinner: {
@@ -16,11 +15,10 @@ export default StyleSheet.create({
     flex: 1,
   },
   container: {
-    backgroundColor: colors.primary,
+   
   },
   button: {
     borderRadius: 5,
-    backgroundColor: colors.secondary,
     flex: 1,
     borderColor: '#fff',
     alignItems: 'center',

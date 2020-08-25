@@ -11,7 +11,6 @@ import database from '@react-native-firebase/database';
 import Image from 'react-native-fast-image';
 import Modal from 'react-native-modalbox';
 import {connect} from 'react-redux';
-import colors from '../constants/colors';
 import styles from '../styles/friendsStyles';
 import {getStateColor, sortByState} from '../constants/utils';
 import {
@@ -35,7 +34,6 @@ class Friends extends Component<FriendsProps, State> {
       refreshing: false,
     };
   }
-
 
   async refresh() {
     const {profile, getFriends} = this.props;
@@ -115,7 +113,6 @@ class Friends extends Component<FriendsProps, State> {
     const {refreshing} = this.state;
     return (
       <FlatList
-        style={{backgroundColor: colors.bgColor}}
         data={sortByState(Object.values(friends))}
         keyExtractor={(friend) => friend.uid}
         onRefresh={() => this.refresh()}
@@ -211,7 +208,6 @@ class Friends extends Component<FriendsProps, State> {
                         size={65}
                         name="person"
                         style={{
-                          color: colors.primary,
                           marginTop: Platform.OS === 'ios' ? -10 : 0,
                         }}
                       />
@@ -288,7 +284,7 @@ class Friends extends Component<FriendsProps, State> {
               alignItems: 'center',
               marginHorizontal: 20,
             }}>
-            <Text style={{color: colors.primary, textAlign: 'center'}}>
+            <Text style={{textAlign: 'center'}}>
               You don't have any pals yet, also please make sure you are
               connected to the internet
             </Text>
@@ -323,10 +319,10 @@ class Friends extends Component<FriendsProps, State> {
             }}>
             <Button
               onPress={() => this.setState({modalOpen: false})}
-              text="Cancel"
-              color={colors.appRed}
-            />
-            <Button onPress={() => this.sendRequest(username)} text="Submit" />
+              status="danger">
+              Cancel
+            </Button>
+            <Button onPress={() => this.sendRequest(username)}>Submit</Button>
           </View>
         </Modal>
       </>

@@ -11,13 +11,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Image as SlowImage,
+  ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import ModalBox from 'react-native-modalbox';
-import {PulseIndicator} from 'react-native-indicators';
 import database from '@react-native-firebase/database';
 import Video from 'react-native-video';
 import Share, {Options} from 'react-native-share';
@@ -25,7 +25,6 @@ import RNFetchBlob from 'rn-fetch-blob';
 import Image from 'react-native-fast-image';
 import VideoCompress from 'react-native-video-compressor';
 import ActionSheet from 'react-native-actionsheet';
-import colors from '../constants/colors';
 import styles from '../styles/homeStyles';
 import sStyles from '../styles/settingsStyles';
 import Comments from '../components/comments';
@@ -130,7 +129,7 @@ class Home extends Component<HomeProps, State> {
             ? navigation.navigate('ProfileView', {uid})
             : navigation.navigate('Profile');
         }}>
-        <Text style={{fontWeight: 'bold', color: colors.secondary, flex: 1}}>
+        <Text style={{fontWeight: 'bold', flex: 1}}>
           {uid === profile.uid ? 'You' : this.getUsername(uid)}
         </Text>
       </TouchableOpacity>
@@ -231,7 +230,6 @@ class Home extends Component<HomeProps, State> {
             style={{
               width: 25,
               height: 25,
-              tintColor: item.rep ? colors.secondary : colors.postIcon,
             }}
           />
           {/* <Text style={{color: item.rep ? colors.secondary : colors.postIcon, marginLeft: 10}}>Rep</Text> */}
@@ -439,7 +437,7 @@ class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{marginBottom: 5}}>
-              <ParsedText text={item.text} style={{color: colors.textGrey}} />
+              <ParsedText text={item.text} />
             </View>
             {this.repCommentCount(item)}
             {this.repsAndComments(item)}
@@ -470,7 +468,7 @@ class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{margin: 5, marginHorizontal: 10}}>
-              <ParsedText text={item.text} style={{color: colors.textGrey}} />
+              <ParsedText text={item.text} />
             </View>
             <TouchableOpacity
               activeOpacity={1}
@@ -517,7 +515,7 @@ class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{margin: 10}}>
-              <ParsedText text={item.text} style={{color: colors.textGrey}} />
+              <ParsedText text={item.text} />
             </View>
             <TouchableWithoutFeedback
               onPress={() => {
@@ -634,7 +632,7 @@ class Home extends Component<HomeProps, State> {
                         this.setState({spinner: false});
                       });
                     }}>
-                    <Text style={{color: colors.secondary}}>Load more</Text>
+                    <Text>Load more</Text>
                   </TouchableOpacity>
                 </Card>
               );
@@ -901,7 +899,7 @@ class Home extends Component<HomeProps, State> {
         </ScrollView>
         {spinner && (
           <View style={sStyles.spinner}>
-            <PulseIndicator color={colors.secondary} />
+            <ActivityIndicator />
           </View>
         )}
         <Modal onRequestClose={() => null} visible={showImage} transparent>

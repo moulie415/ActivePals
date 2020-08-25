@@ -6,7 +6,6 @@ import {
   getSimplifiedTime,
   sortChatsByDate,
 } from '../../constants/utils';
-import colors from '../../constants/colors';
 import ChatRowCount from '../../components/ChatRowCount';
 import SessionChatsProps from '../../types/views/chat/SessionChats';
 import {Text} from '@ui-kitten/components';
@@ -16,7 +15,6 @@ class SessionChats extends Component<SessionChatsProps> {
     const {chats, navigation} = this.props;
     return (
       <FlatList
-        style={{backgroundColor: colors.bgColor}}
         data={sortChatsByDate(Object.values(chats))}
         keyExtractor={(chat) => chat.key}
         renderItem={({item}) => {
@@ -75,11 +73,10 @@ class SessionChats extends Component<SessionChatsProps> {
               flex: 1,
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: colors.bgColor,
             }}>
             <Text
               style={{
-                color: colors.primary,
+
                 textAlign: 'center',
                 marginHorizontal: 20,
               }}>

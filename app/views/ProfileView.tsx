@@ -7,6 +7,7 @@ import {
   Platform,
   Modal,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,7 +17,7 @@ import Image from 'react-native-fast-image';
 import database from '@react-native-firebase/database';
 import Text from '../components/Text';
 import hStyles from '../styles/homeStyles';
-import colors from '../constants/colors';
+
 import {calculateAge, getFormattedBirthday} from '../constants/utils';
 import Header from '../components/Header/header';
 import globalStyles from '../styles/globalStyles';
@@ -77,7 +78,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
       .once('value', (user) => {
         this.setState({profile: user.val()});
         if (user.val().gym) {
-         database()
+          database()
             .ref(`gyms/${user.val().gym}`)
             .once('value', (gym) => {
               this.setState({gym: gym.val(), loaded: true});
@@ -148,7 +149,6 @@ class ProfileView extends Component<ProfileViewProps, State> {
                     style={{
                       height: 150,
                       width: '100%',
-                      backgroundColor: colors.primaryLighter,
                       justifyContent: 'center',
                     }}
                   />
@@ -166,7 +166,6 @@ class ProfileView extends Component<ProfileViewProps, State> {
                         marginTop: -45,
                         marginHorizontal: 20,
                         borderWidth: 0.5,
-                        borderColor: '#fff',
                       },
                       globalStyles.shadow,
                     ]}>
@@ -180,15 +179,12 @@ class ProfileView extends Component<ProfileViewProps, State> {
                     name="md-contact"
                     size={80}
                     style={{
-                      color: colors.primary,
                       marginTop: -45,
                       textAlign: 'center',
-                      backgroundColor: '#fff',
                       marginBottom: 10,
                       paddingHorizontal: 10,
                       paddingTop: Platform.OS === 'ios' ? 5 : 0,
                       borderWidth: 1,
-                      borderColor: colors.secondary,
                     }}
                   />
                 )}
@@ -237,11 +233,9 @@ class ProfileView extends Component<ProfileViewProps, State> {
               )}
 
               {accountType && isFriend && (
-                <Text
-                  style={{color: '#999', marginLeft: 10, marginVertical: 5}}>
+                <Text style={{marginLeft: 10, marginVertical: 5}}>
                   Account type:
-                  <Text
-                    style={{color: colors.secondary}}>{` ${accountType}`}</Text>
+                  <Text>{` ${accountType}`}</Text>
                 </Text>
               )}
 
@@ -250,22 +244,19 @@ class ProfileView extends Component<ProfileViewProps, State> {
                   onPress={() =>
                     navigation.navigate('Gym', {id: gym.place_id})
                   }>
-                  <Text
-                    style={{color: '#999', marginLeft: 10, marginVertical: 5}}>
+                  <Text style={{marginLeft: 10, marginVertical: 5}}>
                     Gym:
-                    <Text
-                      style={{color: colors.secondary}}>{` ${gym.name}`}</Text>
+                    <Text>{` ${gym.name}`}</Text>
                   </Text>
                 </TouchableOpacity>
               )}
 
               {birthday && isFriend && (
                 <Text style={{marginLeft: 10, marginVertical: 5}}>
-                  <Text
-                    style={{color: '#999', marginLeft: 10, marginVertical: 5}}>
+                  <Text style={{marginLeft: 10, marginVertical: 5}}>
                     Birthday:{' '}
                   </Text>
-                  <Text style={{color: colors.secondary}}>
+                  <Text>
                     {`${getFormattedBirthday(birthday)} (${calculateAge(
                       new Date(birthday),
                     )})`}
@@ -274,30 +265,23 @@ class ProfileView extends Component<ProfileViewProps, State> {
               )}
 
               {isFriend && (
-                <Text
-                  style={{color: '#999', marginLeft: 10, marginVertical: 5}}>
+                <Text style={{marginLeft: 10, marginVertical: 5}}>
                   {'Preferred activity: '}
-                  <Text style={{color: colors.secondary}}>
-                    {activity || 'Unspecified'}
-                  </Text>
+                  <Text>{activity || 'Unspecified'}</Text>
                 </Text>
               )}
 
               {activity && isFriend && (
-                <Text
-                  style={{color: '#999', marginLeft: 10, marginVertical: 5}}>
+                <Text style={{marginLeft: 10, marginVertical: 5}}>
                   {'Level: '}
-                  <Text style={{color: colors.secondary}}>
-                    {level || 'Unspecified'}
-                  </Text>
+                  <Text>{level || 'Unspecified'}</Text>
                 </Text>
               )}
             </View>
 
             {isFriend && (
               <Button
-                color={colors.appRed}
-                text="Remove pal"
+                status="danger"
                 style={{alignSelf: 'center', margin: 10}}
                 onPress={() => {
                   Alert.alert('Remove pal', 'Are you sure?', [
@@ -311,13 +295,14 @@ class ProfileView extends Component<ProfileViewProps, State> {
                       style: 'destructive',
                     },
                   ]);
-                }}
-              />
+                }}>
+                Remove pal
+              </Button>
             )}
           </View>
         ) : (
           <View style={hStyles.spinner}>
-            <PulseIndicator color={colors.secondary} />
+            <ActivityIndicator />
           </View>
         )}
         <Modal onRequestClose={() => null} visible={showImage} transparent>

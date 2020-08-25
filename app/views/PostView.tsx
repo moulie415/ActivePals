@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   View,
@@ -12,20 +12,21 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   Image as SlowImage,
+  ActivityIndicator,
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
-import Share, { Options } from 'react-native-share';
+import Share, {Options} from 'react-native-share';
 import Video from 'react-native-video';
-import { connect } from 'react-redux';
-import { PulseIndicator } from 'react-native-indicators';
+import {connect} from 'react-redux';
+import {PulseIndicator} from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import ParsedText from '../components/ParsedText';
 import Text from '../components/Text';
-import colors from '../constants/colors';
+
 import Comments from '../components/comments';
 import sStyles from '../styles/settingsStyles';
-import { likesExtractor, getSimplifiedTime } from '../constants/utils';
+import {likesExtractor, getSimplifiedTime} from '../constants/utils';
 import styles from '../styles/postViewStyles';
 import Header from '../components/Header/header';
 import hStyles from '../styles/homeStyles';
@@ -55,7 +56,7 @@ interface State {
   userFetchAmount: number;
   showImage: boolean;
   playing?: boolean;
-  selectedImage?: { url: string }[];
+  selectedImage?: {url: string}[];
   focusCommentInput?: boolean;
   repsId: string;
   repCount: number;
@@ -80,14 +81,14 @@ class PostView extends Component<PostViewProps, State> {
   }
 
   async componentDidMount() {
-    const { getPost, getComments, navigation } = this.props;
-    const { postId } = navigation.state.params;
+    const {getPost, getComments, navigation} = this.props;
+    const {postId} = navigation.state.params;
     await getPost(postId);
     getComments(postId);
   }
 
   getUsername(uid) {
-    const { friends, users } = this.props;
+    const {friends, users} = this.props;
     if (friends[uid]) {
       return friends[uid].username;
     }
@@ -98,14 +99,15 @@ class PostView extends Component<PostViewProps, State> {
   }
 
   getUsernameFormatted(uid) {
-    const { profile, navigation } = this.props;
+    const {profile, navigation} = this.props;
     return (
       <TouchableOpacity
         onPress={() => {
-          uid !== profile.uid ? navigation.navigate('ProfileView', { uid }) : navigation.navigate('Profile');
-        }}
-      >
-        <Text style={{ fontWeight: 'bold', color: colors.secondary, flex: 1 }}>
+          uid !== profile.uid
+            ? navigation.navigate('ProfileView', {uid})
+            : navigation.navigate('Profile');
+        }}>
+        <Text style={{fontWeight: 'bold', flex: 1}}>
           {uid === profile.uid ? 'You' : this.getUsername(uid)}
         </Text>
       </TouchableOpacity>
@@ -117,9 +119,9 @@ class PostView extends Component<PostViewProps, State> {
   };
 
   async sharePost(item) {
-    const { profile } = this.props;
-    this.setState({ spinner: true });
-    const { username } = profile;
+    const {profile} = this.props;
+    this.setState({spinner: true});
+    const {username} = profile;
     const text = item.text ? `"${item.text}"` : '';
     const options: Options = {
       message: `${username} shared a post from ActivePals:\n ${text}`,
@@ -127,61 +129,89 @@ class PostView extends Component<PostViewProps, State> {
     };
     if (item.type === 'photo') {
       try {
-        const resp = await RNFetchBlob.config({ fileCache: false }).fetch('GET', item.url);
+        const resp = await RNFetchBlob.config({fileCache: false}).fetch(
+          'GET',
+          item.url,
+        );
         const base64 = await resp.base64();
         const dataUrl = `data:image/jpeg;base64,${base64}`;
         options.url = dataUrl;
       } catch (e) {
         Alert.alert('Error', 'There was a problem sharing the photo');
-        this.setState({ spinner: false });
+        this.setState({spinner: false});
         return;
       }
     }
     try {
       await Share.open(options);
       Alert.alert('Success', 'Post Shared');
-      this.setState({ spinner: false });
+      this.setState({spinner: false});
     } catch (e) {
-      this.setState({ spinner: false });
+      this.setState({spinner: false});
       console.log(e);
     }
   }
 
   repCommentCount(item) {
-    const { onRepPost, getRepsUsers } = this.props;
+    const {onRepPost, getRepsUsers} = this.props;
     return (
-      <View style={{ flexDirection: 'row', borderTopWidth: 0.5, borderBottomWidth: 0.5, borderColor: '#999' }}>
-        <View style={{ flex: 1, marginVertical: 10, flexDirection: 'row', alignItems: 'center' }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          borderTopWidth: 0.5,
+          borderBottomWidth: 0.5,
+          borderColor: '#999',
+        }}>
+        <View
+          style={{
+            flex: 1,
+            marginVertical: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
           {item.type !== 'video' && (
             <TouchableOpacity
               onPress={() => this.sharePost(item)}
-              style={{ flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center' }}
-            >
-              <Icon size={25} style={{ color: colors.postIcon }} name="md-share" />
+              style={{
+                flexDirection: 'row',
+                paddingHorizontal: 25,
+                alignItems: 'center',
+              }}>
+              <Icon size={25} name="md-share" />
               {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
             </TouchableOpacity>
           )}
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: '#999', textAlign: 'center' }}>
-              {`${item.commentCount || 0} ${item.commentCount === 1 ? ' comment' : ' comments'}`}
+          <View style={{flex: 1}}>
+            <Text style={{color: '#999', textAlign: 'center'}}>
+              {`${item.commentCount || 0} ${
+                item.commentCount === 1 ? ' comment' : ' comments'
+              }`}
             </Text>
           </View>
-          <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
+          <View style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
             <TouchableOpacity onPress={() => onRepPost(item)}>
               <SlowImage
                 source={item.rep ? weightUp : weightDown}
-                style={{ width: 25, height: 25, tintColor: item.rep ? colors.secondary : '#616770' }}
+                style={{
+                  width: 25,
+                  height: 25,
+                }}
               />
             </TouchableOpacity>
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
               <TouchableOpacity
                 onPress={async () => {
-                  this.setState({ likesModalVisible: true, repsId: item.key, repCount: item.repCount });
+                  this.setState({
+                    likesModalVisible: true,
+                    repsId: item.key,
+                    repCount: item.repCount,
+                  });
                   await getRepsUsers(item.key);
-                }}
-              >
-                <Text style={{ color: '#999', textAlign: 'center' }}>
-                  {`${item.repCount || 0} ${item.repCount === 1 ? ' rep' : ' reps'}`}
+                }}>
+                <Text style={{color: '#999', textAlign: 'center'}}>
+                  {`${item.repCount || 0} ${
+                    item.repCount === 1 ? ' rep' : ' reps'
+                  }`}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -192,15 +222,17 @@ class PostView extends Component<PostViewProps, State> {
   }
 
   fetchAvatar(uid) {
-    const { profile, friends, navigation } = this.props;
+    const {profile, friends, navigation} = this.props;
     const navigate = () =>
-      uid !== profile.uid ? navigation.navigate('ProfileView', { uid }) : navigation.navigate('Profile');
+      uid !== profile.uid
+        ? navigation.navigate('ProfileView', {uid})
+        : navigation.navigate('Profile');
     if (profile.avatar && uid === profile.uid) {
       return (
         <TouchableOpacity onPress={navigate}>
           <Image
-            source={{ uri: profile.avatar }}
-            style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
+            source={{uri: profile.avatar}}
+            style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}
           />
         </TouchableOpacity>
       );
@@ -209,35 +241,34 @@ class PostView extends Component<PostViewProps, State> {
       return (
         <TouchableOpacity onPress={navigate}>
           <Image
-            source={{ uri: friends[uid].avatar }}
-            style={{ height: 35, width: 35, borderRadius: 17, marginRight: 10 }}
+            source={{uri: friends[uid].avatar}}
+            style={{height: 35, width: 35, borderRadius: 17, marginRight: 10}}
           />
         </TouchableOpacity>
       );
     }
     return (
       <TouchableOpacity onPress={navigate}>
-        <Icon name="md-contact" size={45} style={{ color: colors.primary, marginRight: 10 }} />
+        <Icon name="md-contact" size={45} style={{marginRight: 10}} />
       </TouchableOpacity>
     );
   }
 
   renderRepsFooter() {
-    const { userFetchAmount } = this.state;
-    const { getRepsUsers, navigation, feed } = this.props;
-    const { postId } = navigation.state.params;
+    const {userFetchAmount} = this.state;
+    const {getRepsUsers, navigation, feed} = this.props;
+    const {postId} = navigation.state.params;
     const post = feed[postId];
     if (post && post.repCount > userFetchAmount) {
       return (
         <TouchableOpacity
-          style={{ alignItems: 'center' }}
+          style={{alignItems: 'center'}}
           onPress={() => {
-            this.setState({ userFetchAmount: userFetchAmount + 5 }, () => {
+            this.setState({userFetchAmount: userFetchAmount + 5}, () => {
               getRepsUsers(postId, userFetchAmount);
             });
-          }}
-        >
-          <Text style={{ color: colors.secondary }}>Show more</Text>
+          }}>
+          <Text>Show more</Text>
         </TouchableOpacity>
       );
     }
@@ -245,20 +276,26 @@ class PostView extends Component<PostViewProps, State> {
   }
 
   renderPost(item) {
-    const { playing } = this.state;
-    const { navigation } = this.props;
+    const {playing} = this.state;
+    const {navigation} = this.props;
     switch (item.type) {
       case 'status':
         return (
-          <View style={{ padding: 10, margin: 5 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{padding: 10, margin: 5}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {this.fetchAvatar(item.uid)}
-              <View style={{ flex: 1 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
                   {this.getUsernameFormatted(item.uid)}
-                  <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+                  <Text style={{color: '#999'}}>
+                    {getSimplifiedTime(item.createdAt)}
+                  </Text>
                 </View>
-                <ParsedText text={item.text} style={{ color: colors.textGrey }} />
+                <ParsedText text={item.text} />
               </View>
             </View>
           </View>
@@ -266,31 +303,48 @@ class PostView extends Component<PostViewProps, State> {
       case 'photo':
         return (
           <View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', padding: 10, paddingBottom: 0 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: 10,
+                paddingBottom: 0,
+              }}>
               {this.fetchAvatar(item.uid)}
-              <View style={{ flex: 1 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
                   {this.getUsernameFormatted(item.uid)}
-                  <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+                  <Text style={{color: '#999'}}>
+                    {getSimplifiedTime(item.createdAt)}
+                  </Text>
                 </View>
-                <ParsedText text={item.text} style={{ color: colors.textGrey }} />
+                <ParsedText text={item.text} />
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => this.setState({ selectedImage: [{ url: item.url }], showImage: true })}
-              style={{ marginTop: 10, marginBottom: 10 }}
-            >
+              onPress={() =>
+                this.setState({
+                  selectedImage: [{url: item.url}],
+                  showImage: true,
+                })
+              }
+              style={{marginTop: 10, marginBottom: 10}}>
               <Image
-                style={{ width: '100%', height: SCREEN_HEIGHT / 2 - 55 }}
+                style={{width: '100%', height: SCREEN_HEIGHT / 2 - 55}}
                 resizeMode="contain"
-                source={{ uri: item.url }}
+                source={{uri: item.url}}
               />
             </TouchableOpacity>
           </View>
         );
       case 'video':
         return (
-          <TouchableWithoutFeedback onPress={() => this.setState({ playing: false })}>
+          <TouchableWithoutFeedback
+            onPress={() => this.setState({playing: false})}>
             <View>
               <View
                 style={{
@@ -300,38 +354,50 @@ class PostView extends Component<PostViewProps, State> {
                   padding: 10,
                   paddingBottom: 0,
                   zIndex: 2,
-                }}
-              >
+                }}>
                 {this.fetchAvatar(item.uid)}
-                <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{flex: 1}}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
                     {this.getUsernameFormatted(item.uid)}
-                    <Text style={{ color: '#999' }}>{getSimplifiedTime(item.createdAt)}</Text>
+                    <Text style={{color: '#999'}}>
+                      {getSimplifiedTime(item.createdAt)}
+                    </Text>
                   </View>
-                  <ParsedText text={item.text} style={{ color: colors.textGrey }} />
+                  <ParsedText text={item.text} />
                 </View>
               </View>
               <Video
-                ref={ref => {
+                ref={(ref) => {
                   this.player = ref;
                 }}
-                source={{ uri: item.url }}
-                style={{ width: '100%', height: SCREEN_HEIGHT / 2 - 55 }}
+                source={{uri: item.url}}
+                style={{width: '100%', height: SCREEN_HEIGHT / 2 - 55}}
                 paused={!playing}
                 ignoreSilentSwitch="ignore"
                 repeat
-                onFullscreenPlayerDidPresent={() => this.setState({ playing: false })}
+                onFullscreenPlayerDidPresent={() =>
+                  this.setState({playing: false})
+                }
                 resizeMode="contain"
                 onBuffer={() => console.log('buffering')} // Callback when remote video is buffering
-                onError={e => Alert.alert('Error', e.error.errorString)}
+                onError={(e) => Alert.alert('Error', e.error.errorString)}
               />
               {!playing && (
                 <View style={hStyles.playButtonContainer}>
-                  <TouchableOpacity onPress={() => this.setState({ playing: true })}>
+                  <TouchableOpacity
+                    onPress={() => this.setState({playing: true})}>
                     <Icon
                       name="md-play"
                       size={50}
-                      style={{ color: '#fff', backgroundColor: 'transparent', opacity: 0.8 }}
+                      style={{
+                        color: '#fff',
+                        backgroundColor: 'transparent',
+                        opacity: 0.8,
+                      }}
                     />
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -345,15 +411,18 @@ class PostView extends Component<PostViewProps, State> {
                       borderRadius: 5,
                     }}
                     onPress={() => {
-                      this.setState({ playing: false });
+                      this.setState({playing: false});
                       if (Platform.OS === 'ios') {
                         this.player.presentFullscreenPlayer();
                       } else {
-                        navigation.navigate('FullScreenVideo', { uri: item.url });
+                        navigation.navigate('FullScreenVideo', {uri: item.url});
                       }
-                    }}
-                  >
-                    <Icon name="md-expand" size={30} style={{ backgroundColor: 'transparent', color: '#fff' }} />
+                    }}>
+                    <Icon
+                      name="md-expand"
+                      size={30}
+                      style={{backgroundColor: 'transparent', color: '#fff'}}
+                    />
                   </TouchableOpacity>
                 </View>
               )}
@@ -379,7 +448,7 @@ class PostView extends Component<PostViewProps, State> {
       getReplies,
       feed,
     } = this.props;
-    const combined = { ...users, ...friends };
+    const combined = {...users, ...friends};
     const {
       commentFetchAmount,
       selectedImage,
@@ -390,24 +459,22 @@ class PostView extends Component<PostViewProps, State> {
       repsId,
       spinner,
     } = this.state;
-    const { postId } = navigation.state.params;
+    const {postId} = navigation.state.params;
     const post = feed[postId];
     const comments = post && post.comments ? post.comments : [];
     const scrollRef = React.createRef<ScrollView>();
     return post ? (
       <KeyboardAvoidingView
-        contentContainerStyle={{ flex: 1 }}
-        style={{ flex: 1 }}
-        behavior={post && post.type === 'status' ? 'padding' : 'position'}
-      >
+        contentContainerStyle={{flex: 1}}
+        style={{flex: 1}}
+        behavior={post && post.type === 'status' ? 'padding' : 'position'}>
         <Header hasBack />
         <ScrollView
           ref={scrollRef}
-          onScroll={event => {
+          onScroll={(event) => {
             this.scrollIndex = event.nativeEvent.contentOffset.y;
           }}
-          style={styles.container}
-        >
+          style={styles.container}>
           {post && <View>{this.renderPost(post)}</View>}
           {post && this.repCommentCount(post)}
           {post && (
@@ -415,7 +482,7 @@ class PostView extends Component<PostViewProps, State> {
               <Comments
                 data={comments}
                 viewingUserName={profile.username}
-                deleteAction={c => console.log('delete comment')}
+                deleteAction={(c) => console.log('delete comment')}
                 initialDisplayCount={10}
                 editMinuteLimit={900}
                 focusCommentInput={focusCommentInput}
@@ -426,71 +493,98 @@ class PostView extends Component<PostViewProps, State> {
                   if (uid === profile.uid) {
                     navigation.navigate('Profile');
                   } else {
-                    navigation.navigate('ProfileView', { uid });
+                    navigation.navigate('ProfileView', {uid});
                   }
                 }}
                 childPropName="children"
-                isChild={c => c.parentCommentId}
-                parentIdExtractor={c => c.key}
-                keyExtractor={item => item.comment_id}
-                usernameExtractor={item => {
+                isChild={(c) => c.parentCommentId}
+                parentIdExtractor={(c) => c.key}
+                keyExtractor={(item) => item.comment_id}
+                usernameExtractor={(item) => {
                   if (item.uid === profile.uid) {
                     return 'You';
                   }
                   return friends[item.uid].username || users[item.uid].username;
                 }}
-                uidExtractor={item => item.uid}
-                editTimeExtractor={item => item.updated_at || new Date(item.created_at).toISOString()}
-                createdTimeExtractor={item => new Date(item.created_at).toISOString()}
-                bodyExtractor={item => item.text}
-                imageExtractor={item => {
+                uidExtractor={(item) => item.uid}
+                editTimeExtractor={(item) =>
+                  item.updated_at || new Date(item.created_at).toISOString()
+                }
+                createdTimeExtractor={(item) =>
+                  new Date(item.created_at).toISOString()
+                }
+                bodyExtractor={(item) => item.text}
+                imageExtractor={(item) => {
                   if (item.uid === profile.uid) {
                     return profile.avatar;
                   }
                   return friends[item.uid].avatar || users[item.uid].avatar;
                 }}
-                likeExtractor={item => item.rep}
-                reportedExtractor={item => item.reported}
-                likesExtractor={item =>
+                likeExtractor={(item) => item.rep}
+                reportedExtractor={(item) => item.reported}
+                likesExtractor={(item) =>
                   likesExtractor(
                     item,
                     profile.uid,
-                    (id: string) => navigation.navigate('ProfileView', { uid: id }),
-                    () => navigation.navigate('Profile')
+                    (id: string) =>
+                      navigation.navigate('ProfileView', {uid: id}),
+                    () => navigation.navigate('Profile'),
                   )
                 }
-                likeCountExtractor={item => item.repCount}
+                likeCountExtractor={(item) => item.repCount}
                 commentCount={feed[postId] ? feed[postId].commentCount : 0}
-                childrenCountExtractor={c => c.childrenCount}
-                timestampExtractor={item => new Date(item.created_at).toISOString()}
-                replyAction={offset => {
-                  scrollRef.current.scrollTo({ x: null, y: this.scrollIndex + offset - 300, animated: true });
+                childrenCountExtractor={(c) => c.childrenCount}
+                timestampExtractor={(item) =>
+                  new Date(item.created_at).toISOString()
+                }
+                replyAction={(offset) => {
+                  scrollRef.current.scrollTo({
+                    x: null,
+                    y: this.scrollIndex + offset - 300,
+                    animated: true,
+                  });
                 }}
                 saveAction={async (text, parentCommentId) => {
                   if (text) {
-                    await comment(profile.uid, postId, text, new Date().toString(), parentCommentId);
+                    await comment(
+                      profile.uid,
+                      postId,
+                      text,
+                      new Date().toString(),
+                      parentCommentId,
+                    );
                   }
                 }}
                 editAction={(text, c) => console.log(text)}
-                reportAction={c => console.log(c)}
-                likeAction={c => onRepComment(c)}
+                reportAction={(c) => console.log(c)}
+                likeAction={(c) => onRepComment(c)}
                 likesTapAction={(c: Comment) => {
-                  this.setState({ likesModalVisible: true, repsId: c.key, repCount: c.repCount });
+                  this.setState({
+                    likesModalVisible: true,
+                    repsId: c.key,
+                    repCount: c.repCount,
+                  });
                   getRepsUsers(c.key);
                 }}
-                paginateAction={(fromComment: Comment, direction: string, parentComment?: Comment) => {
+                paginateAction={(
+                  fromComment: Comment,
+                  direction: string,
+                  parentComment?: Comment,
+                ) => {
                   if (parentComment) {
                     getReplies(parentComment, 10, fromComment.key);
                   } else {
                     getComments(postId, 10, fromComment.key);
                   }
                 }}
-                getCommentRepsUsers={(c, amount) => getCommentRepsUsers(c, amount)}
+                getCommentRepsUsers={(c, amount) =>
+                  getCommentRepsUsers(c, amount)
+                }
               />
             </SafeAreaView>
           )}
           <RepsModal
-            onClosed={() => this.setState({ likesModalVisible: false })}
+            onClosed={() => this.setState({likesModalVisible: false})}
             isOpen={likesModalVisible}
             id={repsId}
             repCount={repCount}
@@ -500,24 +594,34 @@ class PostView extends Component<PostViewProps, State> {
               renderIndicator={(currentIndex, allSize) => null}
               loadingRender={() => (
                 <SafeAreaView>
-                  <Text style={{ color: '#fff', fontSize: 20 }}>Loading...</Text>
+                  <Text style={{color: '#fff', fontSize: 20}}>Loading...</Text>
                 </SafeAreaView>
               )}
               renderHeader={() => {
                 return (
                   <TouchableOpacity
-                    style={{ position: 'absolute', top: 20, left: 10, padding: 10, zIndex: 9999 }}
-                    onPress={() => this.setState({ selectedImage: null, showImage: false })}
-                  >
+                    style={{
+                      position: 'absolute',
+                      top: 20,
+                      left: 10,
+                      padding: 10,
+                      zIndex: 9999,
+                    }}
+                    onPress={() =>
+                      this.setState({selectedImage: null, showImage: false})
+                    }>
                     <View
                       style={{
                         backgroundColor: '#0007',
                         paddingHorizontal: 15,
                         paddingVertical: 2,
                         borderRadius: 10,
-                      }}
-                    >
-                      <Icon size={40} name="ios-arrow-back" style={{ color: '#fff' }} />
+                      }}>
+                      <Icon
+                        size={40}
+                        name="ios-arrow-back"
+                        style={{color: '#fff'}}
+                      />
                     </View>
                   </TouchableOpacity>
                 );
@@ -528,33 +632,35 @@ class PostView extends Component<PostViewProps, State> {
         </ScrollView>
         {spinner && (
           <View style={sStyles.spinner}>
-            <PulseIndicator color={colors.secondary} />
+            <ActivityIndicator />
           </View>
         )}
       </KeyboardAvoidingView>
     ) : (
       <View style={sStyles.spinner}>
-        <PulseIndicator color={colors.secondary} />
+        <ActivityIndicator />
       </View>
     );
   }
 }
 
-const mapStateToProps = ({ profile, home, friends, sharedInfo }) => ({
+const mapStateToProps = ({profile, home, friends, sharedInfo}) => ({
   profile: profile.profile,
   feed: home.feed,
   friends: friends.friends,
   users: sharedInfo.users,
 });
 
-const mapDispatchToProps = dispatch => ({
-  onRepPost: item => dispatch(repPost(item)),
+const mapDispatchToProps = (dispatch) => ({
+  onRepPost: (item) => dispatch(repPost(item)),
   comment: (uid, postId, text, created_at, parentCommentId) =>
     dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
-  onRepComment: comment => dispatch(repComment(comment)),
-  getComments: (key: string, amount?: number, endAt?: string) => dispatch(fetchComments(key, amount, endAt)),
-  getCommentRepsUsers: (comment, limit) => dispatch(fetchCommentRepsUsers(comment, limit)),
-  getPost: key => dispatch(fetchPost(key)),
+  onRepComment: (comment) => dispatch(repComment(comment)),
+  getComments: (key: string, amount?: number, endAt?: string) =>
+    dispatch(fetchComments(key, amount, endAt)),
+  getCommentRepsUsers: (comment, limit) =>
+    dispatch(fetchCommentRepsUsers(comment, limit)),
+  getPost: (key) => dispatch(fetchPost(key)),
   getRepsUsers: (postId, limit) => dispatch(fetchRepsUsers(postId, limit)),
   getReplies: (fromCommentId: Comment, limit: number, endAt?: string) =>
     dispatch(fetchReplies(fromCommentId, limit, endAt)),
