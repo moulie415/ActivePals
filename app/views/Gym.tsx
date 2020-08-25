@@ -124,7 +124,7 @@ class Gym extends Component<GymProps, State> {
         <Header hasBack title={gym && gym.name} />
         {gym ? (
           <View style={{flex: 1}}>
-            <ScrollView style={{backgroundColor: '#9993'}}>
+            <ScrollView>
               <View style={{alignItems: 'center', marginBottom: 20}}>
                 {gym && gym.photo ? (
                   <Image
@@ -149,7 +149,6 @@ class Gym extends Component<GymProps, State> {
                       height: 80,
                       marginTop: -40,
                       borderWidth: 1,
-                      backgroundColor: '#fff',
                     }}
                     source={require('../../assets/images/dumbbell.png')}
                   />
@@ -157,7 +156,6 @@ class Gym extends Component<GymProps, State> {
               </View>
               <View
                 style={{
-                  backgroundColor: '#fff',
                   ...globalStyles.sectionShadow,
                 }}>
                 {yourGym && yourGym.place_id === id ? (
@@ -336,7 +334,6 @@ class Gym extends Component<GymProps, State> {
               {gym && gym.users && (
                 <View
                   style={{
-                    backgroundColor: '#fff',
                     ...globalStyles.sectionShadow,
                     marginTop: 20,
                   }}>

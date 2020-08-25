@@ -7,7 +7,6 @@ export default StyleSheet.create({
   },
   inputGrp: {
     flexDirection: 'row',
-    //backgroundColor: '#fff7',
     marginBottom: 20,
     borderWidth: 0,
     borderColor: 'transparent',

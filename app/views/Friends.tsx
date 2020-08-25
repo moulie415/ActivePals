@@ -1,12 +1,5 @@
 import React, {Component} from 'react';
-import {
-  Alert,
-  View,
-  TextInput,
-  Platform,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import {Alert, View, TextInput, Platform, TouchableOpacity} from 'react-native';
 import database from '@react-native-firebase/database';
 import Image from 'react-native-fast-image';
 import Modal from 'react-native-modalbox';
@@ -20,7 +13,7 @@ import {
   deleteFriend,
 } from '../actions/friends';
 import FriendsProps from '../types/views/Friends';
-import {Icon, Button, Text} from '@ui-kitten/components';
+import {Icon, Button, Text, Layout, List} from '@ui-kitten/components';
 
 interface State {
   refreshing: boolean;
@@ -112,7 +105,7 @@ class Friends extends Component<FriendsProps, State> {
     const {friends, profile, onAccept, navigation} = this.props;
     const {refreshing} = this.state;
     return (
-      <FlatList
+      <List
         data={sortByState(Object.values(friends))}
         keyExtractor={(friend) => friend.uid}
         onRefresh={() => this.refresh()}
@@ -120,8 +113,7 @@ class Friends extends Component<FriendsProps, State> {
         renderItem={({item}) => {
           if (item.status === 'outgoing') {
             return (
-              <View
-                style={{padding: 10, backgroundColor: '#fff', marginBottom: 1}}>
+              <View style={{padding: 10, marginBottom: 1}}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -154,7 +146,6 @@ class Friends extends Component<FriendsProps, State> {
                 style={{
                   paddingVertical: 20,
                   paddingHorizontal: 15,
-                  backgroundColor: '#fff',
                 }}>
                 <View
                   style={{
@@ -185,7 +176,6 @@ class Friends extends Component<FriendsProps, State> {
             return (
               <View
                 style={{
-                  backgroundColor: '#fff',
                   marginBottom: 1,
                   paddingVertical: 15,
                   paddingHorizontal: 10,
@@ -273,11 +263,11 @@ class Friends extends Component<FriendsProps, State> {
       </TouchableOpacity>
     );
     return (
-      <>
+      <Layout>
         {Object.values(friends).length > 0 ? (
           this.renderFriends()
         ) : (
-          <View
+          <Layout
             style={{
               flex: 1,
               justifyContent: 'center',
@@ -288,7 +278,7 @@ class Friends extends Component<FriendsProps, State> {
               You don't have any pals yet, also please make sure you are
               connected to the internet
             </Text>
-          </View>
+          </Layout>
         )}
         <Modal
           backButtonClose
@@ -325,7 +315,7 @@ class Friends extends Component<FriendsProps, State> {
             <Button onPress={() => this.sendRequest(username)}>Submit</Button>
           </View>
         </Modal>
-      </>
+      </Layout>
     );
   }
 }

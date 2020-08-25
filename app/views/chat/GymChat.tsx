@@ -8,7 +8,7 @@ import styles from '../../styles/chatStyles';
 import {SessionType} from '../../types/Session';
 import {fetchGymChat} from '../../actions/chats';
 import {GymChatProps} from '../../types/views/chat/GymChat';
-import {Text} from '@ui-kitten/components';
+import {Text, Layout} from '@ui-kitten/components';
 
 class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
   constructor(props) {
@@ -22,7 +22,7 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
     const {gym, gymChat, getChat, navigation} = this.props;
     const {refreshing} = this.state;
     return (
-      <>
+      <Layout>
         {gym ? (
           <ScrollView
             refreshControl={
@@ -34,8 +34,7 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
                   this.setState({refreshing: false});
                 }}
               />
-            }
-            style={{backgroundColor: '#9993'}}>
+            }>
             <TouchableOpacity
               onPress={() =>
                 navigation.navigate('Messaging', {gymId: gym.place_id})
@@ -82,7 +81,6 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
               flex: 1,
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: '#9993',
             }}>
             <Text
               style={{
@@ -95,7 +93,7 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
             </Text>
           </View>
         )}
-      </>
+      </Layout>
     );
   }
 }

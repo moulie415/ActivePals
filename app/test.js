@@ -170,7 +170,7 @@
 //         backgroundColor: colors.primary,
 //       },
 //       indicatorStyle: {
-//         backgroundColor: '#fff',
+//
 //       },
 //     },
 //   }
@@ -191,7 +191,7 @@
 //       inactiveTintColor: color(colors.secondary)
 //         .lighten(0.3)
 //         .hex(),
-//       style: { backgroundColor: '#fff' },
+//       style: {  },
 //       showIcon: true,
 //       labelStyle: {
 //         fontSize: 10,

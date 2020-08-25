@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {
   View,
   Alert,
-  FlatList,
   Modal,
   SafeAreaView,
   Dimensions,
@@ -52,7 +51,7 @@ import {
 } from '../actions/home';
 import Comment from '../types/Comment';
 import Profile from '../types/Profile';
-import {Icon, Text, Card, Input, Layout} from '@ui-kitten/components';
+import {Icon, Text, Card, Input, Layout, List} from '@ui-kitten/components';
 import {MyRootState} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
@@ -565,7 +564,7 @@ class Home extends Component<HomeProps, State> {
                     position: 'absolute',
                     padding: 2,
                     paddingHorizontal: 6,
-                    backgroundColor: 'rgba(0,0,0,0.3)',
+    
                     borderRadius: 5,
                   }}
                   onPress={() => {
@@ -601,7 +600,7 @@ class Home extends Component<HomeProps, State> {
     const {loadMore, refreshing} = this.state;
     if (Object.values(feed).length > 0) {
       return (
-        <FlatList
+        <List
           data={sortPostsByDate(Object.values(feed))}
           keyExtractor={(item) => item.key}
           onRefresh={async () => {
@@ -845,7 +844,6 @@ class Home extends Component<HomeProps, State> {
 
         <ScrollView
           contentContainerStyle={{
-            backgroundColor: '#9993',
             flex: 1,
             paddingTop: 10,
           }}
@@ -855,10 +853,10 @@ class Home extends Component<HomeProps, State> {
           }}>
           {mentionList && (
             <View style={styles.mentionList}>
-              <FlatList
+              <List
                 keyboardShouldPersistTaps="handled"
                 data={mentionList}
-                style={{backgroundColor: '#fff'}}
+                style={{}}
                 keyExtractor={(item) => item.uid}
                 renderItem={({item, index}) => {
                   if (index < 10) {
@@ -873,7 +871,6 @@ class Home extends Component<HomeProps, State> {
                           });
                         }}
                         style={{
-                          backgroundColor: '#fff',
                           flexDirection: 'row',
                           alignItems: 'center',
                           padding: 5,
@@ -925,7 +922,7 @@ class Home extends Component<HomeProps, State> {
                   }>
                   <View
                     style={{
-                      backgroundColor: '#0007',
+    
                       paddingHorizontal: 15,
                       paddingVertical: 2,
                       borderRadius: 10,

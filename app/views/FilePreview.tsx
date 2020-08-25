@@ -7,19 +7,16 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Alert,
-  FlatList,
   TouchableOpacity,
   SafeAreaView,
   Image as SlowImage,
   ActivityIndicator,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import firebase, {RNFirebase} from 'react-native-firebase';
 import Video from 'react-native-video';
 import Image from 'react-native-fast-image';
 import {PulseIndicator} from 'react-native-indicators';
 import {connect} from 'react-redux';
-import Text from '../components/Text';
 
 import {getMentionsList, guid} from '../constants/utils';
 import sStyles from '../styles/settingsStyles';
@@ -29,6 +26,7 @@ import {setMessage} from '../actions/chats';
 import FilePreviewProps from '../types/views/FilePreview';
 import {TaskEvent, TaskState} from '../types/Shared';
 import Profile from '../types/Profile';
+import {Text, Icon, List} from '@ui-kitten/components';
 
 interface State {
   paused: boolean;
@@ -214,7 +212,6 @@ class FilePreview extends Component<FilePreviewProps, State> {
                 paddingLeft: 10,
                 width: '100%',
                 fontSize: 18,
-                backgroundColor: '#fff',
               }}
               maxLength={280}
               underlineColorAndroid="transparent"
@@ -307,7 +304,6 @@ class FilePreview extends Component<FilePreviewProps, State> {
                 paddingLeft: 10,
                 width: '100%',
                 fontSize: 18,
-                backgroundColor: '#fff',
               }}
               underlineColorAndroid="transparent"
               onChangeText={(newText) => {
@@ -341,10 +337,10 @@ class FilePreview extends Component<FilePreviewProps, State> {
     const {mentionList, text} = this.state;
     return (
       <View style={[styles.mentionList, {bottom: 0, marginBottom: 50}]}>
-        <FlatList
+        <List
           keyboardShouldPersistTaps="handled"
           data={mentionList}
-          style={{backgroundColor: '#fff'}}
+          style={{}}
           keyExtractor={(item) => item.uid}
           renderItem={({item, index}) => {
             if (index < 10) {
@@ -356,7 +352,6 @@ class FilePreview extends Component<FilePreviewProps, State> {
                     this.setState({text: split.join(' '), mentionList: null});
                   }}
                   style={{
-                    backgroundColor: '#fff',
                     flexDirection: 'row',
                     alignItems: 'center',
                     padding: 5,

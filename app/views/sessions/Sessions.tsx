@@ -4,7 +4,6 @@ import Geolocation from '@react-native-community/geolocation';
 import {
   Alert,
   View,
-  FlatList,
   TouchableOpacity,
   Platform,
   Image as SlowImage,
@@ -44,7 +43,15 @@ import SessionsProps from '../../types/views/sessions/Sessions';
 import Session from '../../types/Session';
 import Place from '../../types/Place';
 import globalStyles from '../../styles/globalStyles';
-import {CheckBox, Button, Icon, Text, Toggle} from '@ui-kitten/components';
+import {
+  CheckBox,
+  Button,
+  Icon,
+  Text,
+  Toggle,
+  Layout,
+  List,
+} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 
 const LOCATION_PERMISSION =
@@ -349,7 +356,7 @@ class Sessions extends Component<SessionsProps, State> {
           <View
             style={{
               padding: 10,
-              backgroundColor: '#fff',
+
               borderWidth: 1,
             }}>
             <View style={{flexDirection: 'row'}}>
@@ -407,8 +414,7 @@ class Sessions extends Component<SessionsProps, State> {
           </View>
         )}
         {selectedIndex === 0 ? (
-          <FlatList
-            style={{backgroundColor: '#9993'}}
+          <List
             refreshing={refreshing}
             onRefresh={() => this.handleRefresh()}
             contentContainerStyle={[
@@ -429,7 +435,7 @@ class Sessions extends Component<SessionsProps, State> {
                 <View
                   style={{
                     padding: 10,
-                    backgroundColor: '#fff',
+
                     marginTop: 10,
                     marginHorizontal: 10,
                     borderRadius: 5,
@@ -503,7 +509,7 @@ class Sessions extends Component<SessionsProps, State> {
             )}
           />
         ) : (
-          <FlatList
+          <List
             data={this.sortPlacesByDistance(Object.values(places))}
             refreshing={refreshing}
             onEndReached={async () => {
@@ -524,7 +530,6 @@ class Sessions extends Component<SessionsProps, State> {
             }}
             onEndReachedThreshold={0.1}
             onRefresh={() => this.handleRefresh()}
-            style={{backgroundColor: '#9993'}}
             keyExtractor={(item) => item.place_id}
             renderItem={({item, index}) => {
               const {lat, lng} = item.geometry.location;
@@ -540,7 +545,7 @@ class Sessions extends Component<SessionsProps, State> {
                     <View
                       style={{
                         padding: 10,
-                        backgroundColor: '#fff',
+
                         marginTop: 10,
                         marginHorizontal: 10,
                         borderRadius: 5,
@@ -678,7 +683,7 @@ class Sessions extends Component<SessionsProps, State> {
     return (
       <>
         {spinner && <ActivityIndicator style={styles.spinner} />}
-        <View style={{flex: 1}}>
+        <Layout style={{flex: 1}}>
           {!showMap && this.renderLists()}
           {showMap && (
             <MapView
@@ -832,7 +837,7 @@ class Sessions extends Component<SessionsProps, State> {
             options={options}
             appsWhiteList={[]}
           />
-        </View>
+        </Layout>
         <ActionSheet
           ref={(ref) => {
             this.ActionSheet = ref;

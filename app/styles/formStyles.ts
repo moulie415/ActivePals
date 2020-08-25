@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';;
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   rootView: {
@@ -38,7 +38,7 @@ export default StyleSheet.create({
   listCellInput: {
     textAlignVertical: 'top',
     height: 35,
-    backgroundColor: 'white',
+
     borderColor: 'grey',
     borderWidth: 0.5,
     paddingLeft: 6,
@@ -54,7 +54,7 @@ export default StyleSheet.create({
   },
   addPhotoView: {
     marginBottom: 10,
-    backgroundColor: 'white',
+
     flexDirection: 'row',
     padding: 2,
     flexWrap: 'wrap',
@@ -65,7 +65,6 @@ export default StyleSheet.create({
     margin: 10,
   },
   photoThumbnail: {
-    backgroundColor: 'grey',
     margin: 1,
     width: 100,
     height: 150,
@@ -83,7 +82,6 @@ export default StyleSheet.create({
     right: 0,
     left: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
     alignItems: 'center',
     justifyContent: 'center',
     paddingBottom: 150,

@@ -26,7 +26,7 @@ import {pickerItems, getBirthdayDate} from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
 import Profile from '../types/Profile';
-import {Text, Button, Input, Icon} from '@ui-kitten/components';
+import {Text, Button, Input, Icon, Layout} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
@@ -329,7 +329,7 @@ class ProfileView extends Component<ProfileProps, State> {
           }
         /> */}
         <ScrollView>
-          <View style={{alignItems: 'center', marginBottom: 10}}>
+          <Layout style={{alignItems: 'center', marginBottom: 10}}>
             <TouchableOpacity
               style={{width: '100%'}}
               onPress={() => this.selectAvatar(true)}>
@@ -380,9 +380,9 @@ class ProfileView extends Component<ProfileProps, State> {
                 </View>
               )}
             </TouchableOpacity>
-          </View>
+          </Layout>
 
-          <View
+          <Layout
             style={{
               flex: 1,
               marginRight: 10,
@@ -400,9 +400,7 @@ class ProfileView extends Component<ProfileProps, State> {
                   marginBottom: gym ? 0 : 10,
                 }}>
                 {'Account type: '}
-                <Text>
-                  {profile && profile.accountType}
-                </Text>
+                <Text>{profile && profile.accountType}</Text>
               </Text>
               {gym && (
                 <TouchableOpacity
@@ -428,13 +426,11 @@ class ProfileView extends Component<ProfileProps, State> {
                   alignItems: 'center',
                 }}
                 onPress={() => navigation.navigate('Settings')}>
-                <Text style={{ marginRight: 10}}>
-                  Settings
-                </Text>
+                <Text style={{marginRight: 10}}>Settings</Text>
                 <ThemedIcon size={25} name="settings" />
               </TouchableOpacity>
             </View>
-          </View>
+          </Layout>
           <Input
             value={profile && profile.username}
             onChangeText={(username) =>
@@ -585,9 +581,7 @@ class ProfileView extends Component<ProfileProps, State> {
                 <TouchableOpacity
                   style={{padding: 10}}
                   onPress={() => this.setState({showPicker: false})}>
-                  <Text style={{fontSize: 16}}>
-                    Confirm
-                  </Text>
+                  <Text style={{fontSize: 16}}>Confirm</Text>
                 </TouchableOpacity>
               </View>
             )}

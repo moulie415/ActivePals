@@ -20,7 +20,6 @@ export default StyleSheet.create({
   rightContent: {
     borderRadius: 10,
     padding: 5,
-    backgroundColor: '#f1f3f6',
   },
   rightContentTop: {
     flexDirection: 'row',
@@ -78,7 +77,6 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
   },
   submit: {
     padding: 10,
@@ -87,7 +85,7 @@ export default StyleSheet.create({
     flex: 1,
     padding: Platform.OS == 'ios' ? 10 : 0,
     marginBottom: Platform.OS == 'ios' ? 0 : 10,
-    backgroundColor: '#fff',
+
     color: '#424242',
     borderColor: '#999',
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -130,7 +128,6 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   editModal: {
-    backgroundColor: 'white',
     width: 400,
     height: 300,
     borderWidth: 2,
@@ -154,7 +151,7 @@ export default StyleSheet.create({
     width: 200,
     right: 0,
     top: 0,
-    backgroundColor: 'white',
+
     position: 'absolute',
   },
   menuItem: {

@@ -33,7 +33,6 @@ export default StyleSheet.create({
   },
   btn: {
     margin: 10,
-    backgroundColor: '#3B5998',
     color: 'white',
     padding: 10,
   },

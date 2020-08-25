@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {
   View,
-  FlatList,
   TouchableOpacity,
   Image as SlowImage,
   ActivityIndicator,
@@ -10,12 +9,9 @@ import {PulseIndicator} from 'react-native-indicators';
 import Swipeout from 'react-native-swipeout';
 import {connect} from 'react-redux';
 import Image from 'react-native-fast-image';
-import Icon from 'react-native-vector-icons/Ionicons';
-import Text from '../components/Text';
 import styles from '../styles/notificationsStyles';
 
 import {getSimplifiedTime, sortNotificationsByDate} from '../constants/utils';
-import Header from '../components/Header/header';
 import {
   getNotifications,
   setNotificationsRead,
@@ -24,6 +20,7 @@ import {
 import NotificationsProps from '../types/views/Notifications';
 import {NotificationType} from '../types/Notification';
 import globalStyles from '../styles/globalStyles';
+import {Icon, Text, List} from '@ui-kitten/components';
 
 interface State {
   close: boolean;
@@ -177,14 +174,14 @@ class Notifications extends Component<NotificationsProps, State> {
     );
 
     return (
-      <View style={{backgroundColor: '#9993', flex: 1}}>
+      <View style={{flex: 1}}>
         <Header hasBack title="Notifications" />
         {spinner ? (
           <View style={globalStyles.indicator}>
             <ActivityIndicator />
           </View>
         ) : (
-          <FlatList
+          <List
             data={sortNotificationsByDate(Object.values(notifications))}
             renderItem={({item}) => {
               const swipeoutBtns = [
@@ -248,7 +245,6 @@ class Notifications extends Component<NotificationsProps, State> {
                       );
                     }}
                     style={{
-                      backgroundColor: '#fff',
                       paddingVertical: loadingMore ? 0 : 10,
                     }}>
                     {loadingMore ? (

@@ -13,6 +13,7 @@ import styles from './styles';
 
 import FriendsModalProps from '../../types/components/FriendsModal';
 import {Button, Icon, Text} from '@ui-kitten/components';
+import {MyRootState} from '../../types/Shared';
 
 interface State {
   selectedFriends: string[];
@@ -48,7 +49,6 @@ class FriendsModal extends Component<FriendsModalProps, State> {
             onPress={() => this.onFriendPress(friend.uid)}>
             <View
               style={{
-                backgroundColor: '#fff',
                 paddingVertical: 15,
                 paddingHorizontal: 10,
                 marginBottom: 0.5,
@@ -95,13 +95,10 @@ class FriendsModal extends Component<FriendsModalProps, State> {
       }
     });
     return connectedFriends.length > 0 ? (
-      <ScrollView style={{backgroundColor: '#d6d6d6'}}>
-        {connectedFriends}
-      </ScrollView>
+      <ScrollView>{connectedFriends}</ScrollView>
     ) : (
       <View
         style={{
-          backgroundColor: '#fff',
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
@@ -153,7 +150,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
   }
 }
 
-const mapStateToProps = ({friends, profile}) => ({
+const mapStateToProps = ({friends, profile}: MyRootState) => ({
   friends: friends.friends,
   profile: profile.profile,
 });

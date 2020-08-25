@@ -328,7 +328,6 @@ class ProfileView extends Component<ProfileViewProps, State> {
                   }>
                   <View
                     style={{
-                      backgroundColor: '#0007',
                       paddingHorizontal: 15,
                       paddingVertical: 2,
                       borderRadius: 10,

@@ -20,7 +20,7 @@ import CommentsProps from '../../types/components/Comments';
 import Profile from '../../types/Profile';
 import CommentType from '../../types/Comment';
 import Comment from './Comment';
-import {Icon, Text} from '@ui-kitten/components';
+import {Icon, Text, List} from '@ui-kitten/components';
 
 const screen = Dimensions.get('screen');
 
@@ -507,10 +507,10 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         </View>
         {mentionList && (
           <View style={styles.mentionsList}>
-            <FlatList
+            <List
               keyboardShouldPersistTaps="handled"
               data={mentionList}
-              style={{backgroundColor: '#fff'}}
+              style={{}}
               keyExtractor={(item) => item.uid}
               renderItem={({item, index}) => {
                 if (index < 10) {
@@ -527,7 +527,6 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                         );
                       }}
                       style={{
-                        backgroundColor: '#fff',
                         flexDirection: 'row',
                         alignItems: 'center',
                         padding: 5,
@@ -538,11 +537,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                           style={{height: 30, width: 30, borderRadius: 15}}
                         />
                       ) : (
-                        <IIcon
-                          name="md-contact"
-                          size={35}
-      
-                        />
+                        <IIcon name="md-contact" size={35} />
                       )}
                       <Text style={{marginLeft: 10}}>{item.username}</Text>
                     </TouchableOpacity>
@@ -575,9 +570,9 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         ) : null */}
         {/* Comments */}
         {data ? (
-          <FlatList
+          <List
             keyboardShouldPersistTaps="always"
-            style={{backgroundColor: 'white'}}
+            style={{}}
             data={data}
             extraData={commentsLastUpdated}
             initialNumToRender={initialDisplayCount || 999}
@@ -593,7 +588,6 @@ export default class Comments extends PureComponent<CommentsProps, State> {
               zIndex: 10,
               bottom: 0,
               height: 60,
-              backgroundColor: 'rgba(255,255,255, 0.9)',
             }}>
             <ActivityIndicator
               animating
@@ -617,9 +611,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
             onPress={() => {
               this.paginate(data, 'up');
             }}>
-            <Text style={{textAlign: 'center'}}>
-              Show more
-            </Text>
+            <Text style={{textAlign: 'center'}}>Show more</Text>
           </TouchableOpacity>
         ) : null}
         <Modal

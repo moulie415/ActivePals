@@ -242,7 +242,6 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                 )}
                 <View
                   style={{
-                    backgroundColor: '#fff',
                     alignSelf: 'center',
                     marginTop: -40,
                     ...globalStyles.shadow,
@@ -253,7 +252,6 @@ class SessionInfo extends Component<SessionInfoProps, State> {
               </View>
               <View
                 style={{
-                  backgroundColor: '#fff',
                   ...globalStyles.sectionShadow,
                 }}>
                 {session && host && this.getButtons(host, session)}
@@ -422,7 +420,6 @@ class SessionInfo extends Component<SessionInfoProps, State> {
               </View>
               <View
                 style={{
-                  backgroundColor: '#fff',
                   ...globalStyles.sectionShadow,
                   marginTop: 20,
                 }}>

@@ -11,7 +11,7 @@ import {connect} from 'react-redux';
 import {fetchRepsUsers} from '../../actions/home';
 import RepsModalProps from '../../types/components/RepsModal';
 import styles from '../../styles/components/RepsModal';
-import {Text, Icon} from '@ui-kitten/components';
+import {Text, Icon, List} from '@ui-kitten/components';
 
 const RepsModal: FunctionComponent<RepsModalProps> = ({
   isOpen,
@@ -34,7 +34,7 @@ const RepsModal: FunctionComponent<RepsModalProps> = ({
       style={styles.container}
       key={isOpen ? 1 : 2}>
       <Text style={styles.likeHeader}>Users that repped the comment</Text>
-      <FlatList
+      <List
         keyExtractor={(item) => item}
         renderItem={({item}) => {
           const {uid} = profile;

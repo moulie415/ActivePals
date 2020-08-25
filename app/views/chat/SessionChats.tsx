@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity, FlatList} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {connect} from 'react-redux';
 import {
   getType,
@@ -8,13 +8,13 @@ import {
 } from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import SessionChatsProps from '../../types/views/chat/SessionChats';
-import {Text} from '@ui-kitten/components';
+import {Text, Layout, List} from '@ui-kitten/components';
 
 class SessionChats extends Component<SessionChatsProps> {
   renderChats() {
     const {chats, navigation} = this.props;
     return (
-      <FlatList
+      <List
         data={sortChatsByDate(Object.values(chats))}
         keyExtractor={(chat) => chat.key}
         renderItem={({item}) => {
@@ -23,7 +23,6 @@ class SessionChats extends Component<SessionChatsProps> {
               onPress={() => navigation.navigate('Messaging', {session: item})}>
               <View
                 style={{
-                  backgroundColor: '#fff',
                   marginBottom: 1,
                   padding: 10,
                   flexDirection: 'row',
@@ -64,7 +63,7 @@ class SessionChats extends Component<SessionChatsProps> {
   render() {
     const {chats} = this.props;
     return (
-      <>
+      <Layout>
         {Object.values(chats).length > 0 && Object.values(chats)[0].type ? (
           this.renderChats()
         ) : (
@@ -76,7 +75,6 @@ class SessionChats extends Component<SessionChatsProps> {
             }}>
             <Text
               style={{
-
                 textAlign: 'center',
                 marginHorizontal: 20,
               }}>
@@ -86,7 +84,7 @@ class SessionChats extends Component<SessionChatsProps> {
             </Text>
           </View>
         )}
-      </>
+      </Layout>
     );
   }
 }

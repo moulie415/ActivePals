@@ -5,7 +5,7 @@ import Image from 'react-native-fast-image';
 import {getSimplifiedTime, sortChatsByDate} from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import DirectMessagesProps from '../../types/views/chat/DirectMessages';
-import {Text, Icon} from '@ui-kitten/components';
+import {Text, List, Layout} from '@ui-kitten/components';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 // import  styles  from './styles/loginStyles'
 
@@ -13,7 +13,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
   renderChats() {
     const {navigation, friends, chats, profile} = this.props;
     return (
-      <FlatList
+      <List
         data={sortChatsByDate(Object.values(chats))}
         keyExtractor={(chat) => chat.chatId}
         renderItem={({item}) => {
@@ -89,7 +89,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
   render() {
     const {chats} = this.props;
     return (
-      <>
+      <Layout>
         {Object.values(chats).length > 0 ? (
           this.renderChats()
         ) : (
@@ -107,7 +107,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
             </Text>
           </View>
         )}
-      </>
+      </Layout>
     );
   }
 }

@@ -1,10 +1,10 @@
-import React, { Component, createRef } from 'react';
-import { View, FlatList, TextInput, Platform, KeyboardAvoidingView } from 'react-native';
-import { connect } from 'react-redux';
-import Text from '../components/Text';
+import React, {Component, createRef} from 'react';
+import {View, TextInput, Platform, KeyboardAvoidingView} from 'react-native';
+import {connect} from 'react-redux';
+
 import styles from '../styles/formStyles';
-import Header from '../components/Header/header';
 import FormProps from '../types/views/Form';
+import {Text, List} from '@ui-kitten/components';
 
 interface State {
   required: string;
@@ -25,19 +25,17 @@ class Form extends Component<FormProps, State> {
   }
 
   render() {
-    const { navigation } = this.props;
-    const { params } = navigation.state;
-    const { verification } = params;
-    const { required } = this.state;
+    const {navigation} = this.props;
+    const {params} = navigation.state;
+    const {verification} = params;
+    const {required} = this.state;
     return (
       <KeyboardAvoidingView
         style={styles.rootView}
         behavior={Platform.OS === 'ios' ? 'padding' : null}
-        keyboardVerticalOffset={50}
-      >
-        <Header hasBack title={verification ? 'Get verified' : 'Support'} />
-        <View style={{ flex: 1 }}>
-          <FlatList
+        keyboardVerticalOffset={50}>
+        <View style={{flex: 1}}>
+          <List
             ref={this.list}
             style={styles.list}
             data={[
@@ -68,27 +66,31 @@ class Form extends Component<FormProps, State> {
                 large: true,
               },
             ]}
-            renderItem={({ item, index }) => {
-              const { key } = item;
-              const { key: value } = this.state;
+            renderItem={({item, index}) => {
+              const {key} = item;
+              const {key: value} = this.state;
               const isRequired = required === key;
               return (
                 <View style={styles.listCell}>
                   <Text style={styles.listCellText}>{item.title}</Text>
                   {key === 'subject' ? (
-                    <Text style={{ marginLeft: 5 }}>Personal trainer verification</Text>
+                    <Text style={{marginLeft: 5}}>
+                      Personal trainer verification
+                    </Text>
                   ) : (
                     <TextInput
-                      ref={i => {
+                      ref={(i) => {
                         this.textInputs[index] = i;
                       }}
-                      onChangeText={text => this.setState({ [key]: text })}
+                      onChangeText={(text) => this.setState({[key]: text})}
                       value={value}
                       autoCapitalize="none"
-                      onFocus={() => this.list.current.scrollToIndex({ index })}
+                      onFocus={() => this.list.current.scrollToIndex({index})}
                       onSubmitEditing={() => {
-                        if (index + 1 < this.textInputs.length) this.textInputs[index + 1].focus();
-                       }}
+                        if (index + 1 < this.textInputs.length) {
+                          this.textInputs[index + 1].focus();
+                        }
+                      }}
                       style={[
                         styles.listCellInput,
                         item.large && styles.listCellInputLarge,
@@ -109,7 +111,7 @@ class Form extends Component<FormProps, State> {
   }
 }
 
-const mapStateToProps = ({ profile }) => ({
+const mapStateToProps = ({profile}) => ({
   profile: profile.profile,
   gym: profile.gym,
 });
