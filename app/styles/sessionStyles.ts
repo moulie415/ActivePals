@@ -14,13 +14,9 @@ export default StyleSheet.create({
   map: {
     flex: 1,
   },
-  container: {
-   
-  },
+  container: {},
   button: {
-    borderRadius: 5,
     flex: 1,
-    borderColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     margin: 5,

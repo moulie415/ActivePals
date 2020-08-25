@@ -36,6 +36,7 @@ import DirectMessages from './views/chat/DirectMessages';
 import GymChat from './views/chat/GymChat';
 import Profile from './views/Profile';
 import ThemedImage from './components/ThemedImage/ThemedImage';
+import Settings from './views/Settings';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -64,6 +65,7 @@ export type StackParamList = {
   SessionChats: undefined;
   GymChat: undefined;
   Profile: undefined;
+  Settings: undefined;
 };
 
 const Stack = createStackNavigator<StackParamList>();
@@ -173,6 +175,7 @@ const App = () => {
                   options={() => ({headerShown: false})}
                 />
                 <Stack.Screen name="Tabs" component={Tabs} />
+                <Stack.Screen name="Settings" component={Settings} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>

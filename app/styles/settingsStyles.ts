@@ -5,7 +5,6 @@ export default StyleSheet.create({
     flex: 1,
   },
   contact: {
-    backgroundColor: '#fff',
     padding: 10,
     borderBottomWidth: 1,
     borderColor: '#c9c9c9c9',

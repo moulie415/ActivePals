@@ -717,17 +717,10 @@ class Sessions extends Component<SessionsProps, State> {
                 this.setState({selectedLocation: {}});
                 showAdmobInterstitial();
                 navigation.navigate('SessionDetail');
-              }}
-              text="Create Session"
-              textStyle={{
-                textAlign: 'center',
-                fontSize: 15,
-                textAlignVertical: 'center',
-              }}
-            />
-            <View
-              style={{borderRightWidth: 1}}
-            />
+              }}>
+              Create Session
+            </Button>
+            <View style={{borderRightWidth: 1}} />
             <Button
               style={styles.button}
               onPress={() => {
@@ -739,14 +732,9 @@ class Sessions extends Component<SessionsProps, State> {
                     'You must have at least one pal to create a private session',
                   );
                 }
-              }}
-              text="Create Private Session"
-              textStyle={{
-                textAlign: 'center',
-                fontSize: 15,
-                textAlignVertical: 'center',
-              }}
-            />
+              }}>
+              Create Private Session
+            </Button>
           </View>
           <FriendsModal
             onClosed={() => this.setState({friendsModalOpen: false})}
