@@ -51,8 +51,13 @@ import {
   Toggle,
   Layout,
   List,
+  ListItem,
+  Divider,
+  Avatar,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
+import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
+import ThemedImage from '../../components/ThemedImage/ThemedImage';
 
 const LOCATION_PERMISSION =
   Platform.OS === 'ios'
@@ -158,17 +163,6 @@ class Sessions extends Component<SessionsProps, State> {
       {enableHighAccuracy: true, timeout: 20000 /* , maximumAge: 1000 */},
     );
   }
-
-  static navigationOptions = {
-    headerShown: false,
-    tabBarLabel: 'Sessions',
-    tabBarIcon: ({tintColor}) => (
-      <SlowImage
-        style={{width: 30, height: 30, tintColor}}
-        source={require('../../../assets/images/dumbbell.png')}
-      />
-    ),
-  };
 
   async handleRefresh() {
     const {fetch} = this.props;
@@ -329,7 +323,7 @@ class Sessions extends Component<SessionsProps, State> {
       loadMoreGyms,
     } = this.state;
     const emptyComponent = (
-      <View>
+      <Layout>
         <Text
           style={{
             textAlign: 'center',
@@ -338,12 +332,12 @@ class Sessions extends Component<SessionsProps, State> {
           No sessions near you have been created yet, also please make sure you
           are connected to the internet
         </Text>
-      </View>
+      </Layout>
     );
     const yourLat = pathOr(null, ['lat'], location);
     const yourLon = pathOr(null, ['lon'], location);
     return (
-      <View style={{flex: 1, marginTop: 45}}>
+      <Layout style={{flex: 1, marginTop: 45}}>
         <SegmentedControlTab
           values={['Sessions', 'Gyms near you']}
           selectedIndex={selectedIndex}
@@ -356,7 +350,6 @@ class Sessions extends Component<SessionsProps, State> {
           <View
             style={{
               padding: 10,
-
               borderWidth: 1,
             }}>
             <View style={{flexDirection: 'row'}}>
@@ -421,77 +414,29 @@ class Sessions extends Component<SessionsProps, State> {
               {flexGrow: 1},
               sessions.length > 0 ? null : {justifyContent: 'center'},
             ]}
+            ItemSeparatorComponent={Divider}
             ListEmptyComponent={emptyComponent}
             data={sessions}
             keyExtractor={(item) => item.key}
-            renderItem={({item, index}) => (
-              <TouchableOpacity
+            renderItem={({item}) => (
+              <ListItem
                 onPress={() =>
                   navigation.navigate('SessionInfo', {
                     sessionId: item.key,
                     isPrivate: item.private,
                   })
-                }>
-                <View
-                  style={{
-                    padding: 10,
-
-                    marginTop: 10,
-                    marginHorizontal: 10,
-                    borderRadius: 5,
-                    borderWidth: 1,
-
-                    // ...globalStyles.bubbleShadow,
-                  }}>
-                  <View style={{flexDirection: 'row'}}>
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        marginRight: 10,
-                        justifyContent: 'center',
-                      }}>
-                      {getType(item.type, 40)}
-                    </View>
-                    <View style={{flex: 5}}>
-                      <View
-                        style={{
-                          justifyContent: 'space-between',
-                          flexDirection: 'row',
-                        }}>
-                        <Text style={{flex: 3}} numberOfLines={1}>
-                          <Text style={styles.title}>{`${item.title} `}</Text>
-                          <Text style={{color: '#999'}}>
-                            {`(${
-                              item.distance
-                                ? item.distance.toFixed(2)
-                                : getDistance(item, yourLat, yourLon).toFixed(2)
-                            } km away)`}
-                          </Text>
-                        </Text>
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}>
-                        <Text style={[styles.date]}>
-                          {item.inProgress
-                            ? 'In progress'
-                            : formatDateTime(item.dateTime)}
-                        </Text>
-                        {item.private && <PrivateIcon size={25} />}
-                      </View>
-                      <Text style={{flex: 2, color: '#000'}} numberOfLines={1}>
-                        {item.location.formattedAddress}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        flex: 1,
-                        justifyContent: 'center',
-                      }}>
+                }
+                title={`${item.title} (${
+                  item.distance
+                    ? item.distance.toFixed(2)
+                    : getDistance(item, yourLat, yourLon).toFixed(2)
+                } km away)`}
+                description={item.details}
+                accessoryLeft={() => getType(item.type, 40)}
+                accessoryRight={() => {
+                  return (
+                    <>
+                      {item.private && <PrivateIcon size={25} />}
                       <TouchableOpacity
                         onPress={() => {
                           this.setState({
@@ -500,18 +445,19 @@ class Sessions extends Component<SessionsProps, State> {
                             showMap: true,
                           });
                         }}>
-                        <Icon name="pin" size={40} />
+                        <ThemedIcon name="pin" size={40} />
                       </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
+                    </>
+                  );
+                }}
+              />
             )}
           />
         ) : (
           <List
             data={this.sortPlacesByDistance(Object.values(places))}
             refreshing={refreshing}
+            ItemSeparatorComponent={Divider}
             onEndReached={async () => {
               if (!spinner && loadMoreGyms) {
                 this.setState({spinner: true});
@@ -531,100 +477,55 @@ class Sessions extends Component<SessionsProps, State> {
             onEndReachedThreshold={0.1}
             onRefresh={() => this.handleRefresh()}
             keyExtractor={(item) => item.place_id}
-            renderItem={({item, index}) => {
+            renderItem={({item}) => {
               const {lat, lng} = item.geometry.location;
               if (this.gymFilter(item)) {
                 return (
-                  <TouchableOpacity
+                  <ListItem
                     onPress={() => {
                       this.setState(
                         {selectedLocation: item, latitude: lat, longitude: lng},
                         () => navigation.navigate('Gym', {id: item.place_id}),
                       );
-                    }}>
-                    <View
-                      style={{
-                        padding: 10,
-
-                        marginTop: 10,
-                        marginHorizontal: 10,
-                        borderRadius: 5,
-                        borderWidth: 1,
-                        // ...globalStyles.bubbleShadow,
-                      }}>
-                      <View style={{flexDirection: 'row'}}>
-                        {item.photo ? (
-                          <Image
-                            source={{uri: item.photo}}
-                            style={{
-                              height: 40,
-                              width: 40,
-                              alignSelf: 'center',
-                              borderRadius: 20,
-                              marginRight: 10,
-                            }}
-                          />
-                        ) : (
-                          <Image
-                            source={require('../../../assets/images/dumbbell.png')}
-                            style={{
-                              height: 40,
-                              width: 40,
-                              alignSelf: 'center',
-                              marginRight: 10,
-                            }}
-                          />
-                        )}
-                        <View style={{flex: 5}}>
-                          <View
-                            style={{
-                              justifyContent: 'space-between',
-                              flexDirection: 'row',
-                            }}>
-                            <Text
-                              style={[{flex: 3}, styles.title]}
-                              numberOfLines={1}>
-                              {item.name}
-                            </Text>
-                          </View>
-                          <Text
-                            style={{flex: 2, color: '#000'}}
-                            numberOfLines={1}>
-                            {item.vicinity}
-                          </Text>
-                          <Text style={{color: '#999'}}>{` (${getDistance(
-                            item,
-                            yourLat,
-                            yourLon,
-                            true,
-                          ).toFixed(2)} km away)`}</Text>
-                        </View>
-                        <View
-                          style={{
-                            alignItems: 'center',
-                            flex: 1,
-                            justifyContent: 'center',
-                          }}>
-                          <TouchableOpacity
-                            onPress={() =>
-                              this.setState({
-                                longitude: lng,
-                                latitude: lat,
-                                showMap: true,
-                              })
-                            }>
-                            <Icon size={40} name="pin" />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
+                    }}
+                    title={`${item.name}  (${getDistance(
+                      item,
+                      yourLat,
+                      yourLon,
+                      true,
+                    ).toFixed(2)} km away)`}
+                    description={item.vicinity}
+                    accessoryLeft={() => {
+                      return item.photo ? (
+                        <Avatar source={{uri: item.photo}} />
+                      ) : (
+                        <ThemedImage
+                          source={require('../../../assets/images/dumbbell.png')}
+                          size={40}
+                        />
+                      );
+                    }}
+                    accessoryRight={() => {
+                      return (
+                        <TouchableOpacity
+                          onPress={() =>
+                            this.setState({
+                              longitude: lng,
+                              latitude: lat,
+                              showMap: true,
+                            })
+                          }>
+                          <ThemedIcon size={40} name="pin" />
+                        </TouchableOpacity>
+                      );
+                    }}
+                  />
                 );
               }
             }}
           />
         )}
-      </View>
+      </Layout>
     );
   }
 

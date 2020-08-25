@@ -90,41 +90,41 @@ export function getType(type: SessionType, size: number, tintColor?: string) {
   switch (type) {
     case SessionType.CYCLING:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{width: size, height: size}}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/bicycle.png')}
         />
       );
     case SessionType.GYM:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{width: size, height: size}}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/dumbbell.png')}
         />
       );
     case SessionType.RUNNING:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{width: size, height: size}}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/running.png')}
         />
       );
     case SessionType.SWIMMING:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{width: size, height: size}}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/swim.png')}
         />
       );
     default:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{width: size, height: size}}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/custom.png')}
         />
       );

@@ -1,25 +1,17 @@
 import React, {FunctionComponent, useState, useContext} from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Alert, ScrollView, ActivityIndicator} from 'react-native';
 import crashlytics from '@react-native-firebase/crashlytics';
 import VersionNumber from 'react-native-version-number';
 import DialogInput from 'react-native-dialog-input';
 import Instabug from 'instabug-reactnative';
 import {connect} from 'react-redux';
-
 import styles from '../styles/settingsStyles';
-
 import FbFriendsModal from '../components/FbFriendsModal';
 import {removeUser} from '../actions/profile';
 import SettingsProps from '../types/views/Settings';
 import {AccountType} from '../types/Profile';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
-import {Text, Layout, Toggle} from '@ui-kitten/components';
+import {Layout, Toggle, ListItem, Divider} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import {ThemeContext} from '../context/themeContext';
 
@@ -37,69 +29,87 @@ const Settings: FunctionComponent<SettingsProps> = ({
   return (
     <Layout style={styles.container}>
       <ScrollView>
-        <TouchableOpacity
+        <ListItem
+          title="Contact Support"
           onPress={() => {
             Alert.alert('coming soon');
             // Linking.openURL('mailto:fitlink-support@gmail.com')
           }}
-          style={styles.contact}>
-          <Text>Contact Support</Text>
-          <ThemedIcon name="arrow-ios-forward" size={25} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Welcome', {goBack: true})}
-          style={styles.contact}>
-          <Text>View Welcome Swiper</Text>
-          <ThemedIcon name="arrow-ios-forward" size={25} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Credits')}
-          style={styles.contact}>
-          <Text>Credits</Text>
-          <ThemedIcon name="arrow-ios-forward" size={25} />
-        </TouchableOpacity>
-        {profile.fb_login && (
-          <TouchableOpacity
-            onPress={() => {
-              profile.username
-                ? setFbModalOpen(true)
-                : Alert.alert(
-                    'Please set a username before trying to add a pal',
-                  );
-            }}
-            style={styles.contact}>
-            <Text>Import Facebook friends</Text>
+          accessoryRight={() => (
             <ThemedIcon name="arrow-ios-forward" size={25} />
-          </TouchableOpacity>
+          )}
+        />
+        <Divider />
+        <ListItem
+          title="View Welcome Swiper"
+          onPress={() => navigation.navigate('Welcome', {goBack: true})}
+          accessoryRight={() => (
+            <ThemedIcon name="arrow-ios-forward" size={25} />
+          )}
+        />
+        <Divider />
+        <ListItem
+          title="Credits"
+          onPress={() => navigation.navigate('Credits')}
+          accessoryRight={() => (
+            <ThemedIcon name="arrow-ios-forward" size={25} />
+          )}
+        />
+        <Divider />
+        {profile.fb_login && (
+          <>
+            <ListItem
+              title="Import Facebook Friends"
+              onPress={() => {
+                profile.username
+                  ? setFbModalOpen(true)
+                  : Alert.alert(
+                      'Please set a username before trying to add a pal',
+                    );
+              }}
+              accessoryRight={() => <ThemedIcon name="facebook" size={25} />}
+            />
+            <Divider />
+          </>
         )}
         {profile.accountType === AccountType.ADMIN && (
-          <TouchableOpacity
-            onPress={() => crashlytics().crash()}
-            style={styles.contact}>
-            <Text>Force crash</Text>
-            <ThemedIcon name="arrow-ios-forward" size={25} />
-          </TouchableOpacity>
+          <>
+            <ListItem
+              title="Force crash"
+              onPress={() => crashlytics().crash()}
+              accessoryRight={() => (
+                <ThemedIcon name="arrow-ios-forward" size={25} />
+              )}
+            />
+            <Divider />
+          </>
         )}
-        <TouchableOpacity onPress={Instabug.show} style={styles.contact}>
-          <Text>Report a problem</Text>
-          <ThemedIcon name="alert-triangle" size={25} />
-        </TouchableOpacity>
-        <View style={styles.contact}>
-          <Text>{`Theme: ${theme}`}</Text>
-          <Toggle checked={theme === 'dark'} onChange={toggleTheme} />
-        </View>
-        <View style={styles.contact}>
-          <Text>Version no: </Text>
-          <Text
-            style={{
-              fontWeight: 'bold',
-            }}>{`${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}</Text>
-        </View>
-        <TouchableOpacity
-          style={{padding: 15}}
-          onPress={() => setShowDialog(true)}>
-          <Text style={{color: 'red'}}>Delete account</Text>
-        </TouchableOpacity>
+        <ListItem
+          onPress={Instabug.show}
+          title="Report a problem"
+          accessoryRight={() => <ThemedIcon name="alert-triangle" size={25} />}
+        />
+        <Divider />
+        <ListItem
+          title={`Theme: ${theme}`}
+          accessoryRight={() => (
+            <Toggle checked={theme === 'dark'} onChange={toggleTheme} />
+          )}
+        />
+        <Divider />
+        <ListItem
+          title="Version"
+          description={`${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}
+        />
+        <Divider />
+        <ListItem
+          title="Delete account"
+          onPress={() => setShowDialog(true)}
+          accessoryRight={() => (
+            <ThemedIcon name="arrow-ios-forward" size={25} />
+          )}
+        />
+        <Divider />
       </ScrollView>
       {spinner && (
         <View style={styles.spinner}>
