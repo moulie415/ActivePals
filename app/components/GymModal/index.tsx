@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {getDistance} from '../../constants/utils';
 import styles from './styles';
 import {MyRootState} from '../../types/Shared';
+import {Button} from '@ui-kitten/components';
 
 const GymModal = (
   gym,
@@ -22,7 +23,10 @@ const GymModal = (
 ) => {
   const {vicinity, name, geometry, place_id, photo} = gym;
   return (
-    <Modal style={[styles.modal, {height: null}]} position="center">
+    <Modal
+      useNativeDriver
+      style={[styles.modal, {height: null}]}
+      position="center">
       <View>
         <View
           style={{
@@ -86,10 +90,7 @@ const GymModal = (
               <TouchableOpacity
                 onPress={() => onOpenGymChat(place_id)}
                 style={{justifyContent: 'center', marginRight: 20}}>
-                <Icon
-                  size={40}
-                  name="md-chatboxes"
-                />
+                <Icon size={40} name="md-chatboxes" />
               </TouchableOpacity>
               <Button
                 onPress={() => {
@@ -104,8 +105,9 @@ const GymModal = (
                 }}
                 text="Leave"
                 status="danger"
-                style={{alignSelf: 'center', marginBottom: 5}}
-              >Leave</Button>
+                style={{alignSelf: 'center', marginBottom: 5}}>
+                Leave
+              </Button>
             </View>
           ) : (
             <Button
@@ -123,8 +125,9 @@ const GymModal = (
                 paddingHorizontal: 15,
                 alignSelf: 'center',
                 marginBottom: 10,
-              }}
-            >Join</Button>
+              }}>
+              Join
+            </Button>
           )}
           {photo && (
             <Image
@@ -140,25 +143,23 @@ const GymModal = (
           )}
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Button
-              text="Create Session"
-              textStyle={{fontSize: 13}}
               onPress={() => onContinue(null, gym)}
               style={{
                 flex: 1,
                 marginRight: 10,
                 alignItems: 'center',
                 paddingVertical: 15,
-              }}
-            />
+              }}>
+              Create Session
+            </Button>
             <Button
               onPress={() => {
                 close();
                 openFriends();
               }}
-              textStyle={{fontSize: 13}}
-              text="Create Private Session"
-              style={{flex: 1, alignItems: 'center', paddingVertical: 15}}
-            />
+              style={{flex: 1, alignItems: 'center', paddingVertical: 15}}>
+              Create Private Session
+            </Button>
           </View>
         </View>
       </View>

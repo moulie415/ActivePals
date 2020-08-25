@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   View,
   BackHandler,
-  ActivityIndicator,
 } from 'react-native';
 import {pathOr} from 'ramda';
 import database from '@react-native-firebase/database';
@@ -29,7 +28,7 @@ import {
 } from '../../actions/chats';
 import MessagingProps from '../../types/views/Messaging';
 import Message, {MessageType, SessionType} from '../../types/Message';
-import {Text} from '@ui-kitten/components';
+import {Text, Spinner} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 
@@ -42,7 +41,6 @@ interface State {
 }
 
 class Messaging extends Component<MessagingProps, State> {
-
   constructor(props) {
     super(props);
     const {messageSession} = this.props;
@@ -483,7 +481,7 @@ class Messaging extends Component<MessagingProps, State> {
         />
         {spinner && (
           <View style={globalStyles.indicator}>
-            <ActivityIndicator />
+            <Spinner />
           </View>
         )}
       </View>

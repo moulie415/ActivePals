@@ -7,7 +7,6 @@ import {
   Icon,
   TabBar,
   Tab,
-  Text,
 } from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import database from '@react-native-firebase/database';
@@ -38,8 +37,6 @@ import GymChat from './views/chat/GymChat';
 import Profile from './views/Profile';
 import ThemedImage from './components/ThemedImage/ThemedImage';
 import Settings from './views/Settings';
-import {SafeAreaView, TouchableOpacity, View} from 'react-native';
-import ThemedIcon from './components/ThemedIcon/ThemedIcon';
 import NotificationsButton from './components/NotificationsButton/NotificationsButton';
 import notifications from './views/notifications';
 import SessionInfo from './views/sessions/SessionInfo';
@@ -48,6 +45,8 @@ import Messaging from './views/chat/Messaging';
 import Session from './types/Session';
 import ProfileView from './views/ProfileView';
 import SessionDetail from './views/sessions/SessionDetail';
+import Location from './types/Location';
+import PostView from './views/PostView';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -88,7 +87,8 @@ export type StackParamList = {
     friendUsername?: string;
     friendUid?: string;
   };
-  SessionDetail: {};
+  SessionDetail: {location?: Location; friends?: string[]};
+  PostView: {postId: string};
 };
 
 const Stack = createStackNavigator<StackParamList>();
@@ -216,6 +216,7 @@ const App = () => {
                 <Stack.Screen name="Messaging" component={Messaging} />
                 <Stack.Screen name="ProfileView" component={ProfileView} />
                 <Stack.Screen name="SessionDetail" component={SessionDetail} />
+                <Stack.Screen name="PostView" component={PostView} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>

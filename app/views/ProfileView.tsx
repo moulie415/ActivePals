@@ -7,7 +7,6 @@ import {
   Platform,
   Modal,
   SafeAreaView,
-  ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -21,7 +20,7 @@ import {deleteFriend, sendRequest} from '../actions/friends';
 import ProfileViewProps from '../types/views/ProfileView';
 import Profile from '../types/Profile';
 import Place from '../types/Place';
-import {Button, Text} from '@ui-kitten/components';
+import {Button, Text, Spinner} from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
@@ -287,7 +286,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
           </View>
         ) : (
           <View style={hStyles.spinner}>
-            <ActivityIndicator />
+            <Spinner />
           </View>
         )}
         <Modal onRequestClose={() => null} visible={showImage} transparent>

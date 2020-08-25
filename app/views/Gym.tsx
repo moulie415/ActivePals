@@ -7,7 +7,6 @@ import {
   ScrollView,
   Linking,
   Image as SlowImage,
-  ActivityIndicator,
 } from 'react-native';
 import Image from 'react-native-fast-image';
 import Hyperlink from 'react-native-hyperlink';
@@ -23,7 +22,7 @@ import {fetchGym} from '../actions/sessions';
 import {muteChat} from '../actions/chats';
 import GymProps from '../types/views/Gym';
 import Profile from '../types/Profile';
-import {Icon, Button, Text, Layout} from '@ui-kitten/components';
+import {Icon, Button, Text, Layout, Spinner} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
 interface State {
@@ -365,7 +364,7 @@ class Gym extends Component<GymProps, State> {
           </Layout>
         ) : (
           <View style={hStyles.spinner}>
-            <ActivityIndicator />
+            <Spinner />
           </View>
         )}
         <Popup

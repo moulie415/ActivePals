@@ -5,7 +5,7 @@ import Image from 'react-native-fast-image';
 import {getSimplifiedTime, sortChatsByDate} from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import DirectMessagesProps from '../../types/views/chat/DirectMessages';
-import {Text, List, Layout, ListItem, Avatar} from '@ui-kitten/components';
+import {Text, List, Layout, ListItem, Avatar, Divider} from '@ui-kitten/components';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 import Message from '../../types/Message';
 // import  styles  from './styles/loginStyles'
@@ -29,6 +29,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
     };
     return (
       <List
+        ItemSeparatorComponent={Divider}
         data={sortChatsByDate(Object.values(chats))}
         keyExtractor={(chat) => chat.chatId}
         renderItem={({item}) => {

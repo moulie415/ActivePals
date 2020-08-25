@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import styles from '../styles/formStyles';
 import FormProps from '../types/views/Form';
-import {Text, List} from '@ui-kitten/components';
+import {Text, List, Divider} from '@ui-kitten/components';
 
 interface State {
   required: string;
@@ -36,6 +36,7 @@ class Form extends Component<FormProps, State> {
         keyboardVerticalOffset={50}>
         <View style={{flex: 1}}>
           <List
+            ItemSeparatorComponent={Divider}
             ref={this.list}
             style={styles.list}
             data={[

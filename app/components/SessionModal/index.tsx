@@ -104,14 +104,19 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
               'Session joined',
               'You should now see this session in your session chats',
             );
-          }}
-        >Join</Button>
+          }}>
+          Join
+        </Button>
       );
     }
   };
 
   return (
-    <Modal style={styles.modal} position="center" isDisabled={disabled}>
+    <Modal
+      useNativeDriver
+      style={styles.modal}
+      position="center"
+      isDisabled={disabled}>
       {session && (
         <View style={{flex: 1}}>
           <View
@@ -132,10 +137,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
             </Text>
             <TouchableOpacity
               onPress={() => viewSession(session.key, session.private)}>
-              <Icon
-                size={40}
-                name="md-information-circle"
-              />
+              <Icon size={40} name="md-information-circle" />
             </TouchableOpacity>
           </View>
           <ScrollView style={{margin: 10}}>
@@ -155,7 +157,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
                   <Icon
                     size={25}
                     name="md-chatboxes"
-                    style={{ paddingHorizontal: 10}}
+                    style={{paddingHorizontal: 10}}
                   />
                 </TouchableOpacity>
               )}
@@ -214,10 +216,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
             {session.gym && (
               <TouchableOpacity onPress={() => viewGym(session.gym)}>
                 <Text style={{color: '#999', marginVertical: 10}}>
-                  Gym:{' '}
-                  <Text style={{ fontWeight: 'bold'}}>
-                    {session.gym}
-                  </Text>
+                  Gym: <Text style={{fontWeight: 'bold'}}>{session.gym}</Text>
                 </Text>
               </TouchableOpacity>
             )}

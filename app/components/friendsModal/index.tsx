@@ -115,6 +115,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
     const {selectedFriends} = this.state;
     return (
       <Modal
+        useNativeDriver
         onClosed={onClosed}
         isOpen={isOpen}
         style={styles.modal}

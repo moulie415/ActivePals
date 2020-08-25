@@ -2,7 +2,6 @@ import React, {FunctionComponent, useState, useContext} from 'react';
 import {View, Alert, ScrollView, ActivityIndicator} from 'react-native';
 import crashlytics from '@react-native-firebase/crashlytics';
 import VersionNumber from 'react-native-version-number';
-import DialogInput from 'react-native-dialog-input';
 import Instabug from 'instabug-reactnative';
 import {connect} from 'react-redux';
 import styles from '../styles/settingsStyles';
@@ -11,9 +10,21 @@ import {removeUser} from '../actions/profile';
 import SettingsProps from '../types/views/Settings';
 import {AccountType} from '../types/Profile';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
-import {Layout, Toggle, ListItem, Divider} from '@ui-kitten/components';
+import {
+  Layout,
+  Toggle,
+  ListItem,
+  Divider,
+  Modal,
+  Card,
+  Text,
+  Button,
+  Input,
+  Spinner,
+} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import {ThemeContext} from '../context/themeContext';
+import globalStyles from '../styles/globalStyles';
 
 const Settings: FunctionComponent<SettingsProps> = ({
   profile,
@@ -23,7 +34,7 @@ const Settings: FunctionComponent<SettingsProps> = ({
   const [spinner, setSpinner] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [fbModalOpen, setFbModalOpen] = useState(false);
-
+  const [email, setEmail] = useState('');
   const {theme, toggleTheme} = useContext(ThemeContext);
 
   return (
@@ -113,36 +124,61 @@ const Settings: FunctionComponent<SettingsProps> = ({
       </ScrollView>
       {spinner && (
         <View style={styles.spinner}>
-          <ActivityIndicator />
+          <Spinner />
         </View>
       )}
       <FbFriendsModal
         isOpen={fbModalOpen}
         onClosed={() => setFbModalOpen(false)}
       />
-      <DialogInput
-        isDialogVisible={showDialog}
-        title="Enter email to confirm"
-        message="All your data will be deleted."
-        hintInput="Enter email"
-        submitInput={async (inputText: string) => {
-          if (inputText === profile.email) {
-            setSpinner(true);
-            try {
-              await onRemoveUser();
-              navigation.navigate('Login');
-              Alert.alert('Success', 'Account deleted');
-              setSpinner(false);
-            } catch (e) {
-              Alert.alert('Error', e.message);
-              setSpinner(false);
-            }
-          } else {
-            Alert.alert('Incorrect email');
-          }
-        }}
-        closeDialog={() => setShowDialog(false)}
-      />
+
+      <Modal
+        visible={showDialog}
+        backdropStyle={globalStyles.backdrop}
+        onBackdropPress={() => setShowDialog(false)}>
+        <Card disabled={true}>
+          <Text style={{textAlign: 'center'}} category="h6">
+            Enter email to confirm
+          </Text>
+          <Text
+            style={{textAlign: 'center', margin: 5}}
+            status="danger"
+            category="label">
+            All your data will be deleted.
+          </Text>
+          <Input
+            placeholder="Enter email"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <View style={{flexDirection: 'row'}}>
+            <Button style={{margin: 5}} onPress={() => setShowDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              style={{margin: 5}}
+              status="danger"
+              onPress={async () => {
+                if (email === profile.email) {
+                  setSpinner(true);
+                  try {
+                    await onRemoveUser();
+                    navigation.navigate('Login');
+                    Alert.alert('Success', 'Account deleted');
+                    setSpinner(false);
+                  } catch (e) {
+                    Alert.alert('Error', e.message);
+                    setSpinner(false);
+                  }
+                } else {
+                  Alert.alert('Incorrect email');
+                }
+              }}>
+              Submit
+            </Button>
+          </View>
+        </Card>
+      </Modal>
     </Layout>
   );
 };

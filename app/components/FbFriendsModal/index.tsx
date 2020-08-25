@@ -8,14 +8,13 @@ import {
   Platform,
   Alert,
   TouchableOpacity,
-  ActivityIndicator,
 } from 'react-native';
 import styles from './styles';
 import {sendRequest, fetchFbFriends} from '../../actions/friends';
 import {getNameString} from '../../constants/utils';
 import FbFriendsModalProps from '../../types/components/FbFriendsModalProps';
 import Profile from '../../types/Profile';
-import {Text, Button, Icon, Layout} from '@ui-kitten/components';
+import {Text, Button, Icon, Layout, Spinner} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 
 const FbFriendsModal: FunctionComponent<FbFriendsModalProps> = ({
@@ -136,6 +135,7 @@ const FbFriendsModal: FunctionComponent<FbFriendsModalProps> = ({
 
   return (
     <Modal
+      useNativeDriver
       onClosed={onClosed}
       isOpen={isOpen}
       style={styles.modal}
@@ -144,7 +144,7 @@ const FbFriendsModal: FunctionComponent<FbFriendsModalProps> = ({
       <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
         Select Facebook friends
       </Text>
-      {loading ? <ActivityIndicator /> : renderFriendsSelection()}
+      {loading ? <Spinner /> : renderFriendsSelection()}
       <Layout
         style={{
           flexDirection: 'row',

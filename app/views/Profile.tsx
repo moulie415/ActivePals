@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import moment from 'moment';
 import {equals} from 'ramda';
@@ -26,7 +25,16 @@ import {pickerItems, getBirthdayDate} from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
 import Profile from '../types/Profile';
-import {Text, Button, Input, Icon, Layout} from '@ui-kitten/components';
+import {
+  Text,
+  Button,
+  Input,
+  Spinner,
+  Layout,
+  Select,
+  SelectItem,
+  IndexPath,
+} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
@@ -179,7 +187,7 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 
   uploadImage(
-    uri,
+    uri: string,
     backdrop = false,
     mime = 'application/octet-stream',
   ): Promise<string> {
@@ -291,7 +299,7 @@ class ProfileView extends Component<ProfileProps, State> {
       ? moment(birthday).format('DD/MM/YYYY')
       : '';
     return (
-      <>
+      <Layout>
         {/* <Header
           left={
             this.hasChanged() && (
@@ -464,7 +472,7 @@ class ProfileView extends Component<ProfileProps, State> {
 
           <View style={styles.inputGrp}>
             <Text style={{alignSelf: 'center'}}>Preferred activity: </Text>
-            <RNPickerSelect
+            {/* <RNPickerSelect
               placeholder={{
                 label: 'Unspecified',
                 value: null,
@@ -493,12 +501,22 @@ class ProfileView extends Component<ProfileProps, State> {
               }}
               // style={{ ...pickerSelectStyles }}
               value={profile ? profile.activity : null}
-            />
+            /> */}
+            <Select
+              selectedIndex={
+                new IndexPath(
+                  activities.findIndex((a) => a === profile.activity),
+                )
+              }>
+              {activities.map((activity) => (
+                <SelectItem title={activity} />
+              ))}
+            </Select>
           </View>
           {profile && profile.activity && (
             <View style={styles.inputGrp}>
               <Text style={{alignSelf: 'center'}}>Level: </Text>
-              <RNPickerSelect
+              {/* <RNPickerSelect
                 placeholder={{
                   label: 'Unspecified',
                   value: null,
@@ -527,7 +545,12 @@ class ProfileView extends Component<ProfileProps, State> {
                 }}
                 // style={{ ...pickerSelectStyles }}
                 value={profile.level}
-              />
+              /> */}
+              <Select selectedIndex={new IndexPath(0)}>
+                {levels.map((level) => (
+                  <SelectItem title={level} />
+                ))}
+              </Select>
             </View>
           )}
           <TouchableOpacity
@@ -543,7 +566,7 @@ class ProfileView extends Component<ProfileProps, State> {
           </Button>
           {spinner && (
             <View style={hStyles.spinner}>
-              <ActivityIndicator />
+              <Spinner />
             </View>
           )}
         </ScrollView>
@@ -587,7 +610,7 @@ class ProfileView extends Component<ProfileProps, State> {
             )}
           </>
         )}
-      </>
+      </Layout>
     );
   }
 }

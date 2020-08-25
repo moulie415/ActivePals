@@ -37,6 +37,7 @@ class MapModal extends Component<MapModalProps, State> {
         onClosed={onClosed}
         isOpen={isOpen}
         swipeToClose={false}
+        useNativeDriver
         key={isOpen ? 1 : 2}>
         <Text
           numberOfLines={1}

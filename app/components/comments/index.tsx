@@ -6,7 +6,6 @@ import {
   View,
   Modal,
   Dimensions,
-  ActivityIndicator,
   Keyboard,
   TextInput,
   TouchableOpacity,
@@ -19,7 +18,7 @@ import CommentsProps from '../../types/components/Comments';
 import Profile from '../../types/Profile';
 import CommentType from '../../types/Comment';
 import Comment from './Comment';
-import {Icon, Text, List} from '@ui-kitten/components';
+import {Icon, Text, List, Divider, Spinner} from '@ui-kitten/components';
 
 const screen = Dimensions.get('screen');
 
@@ -507,6 +506,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         {mentionList && (
           <View style={styles.mentionsList}>
             <List
+              ItemSeparatorComponent={Divider}
               keyboardShouldPersistTaps="handled"
               data={mentionList}
               style={{}}
@@ -570,6 +570,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         {/* Comments */}
         {data ? (
           <List
+            ItemSeparatorComponent={Divider}
             keyboardShouldPersistTaps="always"
             style={{}}
             data={data}
@@ -588,16 +589,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
               bottom: 0,
               height: 60,
             }}>
-            <ActivityIndicator
-              animating
-              style={{
-                height: 50,
-                width: screen.width,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              size="small"
-            />
+            <Spinner size="small" />
           </View>
         ) : null}
 

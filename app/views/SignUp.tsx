@@ -1,10 +1,5 @@
 import React, {FunctionComponent, useState} from 'react';
-import {
-  Alert,
-  View,
-  KeyboardAvoidingView,
-  ActivityIndicator,
-} from 'react-native';
+import {Alert, View, KeyboardAvoidingView} from 'react-native';
 import {connect} from 'react-redux';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -67,7 +62,7 @@ const SignUp: FunctionComponent<SignUpProps> = ({navigation}) => {
     <Layout style={{flex: 1, justifyContent: 'center', padding: 20}} level="4">
       {spinner && (
         <View style={globalStyles.indicator}>
-          <ActivityIndicator />
+          <Spinner />
         </View>
       )}
 

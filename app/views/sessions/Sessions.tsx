@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Platform,
   Image as SlowImage,
-  ActivityIndicator,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
@@ -54,6 +53,7 @@ import {
   ListItem,
   Divider,
   Avatar,
+  Spinner,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
@@ -583,7 +583,7 @@ class Sessions extends Component<SessionsProps, State> {
     );
     return (
       <>
-        {spinner && <ActivityIndicator style={styles.spinner} />}
+        {spinner && <Spinner style={styles.spinner} />}
         <Layout style={{flex: 1}}>
           {!showMap && this.renderLists()}
           {showMap && (
@@ -616,7 +616,7 @@ class Sessions extends Component<SessionsProps, State> {
             style={{
               flexDirection: 'row',
               height: 60,
-              justifyContent: 'space-evenly'
+              justifyContent: 'space-evenly',
             }}>
             <Button
               style={styles.button}
@@ -655,6 +655,7 @@ class Sessions extends Component<SessionsProps, State> {
             isOpen={friendsModalOpen}
           />
           <Modal
+            useNativeDriver
             onClosed={async () => {
               const {radius: currentRadius, fetch, saveRadius} = this.props;
               this.setState({filterModalOpen: false});

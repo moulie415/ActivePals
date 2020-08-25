@@ -1,11 +1,5 @@
 import React, {FunctionComponent, useState, useEffect, useContext} from 'react';
-import {
-  Alert,
-  View,
-  TouchableOpacity,
-  Platform,
-  ActivityIndicator,
-} from 'react-native';
+import {Alert, View, TouchableOpacity, Platform} from 'react-native';
 import VersionNumber from 'react-native-version-number';
 import SpinnerButton from 'react-native-spinner-button';
 import auth from '@react-native-firebase/auth';
@@ -28,7 +22,7 @@ import {getProfileImage} from '../helpers/images';
 import {setupNotifications} from '../helpers/notifications';
 import LoginProps from '../types/views/Login';
 import styles from '../styles/loginStyles';
-import {Layout, Icon, Button, Input, Text, Toggle} from '@ui-kitten/components';
+import {Layout, Icon, Button, Input, Text, Toggle, Spinner} from '@ui-kitten/components';
 import globalStyles from '../styles/globalStyles';
 import {GOOGLE_WEB_ID} from 'react-native-dotenv';
 import {ThemeContext} from '../context/themeContext';
@@ -183,7 +177,7 @@ const Login: FunctionComponent<LoginProps> = ({
     <Layout style={{flex: 1, justifyContent: 'center', padding: 20}} level="4">
       {spinner && (
         <View style={globalStyles.indicator}>
-          <ActivityIndicator />
+          <Spinner />
         </View>
       )}
       <Toggle

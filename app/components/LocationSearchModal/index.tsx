@@ -12,9 +12,10 @@ const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({
   onPress,
   onClosed,
 }) => {
-  const ref = useRef<GooglePlacesAutocomplete>();
+  const ref = useRef<GooglePlacesAutocomplete>(null);
   return (
     <Modal
+      useNativeDriver
       onClosed={onClosed}
       isOpen={isOpen}
       style={styles.modal}

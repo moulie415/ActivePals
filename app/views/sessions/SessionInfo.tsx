@@ -6,7 +6,6 @@ import {
   ScrollView,
   Switch,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import RNCalendarEvents from 'react-native-calendar-events';
 import Image from 'react-native-fast-image';
@@ -32,7 +31,7 @@ import {
 import {muteChat} from '../../actions/chats';
 import SessionInfoProps from '../../types/views/sessions/SessionInfo';
 import {SessionType} from '../../types/Session';
-import {Icon, Text, Button, Layout} from '@ui-kitten/components';
+import {Icon, Text, Button, Layout, Spinner} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 
@@ -345,9 +344,9 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                             options: newOptions,
                           });
                         }}
-                        text="Directions"
-                        style={{alignSelf: 'flex-end'}}
-                      />
+                        style={{alignSelf: 'flex-end'}}>
+                        Directions
+                      </Button>
                     </View>
                   )}
                 </View>
@@ -433,7 +432,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
               </View>
             </Layout>
           ) : (
-            <ActivityIndicator />
+            <Spinner />
           )}
           <Popup
             isVisible={popUpVisible}

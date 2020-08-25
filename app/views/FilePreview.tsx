@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image as SlowImage,
-  ActivityIndicator,
 } from 'react-native';
 import firebase, {RNFirebase} from 'react-native-firebase';
 import Video from 'react-native-video';
@@ -26,7 +25,7 @@ import {setMessage} from '../actions/chats';
 import FilePreviewProps from '../types/views/FilePreview';
 import {TaskEvent, TaskState} from '../types/Shared';
 import Profile from '../types/Profile';
-import {Text, Icon, List} from '@ui-kitten/components';
+import {Text, Icon, List, Divider, Spinner} from '@ui-kitten/components';
 
 interface State {
   paused: boolean;
@@ -60,7 +59,6 @@ class FilePreview extends Component<FilePreviewProps, State> {
       this.player.current.seek(0);
     }
   }
-
 
   previewView() {
     const {navigation} = this.props;
@@ -227,7 +225,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
             />
             {spinner && (
               <View style={sStyles.spinner}>
-                <ActivityIndicator />
+                <Spinner />
               </View>
             )}
           </View>
@@ -318,7 +316,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
             />
             {spinner && (
               <View style={sStyles.spinner}>
-                <ActivityIndicator />
+                <Spinner />
                 {!!progress && (
                   <Text style={{color: '#fff'}}>{`${progress}%`}</Text>
                 )}
@@ -335,6 +333,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
     return (
       <View style={[styles.mentionList, {bottom: 0, marginBottom: 50}]}>
         <List
+          ItemSeparatorComponent={Divider}
           keyboardShouldPersistTaps="handled"
           data={mentionList}
           style={{}}

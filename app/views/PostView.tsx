@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {
   View,
   Dimensions,
@@ -12,23 +11,18 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   Image as SlowImage,
-  ActivityIndicator,
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
 import Share, {Options} from 'react-native-share';
 import Video from 'react-native-video';
 import {connect} from 'react-redux';
-import {PulseIndicator} from 'react-native-indicators';
 import Image from 'react-native-fast-image';
 import ParsedText from '../components/ParsedText';
-import Text from '../components/Text';
-
 import Comments from '../components/comments';
 import sStyles from '../styles/settingsStyles';
 import {likesExtractor, getSimplifiedTime} from '../constants/utils';
 import styles from '../styles/postViewStyles';
-import Header from '../components/Header/header';
 import hStyles from '../styles/homeStyles';
 import PostViewProps from '../types/views/PostView';
 import {
@@ -43,6 +37,7 @@ import {
 } from '../actions/home';
 import RepsModal from '../components/RepsModal';
 import Comment from '../types/Comment';
+import {Text, Spinner, Icon} from '@ui-kitten/components';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
 
@@ -81,8 +76,8 @@ class PostView extends Component<PostViewProps, State> {
   }
 
   async componentDidMount() {
-    const {getPost, getComments, navigation} = this.props;
-    const {postId} = navigation.state.params;
+    const {getPost, getComments, route} = this.props;
+    const {postId} = route.params;
     await getPost(postId);
     getComments(postId);
   }
@@ -252,8 +247,8 @@ class PostView extends Component<PostViewProps, State> {
 
   renderRepsFooter() {
     const {userFetchAmount} = this.state;
-    const {getRepsUsers, navigation, feed} = this.props;
-    const {postId} = navigation.state.params;
+    const {getRepsUsers, route, feed} = this.props;
+    const {postId} = route.params;
     const post = feed[postId];
     if (post && post.repCount > userFetchAmount) {
       return (
@@ -443,6 +438,7 @@ class PostView extends Component<PostViewProps, State> {
       getRepsUsers,
       getReplies,
       feed,
+      route,
     } = this.props;
     const combined = {...users, ...friends};
     const {
@@ -455,7 +451,7 @@ class PostView extends Component<PostViewProps, State> {
       repsId,
       spinner,
     } = this.state;
-    const {postId} = navigation.state.params;
+    const {postId} = route.params;
     const post = feed[postId];
     const comments = post && post.comments ? post.comments : [];
     const scrollRef = React.createRef<ScrollView>();
@@ -464,7 +460,6 @@ class PostView extends Component<PostViewProps, State> {
         contentContainerStyle={{flex: 1}}
         style={{flex: 1}}
         behavior={post && post.type === 'status' ? 'padding' : 'position'}>
-        <Header hasBack />
         <ScrollView
           ref={scrollRef}
           onScroll={(event) => {
@@ -628,13 +623,13 @@ class PostView extends Component<PostViewProps, State> {
         </ScrollView>
         {spinner && (
           <View style={sStyles.spinner}>
-            <ActivityIndicator />
+            <Spinner />
           </View>
         )}
       </KeyboardAvoidingView>
     ) : (
       <View style={sStyles.spinner}>
-        <ActivityIndicator />
+        <Spinner />
       </View>
     );
   }

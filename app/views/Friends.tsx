@@ -255,6 +255,7 @@ class Friends extends Component<FriendsProps, State> {
           </Layout>
         )}
         <Modal
+          useNativeDriver
           backButtonClose
           backdropPressToClose={false}
           style={styles.modal}

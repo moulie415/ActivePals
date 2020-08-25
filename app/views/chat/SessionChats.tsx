@@ -8,7 +8,7 @@ import {
 } from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import SessionChatsProps from '../../types/views/chat/SessionChats';
-import {Text, Layout, List, ListItem} from '@ui-kitten/components';
+import {Text, Layout, List, ListItem, Divider} from '@ui-kitten/components';
 import {MyRootState} from '../../types/Shared';
 
 class SessionChats extends Component<SessionChatsProps> {
@@ -16,6 +16,7 @@ class SessionChats extends Component<SessionChatsProps> {
     const {chats, navigation} = this.props;
     return (
       <List
+        ItemSeparatorComponent={Divider}
         data={sortChatsByDate(Object.values(chats))}
         keyExtractor={(chat) => chat.key}
         renderItem={({item}) => {

@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {fetchRepsUsers} from '../../actions/home';
 import RepsModalProps from '../../types/components/RepsModal';
 import styles from '../../styles/components/RepsModal';
-import {Text, Icon, List} from '@ui-kitten/components';
+import {Text, Icon, List, Divider, Spinner} from '@ui-kitten/components';
 
 const RepsModal: FunctionComponent<RepsModalProps> = ({
   isOpen,
@@ -24,12 +24,14 @@ const RepsModal: FunctionComponent<RepsModalProps> = ({
   const uids = repsUsers[id] ? Object.keys(repsUsers[id]) : [];
   return (
     <ModalBox
+      useNativeDriver
       isOpen={isOpen}
       onClosed={() => onClosed()}
       style={styles.container}
       key={isOpen ? 1 : 2}>
       <Text style={styles.likeHeader}>Users that repped the comment</Text>
       <List
+        ItemSeparatorComponent={Divider}
         keyExtractor={(item) => item}
         renderItem={({item}) => {
           const {uid} = profile;
@@ -58,7 +60,7 @@ const RepsModal: FunctionComponent<RepsModalProps> = ({
               </View>
             </TouchableOpacity>
           ) : (
-            <ActivityIndicator />
+            <Spinner />
           );
         }}
         data={uids}

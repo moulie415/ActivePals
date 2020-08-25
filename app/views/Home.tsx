@@ -10,7 +10,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image as SlowImage,
-  ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
@@ -51,7 +50,15 @@ import {
 } from '../actions/home';
 import Comment from '../types/Comment';
 import Profile from '../types/Profile';
-import {Icon, Text, Card, Input, Layout, List} from '@ui-kitten/components';
+import {
+  Text,
+  Card,
+  Input,
+  Layout,
+  List,
+  Divider,
+  Spinner
+} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
@@ -564,7 +571,7 @@ class Home extends Component<HomeProps, State> {
                     position: 'absolute',
                     padding: 2,
                     paddingHorizontal: 6,
-    
+
                     borderRadius: 5,
                   }}
                   onPress={() => {
@@ -854,6 +861,7 @@ class Home extends Component<HomeProps, State> {
           {mentionList && (
             <View style={styles.mentionList}>
               <List
+                ItemSeparatorComponent={Divider}
                 keyboardShouldPersistTaps="handled"
                 data={mentionList}
                 style={{}}
@@ -896,7 +904,7 @@ class Home extends Component<HomeProps, State> {
         </ScrollView>
         {spinner && (
           <View style={sStyles.spinner}>
-            <ActivityIndicator />
+            <Spinner />
           </View>
         )}
         <Modal onRequestClose={() => null} visible={showImage} transparent>
@@ -922,7 +930,6 @@ class Home extends Component<HomeProps, State> {
                   }>
                   <View
                     style={{
-    
                       paddingHorizontal: 15,
                       paddingVertical: 2,
                       borderRadius: 10,
@@ -936,6 +943,7 @@ class Home extends Component<HomeProps, State> {
           />
         </Modal>
         <ModalBox
+          useNativeDriver
           style={{
             width: SCREEN_WIDTH - 20,
             height: SCREEN_HEIGHT - 150,

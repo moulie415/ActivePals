@@ -1,10 +1,5 @@
 import React, {Component} from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Image as SlowImage,
-  ActivityIndicator,
-} from 'react-native';
+import {View, TouchableOpacity, Image as SlowImage} from 'react-native';
 import Swipeout from 'react-native-swipeout';
 import {connect} from 'react-redux';
 import Image from 'react-native-fast-image';
@@ -19,7 +14,14 @@ import {
 import NotificationsProps from '../types/views/Notifications';
 import {NotificationType} from '../types/Notification';
 import globalStyles from '../styles/globalStyles';
-import {Text, List, Layout, ListItem, Divider} from '@ui-kitten/components';
+import {
+  Text,
+  List,
+  Layout,
+  ListItem,
+  Divider,
+  Spinner,
+} from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyThunkDispatch, MyRootState} from '../types/Shared';
 
@@ -150,7 +152,6 @@ class Notifications extends Component<NotificationsProps, State> {
     }
   }
 
-
   render() {
     const {
       notifications,
@@ -177,7 +178,7 @@ class Notifications extends Component<NotificationsProps, State> {
       <Layout style={{flex: 1}}>
         {spinner ? (
           <View style={globalStyles.indicator}>
-            <ActivityIndicator />
+            <Spinner />
           </View>
         ) : (
           <List
@@ -264,7 +265,7 @@ class Notifications extends Component<NotificationsProps, State> {
                       paddingVertical: loadingMore ? 0 : 10,
                     }}>
                     {loadingMore ? (
-                      <ActivityIndicator style={{height: 35}} />
+                      <Spinner />
                     ) : (
                       <Text style={{textAlign: 'center'}}>Load More</Text>
                     )}
