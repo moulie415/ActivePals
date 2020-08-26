@@ -60,6 +60,7 @@ target 'ActivePals' do
 
   pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse.podspec"
 
+
   target 'ActivePalsTests' do
     inherit! :complete
     # Pods for testing

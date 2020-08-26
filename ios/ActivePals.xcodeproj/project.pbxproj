@@ -51,6 +51,7 @@
 		0A8C7E4024F688360049A0F8 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		0AA86ECE24F2D141008068B6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0C4321C54EFD9BE7F60EF189 /* Pods-ActivePals-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ActivePals-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-ActivePals-tvOSTests/Pods-ActivePals-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
+		127CA97413EEF991A73FA3F5 /* Instabug.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Instabug.framework; path = "../node_modules/instabug-reactnative/ios/Instabug.framework"; sourceTree = "<group>"; };
 		1317D477E373D241CD384A3F /* libPods-ActivePals-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ActivePals-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* ActivePals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ActivePals.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ActivePals/AppDelegate.h; sourceTree = "<group>"; };
@@ -65,6 +66,7 @@
 		34063ED2ABDE22661DAD230B /* libPods-ActivePals.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ActivePals.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48157D4E80AE4C4CFFA9C2C5 /* Pods-ActivePals-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ActivePals-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-ActivePals-tvOS/Pods-ActivePals-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		5F0D367317B9C249E16F6AB8 /* Pods-ActivePals-ActivePalsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ActivePals-ActivePalsTests.release.xcconfig"; path = "Target Support Files/Pods-ActivePals-ActivePalsTests/Pods-ActivePals-ActivePalsTests.release.xcconfig"; sourceTree = "<group>"; };
+		A17C44A87831233EBB35F023 /* Instabug.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Instabug.framework; path = "../node_modules/instabug-reactnative/ios/Instabug.framework"; sourceTree = "<group>"; };
 		A387E61F2A091605DE7B70AE /* Pods-ActivePals-ActivePalsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ActivePals-ActivePalsTests.debug.xcconfig"; path = "Target Support Files/Pods-ActivePals-ActivePalsTests/Pods-ActivePals-ActivePalsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A40E2A3C172203BCF5417C98 /* libPods-ActivePals-ActivePalsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ActivePals-ActivePalsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA3A9173917BD4A32F99B65A /* Pods-ActivePals-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ActivePals-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-ActivePals-tvOSTests/Pods-ActivePals-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -153,6 +155,8 @@
 				A40E2A3C172203BCF5417C98 /* libPods-ActivePals-ActivePalsTests.a */,
 				1317D477E373D241CD384A3F /* libPods-ActivePals-tvOS.a */,
 				D2DEC3DF2740EA1578C3EED7 /* libPods-ActivePals-tvOSTests.a */,
+				A17C44A87831233EBB35F023 /* Instabug.framework */,
+				127CA97413EEF991A73FA3F5 /* Instabug.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -245,6 +249,8 @@
 				BC0E22F7161FA9F8D8C975CB /* [CP-User] [RNFB] Core Configuration */,
 				899ABBA4328D8B6351DF373E /* [CP-User] [RNFB] Crashlytics Configuration */,
 				9EBAF73695539F955D251495 /* [CP] Embed Pods Frameworks */,
+				6E26654C6560778B09CB5BD0 /* Upload Sourcemap */,
+				EBBDE1F508B7E389B4CECC72 /* Upload Sourcemap */,
 			);
 			buildRules = (
 			);
@@ -498,6 +504,24 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		6E26654C6560778B09CB5BD0 /* Upload Sourcemap */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Sourcemap";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "bash \"../node_modules/instabug-reactnative/ios/upload_sourcemap.sh\"\n";
+		};
 		7AB4CB8D9B1302677DA38138 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -599,6 +623,24 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ActivePals-ActivePalsTests/Pods-ActivePals-ActivePalsTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		EBBDE1F508B7E389B4CECC72 /* Upload Sourcemap */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Sourcemap";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "bash \"../node_modules/instabug-reactnative/ios/upload_sourcemap.sh\"\n";
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
