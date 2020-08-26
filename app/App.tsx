@@ -196,7 +196,7 @@ const App = () => {
   useEffect(() => {
     Instabug.setWelcomeMessageMode(Instabug.welcomeMessageMode.disabled);
     Instabug.startWithToken('804c8f8e35fa17bdafb82e6778629dd4', [
-      Instabug.invocationEvent.shake,
+      Instabug.invocationEvent.none,
     ]);
   }, []);
   return (

@@ -2,6 +2,8 @@ import db from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
+import messaging from '@react-native-firebase/messaging';
+
 import {fetchFriends} from './friends';
 import {
   fetchSessionChats,
@@ -88,26 +90,14 @@ export const doSetup = (): MyThunkResult<Promise<void>> => {
   return async (dispatch, getState) => {
     //const {uid} = profile;
     const {uid, gym} = getState().profile.profile;
-    try {
-      setupPresence(uid);
-
-      //   const fcmToken = await messaging().getToken();
-      //   if (fcmToken) {
-      //     database()
-      //       .ref(`users/${uid}`)
-      //       .child('FCMToken')
-      //       .set(fcmToken);
-      //     console.log(fcmToken);
-      //   } else {
-      //     console.warn('no token');
-      //   }
-    } catch (e) {
-      console.warn(e);
+    setupPresence(uid);
+    await messaging().requestPermission();
+    const token = await messaging().getToken();
+    if (token) {
+      await database().ref('users').child(uid).update({FCMToken: token});
     }
     dispatch(getUnreadCount(uid));
-
     dispatch(fetchFriends(uid));
-
     gym && dispatch(fetchGymChat(gym));
   };
 };

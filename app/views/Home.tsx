@@ -695,7 +695,7 @@ class Home extends Component<HomeProps, State> {
             {profile && avatar ? (
               <Avatar source={{uri: avatar}} size="large" />
             ) : (
-              <ThemedIcon name="person" size={60} />
+              <ThemedIcon name="person" size={50} />
             )}
           </TouchableOpacity>
           <Input

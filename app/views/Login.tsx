@@ -5,7 +5,7 @@ import SpinnerButton from 'react-native-spinner-button';
 import auth from '@react-native-firebase/auth';
 import {connect} from 'react-redux';
 import {SetProfile, doSetup, fetchProfile} from '../actions/profile';
-import Profile from '../types/Profile';
+import Profile, {AccountType} from '../types/Profile';
 import {MyThunkDispatch, MyRootState} from '../types/Shared';
 import {CommonActions} from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
@@ -37,7 +37,7 @@ import {ThemeContext} from '../context/themeContext';
 import Logo from '../components/Logo/Logo';
 
 GoogleSignin.configure({
-  webClientId: GOOGLE_WEB_ID, // From Firebase Console Settings
+  webClientId: Platform.OS === 'ios' ? GOOGLE_IOS_ID : GOOGLE_WEB_ID, // From Firebase Console Settings
   iosClientId: GOOGLE_IOS_ID,
 });
 
@@ -66,12 +66,28 @@ const Login: FunctionComponent<LoginProps> = ({
         ((user && user.emailVerified) ||
           (user.providerData && user.providerData.length > 0))
       ) {
+        const isAdmin = await database()
+          .ref('admins')
+          .child(user.uid)
+          .once('value');
+
+        const avatar = getProfileImage(user);
+        await database()
+          .ref('users')
+          .child(user.uid)
+          .update({
+            uid: user.uid,
+            email: user.email,
+            accountType: isAdmin.val()
+              ? AccountType.ADMIN
+              : AccountType.STANDARD,
+            // avatar,
+          });
         const userRef = db().collection('users').doc(user.uid);
         const doc = await userRef.get();
         if (doc.exists) {
           // setProfile(doc.data());
         } else {
-          const avatar = getProfileImage(user);
           userRef.set({uid: user.uid, email: user.email, avatar});
           // setProfile({uid: user.uid, email: user.email});
         }
@@ -89,7 +105,9 @@ const Login: FunctionComponent<LoginProps> = ({
         } else {
           navigation.navigate('Welcome', {goBack: false});
         }
+        debugger;
         setupNotifications(user.uid);
+        
       }
     });
     // unsubscribe to the listener when unmounting
@@ -157,10 +175,11 @@ const Login: FunctionComponent<LoginProps> = ({
       );
       // Sign-in the user with the credential
       const credentials = await auth().signInWithCredential(facebookCredential);
+      const {uid, email} = credentials.user;
       await database()
         .ref('users')
-        .child(credentials.user.uid)
-        .update({token: data.accessToken});
+        .child(uid)
+        .update({uid, email, token: data.accessToken, fb_login: true});
       setFacebookLoading(false);
       return credentials;
     } catch (e) {

@@ -1,6 +1,7 @@
 import PushNotification from 'react-native-push-notification';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import db from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
 
 export const createChannels = () => {
   const channelData = [
@@ -45,9 +46,10 @@ export const createChannels = () => {
 export const setupNotifications = (uid: string) => {
   PushNotification.configure({
     // (optional) Called when Token is generated (iOS and Android)
-    onRegister: (token) => {
+    onRegister: ({token}) => {
       console.log('TOKEN:', token);
       db().collection('users').doc(uid).update({FCMToken: token});
+      database().ref('users').child(uid).update({registeredToken: token});
     },
 
     // (required) Called when a remote or local notification is opened or received

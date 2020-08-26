@@ -299,7 +299,7 @@ class ProfileView extends Component<ProfileProps, State> {
       ? moment(birthday).format('DD/MM/YYYY')
       : '';
     return (
-      <Layout style={{ flex: 1}}>
+      <Layout style={{flex: 1}}>
         {/* <Header
           left={
             this.hasChanged() && (
@@ -352,6 +352,7 @@ class ProfileView extends Component<ProfileProps, State> {
                   style={{
                     height: 150,
                     justifyContent: 'center',
+                    alignItems: 'center',
                   }}>
                   <ThemedIcon name="plus" size={25} />
                 </View>
@@ -379,12 +380,9 @@ class ProfileView extends Component<ProfileProps, State> {
                     height: 80,
                     alignSelf: 'center',
                     justifyContent: 'center',
+                    alignItems: 'center',
                   }}>
-                  <ThemedIcon
-                    name="plus"
-                    size={25}
-                    style={{textAlign: 'center'}}
-                  />
+                  <ThemedIcon name="plus" size={25} />
                 </View>
               )}
             </TouchableOpacity>

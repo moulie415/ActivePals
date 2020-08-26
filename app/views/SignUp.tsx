@@ -6,7 +6,7 @@ import auth from '@react-native-firebase/auth';
 import {AccountType} from '../types/Profile';
 import str from '../constants/strings';
 import SignUpProps from '../types/views/SignUp';
-import {Layout, Button, Input, Icon} from '@ui-kitten/components';
+import {Layout, Button, Input, Icon, Spinner} from '@ui-kitten/components';
 import globalStyles from '../styles/globalStyles';
 import styles from '../styles/signUpStyles';
 
