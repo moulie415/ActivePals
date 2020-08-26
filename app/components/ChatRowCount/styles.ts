@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   count: {
-    color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
   },

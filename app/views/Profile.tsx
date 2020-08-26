@@ -299,7 +299,7 @@ class ProfileView extends Component<ProfileProps, State> {
       ? moment(birthday).format('DD/MM/YYYY')
       : '';
     return (
-      <Layout>
+      <Layout style={{ flex: 1}}>
         {/* <Header
           left={
             this.hasChanged() && (

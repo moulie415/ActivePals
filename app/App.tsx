@@ -7,13 +7,18 @@ import {
   Icon,
   TabBar,
   Tab,
+  TopNavigation,
 } from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import database from '@react-native-firebase/database';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator, Header} from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  Header,
+  HeaderBackButton,
+} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Login from './views/Login';
@@ -47,6 +52,9 @@ import ProfileView from './views/ProfileView';
 import SessionDetail from './views/sessions/SessionDetail';
 import Location from './types/Location';
 import PostView from './views/PostView';
+import ChatTabBarIcon from './components/ChatTabBarIcon';
+import {ImageProps} from 'react-native';
+import ThemedHeader from './components/ThemedHeader/ThemedHeader';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -113,20 +121,28 @@ const Chats = () => (
   </TopTab.Navigator>
 );
 
-const HomeIcon = (props) => <Icon {...props} name="home" />;
-const SessionsIcon = ({style}) => {
+const HomeIcon = (props: Partial<ImageProps> | undefined) => (
+  <Icon {...props} name="home" />
+);
+const SessionsIcon = ({style}: Partial<ImageProps> | undefined) => {
   return (
     <ThemedImage
       size={24}
-      fill={style.tintColor}
-      style={{marginVertical: style.marginVertical}}
+      fill={style?.tintColor}
+      style={{marginVertical: style?.marginVertical}}
       source={require('../assets/images/dumbbell.png')}
     />
   );
 };
-const FriendsIcon = (props) => <Icon {...props} name="people" />;
-const ChatsIcon = (props) => <Icon {...props} name="message-square" />;
-const ProfileIcon = (props) => <Icon {...props} name="person" />;
+const FriendsIcon = (props: Partial<ImageProps> | undefined) => (
+  <Icon {...props} name="people" />
+);
+const ChatsIcon = (props: Partial<ImageProps> | undefined) => (
+  <ChatTabBarIcon color={props?.style?.tintColor} />
+);
+const ProfileIcon = (props: Partial<ImageProps> | undefined) => (
+  <Icon {...props} name="person" />
+);
 
 const BottomTabBar = ({navigation, state}) => (
   <BottomNavigation
@@ -135,7 +151,7 @@ const BottomTabBar = ({navigation, state}) => (
     onSelect={(index) => navigation.navigate(state.routeNames[index])}>
     <BottomNavigationTab title="Home" icon={HomeIcon} />
     <BottomNavigationTab title="Sessions" icon={SessionsIcon} />
-    <BottomNavigationTab title="Friends" icon={FriendsIcon} />
+    <BottomNavigationTab title="Pals" icon={FriendsIcon} />
     <BottomNavigationTab title="Chats" icon={ChatsIcon} />
     <BottomNavigationTab title="Profile" icon={ProfileIcon} />
   </BottomNavigation>
@@ -187,7 +203,24 @@ const App = () => {
             <NavigationContainer>
               <Stack.Navigator
                 screenOptions={({navigation, route}) => ({
-                  headerTitle: '',
+                  headerStyle: {
+                    backgroundColor: theme === 'light' ? '#fff' : '#222B45',
+                  },
+                  headerTitleStyle: {
+                    color: theme === 'light' ? '#222B45' : '#fff',
+                  },
+                  headerBackTitleStyle: {
+                    color: theme === 'light' ? '#222B45' : '#fff',
+                  },
+                  headerLeft: (props) =>
+                    props.canGoBack && (
+                      <HeaderBackButton
+                        {...props}
+                        tintColor={theme === 'light' ? '#222B45' : '#fff'}
+                      />
+                    ),
+
+                  headerTitle: route.name === 'Tabs' ? '' : undefined,
                   headerRight: () => {
                     if (
                       (!route.state || route.state.index === 0) &&

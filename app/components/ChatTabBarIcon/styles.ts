@@ -13,8 +13,8 @@ const styles = StyleSheet.create({
   },
   unreadCount: {
     fontSize: 10,
-    color: '#fff',
     fontWeight: 'bold',
+    color: '#fff'
   },
 });
 
