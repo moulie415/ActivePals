@@ -22,7 +22,15 @@ import {getProfileImage} from '../helpers/images';
 import {setupNotifications} from '../helpers/notifications';
 import LoginProps from '../types/views/Login';
 import styles from '../styles/loginStyles';
-import {Layout, Icon, Button, Input, Text, Toggle, Spinner} from '@ui-kitten/components';
+import {
+  Layout,
+  Icon,
+  Button,
+  Input,
+  Text,
+  Toggle,
+  Spinner,
+} from '@ui-kitten/components';
 import globalStyles from '../styles/globalStyles';
 import {GOOGLE_WEB_ID} from 'react-native-dotenv';
 import {ThemeContext} from '../context/themeContext';

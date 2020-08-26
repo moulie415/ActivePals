@@ -733,9 +733,6 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
     - ReactCommon/callinvoker (= 0.62.2)
-  - ReactNativeAdsFacebook (6.3.1):
-    - FBAudienceNetwork
-    - React
   - rn-fetch-blob (0.12.0):
     - React-Core
   - RNAppleAuthentication (1.1.2):
@@ -768,8 +765,7 @@ PODS:
     - Firebase/Auth (~> 6.28.1)
     - React
     - RNFBApp
-  - RNFBCrashlytics (8.3.2):
-    - Firebase/Core (~> 6.28.1)
+  - RNFBCrashlytics (8.3.4):
     - Firebase/Crashlytics (~> 6.28.1)
     - React
     - RNFBApp
@@ -804,6 +800,8 @@ PODS:
   - RNSound/Core (0.11.0):
     - React
   - RNSVG (12.1.0):
+    - React
+  - RNVectorIcons (7.0.0):
     - React
   - SDWebImage (5.8.4):
     - SDWebImage/Core (= 5.8.4)
@@ -863,7 +861,6 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/callinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - ReactNativeAdsFacebook (from `../node_modules/react-native-fbads`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - RNCalendarEvents (from `../node_modules/react-native-calendar-events`)
@@ -887,6 +884,7 @@ DEPENDENCIES:
   - RNShare (from `../node_modules/react-native-share`)
   - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1013,8 +1011,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  ReactNativeAdsFacebook:
-    :path: "../node_modules/react-native-fbads"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
   RNAppleAuthentication:
@@ -1061,6 +1057,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-sound"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1145,7 +1143,6 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  ReactNativeAdsFacebook: f26673210344d50687d4c7b1b4242c3b6b48c33f
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNAppleAuthentication: 473b2c076f1a48a537610580a168c1fb6d0a90c6
   RNCalendarEvents: 3a79bc6e476b55920aa706c211a15a1d2c53ec17
@@ -1157,7 +1154,7 @@ SPEC CHECKSUMS:
   RNFBAnalytics: 715279002cf21b600aec33bc2e315c4cdf5d05e6
   RNFBApp: abbab9c96e6d2f1cada6401c9138d3f8cb2ae930
   RNFBAuth: 310c2e57dd86cdf50eccb6ac83ba0212115ac919
-  RNFBCrashlytics: 66045514b40740f8839830cf6aaa90ea2ddce8a5
+  RNFBCrashlytics: f2ea7eeeb19ee564db3d37c28bf54206f6937e5d
   RNFBDatabase: 654cc97f24c44395cc934aa6d661311fe31ff604
   RNFBFirestore: e6de55217697a483c9dd54c2676fd82967b19349
   RNFBStorage: ef83d95cf7470b2b6ce73428ab0b334fb19a6161
@@ -1169,11 +1166,12 @@ SPEC CHECKSUMS:
   RNShare: a1d5064df7a0ebe778d001869b3f0a124bf0a491
   RNSound: da030221e6ac7e8290c6b43f2b5f2133a8e225b0
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
+  RNVectorIcons: da6fe858f5a65d7bbc3379540a889b0b12aa5976
   SDWebImage: cf6922231e95550934da2ada0f20f2becf2ceba9
   SDWebImageWebPCoder: d0dac55073088d24b2ac1b191a71a8f8d0adac21
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 79990ef74686571380fecc55f0528538726e2eef
+PODFILE CHECKSUM: c6f891101c2c691d7024d4b05e54e5ff107f014f
 
 COCOAPODS: 1.9.3
