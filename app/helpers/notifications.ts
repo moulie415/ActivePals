@@ -49,7 +49,7 @@ export const setupNotifications = (uid: string) => {
     onRegister: ({token}) => {
       console.log('TOKEN:', token);
       db().collection('users').doc(uid).update({FCMToken: token});
-      database().ref('users').child(uid).update({registeredToken: token});
+      database().ref('users').child(uid).update({FCMToken: token});
     },
 
     // (required) Called when a remote or local notification is opened or received
