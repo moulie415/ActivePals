@@ -10,6 +10,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import com.instabug.reactlibrary.RNInstabugReactnativePackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -45,6 +46,13 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    new RNInstabugReactnativePackage
+      .Builder("804c8f8e35fa17bdafb82e6778629dd4", MainApplication.this)
+      .setInvocationEvent("none")
+      .setPrimaryColor("#1D82DC")
+      .setFloatingEdge("left")
+      .setFloatingButtonOffsetFromTop(250)
+      .build();
   }
 
   /**

@@ -11,7 +11,6 @@ export default StyleSheet.create({
   },
   indicator: {
     position: 'absolute',
-    zIndex: -1,
     top: 0,
     left: 0,
     right: 0,

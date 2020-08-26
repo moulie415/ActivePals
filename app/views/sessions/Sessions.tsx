@@ -582,165 +582,174 @@ class Sessions extends Component<SessionsProps, State> {
       </View>
     );
     return (
-      <>
-        {spinner && <Spinner style={styles.spinner} />}
-        <Layout style={{flex: 1}}>
-          {!showMap && this.renderLists()}
-          {showMap && (
-            <MapView
-              style={styles.map}
-              onPress={(event) => this.handlePress(event)}
-              // onLongPress={event => this.handlePress(event)}
-              showsUserLocation
-              initialRegion={{
-                latitude,
-                longitude,
-                latitudeDelta: 0.015,
-                longitudeDelta: 0.0121,
-              }}
-              region={{
-                latitude,
-                longitude,
-                latitudeDelta: 0.015,
-                longitudeDelta: 0.0121,
-              }}>
-              {markers}
-              {this.gymMarkers(Object.values(places))}
-            </MapView>
-          )}
-          <GymSearch
-            parent={this}
-            onOpen={(id) => navigation.navigate('Gym', {id})}
-          />
-          <View
-            style={{
-              flexDirection: 'row',
-              height: 60,
-              justifyContent: 'space-evenly',
-            }}>
-            <Button
-              style={styles.button}
-              onPress={() => {
-                this.setState({selectedLocation: {}});
-                //showAdmobInterstitial();
-                navigation.navigate('SessionDetail', {});
-              }}>
-              Create Session
-            </Button>
-            {/* <View style={{borderRightWidth: 1}} /> */}
-            <Button
-              style={styles.button}
-              onPress={() => {
-                if (Object.keys(friends).length > 0) {
-                  this.setState({selectedLocation: {}, friendsModalOpen: true});
-                } else {
-                  Alert.alert(
-                    'Sorry',
-                    'You must have at least one pal to create a private session',
-                  );
-                }
-              }}>
-              Create Private Session
-            </Button>
+      <Layout style={{flex: 1}}>
+        {spinner ? (
+          <View style={globalStyles.indicator}>
+            <Spinner />
           </View>
-          <FriendsModal
-            onClosed={() => this.setState({friendsModalOpen: false})}
-            onContinue={(f) => {
-              //showAdmobInterstitial();
-              navigation.navigate('SessionDetail', {
-                friends: f,
-                location: selectedLocation,
-              });
-            }}
-            isOpen={friendsModalOpen}
-          />
-          <Modal
-            useNativeDriver
-            onClosed={async () => {
-              const {radius: currentRadius, fetch, saveRadius} = this.props;
-              this.setState({filterModalOpen: false});
-              if (radius !== currentRadius) {
-                this.setState({refreshing: true});
-                saveRadius(radius);
-                await fetch(radius);
-                this.setState({refreshing: false});
-              }
-            }}
-            style={styles.modal}
-            position="center"
-            isOpen={filterModalOpen}
-            key={filterModalOpen ? 1 : 2}>
-            <View style={{flex: 1, borderRadius: 5}}>
-              <Text style={styles.sessionFilterTitle}>Sessions</Text>
-              <View style={styles.sessionFilterContainer}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text
-                    style={{
-                      marginRight: 5,
-                      fontSize: 12,
-                    }}>{`Search radius* ${radius} km`}</Text>
-                  <Slider
-                    maximumValue={50}
-                    minimumValue={5}
-                    step={5}
-                    style={{flex: 1}}
-                    value={radius}
-                    onValueChange={(val) => this.setState({radius: val})}
-                  />
-                </View>
-                <View style={{flex: 1, justifyContent: 'flex-end'}}>
-                  <Text style={{fontSize: 12, textAlign: 'right', margin: 10}}>
-                    *Public only (private sessions should always be visible)
-                  </Text>
+        ) : (
+          <Layout style={{flex: 1}}>
+            {!showMap && this.renderLists()}
+            {showMap && (
+              <MapView
+                style={styles.map}
+                onPress={(event) => this.handlePress(event)}
+                // onLongPress={event => this.handlePress(event)}
+                showsUserLocation
+                initialRegion={{
+                  latitude,
+                  longitude,
+                  latitudeDelta: 0.015,
+                  longitudeDelta: 0.0121,
+                }}
+                region={{
+                  latitude,
+                  longitude,
+                  latitudeDelta: 0.015,
+                  longitudeDelta: 0.0121,
+                }}>
+                {markers}
+                {this.gymMarkers(Object.values(places))}
+              </MapView>
+            )}
+            <GymSearch
+              parent={this}
+              onOpen={(id) => navigation.navigate('Gym', {id})}
+            />
+            <View
+              style={{
+                flexDirection: 'row',
+                height: 60,
+                justifyContent: 'space-evenly',
+              }}>
+              <Button
+                style={styles.button}
+                onPress={() => {
+                  this.setState({selectedLocation: {}});
+                  //showAdmobInterstitial();
+                  navigation.navigate('SessionDetail', {});
+                }}>
+                Create Session
+              </Button>
+              {/* <View style={{borderRightWidth: 1}} /> */}
+              <Button
+                style={styles.button}
+                onPress={() => {
+                  if (Object.keys(friends).length > 0) {
+                    this.setState({
+                      selectedLocation: {},
+                      friendsModalOpen: true,
+                    });
+                  } else {
+                    Alert.alert(
+                      'Sorry',
+                      'You must have at least one pal to create a private session',
+                    );
+                  }
+                }}>
+                Create Private Session
+              </Button>
+            </View>
+            <FriendsModal
+              onClosed={() => this.setState({friendsModalOpen: false})}
+              onContinue={(f) => {
+                //showAdmobInterstitial();
+                navigation.navigate('SessionDetail', {
+                  friends: f,
+                  location: selectedLocation,
+                });
+              }}
+              isOpen={friendsModalOpen}
+            />
+            <Modal
+              useNativeDriver
+              onClosed={async () => {
+                const {radius: currentRadius, fetch, saveRadius} = this.props;
+                this.setState({filterModalOpen: false});
+                if (radius !== currentRadius) {
+                  this.setState({refreshing: true});
+                  saveRadius(radius);
+                  await fetch(radius);
+                  this.setState({refreshing: false});
+                }
+              }}
+              style={styles.modal}
+              position="center"
+              isOpen={filterModalOpen}
+              key={filterModalOpen ? 1 : 2}>
+              <View style={{flex: 1, borderRadius: 5}}>
+                <Text style={styles.sessionFilterTitle}>Sessions</Text>
+                <View style={styles.sessionFilterContainer}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text
+                      style={{
+                        marginRight: 5,
+                        fontSize: 12,
+                      }}>{`Search radius* ${radius} km`}</Text>
+                    <Slider
+                      maximumValue={50}
+                      minimumValue={5}
+                      step={5}
+                      style={{flex: 1}}
+                      value={radius}
+                      onValueChange={(val) => this.setState({radius: val})}
+                    />
+                  </View>
+                  <View style={{flex: 1, justifyContent: 'flex-end'}}>
+                    <Text
+                      style={{fontSize: 12, textAlign: 'right', margin: 10}}>
+                      *Public only (private sessions should always be visible)
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-            <View style={{flex: 1}}>
-              <Text
-                style={{
-                  fontSize: 20,
-                  textAlign: 'center',
-                  padding: 10,
-                  color: '#000',
-                  fontWeight: 'bold',
-                }}>
-                Gyms
-              </Text>
-              <TouchableOpacity
-                onPress={() => this.setState({yoga: !stateYoga})}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  borderTopWidth: 0.5,
-                  borderTopColor: '#999',
-                }}>
-                <CheckBox
-                  checked={stateYoga}
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    textAlign: 'center',
+                    padding: 10,
+                    color: '#000',
+                    fontWeight: 'bold',
+                  }}>
+                  Gyms
+                </Text>
+                <TouchableOpacity
                   onPress={() => this.setState({yoga: !stateYoga})}
-                />
-                <Text>Show Yoga</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => this.setState({pilates: !statePilates})}
-                style={{flexDirection: 'row', alignItems: 'center'}}>
-                <CheckBox
-                  checked={statePilates}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    borderTopWidth: 0.5,
+                    borderTopColor: '#999',
+                  }}>
+                  <CheckBox
+                    checked={stateYoga}
+                    onPress={() => this.setState({yoga: !stateYoga})}
+                  />
+                  <Text>Show Yoga</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   onPress={() => this.setState({pilates: !statePilates})}
-                />
-                <Text>Show Pilates</Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
-          <Popup
-            isVisible={popUpVisible}
-            onCancelPressed={() => this.setState({popUpVisible: false})}
-            onAppPressed={() => this.setState({popUpVisible: false})}
-            onBackButtonPressed={() => this.setState({popUpVisible: false})}
-            modalProps={{animationIn: 'slideInUp'}}
-            options={options}
-            appsWhiteList={[]}
-          />
-        </Layout>
+                  style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <CheckBox
+                    checked={statePilates}
+                    onPress={() => this.setState({pilates: !statePilates})}
+                  />
+                  <Text>Show Pilates</Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>
+            <Popup
+              isVisible={popUpVisible}
+              onCancelPressed={() => this.setState({popUpVisible: false})}
+              onAppPressed={() => this.setState({popUpVisible: false})}
+              onBackButtonPressed={() => this.setState({popUpVisible: false})}
+              modalProps={{animationIn: 'slideInUp'}}
+              options={options}
+              appsWhiteList={[]}
+            />
+          </Layout>
+        )}
         <ActionSheet
           ref={(ref) => {
             this.ActionSheet = ref;
@@ -766,7 +775,7 @@ class Sessions extends Component<SessionsProps, State> {
             }
           }}
         />
-      </>
+      </Layout>
     );
   }
 }

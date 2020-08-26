@@ -51,6 +51,7 @@ import ChatTabBarIcon from './components/ChatTabBarIcon';
 import {ImageProps, SafeAreaView} from 'react-native';
 import FullScreenVideo from './views/FullScreenVideo';
 import Credits from './views/Credits';
+import Instabug from 'instabug-reactnative';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -191,6 +192,13 @@ const App = () => {
   useEffect(() => {
     AsyncStorage.setItem(key, theme);
   }, [theme]);
+
+  useEffect(() => {
+    Instabug.setWelcomeMessageMode(Instabug.welcomeMessageMode.disabled);
+    Instabug.startWithToken('804c8f8e35fa17bdafb82e6778629dd4', [
+      Instabug.invocationEvent.shake,
+    ]);
+  }, []);
   return (
     <PersistGate persistor={persistor}>
       <Provider store={store}>

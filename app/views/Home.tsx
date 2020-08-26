@@ -151,14 +151,8 @@ class Home extends Component<HomeProps, State> {
     ) {
       return (
         <View>
-          <View
-            style={{
-              borderTopWidth: 0.5,
-              borderTopColor: '#999',
-              marginVertical: 5,
-            }}
-          />
-          <View style={{marginHorizontal: 10, flexDirection: 'row'}}>
+          <Divider />
+          <View style={{margin: 10, flexDirection: 'row'}}>
             {!!item.repCount && item.repCount > 0 && (
               <TouchableOpacity
                 style={{flex: 1}}
@@ -170,7 +164,7 @@ class Home extends Component<HomeProps, State> {
                   });
                   await getRepsUsers(item.key);
                 }}>
-                <Text style={{color: '#999'}}>{`${item.repCount} ${
+                <Text>{`${item.repCount} ${
                   item.repCount > 1 ? ' reps' : ' rep'
                 }`}</Text>
               </TouchableOpacity>
@@ -182,7 +176,7 @@ class Home extends Component<HomeProps, State> {
                   this.setState({postId: item.key, showCommentModal: true});
                   getComments(item.key);
                 }}>
-                <Text style={{color: '#999', textAlign: 'right'}}>
+                <Text style={{textAlign: 'right'}}>
                   {`${item.commentCount} ${
                     item.commentCount > 1 ? ' comments' : ' comment'
                   }`}
@@ -190,27 +184,22 @@ class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             )}
           </View>
-          <View
-            style={{
-              borderTopWidth: 0.5,
-              borderTopColor: '#999',
-              marginVertical: 5,
-            }}
-          />
+          <Divider />
         </View>
       );
     }
-    return (
-      <View
-        style={{borderTopWidth: 0.5, borderTopColor: '#999', marginVertical: 5}}
-      />
-    );
+    return <Divider />;
   }
 
   repsAndComments(item) {
     const {onRepPost, getComments} = this.props;
     return (
-      <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          marginTop: 5,
+        }}>
         {item.type !== 'video' && (
           <TouchableOpacity
             onPress={() => {
@@ -426,9 +415,7 @@ class Home extends Component<HomeProps, State> {
               {this.renderAvatar(item.uid)}
               <View style={{flex: 1}}>
                 {this.getUsernameFormatted(item.uid)}
-                <Text style={{color: '#999'}}>
-                  {getSimplifiedTime(item.createdAt)}
-                </Text>
+                <Text>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
               <TouchableOpacity
                 onPress={() =>
@@ -457,9 +444,7 @@ class Home extends Component<HomeProps, State> {
               {this.renderAvatar(item.uid)}
               <View style={{flex: 1}}>
                 {this.getUsernameFormatted(item.uid)}
-                <Text style={{color: '#999'}}>
-                  {getSimplifiedTime(item.createdAt)}
-                </Text>
+                <Text>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
               <TouchableOpacity
                 onPress={() =>
@@ -504,9 +489,7 @@ class Home extends Component<HomeProps, State> {
               {this.renderAvatar(item.uid)}
               <View style={{flex: 1}}>
                 {this.getUsernameFormatted(item.uid)}
-                <Text style={{color: '#999'}}>
-                  {getSimplifiedTime(item.createdAt)}
-                </Text>
+                <Text>{getSimplifiedTime(item.createdAt)}</Text>
               </View>
               <TouchableOpacity
                 onPress={() =>
@@ -659,7 +642,6 @@ class Home extends Component<HomeProps, State> {
           fontSize: 20,
           alignSelf: 'center',
           marginTop: 20,
-          color: '#999',
         }}>
         No feed items yet
       </Text>
@@ -863,7 +845,7 @@ class Home extends Component<HomeProps, State> {
             renderIndicator={(currentIndex, allSize) => null}
             loadingRender={() => (
               <SafeAreaView>
-                <Text style={{color: '#fff', fontSize: 20}}>Loading...</Text>
+                <Text style={{fontSize: 20}}>Loading...</Text>
               </SafeAreaView>
             )}
             renderHeader={() => {

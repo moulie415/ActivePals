@@ -85,9 +85,6 @@ export default StyleSheet.create({
     flex: 1,
     padding: Platform.OS == 'ios' ? 10 : 0,
     marginBottom: Platform.OS == 'ios' ? 0 : 10,
-
-    color: '#424242',
-    borderColor: '#999',
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginLeft: 5,
   },
@@ -147,7 +144,6 @@ export default StyleSheet.create({
   menu: {
     zIndex: 999,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#999',
     width: 200,
     right: 0,
     top: 0,
@@ -160,7 +156,6 @@ export default StyleSheet.create({
     borderWidth: 0,
     justifyContent: 'center',
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderColor: '#999',
   },
   menuText: {
     textAlign: 'center',
