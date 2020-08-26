@@ -32,12 +32,13 @@ import {
   Spinner,
 } from '@ui-kitten/components';
 import globalStyles from '../styles/globalStyles';
-import {GOOGLE_WEB_ID} from 'react-native-dotenv';
+import {GOOGLE_WEB_ID, GOOGLE_IOS_ID} from 'react-native-dotenv';
 import {ThemeContext} from '../context/themeContext';
 import Logo from '../components/Logo/Logo';
 
 GoogleSignin.configure({
   webClientId: GOOGLE_WEB_ID, // From Firebase Console Settings
+  iosClientId: GOOGLE_IOS_ID,
 });
 
 const Login: FunctionComponent<LoginProps> = ({
@@ -169,16 +170,21 @@ const Login: FunctionComponent<LoginProps> = ({
   };
 
   const googleSignIn = async () => {
-    // Get the users ID token
-    const {idToken} = await GoogleSignin.signIn();
+    try {
+      // Get the users ID token
+      const {idToken} = await GoogleSignin.signIn();
 
-    // Create a Google credential with the token
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
-    // Sign-in the user with the credential
-    const credentials = await auth().signInWithCredential(googleCredential);
-    setGoogleLoading(false);
-    return credentials;
+      // Sign-in the user with the credential
+      const credentials = await auth().signInWithCredential(googleCredential);
+      setGoogleLoading(false);
+      return credentials;
+    } catch (e) {
+      Alert.alert('Error', e.message);
+      setGoogleLoading(false);
+    }
   };
 
   return (
