@@ -7,7 +7,6 @@ export default StyleSheet.create({
   contact: {
     padding: 10,
     borderBottomWidth: 1,
-    borderColor: '#c9c9c9c9',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

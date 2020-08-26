@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import Geocoder from 'react-native-geocoder';
 import database from '@react-native-firebase/database';
-import DateTimePicker from '@react-native-community/datetimepicker';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import RNCalendarEvents from 'react-native-calendar-events';
 import {geofire} from '../../App';
 import {types, getType, addSessionToCalendar} from '../../constants/utils';
@@ -460,7 +460,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
         />
         {showDatePicker && (
           <SafeAreaView>
-            <DateTimePicker
+            {/* <DateTimePicker
               value={selectedDate}
               mode="datetime"
               onChange={(event, newDate) => {
@@ -475,7 +475,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
                 }
               }}
               minimumDate={new Date()}
-            />
+            /> */}
             {Platform.OS === 'ios' && (
               <View
                 style={{flexDirection: 'row', justifyContent: 'space-between'}}>

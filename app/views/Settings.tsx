@@ -1,5 +1,5 @@
 import React, {FunctionComponent, useState, useContext} from 'react';
-import {View, Alert, ScrollView, ActivityIndicator} from 'react-native';
+import {View, Alert, ScrollView} from 'react-native';
 import crashlytics from '@react-native-firebase/crashlytics';
 import VersionNumber from 'react-native-version-number';
 import Instabug from 'instabug-reactnative';
@@ -102,6 +102,7 @@ const Settings: FunctionComponent<SettingsProps> = ({
         />
         <Divider />
         <ListItem
+          onPress={toggleTheme}
           title={`Theme: ${theme}`}
           accessoryRight={() => (
             <Toggle checked={theme === 'dark'} onChange={toggleTheme} />

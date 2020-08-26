@@ -1,28 +1,21 @@
 import React, {Component} from 'react';
 import {View, Image, ScrollView} from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
-import Header from '../components/Header/header';
-import Text from '../components/Text';
 import {getType} from '../constants/utils';
-
+import {Text, Layout} from '@ui-kitten/components';
 import {SessionType} from '../types/Session';
+import ThemedImage from '../components/ThemedImage/ThemedImage';
 
 // football icon made by Christopher Schreiner @infanf http://twitter.com/infanf
 
-const renderImage = (require, size, margin, color = '#000') => {
-  return (
-    <Image
-      style={{height: size, width: size, tintColor: color, margin}}
-      source={require}
-    />
-  );
+const renderImage = (require, size, margin) => {
+  return <ThemedImage size={size} style={{margin}} source={require} />;
 };
 
 class Credits extends Component {
   render() {
     return (
-      <>
-        <Header hasBack title="Credits" />
+      <Layout style={{flex: 1}}>
         <ScrollView>
           <Hyperlink
             linkDefault
@@ -144,7 +137,7 @@ class Credits extends Component {
             </View>
           </Hyperlink>
         </ScrollView>
-      </>
+      </Layout>
     );
   }
 }

@@ -1,10 +1,10 @@
 import React, {Component, createRef} from 'react';
-import {View, TextInput, Platform, KeyboardAvoidingView} from 'react-native';
+import {View, Platform, KeyboardAvoidingView} from 'react-native';
 import {connect} from 'react-redux';
 
 import styles from '../styles/formStyles';
 import FormProps from '../types/views/Form';
-import {Text, List, Divider} from '@ui-kitten/components';
+import {Text, List, Divider, Input} from '@ui-kitten/components';
 
 interface State {
   required: string;
@@ -13,7 +13,7 @@ interface State {
 class Form extends Component<FormProps, State> {
   list;
 
-  textInputs: TextInput[];
+  textInputs: Input[];
 
   constructor(props) {
     super(props);
@@ -79,7 +79,7 @@ class Form extends Component<FormProps, State> {
                       Personal trainer verification
                     </Text>
                   ) : (
-                    <TextInput
+                    <Input
                       ref={(i) => {
                         this.textInputs[index] = i;
                       }}

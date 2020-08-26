@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Alert, View, TextInput, Platform, TouchableOpacity} from 'react-native';
+import {Alert, View, Platform, TouchableOpacity} from 'react-native';
 import database from '@react-native-firebase/database';
 import Image from 'react-native-fast-image';
 import Modal from 'react-native-modalbox';
@@ -22,6 +22,7 @@ import {
   Divider,
   ListItem,
   Avatar,
+  Input,
 } from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
@@ -267,7 +268,7 @@ class Friends extends Component<FriendsProps, State> {
           </Text>
           <Layout
             style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <TextInput
+            <Input
               underlineColorAndroid="transparent"
               style={styles.usernameInput}
               autoCapitalize="none"

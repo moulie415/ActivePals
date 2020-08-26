@@ -12,8 +12,17 @@ import Image from 'react-native-fast-image';
 import styles from './styles';
 
 import FriendsModalProps from '../../types/components/FriendsModal';
-import {Button, Icon, Text} from '@ui-kitten/components';
+import {
+  Button,
+  Icon,
+  Text,
+  List,
+  ListItem,
+  Avatar,
+  Layout,
+} from '@ui-kitten/components';
 import {MyRootState} from '../../types/Shared';
+import ThemedIcon from '../ThemedIcon/ThemedIcon';
 
 interface State {
   selectedFriends: string[];
@@ -40,73 +49,47 @@ class FriendsModal extends Component<FriendsModalProps, State> {
     const {friends} = this.props;
     const {selectedFriends} = this.state;
     const connectedFriends = [];
-    Object.values(friends).forEach((friend, index) => {
-      const selected = selectedFriends.some((uid) => uid === friend.uid);
-      if (friend.status === 'connected') {
-        connectedFriends.push(
-          <TouchableOpacity
-            key={friend.uid}
-            onPress={() => this.onFriendPress(friend.uid)}>
-            <View
-              style={{
-                paddingVertical: 15,
-                paddingHorizontal: 10,
-                marginBottom: 0.5,
-                marginTop: index === 0 ? 0.5 : 0,
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  height: 30,
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  {friend.avatar ? (
-                    <Image
-                      source={{uri: friend.avatar}}
-                      style={{height: 30, width: 30, borderRadius: 15}}
-                    />
+    return (
+      <List
+        data={Object.values(friends)}
+        renderItem={({item}) => {
+          const selected = selectedFriends.some((uid) => uid === item.uid);
+          if (item.status === 'connected') {
+            return (
+              <ListItem
+                title={item.username}
+                accessoryLeft={() =>
+                  item.avatar ? (
+                    <Avatar source={{uri: item.avatar}} />
                   ) : (
-                    <Icon
-                      name="md-contact"
-                      size={35}
-                      style={{
-                        marginTop: Platform.OS === 'ios' ? -2 : 0,
-                      }}
-                    />
-                  )}
-                  <Text style={{marginHorizontal: 10}}>{friend.username}</Text>
-                  {selected && (
-                    <Icon
-                      size={25}
-                      name="ios-checkmark-circle"
-                      style={{
-                        textAlign: 'right',
-                        flex: 1,
-                      }}
-                    />
-                  )}
-                </View>
-              </View>
-            </View>
-          </TouchableOpacity>,
-        );
-      }
-    });
-    return connectedFriends.length > 0 ? (
-      <ScrollView>{connectedFriends}</ScrollView>
-    ) : (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Text style={{padding: 15, textAlign: 'center'}}>
-          Sorry, you must have at least one Pal to create a Private Session
-        </Text>
-      </View>
+                    <ThemedIcon name="person" size={35} />
+                  )
+                }
+                accessoryRight={() =>
+                  selected ? (
+                    <ThemedIcon size={25} name="checkmark-circle-2" />
+                  ) : (
+                    <View />
+                  )
+                }
+              />
+            );
+          }
+          return null;
+        }}
+        ListEmptyComponent={
+          <Layout
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text style={{padding: 15, textAlign: 'center'}}>
+              Sorry, you must have at least one Pal to create a Private Session
+            </Text>
+          </Layout>
+        }
+      />
     );
   }
 

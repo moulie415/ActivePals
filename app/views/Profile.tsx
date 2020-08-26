@@ -11,10 +11,10 @@ import {equals} from 'ramda';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
-import DateTimePicker from '@react-native-community/datetimepicker';
+//import DateTimePicker from '@react-native-community/datetimepicker';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
-import RNPickerSelect from 'react-native-picker-select';
+//import RNPickerSelect from 'react-native-picker-select';
 import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
 import styles from '../styles/profileStyles';
@@ -572,7 +572,7 @@ class ProfileView extends Component<ProfileProps, State> {
         </ScrollView>
         {showPicker && (
           <>
-            <DateTimePicker
+            {/* <DateTimePicker
               mode="date"
               value={birthday ? birthday.toDate() : new Date()}
               maximumDate={new Date()}
@@ -587,7 +587,7 @@ class ProfileView extends Component<ProfileProps, State> {
                   });
                 }
               }}
-            />
+            /> */}
             {Platform.OS === 'ios' && (
               <View
                 style={{flexDirection: 'row', justifyContent: 'space-between'}}>

@@ -7,18 +7,13 @@ import {
   Icon,
   TabBar,
   Tab,
-  TopNavigation,
 } from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import database from '@react-native-firebase/database';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
-import {
-  createStackNavigator,
-  Header,
-  HeaderBackButton,
-} from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Login from './views/Login';
@@ -54,7 +49,8 @@ import Location from './types/Location';
 import PostView from './views/PostView';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
 import {ImageProps} from 'react-native';
-import ThemedHeader from './components/ThemedHeader/ThemedHeader';
+import FullScreenVideo from './views/FullScreenVideo';
+import Credits from './views/Credits';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -97,6 +93,8 @@ export type StackParamList = {
   };
   SessionDetail: {location?: Location; friends?: string[]};
   PostView: {postId: string};
+  FullScreenVideo: {uri: string};
+  Credits: undefined;
 };
 
 const Stack = createStackNavigator<StackParamList>();
@@ -212,14 +210,7 @@ const App = () => {
                   headerBackTitleStyle: {
                     color: theme === 'light' ? '#222B45' : '#fff',
                   },
-                  headerLeft: (props) =>
-                    props.canGoBack && (
-                      <HeaderBackButton
-                        {...props}
-                        tintColor={theme === 'light' ? '#222B45' : '#fff'}
-                      />
-                    ),
-
+                  headerTintColor: theme === 'light' ? '#222B45' : '#fff',
                   headerTitle: route.name === 'Tabs' ? '' : undefined,
                   headerRight: () => {
                     if (
@@ -250,6 +241,11 @@ const App = () => {
                 <Stack.Screen name="ProfileView" component={ProfileView} />
                 <Stack.Screen name="SessionDetail" component={SessionDetail} />
                 <Stack.Screen name="PostView" component={PostView} />
+                <Stack.Screen
+                  name="FullScreenVideo"
+                  component={FullScreenVideo}
+                />
+                <Stack.Screen name="Credits" component={Credits} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>

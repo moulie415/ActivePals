@@ -57,7 +57,8 @@ import {
   Layout,
   List,
   Divider,
-  Spinner
+  Spinner,
+  Avatar,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
@@ -115,7 +116,7 @@ class Home extends Component<HomeProps, State> {
     };
   }
 
-  getUsername(uid) {
+  getUsername(uid: string) {
     const {friends, users} = this.props;
     if (friends[uid]) {
       return friends[uid].username;
@@ -126,7 +127,7 @@ class Home extends Component<HomeProps, State> {
     return 'N/A';
   }
 
-  getUsernameFormatted(uid) {
+  getUsernameFormatted(uid: string) {
     const {profile, navigation} = this.props;
     return (
       <TouchableOpacity
@@ -370,7 +371,7 @@ class Home extends Component<HomeProps, State> {
     }
   }
 
-  renderAvatar(uid) {
+  renderAvatar(uid: string) {
     const {profile, friends, navigation} = this.props;
     if (profile.avatar && uid === profile.uid) {
       return (
@@ -571,7 +572,7 @@ class Home extends Component<HomeProps, State> {
                     position: 'absolute',
                     padding: 2,
                     paddingHorizontal: 6,
-
+                    backgroundColor: 'rgba(0,0,0,0.3)',
                     borderRadius: 5,
                   }}
                   onPress={() => {
@@ -582,14 +583,7 @@ class Home extends Component<HomeProps, State> {
                       navigation.navigate('FullScreenVideo', {uri: item.url});
                     }
                   }}>
-                  <ThemedIcon
-                    name="expand"
-                    size={30}
-                    fill="#fff"
-                    style={{
-                      backgroundColor: 'transparent',
-                    }}
-                  />
+                  <ThemedIcon name="expand" size={30} fill="#fff" style={{}} />
                 </TouchableOpacity>
               </View>
             )}
@@ -706,48 +700,18 @@ class Home extends Component<HomeProps, State> {
 
     const combined = {...users, ...friends};
 
-    const notificationsButton = (
-      <TouchableOpacity
-        onPress={() => navigation.navigate({routeName: 'Notifications'})}>
-        <View style={{width: 30, alignItems: 'center'}}>
-          <ThemedIcon name="bell" size={25} style={{marginLeft: -10}} />
-          {!!unreadCount && unreadCount > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text
-                numberOfLines={1}
-                adjustsFontSizeToFit={unreadCount > 0}
-                style={{fontSize: 10, color: '#fff'}}>
-                {unreadCount}
-              </Text>
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
-    );
     return (
-      <Layout style={{ flex: 1}}>
-        {/* <Header title="Feed" right={notificationsButton} /> */}
+      <Layout style={{flex: 1}}>
         <Layout
           style={{
             flexDirection: 'row',
             padding: 10,
             alignItems: 'center',
-            borderBottomWidth: 0.5,
+            justifyContent: 'space-evenly',
           }}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Profile')}
-            style={{
-              elevation: 4,
-              shadowOffset: {width: 5, height: 5},
-              shadowColor: 'grey',
-              shadowOpacity: 0.5,
-              shadowRadius: 10,
-            }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
             {profile && avatar ? (
-              <Image
-                source={{uri: avatar}}
-                style={{height: 50, width: 50, borderRadius: 25}}
-              />
+              <Avatar source={{uri: avatar}} size="large" />
             ) : (
               <ThemedIcon name="person" size={60} />
             )}
@@ -785,14 +749,7 @@ class Home extends Component<HomeProps, State> {
                 );
               }
             }}>
-            <ThemedIcon
-              name="camera"
-              size={40}
-              style={{
-                marginLeft: 5,
-                marginRight: 10,
-              }}
-            />
+            <ThemedIcon name="camera" size={40} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -839,16 +796,10 @@ class Home extends Component<HomeProps, State> {
                 // alert no status
               }
             }}>
-            <ThemedIcon
-              name="corner-down-right"
-              size={40}
-              style={{
-                paddingTop: 5,
-              }}
-            />
+            <ThemedIcon name="corner-down-right" size={40} />
           </TouchableOpacity>
         </Layout>
-
+        <Divider />
         <ScrollView
           contentContainerStyle={{
             flex: 1,

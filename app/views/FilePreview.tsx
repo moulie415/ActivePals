@@ -3,7 +3,6 @@ import {
   View,
   TouchableWithoutFeedback,
   Platform,
-  TextInput,
   KeyboardAvoidingView,
   Keyboard,
   Alert,
@@ -11,10 +10,10 @@ import {
   SafeAreaView,
   Image as SlowImage,
 } from 'react-native';
-import firebase, {RNFirebase} from 'react-native-firebase';
+import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 import Video from 'react-native-video';
 import Image from 'react-native-fast-image';
-import {PulseIndicator} from 'react-native-indicators';
 import {connect} from 'react-redux';
 
 import {getMentionsList, guid} from '../constants/utils';
@@ -23,9 +22,14 @@ import styles from '../styles/homeStyles';
 import {addPost} from '../actions/home';
 import {setMessage} from '../actions/chats';
 import FilePreviewProps from '../types/views/FilePreview';
-import {TaskEvent, TaskState} from '../types/Shared';
+import {
+  TaskEvent,
+  TaskState,
+  MyRootState,
+  MyThunkDispatch,
+} from '../types/Shared';
 import Profile from '../types/Profile';
-import {Text, Icon, List, Divider, Spinner} from '@ui-kitten/components';
+import {Text, Icon, List, Divider, Spinner, Input} from '@ui-kitten/components';
 
 interface State {
   paused: boolean;
@@ -88,7 +92,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
     return new Promise((resolve, reject) => {
       // const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       const id = guid();
-      const imageRef = firebase.storage().ref(ref).child(id);
+      const imageRef = storage().ref(ref).child(id);
 
       imageRef.putFile(uri, {contentType: mimeType}).on(
         TaskEvent.STATE_CHANGED,
@@ -201,7 +205,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
               </TouchableOpacity>
             </View>
             {mentionList && !message && this.renderMentionList()}
-            <TextInput
+            <Input
               style={{
                 height: 50,
                 paddingLeft: 10,
@@ -293,7 +297,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
               </TouchableOpacity>
             </View>
             {mentionList && !message && this.renderMentionList()}
-            <TextInput
+            <Input
               style={{
                 height: 50,
                 paddingLeft: 10,
@@ -383,14 +387,15 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 }
 
-const mapStateToProps = ({profile, friends}) => ({
+const mapStateToProps = ({profile, friends}: MyRootState) => ({
   profile: profile.profile,
   friends: friends.friends,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  postStatus: (status) => dispatch(addPost(status)),
-  setPostMessage: (url, text) => dispatch(setMessage(url, text)),
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
+  postStatus: (status: string) => dispatch(addPost(status)),
+  setPostMessage: (url: string, text: string) =>
+    dispatch(setMessage(url, text)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FilePreview);

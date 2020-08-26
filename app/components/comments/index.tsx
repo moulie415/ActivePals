@@ -7,7 +7,6 @@ import {
   Modal,
   Dimensions,
   Keyboard,
-  TextInput,
   TouchableOpacity,
 } from 'react-native';
 import Image from 'react-native-fast-image';
@@ -18,7 +17,8 @@ import CommentsProps from '../../types/components/Comments';
 import Profile from '../../types/Profile';
 import CommentType from '../../types/Comment';
 import Comment from './Comment';
-import {Icon, Text, List, Divider, Spinner} from '@ui-kitten/components';
+import {Icon, Text, List, Divider, Spinner, Input} from '@ui-kitten/components';
+import ThemedIcon from '../ThemedIcon/ThemedIcon';
 
 const screen = Dimensions.get('screen');
 
@@ -32,9 +32,9 @@ interface State {
 }
 
 export default class Comments extends PureComponent<CommentsProps, State> {
-  inputMain: TextInput;
+  inputMain: Input;
 
-  textInputs: TextInput[];
+  textInputs: Input[];
 
   newCommentText: string;
 
@@ -319,7 +319,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
           {like.image ? (
             <Image style={[styles.likeImage]} source={{uri: like.image}} />
           ) : (
-            <IIcon name="md-contact" size={40} />
+            <ThemedIcon name="person" size={40} />
           )}
           <Text>{like.name || like.username}</Text>
         </View>
@@ -413,7 +413,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
               </View>
             ) : null}
             <View style={styles.inputSection}>
-              <TextInput
+              <Input
                 ref={(input) => {
                   this.textInputs[`input${keyExtractor(item)}`] = input;
                 }}
@@ -432,11 +432,11 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                   this.textInputs[`input${keyExtractor(item)}`].clear();
                   Keyboard.dismiss();
                 }}>
-                <IIcon
+                <ThemedIcon
                   style={styles.submit}
-                  name="md-return-right"
+                  name="corner-down-right"
                   size={40}
-                  color="#000"
+                  fill="#000"
                 />
               </TouchableOpacity>
             </View>
@@ -467,7 +467,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
     return (
       <View style={{flex: 1}}>
         <View style={styles.inputSection}>
-          <TextInput
+          <Input
             style={styles.input}
             ref={(input) => {
               this.inputMain = input;
@@ -495,11 +495,10 @@ export default class Comments extends PureComponent<CommentsProps, State> {
               this.inputMain.clear();
               Keyboard.dismiss();
             }}>
-            <IIcon
+            <ThemedIcon
               style={styles.submit}
-              name="md-return-right"
+              name="corner-down-right"
               size={30}
-              color="#000"
             />
           </TouchableOpacity>
         </View>
@@ -536,7 +535,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                           style={{height: 30, width: 30, borderRadius: 15}}
                         />
                       ) : (
-                        <IIcon name="md-contact" size={35} />
+                        <ThemedIcon name="person" size={35} />
                       )}
                       <Text style={{marginLeft: 10}}>{item.username}</Text>
                     </TouchableOpacity>
@@ -615,7 +614,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
           onRequestClose={() => this.setEditModalVisible(false)}>
           <View style={styles.editModalContainer}>
             <View style={styles.editModal}>
-              <TextInput
+              <Input
                 ref={(input) => {
                   this.textInputs.editCommentInput = input;
                 }}

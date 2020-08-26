@@ -14,11 +14,10 @@ export default StyleSheet.create({
   container: {
     position: 'absolute',
     width: '100%',
+    backgroundColor: '#fff',
   },
   description: {
     fontWeight: 'bold',
   },
-  predefinedPlacesDescription: {
- 
-  },
+  predefinedPlacesDescription: {},
 });

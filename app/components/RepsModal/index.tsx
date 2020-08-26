@@ -1,12 +1,13 @@
 import React, {FunctionComponent} from 'react';
 import ModalBox from 'react-native-modalbox';
-import {TouchableOpacity, View, ActivityIndicator} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
 import {fetchRepsUsers} from '../../actions/home';
 import RepsModalProps from '../../types/components/RepsModal';
 import styles from '../../styles/components/RepsModal';
 import {Text, Icon, List, Divider, Spinner} from '@ui-kitten/components';
+import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 
 const RepsModal: FunctionComponent<RepsModalProps> = ({
   isOpen,
@@ -80,14 +81,19 @@ const RepsModal: FunctionComponent<RepsModalProps> = ({
   );
 };
 
-const mapStateToProps = ({friends, sharedInfo, profile, home}) => ({
+const mapStateToProps = ({
+  friends,
+  sharedInfo,
+  profile,
+  home,
+}: MyRootState) => ({
   friends: friends.friends,
   users: sharedInfo.users,
   profile: profile.profile,
   repsUsers: home.repsUsers,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   getRepUsers: (postId: string, limit?: number) =>
     dispatch(fetchRepsUsers(postId, limit)),
 });
