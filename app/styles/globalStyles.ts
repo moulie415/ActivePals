@@ -17,6 +17,7 @@ export default StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 9,
   },
   backdrop: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

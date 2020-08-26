@@ -18,6 +18,8 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
+    top: -2,
+    right: 0,
   },
   mentionList: {
     position: 'absolute',

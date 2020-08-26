@@ -9,4 +9,6 @@ export default interface FriendsProps {
   onRemove: (uid: string) => void;
   onAccept: (uid: string, friendUid: string) => void;
   navigation: NavigationStackProp;
+  setModal: (show: boolean) => void;
+  modalOpen: boolean;
 };

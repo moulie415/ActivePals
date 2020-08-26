@@ -52,6 +52,7 @@ import {ImageProps, SafeAreaView} from 'react-native';
 import FullScreenVideo from './views/FullScreenVideo';
 import Credits from './views/Credits';
 import Instabug from 'instabug-reactnative';
+import AddFriendButton from './components/AddFriendButton/AddFriendButton';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -223,11 +224,13 @@ const App = () => {
 
                   headerRight: () => {
                     const index = route?.state?.index;
-                    if (
-                      (!route.state || index === 0) &&
-                      route.name === 'Tabs'
-                    ) {
-                      return <NotificationsButton navigation={navigation} />;
+                    if (route.name === 'Tabs') {
+                      if (!route.state || index === 0) {
+                        return <NotificationsButton navigation={navigation} />;
+                      }
+                      if (index === 2) {
+                        return <AddFriendButton />;
+                      }
                     }
                   },
                 })}>

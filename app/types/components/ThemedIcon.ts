@@ -7,4 +7,5 @@ export default interface ThemeImageProps {
   name: string;
   style?: ViewStyle;
   fill?: string;
-};
+  status?: 'success' | 'danger';
+}

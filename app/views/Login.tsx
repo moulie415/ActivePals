@@ -105,9 +105,7 @@ const Login: FunctionComponent<LoginProps> = ({
         } else {
           navigation.navigate('Welcome', {goBack: false});
         }
-        debugger;
         setupNotifications(user.uid);
-        
       }
     });
     // unsubscribe to the listener when unmounting

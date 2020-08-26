@@ -165,8 +165,6 @@ class Notifications extends Component<NotificationsProps, State> {
         <Text
           style={{
             textAlign: 'center',
-            color: '#999',
-            fontSize: 20,
             marginTop: 10,
           }}>
           No notifications yet
@@ -198,51 +196,20 @@ class Notifications extends Component<NotificationsProps, State> {
               return (
                 <Swipeout right={swipeoutBtns} key={item.key} close={close}>
                   <ListItem
-                    title={this.getNotificationString(item)}
-                    description={getSimplifiedTime(new Date(item.date))}
-                    accessoryLeft={() => this.getTypeImage(item)}
-                    accessoryRight={() => (
-                      <ThemedIcon
-                        size={25}
-                        name="arrow-ios-forward"
-                        style={{
-                          textAlign: 'right',
-                          marginRight: 10,
-                          flex: 1,
-                        }}
-                      />
-                    )}
-                  />
-                  {/* <TouchableOpacity
                     onPress={() => {
                       if (item.postId) {
                         navigation.navigate('PostView', {postId: item.postId});
                       } else if (item.type === 'friendRequest') {
                         navigation.navigate('Friends');
                       }
-                    }}>
-                    <View style={styles.inboxItem}>
-                      {this.getTypeImage(item)}
-                      <View style={{flex: 8}}>
-                        <Text style={{color: '#000', fontSize: 15}}>
-                          {this.getNotificationString(item)}
-                        </Text>
-                        <Text style={{color: '#999', fontSize: 12}}>
-                          {getSimplifiedTime(new Date(item.date))}
-                        </Text>
-                      </View>
-                      <ThemedIcon
-                        size={25}
-                        name="arrow-ios-forward"
-                        style={{
-                          color: '#999',
-                          textAlign: 'right',
-                          marginRight: 10,
-                          flex: 1,
-                        }}
-                      />
-                    </View>
-                  </TouchableOpacity> */}
+                    }}
+                    title={this.getNotificationString(item)}
+                    description={getSimplifiedTime(new Date(item.date))}
+                    accessoryLeft={() => this.getTypeImage(item)}
+                    accessoryRight={() => (
+                      <ThemedIcon size={25} name="arrow-ios-forward" />
+                    )}
+                  />
                 </Swipeout>
               );
             }}

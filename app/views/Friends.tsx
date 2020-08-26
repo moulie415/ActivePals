@@ -11,6 +11,7 @@ import {
   sendRequest,
   acceptRequest,
   deleteFriend,
+  SetModal,
 } from '../actions/friends';
 import FriendsProps from '../types/views/Friends';
 import {
@@ -29,7 +30,6 @@ import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
 interface State {
   refreshing: boolean;
-  modalOpen?: boolean;
   username?: string;
 }
 class Friends extends Component<FriendsProps, State> {
@@ -50,17 +50,17 @@ class Friends extends Component<FriendsProps, State> {
   }
 
   async remove(friend) {
-    const {onRemove} = this.props;
+    const {onRemove, setModal} = this.props;
     try {
       await onRemove(friend);
-      this.setState({modalOpen: false});
+      setModal(false);
     } catch (e) {
       Alert.alert('Error', e.message);
     }
   }
 
-  async sendRequest(username) {
-    const {profile, onRequest} = this.props;
+  async sendRequest(username: string) {
+    const {profile, onRequest, setModal} = this.props;
     if (username !== profile.username) {
       try {
         const snapshot = await database()
@@ -76,7 +76,7 @@ class Friends extends Component<FriendsProps, State> {
           } else {
             await onRequest(snapshot.val());
             Alert.alert('Success', 'Request sent');
-            this.setState({modalOpen: false});
+            setModal(false);
           }
         } else {
           Alert.alert('Sorry', 'Username does not exist');
@@ -137,7 +137,7 @@ class Friends extends Component<FriendsProps, State> {
                         {text: 'OK', onPress: () => this.remove(item.uid)},
                       ]);
                     }}>
-                    <ThemedIcon name="close" size={50} status="danger" />
+                    <ThemedIcon name="close" size={40} status="danger" />
                   </TouchableOpacity>
                 )}
               />
@@ -148,15 +148,15 @@ class Friends extends Component<FriendsProps, State> {
               <ListItem
                 title={`${item.username} has sent you a pal request`}
                 accessoryRight={() => (
-                  <View style={{flexDirection: 'row', flex: 1}}>
+                  <>
                     <TouchableOpacity
                       onPress={() => onAccept(profile.uid, item.uid)}>
-                      <Icon size={50} name="checkmark" status="positive" />
+                      <ThemedIcon size={40} name="checkmark" status="success" />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => this.remove(item.uid)}>
-                      <Icon size={50} name="close" status="danger" />
+                      <ThemedIcon size={40} name="close" status="danger" />
                     </TouchableOpacity>
-                  </View>
+                  </>
                 )}
               />
             );
@@ -225,18 +225,9 @@ class Friends extends Component<FriendsProps, State> {
   }
 
   render() {
-    const {profile, friends} = this.props;
-    const {username, modalOpen} = this.state;
-    const addButton = (
-      <TouchableOpacity
-        onPress={() => {
-          profile.username
-            ? this.setState({modalOpen: true})
-            : Alert.alert('Please set a username before trying to add a pal');
-        }}>
-        <ThemedIcon name="person-add" size={25} style={{padding: 5}} />
-      </TouchableOpacity>
-    );
+    const {profile, friends, modalOpen, setModal} = this.props;
+    const {username} = this.state;
+
     return (
       <Layout style={{flex: 1}}>
         {Object.values(friends).length > 0 ? (
@@ -270,7 +261,6 @@ class Friends extends Component<FriendsProps, State> {
             style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Input
               underlineColorAndroid="transparent"
-              style={styles.usernameInput}
               autoCapitalize="none"
               placeholder="Enter username"
               value={username}
@@ -283,9 +273,7 @@ class Friends extends Component<FriendsProps, State> {
               justifyContent: 'space-evenly',
               marginBottom: 10,
             }}>
-            <Button
-              onPress={() => this.setState({modalOpen: false})}
-              status="danger">
+            <Button onPress={() => setModal(false)} status="danger">
               Cancel
             </Button>
             <Button onPress={() => this.sendRequest(username)}>Submit</Button>
@@ -299,14 +287,17 @@ class Friends extends Component<FriendsProps, State> {
 const mapStateToProps = ({friends, profile}: MyRootState) => ({
   friends: friends.friends,
   profile: profile.profile,
+  modalOpen: friends.modalOpen,
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   getFriends: (uid: string, limit?: number, startAt?: string) =>
     dispatch(fetchFriends(uid, limit, startAt)),
-  onRequest: (friendUid) => dispatch(sendRequest(friendUid)),
-  onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
-  onRemove: (uid) => dispatch(deleteFriend(uid)),
+  onRequest: (friendUid: string) => dispatch(sendRequest(friendUid)),
+  onAccept: (uid: string, friendUid: string) =>
+    dispatch(acceptRequest(uid, friendUid)),
+  onRemove: (uid: string) => dispatch(deleteFriend(uid)),
+  setModal: (show: boolean) => dispatch(SetModal(show)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Friends);

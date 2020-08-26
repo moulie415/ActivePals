@@ -3,12 +3,13 @@ import storage from '@react-native-firebase/storage';
 import {upUnreadCount, fetchUsers} from './home';
 import Profile, {UserState} from '../types/Profile';
 import {fetchOther} from './profile';
-import { MyThunkDispatch } from '../types/Shared';
+import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
 
 export const SET_FRIENDS = 'SET_FRIENDS';
 export const SET_FRIEND = 'SET_FRIEND';
 export const ADD_FRIEND = 'ADD_FRIEND';
 export const UPDATE_FRIEND_STATE = 'UPDATE_FRIEND_STATE';
+export const SET_MODAL = 'SET_MODAL';
 
 const setFriends = (friends) => ({
   type: SET_FRIENDS,
@@ -32,8 +33,13 @@ export const updateFriendState = (uid, state) => ({
   state,
 });
 
-export const removeFriend = (uid: string) => {
-  return (dispatch, getState) => {
+export const SetModal = (open: boolean) => ({
+  type: SET_MODAL,
+  open,
+});
+
+export const removeFriend = (uid: string): MyThunkResult<void> => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const {friends}: {[key: string]: Profile} = getState().friends;
     const friendArr = Object.values(friends).filter(
       (friend) => friend.uid !== uid,
@@ -112,7 +118,7 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
   };
 };
 
-export const sendRequest = (friendUid) => {
+export const sendRequest = (friendUid: string) => {
   return async (dispatch, getState) => {
     const {uid} = getState().profile.profile;
     const promise1 = database()
