@@ -48,7 +48,7 @@ import SessionDetail from './views/sessions/SessionDetail';
 import Location from './types/Location';
 import PostView from './views/PostView';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
-import {ImageProps} from 'react-native';
+import {ImageProps, SafeAreaView} from 'react-native';
 import FullScreenVideo from './views/FullScreenVideo';
 import Credits from './views/Credits';
 
@@ -212,9 +212,11 @@ const App = () => {
                   },
                   headerTintColor: theme === 'light' ? '#222B45' : '#fff',
                   headerTitle: route.name === 'Tabs' ? '' : undefined,
+
                   headerRight: () => {
+                    const index = route?.state?.index;
                     if (
-                      (!route.state || route.state.index === 0) &&
+                      (!route.state || index === 0) &&
                       route.name === 'Tabs'
                     ) {
                       return <NotificationsButton navigation={navigation} />;

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* ActivePalsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ActivePalsTests.m */; };
+		0A8C7E4124F688360049A0F8 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0A8C7E4024F688360049A0F8 /* Ionicons.ttf */; };
 		0AA86ECF24F2D141008068B6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0AA86ECE24F2D141008068B6 /* GoogleService-Info.plist */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
@@ -47,6 +48,7 @@
 		00E356F21AD99517003FC87E /* ActivePalsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ActivePalsTests.m; sourceTree = "<group>"; };
 		0A58F54C24F2FB6B00C9A400 /* ActivePalsDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ActivePalsDebug.entitlements; path = ActivePals/ActivePalsDebug.entitlements; sourceTree = "<group>"; };
 		0A58F54D24F2FB7400C9A400 /* ActivePals.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ActivePals.entitlements; path = ActivePals/ActivePals.entitlements; sourceTree = "<group>"; };
+		0A8C7E4024F688360049A0F8 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		0AA86ECE24F2D141008068B6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0C4321C54EFD9BE7F60EF189 /* Pods-ActivePals-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ActivePals-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-ActivePals-tvOSTests/Pods-ActivePals-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		1317D477E373D241CD384A3F /* libPods-ActivePals-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ActivePals-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -165,6 +167,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				0A8C7E4024F688360049A0F8 /* Ionicons.ttf */,
 				0AA86ECE24F2D141008068B6 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* ActivePals */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -354,6 +357,7 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				0A8C7E4124F688360049A0F8 /* Ionicons.ttf in Resources */,
 				0AA86ECF24F2D141008068B6 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

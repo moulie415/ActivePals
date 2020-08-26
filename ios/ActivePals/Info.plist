@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Ionicons.ttf</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -22,24 +26,7 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-  <!-- <key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fb1959322104333437</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.48631950986-8hrquvsh6n7krak0s1hirg23qlr98bdi</string>
-			</array>
-		</dict>
-	</array> -->
-  <key>CFBundleURLTypes</key>
+	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLSchemes</key>
@@ -78,7 +65,7 @@
 			</array>
 		</dict>
 	</array>
-  <key>FacebookAppID</key>
+	<key>FacebookAppID</key>
 	<string>1959322104333437</string>
 	<key>FacebookDisplayName</key>
 	<string>ActivePals</string>
@@ -133,7 +120,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-  <string>ActivePals requires you location to find nearby sessions</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>ActivePals requires you location to find nearby sessions</string>
 </dict>
 </plist>

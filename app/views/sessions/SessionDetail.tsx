@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-
-// import NumericInput from 'react-native-numeric-input';
-
+import NumericInput from 'react-native-numeric-input';
 import {connect} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
 import moment from 'moment';
@@ -271,7 +269,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
                   this.setState({addToCalendar: val});
                   try {
                     if (val) {
-                      const result = await RNCalendarEvents.authorizeEventStore();
+                      const result = await RNCalendarEvents.requestPermissions();
                       if (result === 'authorized') {
                         const calendars = await RNCalendarEvents.findCalendars();
                         const validList = calendars.filter(
@@ -306,11 +304,12 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               marginHorizontal: 10,
               marginBottom: 10,
               alignItems: 'center',
+              justifyContent: 'space-evenly',
             }}>
             <Text style={{color: '#999', textAlign: 'center', width: 40}}>
               For
             </Text>
-            {/* <NumericInput
+            <NumericInput
               value={duration}
               onChange={(duration) => this.setState({duration})}
               onLimitReached={(isMax, msg) => console.log(isMax, msg)}
@@ -323,12 +322,11 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               maxValue={24}
               minValue={0}
               // @ts-ignore
-              iconStyle={{color: 'white'}}
-            /> */}
+            />
             <Text style={{color: '#999', width: 40, textAlign: 'center'}}>
               {duration === 1 ? 'hr' : 'hrs'}
             </Text>
-            {/* <NumericInput
+            <NumericInput
               value={durationMinutes}
               onChange={(durationMinutes) => this.setState({durationMinutes})}
               onLimitReached={(isMax, msg) => console.log(isMax, msg)}
@@ -341,8 +339,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               maxValue={59}
               minValue={0}
               // @ts-ignore
-              iconStyle={{color: 'white'}}
-            /> */}
+            />
             <Text style={{textAlign: 'center'}}>
               {durationMinutes === 1 ? 'min' : 'mins'}
             </Text>

@@ -35,7 +35,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
     };
   }
 
-  onFriendPress(uid) {
+  onFriendPress(uid: string) {
     const {selectedFriends} = this.state;
     if (selectedFriends.some((friend) => friend === uid)) {
       const friends = selectedFriends.filter((friend) => friend !== uid);
@@ -48,7 +48,6 @@ class FriendsModal extends Component<FriendsModalProps, State> {
   renderFriendsSelection() {
     const {friends} = this.props;
     const {selectedFriends} = this.state;
-    const connectedFriends = [];
     return (
       <List
         data={Object.values(friends)}
@@ -57,6 +56,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
           if (item.status === 'connected') {
             return (
               <ListItem
+                onPress={() => this.onFriendPress(item.uid)}
                 title={item.username}
                 accessoryLeft={() =>
                   item.avatar ? (
