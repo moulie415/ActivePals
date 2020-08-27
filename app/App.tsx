@@ -48,7 +48,7 @@ import SessionDetail from './views/sessions/SessionDetail';
 import Location from './types/Location';
 import PostView from './views/PostView';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
-import {ImageProps, SafeAreaView} from 'react-native';
+import {ImageProps} from 'react-native';
 import FullScreenVideo from './views/FullScreenVideo';
 import Credits from './views/Credits';
 import Instabug from 'instabug-reactnative';
@@ -102,7 +102,7 @@ export type StackParamList = {
     type: 'video' | 'image';
     uri: string;
     message: boolean;
-    text: string;
+    text?: string;
   };
 };
 

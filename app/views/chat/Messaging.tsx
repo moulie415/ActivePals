@@ -1,16 +1,9 @@
 import React, {Component} from 'react';
-import {
-  Alert,
-  Platform,
-  TouchableOpacity,
-  View,
-  BackHandler,
-} from 'react-native';
+import {Alert, TouchableOpacity, View, BackHandler} from 'react-native';
 import {pathOr} from 'ramda';
 import database from '@react-native-firebase/database';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
-import {isIphoneX} from 'react-native-iphone-x-helper';
 import {GiftedChat, Bubble, MessageText} from 'react-native-gifted-chat';
 import {connect} from 'react-redux';
 import globalStyles from '../../styles/globalStyles';
@@ -28,9 +21,11 @@ import {
 } from '../../actions/chats';
 import MessagingProps from '../../types/views/Messaging';
 import Message, {MessageType, SessionType} from '../../types/Message';
-import {Text, Spinner} from '@ui-kitten/components';
+import {Text, Spinner, Layout} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
+import moment from 'moment';
+import Profile from '../../types/Profile';
 
 interface State {
   spinner: boolean;
@@ -53,7 +48,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   componentDidMount() {
-    const {navigation, unreadCount, onResetUnreadCount, route} = this.props;
+    const {unreadCount, onResetUnreadCount, route} = this.props;
 
     const {gymId, friendUid, session} = route.params;
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
@@ -66,7 +61,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {navigation, profile, onResetMessage, resetNotif, route} = this.props;
+    const {profile, onResetMessage, resetNotif, route} = this.props;
 
     const {friendUid, gymId} = route.params;
     const session = pathOr({}, ['session'], route.params);
@@ -173,29 +168,40 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   async onSend(messages: Message[] = []) {
-    const {navigation, gym, onUpdateLastMessage, route} = this.props;
+    const {gym, onUpdateLastMessage, route} = this.props;
     const {friendUid, gymId, session, chatId} = route.params;
     // make messages database friendly
     const converted = messages.map((message) => {
       const type = this.getType();
+      const createdAt = moment().utc().valueOf();
       if (session) {
         const {key: sessionId, title: sessionTitle} = session;
         const sessionType: SessionType = session.private
           ? 'privateSessions'
           : 'sessions';
-        return {...message, sessionTitle, sessionId, sessionType, type};
+        return {
+          ...message,
+          createdAt,
+          sessionTitle,
+          sessionId,
+          sessionType,
+          type,
+        };
       }
       if (gymId) {
         const {name} = gym;
-        return {...message, gymId, gymName: name, type};
+        return {...message, createdAt, gymId, gymName: name, type};
       }
-      return {...message, chatId, friendUid, type};
+      return {...message, createdAt, chatId, friendUid, type};
     });
 
     const ref = this.getDbRef();
 
     try {
-      await ref.push(...converted);
+      const dbFriendly = converted.map((msg) => {
+        return {...msg, createdAt: moment(msg.createdAt).utc().format()};
+      });
+      await ref.push(...dbFriendly);
       this.setState((previousState) => ({
         messages: [...previousState.messages, ...messages],
       }));
@@ -286,7 +292,7 @@ class Messaging extends Component<MessagingProps, State> {
       durationLimit: 30,
     };
     const options: ImagePickerOptions = {
-      title: null,
+      title: '',
       mediaType: 'photo',
       // customButtons: [
       // {name: 'video', title: 'Shoot video (coming soon)'},
@@ -347,7 +353,7 @@ class Messaging extends Component<MessagingProps, State> {
     });
   }
 
-  async openChat(user) {
+  async openChat(user: Profile) {
     const {profile, navigation} = this.props;
     const snapshot = await database()
       .ref(`userChats/${profile.uid}`)
@@ -367,11 +373,12 @@ class Messaging extends Component<MessagingProps, State> {
     const {messages, showLoadEarlier, spinner, text} = this.state;
     const {friendUsername, session} = route.params;
     return (
-      <View style={{flex: 1, backgroundColor: '#9993'}}>
+      <Layout style={{flex: 1}}>
         <GiftedChat
           text={text}
           onInputTextChanged={(input) => this.setState({text: input})}
-          messages={sortMessagesByCreatedAt(messages)}
+          messages={messages}
+          inverted={false}
           onSend={(msgs) => {
             if (profile.username) {
               this.onSend(msgs);
@@ -474,11 +481,11 @@ class Messaging extends Component<MessagingProps, State> {
           ]}
         />
         {spinner && (
-          <View style={globalStyles.indicator}>
+          <Layout style={globalStyles.indicator}>
             <Spinner />
-          </View>
+          </Layout>
         )}
-      </View>
+      </Layout>
     );
   }
 }
@@ -511,18 +518,24 @@ const mapStateToProps = (
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  onUpdateLastMessage: (message) => dispatch(updateLastMessage(message)),
-  onRequest: (friendUid) => dispatch(sendRequest(friendUid)),
-  onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
-  getMessages: (id, amount, uid, endAt) =>
+  onUpdateLastMessage: (message: Message) =>
+    dispatch(updateLastMessage(message)),
+  onRequest: (friendUid: string) => dispatch(sendRequest(friendUid)),
+  onAccept: (uid: string, friendUid: string) =>
+    dispatch(acceptRequest(uid, friendUid)),
+  getMessages: (id: string, amount: number, uid: string, endAt: string) =>
     dispatch(fetchMessages(id, amount, uid, endAt)),
-  getSessionMessages: (id, amount, isPrivate, endAt) =>
-    dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
-  getGymMessages: (id, amount, endAt) =>
+  getSessionMessages: (
+    id: string,
+    amount: number,
+    isPrivate: boolean,
+    endAt: string,
+  ) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
+  getGymMessages: (id: string, amount: number, endAt: string) =>
     dispatch(fetchGymMessages(id, amount, endAt)),
   resetNotif: () => dispatch(resetNotification()),
   onResetMessage: () => dispatch(resetMessage()),
-  onResetUnreadCount: (id) => dispatch(resetUnreadCount(id)),
+  onResetUnreadCount: (id: string) => dispatch(resetUnreadCount(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messaging);
