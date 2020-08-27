@@ -20,6 +20,7 @@ export const SET_PLACE = 'SET_PLACE';
 export const SET_RADIUS = 'SET_RADIUS';
 export const SET_IGNORED = 'SET_IGNORED';
 export const SET_SHOW_MAP = 'SET_SHOW_MAP';
+export const SET_SHOW_FILTER_MODAL = 'SET_SHOW_FILTER_MODAL';
 
 const setPrivateSessions = (sessions) => ({
   type: SET_PRIVATE_SESSIONS,
@@ -56,7 +57,7 @@ export const setPlace = (place) => ({
   place,
 });
 
-export const setRadius = (radius) => ({
+export const setRadius = (radius: number) => ({
   type: SET_RADIUS,
   radius,
 });
@@ -68,6 +69,11 @@ export const setIgnored = (session) => ({
 
 export const SetShowMap = (show: boolean) => ({
   type: SET_SHOW_MAP,
+  show,
+});
+
+export const SetShowFilterModal = (show: boolean) => ({
+  type: SET_SHOW_FILTER_MODAL,
   show,
 });
 

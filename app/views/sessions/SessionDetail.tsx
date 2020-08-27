@@ -229,20 +229,22 @@ class SessionDetail extends Component<SessionDetailProps, State> {
     return (
       <Layout style={{flex: 1}}>
         <ScrollView style={{flex: 1}}>
-          <Input
-            underlineColorAndroid="transparent"
-            onChangeText={(input) => this.setState({title: input})}
-            placeholder="Title"
-          />
-
-          <Input
-            placeholder="Details..."
-            textAlignVertical="top"
-            textStyle={{minHeight: 64}}
-            multiline
-            underlineColorAndroid="transparent"
-            onChangeText={(input) => this.setState({details: input})}
-          />
+          <View style={{margin: 10}}>
+            <Input
+              style={{ marginBottom: 10}}
+              underlineColorAndroid="transparent"
+              onChangeText={(input) => this.setState({title: input})}
+              placeholder="Title"
+            />
+            <Input
+              placeholder="Details..."
+              textAlignVertical="top"
+              textStyle={{minHeight: 64}}
+              multiline
+              underlineColorAndroid="transparent"
+              onChangeText={(input) => this.setState({details: input})}
+            />
+          </View>
           <View
             style={{
               flexDirection: 'row',

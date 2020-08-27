@@ -37,6 +37,7 @@ import {
   fetchPlaces,
   setRadius,
   SetShowMap,
+  SetShowFilterModal,
 } from '../../actions/sessions';
 import {removeGym, joinGym, setLocation} from '../../actions/profile';
 import SessionsProps from '../../types/views/sessions/Sessions';
@@ -81,7 +82,6 @@ interface State {
   latitude?: number;
   friendsModalOpen?: boolean;
   options?: Options;
-  filterModalOpen?: boolean;
   loadMoreGyms: boolean;
 }
 class Sessions extends Component<SessionsProps, State> {
@@ -321,16 +321,14 @@ class Sessions extends Component<SessionsProps, State> {
       loadMoreGyms,
     } = this.state;
     const emptyComponent = (
-      <Layout>
-        <Text
-          style={{
-            textAlign: 'center',
-            marginHorizontal: 20,
-          }}>
-          No sessions near you have been created yet, also please make sure you
-          are connected to the internet
-        </Text>
-      </Layout>
+      <Text
+        style={{
+          textAlign: 'center',
+          marginHorizontal: 20,
+        }}>
+        No sessions near you have been created yet, also please make sure you
+        are connected to the internet
+      </Text>
     );
     const yourLat = pathOr(null, ['lat'], location);
     const yourLon = pathOr(null, ['lon'], location);
@@ -540,25 +538,15 @@ class Sessions extends Component<SessionsProps, State> {
       pilates: statePilates,
       popUpVisible,
       options,
-      filterModalOpen,
     } = this.state;
-    const {places, navigation, friends, showMap} = this.props;
-    // switch for list view and map view
-    // action sheet when pressing
-    const left = (
-      <TouchableOpacity
-        style={{
-          position: 'absolute',
-          top: 8,
-          bottom: 0,
-          left: 0,
-          justifyContent: 'center',
-          paddingLeft: 10,
-        }}
-        onPress={() => this.setState({filterModalOpen: true})}>
-        <Text style={{color: '#fff'}}>Filters</Text>
-      </TouchableOpacity>
-    );
+    const {
+      places,
+      navigation,
+      friends,
+      showMap,
+      setShowFilterModal,
+      showFilterModal,
+    } = this.props;
 
     return (
       <Layout style={{flex: 1}}>
@@ -644,7 +632,7 @@ class Sessions extends Component<SessionsProps, State> {
               useNativeDriver
               onClosed={async () => {
                 const {radius: currentRadius, fetch, saveRadius} = this.props;
-                this.setState({filterModalOpen: false});
+                setShowFilterModal(false)
                 if (radius !== currentRadius) {
                   this.setState({refreshing: true});
                   saveRadius(radius);
@@ -654,8 +642,8 @@ class Sessions extends Component<SessionsProps, State> {
               }}
               style={styles.modal}
               position="center"
-              isOpen={filterModalOpen}
-              key={filterModalOpen ? 1 : 2}>
+              isOpen={showFilterModal}
+              key={showFilterModal ? 1 : 2}>
               <View style={{flex: 1, borderRadius: 5}}>
                 <Text style={styles.sessionFilterTitle}>Sessions</Text>
                 <View style={styles.sessionFilterContainer}>
@@ -777,6 +765,7 @@ const mapStateToProps = ({
   radius: sessions.radius,
   location: profile.location,
   showMap: sessions.showMap,
+  showFilterModal: sessions.showFilterModal,
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
@@ -791,6 +780,7 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   getPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
   saveRadius: (radius) => dispatch(setRadius(radius)),
   setShowMap: (show: boolean) => dispatch(SetShowMap(show)),
+  setShowFilterModal: (show: boolean) => dispatch(SetShowFilterModal(show)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions);

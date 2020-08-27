@@ -22,4 +22,6 @@ export default interface SessionsProps {
   navigation: NavigationStackProp;
   showMap: boolean;
   setShowMap: (show: boolean) => void;
+  showFilterModal: boolean;
+  setShowFilterModal: (show: boolean) => void; 
 };

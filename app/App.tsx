@@ -55,6 +55,7 @@ import Instabug from 'instabug-reactnative';
 import AddFriendButton from './components/AddFriendButton/AddFriendButton';
 import FilePreview from './views/FilePreview';
 import MapToggle from './components/MapToggle/MapToggle';
+import FilterModalButton from './components/FilterModalButton/FilterModalButton';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -241,6 +242,14 @@ const App = () => {
                       }
                       if (index === 2) {
                         return <AddFriendButton />;
+                      }
+                    }
+                  },
+                  headerLeft: () => {
+                    const index = route?.state?.index;
+                    if (route.name === 'Tabs') {
+                      if (index === 1) {
+                        return <FilterModalButton />;
                       }
                     }
                   },

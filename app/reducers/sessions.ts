@@ -10,6 +10,7 @@ import {
   SET_RADIUS,
   SET_IGNORED,
   SET_SHOW_MAP,
+  SET_SHOW_FILTER_MODAL,
 } from '../actions/sessions';
 import {SET_LOGGED_OUT} from '../actions/profile';
 import Session from '../types/Session';
@@ -22,6 +23,7 @@ export interface SessionsState {
   radius: number;
   ignored: {[key: string]: boolean};
   showMap: boolean;
+  showFilterModal: boolean;
 }
 
 const initialState: SessionsState = {
@@ -31,6 +33,7 @@ const initialState: SessionsState = {
   radius: 10,
   ignored: {},
   showMap: false,
+  showFilterModal: false,
 };
 
 export default function (state = initialState, action) {
@@ -102,6 +105,12 @@ export default function (state = initialState, action) {
       return {
         ...state,
         showMap: action.show,
+      };
+    }
+    case SET_SHOW_FILTER_MODAL: {
+      return {
+        ...state,
+        showFilterModal: action.show,
       };
     }
     case SET_LOGGED_OUT: {
