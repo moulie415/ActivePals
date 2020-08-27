@@ -640,7 +640,7 @@ const mapStateToProps = ({profile, home, friends, sharedInfo}) => ({
   users: sharedInfo.users,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onRepPost: (item) => dispatch(repPost(item)),
   comment: (uid, postId, text, created_at, parentCommentId) =>
     dispatch(postComment(uid, postId, text, created_at, parentCommentId)),

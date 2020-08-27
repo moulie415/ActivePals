@@ -78,7 +78,7 @@ const checkHost = (host, state) => {
 };
 
 export const removeSession = (key, isPrivate, force = false) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const {uid} = getState().profile.profile;
     const sessions: {[key: string]: Session} = isPrivate
       ? getState().sessions.privateSessions
@@ -122,7 +122,7 @@ export const removeSession = (key, isPrivate, force = false) => {
 };
 
 const expirationAlert = (session, isPrivate) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const ignore = getState().sessions.ignored[session.key];
     if (!ignore) {
       const {uid} = getState().profile.profile;
@@ -148,7 +148,7 @@ const expirationAlert = (session, isPrivate) => {
 };
 
 export const fetchSessions = () => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     dispatch(updateSessions([]));
     const {radius} = getState().sessions;
     const {uid} = getState().profile.profile;
@@ -258,7 +258,7 @@ export const fetchSessions = () => {
 };
 
 export const fetchPrivateSessions = () => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const {uid} = getState().profile.profile;
     const userFetches = [];
     return database()
@@ -326,7 +326,7 @@ export const fetchPhotoPath = async (result) => {
 };
 
 export const fetchGym = (id: string) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${GOOGLE_API_KEY}`;
     const response = await fetch(url);
     const json = await response.json();
@@ -351,7 +351,7 @@ export const fetchGym = (id: string) => {
 };
 
 export const fetchSession = (id: string) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     let distance;
     // check if session exists and use existing distance value
     const currentSession = getState().sessions.sessions[id];
@@ -382,7 +382,7 @@ export const fetchSession = (id: string) => {
 };
 
 export const fetchPrivateSession = (id) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const session = await database()
       .ref('privateSessions')
       .child(id)
@@ -409,7 +409,7 @@ export const fetchPrivateSession = (id) => {
 };
 
 export const addUser = (key, isPrivate, uid) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const type = isPrivate ? 'privateSessions/' : 'sessions/';
     await database()
       .ref(`userSessions/${uid}`)
@@ -428,7 +428,7 @@ export const addUser = (key, isPrivate, uid) => {
 };
 
 export const fetchPhotoPaths = () => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const obj = getState().sessions.places;
     const places = await Promise.all(
       Object.values(obj).map((place) => fetchPhotoPath(place)),
@@ -449,7 +449,7 @@ const mapIdsToPlaces = (places) => {
 };
 
 export const fetchPlaces = (lat, lon, token) => {
-  return async (dispatch) => {
+  return async (dispatch: MyThunkDispatch) => {
     const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?';
     const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${GOOGLE_API_KEY}`;
     if (token) {

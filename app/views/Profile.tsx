@@ -53,10 +53,6 @@ interface State {
   email: string;
   profile: Profile;
   initialProfile: Profile;
-  initialAvatar: string;
-  avatar: string;
-  backdrop?: string;
-  initialBackdrop?: string;
   showPicker?: boolean;
 }
 class ProfileView extends Component<ProfileProps, State> {
@@ -68,22 +64,11 @@ class ProfileView extends Component<ProfileProps, State> {
       profile,
       initialProfile: profile,
       spinner: false,
-      initialAvatar: profile.avatar,
-      avatar: profile.avatar,
     };
   }
 
   async componentDidMount() {
     const {profile} = this.props;
-    try {
-      const backdrop = await storage()
-        .ref(`images/${profile.uid}`)
-        .child('backdrop')
-        .getDownloadURL();
-      this.setState({backdrop, initialBackdrop: backdrop});
-    } catch (e) {
-      console.log(e);
-    }
     this.listenForUserChanges(database().ref(`users/${profile.uid}`));
   }
 
@@ -211,15 +196,18 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 
   async checkImages() {
-    const {initialAvatar, avatar, backdrop, initialBackdrop} = this.state;
+    const {avatar, backdrop} = this.state.profile;
+    const {
+      avatar: initialAvatar,
+      backdrop: initialBackdrop,
+    } = this.state.initialProfile;
+
     try {
       if (initialAvatar !== avatar) {
         const url = await this.uploadImage(avatar);
-        this.setState({initialAvatar: url, avatar: url});
       }
       if (initialBackdrop !== backdrop) {
         const url = await this.uploadImage(backdrop, true);
-        this.setState({initialBackdrop: url, backdrop: url});
       }
     } catch (e) {
       Alert.alert('Error', e.message);
@@ -227,19 +215,8 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 
   hasChanged() {
-    const {
-      initialProfile,
-      initialAvatar,
-      avatar,
-      profile,
-      backdrop,
-      initialBackdrop,
-    } = this.state;
-    return !(
-      equals(initialProfile, profile) &&
-      initialAvatar === avatar &&
-      backdrop === initialBackdrop
-    );
+    const {initialProfile, profile} = this.state;
+    return !equals(initialProfile, profile);
   }
 
   async updateUser(initial: Profile, newProfile: Profile) {
@@ -283,17 +260,7 @@ class ProfileView extends Component<ProfileProps, State> {
 
   render() {
     const {gym, navigation} = this.props;
-    const {
-      initialAvatar,
-      initialProfile,
-      initialBackdrop,
-      backdrop,
-      email,
-      profile,
-      avatar,
-      spinner,
-      showPicker,
-    } = this.state;
+    const {initialProfile, email, profile, spinner, showPicker} = this.state;
     const birthday = getBirthdayDate(profile.birthday);
     const birthdayString = birthday
       ? moment(birthday).format('DD/MM/YYYY')
@@ -341,11 +308,11 @@ class ProfileView extends Component<ProfileProps, State> {
             <TouchableOpacity
               style={{width: '100%'}}
               onPress={() => this.selectAvatar(true)}>
-              {backdrop ? (
+              {profile.backdrop ? (
                 <Image
                   style={{height: 150}}
                   resizeMode="cover"
-                  source={{uri: backdrop}}
+                  source={{uri: profile.backdrop}}
                 />
               ) : (
                 <View
@@ -360,17 +327,15 @@ class ProfileView extends Component<ProfileProps, State> {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[{marginTop: -45}, globalStyles.shadow]}
+              style={[{marginTop: -45}]}
               onPress={() => this.selectAvatar()}>
-              {avatar ? (
+              {profile.avatar ? (
                 <Image
-                  source={{uri: avatar}}
+                  source={{uri: profile.avatar}}
                   style={{
                     width: 90,
                     height: 90,
                     alignSelf: 'center',
-                    borderWidth: 0.5,
-                    borderColor: '#fff',
                   }}
                 />
               ) : (

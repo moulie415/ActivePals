@@ -87,7 +87,7 @@ export const setHasViewedWelcome = () => ({
 });
 
 export const doSetup = (): MyThunkResult<Promise<void>> => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     //const {uid} = profile;
     const {uid, gym} = getState().profile.profile;
     setupPresence(uid);
@@ -133,13 +133,9 @@ export const fetchProfile = () => {
     if (user) {
       const snapshot = await database().ref(`users/${user.uid}`).once('value');
       try {
-        const url = await storage()
-          .ref(`images/${user.uid}`)
-          .child('avatar')
-          .getDownloadURL();
-        dispatch(SetProfile({...snapshot.val(), avatar: url}));
+        dispatch(SetProfile(snapshot.val()));
         dispatch(fetchGym(snapshot.val()));
-        return {...snapshot.val(), avatar: url};
+        return snapshot.val();
       } catch (e) {
         dispatch(SetProfile(snapshot.val()));
         dispatch(fetchGym(snapshot.val()));

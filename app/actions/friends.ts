@@ -63,7 +63,7 @@ const getStateString = (state) => {
 };
 
 export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const ref = database().ref('userFriends').child(uid).limitToLast(limit);
     await ref.on('value', async (snapshot) => {
       if (snapshot.val()) {
@@ -85,24 +85,9 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
                   if (profile.val()) {
                     const {state} = profile.val();
                     const userState = getStateString(state);
-                    try {
-                      const avatar = await storage()
-                        .ref(`images/${friendUid}`)
-                        .child('avatar')
-                        .getDownloadURL();
-                      dispatch(
-                        setFriend({
-                          ...profile.val(),
-                          state: userState,
-                          avatar,
-                          status,
-                        }),
-                      );
-                    } catch (e) {
-                      dispatch(
-                        setFriend({...profile.val(), state: userState, status}),
-                      );
-                    }
+                    dispatch(
+                      setFriend({...profile.val(), state: userState, status}),
+                    );
                     resolve();
                   }
                 });
@@ -119,7 +104,7 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
 };
 
 export const sendRequest = (friendUid: string) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const {uid} = getState().profile.profile;
     const promise1 = database()
       .ref(`userFriends/${uid}`)
@@ -154,7 +139,7 @@ export const acceptRequest = (uid, friendUid) => {
 };
 
 export const deleteFriend = (uid) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const you = getState().profile.profile.uid;
     dispatch(removeFriend(uid));
     return database().ref(`userFriends/${you}`).child(uid).remove();

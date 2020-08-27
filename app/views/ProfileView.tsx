@@ -52,19 +52,6 @@ class ProfileView extends Component<ProfileViewProps, State> {
         params: {uid},
       },
     } = this.props;
-    storage()
-      .ref(`images/${uid}`)
-      .child('backdrop')
-      .getDownloadURL()
-      .then((backdrop) => this.setState({backdrop}))
-      .catch((e) => console.log(e));
-
-    storage()
-      .ref(`images/${uid}`)
-      .child('avatar')
-      .getDownloadURL()
-      .then((avatar) => this.setState({avatar}))
-      .catch((e) => console.log(e));
 
     database()
       .ref(`users/${uid}`)

@@ -77,7 +77,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   uploadImage(
-    uri,
+    uri: string,
     mime = 'application/octet-stream',
   ): Promise<{url: string; id: string}> {
     const {

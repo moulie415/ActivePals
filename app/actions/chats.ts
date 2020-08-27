@@ -1,6 +1,7 @@
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import {MessageType} from '../types/Message';
+import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
 
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS';
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT';
@@ -82,7 +83,7 @@ export const setUnreadCount = ({id, count}) => ({
 });
 
 export const fetchGymChat = (gym) => {
-  return (dispatch) => {
+  return (dispatch: MyThunkDispatch) => {
     return database()
       .ref('gymChats')
       .child(gym)
@@ -102,7 +103,7 @@ export const fetchGymChat = (gym) => {
 };
 
 export const updateLastMessage = (notif) => {
-  return (dispatch) => {
+  return (dispatch: MyThunkDispatch) => {
     if (notif.type === MessageType.MESSAGE) {
       return database()
         .ref('chats')
@@ -141,7 +142,7 @@ export const updateLastMessage = (notif) => {
 };
 
 export const resetUnreadCount = (id) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const count = 0;
     const {uid} = getState().profile.profile;
     database().ref(`unreadCount/${uid}`).child(id).set(count);
@@ -150,7 +151,7 @@ export const resetUnreadCount = (id) => {
 };
 
 export const getUnreadCount = (uid) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     database()
       .ref('unreadCount')
       .child(uid)
@@ -170,7 +171,7 @@ export const getUnreadCount = (uid) => {
 };
 
 export const fetchChats = (uid, limit = 10) => {
-  return async (dispatch) => {
+  return async (dispatch: MyThunkDispatch) => {
     return database()
       .ref('userChats')
       .child(uid)
@@ -206,8 +207,8 @@ export const fetchChats = (uid, limit = 10) => {
   };
 };
 
-export const fetchSessionChats = (uid, limit = 10) => {
-  return async (dispatch) => {
+export const fetchSessionChats = (uid: string, limit = 10) => {
+  return async (dispatch: MyThunkDispatch) => {
     return database()
       .ref('userSessions')
       .child(uid)
@@ -249,8 +250,13 @@ export const fetchSessionChats = (uid, limit = 10) => {
   };
 };
 
-export const fetchMessages = (id, amount, uid, endAt) => {
-  return async (dispatch) => {
+export const fetchMessages = (
+  id: string,
+  amount: number,
+  uid: string,
+  endAt: string,
+) => {
+  return async (dispatch: MyThunkDispatch) => {
     const ref = endAt
       ? database()
           .ref(`chats/${id}`)
@@ -261,17 +267,13 @@ export const fetchMessages = (id, amount, uid, endAt) => {
     const snapshot = await ref.once('value');
     const messages = {};
     try {
-      const url = await storage()
-        .ref(`images/${uid}`)
-        .child('avatar')
-        .getDownloadURL();
       snapshot.forEach((child) => {
         if (child.val().user && child.val().user._id === uid) {
           messages[child.key] = {
             ...child.val(),
             key: child.key,
             createdAt: new Date(child.val().createdAt),
-            user: {...child.val().user, avatar: url},
+            user: {...child.val().user},
           };
         } else {
           messages[child.key] = {
@@ -297,8 +299,13 @@ export const fetchMessages = (id, amount, uid, endAt) => {
   };
 };
 
-export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
-  return (dispatch) => {
+export const fetchSessionMessages = (
+  id: string,
+  amount: number,
+  isPrivate = false,
+  endAt: string,
+) => {
+  return (dispatch: MyThunkDispatch) => {
     const type = isPrivate ? 'privateSessions' : 'sessions';
     const ref = endAt
       ? database()
@@ -363,8 +370,8 @@ export const fetchSessionMessages = (id, amount, isPrivate = false, endAt) => {
   };
 };
 
-export const fetchGymMessages = (id, amount, endAt) => {
-  return (dispatch) => {
+export const fetchGymMessages = (id: string, amount: number, endAt: string) => {
+  return (dispatch: MyThunkDispatch) => {
     const ref = endAt
       ? database().ref(`gymChats/${id}`).endAt(endAt).limitToLast(amount)
       : database().ref(`gymChats/${id}`).limitToLast(amount);
@@ -423,8 +430,8 @@ export const fetchGymMessages = (id, amount, endAt) => {
   };
 };
 
-export const muteChat = (id, mute) => {
-  return (dispatch, getState) => {
+export const muteChat = (id: string, mute: boolean): MyThunkResult<void> => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const {uid} = getState().profile.profile;
     dispatch(setMute(id, mute));
     database().ref(`muted/${uid}`).child(id).set(mute);

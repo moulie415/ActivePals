@@ -5,6 +5,7 @@ import str from '../constants/strings';
 import Profile from '../types/Profile';
 import Comment from '../types/Comment';
 import {dedupeSortAndAddCommentIds, sortComments} from '../constants/utils';
+import {MyThunkDispatch} from '../types/Shared';
 
 export const ADD_POST = 'ADD_POST';
 export const SET_FEED = 'SET_FEED';
@@ -72,7 +73,7 @@ export const setNotificationCount = (count) => ({
 });
 
 export const addPost = (item) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const uid = getState().profile.profile.uid;
     const uids = Object.keys(getState().friends.friends);
     const ref = database().ref('posts').push();
@@ -96,7 +97,7 @@ export const addPost = (item) => {
 };
 
 const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const friends: Profile[] = Object.values(getState().friends.friends);
     const users: Profile[] = Object.values(getState().sharedInfo.users);
     const combined = [...friends, ...users];
@@ -133,7 +134,7 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
 };
 
 export const fetchPost = (key) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     return new Promise((resolve) => {
       const uid = getState().profile.profile.uid;
       database()
@@ -171,7 +172,7 @@ export const fetchPost = (key) => {
 };
 
 export const fetchPosts = (uid, amount = 30, endAt?: string) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const promises = [];
     const ref = endAt
       ? database()
@@ -275,7 +276,7 @@ export const fetchPosts = (uid, amount = 30, endAt?: string) => {
 };
 
 export const resetFeed = () => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const uid = getState().profile.profile.uid;
     dispatch(setFeed({}));
     dispatch(fetchPosts(uid, 30));
@@ -283,7 +284,7 @@ export const resetFeed = () => {
 };
 
 export const repPost = (item) => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     repSound.play();
     let post = item.key;
     let uid = getState().profile.profile.uid;
@@ -394,7 +395,7 @@ export const repPost = (item) => {
 };
 
 export const postComment = (uid, postId, text, created_at, parentCommentId) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const location = parentCommentId
       ? 'commentReplies/' + parentCommentId
       : 'comments';
@@ -492,7 +493,7 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
 };
 
 export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const key = comment.key;
     const {uid} = getState().profile.profile;
     const {friends} = getState().friends;
@@ -548,7 +549,7 @@ export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
 };
 
 export const fetchComments = (key: string, limit = 10, endAt?: string) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const userFetches = [];
     const {uid} = getState().profile.profile;
     const {friends} = getState().friends;
@@ -616,7 +617,7 @@ export const fetchComments = (key: string, limit = 10, endAt?: string) => {
 };
 
 export const repComment = (comment: Comment) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     repSound.play();
     const uid = getState().profile.profile.uid;
     const parentCommentId = comment.parentCommentId;
@@ -736,7 +737,7 @@ export const repComment = (comment: Comment) => {
 };
 
 export const fetchRepsUsers = (postId: string, limit = 10, endAt?: string) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const ref = database().ref('reps').child(postId);
     const snapshot = endAt
       ? await ref.limitToLast(limit).endAt(endAt).once('value')
@@ -757,7 +758,7 @@ export const fetchRepsUsers = (postId: string, limit = 10, endAt?: string) => {
 };
 
 export const fetchCommentRepsUsers = (comment: Comment, limit = 10) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const {key, postId, comment_id} = comment;
     const snapshot = await database()
       .ref('reps')
@@ -780,7 +781,7 @@ export const fetchCommentRepsUsers = (comment: Comment, limit = 10) => {
 };
 
 export const getNotifications = (limit = 10) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const uid = getState().profile.profile.uid;
     const refs = [];
     const snapshot = await database()
@@ -819,7 +820,7 @@ export const upUnreadCount = async (uid) => {
 };
 
 export const setNotificationsRead = () => {
-  return (dispatch, getState) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const uid = getState().profile.profile.uid;
     dispatch(setNotificationCount(0));
     return database()
@@ -830,7 +831,7 @@ export const setNotificationsRead = () => {
 };
 
 export const deleteNotification = (key) => {
-  return async (dispatch, getState) => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const uid = getState().profile.profile.uid;
     const notifs = getState().home.notifications;
     delete notifs[key];
@@ -843,42 +844,22 @@ export const deleteNotification = (key) => {
   };
 };
 
-export const fetchUser = (uid) => {
-  return new Promise((resolve) => {
-    database()
-      .ref('users/' + uid)
-      .once('value', (profile) => {
-        storage()
-          .ref('images/' + uid)
-          .child('avatar')
-          .getDownloadURL()
-          .then((url) => {
-            resolve({...profile.val(), avatar: url});
-          })
-          .catch((e) => {
-            resolve(profile.val());
-          });
-      });
-  });
+export const fetchUser = async (uid: string) => {
+  const profile = await database()
+    .ref('users/' + uid)
+    .once('value');
+  return profile.val();
 };
 
 export const fetchUsers = (uids: string[]) => {
-  return async (dispatch) => {
+  return async (dispatch: MyThunkDispatch) => {
     if (uids.length > 0) {
       const users: Profile[] = await Promise.all(
         uids.map(async (uid) => {
           const profile = await database()
             .ref('users/' + uid)
             .once('value');
-          try {
-            const url = await storage()
-              .ref('images/' + uid)
-              .child('avatar')
-              .getDownloadURL();
-            return {...profile.val(), avatar: url};
-          } catch (e) {
-            return profile.val();
-          }
+          return profile.val();
         }),
       );
       const sharedUsers = {};

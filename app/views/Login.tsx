@@ -90,7 +90,7 @@ const Login: FunctionComponent<LoginProps> = ({
             accountType: isAdmin.val()
               ? AccountType.ADMIN
               : AccountType.STANDARD,
-            // avatar,
+            avatar,
           });
         const userRef = db().collection('users').doc(user.uid);
         const doc = await userRef.get();
@@ -184,10 +184,11 @@ const Login: FunctionComponent<LoginProps> = ({
       // Sign-in the user with the credential
       const credentials = await auth().signInWithCredential(facebookCredential);
       const {uid, email} = credentials.user;
+      const avatar = getProfileImage(credentials.user);
       await database()
         .ref('users')
         .child(uid)
-        .update({uid, email, token: data.accessToken, fb_login: true});
+        .update({uid, email, token: data.accessToken, fb_login: true, avatar});
       setFacebookLoading(false);
       return credentials;
     } catch (e) {
@@ -206,6 +207,14 @@ const Login: FunctionComponent<LoginProps> = ({
 
       // Sign-in the user with the credential
       const credentials = await auth().signInWithCredential(googleCredential);
+      if (credentials.additionalUserInfo?.isNewUser) {
+        const avatar = getProfileImage(credentials.user);
+        await database().ref('users').child(credentials.user.uid).update({
+          uid: credentials.user.uid,
+          email: credentials.user.email,
+          avatar,
+        });
+      }
       setGoogleLoading(false);
       return credentials;
     } catch (e) {
