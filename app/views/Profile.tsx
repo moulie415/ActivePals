@@ -362,9 +362,14 @@ class ProfileView extends Component<ProfileProps, State> {
           </Layout>
 
           <Layout style={{flex: 1}}>
-            <ListItem title="Email" description={email} />
             <Divider />
-            <ListItem title="Account type" description={profile.accountType} />
+            <ListItem title="Email" description={email} disabled />
+            <Divider />
+            <ListItem
+              title="Account type"
+              description={profile.accountType}
+              disabled
+            />
             <Divider />
             {gym && (
               <>
@@ -390,6 +395,7 @@ class ProfileView extends Component<ProfileProps, State> {
             <Divider />
             <Layout style={{margin: 10}}>
               <Input
+                style={{marginBottom: 10}}
                 accessoryLeft={() => <Text category="label">Username</Text>}
                 value={profile && profile.username}
                 onChangeText={(username) =>
@@ -401,6 +407,7 @@ class ProfileView extends Component<ProfileProps, State> {
               />
 
               <Input
+                style={{marginBottom: 10}}
                 accessoryLeft={() => <Text category="label">First name</Text>}
                 value={profile && profile.first_name}
                 onChangeText={(name) =>
@@ -412,6 +419,7 @@ class ProfileView extends Component<ProfileProps, State> {
               />
 
               <Input
+                style={{ marginBottom: 10 }}
                 accessoryLeft={() => <Text category="label">Last name</Text>}
                 value={profile && profile.last_name}
                 onChangeText={(name) =>
