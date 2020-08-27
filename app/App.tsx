@@ -53,6 +53,7 @@ import FullScreenVideo from './views/FullScreenVideo';
 import Credits from './views/Credits';
 import Instabug from 'instabug-reactnative';
 import AddFriendButton from './components/AddFriendButton/AddFriendButton';
+import FilePreview from './views/FilePreview';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -97,6 +98,12 @@ export type StackParamList = {
   PostView: {postId: string};
   FullScreenVideo: {uri: string};
   Credits: undefined;
+  FilePreview: {
+    type: 'video' | 'image';
+    uri: string;
+    message: boolean;
+    text: string;
+  };
 };
 
 const Stack = createStackNavigator<StackParamList>();
@@ -257,8 +264,10 @@ const App = () => {
                 <Stack.Screen
                   name="FullScreenVideo"
                   component={FullScreenVideo}
+                  options={() => ({headerShown: false})}
                 />
                 <Stack.Screen name="Credits" component={Credits} />
+                <Stack.Screen name="FilePreview" component={FilePreview} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>

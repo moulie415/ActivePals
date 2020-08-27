@@ -507,7 +507,7 @@ class ProfileView extends Component<ProfileProps, State> {
                 )
               }>
               {activities.map((activity) => (
-                <SelectItem title={activity} />
+                <SelectItem key={activity} title={activity} />
               ))}
             </Select>
           </View>
@@ -546,7 +546,7 @@ class ProfileView extends Component<ProfileProps, State> {
               /> */}
               <Select selectedIndex={new IndexPath(0)}>
                 {levels.map((level) => (
-                  <SelectItem title={level} />
+                  <SelectItem key={level} title={level} />
                 ))}
               </Select>
             </View>

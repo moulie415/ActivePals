@@ -213,7 +213,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   getType() {
-    const {navigation} = this.props;
+    const {route} = this.props;
     const {gymId, session} = route.params;
     if (session) {
       return MessageType.SESSION_MESSAGE;
@@ -225,7 +225,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   getDbRef() {
-    const {navigation, route} = this.props;
+    const {route} = this.props;
     const {gymId, session, chatId} = route.params;
     if (session && session.key) {
       return database().ref('sessionChats').child(session.key);
@@ -264,13 +264,7 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   loadMessages(endAt?: string) {
-    const {
-      navigation,
-      getSessionMessages,
-      getGymMessages,
-      getMessages,
-      route,
-    } = this.props;
+    const {getSessionMessages, getGymMessages, getMessages, route} = this.props;
     const {amount} = this.state;
     const {friendUid, gymId, session, chatId} = route.params;
     this.setState({spinner: true});

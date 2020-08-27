@@ -169,13 +169,7 @@ class Friends extends Component<FriendsProps, State> {
                   item.avatar ? (
                     <Avatar source={{uri: item.avatar}} size="large" />
                   ) : (
-                    <Icon
-                      size={65}
-                      name="person"
-                      style={{
-                        marginTop: Platform.OS === 'ios' ? -10 : 0,
-                      }}
-                    />
+                    <ThemedIcon size={40} name="person" />
                   )
                 }
                 accessoryRight={() => (

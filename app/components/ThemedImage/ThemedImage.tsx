@@ -10,7 +10,6 @@ const ThemedImage: FunctionComponent<ThemedImageProps> = ({
   style,
   fill,
 }) => {
-  console.log(eva.theme)
   return (
     <Image
       style={[

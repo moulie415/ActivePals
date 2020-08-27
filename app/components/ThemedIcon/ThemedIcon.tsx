@@ -10,7 +10,6 @@ const ThemedIcon: FunctionComponent<ThemedIconProps> = ({
   fill,
   status,
 }) => {
-  console.log(eva);
   return (
     <Icon
       style={[
