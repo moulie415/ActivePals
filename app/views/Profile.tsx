@@ -159,12 +159,13 @@ class ProfileView extends Component<ProfileProps, State> {
         );
         // response.uri is the URI of the new image that can now be displayed, uploaded...
         // response.path is the path of the new image
-        // response.name is the name of the new image with the extension
+        // response.name is the name of the new image with the extension 
         // response.size is the size of the new image
+        const {profile} = this.state;
         if (backdrop) {
-          this.setState({backdrop: resized.uri});
+          this.setState({profile: {...profile, backdrop: resized.uri}});
         } else {
-          this.setState({avatar: resized.uri});
+          this.setState({profile: {...profile, avatar: resized.uri}});
         }
         this.setState({spinner: false});
       }
@@ -304,7 +305,7 @@ class ProfileView extends Component<ProfileProps, State> {
           }
         /> */}
         <ScrollView>
-          <Layout style={{alignItems: 'center', marginBottom: 10}}>
+          <Layout style={{alignItems: 'center', marginBottom: 10, flex: 1}}>
             <TouchableOpacity
               style={{width: '100%'}}
               onPress={() => this.selectAvatar(true)}>
@@ -408,7 +409,6 @@ class ProfileView extends Component<ProfileProps, State> {
               this.setState({profile: {...profile, username}})
             }
             placeholder="Username"
-            style={styles.input}
             autoCapitalize="none"
             autoCorrect={false}
           />
@@ -433,7 +433,7 @@ class ProfileView extends Component<ProfileProps, State> {
             autoCorrect={false}
           />
 
-          <View style={styles.inputGrp}>
+          <View>
             <Text style={{alignSelf: 'center'}}>Preferred activity: </Text>
             {/* <RNPickerSelect
               placeholder={{
@@ -477,7 +477,7 @@ class ProfileView extends Component<ProfileProps, State> {
             </Select>
           </View>
           {profile && profile.activity && (
-            <View style={styles.inputGrp}>
+            <View>
               <Text style={{alignSelf: 'center'}}>Level: </Text>
               {/* <RNPickerSelect
                 placeholder={{
@@ -516,17 +516,20 @@ class ProfileView extends Component<ProfileProps, State> {
               </Select>
             </View>
           )}
-          <TouchableOpacity
-            onPress={() => this.setState({showPicker: true})}
-            style={styles.inputGrp}>
+          <TouchableOpacity onPress={() => this.setState({showPicker: true})}>
             <Text style={{alignSelf: 'center'}}>
               <Text>Birthday: </Text>
-              <Text style={styles.input}>{birthdayString}</Text>
+              <Text>{birthdayString}</Text>
             </Text>
           </TouchableOpacity>
-          <Button status="danger" onPress={() => this.logout()}>
-            Log out
-          </Button>
+          <Layout style={{flex: 1, alignItems: 'flex-end'}}>
+            <Button
+              style={{alignSelf: 'center'}}
+              status="danger"
+              onPress={() => this.logout()}>
+              Log out
+            </Button>
+          </Layout>
           {spinner && (
             <View style={hStyles.spinner}>
               <Spinner />
