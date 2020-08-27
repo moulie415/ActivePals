@@ -7,6 +7,7 @@ import {fetchUsers, updateUsers} from './home';
 import {setGym} from './profile';
 import {calculateDuration} from '../constants/utils';
 import Session from '../types/Session';
+import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
 
 export const SET_SESSIONS = 'SET_SESSIONS';
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS';
@@ -18,6 +19,7 @@ export const SET_PLACES = 'SET_PLACES';
 export const SET_PLACE = 'SET_PLACE';
 export const SET_RADIUS = 'SET_RADIUS';
 export const SET_IGNORED = 'SET_IGNORED';
+export const SET_SHOW_MAP = 'SET_SHOW_MAP';
 
 const setPrivateSessions = (sessions) => ({
   type: SET_PRIVATE_SESSIONS,
@@ -64,6 +66,11 @@ export const setIgnored = (session) => ({
   session,
 });
 
+export const SetShowMap = (show: boolean) => ({
+  type: SET_SHOW_MAP,
+  show,
+});
+
 const checkHost = (host, state) => {
   const {uid} = state.profile.profile;
   if (host === uid) {
@@ -77,7 +84,11 @@ const checkHost = (host, state) => {
   }
 };
 
-export const removeSession = (key, isPrivate, force = false) => {
+export const removeSession = (
+  key: string,
+  isPrivate: boolean,
+  force = false,
+) => {
   return (dispatch: MyThunkDispatch, getState) => {
     const {uid} = getState().profile.profile;
     const sessions: {[key: string]: Session} = isPrivate
@@ -121,7 +132,7 @@ export const removeSession = (key, isPrivate, force = false) => {
   };
 };
 
-const expirationAlert = (session, isPrivate) => {
+const expirationAlert = (session, isPrivate: boolean): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
     const ignore = getState().sessions.ignored[session.key];
     if (!ignore) {
@@ -147,7 +158,7 @@ const expirationAlert = (session, isPrivate) => {
   };
 };
 
-export const fetchSessions = () => {
+export const fetchSessions = (): MyThunkResult<Promise<void>> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     dispatch(updateSessions([]));
     const {radius} = getState().sessions;

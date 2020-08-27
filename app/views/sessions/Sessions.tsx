@@ -36,6 +36,7 @@ import {
   setPlaces,
   fetchPlaces,
   setRadius,
+  SetShowMap,
 } from '../../actions/sessions';
 import {removeGym, joinGym, setLocation} from '../../actions/profile';
 import SessionsProps from '../../types/views/sessions/Sessions';
@@ -47,7 +48,6 @@ import {
   Button,
   Icon,
   Text,
-  Toggle,
   Layout,
   List,
   ListItem,
@@ -67,7 +67,6 @@ const LOCATION_PERMISSION =
 interface State {
   radius: number;
   spinner: boolean;
-  showMap: boolean;
   sessions: Session[];
   refreshing: boolean;
   markers: Element[];
@@ -98,7 +97,6 @@ class Sessions extends Component<SessionsProps, State> {
 
     this.state = {
       spinner: false,
-      showMap: false,
       radius: props.radius,
       sessions: sortSessionsByDistance(combined),
       refreshing: false,
@@ -313,7 +311,7 @@ class Sessions extends Component<SessionsProps, State> {
   }
 
   renderLists() {
-    const {gym, location, navigation, places} = this.props;
+    const {gym, location, navigation, places, setShowMap} = this.props;
     const {
       selectedIndex,
       refreshing,
@@ -442,8 +440,8 @@ class Sessions extends Component<SessionsProps, State> {
                           this.setState({
                             longitude: item.location.position.lng,
                             latitude: item.location.position.lat,
-                            showMap: true,
                           });
+                          setShowMap(true);
                         }}>
                         <ThemedIcon name="pin" size={40} />
                       </TouchableOpacity>
@@ -508,13 +506,13 @@ class Sessions extends Component<SessionsProps, State> {
                     accessoryRight={() => {
                       return (
                         <TouchableOpacity
-                          onPress={() =>
+                          onPress={() => {
                             this.setState({
                               longitude: lng,
                               latitude: lat,
-                              showMap: true,
-                            })
-                          }>
+                            });
+                            setShowMap(true);
+                          }}>
                           <ThemedIcon size={40} name="pin" />
                         </TouchableOpacity>
                       );
@@ -535,7 +533,6 @@ class Sessions extends Component<SessionsProps, State> {
       latitude,
       longitude,
       markers,
-      showMap,
       friendsModalOpen,
       selectedLocation,
       radius,
@@ -545,7 +542,7 @@ class Sessions extends Component<SessionsProps, State> {
       options,
       filterModalOpen,
     } = this.state;
-    const {places, navigation, friends} = this.props;
+    const {places, navigation, friends, showMap} = this.props;
     // switch for list view and map view
     // action sheet when pressing
     const left = (
@@ -562,25 +559,7 @@ class Sessions extends Component<SessionsProps, State> {
         <Text style={{color: '#fff'}}>Filters</Text>
       </TouchableOpacity>
     );
-    const right = (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <Text style={{color: '#fff'}}>Map: </Text>
-        <Toggle
-          checked={showMap}
-          onChange={(val) => {
-            if (val) {
-              if (latitude && longitude) {
-                this.setState({showMap: val});
-              } else {
-                Alert.alert('Error', 'Sorry your location could not be found');
-              }
-            } else {
-              this.setState({showMap: val});
-            }
-          }}
-        />
-      </View>
-    );
+
     return (
       <Layout style={{flex: 1}}>
         {spinner ? (
@@ -797,6 +776,7 @@ const mapStateToProps = ({
   places: sessions.places,
   radius: sessions.radius,
   location: profile.location,
+  showMap: sessions.showMap,
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
@@ -810,6 +790,7 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   setPlaces: (places) => dispatch(setPlaces(places)),
   getPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
   saveRadius: (radius) => dispatch(setRadius(radius)),
+  setShowMap: (show: boolean) => dispatch(SetShowMap(show)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sessions);

@@ -54,6 +54,7 @@ import Credits from './views/Credits';
 import Instabug from 'instabug-reactnative';
 import AddFriendButton from './components/AddFriendButton/AddFriendButton';
 import FilePreview from './views/FilePreview';
+import MapToggle from './components/MapToggle/MapToggle';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -234,6 +235,9 @@ const App = () => {
                     if (route.name === 'Tabs') {
                       if (!route.state || index === 0) {
                         return <NotificationsButton navigation={navigation} />;
+                      }
+                      if (index === 1) {
+                        return <MapToggle />;
                       }
                       if (index === 2) {
                         return <AddFriendButton />;

@@ -9,6 +9,7 @@ import {
   SET_PLACE,
   SET_RADIUS,
   SET_IGNORED,
+  SET_SHOW_MAP,
 } from '../actions/sessions';
 import {SET_LOGGED_OUT} from '../actions/profile';
 import Session from '../types/Session';
@@ -20,6 +21,7 @@ export interface SessionsState {
   places: {[key: string]: Place};
   radius: number;
   ignored: {[key: string]: boolean};
+  showMap: boolean;
 }
 
 const initialState: SessionsState = {
@@ -28,6 +30,7 @@ const initialState: SessionsState = {
   places: {},
   radius: 10,
   ignored: {},
+  showMap: false,
 };
 
 export default function (state = initialState, action) {
@@ -93,6 +96,12 @@ export default function (state = initialState, action) {
       return {
         ...state,
         ignored: {...state.ignored, [action.session]: true},
+      };
+    }
+    case SET_SHOW_MAP: {
+      return {
+        ...state,
+        showMap: action.show,
       };
     }
     case SET_LOGGED_OUT: {

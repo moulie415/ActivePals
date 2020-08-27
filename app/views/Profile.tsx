@@ -419,7 +419,7 @@ class ProfileView extends Component<ProfileProps, State> {
               />
 
               <Input
-                style={{ marginBottom: 10 }}
+                style={{marginBottom: 10}}
                 accessoryLeft={() => <Text category="label">Last name</Text>}
                 value={profile && profile.last_name}
                 onChangeText={(name) =>
