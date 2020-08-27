@@ -17,11 +17,9 @@ import ImageResizer from 'react-native-image-resizer';
 //import RNPickerSelect from 'react-native-picker-select';
 import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
-import styles from '../styles/profileStyles';
 import hStyles from '../styles/homeStyles';
-import globalStyles from '../styles/globalStyles';
 import {fetchProfile, setLoggedOut} from '../actions/profile';
-import {pickerItems, getBirthdayDate} from '../constants/utils';
+import {getBirthdayDate} from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
 import Profile from '../types/Profile';
@@ -34,6 +32,8 @@ import {
   Select,
   SelectItem,
   IndexPath,
+  ListItem,
+  Divider,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
@@ -78,7 +78,6 @@ class ProfileView extends Component<ProfileProps, State> {
       this.setState({
         profile,
         initialProfile: profile,
-        initialAvatar: profile.avatar,
       });
     }
   }
@@ -145,8 +144,6 @@ class ProfileView extends Component<ProfileProps, State> {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({spinner: false});
       } else {
-        const source = {uri: response.uri};
-
         const size = 640;
         // You can also display the image using data:
         // let source = { uri: 'data:image/jpeg;base64,' + response.data };
@@ -159,7 +156,7 @@ class ProfileView extends Component<ProfileProps, State> {
         );
         // response.uri is the URI of the new image that can now be displayed, uploaded...
         // response.path is the path of the new image
-        // response.name is the name of the new image with the extension 
+        // response.name is the name of the new image with the extension
         // response.size is the size of the new image
         const {profile} = this.state;
         if (backdrop) {
@@ -197,7 +194,7 @@ class ProfileView extends Component<ProfileProps, State> {
   }
 
   async checkImages() {
-    const {avatar, backdrop} = this.state.profile;
+    const {avatar, backdrop, uid} = this.state.profile;
     const {
       avatar: initialAvatar,
       backdrop: initialBackdrop,
@@ -206,9 +203,19 @@ class ProfileView extends Component<ProfileProps, State> {
     try {
       if (initialAvatar !== avatar) {
         const url = await this.uploadImage(avatar);
+        await database().ref('users').child(uid).update({avatar: url});
+        this.setState({
+          profile: {...this.state.profile, avatar: url},
+          initialProfile: {...this.state.initialProfile, avatar: url},
+        });
       }
       if (initialBackdrop !== backdrop) {
         const url = await this.uploadImage(backdrop, true);
+        await database().ref('users').child(uid).update({backdrop: url});
+        this.setState({
+          profile: {...this.state.profile, backdrop: url},
+          initialProfile: {...this.state.initialProfile, backdrop: url},
+        });
       }
     } catch (e) {
       Alert.alert('Error', e.message);
@@ -304,8 +311,8 @@ class ProfileView extends Component<ProfileProps, State> {
             )
           }
         /> */}
-        <ScrollView>
-          <Layout style={{alignItems: 'center', marginBottom: 10, flex: 1}}>
+        <ScrollView contentContainerStyle={{flex: 1}}>
+          <Layout style={{alignItems: 'center', marginBottom: 10}}>
             <TouchableOpacity
               style={{width: '100%'}}
               onPress={() => this.selectAvatar(true)}>
@@ -354,88 +361,70 @@ class ProfileView extends Component<ProfileProps, State> {
             </TouchableOpacity>
           </Layout>
 
-          <Layout
-            style={{
-              flex: 1,
-              marginRight: 10,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <View style={{width: '60%'}}>
-              <Text>
-                {'Email: '}
-                <Text>{email}</Text>
-              </Text>
-              <Text
-                style={{
-                  marginHorizontal: 20,
-                  marginBottom: gym ? 0 : 10,
-                }}>
-                {'Account type: '}
-                <Text>{profile && profile.accountType}</Text>
-              </Text>
-              {gym && (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Gym', {id: gym.place_id})
-                  }>
-                  <Text
-                    style={{
-                      marginHorizontal: 20,
-                      marginBottom: 10,
-                    }}>
-                    {'Gym: '}
-                    <Text>{gym.name}</Text>
-                  </Text>
-                </TouchableOpacity>
+          <Layout style={{flex: 1}}>
+            <ListItem title="Email" description={email} />
+            <Divider />
+            <ListItem title="Account type" description={profile.accountType} />
+            <Divider />
+            {gym && (
+              <>
+                <ListItem
+                  onPress={() => navigation.navigate('Gym', {id: gym.place_id})}
+                  title="Gym"
+                  description={gym.name}
+                  accessoryRight={() => (
+                    <ThemedIcon size={25} name="arrow-ios-forward" />
+                  )}
+                />
+                <Divider />
+              </>
+            )}
+            <ListItem
+              onPress={() => navigation.navigate('Settings')}
+              title="Settings"
+              accessoryLeft={() => <ThemedIcon size={25} name="settings" />}
+              accessoryRight={() => (
+                <ThemedIcon size={25} name="arrow-ios-forward" />
               )}
-            </View>
-            <View style={{flex: 1, marginRight: 20}}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-end',
-                  alignItems: 'center',
-                }}
-                onPress={() => navigation.navigate('Settings')}>
-                <Text style={{marginRight: 10}}>Settings</Text>
-                <ThemedIcon size={25} name="settings" />
-              </TouchableOpacity>
-            </View>
-          </Layout>
-          <Input
-            value={profile && profile.username}
-            onChangeText={(username) =>
-              this.setState({profile: {...profile, username}})
-            }
-            placeholder="Username"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+            />
+            <Divider />
+            <Layout style={{margin: 10}}>
+              <Input
+                accessoryLeft={() => <Text category="label">Username</Text>}
+                value={profile && profile.username}
+                onChangeText={(username) =>
+                  this.setState({profile: {...profile, username}})
+                }
+                placeholder="Username"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
 
-          <Input
-            value={profile && profile.first_name}
-            onChangeText={(name) =>
-              this.setState({profile: {...profile, first_name: name}})
-            }
-            placeholder="First name"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+              <Input
+                accessoryLeft={() => <Text category="label">First name</Text>}
+                value={profile && profile.first_name}
+                onChangeText={(name) =>
+                  this.setState({profile: {...profile, first_name: name}})
+                }
+                placeholder="First name"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
 
-          <Input
-            value={profile && profile.last_name}
-            onChangeText={(name) =>
-              this.setState({profile: {...profile, last_name: name}})
-            }
-            placeholder="Last name"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+              <Input
+                accessoryLeft={() => <Text category="label">Last name</Text>}
+                value={profile && profile.last_name}
+                onChangeText={(name) =>
+                  this.setState({profile: {...profile, last_name: name}})
+                }
+                placeholder="Last name"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
 
-          <View>
-            <Text style={{alignSelf: 'center'}}>Preferred activity: </Text>
-            {/* <RNPickerSelect
+              <>
+                <Text style={{alignSelf: 'center'}}>Preferred activity: </Text>
+                {/* <RNPickerSelect
               placeholder={{
                 label: 'Unspecified',
                 value: null,
@@ -465,21 +454,21 @@ class ProfileView extends Component<ProfileProps, State> {
               // style={{ ...pickerSelectStyles }}
               value={profile ? profile.activity : null}
             /> */}
-            <Select
-              selectedIndex={
-                new IndexPath(
-                  activities.findIndex((a) => a === profile.activity),
-                )
-              }>
-              {activities.map((activity) => (
-                <SelectItem key={activity} title={activity} />
-              ))}
-            </Select>
-          </View>
-          {profile && profile.activity && (
-            <View>
-              <Text style={{alignSelf: 'center'}}>Level: </Text>
-              {/* <RNPickerSelect
+                <Select
+                  selectedIndex={
+                    new IndexPath(
+                      activities.findIndex((a) => a === profile.activity),
+                    )
+                  }>
+                  {activities.map((activity) => (
+                    <SelectItem key={activity} title={activity} />
+                  ))}
+                </Select>
+              </>
+              {profile && profile.activity && (
+                <>
+                  <Text style={{alignSelf: 'center'}}>Level: </Text>
+                  {/* <RNPickerSelect
                 placeholder={{
                   label: 'Unspecified',
                   value: null,
@@ -509,26 +498,29 @@ class ProfileView extends Component<ProfileProps, State> {
                 // style={{ ...pickerSelectStyles }}
                 value={profile.level}
               /> */}
-              <Select selectedIndex={new IndexPath(0)}>
-                {levels.map((level) => (
-                  <SelectItem key={level} title={level} />
-                ))}
-              </Select>
-            </View>
-          )}
-          <TouchableOpacity onPress={() => this.setState({showPicker: true})}>
-            <Text style={{alignSelf: 'center'}}>
-              <Text>Birthday: </Text>
-              <Text>{birthdayString}</Text>
-            </Text>
-          </TouchableOpacity>
-          <Layout style={{flex: 1, alignItems: 'flex-end'}}>
-            <Button
-              style={{alignSelf: 'center'}}
-              status="danger"
-              onPress={() => this.logout()}>
-              Log out
-            </Button>
+                  <Select selectedIndex={new IndexPath(0)}>
+                    {levels.map((level) => (
+                      <SelectItem key={level} title={level} />
+                    ))}
+                  </Select>
+                </>
+              )}
+            </Layout>
+            <TouchableOpacity onPress={() => this.setState({showPicker: true})}>
+              <Text style={{alignSelf: 'center'}}>
+                <Text>Birthday: </Text>
+                <Text>{birthdayString}</Text>
+              </Text>
+            </TouchableOpacity>
+            <Layout
+              style={{flex: 1, justifyContent: 'flex-end', marginBottom: 10}}>
+              <Button
+                style={{alignSelf: 'center'}}
+                status="danger"
+                onPress={() => this.logout()}>
+                Log out
+              </Button>
+            </Layout>
           </Layout>
           {spinner && (
             <View style={hStyles.spinner}>
