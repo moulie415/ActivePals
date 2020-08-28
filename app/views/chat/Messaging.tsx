@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {Alert, TouchableOpacity, View, BackHandler} from 'react-native';
-import {pathOr} from 'ramda';
 import database from '@react-native-firebase/database';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
@@ -50,10 +49,10 @@ class Messaging extends Component<MessagingProps, State> {
   componentDidMount() {
     const {unreadCount, onResetUnreadCount, route} = this.props;
 
-    const {gymId, friendUid, session} = route.params;
+    const {gymId, friendUid, sessionId} = route.params;
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
     this.loadMessages();
-    const id = friendUid || session || gymId;
+    const id = friendUid || sessionId || gymId;
     const count = unreadCount[id];
     if (count && count > 0) {
       onResetUnreadCount(id);
@@ -63,9 +62,7 @@ class Messaging extends Component<MessagingProps, State> {
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {profile, onResetMessage, resetNotif, route} = this.props;
 
-    const {friendUid, gymId} = route.params;
-    const session = pathOr({}, ['session'], route.params);
-    const {key: sessionId} = session;
+    const {friendUid, gymId, sessionId} = route.params;
     const {messages} = this.state;
     // message it populated when an attachment is sent
     if (nextProps.message) {
@@ -168,14 +165,16 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   async onSend(messages: Message[] = []) {
-    const {gym, onUpdateLastMessage, route} = this.props;
-    const {friendUid, gymId, session, chatId} = route.params;
+    const {gym, onUpdateLastMessage, route, sessions} = this.props;
+    const {friendUid, gymId, sessionId, chatId} = route.params;
+    const session = sessions[sessionId];
     // make messages database friendly
     const converted = messages.map((message) => {
       const type = this.getType();
       const createdAt = moment().utc().valueOf();
+
       if (session) {
-        const {key: sessionId, title: sessionTitle} = session;
+        const {title: sessionTitle} = session;
         const sessionType: SessionType = session.private
           ? 'privateSessions'
           : 'sessions';
@@ -220,8 +219,8 @@ class Messaging extends Component<MessagingProps, State> {
 
   getType() {
     const {route} = this.props;
-    const {gymId, session} = route.params;
-    if (session) {
+    const {gymId, sessionId} = route.params;
+    if (sessionId) {
       return MessageType.SESSION_MESSAGE;
     }
     if (gymId) {
@@ -232,9 +231,9 @@ class Messaging extends Component<MessagingProps, State> {
 
   getDbRef() {
     const {route} = this.props;
-    const {gymId, session, chatId} = route.params;
-    if (session && session.key) {
-      return database().ref('sessionChats').child(session.key);
+    const {gymId, sessionId, chatId} = route.params;
+    if (sessionId) {
+      return database().ref('sessionChats').child(sessionId);
     }
     if (gymId) {
       return database().ref('gymChats').child(gymId);
@@ -245,8 +244,8 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   getRightHandIcon() {
-    const {navigation, route} = this.props;
-    const {gymId, session} = route.params;
+    const {navigation, route, sessions} = this.props;
+    const {gymId, sessionId} = route.params;
     if (gymId) {
       return (
         <TouchableOpacity
@@ -255,6 +254,7 @@ class Messaging extends Component<MessagingProps, State> {
         </TouchableOpacity>
       );
     }
+    const session = sessions[sessionId];
     if (session) {
       const {key, private: isPrivate} = session;
       return (
@@ -270,10 +270,18 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   loadMessages(endAt?: string) {
-    const {getSessionMessages, getGymMessages, getMessages, route} = this.props;
+    const {
+      getSessionMessages,
+      getGymMessages,
+      getMessages,
+      route,
+      sessions,
+    } = this.props;
     const {amount} = this.state;
-    const {friendUid, gymId, session, chatId} = route.params;
+    const {friendUid, gymId, sessionId, chatId} = route.params;
+    const session = sessions[sessionId];
     this.setState({spinner: true});
+    debugger;
     if (session) {
       const {key, private: isPrivate} = session;
       getSessionMessages(key, amount, isPrivate, endAt);
@@ -369,9 +377,9 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   render() {
-    const {navigation, gym, profile, friends, users, route} = this.props;
+    const {navigation, profile, friends, users} = this.props;
     const {messages, showLoadEarlier, spinner, text} = this.state;
-    const {friendUsername, session} = route.params;
+
     return (
       <Layout style={{flex: 1}}>
         <GiftedChat
@@ -501,7 +509,7 @@ const fetchId = (params) => {
 };
 
 const mapStateToProps = (
-  {friends, profile, chats, sharedInfo}: MyRootState,
+  {friends, profile, chats, sharedInfo, sessions}: MyRootState,
   ownProps,
 ) => ({
   friends: friends.friends,
@@ -515,6 +523,7 @@ const mapStateToProps = (
   messageSession: chats.messageSessions[fetchId(ownProps.route.params)],
   notif: chats.notif,
   unreadCount: chats.unreadCount,
+  sessions: {...sessions.sessions, ...sessions.privateSessions},
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({

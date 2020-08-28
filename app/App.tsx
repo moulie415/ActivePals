@@ -92,7 +92,7 @@ export type StackParamList = {
   SessionInfo: {sessionId: string; isPrivate: boolean};
   Gym: {id: string};
   Messaging: {
-    session?: Session;
+    sessionId?: string;
     gymId?: string;
     chatId?: string;
     friendUsername?: string;

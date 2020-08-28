@@ -4,6 +4,7 @@ import Message from '../Message';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {StackParamList} from '../../App';
 import {RouteProp} from '@react-navigation/native';
+import Session from '../Session';
 
 type MessagingNavigationProp = StackNavigationProp<StackParamList, 'Messaging'>;
 
@@ -30,4 +31,5 @@ export default interface MessagingProps {
   ) => void;
   getGymMessages: (id: string, amount: number, endAt: string) => void;
   onUpdateLastMessage: (message: Message) => void;
-}
+  sessions: {[key: string]: Session};
+};

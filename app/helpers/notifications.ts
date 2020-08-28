@@ -3,6 +3,8 @@ import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import db from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import messaging from '@react-native-firebase/messaging';
+import {navigateFromNotif, shouldNavigate} from './navigation';
+import {LoginNavigationProp, LoginRouteProp} from '../types/views/Login';
 
 export const createChannels = () => {
   const channelData = [
@@ -55,7 +57,11 @@ export const createChannels = () => {
   );
 };
 
-export const setupNotifications = (uid: string) => {
+export const setupNotifications = (
+  uid: string,
+  navigation: LoginNavigationProp,
+  route: LoginRouteProp,
+) => {
   messaging().onTokenRefresh((token) => {
     database().ref(`users/${uid}`).child('FCMToken').set(token);
   });
@@ -70,6 +76,11 @@ export const setupNotifications = (uid: string) => {
     // (required) Called when a remote or local notification is opened or received
     onNotification: (notification) => {
       console.log('NOTIFICATION:', notification);
+      if (notification.userInteraction) {
+        if (shouldNavigate(notification)) {
+          navigateFromNotif(notification, navigation);
+        }
+      }
 
       // process the notification
 

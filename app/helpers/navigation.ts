@@ -1,11 +1,11 @@
-import NavigationService from '../actions/navigation';
+import {LoginNavigationProp} from '../types/views/Login';
 
-export const shouldNavigate = notification => {
-  const { nav } = NavigationService.getNavigator().state;
+export const shouldNavigate = (notification) => {
+  const {nav} = NavigationService.getNavigator().state;
   if (nav.routes.length > 0) {
     const route = nav.routes[nav.index];
     if (route.params) {
-      const { chatId, session, gymId } = route.params;
+      const {chatId, session, gymId} = route.params;
       return (
         !(chatId && notification.chatId === chatId) &&
         !(session && session.key === notification.sessionId) &&
@@ -16,28 +16,41 @@ export const shouldNavigate = notification => {
   return true;
 };
 
-export const navigateFromNotif = notif => {
-  const { type, sessionId, sessionTitle, chatId, uid, username, postId, gymId, isPrivate } = notif;
+export const navigateFromNotif = (notif, navigation: LoginNavigationProp) => {
+  const {
+    type,
+    sessionId,
+    sessionTitle,
+    chatId,
+    uid,
+    username,
+    postId,
+    gymId,
+    isPrivate,
+  } = notif;
   if (type === 'sessionMessage') {
-    const session = { key: sessionId, title: sessionTitle, private: notif.private === 'privateSessions' };
-    NavigationService.navigate('Messaging', { session });
+    navigation.navigate('Messaging', {sessionId});
   }
   switch (type) {
     case 'message':
-      NavigationService.navigate('Messaging', { chatId, friendUsername: username, friendUid: uid });
+      navigation.navigate('Messaging', {
+        chatId,
+        friendUsername: username,
+        friendUid: uid,
+      });
       break;
     case 'gymMessage':
-      NavigationService.navigate('Messaging', { gymId });
+      navigation.navigate('Messaging', {gymId});
       break;
     case 'friendRequest':
-      NavigationService.navigate('Friends');
+      navigation.navigate('Friends');
       break;
     case 'comment':
     case 'rep':
-      NavigationService.navigate('PostView', { postId });
+      navigation.navigate('PostView', {postId});
       break;
     case 'addedToSession':
-      NavigationService.navigate('SessionInfo', { sessionId, isPrivate });
+      navigation.navigate('SessionInfo', {sessionId, isPrivate});
       break;
     default:
       console.log('invalid notif type');

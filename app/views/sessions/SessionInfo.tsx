@@ -134,7 +134,10 @@ class SessionInfo extends Component<SessionInfoProps, State> {
   chatButton(session) {
     const {navigation} = this.props;
     return (
-      <Button onPress={() => navigation.navigate('Messaging', {session})}>
+      <Button
+        onPress={() =>
+          navigation.navigate('Messaging', {sessionId: session.key})
+        }>
         Chat
       </Button>
     );

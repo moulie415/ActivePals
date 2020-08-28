@@ -49,6 +49,7 @@ GoogleSignin.configure({
 
 const Login: FunctionComponent<LoginProps> = ({
   navigation,
+  route,
   setProfile,
   hasViewedWelcome,
   setup,
@@ -114,13 +115,13 @@ const Login: FunctionComponent<LoginProps> = ({
         } else {
           navigation.navigate('Welcome', {goBack: false});
         }
-        setupNotifications(user.uid);
+        setupNotifications(user.uid, navigation, route);
       }
       authRef.current = true;
     });
     // unsubscribe to the listener when unmounting
     return () => unsubscribe();
-  }, [setProfile, navigation, hasViewedWelcome, setup, getProfile]);
+  }, [setProfile, navigation, hasViewedWelcome, setup, getProfile, route]);
 
   const signIn = async (email: string, password: string) => {
     try {

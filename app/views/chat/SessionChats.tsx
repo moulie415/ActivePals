@@ -22,7 +22,9 @@ class SessionChats extends Component<SessionChatsProps> {
         renderItem={({item}) => {
           return (
             <ListItem
-              onPress={() => navigation.navigate('Messaging', {session: item})}
+              onPress={() =>
+                navigation.navigate('Messaging', {sessionId: item.key})
+              }
               title={item.title}
               description={item.lastMessage.text}
               accessoryLeft={() => getType(item.type, 50)}
