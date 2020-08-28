@@ -1,9 +1,7 @@
 import db from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import storage from '@react-native-firebase/storage';
 import messaging from '@react-native-firebase/messaging';
-
 import {fetchFriends} from './friends';
 import {
   fetchSessionChats,
@@ -18,7 +16,7 @@ import Profile, {UserState} from '../types/Profile';
 import Place from '../types/Place';
 import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
 import {createChannels} from '../helpers/notifications';
-import Location from '../types/Location';
+import {YourLocation} from '../types/Location';
 
 export const SET_PROFILE = 'SET_PROFILE';
 export const SET_LOGGED_IN = 'SET_LOGGED_IN';
@@ -43,7 +41,7 @@ interface ViewedWelcomeAction {
 
 interface SetLocationAction {
   type: typeof SET_LOCATION;
-  location: Location;
+  location: YourLocation;
 }
 
 interface SetGymAction {
@@ -87,7 +85,7 @@ export const resetGym = (): ResetGymAction => ({
   type: REMOVE_GYM,
 });
 
-export const setLocation = (location: Location): SetLocationAction => ({
+export const setLocation = (location: YourLocation): SetLocationAction => ({
   type: SET_LOCATION,
   location,
 });

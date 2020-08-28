@@ -47,7 +47,6 @@ import globalStyles from '../../styles/globalStyles';
 import {
   CheckBox,
   Button,
-  Icon,
   Text,
   Layout,
   List,
@@ -59,6 +58,20 @@ import {
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 import ThemedImage from '../../components/ThemedImage/ThemedImage';
+import {YourLocation} from '../../types/Location';
+import {
+  InterstitialAd,
+  TestIds,
+  AdEventType,
+} from '@react-native-firebase/admob';
+import str from '../../constants/strings';
+
+const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+  requestNonPersonalizedAdsOnly: true,
+  keywords: ['fashion', 'clothing'],
+});
 
 const LOCATION_PERMISSION =
   Platform.OS === 'ios'
@@ -343,64 +356,46 @@ class Sessions extends Component<SessionsProps, State> {
           tabsContainerStyle={{marginHorizontal: 8, marginVertical: 5}}
         />
         {gym && selectedIndex === 1 && (
-          <View
-            style={{
-              padding: 10,
-              borderWidth: 1,
-            }}>
-            <View style={{flexDirection: 'row'}}>
-              {gym.photo ? (
+          <ListItem
+            title="Your gym"
+            description={gym.name}
+            onPress={() =>
+              navigation.navigate('Messaging', {gymId: gym.place_id})
+            }
+            accessoryLeft={() =>
+              gym.photo ? (
                 <Image
                   source={{uri: gym.photo}}
                   style={{
                     height: 40,
                     width: 40,
-                    alignSelf: 'center',
                     borderRadius: 20,
-                    marginRight: 10,
                   }}
                 />
               ) : (
-                <Image
+                <ThemedImage
                   source={require('../../../assets/images/dumbbell.png')}
-                  style={{
-                    height: 40,
-                    width: 40,
-                    alignSelf: 'center',
-                    marginRight: 10,
-                  }}
+                  size={40}
                 />
-              )}
-              <View style={{flex: 1}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <View>
-                    <Text>Your gym:</Text>
-                    <Text>{gym.name}</Text>
-                  </View>
-                  <View style={{flexDirection: 'row'}}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('Messaging', {gymId: gym.place_id})
-                      }
-                      style={{justifyContent: 'center', marginRight: 20}}>
-                      <Icon name="message-square" size={25} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('Gym', {id: gym.place_id})
-                      }>
-                      <Icon name="info" size={25} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
+              )
+            }
+            accessoryRight={() => (
+              <>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Messaging', {gymId: gym.place_id})
+                  }>
+                  <ThemedIcon name="message-square" size={25} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Gym', {id: gym.place_id})
+                  }>
+                  <ThemedIcon name="info" size={25} />
+                </TouchableOpacity>
+              </>
+            )}
+          />
         )}
         {selectedIndex === 0 ? (
           <List
@@ -518,6 +513,7 @@ class Sessions extends Component<SessionsProps, State> {
                   />
                 );
               }
+              return null;
             }}
           />
         )}
@@ -632,7 +628,7 @@ class Sessions extends Component<SessionsProps, State> {
               useNativeDriver
               onClosed={async () => {
                 const {radius: currentRadius, fetch, saveRadius} = this.props;
-                setShowFilterModal(false)
+                setShowFilterModal(false);
                 if (radius !== currentRadius) {
                   this.setState({refreshing: true});
                   saveRadius(radius);
@@ -775,7 +771,7 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   remove: (key, type) => dispatch(removeSession(key, type)),
   fetch: () =>
     Promise.all([dispatch(fetchSessions()), dispatch(fetchPrivateSessions())]),
-  setYourLocation: (location) => dispatch(setLocation(location)),
+  setYourLocation: (location: YourLocation) => dispatch(setLocation(location)),
   setPlaces: (places) => dispatch(setPlaces(places)),
   getPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
   saveRadius: (radius) => dispatch(setRadius(radius)),

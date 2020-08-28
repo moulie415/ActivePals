@@ -5,7 +5,7 @@ import str from '../constants/strings';
 import Profile from '../types/Profile';
 import Comment from '../types/Comment';
 import {dedupeSortAndAddCommentIds, sortComments} from '../constants/utils';
-import {MyThunkDispatch} from '../types/Shared';
+import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
 
 export const ADD_POST = 'ADD_POST';
 export const SET_FEED = 'SET_FEED';
@@ -103,7 +103,12 @@ export const addPost = (item) => {
   };
 };
 
-const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
+const sendMentionNotifs = (
+  item,
+  key: string,
+  commentMention = false,
+  postUid: string,
+): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
     const friends: Profile[] = Object.values(getState().friends.friends);
     const users: Profile[] = Object.values(getState().sharedInfo.users);
@@ -113,8 +118,10 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
       if (mentions) {
         mentions.forEach(async (mention) => {
           const username = mention.substring(1);
-          const friend = combined.find((friend) => friend.username == username);
-          if (friend && friend.uid != postUid && friend.uid != item.uid) {
+          const friend = combined.find(
+            (friend) => friend.username === username,
+          );
+          if (friend && friend.uid !== postUid && friend.uid !== item.uid) {
             //add notification for user
             const id = key + item.uid + 'mention';
             const type = commentMention ? 'commentMention' : 'postMention';
@@ -140,7 +147,7 @@ const sendMentionNotifs = (item, key, commentMention = false, postUid) => {
   };
 };
 
-export const fetchPost = (key) => {
+export const fetchPost = (key: string): MyThunkResult<Promise<void>> => {
   return (dispatch: MyThunkDispatch, getState) => {
     return new Promise((resolve) => {
       const uid = getState().profile.profile.uid;
@@ -178,7 +185,7 @@ export const fetchPost = (key) => {
   };
 };
 
-export const fetchPosts = (uid, amount = 30, endAt?: string) => {
+export const fetchPosts = (uid: string, amount = 30, endAt?: string) => {
   return (dispatch: MyThunkDispatch, getState) => {
     const promises = [];
     const ref = endAt
@@ -238,9 +245,9 @@ export const fetchPosts = (uid, amount = 30, endAt?: string) => {
           posts.forEach((post) => {
             let friends = getState().friends.friends;
             if (
-              post.val().uid == uid ||
+              post.val().uid === uid ||
               (friends[post.val().uid] &&
-                friends[post.val().uid].status == 'connected')
+                friends[post.val().uid].status === 'connected')
             ) {
               feed[post.key] = post.val();
               feed[post.key].key = post.key;
@@ -317,7 +324,7 @@ export const repPost = (item) => {
           .child(uid)
           .set({date, uid, post, type: 'post'})
           .then(() => {
-            if (uid != obj.uid) {
+            if (uid !== obj.uid) {
               //add notification for user
               database()
                 .ref('userNotifications/' + obj.uid)
@@ -440,7 +447,7 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
             ),
           );
         }
-        if (snapshot.val() && snapshot.val() != user.uid) {
+        if (snapshot.val() && snapshot.val() !== user.uid) {
           const date = created_at;
           database()
             .ref('notifications')

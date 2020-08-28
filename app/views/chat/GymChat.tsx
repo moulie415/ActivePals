@@ -21,46 +21,33 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
     const {gymChat, getChat, navigation, places, profile} = this.props;
     const {refreshing} = this.state;
     const gym = places[profile.gym];
-    console.log({gym});
     return (
-      <Layout style={{flex: 1}}>
+      <Layout style={{flex: 1}} level="2">
         {gym ? (
-          <ScrollView
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={async () => {
-                  this.setState({refreshing: true});
-                  await getChat(gym.place_id);
-                  this.setState({refreshing: false});
-                }}
-              />
-            }>
-            <ListItem
-              onPress={() =>
-                navigation.navigate('Messaging', {gymId: gym.place_id})
-              }
-              title={gym.name}
-              description={gymChat.lastMessage.text}
-              accessoryLeft={() =>
-                gym && gym.photo ? (
-                  <Avatar source={{uri: gym.photo}} size="large" />
-                ) : (
-                  getType(SessionType.GYM, 50)
-                )
-              }
-              accessoryRight={() => (
-                <View style={{flexDirection: 'row'}}>
-                  {gymChat?.lastMessage?.createdAt && (
-                    <Text>
-                      {getSimplifiedTime(gymChat.lastMessage.createdAt)}
-                    </Text>
-                  )}
-                  <ChatRowCount id={gym.place_id} />
-                </View>
-              )}
-            />
-          </ScrollView>
+          <ListItem
+            onPress={() =>
+              navigation.navigate('Messaging', {gymId: gym.place_id})
+            }
+            title={gym.name}
+            description={gymChat.lastMessage.text}
+            accessoryLeft={() =>
+              gym && gym.photo ? (
+                <Avatar source={{uri: gym.photo}} size="large" />
+              ) : (
+                getType(SessionType.GYM, 50)
+              )
+            }
+            accessoryRight={() => (
+              <View style={{flexDirection: 'row'}}>
+                {gymChat?.lastMessage?.createdAt && (
+                  <Text>
+                    {getSimplifiedTime(gymChat.lastMessage.createdAt)}
+                  </Text>
+                )}
+                <ChatRowCount id={gym.place_id} />
+              </View>
+            )}
+          />
         ) : (
           <Layout
             style={{
@@ -92,7 +79,7 @@ const mapStateToProps = ({friends, profile, chats, sessions}: MyRootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  getChat: (gym) => dispatch(fetchGymChat(gym)),
+  getChat: (gym: string) => dispatch(fetchGymChat(gym)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GymChat);

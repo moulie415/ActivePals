@@ -2,11 +2,12 @@ import Session from '../../Session';
 import Place from '../../Place';
 import Profile from '../../Profile';
 import {NavigationStackProp} from 'react-navigation-stack';
+import {YourLocation} from '../../Location';
 
 export default interface SessionsProps {
   sessions: {[key: string]: Session};
   privateSessions: {[key: string]: Session};
-  setYourLocation: ({lat, lon}) => void;
+  setYourLocation: (location: YourLocation) => void;
   getPlaces: (
     lat: number,
     lon: number,
@@ -23,5 +24,5 @@ export default interface SessionsProps {
   showMap: boolean;
   setShowMap: (show: boolean) => void;
   showFilterModal: boolean;
-  setShowFilterModal: (show: boolean) => void; 
-};
+  setShowFilterModal: (show: boolean) => void;
+}

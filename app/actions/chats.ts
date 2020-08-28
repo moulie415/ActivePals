@@ -82,7 +82,7 @@ export const setUnreadCount = ({id, count}) => ({
   count,
 });
 
-export const fetchGymChat = (gym) => {
+export const fetchGymChat = (gym: string) => {
   return (dispatch: MyThunkDispatch) => {
     return database()
       .ref('gymChats')

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Linking, Alert, View} from 'react-native';
 import {pipe} from 'ramda';
-import admob from '@react-native-firebase/admob';
+import { InterstitialAd, TestIds, AdEventType } from '@react-native-firebase/admob';
 import crashlytics from '@react-native-firebase/crashlytics';
 import moment, {Moment} from 'moment';
 import Image from 'react-native-fast-image';
@@ -21,6 +21,8 @@ import ThemedImage from '../components/ThemedImage/ThemedImage';
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
 export const showAdmobInterstitial = () => {
+
+  
 
   const advert = admob().interstitial(str.admobInterstitial);
  

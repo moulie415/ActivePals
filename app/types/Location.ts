@@ -16,3 +16,8 @@ export interface Position {
   lat: number;
   lng: number;
 }
+
+export interface YourLocation {
+  lat: number;
+  lon: number;
+}

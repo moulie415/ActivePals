@@ -168,7 +168,7 @@ export const fetchFbFriends = (token: string) => {
           return snapshot.val();
         }),
       );
-      const validUids = uids.filter((uid) => uid != null);
+      const validUids = uids.filter((uid) => uid !== null);
       return dispatch(fetchUsers(validUids)) || {};
     }
     return {};

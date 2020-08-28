@@ -83,8 +83,8 @@ export default StyleSheet.create({
   },
   input: {
     flex: 1,
-    padding: Platform.OS == 'ios' ? 10 : 0,
-    marginBottom: Platform.OS == 'ios' ? 0 : 10,
+    padding: Platform.OS === 'ios' ? 10 : 0,
+    marginBottom: Platform.OS === 'ios' ? 0 : 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginLeft: 5,
   },

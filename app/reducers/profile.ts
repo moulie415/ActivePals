@@ -10,12 +10,14 @@ import {
 import Profile from '../types/Profile';
 import {SET_NOTIFICATION_COUNT} from '../actions/home';
 import Place from '../types/Place';
+import {YourLocation} from '../types/Location';
 
 export interface ProfileState {
   profile: Profile;
   hasViewedWelcome: boolean;
   gym?: Place;
   unreadCount: number;
+  location?: YourLocation;
 }
 
 const initialState: ProfileState = {
