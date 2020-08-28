@@ -183,7 +183,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                   paddingHorizontal: 15,
                   borderRadius: 5,
                 }}>
-                <Icon size={30} name="md-close" style={{color: '#fff'}} />
+                <Icon size={30} name="close" style={{color: '#fff'}} />
               </TouchableOpacity>
             </View>
             <View
@@ -201,7 +201,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                   paddingHorizontal: 15,
                   borderRadius: 5,
                 }}>
-                <Icon size={30} name="md-checkmark" style={{color: '#fff'}} />
+                <Icon size={30} name="checkmark" style={{color: '#fff'}} />
               </TouchableOpacity>
             </View>
             {mentionList && !message && this.renderMentionList()}
@@ -282,7 +282,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                   padding: 10,
                   borderRadius: 5,
                 }}>
-                <Icon size={30} name="md-close" style={{color: '#fff'}} />
+                <Icon size={30} name="close" style={{color: '#fff'}} />
               </TouchableOpacity>
             </View>
             <View style={{position: 'absolute', margin: 20, right: 0}}>
@@ -293,7 +293,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                   padding: 10,
                   borderRadius: 5,
                 }}>
-                <Icon size={30} name="md-checkmark" style={{color: '#fff'}} />
+                <Icon size={30} name="checkmark" style={{color: '#fff'}} />
               </TouchableOpacity>
             </View>
             {mentionList && !message && this.renderMentionList()}
@@ -362,7 +362,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                       style={{height: 30, width: 30, borderRadius: 15}}
                     />
                   ) : (
-                    <Icon name="md-contact" size={35} />
+                    <Icon name="person" size={35} />
                   )}
                   <Text style={{marginLeft: 10}}>{item.username}</Text>
                 </TouchableOpacity>

@@ -12,12 +12,13 @@ import {
   setGymChat,
   getUnreadCount,
 } from './chats';
-import {fetchPosts} from './home';
+import {fetchPosts, SetNotificationCountAction} from './home';
 import {fetchSessions, fetchPhotoPath, fetchPrivateSessions} from './sessions';
 import Profile, {UserState} from '../types/Profile';
 import Place from '../types/Place';
-import {MyThunkDispatch, MyThunkResult, Theme} from '../types/Shared';
-import { createChannels } from '../helpers/notifications';
+import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
+import {createChannels} from '../helpers/notifications';
+import Location from '../types/Location';
 
 export const SET_PROFILE = 'SET_PROFILE';
 export const SET_LOGGED_IN = 'SET_LOGGED_IN';
@@ -40,10 +41,27 @@ interface ViewedWelcomeAction {
   type: typeof SET_HAS_VIEWED_WELCOME;
 }
 
+interface SetLocationAction {
+  type: typeof SET_LOCATION;
+  location: Location;
+}
+
+interface SetGymAction {
+  type: typeof SET_GYM;
+  gym: Place;
+}
+
+interface ResetGymAction {
+  type: typeof REMOVE_GYM;
+}
 export type ProfileActionTypes =
   | SetProfileAction
   | SetLoggedOutOutAction
-  | ViewedWelcomeAction;
+  | ViewedWelcomeAction
+  | SetGymAction
+  | ResetGymAction
+  | SetLocationAction
+  | SetNotificationCountAction;
 
 export const SetProfile = (profile: {
   [key: string]: any;
@@ -52,38 +70,29 @@ export const SetProfile = (profile: {
   profile,
 });
 
-export const SetLoggedOut = (): SetLoggedOutOutAction => ({
-  type: SET_LOGGED_OUT,
-});
-
 export const ViewedWelcome = (): ViewedWelcomeAction => ({
   type: SET_HAS_VIEWED_WELCOME,
 });
 
-export const setHasLoggedIn = (loggedIn) => ({
-  type: SET_LOGGED_IN,
-  loggedIn,
-});
-
-export const setLoggedOut = () => ({
+export const setLoggedOut = (): SetLoggedOutOutAction => ({
   type: SET_LOGGED_OUT,
 });
 
-export const setGym = (gym) => ({
+export const setGym = (gym: Place): SetGymAction => ({
   type: SET_GYM,
   gym,
 });
 
-export const resetGym = () => ({
+export const resetGym = (): ResetGymAction => ({
   type: REMOVE_GYM,
 });
 
-export const setLocation = (location) => ({
+export const setLocation = (location: Location): SetLocationAction => ({
   type: SET_LOCATION,
   location,
 });
 
-export const setHasViewedWelcome = () => ({
+export const setHasViewedWelcome = (): ViewedWelcomeAction => ({
   type: SET_HAS_VIEWED_WELCOME,
 });
 

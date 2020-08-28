@@ -170,7 +170,7 @@ export const getUnreadCount = (uid) => {
   };
 };
 
-export const fetchChats = (uid, limit = 10) => {
+export const fetchChats = (uid: string, limit = 10) => {
   return async (dispatch: MyThunkDispatch) => {
     return database()
       .ref('userChats')

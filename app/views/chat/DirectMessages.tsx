@@ -1,19 +1,25 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {View} from 'react-native';
 import {connect} from 'react-redux';
-import Image from 'react-native-fast-image';
 import {getSimplifiedTime, sortChatsByDate} from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import DirectMessagesProps from '../../types/views/chat/DirectMessages';
-import {Text, List, Layout, ListItem, Avatar, Divider} from '@ui-kitten/components';
+import {
+  Text,
+  List,
+  Layout,
+  ListItem,
+  Avatar,
+  Divider,
+} from '@ui-kitten/components';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 import Message from '../../types/Message';
+import {MyRootState} from '../../types/Shared';
 // import  styles  from './styles/loginStyles'
 
 class DirectMessages extends Component<DirectMessagesProps> {
   renderChats() {
     const {navigation, friends, chats, profile} = this.props;
-
     const getLastMessageText = (lastMessage: Message) => {
       if (lastMessage.text) {
         return lastMessage.text;
@@ -50,7 +56,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
                   friend.avatar ? (
                     <Avatar source={{uri: friend.avatar}} size="large" />
                   ) : (
-                    <ThemedIcon size={60} name="md-contact" />
+                    <ThemedIcon size={40} name="person" />
                   )
                 }
                 accessoryRight={() => (
@@ -75,7 +81,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
   render() {
     const {chats} = this.props;
     return (
-      <Layout style={{ flex: 1}}>
+      <Layout style={{flex: 1}}>
         {Object.values(chats).length > 0 ? (
           this.renderChats()
         ) : (
@@ -98,7 +104,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
   }
 }
 
-const mapStateToProps = ({friends, profile, chats}) => ({
+const mapStateToProps = ({friends, profile, chats}: MyRootState) => ({
   friends: friends.friends,
   profile: profile.profile,
   chats: chats.chats,

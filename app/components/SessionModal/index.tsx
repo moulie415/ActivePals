@@ -137,7 +137,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
             </Text>
             <TouchableOpacity
               onPress={() => viewSession(session.key, session.private)}>
-              <Icon size={40} name="md-information-circle" />
+              <Icon size={40} name="info" />
             </TouchableOpacity>
           </View>
           <ScrollView style={{margin: 10}}>
@@ -156,7 +156,7 @@ const SessionModal: FunctionComponent<SessionModalProps> = ({
                 <TouchableOpacity onPress={() => openChat(session)}>
                   <Icon
                     size={25}
-                    name="md-chatboxes"
+                    name="message-square"
                     style={{paddingHorizontal: 10}}
                   />
                 </TouchableOpacity>

@@ -37,7 +37,7 @@ const GymModal = (
           }}>
           <Text style={{fontSize: 20, padding: 10, color: '#000'}}>{name}</Text>
           <TouchableOpacity onPress={() => viewGym(place_id)}>
-            <Icon size={40} name="md-information-circle" />
+            <Icon size={40} name="info" />
           </TouchableOpacity>
         </View>
         <View style={{margin: 10}}>
@@ -90,7 +90,7 @@ const GymModal = (
               <TouchableOpacity
                 onPress={() => onOpenGymChat(place_id)}
                 style={{justifyContent: 'center', marginRight: 20}}>
-                <Icon size={40} name="md-chatboxes" />
+                <Icon size={40} name="message-square" />
               </TouchableOpacity>
               <Button
                 onPress={() => {

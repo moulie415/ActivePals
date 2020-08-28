@@ -51,11 +51,7 @@ const RepsModal: FunctionComponent<RepsModalProps> = ({
                 {user.avatar ? (
                   <Image style={styles.likeImage} source={{uri: user.avatar}} />
                 ) : (
-                  <Icon
-                    name="md-contact"
-                    size={40}
-                    style={styles.defaultIcon}
-                  />
+                  <Icon name="person" size={40} style={styles.defaultIcon} />
                 )}
                 <Text>{isYou ? 'You' : user.username}</Text>
               </View>

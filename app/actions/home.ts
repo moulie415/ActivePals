@@ -24,6 +24,11 @@ const repSound = new Sound('rep.wav', Sound.MAIN_BUNDLE, (error) => {
   }
 });
 
+export interface SetNotificationCountAction {
+  type: typeof SET_NOTIFICATION_COUNT;
+  count: number;
+}
+
 const addToFeed = (post, id) => ({
   type: ADD_POST,
   post,
@@ -67,7 +72,9 @@ const setRepsUsers = (key: string, users) => ({
   users,
 });
 
-export const setNotificationCount = (count) => ({
+export const setNotificationCount = (
+  count: number,
+): SetNotificationCountAction => ({
   type: SET_NOTIFICATION_COUNT,
   count,
 });

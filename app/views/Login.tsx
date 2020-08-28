@@ -340,7 +340,6 @@ const Login: FunctionComponent<LoginProps> = ({
 };
 
 const mapStateToProps = ({profile}: MyRootState) => ({
-  loggedIn: profile.loggedIn,
   hasViewedWelcome: profile.hasViewedWelcome,
 });
 

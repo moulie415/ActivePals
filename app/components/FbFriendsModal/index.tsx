@@ -87,7 +87,7 @@ const FbFriendsModal: FunctionComponent<FbFriendsModalProps> = ({
                       />
                     ) : (
                       <Icon
-                        name="md-contact"
+                        name="person"
                         size={35}
                         style={{
                           marginTop: Platform.OS === 'ios' ? -2 : 0,

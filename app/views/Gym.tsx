@@ -78,7 +78,7 @@ class Gym extends Component<GymProps, State> {
                 style={{height: 40, width: 40, borderRadius: 25}}
               />
             ) : (
-              <Icon size={50} name="md-contact" />
+              <Icon size={50} name="person" />
             )}
             <Text style={{marginLeft: 10}}>{userItem.username}</Text>
           </TouchableOpacity>

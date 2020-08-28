@@ -21,13 +21,13 @@ const setFriend = (friend) => ({
   friend,
 });
 
-const addToFriends = (uid, friend) => ({
+const addToFriends = (uid: string, friend) => ({
   type: ADD_FRIEND,
   uid,
   friend,
 });
 
-export const updateFriendState = (uid, state) => ({
+export const updateFriendState = (uid: string, state: UserState) => ({
   type: UPDATE_FRIEND_STATE,
   uid,
   state,
@@ -52,7 +52,7 @@ export const removeFriend = (uid: string): MyThunkResult<void> => {
   };
 };
 
-const getStateString = (state) => {
+const getStateString = (state: UserState) => {
   if (state && state !== UserState.AWAY) {
     return UserState.ONLINE;
   }
@@ -62,7 +62,11 @@ const getStateString = (state) => {
   return UserState.AWAY;
 };
 
-export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
+export const fetchFriends = (
+  uid: string,
+  limit = 10,
+  startAt?: string,
+): MyThunkResult<Promise<void>> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const ref = database().ref('userFriends').child(uid).limitToLast(limit);
     await ref.on('value', async (snapshot) => {
@@ -103,7 +107,9 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
   };
 };
 
-export const sendRequest = (friendUid: string) => {
+export const sendRequest = (
+  friendUid: string,
+): MyThunkResult<Promise<void>> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const {uid} = getState().profile.profile;
     const promise1 = database()
@@ -124,7 +130,7 @@ export const sendRequest = (friendUid: string) => {
   };
 };
 
-export const acceptRequest = (uid, friendUid) => {
+export const acceptRequest = (uid: string, friendUid: string) => {
   return () => {
     const promise1 = database()
       .ref(`userFriends/${uid}`)
@@ -138,7 +144,7 @@ export const acceptRequest = (uid, friendUid) => {
   };
 };
 
-export const deleteFriend = (uid) => {
+export const deleteFriend = (uid: string): MyThunkResult<Promise<void>> => {
   return (dispatch: MyThunkDispatch, getState) => {
     const you = getState().profile.profile.uid;
     dispatch(removeFriend(uid));
