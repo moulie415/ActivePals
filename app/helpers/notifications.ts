@@ -2,6 +2,7 @@ import PushNotification from 'react-native-push-notification';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import db from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
+import messaging from '@react-native-firebase/messaging';
 
 export const createChannels = () => {
   const channelData = [
@@ -55,6 +56,9 @@ export const createChannels = () => {
 };
 
 export const setupNotifications = (uid: string) => {
+  messaging().onTokenRefresh((token) => {
+    database().ref(`users/${uid}`).child('FCMToken').set(token);
+  });
   PushNotification.configure({
     // (optional) Called when Token is generated (iOS and Android)
     onRegister: ({token}) => {
