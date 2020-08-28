@@ -10,6 +10,7 @@ import {
 } from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
@@ -48,7 +49,7 @@ import SessionDetail from './views/sessions/SessionDetail';
 import Location from './types/Location';
 import PostView from './views/PostView';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
-import {ImageProps} from 'react-native';
+import {ImageProps, AppState, AppStateStatus} from 'react-native';
 import FullScreenVideo from './views/FullScreenVideo';
 import Credits from './views/Credits';
 import Instabug from 'instabug-reactnative';
@@ -56,6 +57,7 @@ import AddFriendButton from './components/AddFriendButton/AddFriendButton';
 import FilePreview from './views/FilePreview';
 import MapToggle from './components/MapToggle/MapToggle';
 import FilterModalButton from './components/FilterModalButton/FilterModalButton';
+import { UserState } from './types/Profile';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -209,6 +211,29 @@ const App = () => {
       Instabug.invocationEvent.none,
     ]);
   }, []);
+
+  useEffect(() => {
+    AppState.addEventListener('change', _handleAppStateChange);
+
+    return () => {
+      AppState.removeEventListener('change', _handleAppStateChange);
+    };
+  }, []);
+
+  const _handleAppStateChange = (nextAppState: AppStateStatus) => {
+    const user = auth().currentUser;
+    if (user) {
+      if (nextAppState === 'active') {
+        database()
+          .ref(`users/${user.uid}`)
+          .child('state')
+          .set(UserState.ONLINE);
+      } else {
+        database().ref(`users/${user.uid}`).child('state').set(UserState.AWAY);
+      }
+    }
+  };
+
   return (
     <PersistGate persistor={persistor}>
       <Provider store={store}>
