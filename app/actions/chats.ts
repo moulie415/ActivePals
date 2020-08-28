@@ -317,55 +317,16 @@ export const fetchSessionMessages = (
           .limitToLast(amount);
     return ref.once('value', (snapshot) => {
       const messages = {};
-      const promises = [];
-      database()
-        .ref(type + '/' + id)
-        .child('users')
-        .once('value', (users) => {
-          users.forEach((child) => {
-            promises.push(
-              new Promise((resolve) => {
-                storage()
-                  .ref('images/' + child.key)
-                  .child('avatar')
-                  .getDownloadURL()
-                  .then((url) => resolve({[child.key]: url}))
-                  .catch((e) => resolve({[child.key]: null}));
-              }),
-            );
-            return false;
-          });
-          Promise.all(promises).then((array) => {
-            let avatars = {};
-            array.forEach((avatar, index) => {
-              let key = Object.keys(avatar)[0];
-              if (key) {
-                avatars[key] = avatar[key];
-              }
-            });
-            snapshot.forEach((child) => {
-              let avatar = child.val().user
-                ? avatars[child.val().user._id]
-                : '';
-              if (avatar) {
-                messages[child.key] = {
-                  ...child.val(),
-                  key: child.key,
-                  createdAt: new Date(child.val().createdAt),
-                  user: {...child.val().user, avatar},
-                };
-              } else {
-                messages[child.key] = {
-                  ...child.val(),
-                  key: child.key,
-                  createdAt: new Date(child.val().createdAt),
-                };
-              }
-              return false;
-            });
-            dispatch(setMessageSession(id, messages));
-          });
-        });
+      snapshot.forEach((child) => {
+        messages[child.key] = {
+          ...child.val(),
+          key: child.key,
+          createdAt: new Date(child.val().createdAt),
+        };
+
+        return false;
+      });
+      dispatch(setMessageSession(id, messages));
     });
   };
 };
@@ -377,55 +338,16 @@ export const fetchGymMessages = (id: string, amount: number, endAt: string) => {
       : database().ref(`gymChats/${id}`).limitToLast(amount);
     return ref.once('value', (snapshot) => {
       const messages = {};
-      const promises = [];
-      database()
-        .ref(`gyms/${id}`)
-        .child('users')
-        .once('value', (users) => {
-          users.forEach((child) => {
-            promises.push(
-              new Promise((resolve) => {
-                storage()
-                  .ref(`images/${child.key}`)
-                  .child('avatar')
-                  .getDownloadURL()
-                  .then((url) => resolve({[child.key]: url}))
-                  .catch((e) => resolve({[child.key]: null}));
-              }),
-            );
-            return false;
-          });
-          Promise.all(promises).then((array) => {
-            let avatars = {};
-            array.forEach((avatar, index) => {
-              let key = Object.keys(avatar)[0];
-              if (key) {
-                avatars[key] = avatar[key];
-              }
-            });
-            snapshot.forEach((child) => {
-              const avatar = child.val().user
-                ? avatars[child.val().user._id]
-                : '';
-              if (avatar) {
-                messages[child.key] = {
-                  ...child.val(),
-                  key: child.key,
-                  createdAt: new Date(child.val().createdAt),
-                  user: {...child.val().user, avatar},
-                };
-              } else {
-                messages[child.key] = {
-                  ...child.val(),
-                  key: child.key,
-                  createdAt: new Date(child.val().createdAt),
-                };
-              }
-              return false;
-            });
-            dispatch(setMessageSession(id, messages));
-          });
-        });
+      snapshot.forEach((child) => {
+        messages[child.key] = {
+          ...child.val(),
+          key: child.key,
+          createdAt: new Date(child.val().createdAt),
+        };
+
+        return false;
+      });
+      dispatch(setMessageSession(id, messages));
     });
   };
 };

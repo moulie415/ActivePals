@@ -281,7 +281,6 @@ class Messaging extends Component<MessagingProps, State> {
     const {friendUid, gymId, sessionId, chatId} = route.params;
     const session = sessions[sessionId];
     this.setState({spinner: true});
-    debugger;
     if (session) {
       const {key, private: isPrivate} = session;
       getSessionMessages(key, amount, isPrivate, endAt);
@@ -499,8 +498,8 @@ class Messaging extends Component<MessagingProps, State> {
 }
 
 const fetchId = (params) => {
-  if (params.session) {
-    return params.session.key;
+  if (params.sessionId) {
+    return params.sessionId;
   }
   if (params.gymId) {
     return params.gymId;

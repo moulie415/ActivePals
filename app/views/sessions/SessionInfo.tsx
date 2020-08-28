@@ -286,7 +286,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                           text: 'Yes',
                           onPress: async () => {
                             try {
-                              const result = await RNCalendarEvents.authorizeEventStore();
+                              const result = await RNCalendarEvents.requestPermissions();
                               if (result === 'authorized') {
                                 const calendars = await RNCalendarEvents.findCalendars();
                                 const validList = calendars.filter(
@@ -331,26 +331,23 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                     </Text>
                   </TouchableOpacity>
                   {location && (
-                    <View style={{flex: 2}}>
-                      <Button
-                        onPress={() => {
-                          const {lat, lng} = session.location.position;
-                          const newOptions: Options = {
-                            latitude: lat,
-                            longitude: lng,
-                            cancelText: 'Cancel',
-                            sourceLatitude: location.lat,
-                            sourceLongitude: location.lon,
-                          };
-                          this.setState({
-                            popUpVisible: true,
-                            options: newOptions,
-                          });
-                        }}
-                        style={{alignSelf: 'flex-end'}}>
-                        Directions
-                      </Button>
-                    </View>
+                    <Button
+                      onPress={() => {
+                        const {lat, lng} = session.location.position;
+                        const newOptions: Options = {
+                          latitude: lat,
+                          longitude: lng,
+                          cancelText: 'Cancel',
+                          sourceLatitude: location.lat,
+                          sourceLongitude: location.lon,
+                        };
+                        this.setState({
+                          popUpVisible: true,
+                          options: newOptions,
+                        });
+                      }}>
+                      Directions
+                    </Button>
                   )}
                 </View>
                 {gym && (
