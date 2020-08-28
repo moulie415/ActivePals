@@ -17,6 +17,7 @@ import {fetchSessions, fetchPhotoPath, fetchPrivateSessions} from './sessions';
 import Profile, {UserState} from '../types/Profile';
 import Place from '../types/Place';
 import {MyThunkDispatch, MyThunkResult, Theme} from '../types/Shared';
+import { createChannels } from '../helpers/notifications';
 
 export const SET_PROFILE = 'SET_PROFILE';
 export const SET_LOGGED_IN = 'SET_LOGGED_IN';
@@ -96,6 +97,7 @@ export const doSetup = (): MyThunkResult<Promise<void>> => {
     if (token) {
       await database().ref('users').child(uid).update({FCMToken: token});
     }
+    createChannels();
     dispatch(getUnreadCount(uid));
     dispatch(fetchFriends(uid));
     gym && dispatch(fetchGymChat(gym));

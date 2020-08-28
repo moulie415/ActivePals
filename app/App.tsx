@@ -13,7 +13,7 @@ import database from '@react-native-firebase/database';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Login from './views/Login';
@@ -245,12 +245,15 @@ const App = () => {
                       }
                     }
                   },
-                  headerLeft: () => {
+                  headerLeft: (props) => {
                     const index = route?.state?.index;
                     if (route.name === 'Tabs') {
                       if (index === 1) {
                         return <FilterModalButton />;
                       }
+                    }
+                    if (props.canGoBack) {
+                      return <HeaderBackButton {...props} />;
                     }
                   },
                 })}>

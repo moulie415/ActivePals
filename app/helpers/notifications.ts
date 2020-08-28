@@ -41,6 +41,17 @@ export const createChannels = () => {
       description: 'Channel for when you get added to a session',
     },
   ];
+
+  channelData.forEach(({id, description, name}) =>
+    PushNotification.createChannel(
+      {
+        channelId: id,
+        channelDescription: description,
+        channelName: name,
+      },
+      (created) => console.log(`createChannel returned '${created}'`),
+    ),
+  );
 };
 
 export const setupNotifications = (uid: string) => {
