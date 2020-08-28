@@ -1,11 +1,5 @@
 import React, {Component} from 'react';
-import {
-  Alert,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Platform,
-} from 'react-native';
+import {Alert, View, ScrollView, TouchableOpacity} from 'react-native';
 import moment from 'moment';
 import {equals} from 'ramda';
 import database from '@react-native-firebase/database';
@@ -19,7 +13,6 @@ import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
 import hStyles from '../styles/homeStyles';
 import {fetchProfile, setLoggedOut} from '../actions/profile';
-import {getBirthdayDate} from '../constants/utils';
 import str from '../constants/strings';
 import ProfileProps from '../types/views/Profile';
 import Profile from '../types/Profile';
@@ -34,6 +27,7 @@ import {
   IndexPath,
   ListItem,
   Divider,
+  Datepicker,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
@@ -269,49 +263,10 @@ class ProfileView extends Component<ProfileProps, State> {
   render() {
     const {gym, navigation} = this.props;
     const {initialProfile, email, profile, spinner, showPicker} = this.state;
-    const birthday = getBirthdayDate(profile.birthday);
-    const birthdayString = birthday
-      ? moment(birthday).format('DD/MM/YYYY')
-      : '';
+
     return (
-      <Layout style={{flex: 1}}>
-        {/* <Header
-          left={
-            this.hasChanged() && (
-              <TouchableOpacity
-                style={{
-                  position: 'absolute',
-                  top: 8,
-                  bottom: 0,
-                  left: 0,
-                  justifyContent: 'center',
-                  paddingLeft: 10,
-                }}
-                onPress={() => {
-                  this.setState({
-                    profile: initialProfile,
-                    avatar: initialAvatar,
-                    backdrop: initialBackdrop,
-                  });
-                }}>
-                <Text style={{color: '#fff'}}>UNDO</Text>
-              </TouchableOpacity>
-            )
-          }
-          title="Profile"
-          right={
-            this.hasChanged() && (
-              <TouchableOpacity
-                onPress={() => {
-                  this.updateUser(initialProfile, profile);
-                }}
-                style={{backgroundColor: 'transparent', elevation: 0}}>
-                <Text style={{color: '#fff'}}>SAVE</Text>
-              </TouchableOpacity>
-            )
-          }
-        /> */}
-        <ScrollView contentContainerStyle={{flex: 1}}>
+      <ScrollView>
+        <Layout style={{flex: 1}}>
           <Layout style={{alignItems: 'center', marginBottom: 10}}>
             <TouchableOpacity
               style={{width: '100%'}}
@@ -404,6 +359,15 @@ class ProfileView extends Component<ProfileProps, State> {
                 placeholder="Username"
                 autoCapitalize="none"
                 autoCorrect={false}
+                accessoryRight={() =>
+                  initialProfile.username !== profile.username ? (
+                    <TouchableOpacity>
+                      <ThemedIcon size={25} name="save" />
+                    </TouchableOpacity>
+                  ) : (
+                    <Layout />
+                  )
+                }
               />
 
               <Input
@@ -416,6 +380,15 @@ class ProfileView extends Component<ProfileProps, State> {
                 placeholder="First name"
                 autoCapitalize="none"
                 autoCorrect={false}
+                accessoryRight={() =>
+                  initialProfile.first_name !== profile.first_name ? (
+                    <TouchableOpacity>
+                      <ThemedIcon size={25} name="save" />
+                    </TouchableOpacity>
+                  ) : (
+                    <Layout />
+                  )
+                }
               />
 
               <Input
@@ -428,98 +401,62 @@ class ProfileView extends Component<ProfileProps, State> {
                 placeholder="Last name"
                 autoCapitalize="none"
                 autoCorrect={false}
+                accessoryRight={() =>
+                  initialProfile.last_name !== profile.last_name ? (
+                    <TouchableOpacity>
+                      <ThemedIcon size={25} name="save" />
+                    </TouchableOpacity>
+                  ) : (
+                    <Layout />
+                  )
+                }
               />
+              <Select
+                style={{marginBottom: 10}}
+                accessoryLeft={() => (
+                  <Text category="label">Preferred activity</Text>
+                )}
+                selectedIndex={
+                  new IndexPath(
+                    activities.findIndex((a) => a === profile.activity),
+                  )
+                }>
+                {activities.map((activity) => (
+                  <SelectItem key={activity} title={activity} />
+                ))}
+              </Select>
 
-              <>
-                <Text style={{alignSelf: 'center'}}>Preferred activity: </Text>
-                {/* <RNPickerSelect
-              placeholder={{
-                label: 'Unspecified',
-                value: null,
-              }}
-              hideIcon
-              items={pickerItems(activities)}
-              style={{
-                underline: {opacity: 0},
-                viewContainer: {
-                  flex: 1,
-                  justifyContent: 'center',
-                  paddingHorizontal: 5,
-                },
-                placeholderColor: '#fff',
-                inputAndroid: {
-                  color: '#fff',
-                },
-                inputIOS: {
-                  color: '#fff',
-                },
-              }}
-              onValueChange={(value) => {
-                this.setState({
-                  profile: {...profile, activity: value},
-                });
-              }}
-              // style={{ ...pickerSelectStyles }}
-              value={profile ? profile.activity : null}
-            /> */}
+              {profile && profile.activity && (
                 <Select
-                  selectedIndex={
-                    new IndexPath(
-                      activities.findIndex((a) => a === profile.activity),
-                    )
-                  }>
-                  {activities.map((activity) => (
-                    <SelectItem key={activity} title={activity} />
+                  style={{marginBottom: 10}}
+                  accessoryLeft={() => <Text category="label">Level</Text>}
+                  selectedIndex={new IndexPath(0)}>
+                  {levels.map((level) => (
+                    <SelectItem key={level} title={level} />
                   ))}
                 </Select>
-              </>
-              {profile && profile.activity && (
-                <>
-                  <Text style={{alignSelf: 'center'}}>Level: </Text>
-                  {/* <RNPickerSelect
-                placeholder={{
-                  label: 'Unspecified',
-                  value: null,
-                }}
-                hideIcon
-                items={pickerItems(levels)}
-                style={{
-                  underline: {opacity: 0},
-                  viewContainer: {
-                    flex: 1,
-                    justifyContent: 'center',
-                    paddingHorizontal: 5,
-                  },
-                  placeholderColor: '#fff',
-                  inputAndroid: {
-                    color: '#fff',
-                  },
-                  inputIOS: {
-                    color: '#fff',
-                  },
-                }}
-                onValueChange={(value) => {
-                  this.setState({
-                    profile: {...profile, level: value},
-                  });
-                }}
-                // style={{ ...pickerSelectStyles }}
-                value={profile.level}
-              /> */}
-                  <Select selectedIndex={new IndexPath(0)}>
-                    {levels.map((level) => (
-                      <SelectItem key={level} title={level} />
-                    ))}
-                  </Select>
-                </>
               )}
+              <Datepicker
+                style={{marginBottom: 10}}
+                accessoryLeft={() => <Text category="label">Birthday</Text>}
+                date={profile.birthday && new Date(profile.birthday)}
+                min={new Date('01/01/1900')}
+                max={new Date()}
+                onSelect={(nextDate) =>
+                  this.setState({profile: {...profile, birthday: nextDate}})
+                }
+                accessoryRight={() =>
+                  initialProfile.birthday !== profile.birthday ? (
+                    <TouchableOpacity>
+                      <ThemedIcon size={25} name="save" />
+                    </TouchableOpacity>
+                  ) : (
+                    <Layout />
+                  )
+                }
+              />
             </Layout>
-            <TouchableOpacity onPress={() => this.setState({showPicker: true})}>
-              <Text style={{alignSelf: 'center'}}>
-                <Text>Birthday: </Text>
-                <Text>{birthdayString}</Text>
-              </Text>
-            </TouchableOpacity>
+
             <Layout
               style={{flex: 1, justifyContent: 'flex-end', marginBottom: 10}}>
               <Button
@@ -530,53 +467,14 @@ class ProfileView extends Component<ProfileProps, State> {
               </Button>
             </Layout>
           </Layout>
+
           {spinner && (
             <View style={hStyles.spinner}>
               <Spinner />
             </View>
           )}
-        </ScrollView>
-        {showPicker && (
-          <>
-            {/* <DateTimePicker
-              mode="date"
-              value={birthday ? birthday.toDate() : new Date()}
-              maximumDate={new Date()}
-              onChange={(event, selectedDate) => {
-                if (selectedDate) {
-                  this.setState({
-                    profile: {
-                      ...profile,
-                      birthday: moment(selectedDate).format('DD/MM/YYYY'),
-                    },
-                    showPicker: Platform.OS === 'ios',
-                  });
-                }
-              }}
-            /> */}
-            {Platform.OS === 'ios' && (
-              <View
-                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <TouchableOpacity
-                  style={{padding: 10}}
-                  onPress={() =>
-                    this.setState({
-                      showPicker: false,
-                      profile: {...profile, birthday: initialProfile.birthday},
-                    })
-                  }>
-                  <Text style={{fontSize: 16}}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{padding: 10}}
-                  onPress={() => this.setState({showPicker: false})}>
-                  <Text style={{fontSize: 16}}>Confirm</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </>
-        )}
-      </Layout>
+        </Layout>
+      </ScrollView>
     );
   }
 }

@@ -465,7 +465,7 @@ const mapIdsToPlaces = (places) => {
   return obj;
 };
 
-export const fetchPlaces = (lat, lon, token) => {
+export const fetchPlaces = (lat: number, lon: number, token?: string) => {
   return async (dispatch: MyThunkDispatch) => {
     const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?';
     const fullUrl = `${url}location=${lat},${lon}&rankby=distance&types=gym&key=${GOOGLE_API_KEY}`;

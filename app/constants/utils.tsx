@@ -1,12 +1,10 @@
 import React from 'react';
 import {Linking, Alert, View} from 'react-native';
 import {pipe} from 'ramda';
-import { InterstitialAd, TestIds, AdEventType } from '@react-native-firebase/admob';
 import crashlytics from '@react-native-firebase/crashlytics';
 import moment, {Moment} from 'moment';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
-import Instabug from 'instabug-reactnative';
 import str from './strings';
 import Session, {SessionType} from '../types/Session';
 import Profile, {UserState} from '../types/Profile';
@@ -20,23 +18,6 @@ import ThemedImage from '../components/ThemedImage/ThemedImage';
 
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
-export const showAdmobInterstitial = () => {
-
-  
-
-  const advert = admob().interstitial(str.admobInterstitial);
- 
-  const {AdRequest} = admob;
-  const request = new AdRequest();
-  advert.loadAd(request.build());
-  advert.on('onAdLoaded', () => {
-    advert.show();
-  });
-  advert.on('onAdFailedToLoad', (e) => {
-    Instabug.logError(e.message);
-    crashlytics().recordError(0, e.message);
-  });
-};
 const s4 = () => {
   return Math.floor((1 + Math.random()) * 0x10000)
     .toString(16)
@@ -369,18 +350,6 @@ export const addSessionToCalendar = (calendarId: string, session: Session) => {
     notes: session.details,
     description: session.details,
   });
-};
-
-export const getBirthdayDate = (birthday: string): Moment => {
-  if (!birthday) {
-    return null;
-  }
-  for (let i = 0; i < formats.length; i++) {
-    if (moment(birthday, formats[i]).isValid()) {
-      return moment(birthday, formats[i]);
-    }
-  }
-  return moment(birthday);
 };
 
 export const calculateDuration = (data) => {

@@ -11,7 +11,7 @@ export default interface SessionsProps {
   getPlaces: (
     lat: number,
     lon: number,
-    token: string,
+    token?: string,
   ) => {token: string; loadMore: boolean};
   fetch: (radius: number) => void;
   radius: number;

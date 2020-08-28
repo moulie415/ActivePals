@@ -122,7 +122,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
     );
   }
 
-  handleUserPress(uid) {
+  handleUserPress(uid: string) {
     const {navigation, profile} = this.props;
     if (uid === profile.uid) {
       navigation.navigate('Profile');

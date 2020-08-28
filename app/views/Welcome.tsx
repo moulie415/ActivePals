@@ -27,11 +27,8 @@ const Welcome: FunctionComponent<WelcomeProps> = ({
   const [fbModalOpen, setFbModalOpen] = useState(false);
   const [username, setUsername] = useState(profile.username);
 
-  useEffect(() => {
-    viewedWelcome();
-  }, [viewedWelcome]);
-
   const nav = () => {
+    viewedWelcome();
     params && params.goBack
       ? navigation.goBack()
       : navigation.dispatch(

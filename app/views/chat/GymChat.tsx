@@ -23,7 +23,7 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
     const gym = places[profile.gym];
     return (
       <Layout style={{flex: 1}} level="2">
-        {gym ? (
+        {gym && gymChat ? (
           <ListItem
             onPress={() =>
               navigation.navigate('Messaging', {gymId: gym.place_id})

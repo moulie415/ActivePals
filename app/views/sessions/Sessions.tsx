@@ -1,4 +1,11 @@
-import React, {Component} from 'react';
+import React, {
+  Component,
+  FunctionComponent,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import {pathOr} from 'ramda';
 import Geolocation from '@react-native-community/geolocation';
 import {
@@ -12,7 +19,7 @@ import ActionSheet from 'react-native-actionsheet';
 import Modal from 'react-native-modalbox';
 import {Popup, Options} from 'react-native-map-link';
 import Permissions, {PERMISSIONS, RESULTS} from 'react-native-permissions';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, MapEvent} from 'react-native-maps';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import {connect} from 'react-redux';
 import Slider from '@react-native-community/slider';
@@ -23,7 +30,6 @@ import {
   formatDateTime,
   getDistance,
   sortSessionsByDistance,
-  showAdmobInterstitial,
 } from '../../constants/utils';
 import FriendsModal from '../../components/friendsModal';
 import GymSearch from '../../components/GymSearch';
@@ -78,135 +84,25 @@ const LOCATION_PERMISSION =
     ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
     : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
 
-interface State {
-  radius: number;
-  spinner: boolean;
-  sessions: Session[];
-  refreshing: boolean;
-  markers: Element[];
-  selectedIndex: number;
-  popUpVisible: boolean;
-  pilates: boolean;
-  yoga: boolean;
-  selectedLocation: {};
-  locationPermission?: string;
-  token?: string;
-  longitude?: number;
-  latitude?: number;
-  friendsModalOpen?: boolean;
-  options?: Options;
-  loadMoreGyms: boolean;
-}
-class Sessions extends Component<SessionsProps, State> {
-  ActionSheet: ActionSheet;
-
-  constructor(props) {
-    super(props);
-    const {sessions, privateSessions} = this.props;
-    const combined = [
-      ...Object.values(sessions),
-      ...Object.values(privateSessions),
-    ];
-
-    this.state = {
-      spinner: false,
-      radius: props.radius,
-      sessions: sortSessionsByDistance(combined),
-      refreshing: false,
-      markers: this.markers(combined),
-      selectedIndex: 0,
-      popUpVisible: false,
-      pilates: true,
-      yoga: true,
-      selectedLocation: {},
-      loadMoreGyms: true,
-    };
-  }
-
-  async componentDidMount() {
-    const response = await Permissions.check(LOCATION_PERMISSION);
-    this.setState({spinner: true});
-    // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
-    this.setState({locationPermission: response});
-    if (response !== RESULTS.GRANTED) {
-      this.alertForLocationPermission();
-    } else {
-      this.getPosition();
-    }
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.sessions || nextProps.privateSessions) {
-      const sessions: Session[] = Object.values(nextProps.sessions);
-      const privateSessions: Session[] = Object.values(
-        nextProps.privateSessions,
-      );
-      const combined = [...sessions, ...privateSessions];
-      this.setState({
-        markers: this.markers(combined),
-        sessions: sortSessionsByDistance(combined),
-      });
-    }
-  }
-
-  getPosition() {
-    // to watch position:
-    // this.watchID = navigator.geolocation.watchPosition((position) => {
-    return Geolocation.getCurrentPosition(
-      async (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        const {setYourLocation, getPlaces} = this.props;
-        const {token: stateToken} = this.state;
-        setYourLocation({lat, lon});
-        this.setState({
-          latitude: lat,
-          longitude: lon,
-          spinner: false,
-        });
-        const {token} = await getPlaces(lat, lon, stateToken);
-        this.setState({token});
-      },
-      (error) => {
-        this.setState({spinner: false});
-        Alert.alert('Error', error.message);
-      },
-      {enableHighAccuracy: true, timeout: 20000 /* , maximumAge: 1000 */},
-    );
-  }
-
-  async handleRefresh() {
-    const {fetch} = this.props;
-    const {radius} = this.state;
-    this.setState({refreshing: true, sessions: [], markers: []});
-    await fetch(radius);
-    await this.getPosition();
-    this.setState({refreshing: false});
-  }
-
-  sortPlacesByDistance(places: Place[]): Place[] {
-    const {location} = this.props;
-    if (location) {
-      const {lat, lon} = location;
-      return places.sort((a, b) => {
-        const distance1 = getDistance(a, lat, lon, true);
-        const distance2 = getDistance(b, lat, lon, true);
-        return distance1 - distance2;
-      });
-    }
-    return places;
-  }
-
-  handlePress(event) {
-    const lat = event.nativeEvent.coordinate.latitude;
-    const lng = event.nativeEvent.coordinate.longitude;
-    const location = {geometry: {location: {lat, lng}}};
-    this.setState({selectedLocation: location, latitude: lat, longitude: lng});
-    this.ActionSheet.show();
-  }
-
-  markers(sessions: Session[]) {
-    const {navigation} = this.props;
+const Sessions: FunctionComponent<SessionsProps> = ({
+  sessions: propsSessions,
+  privateSessions,
+  radius: currentRadius,
+  saveRadius,
+  setYourLocation,
+  getPlaces,
+  places,
+  fetch,
+  location,
+  navigation,
+  setShowFilterModal,
+  setShowMap,
+  showFilterModal,
+  showMap,
+  gym,
+  friends,
+}) => {
+  const getMarkers = (sessions: Session[]) => {
     return sessions.map((session) => {
       const {lng} = session.location.position;
       const {lat} = session.location.position;
@@ -219,67 +115,145 @@ class Sessions extends Component<SessionsProps, State> {
           }}
           onPress={(event) => {
             event.stopPropagation();
-            this.setState({latitude: lat, longitude: lng}, () => {
-              Alert.alert(`View session ${session.title}?`, '', [
-                {text: 'Cancel', style: 'cancel'},
-                {
-                  text: 'OK',
-                  onPress: () =>
-                    navigation.navigate('SessionInfo', {
-                      sessionId: session.key,
-                      isPrivate: session.private,
-                    }),
-                },
-              ]);
-            });
+            setLatitude(lat);
+            setLongitude(lng);
+            Alert.alert(`View session ${session.title}?`, '', [
+              {text: 'Cancel', style: 'cancel'},
+              {
+                text: 'OK',
+                onPress: () =>
+                  navigation.navigate('SessionInfo', {
+                    sessionId: session.key,
+                    isPrivate: session.private,
+                  }),
+              },
+            ]);
           }}>
           {getType(session.type, 40)}
         </Marker>
       );
     });
-  }
+  };
+  const sessions = sortSessionsByDistance([
+    ...Object.values(propsSessions),
+    ...Object.values(privateSessions),
+  ]);
 
-  // This is a common pattern when asking for permissions.
-  // iOS only gives you once chance to show the permission dialog,
-  // after which the user needs to manually enable them from settings.
-  // The idea here is to explain why we need access and determine if
-  // the user will say no, so that we don't blow our one chance.
-  // If the user already denied access, we can ask them to enable it from settings.
-  alertForLocationPermission() {
-    const {locationPermission} = this.state;
-    Alert.alert(
-      'Can we access your location?',
-      'We need access to help find sessions near you',
-      [
-        {
-          text: 'No way',
-          onPress: () => console.log('Permission denied'),
-          style: 'cancel',
-        },
-        locationPermission === RESULTS.BLOCKED
-          ? {text: 'OK', onPress: this.locationPermission}
-          : {text: 'Open Settings', onPress: Permissions.openSettings},
-      ],
-    );
-  }
+  const ActionSheetRef = useRef<ActionSheet>(null);
+  const [spinner, setSpinner] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [markers, setMarkers] = useState<Element[]>(getMarkers(sessions));
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [popUpVisible, setPopUpVisible] = useState(false);
+  const [pilates, setPilates] = useState(true);
+  const [yoga, setYoga] = useState(true);
+  const [selectedLocation, setSelectedLocation] = useState({});
+  const [loadMoreGyms, setLoadMoreGyms] = useState(true);
+  const [stateToken, setStateToken] = useState<string>();
+  const [latitude, setLatitude] = useState<number>();
+  const [longitude, setLongitude] = useState<number>();
+  const [friendsModalOpen, setFriendsModalOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [radius, setStateRadius] = useState<number>(currentRadius);
 
-  async locationPermission() {
+  const getPosition = useCallback(async () => {
+    setSpinner(true);
     const response = await Permissions.request(LOCATION_PERMISSION);
-    // Returns once the user has chosen to 'allow' or to 'not allow' access
-    // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
-    this.setState({locationPermission: response});
+    // to watch position:
+    // this.watchID = navigator.geolocation.watchPosition((position) => {
     if (response === RESULTS.GRANTED) {
-      this.getPosition();
+      return Geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          setYourLocation({lat, lon});
+          setLatitude(lat);
+          setLongitude(lon);
+          setSpinner(false);
+        },
+        (error) => {
+          setSpinner(false);
+          Alert.alert('Error', error.message);
+        },
+        {enableHighAccuracy: true, timeout: 20000 /* , maximumAge: 1000 */},
+      );
     } else {
       Alert.alert(
-        'Sorry',
-        'The app does not have access to your location, some functionality may not work as a result',
+        'Can we access your location?',
+        'We need access to help find sessions near you',
+        [
+          {
+            text: 'No way',
+            onPress: () => console.log('Permission denied'),
+            style: 'cancel',
+          },
+          response === RESULTS.BLOCKED
+            ? {
+                text: 'OK',
+                onPress: () => Permissions.request(LOCATION_PERMISSION),
+              }
+            : {text: 'Open Settings', onPress: Permissions.openSettings},
+        ],
       );
     }
-  }
+  }, [setYourLocation]);
 
-  gymMarkers(results) {
-    const {navigation} = this.props;
+  useEffect(() => {
+    const getNewPlaces = async () => {
+      if (latitude && longitude) {
+        const {token} = await getPlaces(latitude, longitude, stateToken);
+        setStateToken(token);
+      }
+    };
+    getNewPlaces();
+  }, [latitude, longitude, getPlaces, stateToken]);
+
+  useEffect(() => {
+    const eventListener = interstitial.onAdEvent((type) => {
+      if (type === AdEventType.LOADED) {
+        setLoaded(true);
+      }
+    });
+    // Start loading the interstitial straight away
+    interstitial.load();
+    getPosition();
+    // Unsubscribe from events on unmount
+    return () => {
+      eventListener();
+    };
+  }, [getPosition]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    setMarkers([]);
+    await fetch(radius);
+    await getPosition();
+    setRefreshing(false);
+  };
+
+  const sortPlacesByDistance = (places: Place[]): Place[] => {
+    if (location) {
+      const {lat, lon} = location;
+      return places.sort((a, b) => {
+        const distance1 = getDistance(a, lat, lon, true);
+        const distance2 = getDistance(b, lat, lon, true);
+        return distance1 - distance2;
+      });
+    }
+    return places;
+  };
+
+  const handlePress = (event: MapEvent) => {
+    const lat = event.nativeEvent.coordinate.latitude;
+    const lng = event.nativeEvent.coordinate.longitude;
+    const loc = {geometry: {location: {lat, lng}}};
+    setSelectedLocation(loc);
+    setLatitude(lat);
+    setLongitude(lng);
+    ActionSheetRef.current?.show();
+  };
+
+  const gymMarkers = (results: Place[]) => {
     return results.map((result) => {
       if (result.geometry) {
         const {lat} = result.geometry.location;
@@ -293,46 +267,34 @@ class Sessions extends Component<SessionsProps, State> {
             }}
             onPress={(event) => {
               event.stopPropagation();
-              this.setState(
-                {selectedLocation: result, latitude: lat, longitude: lng},
-                () => {
-                  Alert.alert(`View gym ${result.name}?`, '', [
-                    {text: 'Cancel', style: 'cancel'},
-                    {
-                      text: 'OK',
-                      onPress: () =>
-                        navigation.navigate('Gym', {id: result.place_id}),
-                    },
-                  ]);
+              setSelectedLocation(result);
+              setLatitude(lat);
+              setLongitude(lng);
+              Alert.alert(`View gym ${result.name}?`, '', [
+                {text: 'Cancel', style: 'cancel'},
+                {
+                  text: 'OK',
+                  onPress: () =>
+                    navigation.navigate('Gym', {id: result.place_id}),
                 },
-              );
+              ]);
             }}
           />
         );
       }
     });
-  }
+  };
 
-  gymFilter(gym) {
-    const {yoga, pilates} = this.state;
+  const gymFilter = (gym: Place) => {
     return (
       pilates &&
       !gym.name.toLowerCase().includes('pilates') &&
       yoga &&
       !gym.name.toLowerCase().includes('yoga')
     );
-  }
+  };
 
-  renderLists() {
-    const {gym, location, navigation, places, setShowMap} = this.props;
-    const {
-      selectedIndex,
-      refreshing,
-      sessions,
-      token,
-      spinner,
-      loadMoreGyms,
-    } = this.state;
+  const renderLists = () => {
     const emptyComponent = (
       <Text
         style={{
@@ -350,9 +312,7 @@ class Sessions extends Component<SessionsProps, State> {
         <SegmentedControlTab
           values={['Sessions', 'Gyms near you']}
           selectedIndex={selectedIndex}
-          onTabPress={(index) => {
-            this.setState({selectedIndex: index});
-          }}
+          onTabPress={(index) => setSelectedIndex(index)}
           tabsContainerStyle={{marginHorizontal: 8, marginVertical: 5}}
         />
         {gym && selectedIndex === 1 && (
@@ -400,7 +360,7 @@ class Sessions extends Component<SessionsProps, State> {
         {selectedIndex === 0 ? (
           <List
             refreshing={refreshing}
-            onRefresh={() => this.handleRefresh()}
+            onRefresh={handleRefresh}
             contentContainerStyle={[
               {flexGrow: 1},
               sessions.length > 0 ? null : {justifyContent: 'center'},
@@ -430,10 +390,8 @@ class Sessions extends Component<SessionsProps, State> {
                       {item.private && <PrivateIcon size={25} />}
                       <TouchableOpacity
                         onPress={() => {
-                          this.setState({
-                            longitude: item.location.position.lng,
-                            latitude: item.location.position.lat,
-                          });
+                          setLongitude(item.location.position.lng);
+                          setLatitude(item.location.position.lat);
                           setShowMap(true);
                         }}>
                         <ThemedIcon name="pin" size={40} />
@@ -446,38 +404,35 @@ class Sessions extends Component<SessionsProps, State> {
           />
         ) : (
           <List
-            data={this.sortPlacesByDistance(Object.values(places))}
+            data={sortPlacesByDistance(Object.values(places))}
             refreshing={refreshing}
             ItemSeparatorComponent={Divider}
             onEndReached={async () => {
               if (!spinner && loadMoreGyms) {
-                this.setState({spinner: true});
-                const {getPlaces} = this.props;
+                setRefreshing(true);
                 const {token: newToken, loadMore} = await getPlaces(
                   yourLat,
                   yourLon,
-                  token,
+                  stateToken,
                 );
-                this.setState({
-                  spinner: false,
-                  token: newToken,
-                  loadMoreGyms: loadMore,
-                });
+                setRefreshing(false);
+                setStateToken(newToken);
+                setLoadMoreGyms(loadMore);
               }
             }}
             onEndReachedThreshold={0.1}
-            onRefresh={() => this.handleRefresh()}
+            onRefresh={handleRefresh}
             keyExtractor={(item) => item.place_id}
             renderItem={({item}) => {
               const {lat, lng} = item.geometry.location;
-              if (this.gymFilter(item)) {
+              if (gymFilter(item)) {
                 return (
                   <ListItem
                     onPress={() => {
-                      this.setState(
-                        {selectedLocation: item, latitude: lat, longitude: lng},
-                        () => navigation.navigate('Gym', {id: item.place_id}),
-                      );
+                      setSelectedLocation(item);
+                      setLatitude(lat);
+                      setLongitude(lng);
+                      navigation.navigate('Gym', {id: item.place_id});
                     }}
                     title={`${item.name}  (${getDistance(
                       item,
@@ -500,10 +455,8 @@ class Sessions extends Component<SessionsProps, State> {
                       return (
                         <TouchableOpacity
                           onPress={() => {
-                            this.setState({
-                              longitude: lng,
-                              latitude: lat,
-                            });
+                            setLongitude(lng);
+                            setLatitude(lat);
                             setShowMap(true);
                           }}>
                           <ThemedIcon size={40} name="pin" />
@@ -519,229 +472,205 @@ class Sessions extends Component<SessionsProps, State> {
         )}
       </Layout>
     );
-  }
+  };
 
-  render() {
-    const {
-      spinner,
-      latitude,
-      longitude,
-      markers,
-      friendsModalOpen,
-      selectedLocation,
-      radius,
-      yoga: stateYoga,
-      pilates: statePilates,
-      popUpVisible,
-      options,
-    } = this.state;
-    const {
-      places,
-      navigation,
-      friends,
-      showMap,
-      setShowFilterModal,
-      showFilterModal,
-    } = this.props;
-
-    return (
-      <Layout style={{flex: 1}}>
-        {spinner ? (
-          <View style={globalStyles.indicator}>
-            <Spinner />
-          </View>
-        ) : (
-          <Layout style={{flex: 1}}>
-            {!showMap && this.renderLists()}
-            {showMap && (
-              <MapView
-                style={styles.map}
-                onPress={(event) => this.handlePress(event)}
-                // onLongPress={event => this.handlePress(event)}
-                showsUserLocation
-                initialRegion={{
-                  latitude,
-                  longitude,
-                  latitudeDelta: 0.015,
-                  longitudeDelta: 0.0121,
-                }}
-                region={{
-                  latitude,
-                  longitude,
-                  latitudeDelta: 0.015,
-                  longitudeDelta: 0.0121,
-                }}>
-                {markers}
-                {this.gymMarkers(Object.values(places))}
-              </MapView>
-            )}
-            <GymSearch
-              parent={this}
-              onOpen={(id) => navigation.navigate('Gym', {id})}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
-                height: 60,
-                justifyContent: 'space-evenly',
+  return (
+    <Layout style={{flex: 1}}>
+      {spinner ? (
+        <View style={globalStyles.indicator}>
+          <Spinner />
+        </View>
+      ) : (
+        <Layout style={{flex: 1}}>
+          {!showMap && renderLists()}
+          {showMap && (
+            <MapView
+              style={styles.map}
+              onPress={handlePress}
+              // onLongPress={event => this.handlePress(event)}
+              showsUserLocation
+              initialRegion={{
+                latitude,
+                longitude,
+                latitudeDelta: 0.015,
+                longitudeDelta: 0.0121,
+              }}
+              region={{
+                latitude,
+                longitude,
+                latitudeDelta: 0.015,
+                longitudeDelta: 0.0121,
               }}>
-              <Button
-                style={styles.button}
-                onPress={() => {
-                  this.setState({selectedLocation: {}});
-                  //showAdmobInterstitial();
-                  navigation.navigate('SessionDetail', {});
-                }}>
-                Create Session
-              </Button>
-              {/* <View style={{borderRightWidth: 1}} /> */}
-              <Button
-                style={styles.button}
-                onPress={() => {
-                  if (Object.keys(friends).length > 0) {
-                    this.setState({
-                      selectedLocation: {},
-                      friendsModalOpen: true,
-                    });
-                  } else {
-                    Alert.alert(
-                      'Sorry',
-                      'You must have at least one pal to create a private session',
-                    );
-                  }
-                }}>
-                Create Private Session
-              </Button>
-            </View>
-            <FriendsModal
-              onClosed={() => this.setState({friendsModalOpen: false})}
-              onContinue={(f) => {
-                //showAdmobInterstitial();
-                navigation.navigate('SessionDetail', {
-                  friends: f,
-                  location: selectedLocation,
-                });
-              }}
-              isOpen={friendsModalOpen}
-            />
-            <Modal
-              useNativeDriver
-              onClosed={async () => {
-                const {radius: currentRadius, fetch, saveRadius} = this.props;
-                setShowFilterModal(false);
-                if (radius !== currentRadius) {
-                  this.setState({refreshing: true});
-                  saveRadius(radius);
-                  await fetch(radius);
-                  this.setState({refreshing: false});
+              {markers}
+              {gymMarkers(Object.values(places))}
+            </MapView>
+          )}
+          <GymSearch
+            setSelectedLocation={setSelectedLocation}
+            setLongitude={setLongitude}
+            setLatitude={setLatitude}
+            setMarkers={setMarkers}
+            markers={markers}
+            setSpinner={setSpinner}
+            onOpen={(id) => navigation.navigate('Gym', {id})}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              height: 60,
+              justifyContent: 'space-evenly',
+            }}>
+            <Button
+              style={styles.button}
+              onPress={() => {
+                setSelectedLocation({});
+                if (loaded) {
+                  interstitial.show();
                 }
-              }}
-              style={styles.modal}
-              position="center"
-              isOpen={showFilterModal}
-              key={showFilterModal ? 1 : 2}>
-              <View style={{flex: 1, borderRadius: 5}}>
-                <Text style={styles.sessionFilterTitle}>Sessions</Text>
-                <View style={styles.sessionFilterContainer}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text
-                      style={{
-                        marginRight: 5,
-                        fontSize: 12,
-                      }}>{`Search radius* ${radius} km`}</Text>
-                    <Slider
-                      maximumValue={50}
-                      minimumValue={5}
-                      step={5}
-                      style={{flex: 1}}
-                      value={radius}
-                      onValueChange={(val) => this.setState({radius: val})}
-                    />
-                  </View>
-                  <View style={{flex: 1, justifyContent: 'flex-end'}}>
-                    <Text
-                      style={{fontSize: 12, textAlign: 'right', margin: 10}}>
-                      *Public only (private sessions should always be visible)
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View style={{flex: 1}}>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    textAlign: 'center',
-                    padding: 10,
-                    color: '#000',
-                    fontWeight: 'bold',
-                  }}>
-                  Gyms
-                </Text>
-                <TouchableOpacity
-                  onPress={() => this.setState({yoga: !stateYoga})}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    borderTopWidth: 0.5,
-                    borderTopColor: '#999',
-                  }}>
-                  <CheckBox
-                    checked={stateYoga}
-                    onPress={() => this.setState({yoga: !stateYoga})}
-                  />
-                  <Text>Show Yoga</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => this.setState({pilates: !statePilates})}
-                  style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <CheckBox
-                    checked={statePilates}
-                    onPress={() => this.setState({pilates: !statePilates})}
-                  />
-                  <Text>Show Pilates</Text>
-                </TouchableOpacity>
-              </View>
-            </Modal>
-            <Popup
-              isVisible={popUpVisible}
-              onCancelPressed={() => this.setState({popUpVisible: false})}
-              onAppPressed={() => this.setState({popUpVisible: false})}
-              onBackButtonPressed={() => this.setState({popUpVisible: false})}
-              modalProps={{animationIn: 'slideInUp'}}
-              options={options}
-              appsWhiteList={[]}
-            />
-          </Layout>
-        )}
-        <ActionSheet
-          ref={(ref) => {
-            this.ActionSheet = ref;
-          }}
-          title="Create session at location?"
-          options={['Create session', 'Create private session', 'Cancel']}
-          cancelButtonIndex={2}
-          onPress={(index) => {
-            if (index === 0) {
-              //showAdmobInterstitial();
+                navigation.navigate('SessionDetail', {});
+              }}>
+              Create Session
+            </Button>
+            {/* <View style={{borderRightWidth: 1}} /> */}
+            <Button
+              style={styles.button}
+              onPress={() => {
+                if (Object.keys(friends).length > 0) {
+                  setSelectedLocation({});
+                  setFriendsModalOpen(true);
+                } else {
+                  Alert.alert(
+                    'Sorry',
+                    'You must have at least one pal to create a private session',
+                  );
+                }
+              }}>
+              Create Private Session
+            </Button>
+          </View>
+          <FriendsModal
+            onClosed={() => setFriendsModalOpen(false)}
+            onContinue={(f) => {
+              if (loaded) {
+                interstitial.show();
+              }
               navigation.navigate('SessionDetail', {
+                friends: f,
                 location: selectedLocation,
               });
-            } else if (index === 1) {
-              if (Object.values(friends).length > 0) {
-                this.setState({friendsModalOpen: true});
-              } else {
-                Alert.alert(
-                  'Sorry',
-                  'You must have at least one pal to create a private session',
-                );
+            }}
+            isOpen={friendsModalOpen}
+          />
+          <Modal
+            useNativeDriver
+            onClosed={async () => {
+              setShowFilterModal(false);
+              if (radius !== currentRadius) {
+                setRefreshing(true);
+                saveRadius(radius);
+                await fetch(radius);
+                setRefreshing(false);
               }
+            }}
+            style={styles.modal}
+            position="center"
+            isOpen={showFilterModal}
+            key={showFilterModal ? 1 : 2}>
+            <View style={{flex: 1, borderRadius: 5}}>
+              <Text style={styles.sessionFilterTitle}>Sessions</Text>
+              <View style={styles.sessionFilterContainer}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={{
+                      marginRight: 5,
+                      fontSize: 12,
+                    }}>{`Search radius* ${radius} km`}</Text>
+                  <Slider
+                    maximumValue={50}
+                    minimumValue={5}
+                    step={5}
+                    style={{flex: 1}}
+                    value={radius}
+                    onValueChange={setStateRadius}
+                  />
+                </View>
+                <View style={{flex: 1, justifyContent: 'flex-end'}}>
+                  <Text style={{fontSize: 12, textAlign: 'right', margin: 10}}>
+                    *Public only (private sessions should always be visible)
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={{flex: 1}}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  textAlign: 'center',
+                  padding: 10,
+                  color: '#000',
+                  fontWeight: 'bold',
+                }}>
+                Gyms
+              </Text>
+              <TouchableOpacity
+                onPress={() => setYoga(!yoga)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  borderTopWidth: 0.5,
+                  borderTopColor: '#999',
+                }}>
+                <CheckBox checked={yoga} onPress={() => setYoga(!yoga)} />
+                <Text>Show Yoga</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setPilates(!pilates)}
+                style={{flexDirection: 'row', alignItems: 'center'}}>
+                <CheckBox
+                  checked={pilates}
+                  onPress={() => setPilates(!pilates)}
+                />
+                <Text>Show Pilates</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+          <Popup
+            isVisible={popUpVisible}
+            onCancelPressed={() => setPopUpVisible(false)}
+            onAppPressed={() => setPopUpVisible(false)}
+            onBackButtonPressed={() => setPopUpVisible(false)}
+            modalProps={{animationIn: 'slideInUp'}}
+            //options={options}
+            appsWhiteList={[]}
+          />
+        </Layout>
+      )}
+      <ActionSheet
+        ref={ActionSheetRef}
+        title="Create session at location?"
+        options={['Create session', 'Create private session', 'Cancel']}
+        cancelButtonIndex={2}
+        onPress={(index) => {
+          if (index === 0) {
+            //showAdmobInterstitial();
+            navigation.navigate('SessionDetail', {
+              location: selectedLocation,
+            });
+          } else if (index === 1) {
+            if (Object.values(friends).length > 0) {
+              setFriendsModalOpen(true);
+            } else {
+              Alert.alert(
+                'Sorry',
+                'You must have at least one pal to create a private session',
+              );
             }
-          }}
-        />
-      </Layout>
-    );
-  }
-}
+          }
+        }}
+      />
+    </Layout>
+  );
+};
 
 const mapStateToProps = ({
   friends,
@@ -767,14 +696,16 @@ const mapStateToProps = ({
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   join: (location) => dispatch(joinGym(location)),
   removeGym: () => dispatch(removeGym()),
-  getChats: (sessions, uid) => dispatch(fetchSessionChats(sessions, uid)),
-  remove: (key, type) => dispatch(removeSession(key, type)),
+  getChats: (sessions, uid: string) =>
+    dispatch(fetchSessionChats(sessions, uid)),
+  remove: (key: string, type) => dispatch(removeSession(key, type)),
   fetch: () =>
     Promise.all([dispatch(fetchSessions()), dispatch(fetchPrivateSessions())]),
   setYourLocation: (location: YourLocation) => dispatch(setLocation(location)),
-  setPlaces: (places) => dispatch(setPlaces(places)),
-  getPlaces: (lat, lon, token) => dispatch(fetchPlaces(lat, lon, token)),
-  saveRadius: (radius) => dispatch(setRadius(radius)),
+  setPlaces: (places: Place[]) => dispatch(setPlaces(places)),
+  getPlaces: (lat: number, lon: number, token?: string) =>
+    dispatch(fetchPlaces(lat, lon, token)),
+  saveRadius: (radius: number) => dispatch(setRadius(radius)),
   setShowMap: (show: boolean) => dispatch(SetShowMap(show)),
   setShowFilterModal: (show: boolean) => dispatch(SetShowFilterModal(show)),
 });

@@ -9,8 +9,13 @@ import styles from './styles';
 import GymSearchProps from '../../types/components/GymSearch';
 
 const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({
-  parent,
   onOpen,
+  setSpinner,
+  setSelectedLocation,
+  setLatitude,
+  setLongitude,
+  setMarkers,
+  markers,
 }) => {
   return (
     <GooglePlacesAutocomplete
@@ -24,7 +29,7 @@ const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({
       renderDescription={(row) => row.description} // custom description render
       // 'details' is provided when fetchDetails = true
       onPress={async (data, details) => {
-        parent.setState({spinner: true});
+        setSpinner(true);
         const {lat, lng} = details.geometry.location;
         if (details && details.types && details.types.includes('gym')) {
           const gym = await fetchPhotoPath(details);
@@ -37,27 +42,19 @@ const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({
               }}
               onPress={(event) => {
                 event.stopPropagation();
-                parent.setState(
-                  {
-                    selectedLocation: gym,
-                    latitude: lat,
-                    longitude: lng,
-                  },
-                  () => onOpen(gym.place_id),
-                );
+                setSelectedLocation(gym);
+                setLatitude(lat);
+                setLongitude(lng);
+                onOpen(gym.place_id);
               }}
             />
           );
-          parent.setState(
-            {
-              selectedLocation: gym,
-              latitude: lat,
-              longitude: lng,
-              markers: [...parent.state.markers, marker],
-              spinner: false,
-            },
-            () => onOpen(gym.place_id),
-          );
+          setSelectedLocation(gym);
+          setLatitude(lat);
+          setLongitude(lng);
+          setMarkers([...markers, marker]);
+          setSpinner(false);
+          onOpen(gym.place_id);
         } else {
           Alert.alert(
             'Location selected not recognised as a gym, please contact support if you think this is incorrect',
