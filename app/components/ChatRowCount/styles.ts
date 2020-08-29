@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
   count: {
     fontSize: 12,
     fontWeight: 'bold',
+    color: '#fff'
   },
 });
 

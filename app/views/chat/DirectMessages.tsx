@@ -66,7 +66,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
                         {getSimplifiedTime(item.lastMessage.createdAt)}
                       </Text>
                     )}
-                    <ChatRowCount id={item.key} />
+                    <ChatRowCount id={item.uid} />
                   </View>
                 )}
               />
