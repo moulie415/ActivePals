@@ -21,7 +21,11 @@ import {
 import MessagingProps from '../../types/views/Messaging';
 import Message, {MessageType, SessionType} from '../../types/Message';
 import {Text, Spinner, Layout} from '@ui-kitten/components';
-import {MyRootState, MyThunkDispatch} from '../../types/Shared';
+import {
+  MyRootState,
+  MyThunkDispatch,
+  PushNotificationData,
+} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 import moment from 'moment';
 import Profile from '../../types/Profile';
@@ -53,9 +57,11 @@ class Messaging extends Component<MessagingProps, State> {
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
     this.loadMessages();
     const id = friendUid || sessionId || gymId;
-    const count = unreadCount[id];
-    if (count && count > 0) {
-      onResetUnreadCount(id);
+    if (id) {
+      const count = unreadCount[id];
+      if (count && count > 0) {
+        onResetUnreadCount(id);
+      }
     }
   }
 
@@ -156,9 +162,11 @@ class Messaging extends Component<MessagingProps, State> {
 
     navigation.goBack();
     const id = friendUid || sessionId || gymId;
-    const count = unreadCount[id];
-    if (count && count > 0) {
-      onResetUnreadCount(id);
+    if (id) {
+      const count = unreadCount[id];
+      if (count && count > 0) {
+        onResetUnreadCount(id);
+      }
     }
 
     return true;
@@ -254,17 +262,19 @@ class Messaging extends Component<MessagingProps, State> {
         </TouchableOpacity>
       );
     }
-    const session = sessions[sessionId];
-    if (session) {
-      const {key, private: isPrivate} = session;
-      return (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('SessionInfo', {sessionId: key, isPrivate})
-          }>
-          <ThemedIcon size={25} name="info" />
-        </TouchableOpacity>
-      );
+    if (sessionId) {
+      const session = sessions[sessionId];
+      if (session) {
+        const {key, private: isPrivate} = session;
+        return (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('SessionInfo', {sessionId: key, isPrivate})
+            }>
+            <ThemedIcon size={25} name="info" />
+          </TouchableOpacity>
+        );
+      }
     }
     return null;
   }
@@ -526,7 +536,7 @@ const mapStateToProps = (
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  onUpdateLastMessage: (message: Message) =>
+  onUpdateLastMessage: (message: PushNotificationData) =>
     dispatch(updateLastMessage(message)),
   onRequest: (friendUid: string) => dispatch(sendRequest(friendUid)),
   onAccept: (uid: string, friendUid: string) =>

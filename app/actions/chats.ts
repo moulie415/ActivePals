@@ -1,8 +1,11 @@
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
-import {MessageType} from '../types/Message';
-import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
-
+import Message, {MessageType} from '../types/Message';
+import {
+  MyThunkDispatch,
+  MyThunkResult,
+  PushNotificationData,
+} from '../types/Shared';
 export const SET_SESSION_CHATS = 'SET_SESSION_CHATS';
 export const ADD_SESSION_CHAT = 'ADD_SESSION_CHAT';
 export const SET_CHATS = 'SET_CHATS';
@@ -28,25 +31,25 @@ const setChats = (chats) => ({
   chats,
 });
 
-const setMessageSession = (id, messages) => ({
+const setMessageSession = (id: string, messages: {[key: string]: Message}) => ({
   type: SET_MESSAGE_SESSION,
   id,
   messages,
 });
 
-const updateChat = (id, lastMessage) => ({
+const updateChat = (id: string, lastMessage) => ({
   type: UPDATE_CHAT,
   id,
   lastMessage,
 });
 
-const updateSessionChat = (key, lastMessage) => ({
+const updateSessionChat = (key: string, lastMessage) => ({
   type: UPDATE_SESSION_CHAT,
   key,
   lastMessage,
 });
 
-const setMute = (id, mute) => ({
+const setMute = (id: string, mute) => ({
   type: MUTE_CHAT,
   id,
   mute,
@@ -66,7 +69,7 @@ export const resetNotification = () => ({
   type: RESET_NOTIFICATION,
 });
 
-export const setMessage = (url, text) => ({
+export const setMessage = (url: string, text: string) => ({
   type: SET_MESSAGE,
   url,
   text,
@@ -76,7 +79,7 @@ export const resetMessage = () => ({
   type: RESET_MESSAGE,
 });
 
-export const setUnreadCount = ({id, count}) => ({
+export const setUnreadCount = ({id, count}: {id: string; count: number}) => ({
   type: SET_UNREAD_COUNT,
   id,
   count,
@@ -102,9 +105,9 @@ export const fetchGymChat = (gym: string) => {
   };
 };
 
-export const updateLastMessage = (notif) => {
+export const updateLastMessage = (notif: PushNotificationData) => {
   return (dispatch: MyThunkDispatch) => {
-    if (notif.type === MessageType.MESSAGE) {
+    if (notif.type === MessageType.MESSAGE && notif.chatId) {
       return database()
         .ref('chats')
         .child(notif.chatId)
@@ -120,7 +123,7 @@ export const updateLastMessage = (notif) => {
           }
         });
     }
-    if (notif.type === MessageType.SESSION_MESSAGE) {
+    if (notif.type === MessageType.SESSION_MESSAGE && notif.sessionId) {
       return database()
         .ref('sessionChats')
         .child(notif.sessionId)
@@ -135,13 +138,13 @@ export const updateLastMessage = (notif) => {
           }
         });
     }
-    if (notif.type === MessageType.GYM_MESSAGE) {
+    if (notif.type === MessageType.GYM_MESSAGE && notif.gymId) {
       dispatch(fetchGymChat(notif.gymId));
     }
   };
 };
 
-export const resetUnreadCount = (id) => {
+export const resetUnreadCount = (id: string): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
     const count = 0;
     const {uid} = getState().profile.profile;
@@ -150,8 +153,8 @@ export const resetUnreadCount = (id) => {
   };
 };
 
-export const getUnreadCount = (uid) => {
-  return (dispatch: MyThunkDispatch, getState) => {
+export const getUnreadCount = (uid: string) => {
+  return (dispatch: MyThunkDispatch) => {
     database()
       .ref('unreadCount')
       .child(uid)

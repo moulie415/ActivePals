@@ -6,6 +6,7 @@ import Profile from '../types/Profile';
 import Comment from '../types/Comment';
 import {dedupeSortAndAddCommentIds, sortComments} from '../constants/utils';
 import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
+import Post from '../types/Post';
 
 export const ADD_POST = 'ADD_POST';
 export const SET_FEED = 'SET_FEED';
@@ -79,7 +80,7 @@ export const setNotificationCount = (
   count,
 });
 
-export const addPost = (item) => {
+export const addPost = (item: Post) => {
   return (dispatch: MyThunkDispatch, getState) => {
     const uid = getState().profile.profile.uid;
     const uids = Object.keys(getState().friends.friends);

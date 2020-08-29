@@ -1,5 +1,7 @@
 import {navigate, navigationRef} from '../RootNavigation';
 import {PushNotificationData} from '../types/Shared';
+import {store} from '../App';
+import {resetUnreadCount} from '../actions/chats';
 
 export const shouldNavigate = (notification: PushNotificationData) => {
   const route = navigationRef.current?.getCurrentRoute();
@@ -32,12 +34,15 @@ export const navigateFromNotif = (notif: PushNotificationData) => {
         friendUsername: username,
         friendUid: uid,
       });
+      store.dispatch(resetUnreadCount(uid));
       break;
     case 'sessionMessage':
       navigate('Messaging', {sessionId});
+      store.dispatch(resetUnreadCount(sessionId));
       break;
     case 'gymMessage':
       navigate('Messaging', {gymId});
+      store.dispatch(resetUnreadCount(gymId));
       break;
     case 'friendRequest':
       navigate('Friends');

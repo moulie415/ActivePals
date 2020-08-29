@@ -29,7 +29,9 @@ import {
   MyThunkDispatch,
 } from '../types/Shared';
 import Profile from '../types/Profile';
-import {Text, Icon, List, Divider, Spinner, Input} from '@ui-kitten/components';
+import {Text, List, Divider, Spinner, Input} from '@ui-kitten/components';
+import Post, {PostType} from '../types/Post';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
 interface State {
   paused: boolean;
@@ -44,20 +46,18 @@ class FilePreview extends Component<FilePreviewProps, State> {
 
   constructor(props) {
     super(props);
-    const {navigation} = this.props;
-    const {params} = navigation.state;
+    const {text} = this.props.route.params;
     this.player = createRef<Video>();
     this.state = {
       paused: true,
-      text: params.text,
+      text: text || '',
       spinner: false,
       mentionList: [],
     };
   }
 
   componentDidMount() {
-    const {navigation} = this.props;
-    const {type} = navigation.state.params;
+    const {type} = this.props.route.params;
     if (type === 'video' && this.player.current) {
       this.player.current.presentFullscreenPlayer();
       this.player.current.seek(0);
@@ -65,8 +65,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   previewView() {
-    const {navigation} = this.props;
-    const {type} = navigation.state.params;
+    const {type} = this.props.route.params;
     if (type === 'video') {
       return this.renderVideo();
     }
@@ -81,10 +80,9 @@ class FilePreview extends Component<FilePreviewProps, State> {
     mime = 'application/octet-stream',
   ): Promise<{url: string; id: string}> {
     const {
-      navigation,
       profile: {uid},
     } = this.props;
-    const {type, message} = navigation.state.params;
+    const {type, message} = this.props.route.params;
     const mimeType = type === 'video' ? 'video/mp4' : mime;
     const imagePath = message ? '/messages' : '/photos';
     const ref =
@@ -128,11 +126,10 @@ class FilePreview extends Component<FilePreviewProps, State> {
 
   async acceptPressed() {
     this.setState({spinner: true});
-    const {navigation, profile, postStatus, setPostMessage} = this.props;
+    const {navigation, profile, postStatus, setPostMessage, route} = this.props;
     const {text} = this.state;
-    const {uri, message} = navigation.state.params;
-    const {type: paramType} = navigation.state.params;
-    const type = paramType === 'image' ? 'photo' : 'video';
+    const {type: paramType, uri, message} = route.params;
+    const type = paramType === 'image' ? PostType.PHOTO : PostType.VIDEO;
     const ref = paramType === 'image' ? 'userPhotos/' : 'userVideos/';
     try {
       const image = await this.uploadImage(uri);
@@ -163,8 +160,8 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   renderImage() {
-    const {navigation, friends} = this.props;
-    const {uri, message} = navigation.state.params;
+    const {navigation, friends, route} = this.props;
+    const {uri, message} = route.params;
     const {mentionList, text, spinner} = this.state;
     return (
       <SafeAreaView style={{flex: 1}}>
@@ -183,7 +180,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                   paddingHorizontal: 15,
                   borderRadius: 5,
                 }}>
-                <Icon size={30} name="close" style={{color: '#fff'}} />
+                <ThemedIcon size={30} name="close" status="danger" />
               </TouchableOpacity>
             </View>
             <View
@@ -201,17 +198,11 @@ class FilePreview extends Component<FilePreviewProps, State> {
                   paddingHorizontal: 15,
                   borderRadius: 5,
                 }}>
-                <Icon size={30} name="checkmark" style={{color: '#fff'}} />
+                <ThemedIcon size={30} name="checkmark" status="success" />
               </TouchableOpacity>
             </View>
             {mentionList && !message && this.renderMentionList()}
             <Input
-              style={{
-                height: 50,
-                paddingLeft: 10,
-                width: '100%',
-                fontSize: 18,
-              }}
               maxLength={280}
               underlineColorAndroid="transparent"
               onChangeText={(input) => {
@@ -239,9 +230,9 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   renderVideo() {
-    const {navigation, friends} = this.props;
+    const {navigation, friends, route} = this.props;
     const {paused, mentionList, text, spinner, progress} = this.state;
-    const {uri, message} = navigation.state.params;
+    const {uri, message} = route.params;
     return (
       <SafeAreaView style={{flex: 1}}>
         <TouchableWithoutFeedback
@@ -262,7 +253,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
             <View style={styles.playButtonContainer}>
               <TouchableOpacity onPress={() => this.setState({paused: false})}>
                 {paused && (
-                  <Icon
+                  <ThemedIcon
                     name="md-play"
                     size={75}
                     style={{
@@ -282,7 +273,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                   padding: 10,
                   borderRadius: 5,
                 }}>
-                <Icon size={30} name="close" style={{color: '#fff'}} />
+                <ThemedIcon size={30} name="close" />
               </TouchableOpacity>
             </View>
             <View style={{position: 'absolute', margin: 20, right: 0}}>
@@ -293,7 +284,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                   padding: 10,
                   borderRadius: 5,
                 }}>
-                <Icon size={30} name="checkmark" style={{color: '#fff'}} />
+                <ThemedIcon size={30} name="checkmark" />
               </TouchableOpacity>
             </View>
             {mentionList && !message && this.renderMentionList()}
@@ -362,7 +353,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                       style={{height: 30, width: 30, borderRadius: 15}}
                     />
                   ) : (
-                    <Icon name="person" size={35} />
+                    <ThemedIcon name="person" size={35} />
                   )}
                   <Text style={{marginLeft: 10}}>{item.username}</Text>
                 </TouchableOpacity>
@@ -393,7 +384,7 @@ const mapStateToProps = ({profile, friends}: MyRootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  postStatus: (status: string) => dispatch(addPost(status)),
+  postStatus: (status: Post) => dispatch(addPost(status)),
   setPostMessage: (url: string, text: string) =>
     dispatch(setMessage(url, text)),
 });

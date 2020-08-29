@@ -16,13 +16,14 @@ import {
 } from '../actions/chats';
 import {SET_LOGGED_OUT} from '../actions/profile';
 import Chat from '../types/Chat';
+import Message from '../types/Message';
 
 export interface ChatsState {
   sessionChats: {[key: string]: Chat};
   chats: {[key: string]: Chat};
-
+  messageSessions: {[key: string]: {[key: string]: Message}};
   unreadCount: {[key: string]: number};
-  gymChat: Chat;
+  gymChat: Chat | {};
   muted: {[key: string]: boolean};
 }
 

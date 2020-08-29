@@ -47,7 +47,7 @@ const reducer = (state = initialState, action: ProfileActionTypes) => {
     case REMOVE_GYM:
       return {
         ...state,
-        gym: null,
+        gym: undefined,
       };
     case SET_NOTIFICATION_COUNT:
       return {

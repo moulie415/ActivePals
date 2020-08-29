@@ -5,6 +5,11 @@ import database from '@react-native-firebase/database';
 import messaging from '@react-native-firebase/messaging';
 import {navigateFromNotif, shouldNavigate} from './navigation';
 import {PushNotificationData} from '../types/Shared';
+import {MessageType} from '../types/Message';
+import {NotificationType} from '../types/Notification';
+import {store} from '../App';
+import {newNotification, updateLastMessage} from '../actions/chats';
+import { setNotificationCount } from '../actions/home';
 
 export const createChannels = () => {
   const channelData = [
@@ -55,6 +60,37 @@ export const createChannels = () => {
       (created) => console.log(`createChannel returned '${created}'`),
     ),
   );
+};
+export const handleNotfication = (notification: PushNotificationData) => {
+  const {type} = notification;
+  const localTypes = [
+    MessageType.MESSAGE,
+    MessageType.SESSION_MESSAGE,
+    MessageType.GYM_MESSAGE,
+    NotificationType.FRIEND_REQUEST,
+    NotificationType.ADDED_TO_SESSION,
+    NotificationType.FRIEND_REQUEST,
+  ];
+  if (localTypes.includes(type)) {
+    store.dispatch(newNotification(notification));
+    if (
+      type === MessageType.GYM_MESSAGE ||
+      type === MessageType.SESSION_MESSAGE ||
+      type === MessageType.MESSAGE
+    ) {
+      store.dispatch(updateLastMessage(notification));
+    }
+  }
+  if (
+    type === NotificationType.POST_REP ||
+    type === NotificationType.COMMENT ||
+    type === NotificationType.FRIEND_REQUEST ||
+    type === NotificationType.COMMENT_MENTION ||
+    type === NotificationType.POST_MENTION
+  ) {
+    const count = store.getState().profile.profile.unreadCount || 0;
+    store.dispatch(setNotificationCount(count + 1));
+  }
 };
 
 export const setupNotifications = (uid: string) => {
