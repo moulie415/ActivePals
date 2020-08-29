@@ -37,7 +37,7 @@ import {
 } from '../actions/home';
 import RepsModal from '../components/RepsModal';
 import Comment from '../types/Comment';
-import {Text, Spinner, Icon, Layout} from '@ui-kitten/components';
+import {Text, Spinner, Icon, Layout, Divider} from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
 const weightUp = require('../../assets/images/weightlifting_up.png');
@@ -150,9 +150,8 @@ class PostView extends Component<PostViewProps, State> {
       <View
         style={{
           flexDirection: 'row',
-          borderTopWidth: 0.5,
-          borderBottomWidth: 0.5,
         }}>
+          <Divider />
         <View
           style={{
             flex: 1,
@@ -208,6 +207,7 @@ class PostView extends Component<PostViewProps, State> {
             </View>
           </View>
         </View>
+        <Divider />
       </View>
     );
   }

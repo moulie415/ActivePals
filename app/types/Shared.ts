@@ -6,8 +6,8 @@ import {HomeState} from '../reducers/home';
 import {SharedInfoState} from '../reducers/sharedInfo';
 import {ChatsState} from '../reducers/chats';
 import {SessionsState} from '../reducers/sessions';
-import { MessageType } from './Message';
-import { NotificationType } from './Notification';
+import {MessageType} from './Message';
+import {NotificationType} from './Notification';
 
 export enum TaskEvent {
   STATE_CHANGED = 'state_changed',

@@ -1,20 +1,23 @@
 import React, {FunctionComponent} from 'react';
 import Instabug from 'instabug-reactnative';
-import {
-  AdIconView,
-  MediaView,
-  AdChoicesView,
-  TriggerableView,
-  withNativeAd,
-  AdSettings,
-  NativeAdsManager,
-  NativeAd,
-} from 'react-native-fbads';
+// import {
+//   AdIconView,
+//   MediaView,
+//   AdChoicesView,
+//   TriggerableView,
+//   withNativeAd,
+//   AdSettings,
+//   NativeAdsManager,
+//   NativeAd,
+// } from 'react-native-fbads';
 import {View} from 'react-native';
-import admob from '@react-native-firebase/admob';
+import {BannerAd, BannerAdSize, TestIds} from '@react-native-firebase/admob';
 import crashlytics from '@react-native-firebase/crashlytics';
 import str from '../constants/strings';
-import {Text, Card} from '@ui-kitten/components';
+import {Text, Card, Layout} from '@ui-kitten/components';
+
+const adUnitId = __DEV__ ? TestIds.BANNER : str.admobBanner;
+
 // AdSettings.clearTestDevices()
 // AdSettings.setLogLevel('none')
 // AdSettings.addTestDevice(AdSettings.currentDeviceHash)
@@ -58,26 +61,16 @@ const fbAd: FunctionComponent<{nativeAd: NativeAd}> = ({nativeAd}) => {
 
 const AdComponent: FunctionComponent<{index: number}> = ({index}) => {
   if (index > 0 && index % 4 === 0) {
-    // @ts-ignore
-    const {Banner} = admob;
-    // @ts-ignore
-    const {AdRequest} = admob;
-    const request = new AdRequest();
     return (
-      <Card style={{padding: 10, marginBottom: 10, alignItems: 'center'}}>
-        <Banner
-          size="LARGE_BANNER"
-          request={request.build()}
-          onAdLoaded={() => {
-            console.log('Advert loaded');
+      <Layout style={{marginBottom: 10}}>
+        <BannerAd
+          size={BannerAdSize.FULL_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
           }}
-          onAdFailedToLoad={(e) => {
-            crashlytics().recordError(0, e.message);
-            Instabug.logError(e.message);
-          }}
-          unitId={str.admobBanner}
+          unitId={adUnitId}
         />
-      </Card>
+      </Layout>
     );
   } else {
     return null;

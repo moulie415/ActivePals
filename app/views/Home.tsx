@@ -626,7 +626,7 @@ class Home extends Component<HomeProps, State> {
           renderItem={({item, index}) => {
             return (
               <>
-                {/* <AdView index={index} /> */}
+                <AdView index={index} />
                 <Card style={{marginBottom: 10}}>
                   {this.renderFeedItem(item)}
                 </Card>
@@ -699,6 +699,7 @@ class Home extends Component<HomeProps, State> {
             )}
           </TouchableOpacity>
           <Input
+            style={{flex: 1, marginHorizontal: 10}}
             value={status}
             maxLength={280}
             autoCorrect={false}
