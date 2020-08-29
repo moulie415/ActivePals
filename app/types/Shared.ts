@@ -6,6 +6,8 @@ import {HomeState} from '../reducers/home';
 import {SharedInfoState} from '../reducers/sharedInfo';
 import {ChatsState} from '../reducers/chats';
 import {SessionsState} from '../reducers/sessions';
+import { MessageType } from './Message';
+import { NotificationType } from './Notification';
 
 export enum TaskEvent {
   STATE_CHANGED = 'state_changed',
@@ -34,3 +36,14 @@ type MyExtraArg = undefined;
 export type MyThunkResult<R> = ThunkAction<R, MyRootState, MyExtraArg, Action>;
 
 export type MyThunkDispatch = ThunkDispatch<MyRootState, MyExtraArg, Action>;
+
+export interface PushNotificationData {
+  type: MessageType | NotificationType;
+  sessionId?: string;
+  chatId?: string;
+  uid: string;
+  username: string;
+  postId?: string;
+  gymId?: string;
+  isPrivate?: boolean;
+}

@@ -3,8 +3,8 @@ import {StackParamList} from '../../App';
 import Profile from '../Profile';
 import {RouteProp} from '@react-navigation/native';
 
-export type LoginNavigationProp = StackNavigationProp<StackParamList, 'Login'>;
-export type LoginRouteProp = RouteProp<StackParamList, 'Login'>;
+type LoginNavigationProp = StackNavigationProp<StackParamList, 'Login'>;
+type LoginRouteProp = RouteProp<StackParamList, 'Login'>;
 
 export default interface LoginProps {
   navigation: LoginNavigationProp;

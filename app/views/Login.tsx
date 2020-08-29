@@ -81,7 +81,6 @@ const Login: FunctionComponent<LoginProps> = ({
           .child(user.uid)
           .once('value');
 
-        const avatar = getProfileImage(user);
         await database()
           .ref('users')
           .child(user.uid)
@@ -91,14 +90,13 @@ const Login: FunctionComponent<LoginProps> = ({
             accountType: isAdmin.val()
               ? AccountType.ADMIN
               : AccountType.STANDARD,
-            avatar,
           });
         const userRef = db().collection('users').doc(user.uid);
         const doc = await userRef.get();
         if (doc.exists) {
           // setProfile(doc.data());
         } else {
-          userRef.set({uid: user.uid, email: user.email, avatar});
+          userRef.set({uid: user.uid, email: user.email});
           // setProfile({uid: user.uid, email: user.email});
         }
 
@@ -115,7 +113,7 @@ const Login: FunctionComponent<LoginProps> = ({
         } else {
           navigation.navigate('Welcome', {goBack: false});
         }
-        setupNotifications(user.uid, navigation, route);
+        setupNotifications(user.uid);
       }
       authRef.current = true;
     });
@@ -185,11 +183,23 @@ const Login: FunctionComponent<LoginProps> = ({
       // Sign-in the user with the credential
       const credentials = await auth().signInWithCredential(facebookCredential);
       const {uid, email} = credentials.user;
-      const avatar = getProfileImage(credentials.user);
-      await database()
-        .ref('users')
-        .child(uid)
-        .update({uid, email, token: data.accessToken, fb_login: true, avatar});
+      if (credentials.additionalUserInfo?.isNewUser) {
+        const avatar = getProfileImage(credentials.user);
+        await database().ref('users').child(uid).update({
+          uid,
+          email,
+          token: data.accessToken,
+          fb_login: true,
+          avatar,
+        });
+      } else {
+        await database().ref('users').child(uid).update({
+          uid,
+          email,
+          token: data.accessToken,
+          fb_login: true,
+        });
+      }
       setFacebookLoading(false);
       return credentials;
     } catch (e) {

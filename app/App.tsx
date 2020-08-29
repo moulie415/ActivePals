@@ -57,7 +57,8 @@ import AddFriendButton from './components/AddFriendButton/AddFriendButton';
 import FilePreview from './views/FilePreview';
 import MapToggle from './components/MapToggle/MapToggle';
 import FilterModalButton from './components/FilterModalButton/FilterModalButton';
-import { UserState } from './types/Profile';
+import {UserState} from './types/Profile';
+import {navigationRef} from './RootNavigation';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -241,7 +242,7 @@ const App = () => {
         <ThemeContext.Provider value={{theme, toggleTheme}}>
           {/* @ts-ignore */}
           <ApplicationProvider {...eva} theme={eva[theme]}>
-            <NavigationContainer>
+            <NavigationContainer ref={navigationRef}>
               <Stack.Navigator
                 screenOptions={({navigation, route}) => ({
                   headerStyle: {

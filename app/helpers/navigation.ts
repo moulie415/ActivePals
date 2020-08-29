@@ -1,26 +1,23 @@
-import {LoginNavigationProp} from '../types/views/Login';
+import {navigate, navigationRef} from '../RootNavigation';
+import {PushNotificationData} from '../types/Shared';
 
-export const shouldNavigate = (notification) => {
-  const {nav} = NavigationService.getNavigator().state;
-  if (nav.routes.length > 0) {
-    const route = nav.routes[nav.index];
-    if (route.params) {
-      const {chatId, session, gymId} = route.params;
-      return (
-        !(chatId && notification.chatId === chatId) &&
-        !(session && session.key === notification.sessionId) &&
-        !(gymId && gymId === notification.gymId)
-      );
-    }
+export const shouldNavigate = (notification: PushNotificationData) => {
+  const route = navigationRef.current?.getCurrentRoute();
+  if (route && route.params) {
+    const {chatId, sessionId, gymId} = route.params;
+    return (
+      !(chatId && notification.chatId === chatId) &&
+      !(sessionId === notification.sessionId) &&
+      !(gymId && gymId === notification.gymId)
+    );
   }
   return true;
 };
 
-export const navigateFromNotif = (notif, navigation: LoginNavigationProp) => {
+export const navigateFromNotif = (notif: PushNotificationData) => {
   const {
     type,
     sessionId,
-    sessionTitle,
     chatId,
     uid,
     username,
@@ -28,29 +25,30 @@ export const navigateFromNotif = (notif, navigation: LoginNavigationProp) => {
     gymId,
     isPrivate,
   } = notif;
-  if (type === 'sessionMessage') {
-    navigation.navigate('Messaging', {sessionId});
-  }
   switch (type) {
     case 'message':
-      navigation.navigate('Messaging', {
+      navigate('Messaging', {
         chatId,
         friendUsername: username,
         friendUid: uid,
       });
       break;
+    case 'sessionMessage':
+      navigate('Messaging', {sessionId});
+      break;
     case 'gymMessage':
-      navigation.navigate('Messaging', {gymId});
+      navigate('Messaging', {gymId});
       break;
     case 'friendRequest':
-      navigation.navigate('Friends');
+      navigate('Friends');
       break;
     case 'comment':
-    case 'rep':
-      navigation.navigate('PostView', {postId});
+    case 'commentRep':
+    case 'postRep':
+      navigate('PostView', {postId});
       break;
     case 'addedToSession':
-      navigation.navigate('SessionInfo', {sessionId, isPrivate});
+      navigate('SessionInfo', {sessionId, isPrivate});
       break;
     default:
       console.log('invalid notif type');

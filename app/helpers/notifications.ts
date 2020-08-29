@@ -4,7 +4,7 @@ import db from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import messaging from '@react-native-firebase/messaging';
 import {navigateFromNotif, shouldNavigate} from './navigation';
-import {LoginNavigationProp, LoginRouteProp} from '../types/views/Login';
+import {PushNotificationData} from '../types/Shared';
 
 export const createChannels = () => {
   const channelData = [
@@ -57,11 +57,7 @@ export const createChannels = () => {
   );
 };
 
-export const setupNotifications = (
-  uid: string,
-  navigation: LoginNavigationProp,
-  route: LoginRouteProp,
-) => {
+export const setupNotifications = (uid: string) => {
   messaging().onTokenRefresh((token) => {
     database().ref(`users/${uid}`).child('FCMToken').set(token);
   });
@@ -77,8 +73,8 @@ export const setupNotifications = (
     onNotification: (notification) => {
       console.log('NOTIFICATION:', notification);
       if (notification.userInteraction) {
-        if (shouldNavigate(notification)) {
-          navigateFromNotif(notification, navigation);
+        if (shouldNavigate(notification.data as PushNotificationData)) {
+          navigateFromNotif(notification.data as PushNotificationData);
         }
       }
 
