@@ -67,6 +67,7 @@ const AdComponent: FunctionComponent<{index: number}> = ({index}) => {
           size={BannerAdSize.FULL_BANNER}
           requestOptions={{
             requestNonPersonalizedAdsOnly: true,
+            keywords: str.keywords,
           }}
           unitId={adUnitId}
         />

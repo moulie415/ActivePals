@@ -76,7 +76,7 @@ const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   requestNonPersonalizedAdsOnly: true,
-  keywords: ['fashion', 'clothing'],
+  keywords: str.keywords,
 });
 
 const LOCATION_PERMISSION =

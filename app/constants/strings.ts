@@ -45,6 +45,7 @@ const str = {
   whiteSpaceRegex: /\s/,
   spinner: 'PulseIndicator',
   notifSound: 'notif.wav',
+  keywords: ['gym', 'fitness', 'sports', 'running', 'active', 'health'],
 };
 
 export default str;
