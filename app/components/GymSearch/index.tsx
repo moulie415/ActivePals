@@ -2,11 +2,11 @@ import React, {FunctionComponent} from 'react';
 import {Alert} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {Marker} from 'react-native-maps';
-import {GOOGLE_API_KEY} from 'react-native-dotenv';
 import {connect} from 'react-redux';
 import {fetchPhotoPath} from '../../actions/sessions';
 import styles from './styles';
 import GymSearchProps from '../../types/components/GymSearch';
+import {GOOGLE_API_KEY} from '../../constants/strings';
 
 const GooglePlacesInput: FunctionComponent<GymSearchProps> = ({
   onOpen,

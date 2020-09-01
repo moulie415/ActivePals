@@ -1,13 +1,14 @@
 import database from '@react-native-firebase/database';
 import {Alert} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import {GOOGLE_API_KEY} from 'react-native-dotenv';
+
 import {geofire} from '../App';
 import {fetchUsers, updateUsers} from './home';
 import {setGym} from './profile';
 import {calculateDuration} from '../constants/utils';
 import Session from '../types/Session';
 import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
+import {GOOGLE_API_KEY} from '../constants/strings';
 
 export const SET_SESSIONS = 'SET_SESSIONS';
 export const UPDATE_SESSIONS = 'UPDATE_SESSIONS';

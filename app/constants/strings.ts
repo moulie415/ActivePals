@@ -1,4 +1,7 @@
 import {Platform} from 'react-native';
+import {GOOGLE_API_KEY_ANDROID, GOOGLE_API_KEY_IOS} from 'react-native-dotenv';
+
+export const GOOGLE_API_KEY = Platform.OS === 'ios' ? GOOGLE_API_KEY_IOS : GOOGLE_API_KEY_ANDROID;
 
 const str = {
   months: [

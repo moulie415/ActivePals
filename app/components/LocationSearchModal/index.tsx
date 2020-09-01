@@ -2,10 +2,10 @@ import React, {FunctionComponent, useRef} from 'react';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {connect} from 'react-redux';
 import Modal from 'react-native-modalbox';
-import {GOOGLE_API_KEY} from 'react-native-dotenv';
 import styles, {locationSearch} from './styles';
 import LocationSearchModalProps from '../../types/components/LocationSearchModal';
 import {Button} from '@ui-kitten/components';
+import {GOOGLE_API_KEY} from '../../constants/strings';
 
 const LocationSearch: FunctionComponent<LocationSearchModalProps> = ({
   isOpen,
