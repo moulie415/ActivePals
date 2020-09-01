@@ -125,6 +125,7 @@ const Login: FunctionComponent<LoginProps> = ({
     try {
       return await auth().signInWithEmailAndPassword(email, password);
     } catch (e) {
+      setSpinner(false)
       Alert.alert('Error', e.message);
     }
   };
@@ -290,12 +291,13 @@ const Login: FunctionComponent<LoginProps> = ({
                     'You must first verify your email using the link we sent you before logging in',
                   );
                 }
-              } else {
-                Alert.alert(
-                  'Sorry',
-                  'Please enter both your email and your password',
-                );
               }
+            } else {
+              setSpinner(false);
+              Alert.alert(
+                'Sorry',
+                'Please enter both your email and your password',
+              );
             }
           }}>
           Sign in
