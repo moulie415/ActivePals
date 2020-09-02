@@ -397,7 +397,7 @@ class Gym extends Component<GymProps, State> {
         <FriendsModal
           onClosed={() => this.setState({friendsModalOpen: false})}
           onContinue={(friends) =>
-            navigation.navigate('SessonDetail', {friends, location: gym})
+            navigation.navigate('SessionDetail', {friends, location: gym})
           }
           isOpen={friendsModalOpen}
         />

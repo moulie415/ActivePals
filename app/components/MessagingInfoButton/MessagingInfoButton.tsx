@@ -25,15 +25,17 @@ const MessagingInfoButton: FunctionComponent<MessagingInfoButtonProps> = ({
     const session = sessions[sessionId];
     if (session) {
       const {key, private: isPrivate} = session;
-      return (
-        <TouchableOpacity
-          style={{padding: 10}}
-          onPress={() =>
-            navigation.navigate('SessionInfo', {sessionId: key, isPrivate})
-          }>
-          <ThemedIcon fill={tintColor} size={25} name="info" />
-        </TouchableOpacity>
-      );
+      if (key && isPrivate) {
+        return (
+          <TouchableOpacity
+            style={{padding: 10}}
+            onPress={() =>
+              navigation.navigate('SessionInfo', {sessionId: key, isPrivate})
+            }>
+            <ThemedIcon fill={tintColor} size={25} name="info" />
+          </TouchableOpacity>
+        );
+      }
     }
   }
   return null;
