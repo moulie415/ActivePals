@@ -59,6 +59,7 @@ import MapToggle from './components/MapToggle/MapToggle';
 import FilterModalButton from './components/FilterModalButton/FilterModalButton';
 import {UserState} from './types/Profile';
 import {navigationRef} from './RootNavigation';
+import MessagingInfoButton from './components/MessagingInfoButton/MessagingInfoButton';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -299,7 +300,19 @@ const App = () => {
                 <Stack.Screen name="Notifications" component={notifications} />
                 <Stack.Screen name="SessionInfo" component={SessionInfo} />
                 <Stack.Screen name="Gym" component={Gym} />
-                <Stack.Screen name="Messaging" component={Messaging} />
+                <Stack.Screen
+                  name="Messaging"
+                  component={Messaging}
+                  options={({navigation, route}) => ({
+                    headerRight: ({tintColor}) => (
+                      <MessagingInfoButton
+                        tintColor={tintColor}
+                        navigation={navigation}
+                        route={route}
+                      />
+                    ),
+                  })}
+                />
                 <Stack.Screen name="ProfileView" component={ProfileView} />
                 <Stack.Screen name="SessionDetail" component={SessionDetail} />
                 <Stack.Screen name="PostView" component={PostView} />

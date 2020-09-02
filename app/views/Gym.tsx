@@ -339,13 +339,11 @@ class Gym extends Component<GymProps, State> {
                 )}
               </View>
               {gym && gym.users && (
-                <View
-                  style={{
-                    marginTop: 20,
-                  }}>
+                <View>
                   <View style={[styles.rowSpaceBetween, {padding: 10}]}>
                     <Text style={{fontSize: 18}}>Users</Text>
                   </View>
+                  <Divider />
                   {this.renderUsers(gym.users)}
                 </View>
               )}
