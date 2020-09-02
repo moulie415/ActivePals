@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import Geocoder from 'react-native-geocoder';
 import database from '@react-native-firebase/database';
-// import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import RNCalendarEvents from 'react-native-calendar-events';
 import {geofire} from '../../App';
 import {types, getType, addSessionToCalendar} from '../../constants/utils';
@@ -56,6 +56,7 @@ interface State {
   showDatePicker?: boolean;
   selectedGender: number;
   selectedType: number;
+  mode: 'date' | 'time';
 }
 class SessionDetail extends Component<SessionDetailProps, State> {
   constructor(props) {
@@ -74,6 +75,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
       location,
       selectedGender: 0,
       selectedType: 0,
+      mode: 'date',
     };
   }
 
@@ -231,7 +233,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
         <ScrollView style={{flex: 1}}>
           <View style={{margin: 10}}>
             <Input
-              style={{ marginBottom: 10}}
+              style={{marginBottom: 10}}
               underlineColorAndroid="transparent"
               onChangeText={(input) => this.setState({title: input})}
               placeholder="Title"
@@ -268,10 +270,14 @@ class SessionDetail extends Component<SessionDetailProps, State> {
               <Toggle
                 checked={addToCalendar}
                 onChange={async (val) => {
+                  console.log(val);
                   this.setState({addToCalendar: val});
                   try {
                     if (val) {
-                      const result = await RNCalendarEvents.requestPermissions();
+                      const result = await RNCalendarEvents.requestPermissions(
+                        false,
+                      );
+                      console.log(result);
                       if (result === 'authorized') {
                         const calendars = await RNCalendarEvents.findCalendars();
                         const validList = calendars.filter(
@@ -284,12 +290,19 @@ class SessionDetail extends Component<SessionDetailProps, State> {
                             'Sorry',
                             "You don't have any calendars that allow modification",
                           );
+                          console.log('test');
                           this.setState({addToCalendar: false});
                         }
                       } else {
+                        Alert.alert(
+                          'Sorry',
+                          'ActivePals does not have permissions to add to your calendar',
+                        );
+                        console.log('test1');
                         this.setState({addToCalendar: false});
                       }
                     } else {
+                      console.log('test2');
                       this.setState({addToCalendar: false});
                     }
                   } catch (e) {
@@ -459,22 +472,23 @@ class SessionDetail extends Component<SessionDetailProps, State> {
         />
         {showDatePicker && (
           <SafeAreaView>
-            {/* <DateTimePicker
+            <DateTimePicker
               value={selectedDate}
-              mode="datetime"
+              mode={Platform.OS === 'ios' ? 'datetime' : this.state.mode}
               onChange={(event, newDate) => {
                 if (newDate && Platform.OS === 'android') {
                   this.setState({
                     selectedDate: newDate,
                     date: newDate,
-                    showDatePicker: false,
+                    showDatePicker: this.state.mode === 'date',
+                    mode: this.state.mode === 'date' ? 'time' : 'date',
                   });
                 } else if (newDate) {
                   this.setState({selectedDate: newDate});
                 }
               }}
               minimumDate={new Date()}
-            /> */}
+            />
             {Platform.OS === 'ios' && (
               <View
                 style={{flexDirection: 'row', justifyContent: 'space-between'}}>

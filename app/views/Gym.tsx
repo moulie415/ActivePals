@@ -22,8 +22,18 @@ import {fetchGym} from '../actions/sessions';
 import {muteChat} from '../actions/chats';
 import GymProps from '../types/views/Gym';
 import Profile from '../types/Profile';
-import {Icon, Button, Text, Layout, Spinner} from '@ui-kitten/components';
+import {
+  Icon,
+  Button,
+  Text,
+  Layout,
+  Spinner,
+  List,
+  Divider,
+  ListItem,
+} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
 interface State {
   profile?: Profile;
@@ -57,35 +67,38 @@ class Gym extends Component<GymProps, State> {
 
   renderUsers(users) {
     const {users: currentUsers, friends, profile} = this.props;
-    return Object.keys(users).map((user) => {
-      let userItem = friends[user] || currentUsers[user];
-      if (user === profile.uid) {
-        userItem = profile;
-      }
-      if (userItem) {
-        return (
-          <TouchableOpacity
-            onPress={() => this.handleUserPress(user)}
-            style={[
-              styles.infoRowContainer,
-              styles.userRow,
-              {paddingVertical: userItem.avatar ? 10 : 5},
-            ]}
-            key={user}>
-            {userItem.avatar ? (
-              <Image
-                source={{uri: userItem.avatar}}
-                style={{height: 40, width: 40, borderRadius: 25}}
+    return (
+      <List
+        ItemSeparatorComponent={Divider}
+        keyExtractor={(item) => item}
+        data={Object.keys(users)}
+        renderItem={({item}) => {
+          let userItem = friends[item] || currentUsers[item];
+          if (item === profile.uid) {
+            userItem = profile;
+          }
+          if (userItem) {
+            return (
+              <ListItem
+                onPress={() => this.handleUserPress(item)}
+                title={userItem.username}
+                accessoryLeft={() =>
+                  userItem.avatar ? (
+                    <Image
+                      source={{uri: userItem.avatar}}
+                      style={{height: 40, width: 40, borderRadius: 25}}
+                    />
+                  ) : (
+                    <ThemedIcon size={50} name="person" />
+                  )
+                }
               />
-            ) : (
-              <Icon size={50} name="person" />
-            )}
-            <Text style={{marginLeft: 10}}>{userItem.username}</Text>
-          </TouchableOpacity>
-        );
-      }
-      return null;
-    });
+            );
+          }
+          return null;
+        }}
+      />
+    );
   }
 
   render() {
@@ -144,6 +157,7 @@ class Gym extends Component<GymProps, State> {
                   />
                 </View>
               </View>
+              <Divider />
               <View>
                 {yourGym && yourGym.place_id === id ? (
                   <View
@@ -202,120 +216,126 @@ class Gym extends Component<GymProps, State> {
                     </Button>
                   </View>
                 )}
-                <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-                  <View style={{flex: 4}}>
-                    <Text style={{fontSize: 18}}>Location</Text>
-                    {gym.vicinity && (
-                      <TouchableOpacity
-                        onPress={() => Alert.alert(gym.name, locationString)}>
-                        <Text numberOfLines={1} style={{color: '#999'}}>
-                          {locationString}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  <Button
-                    onPress={() => {
-                      const {lat, lng} = gym.geometry.location;
-                      const {place_id} = gym;
-                      const popupOptions = {
-                        latitude: lat,
-                        longitude: lng,
-                        cancelText: 'Cancel',
-                        sourceLatitude: location.lat,
-                        sourceLongitude: location.lon,
-                        googlePlaceId: place_id,
-                      };
-                      this.setState({
-                        popUpVisible: true,
-                        options: popupOptions,
-                      });
-                    }}
-                    style={{
-                      marginLeft: 20,
-                      marginRight: 10,
-                      alignSelf: 'flex-start',
-                    }}>
-                    Directions
-                  </Button>
-                </View>
-                {gym.website && (
-                  <TouchableOpacity
-                    onPress={() =>
-                      Linking.openURL(gym.website).catch((e) =>
-                        Alert.alert('Error', e.message),
-                      )
-                    }
-                    style={styles.infoRowContainer}>
-                    <Text style={{fontSize: 18}}>Website</Text>
-                    <Hyperlink linkDefault>
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          textDecorationLine: 'underline',
-                        }}>
-                        {gym.website}
-                      </Text>
-                    </Hyperlink>
-                  </TouchableOpacity>
-                )}
-                {gym.rating && (
-                  <View style={styles.infoRowContainer}>
-                    <Text style={{fontSize: 18}}>Google rating</Text>
-                    <Text style={{color: '#999'}}>
-                      <Text>{gym.rating.toFixed(2)}</Text>
-                      {gym.user_ratings_total && (
-                        <Text>
-                          {` from ${gym.user_ratings_total} ${
-                            gym.user_ratings_total > 1 ? 'ratings' : 'rating'
-                          }`}
-                        </Text>
-                      )}
-                    </Text>
-                  </View>
-                )}
-                <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-                  {gym.formatted_phone_number && (
-                    <TouchableOpacity
+                <Divider />
+                <ListItem
+                  onPress={() => Alert.alert(gym.name, locationString)}
+                  title="Location"
+                  description={gym.vicinity ? locationString : ''}
+                  accessoryRight={() => (
+                    <Button
                       onPress={() => {
-                        Linking.openURL(
-                          `tel:${gym.formatted_phone_number}`,
-                        ).catch((e) => Alert.alert('Error', e.message));
+                        const {lat, lng} = gym.geometry.location;
+                        const {place_id} = gym;
+                        const popupOptions = {
+                          latitude: lat,
+                          longitude: lng,
+                          cancelText: 'Cancel',
+                          sourceLatitude: location.lat,
+                          sourceLongitude: location.lon,
+                          googlePlaceId: place_id,
+                        };
+                        this.setState({
+                          popUpVisible: true,
+                          options: popupOptions,
+                        });
                       }}>
-                      <Text style={{fontSize: 18}}>Phone number</Text>
-                      <Text style={{color: '#999'}}>
-                        {gym.formatted_phone_number}
-                      </Text>
-                    </TouchableOpacity>
+                      Directions
+                    </Button>
                   )}
-                  {gym.international_phone_number && (
-                    <TouchableOpacity
-                      onPress={() => {
-                        Linking.openURL(
-                          `tel:${gym.international_phone_number}`,
-                        ).catch((e) => Alert.alert('Error', e.message));
-                      }}>
-                      <Text style={{fontSize: 18}}>Intl phone number</Text>
-                      <Text style={{color: '#999'}}>
-                        {gym.international_phone_number}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
+                />
+                <Divider />
+                {!!gym.website && (
+                  <>
+                    <ListItem
+                      onPress={() =>
+                        Linking.openURL(gym.website).catch((e) =>
+                          Alert.alert('Error', e.message),
+                        )
+                      }
+                      title="Website"
+                      description={gym.website}
+                    />
+                    <Divider />
+                  </>
+                )}
+                {!!gym.rating && (
+                  <>
+                    <ListItem
+                      title="Google rating"
+                      description={gym.rating.toFixed(2)}
+                      accessoryRight={() =>
+                        gym.user_ratings_total ? (
+                          <Text>
+                            {` from ${gym.user_ratings_total} ${
+                              gym.user_ratings_total > 1 ? 'ratings' : 'rating'
+                            }`}
+                          </Text>
+                        ) : (
+                          <View />
+                        )
+                      }
+                    />
+                    <Divider />
+                  </>
+                )}
+                {!!gym.formatted_phone_number ||
+                  (!!gym.international_phone_number && (
+                    <>
+                      <ListItem
+                        accessoryLeft={() =>
+                          gym.formatted_phone_number ? (
+                            <TouchableOpacity
+                              onPress={() => {
+                                Linking.openURL(
+                                  `tel:${gym.formatted_phone_number}`,
+                                ).catch((e) => Alert.alert('Error', e.message));
+                              }}>
+                              <Text style={{fontSize: 18}}>Phone number</Text>
+                              <Text style={{color: '#999'}}>
+                                {gym.formatted_phone_number}
+                              </Text>
+                            </TouchableOpacity>
+                          ) : (
+                            <View />
+                          )
+                        }
+                        accessoryRight={() =>
+                          gym.international_phone_number ? (
+                            <TouchableOpacity
+                              onPress={() => {
+                                Linking.openURL(
+                                  `tel:${gym.international_phone_number}`,
+                                ).catch((e) => Alert.alert('Error', e.message));
+                              }}>
+                              <Text style={{fontSize: 18}}>
+                                Intl phone number
+                              </Text>
+                              <Text style={{color: '#999'}}>
+                                {gym.international_phone_number}
+                              </Text>
+                            </TouchableOpacity>
+                          ) : (
+                            <View />
+                          )
+                        }
+                      />
+                      <Divider />
+                    </>
+                  ))}
                 {gym.opening_hours && gym.opening_hours.weekday_text && (
-                  <TouchableOpacity
-                    onPress={() =>
-                      Alert.alert(
-                        'Opening hours',
-                        gym.opening_hours.weekday_text.join('\n'),
-                      )
-                    }
-                    style={styles.infoRowContainer}>
-                    <Text style={{fontSize: 18}}>Opening hours</Text>
-                    <Text style={{color: '#999'}}>
-                      Touch to see opening hours
-                    </Text>
-                  </TouchableOpacity>
+                  <>
+                    <ListItem
+                      onPress={() =>
+                        Alert.alert(
+                          'Opening hours',
+                          gym.opening_hours.weekday_text.join('\n'),
+                        )
+                      }
+                      title="Opening hours"
+                      description="Touch to see opening hours"
+                    />
+                    <Divider />
+                  </>
                 )}
               </View>
               {gym && gym.users && (

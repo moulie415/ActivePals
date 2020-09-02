@@ -54,15 +54,9 @@ export default StyleSheet.create({
   sessionFilterContainer: {
     flex: 1,
     padding: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#999',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#999',
   },
   infoRowContainer: {
     padding: 10,
-    borderTopColor: '#999',
-    borderTopWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
   },
   rowSpaceBetween: {
@@ -72,8 +66,6 @@ export default StyleSheet.create({
   },
   infoRowSpaceEvenly: {
     padding: 10,
-    borderTopColor: '#999',
-    borderTopWidth: StyleSheet.hairlineWidth,
     justifyContent: 'space-evenly',
     flexDirection: 'row',
     alignItems: 'center',

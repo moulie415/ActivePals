@@ -1,12 +1,5 @@
 import React, {Component} from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Switch,
-  Platform,
-} from 'react-native';
+import {View, TouchableOpacity, Alert, ScrollView} from 'react-native';
 import RNCalendarEvents from 'react-native-calendar-events';
 import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
@@ -31,7 +24,17 @@ import {
 import {muteChat} from '../../actions/chats';
 import SessionInfoProps from '../../types/views/sessions/SessionInfo';
 import {SessionType} from '../../types/Session';
-import {Icon, Text, Button, Layout, Spinner} from '@ui-kitten/components';
+import {
+  Icon,
+  Text,
+  Button,
+  Layout,
+  Spinner,
+  ListItem,
+  Toggle,
+  Divider,
+  List,
+} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 
@@ -149,9 +152,9 @@ class SessionInfo extends Component<SessionInfoProps, State> {
     return (
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Text>Mute </Text>
-        <Switch
-          value={muted[sessionId]}
-          onValueChange={(val) => onMuteChat(sessionId, val)}
+        <Toggle
+          checked={muted[sessionId]}
+          onChange={(val) => onMuteChat(sessionId, val)}
         />
       </View>
     );
@@ -159,35 +162,38 @@ class SessionInfo extends Component<SessionInfoProps, State> {
 
   renderUsers(users) {
     const {profile, friends, users: propsUsers} = this.props;
-    return Object.keys(users).map((user) => {
-      let userItem = friends[user] || propsUsers[user];
-      if (user === profile.uid) {
-        userItem = profile;
-      }
-      if (userItem) {
-        return (
-          <TouchableOpacity
-            onPress={() => this.handleUserPress(user)}
-            style={[
-              styles.infoRowContainer,
-              styles.userRow,
-              {paddingVertical: userItem.avatar ? 10 : 5},
-            ]}
-            key={user}>
-            {userItem.avatar ? (
-              <Image
-                source={{uri: userItem.avatar}}
-                style={{height: 40, width: 40, borderRadius: 25}}
+    return (
+      <List
+        ItemSeparatorComponent={Divider}
+        keyExtractor={(item) => item}
+        data={Object.keys(users)}
+        renderItem={({item}) => {
+          let userItem = friends[item] || propsUsers[item];
+          if (item === profile.uid) {
+            userItem = profile;
+          }
+          if (userItem) {
+            return (
+              <ListItem
+                onPress={() => this.handleUserPress(item)}
+                title={userItem.username}
+                accessoryLeft={() =>
+                  userItem.avatar ? (
+                    <Image
+                      source={{uri: userItem.avatar}}
+                      style={{height: 40, width: 40, borderRadius: 25}}
+                    />
+                  ) : (
+                    <ThemedIcon size={50} name="person" />
+                  )
+                }
               />
-            ) : (
-              <ThemedIcon size={50} name="person" />
-            )}
-            <Text style={{marginLeft: 10}}>{userItem.username}</Text>
-          </TouchableOpacity>
-        );
-      }
-      return null;
-    });
+            );
+          }
+          return null;
+        }}
+      />
+    );
   }
 
   render() {
@@ -246,177 +252,160 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                 </View>
               </View>
               <View>
+                <Divider />
                 {session && host && this.getButtons(host, session)}
-                <TouchableOpacity
+                <Divider />
+                <ListItem
                   onPress={() => Alert.alert('Details', session.details)}
-                  style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-                  <View>
-                    <Text style={{fontSize: 18}}>Details</Text>
-                    <Text numberOfLines={1} style={{color: '#999'}}>
-                      {session.details}
-                    </Text>
-                  </View>
-                  {isPrivate && <PrivateIcon />}
-                  <View>
-                    <Text style={{fontSize: 18}}>Gender</Text>
-                    <Text style={{color: '#999'}}>{session.gender}</Text>
-                  </View>
-                </TouchableOpacity>
-                <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-                  <TouchableOpacity
-                    style={{flex: 4}}
-                    onPress={() => {
-                      Alert.alert(
-                        'Date and duration',
-                        formatDateTime(session.dateTime) +
-                          durationString(session),
-                      );
-                    }}>
-                    <Text style={{fontSize: 18}}>Date</Text>
-                    <Text numberOfLines={1} style={{color: '#999'}}>
-                      {formatDateTime(session.dateTime) +
-                        durationString(session)}
-                    </Text>
-                  </TouchableOpacity>
-                  <Button
-                    onPress={() => {
-                      Alert.alert(`Add ${session.title} to calendar?`, '', [
-                        {text: 'Cancel', style: 'cancel'},
-                        {
-                          text: 'Yes',
-                          onPress: async () => {
-                            try {
-                              const result = await RNCalendarEvents.requestPermissions();
-                              if (result === 'authorized') {
-                                const calendars = await RNCalendarEvents.findCalendars();
-                                const validList = calendars.filter(
-                                  (calendar) => calendar.allowsModifications,
-                                );
-                                if (validList && validList.length > 0) {
-                                  const calendarId = validList[0].id;
-                                  await addSessionToCalendar(
-                                    calendarId,
-                                    session,
-                                  );
-                                  Alert.alert(
-                                    'Success',
-                                    `${session.title} saved to calendar`,
-                                  );
-                                } else {
-                                  Alert.alert(
-                                    'Sorry',
-                                    "You don't have any calendars that allow modification",
-                                  );
-                                }
-                              }
-                            } catch (e) {
-                              Alert.alert('Error', e.message);
-                            }
-                          },
-                        },
-                      ]);
-                    }}>
-                    Add to calendar
-                  </Button>
-                </View>
-                <View style={[styles.infoRowContainer, styles.rowSpaceBetween]}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      Alert.alert('Location', session.location.formattedAddress)
-                    }
-                    style={{flex: 5}}>
-                    <Text style={{fontSize: 18}}>Location</Text>
-                    <Text numberOfLines={1} style={{color: '#999'}}>
-                      {session.location.formattedAddress}
-                    </Text>
-                  </TouchableOpacity>
-                  {location && (
+                  title="Details"
+                  description={session.details}
+                  accessoryRight={() => {
+                    return (
+                      <>
+                        {isPrivate && <PrivateIcon />}
+                        {/* <View>
+                          <Text>Gender</Text>
+                          <Text style={{color: '#999'}}>{session.gender}</Text>
+                        </View> */}
+                      </>
+                    );
+                  }}
+                />
+                <Divider />
+                <ListItem
+                  onPress={() => {
+                    Alert.alert(
+                      'Date and duration',
+                      formatDateTime(session.dateTime) +
+                        durationString(session),
+                    );
+                  }}
+                  title="Date"
+                  description={
+                    formatDateTime(session.dateTime) + durationString(session)
+                  }
+                  accessoryRight={() => (
                     <Button
                       onPress={() => {
-                        const {lat, lng} = session.location.position;
-                        const newOptions: Options = {
-                          latitude: lat,
-                          longitude: lng,
-                          cancelText: 'Cancel',
-                          sourceLatitude: location.lat,
-                          sourceLongitude: location.lon,
-                        };
-                        this.setState({
-                          popUpVisible: true,
-                          options: newOptions,
-                        });
+                        Alert.alert(`Add ${session.title} to calendar?`, '', [
+                          {text: 'Cancel', style: 'cancel'},
+                          {
+                            text: 'Yes',
+                            onPress: async () => {
+                              try {
+                                const result = await RNCalendarEvents.requestPermissions();
+                                if (result === 'authorized') {
+                                  const calendars = await RNCalendarEvents.findCalendars();
+                                  const validList = calendars.filter(
+                                    (calendar) => calendar.allowsModifications,
+                                  );
+                                  if (validList && validList.length > 0) {
+                                    const calendarId = validList[0].id;
+                                    await addSessionToCalendar(
+                                      calendarId,
+                                      session,
+                                    );
+                                    Alert.alert(
+                                      'Success',
+                                      `${session.title} saved to calendar`,
+                                    );
+                                  } else {
+                                    Alert.alert(
+                                      'Sorry',
+                                      "You don't have any calendars that allow modification",
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                Alert.alert('Error', e.message);
+                              }
+                            },
+                          },
+                        ]);
                       }}>
-                      Directions
+                      Add to calendar
                     </Button>
                   )}
-                </View>
+                />
+                <Divider />
+                <ListItem
+                  onPress={() =>
+                    Alert.alert('Location', session.location.formattedAddress)
+                  }
+                  title="Location"
+                  description={session.location.formattedAddress}
+                  accessoryRight={() =>
+                    location ? (
+                      <Button
+                        onPress={() => {
+                          const {lat, lng} = session.location.position;
+                          const newOptions: Options = {
+                            latitude: lat,
+                            longitude: lng,
+                            cancelText: 'Cancel',
+                            sourceLatitude: location.lat,
+                            sourceLongitude: location.lon,
+                          };
+                          this.setState({
+                            popUpVisible: true,
+                            options: newOptions,
+                          });
+                        }}>
+                        Directions
+                      </Button>
+                    ) : (
+                      <Layout />
+                    )
+                  }
+                />
+                <Divider />
                 {gym && (
-                  <TouchableOpacity
+                  <ListItem
                     onPress={() =>
                       navigation.navigate('Gym', {id: gym.place_id})
                     }
-                    style={[styles.infoRowContainer, styles.userRow]}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginRight: 10,
-                      }}>
-                      {gym.photo ? (
+                    accessoryLeft={() =>
+                      gym.photo ? (
                         <Image
                           source={{uri: gym.photo}}
                           style={{height: 40, width: 40, borderRadius: 25}}
                         />
                       ) : (
                         getType(SessionType.GYM, 40)
-                      )}
-                    </View>
-                    <View>
-                      <Text style={{fontSize: 18}}>Gym</Text>
-                      <Text style={{color: '#999'}}>{gym.name}</Text>
-                    </View>
-                  </TouchableOpacity>
+                      )
+                    }
+                    title="Gym"
+                    description={gym.name}
+                  />
                 )}
+                <Divider />
                 {host && (
-                  <TouchableOpacity
+                  <ListItem
                     onPress={() => this.handleUserPress(host.uid)}
-                    style={[
-                      styles.infoRowContainer,
-                      styles.userRow,
-                      {paddingVertical: host.avatar ? 10 : 5},
-                    ]}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginRight: 10,
-                      }}>
-                      {host.avatar ? (
+                    accessoryLeft={() =>
+                      host.avatar ? (
                         <Image
                           source={{uri: host.avatar}}
                           style={{height: 40, width: 40, borderRadius: 25}}
                         />
                       ) : (
                         <ThemedIcon size={50} name="person" />
-                      )}
-                    </View>
-                    <View style={{marginRight: 10}}>
-                      <Text style={{fontSize: 18}}>Host</Text>
-                      <Text style={{color: '#999'}}>{host.username}</Text>
-                    </View>
-                  </TouchableOpacity>
+                      )
+                    }
+                    title="Host"
+                    description={host.username}
+                  />
                 )}
               </View>
-              <View
-                style={{
-                  marginTop: 20,
-                }}>
+              <View>
+                <Divider />
                 <View
                   style={[
                     styles.rowSpaceBetween,
                     {padding: 5, paddingHorizontal: 10},
                   ]}>
                   <Text style={{fontSize: 18}}>Users</Text>
+                
                   {(!isPrivate || (host && profile.uid === host.uid)) && (
                     <TouchableOpacity
                       onPress={() => this.setState({friendsModalOpen: true})}>
@@ -428,6 +417,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                     </TouchableOpacity>
                   )}
                 </View>
+                <Divider />
                 {session && this.renderUsers(session.users)}
               </View>
             </Layout>

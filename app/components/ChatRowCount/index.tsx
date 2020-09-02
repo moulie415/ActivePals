@@ -11,10 +11,7 @@ const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({
   id,
   eva,
 }) => {
-  console.log({unreadCount});
   const count = unreadCount[id];
-  console.log({id});
-  console.log({count});
   if (count && count > 0) {
     return (
       <View
