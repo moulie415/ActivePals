@@ -423,7 +423,6 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                   this.replyCommentText = text;
                 }}
                 placeholder="Write comment"
-                numberOfLines={3}
               />
               <TouchableOpacity
                 onPress={() => {
@@ -485,7 +484,6 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                 : this.setState({mentionList: null});
             }}
             placeholder="Write comment..."
-            numberOfLines={3}
           />
           <TouchableOpacity
             onPress={() => {
@@ -625,7 +623,6 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                   this.editCommentText = text;
                 }}
                 placeholder="Edit comment"
-                numberOfLines={3}
               />
               <View
                 style={{flexDirection: 'row', justifyContent: 'space-around'}}>
