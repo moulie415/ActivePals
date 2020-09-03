@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, TouchableOpacity, Image as SlowImage} from 'react-native';
-import Swipeout from 'react-native-swipeout';
+import Swipeout, {SwipeoutButtonProperties} from 'react-native-swipeout';
 import {connect} from 'react-redux';
 import Image from 'react-native-fast-image';
 import styles from '../styles/notificationsStyles';
@@ -21,9 +21,11 @@ import {
   ListItem,
   Divider,
   Spinner,
+  withStyles,
 } from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyThunkDispatch, MyRootState} from '../types/Shared';
+import RepIcon from '../components/RepIcon/RepIcon';
 
 interface State {
   close: boolean;
@@ -68,21 +70,9 @@ class Notifications extends Component<NotificationsProps, State> {
     const friend = friends[item.uid] || users[item.uid];
     switch (item.type) {
       case NotificationType.COMMENT:
-        return (
-          <ThemedIcon
-            size={25}
-            name="message-square"
-            style={{marginRight: 15, marginLeft: 5}}
-          />
-        );
+        return <ThemedIcon size={25} name="message-square" />;
       case NotificationType.FRIEND_REQUEST:
-        return (
-          <ThemedIcon
-            size={25}
-            name="person-add"
-            style={{marginRight: 15, marginLeft: 5}}
-          />
-        );
+        return <ThemedIcon size={25} name="person-add" />;
       case NotificationType.POST_MENTION:
       case NotificationType.COMMENT_MENTION:
         if (friend) {
@@ -94,33 +84,15 @@ class Notifications extends Component<NotificationsProps, State> {
                   height: 30,
                   width: 30,
                   borderRadius: 15,
-                  marginRight: 15,
                 }}
               />
             );
           }
-          return (
-            <ThemedIcon size={35} name="person" style={{marginRight: 15}} />
-          );
+          return <ThemedIcon size={35} name="person" />;
         }
-        return (
-          <ThemedIcon
-            size={25}
-            name="message-square"
-            style={{marginRight: 15, marginLeft: 5}}
-          />
-        );
+        return <ThemedIcon size={25} name="message-square" />;
       default:
-        return (
-          <SlowImage
-            source={require('../../assets/images/weightlifting_up.png')}
-            style={{
-              width: 25,
-              height: 25,
-              marginRight: 15,
-            }}
-          />
-        );
+        return <RepIcon size={25} disabled active />;
     }
   }
 
@@ -183,7 +155,7 @@ class Notifications extends Component<NotificationsProps, State> {
             data={sortNotificationsByDate(Object.values(notifications))}
             ItemSeparatorComponent={Divider}
             renderItem={({item}) => {
-              const swipeoutBtns = [
+              const swipeoutBtns: SwipeoutButtonProperties[] = [
                 {
                   text: 'Delete',
                   onPress: async () => {
@@ -191,6 +163,7 @@ class Notifications extends Component<NotificationsProps, State> {
                     fetchNotifications(fetchAmount);
                     this.setState({close: true});
                   },
+                  backgroundColor: this.props.eva.theme['color-danger-active'],
                 },
               ];
               return (
@@ -205,7 +178,9 @@ class Notifications extends Component<NotificationsProps, State> {
                     }}
                     title={this.getNotificationString(item)}
                     description={getSimplifiedTime(new Date(item.date))}
-                    accessoryLeft={() => this.getTypeImage(item)}
+                    accessoryLeft={() => (
+                      <View style={{margin: 5}}>{this.getTypeImage(item)}</View>
+                    )}
                     accessoryRight={() => (
                       <ThemedIcon size={25} name="arrow-ios-forward" />
                     )}
@@ -266,4 +241,7 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onDelete: (key) => dispatch(deleteNotification(key)),
 });
 
-export default connect(matchStateToProps, mapDispatchToProps)(Notifications);
+export default connect(
+  matchStateToProps,
+  mapDispatchToProps,
+)(withStyles(Notifications));

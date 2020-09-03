@@ -21,7 +21,6 @@ import {
   List,
   Divider,
   ListItem,
-  Avatar,
   Input,
   Modal,
   Card,
@@ -29,6 +28,7 @@ import {
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import globalStyles from '../styles/globalStyles';
+import Avatar from '../components/Avatar/Avatar';
 
 interface State {
   refreshing: boolean;
@@ -169,7 +169,7 @@ class Friends extends Component<FriendsProps, State> {
                 title={item.username}
                 accessoryLeft={() =>
                   item.avatar ? (
-                    <Avatar source={{uri: item.avatar}} size="large" />
+                    <Avatar uri={item.avatar} size={50} />
                   ) : (
                     <ThemedIcon size={40} name="person" />
                   )

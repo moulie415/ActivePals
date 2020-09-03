@@ -11,9 +11,7 @@ import styles from './styles';
 import str from '../../constants/strings';
 import CommentProps from '../../types/components/CommentProps';
 import {Text} from '@ui-kitten/components';
-
-const weightUp = require('../../../assets/images/weightlifting_up.png');
-const weightDown = require('../../../assets/images/weightlifting_down.png');
+import RepIcon from '../RepIcon/RepIcon';
 
 interface State {
   menuVisible: boolean;
@@ -152,13 +150,7 @@ export default class Comment extends PureComponent<CommentProps, State> {
                   style={{paddingTop: 5}}
                   onPress={this.handleLikesTap}>
                   <View style={{flexDirection: 'row'}}>
-                    <SlowImage
-                      source={weightUp}
-                      style={{
-                        width: 15,
-                        height: 15,
-                      }}
-                    />
+                    <RepIcon disabled active size={15} />
                     <Text style={styles.likeNr}> {likesNr}</Text>
                   </View>
                 </TouchableOpacity>
@@ -190,23 +182,11 @@ export default class Comment extends PureComponent<CommentProps, State> {
           <View style={styles.rightActionBar}>
             <TimeAgo style={styles.time} time={updatedAt} />
             {likeAction ? (
-              <TouchableOpacity onPress={() => this.handleLike()}>
-                <View style={{flexDirection: 'row', marginTop: 2}}>
-                  <Text
-                    style={[
-                      styles.actionText,
-                      {color: liked ? '#4DB2DF' : '#999'},
-                    ]}
-                  />
-                  <SlowImage
-                    source={liked ? weightUp : weightDown}
-                    style={{
-                      width: 25,
-                      height: 25,
-                    }}
-                  />
-                </View>
-              </TouchableOpacity>
+              <RepIcon
+                onPress={() => this.handleLike()}
+                size={25}
+                active={liked}
+              />
             ) : null}
             {replyAction ? (
               <TouchableOpacity onPress={this.handleReply}>

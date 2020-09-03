@@ -57,7 +57,6 @@ import {
   List,
   ListItem,
   Divider,
-  Avatar,
   Spinner,
   Modal,
   Card,
@@ -72,6 +71,7 @@ import {
   AdEventType,
 } from '@react-native-firebase/admob';
 import str from '../../constants/strings';
+import Avatar from '../../components/Avatar/Avatar';
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
 
@@ -444,7 +444,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
                     description={item.vicinity}
                     accessoryLeft={() => {
                       return item.photo ? (
-                        <Avatar source={{uri: item.photo}} />
+                        <Avatar uri={item.photo} size={40} />
                       ) : (
                         <ThemedImage
                           source={require('../../../assets/images/dumbbell.png')}

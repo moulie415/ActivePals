@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
-import {View, ScrollView, RefreshControl} from 'react-native';
+import {View} from 'react-native';
 import {connect} from 'react-redux';
 import {getType, getSimplifiedTime} from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import {SessionType} from '../../types/Session';
 import {fetchGymChat} from '../../actions/chats';
 import {GymChatProps} from '../../types/views/chat/GymChat';
-import {Text, Layout, ListItem, Avatar} from '@ui-kitten/components';
+import {Text, Layout, ListItem} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
+import Avatar from '../../components/Avatar/Avatar';
 
 class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
   constructor(props) {
@@ -32,7 +33,7 @@ class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
             description={gymChat.lastMessage.text}
             accessoryLeft={() =>
               gym && gym.photo ? (
-                <Avatar source={{uri: gym.photo}} size="large" />
+                <Avatar uri={gym.photo} size={50} />
               ) : (
                 getType(SessionType.GYM, 50)
               )

@@ -17,11 +17,11 @@ import {
   Text,
   List,
   ListItem,
-  Avatar,
   Layout,
   Modal,
   Card,
   Divider,
+  Avatar,
 } from '@ui-kitten/components';
 import {MyRootState} from '../../types/Shared';
 import ThemedIcon from '../ThemedIcon/ThemedIcon';
@@ -64,7 +64,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
                 title={item.username}
                 accessoryLeft={() =>
                   item.avatar ? (
-                    <Avatar source={{uri: item.avatar}} />
+                    <Avatar uri={item.avatar} size={35} />
                   ) : (
                     <ThemedIcon name="person" size={35} />
                   )
@@ -105,8 +105,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
         visible={isOpen}
         backdropStyle={globalStyles.backdrop}
         onBackdropPress={onClosed}
-        style={styles.modal}
-      >
+        style={styles.modal}>
         <Card disabled>
           <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
             {title || 'Select Pals'}

@@ -4,17 +4,11 @@ import {connect} from 'react-redux';
 import {getSimplifiedTime, sortChatsByDate} from '../../constants/utils';
 import ChatRowCount from '../../components/ChatRowCount';
 import DirectMessagesProps from '../../types/views/chat/DirectMessages';
-import {
-  Text,
-  List,
-  Layout,
-  ListItem,
-  Avatar,
-  Divider,
-} from '@ui-kitten/components';
+import {Text, List, Layout, ListItem, Divider} from '@ui-kitten/components';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 import Message from '../../types/Message';
 import {MyRootState} from '../../types/Shared';
+import Avatar from '../../components/Avatar/Avatar';
 // import  styles  from './styles/loginStyles'
 
 class DirectMessages extends Component<DirectMessagesProps> {
@@ -54,7 +48,7 @@ class DirectMessages extends Component<DirectMessagesProps> {
                 description={getLastMessageText(item.lastMessage)}
                 accessoryLeft={() =>
                   friend.avatar ? (
-                    <Avatar source={{uri: friend.avatar}} size="large" />
+                    <Avatar uri={friend.avatar} size={50} />
                   ) : (
                     <ThemedIcon size={40} name="person" />
                   )

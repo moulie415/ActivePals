@@ -58,13 +58,11 @@ import {
   List,
   Divider,
   Spinner,
-  Avatar,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
-
-const weightUp = require('../../assets/images/weightlifting_up.png');
-const weightDown = require('../../assets/images/weightlifting_down.png');
+import RepIcon from '../components/RepIcon/RepIcon';
+import Avatar from '../components/Avatar/Avatar';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -198,7 +196,7 @@ class Home extends Component<HomeProps, State> {
         style={{
           flexDirection: 'row',
           justifyContent: 'space-evenly',
-          marginTop: 5,
+          marginTop: 10,
         }}>
         {item.type !== 'video' && (
           <TouchableOpacity
@@ -214,22 +212,7 @@ class Home extends Component<HomeProps, State> {
             {/* <Text style={{color: colors.postIcon, marginLeft: 10}}>Share</Text> */}
           </TouchableOpacity>
         )}
-        <TouchableOpacity
-          onPress={() => onRepPost(item)}
-          style={{
-            flexDirection: 'row',
-            paddingHorizontal: 25,
-            alignItems: 'center',
-          }}>
-          <SlowImage
-            source={item.rep ? weightUp : weightDown}
-            style={{
-              width: 25,
-              height: 25,
-            }}
-          />
-          {/* <Text style={{color: item.rep ? colors.secondary : colors.postIcon, marginLeft: 10}}>Rep</Text> */}
-        </TouchableOpacity>
+        <RepIcon onPress={() => onRepPost(item)} active={item.rep} size={25} />
         <TouchableOpacity
           onPress={() => {
             this.setState({
@@ -693,7 +676,7 @@ class Home extends Component<HomeProps, State> {
           }}>
           <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
             {profile && avatar ? (
-              <Avatar source={{uri: avatar}} size="large" />
+              <Avatar uri={avatar} size={50} />
             ) : (
               <ThemedIcon name="person" size={50} />
             )}

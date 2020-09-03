@@ -39,10 +39,7 @@ import RepsModal from '../components/RepsModal';
 import Comment from '../types/Comment';
 import {Text, Spinner, Icon, Layout, Divider} from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
-
-const weightUp = require('../../assets/images/weightlifting_up.png');
-
-const weightDown = require('../../assets/images/weightlifting_down.png');
+import RepIcon from '../components/RepIcon/RepIcon';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -151,7 +148,7 @@ class PostView extends Component<PostViewProps, State> {
         style={{
           flexDirection: 'row',
         }}>
-          <Divider />
+        <Divider />
         <View
           style={{
             flex: 1,
@@ -172,22 +169,18 @@ class PostView extends Component<PostViewProps, State> {
             </TouchableOpacity>
           )}
           <View style={{flex: 1}}>
-            <Text style={{color: '#999', textAlign: 'center'}}>
+            <Text style={{ textAlign: 'center'}}>
               {`${item.commentCount || 0} ${
                 item.commentCount === 1 ? ' comment' : ' comments'
               }`}
             </Text>
           </View>
           <View style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
-            <TouchableOpacity onPress={() => onRepPost(item)}>
-              <SlowImage
-                source={item.rep ? weightUp : weightDown}
-                style={{
-                  width: 25,
-                  height: 25,
-                }}
-              />
-            </TouchableOpacity>
+            <RepIcon
+              onPress={() => onRepPost(item)}
+              size={25}
+              active={item.rep}
+            />
             <View style={{flex: 1}}>
               <TouchableOpacity
                 onPress={async () => {
