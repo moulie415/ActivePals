@@ -137,7 +137,7 @@ const Settings: FunctionComponent<SettingsProps> = ({
         visible={showDialog}
         backdropStyle={globalStyles.backdrop}
         onBackdropPress={() => setShowDialog(false)}>
-        <Card disabled={true}>
+        <Card disabled>
           <Text style={{textAlign: 'center'}} category="h6">
             Enter email to confirm
           </Text>

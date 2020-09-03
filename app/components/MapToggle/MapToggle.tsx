@@ -1,6 +1,6 @@
 import React, {FunctionComponent} from 'react';
-import {View, Text} from 'react-native';
-import {Toggle} from '@ui-kitten/components';
+import {View} from 'react-native';
+import {Toggle, Text} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import {SetShowMap} from '../../actions/sessions';
 import {connect} from 'react-redux';

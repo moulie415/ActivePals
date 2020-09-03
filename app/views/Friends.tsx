@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Alert, View, Platform, TouchableOpacity} from 'react-native';
 import database from '@react-native-firebase/database';
 import Image from 'react-native-fast-image';
-import Modal from 'react-native-modalbox';
 import {connect} from 'react-redux';
 import styles from '../styles/friendsStyles';
 import {getStateColor, sortByState} from '../constants/utils';
@@ -24,9 +23,12 @@ import {
   ListItem,
   Avatar,
   Input,
+  Modal,
+  Card,
 } from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
+import globalStyles from '../styles/globalStyles';
 
 interface State {
   refreshing: boolean;
@@ -241,18 +243,19 @@ class Friends extends Component<FriendsProps, State> {
           </Layout>
         )}
         <Modal
-          useNativeDriver
-          backButtonClose
-          backdropPressToClose={false}
-          style={styles.modal}
-          position="center"
-          isOpen={modalOpen}
-          key={modalOpen ? 1 : 2}>
-          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
-            Send pal request
-          </Text>
-          <Layout
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          // backButtonClose
+          //backdropPressToClose={false}
+          backdropStyle={globalStyles.backdrop}
+          onBackdropPress={() => setModal(false)}
+          //position="center"
+          visible={modalOpen}
+          //key={modalOpen ? 1 : 2}
+        >
+          <Card disabled>
+            <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
+              Send pal request
+            </Text>
+
             <Input
               underlineColorAndroid="transparent"
               autoCapitalize="none"
@@ -260,18 +263,20 @@ class Friends extends Component<FriendsProps, State> {
               value={username}
               onChangeText={(u) => this.setState({username: u})}
             />
-          </Layout>
-          <Layout
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-evenly',
-              marginBottom: 10,
-            }}>
-            <Button onPress={() => setModal(false)} status="danger">
-              Cancel
-            </Button>
-            <Button onPress={() => this.sendRequest(username)}>Submit</Button>
-          </Layout>
+            <Layout style={{flexDirection: 'row', marginTop: 10}}>
+              <Button
+                style={{margin: 5}}
+                onPress={() => setModal(false)}
+                status="danger">
+                Cancel
+              </Button>
+              <Button
+                style={{margin: 5}}
+                onPress={() => this.sendRequest(username)}>
+                Submit
+              </Button>
+            </Layout>
+          </Card>
         </Modal>
       </Layout>
     );

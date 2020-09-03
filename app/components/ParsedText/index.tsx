@@ -5,6 +5,7 @@ import database from '@react-native-firebase/database';
 import {connect} from 'react-redux';
 import str from '../../constants/strings';
 import ParsedTextProps from '../../types/components/ParsedText';
+import {MyRootState} from '../../types/Shared';
 
 const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
   text,
@@ -65,7 +66,7 @@ const CustomParsedText: FunctionComponent<ParsedTextProps> = ({
   );
 };
 
-const mapStateToProps = ({profile, friends, sharedInfo}) => ({
+const mapStateToProps = ({profile, friends, sharedInfo}: MyRootState) => ({
   profile: profile.profile,
   friends: friends.friends,
   users: sharedInfo.users,

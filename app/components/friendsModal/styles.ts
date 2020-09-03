@@ -2,7 +2,6 @@ import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   button: {
-    color: '#fff',
     alignSelf: 'center',
     padding: 5,
     paddingHorizontal: 10,
@@ -10,8 +9,6 @@ export default StyleSheet.create({
     marginVertical: 5,
   },
   modal: {
-    height: 400,
     width: '90%',
-    borderRadius: 10,
   },
 });

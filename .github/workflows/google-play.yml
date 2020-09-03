@@ -10,13 +10,12 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install npm dependencies
         run: |
-          npm install
-      - name: Run tests
-        run: |
-          npm test
+          yarn
+      # - name: Run tests
+      #   run: |
+      #     npm test
       - name: Build android aab
         run: |
-          npm run remove-uneeded
           touch .env
           echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env
           echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env

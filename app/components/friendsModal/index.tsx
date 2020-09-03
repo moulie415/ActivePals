@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Modal from 'react-native-modalbox';
 import {connect} from 'react-redux';
 import {
   View,
@@ -20,9 +19,13 @@ import {
   ListItem,
   Avatar,
   Layout,
+  Modal,
+  Card,
+  Divider,
 } from '@ui-kitten/components';
 import {MyRootState} from '../../types/Shared';
 import ThemedIcon from '../ThemedIcon/ThemedIcon';
+import globalStyles from '../../styles/globalStyles';
 
 interface State {
   selectedFriends: string[];
@@ -50,6 +53,7 @@ class FriendsModal extends Component<FriendsModalProps, State> {
     const {selectedFriends} = this.state;
     return (
       <List
+        ItemSeparatorComponent={Divider}
         data={Object.values(friends)}
         renderItem={({item}) => {
           const selected = selectedFriends.some((uid) => uid === item.uid);
@@ -98,37 +102,40 @@ class FriendsModal extends Component<FriendsModalProps, State> {
     const {selectedFriends} = this.state;
     return (
       <Modal
-        useNativeDriver
-        onClosed={onClosed}
-        isOpen={isOpen}
+        visible={isOpen}
+        backdropStyle={globalStyles.backdrop}
+        onBackdropPress={onClosed}
         style={styles.modal}
-        position="center"
-        key={isOpen ? 1 : 2}>
-        <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
-          {title || 'Select Pals'}
-        </Text>
-        {this.renderFriendsSelection()}
-        <View
-          style={{
-            marginVertical: 10,
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-          }}>
-          <Button onPress={onClosed} status="danger">
-            Cancel
-          </Button>
-          <Button
-            onPress={() => {
-              const {length} = selectedFriends;
-              if (length > 0) {
-                onContinue(selectedFriends);
-              } else {
-                Alert.alert('Sorry', 'Please select at least one friend');
-              }
+      >
+        <Card disabled>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
+            {title || 'Select Pals'}
+          </Text>
+          <Divider />
+          {this.renderFriendsSelection()}
+          <Divider />
+          <Layout
+            style={{
+              marginVertical: 10,
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
             }}>
-            Continue
-          </Button>
-        </View>
+            <Button onPress={onClosed} status="danger">
+              Cancel
+            </Button>
+            <Button
+              onPress={() => {
+                const {length} = selectedFriends;
+                if (length > 0) {
+                  onContinue(selectedFriends);
+                } else {
+                  Alert.alert('Sorry', 'Please select at least one friend');
+                }
+              }}>
+              Continue
+            </Button>
+          </Layout>
+        </Card>
       </Modal>
     );
   }

@@ -10,13 +10,12 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install npm dependencies
         run: |
-          npm install
-      - name: Run tests
-        run: |
-          npm test
+          yarn
+      # - name: Run tests
+        # run: |
+        #   npm test
       - name: Build android apk
         run: |
-          npm run remove-uneeded
           touch .env
           echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env
           echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env
@@ -30,9 +29,9 @@ jobs:
           echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
           ./gradlew assembleRelease
       - name: upload artifact to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1.1.1
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.2.2
         with:
           appId: ${{secrets.FIREBASE_ANDROID_ID}}
           token: ${{secrets.FIREBASE_TOKEN}}
-          groups: activepals
+          groups: internal
           file: android/app/build/outputs/apk/release/app-release.apk
