@@ -17,9 +17,10 @@ jobs:
       - name: Build android aab
         run: |
           touch .env
-          echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env
-          echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env
-          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env
+          touch .env.prod
+          echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env.prod
+          echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env.prod
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env.prod
           cd scripts && ENV=production ./envscript.sh
           cd .. && cd android
           echo "MYAPP_RELEASE_KEY_ALIAS=${{ secrets.MYAPP_RELEASE_KEY_ALIAS }}" >> gradle.properties
