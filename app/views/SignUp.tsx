@@ -21,7 +21,7 @@ const SignUp: FunctionComponent<SignUpProps> = ({navigation}) => {
     database()
       .ref('admins')
       .child(uid)
-      .once('value', (snapshot) => {
+      .once('value', (snapshot: any) => {
         const defaults = {
           uid,
           token,

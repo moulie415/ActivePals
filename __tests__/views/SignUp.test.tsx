@@ -1,14 +1,14 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import {shallow} from 'enzyme';
 import SignUp from '../../app/views/SignUp';
-import mockStore from '../__mocks__/mockstore';
+import {SignUpNavigationProp} from '../../app/types/views/SignUp';
 
 describe('SignUp', () => {
-  const initialState = {};
-  const store = mockStore(initialState);
   describe('Rendering', () => {
     it('should match to snapshot', () => {
-      const component = shallow(<SignUp store={store} />);
+      const component = shallow(
+        <SignUp navigation={{} as SignUpNavigationProp} />,
+      );
       expect(component).toMatchSnapshot();
     });
   });

@@ -1,17 +1,15 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import {shallow} from 'enzyme';
 import SessionChats from '../../../app/views/chat/SessionChats';
-import mockStore from '../../__mocks__/mockstore';
-import friends from '../../fixtures/friends';
-import profile from '../../fixtures/profile';
-import chats from '../../fixtures/chats';
+import {SessionChatsNavigationProp} from '../../../app/types/views/chat/SessionChats';
 
 describe('SessionChats', () => {
-  const initialState = { friends: { friends }, profile: { profile }, chats: { chats } };
-  const store = mockStore(initialState);
+
   describe('Rendering', () => {
     it('should match to snapshot', () => {
-      const component = shallow(<SessionChats store={store} />);
+      const component = shallow(
+        <SessionChats navigation={{} as SessionChatsNavigationProp} />,
+      );
       expect(component).toMatchSnapshot();
     });
   });

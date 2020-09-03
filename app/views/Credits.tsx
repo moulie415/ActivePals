@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
-import {View, Image, ScrollView} from 'react-native';
+import {View, ScrollView} from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
 import {getType} from '../constants/utils';
 import {Text, Layout} from '@ui-kitten/components';
 import {SessionType} from '../types/Session';
 import ThemedImage from '../components/ThemedImage/ThemedImage';
+import {Source} from 'react-native-fast-image';
 
 // football icon made by Christopher Schreiner @infanf http://twitter.com/infanf
 
-const renderImage = (require, size, margin) => {
+const renderImage = (require: Source, size: number, margin: number) => {
   return <ThemedImage size={size} style={{margin}} source={require} />;
 };
 
