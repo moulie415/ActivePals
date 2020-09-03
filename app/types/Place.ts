@@ -1,4 +1,4 @@
-import { Position } from './Location';
+import {Position} from './Location';
 
 export default interface Place {
   formatted_address: string;
@@ -16,12 +16,12 @@ export default interface Place {
   url: string;
   userCount?: number;
   user_ratings_total: number;
-  users: { [key: string]: boolean };
+  users: {[key: string]: boolean};
   utc_offset: string;
   vicinity: string;
   website: string;
   opening_hours: OpeningHours;
-}
+};
 
 interface OpeningHours {
   open_now: boolean;

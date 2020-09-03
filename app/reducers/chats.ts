@@ -14,9 +14,20 @@ import {
   SET_UNREAD_COUNT,
   MUTE_CHAT,
 } from '../actions/chats';
-import { SET_LOGGED_OUT } from '../actions/profile';
+import {SET_LOGGED_OUT} from '../actions/profile';
+import Chat from '../types/Chat';
+import Message from '../types/Message';
 
-const initialState = {
+export interface ChatsState {
+  sessionChats: {[key: string]: Chat};
+  chats: {[key: string]: Chat};
+  messageSessions: {[key: string]: {[key: string]: Message}};
+  unreadCount: {[key: string]: number};
+  gymChat: Chat | {};
+  muted: {[key: string]: boolean};
+}
+
+const initialState: ChatsState = {
   sessionChats: {},
   chats: {},
   messageSessions: {},
@@ -25,7 +36,7 @@ const initialState = {
   muted: {},
 };
 
-export default function(state = initialState, action) {
+export default function (state = initialState, action) {
   switch (action.type) {
     case SET_SESSION_CHATS:
       return {
@@ -35,7 +46,7 @@ export default function(state = initialState, action) {
     case ADD_SESSION_CHAT:
       return {
         ...state,
-        sessionChats: { ...state.sessionChats, [action.key]: action.session },
+        sessionChats: {...state.sessionChats, [action.key]: action.session},
       };
     case SET_CHATS:
       return {
@@ -45,12 +56,18 @@ export default function(state = initialState, action) {
     case ADD_CHAT:
       return {
         ...state,
-        chats: { ...state.chats, [action.uid]: action.chat },
+        chats: {...state.chats, [action.uid]: action.chat},
       };
     case UPDATE_CHAT:
       return {
         ...state,
-        chats: { ...state.chats, [action.id]: { ...state.chats[action.id], lastMessage: action.lastMessage } },
+        chats: {
+          ...state.chats,
+          [action.id]: {
+            ...state.chats[action.id],
+            lastMessage: action.lastMessage,
+          },
+        },
         messageSessions: {
           ...state.messageSessions,
           [action.lastMessage.chatId]: {
@@ -64,7 +81,10 @@ export default function(state = initialState, action) {
         ...state,
         sessionChats: {
           ...state.sessionChats,
-          [action.key]: { ...state.sessionChats[action.key], lastMessage: action.lastMessage },
+          [action.key]: {
+            ...state.sessionChats[action.key],
+            lastMessage: action.lastMessage,
+          },
         },
         messageSessions: {
           ...state.messageSessions,
@@ -79,7 +99,10 @@ export default function(state = initialState, action) {
         ...state,
         messageSessions: {
           ...state.messageSessions,
-          [action.id]: { ...state.messageSessions[action.id], ...action.messages },
+          [action.id]: {
+            ...state.messageSessions[action.id],
+            ...action.messages,
+          },
         },
       };
     case NEW_NOTIF:
@@ -107,7 +130,7 @@ export default function(state = initialState, action) {
     case SET_MESSAGE:
       return {
         ...state,
-        message: { url: action.url, text: action.text },
+        message: {url: action.url, text: action.text},
       };
     case RESET_MESSAGE:
       return {
@@ -117,12 +140,12 @@ export default function(state = initialState, action) {
     case SET_UNREAD_COUNT:
       return {
         ...state,
-        unreadCount: { ...state.unreadCount, [action.id]: action.count },
+        unreadCount: {...state.unreadCount, [action.id]: action.count},
       };
     case MUTE_CHAT:
       return {
         ...state,
-        muted: { ...state.muted, [action.id]: action.mute },
+        muted: {...state.muted, [action.id]: action.mute},
       };
     case SET_LOGGED_OUT: {
       return initialState;

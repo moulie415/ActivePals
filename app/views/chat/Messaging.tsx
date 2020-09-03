@@ -1,22 +1,14 @@
-import React, { Component } from 'react';
-import { Alert, Platform, TouchableOpacity, View, BackHandler, Keyboard } from 'react-native';
-import { pathOr } from 'ramda';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { PulseIndicator } from 'react-native-indicators';
-import firebase from 'react-native-firebase';
-import ImagePicker, { ImagePickerOptions } from 'react-native-image-picker';
+import React, {Component} from 'react';
+import {Alert, TouchableOpacity, View, BackHandler} from 'react-native';
+import database from '@react-native-firebase/database';
+import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
-import { isIphoneX } from 'react-native-iphone-x-helper';
-import { GiftedChat, Bubble, MessageText } from 'react-native-gifted-chat';
-import { connect } from 'react-redux';
-import Text from '../../components/Text';
-import colors from '../../constants/colors';
+import {GiftedChat, Bubble, MessageText} from 'react-native-gifted-chat';
+import {connect} from 'react-redux';
 import globalStyles from '../../styles/globalStyles';
-import Header from '../../components/Header/header';
-import { guid, sortMessagesByCreatedAt } from '../../constants/utils';
+import {guid, sortMessagesByCreatedAt} from '../../constants/utils';
 import str from '../../constants/strings';
-// import EmojiInput from 'react-native-emoji-input'
-import { sendRequest, acceptRequest } from '../../actions/friends';
+import {sendRequest, acceptRequest} from '../../actions/friends';
 import {
   fetchMessages,
   fetchSessionMessages,
@@ -27,23 +19,29 @@ import {
   updateLastMessage,
 } from '../../actions/chats';
 import MessagingProps from '../../types/views/Messaging';
-import Message, { MessageType, SessionType } from '../../types/Message';
+import Message, {MessageType, SessionType} from '../../types/Message';
+import {Text, Spinner, Layout} from '@ui-kitten/components';
+import {
+  MyRootState,
+  MyThunkDispatch,
+  PushNotificationData,
+} from '../../types/Shared';
+import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
+import moment from 'moment';
+import Profile from '../../types/Profile';
 
 interface State {
   spinner: boolean;
   showLoadEarlier: boolean;
-  showEmojiKeyboard?: boolean;
   messages: Message[];
   amount: number;
   text?: string;
 }
 
 class Messaging extends Component<MessagingProps, State> {
-  keyboardDidShowListener;
-
   constructor(props) {
     super(props);
-    const { messageSession } = this.props;
+    const {messageSession} = this.props;
     this.state = {
       messages: messageSession ? Object.values(messageSession) : [],
       spinner: false,
@@ -53,26 +51,25 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   componentDidMount() {
-    const { navigation, unreadCount, onResetUnreadCount } = this.props;
-    const { params } = navigation.state;
-    const { gymId, friendUid, session } = params;
+    const {unreadCount, onResetUnreadCount, route} = this.props;
+
+    const {gymId, friendUid, sessionId} = route.params;
     BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this));
     this.loadMessages();
-    const id = friendUid || session || gymId;
-    const count = unreadCount[id];
-    if (count && count > 0) {
-      onResetUnreadCount(id);
+    const id = friendUid || sessionId || gymId;
+    if (id) {
+      const count = unreadCount[id];
+      if (count && count > 0) {
+        onResetUnreadCount(id);
+      }
     }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const { navigation, profile, onResetMessage, resetNotif } = this.props;
-    const { params } = navigation.state;
-    const { friendUid, gymId } = params;
-    const session = pathOr({}, ['session'], params);
-    const { key: sessionId } = session;
-    const { messages } = this.state;
+    const {profile, onResetMessage, resetNotif, route} = this.props;
+
+    const {friendUid, gymId, sessionId} = route.params;
+    const {messages} = this.state;
     // message it populated when an attachment is sent
     if (nextProps.message) {
       const message = {
@@ -91,10 +88,13 @@ class Messaging extends Component<MessagingProps, State> {
       onResetMessage();
     }
     if (nextProps.messageSession) {
-      const { messageSession }: { [key: string]: Message } = nextProps;
-      this.setState({ messages: Object.values(messageSession), spinner: false });
-      if (messageSession && Object.values(messageSession).some(message => message._id === 1)) {
-        this.setState({ showLoadEarlier: false });
+      const {messageSession}: {[key: string]: Message} = nextProps;
+      this.setState({messages: Object.values(messageSession), spinner: false});
+      if (
+        messageSession &&
+        Object.values(messageSession).some((message) => message._id === 1)
+      ) {
+        this.setState({showLoadEarlier: false});
       }
     }
     if (nextProps.notif) {
@@ -113,26 +113,36 @@ class Messaging extends Component<MessagingProps, State> {
         image,
         sessionType,
       } = nextProps.notif;
-      if (type === MessageType.MESSAGE || type === MessageType.SESSION_MESSAGE || type === MessageType.GYM_MESSAGE) {
+      if (
+        type === MessageType.MESSAGE ||
+        type === MessageType.SESSION_MESSAGE ||
+        type === MessageType.GYM_MESSAGE
+      ) {
         const date = new Date(createdAt);
         const message = {
           createdAt: date,
           _id,
           text: body,
-          user: { _id: uid, name: username, avatar },
+          user: {_id: uid, name: username, avatar},
           image,
           type,
           sessionType,
         };
         if (
           (type === MessageType.MESSAGE && friendUid === uid) ||
-          (type === MessageType.SESSION_MESSAGE && messageSessionId === sessionId && profile.uid !== uid) ||
-          (type === MessageType.GYM_MESSAGE && messageGymId === gymId && profile.uid !== uid)
+          (type === MessageType.SESSION_MESSAGE &&
+            messageSessionId === sessionId &&
+            profile.uid !== uid) ||
+          (type === MessageType.GYM_MESSAGE &&
+            messageGymId === gymId &&
+            profile.uid !== uid)
         ) {
           // check if its a dupe
-          if (!messages.some(msg => msg._id === message._id)) {
-            this.setState(previousState => ({
-              messages: previousState.messages ? [...previousState.messages, message] : [message],
+          if (!messages.some((msg) => msg._id === message._id)) {
+            this.setState((previousState) => ({
+              messages: previousState.messages
+                ? [...previousState.messages, message]
+                : [message],
             }));
           }
         }
@@ -141,61 +151,74 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', () => this.onBackPress());
-    this.keyboardDidShowListener.remove();
+    BackHandler.removeEventListener('hardwareBackPress', () =>
+      this.onBackPress(),
+    );
   }
 
   onBackPress() {
-    const { navigation, onResetUnreadCount, unreadCount } = this.props;
-    const { params } = navigation.state;
-    const { gymId, friendUid, sessionId } = params;
-    const { showEmojiKeyboard } = this.state;
-    if (showEmojiKeyboard) {
-      this.setState({ showEmojiKeyboard: false });
-    } else {
-      navigation.goBack();
-      const id = friendUid || sessionId || gymId;
+    const {navigation, onResetUnreadCount, unreadCount, route} = this.props;
+    const {gymId, friendUid, sessionId} = route.params;
+
+    navigation.goBack();
+    const id = friendUid || sessionId || gymId;
+    if (id) {
       const count = unreadCount[id];
       if (count && count > 0) {
         onResetUnreadCount(id);
       }
     }
+
     return true;
   }
 
   async onSend(messages: Message[] = []) {
-    const { navigation, gym, onUpdateLastMessage } = this.props;
-    const { params } = navigation.state;
-    const { friendUid, gymId, session, chatId } = params;
+    const {gym, onUpdateLastMessage, route, sessions} = this.props;
+    const {friendUid, gymId, sessionId, chatId} = route.params;
+    const session = sessions[sessionId];
     // make messages database friendly
-    const converted = messages.map(message => {
+    const converted = messages.map((message) => {
       const type = this.getType();
+      const createdAt = moment().utc().valueOf();
+
       if (session) {
-        const { key: sessionId, title: sessionTitle } = session;
-        const sessionType: SessionType = session.private ? 'privateSessions' : 'sessions';
-        return { ...message, sessionTitle, sessionId, sessionType, type };
+        const {title: sessionTitle} = session;
+        const sessionType: SessionType = session.private
+          ? 'privateSessions'
+          : 'sessions';
+        return {
+          ...message,
+          createdAt,
+          sessionTitle,
+          sessionId,
+          sessionType,
+          type,
+        };
       }
       if (gymId) {
-        const { name } = gym;
-        return { ...message, gymId, gymName: name, type };
+        const {name} = gym;
+        return {...message, createdAt, gymId, gymName: name, type};
       }
-      return { ...message, chatId, friendUid, type };
+      return {...message, createdAt, chatId, friendUid, type};
     });
 
     const ref = this.getDbRef();
 
     try {
-      await ref.push(...converted);
-      this.setState(previousState => ({
+      const dbFriendly = converted.map((msg) => {
+        return {...msg, createdAt: moment(msg.createdAt).utc().format()};
+      });
+      await ref.push(...dbFriendly);
+      this.setState((previousState) => ({
         messages: [...previousState.messages, ...messages],
       }));
 
       if (session) {
-        onUpdateLastMessage({ ...converted[0] });
+        onUpdateLastMessage({...converted[0]});
       } else if (gymId) {
-        onUpdateLastMessage({ ...converted[0] });
+        onUpdateLastMessage({...converted[0]});
       } else {
-        onUpdateLastMessage({ ...converted[0] });
+        onUpdateLastMessage({...converted[0]});
       }
     } catch (e) {
       Alert.alert('Error sending message', e.message);
@@ -203,10 +226,9 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   getType() {
-    const { navigation } = this.props;
-    const { params } = navigation.state;
-    const { gymId, session } = params;
-    if (session) {
+    const {route} = this.props;
+    const {gymId, sessionId} = route.params;
+    if (sessionId) {
       return MessageType.SESSION_MESSAGE;
     }
     if (gymId) {
@@ -216,63 +238,61 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   getDbRef() {
-    const { navigation } = this.props;
-    const { params } = navigation.state;
-    const { gymId, session, chatId } = params;
-    if (session) {
-      return firebase
-        .database()
-        .ref('sessionChats')
-        .child(session.key);
+    const {route} = this.props;
+    const {gymId, sessionId, chatId} = route.params;
+    if (sessionId) {
+      return database().ref('sessionChats').child(sessionId);
     }
     if (gymId) {
-      return firebase
-        .database()
-        .ref('gymChats')
-        .child(gymId);
+      return database().ref('gymChats').child(gymId);
     }
-    return firebase
-      .database()
-      .ref('chats')
-      .child(chatId);
+    if (chatId) {
+      return database().ref('chats').child(chatId);
+    }
   }
 
   getRightHandIcon() {
-    const { navigation } = this.props;
-    const { params } = navigation.state;
-    const { gymId, session } = params;
+    const {navigation, route, sessions} = this.props;
+    const {gymId, sessionId} = route.params;
     if (gymId) {
       return (
-        <TouchableOpacity onPress={() => navigation.navigate('Gym', { id: gymId })}>
-          <Icon size={25} name="md-information-circle" style={{ color: '#fff' }} />
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Gym', {id: gymId})}>
+          <ThemedIcon size={25} name="info" />
         </TouchableOpacity>
       );
     }
-    if (session) {
-      const { key, private: isPrivate } = session;
-      return (
-        <TouchableOpacity onPress={() => navigation.navigate('SessionInfo', { sessionId: key, isPrivate })}>
-          <Icon size={25} name="md-information-circle" style={{ color: '#fff' }} />
-        </TouchableOpacity>
-      );
+    if (sessionId) {
+      const session = sessions[sessionId];
+      if (session) {
+        const {key, private: isPrivate} = session;
+        return (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('SessionInfo', {sessionId: key, isPrivate})
+            }>
+            <ThemedIcon size={25} name="info" />
+          </TouchableOpacity>
+        );
+      }
     }
     return null;
   }
 
-  keyboardDidShow() {
-    if (Platform.OS === 'ios') {
-      this.setState({ showEmojiKeyboard: false });
-    }
-  }
-
   loadMessages(endAt?: string) {
-    const { navigation, getSessionMessages, getGymMessages, getMessages } = this.props;
-    const { amount } = this.state;
-    const { params } = navigation.state;
-    const { friendUid, gymId, session, chatId } = params;
-    this.setState({ spinner: true });
+    const {
+      getSessionMessages,
+      getGymMessages,
+      getMessages,
+      route,
+      sessions,
+    } = this.props;
+    const {amount} = this.state;
+    const {friendUid, gymId, sessionId, chatId} = route.params;
+    const session = sessions[sessionId];
+    this.setState({spinner: true});
     if (session) {
-      const { key, private: isPrivate } = session;
+      const {key, private: isPrivate} = session;
       getSessionMessages(key, amount, isPrivate, endAt);
     } else if (gymId) {
       getGymMessages(gymId, amount, endAt);
@@ -282,14 +302,14 @@ class Messaging extends Component<MessagingProps, State> {
   }
 
   showPicker() {
-    const { navigation } = this.props;
-    const { text } = this.state;
+    const {navigation} = this.props;
+    const {text} = this.state;
     const videoOptions: ImagePickerOptions = {
       mediaType: 'video',
       durationLimit: 30,
     };
     const options: ImagePickerOptions = {
-      title: null,
+      title: '',
       mediaType: 'photo',
       // customButtons: [
       // {name: 'video', title: 'Shoot video (coming soon)'},
@@ -300,88 +320,103 @@ class Messaging extends Component<MessagingProps, State> {
         skipBackup: true,
       },
     };
-    ImagePicker.showImagePicker(options, async response => {
-      this.setState({ spinner: true });
+    ImagePicker.showImagePicker(options, async (response) => {
+      this.setState({spinner: true});
       console.log('Response = ', response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
-        this.setState({ spinner: false });
+        this.setState({spinner: false});
       } else if (response.error) {
         Alert.alert('Error', response.error);
-        this.setState({ spinner: false });
+        this.setState({spinner: false});
       } else if (response.customButton) {
         if (response.customButton === 'uploadVideo') {
-          ImagePicker.launchImageLibrary(videoOptions, imageResponse => {
+          ImagePicker.launchImageLibrary(videoOptions, (imageResponse) => {
             if (imageResponse.error) {
               Alert.alert('Error', imageResponse.error);
-              this.setState({ spinner: false });
+              this.setState({spinner: false});
             }
           });
         } else if (response.customButton === 'video') {
-          ImagePicker.launchCamera(videoOptions, videoResponse => {
+          ImagePicker.launchCamera(videoOptions, (videoResponse) => {
             if (videoResponse.error) {
               Alert.alert('Error', videoResponse.error);
-              this.setState({ spinner: false });
+              this.setState({spinner: false});
             }
           });
         }
       } else {
         const size = 720;
         try {
-          const resized = await ImageResizer.createResizedImage(response.uri, size, size, 'JPEG', 100);
-          this.setState({ spinner: false });
-          navigation.navigate('FilePreview', { type: 'image', uri: resized.uri, message: true, text });
+          const resized = await ImageResizer.createResizedImage(
+            response.uri,
+            size,
+            size,
+            'JPEG',
+            100,
+          );
+          this.setState({spinner: false});
+          navigation.navigate('FilePreview', {
+            type: 'image',
+            uri: resized.uri,
+            message: true,
+            text,
+          });
         } catch (e) {
           Alert.alert('Error', e.message);
-          this.setState({ spinner: false });
+          this.setState({spinner: false});
         }
       }
     });
   }
 
-  async openChat(user) {
-    const { profile, navigation } = this.props;
-    const snapshot = await firebase
-      .database()
+  async openChat(user: Profile) {
+    const {profile, navigation} = this.props;
+    const snapshot = await database()
       .ref(`userChats/${profile.uid}`)
       .child(user.uid)
       .once('value');
     if (snapshot.val()) {
-      navigation.navigate('Messaging', { chatId: snapshot.val(), friendUsername: user.username, friendUid: user.uid });
+      navigation.navigate('Messaging', {
+        chatId: snapshot.val(),
+        friendUsername: user.username,
+        friendUid: user.uid,
+      });
     }
   }
 
   render() {
-    const { navigation, gym, profile, friends, users } = this.props;
-    const { messages, showLoadEarlier, spinner, text } = this.state;
-    const { params } = navigation.state;
-    const { friendUsername, session } = params;
+    const {navigation, profile, friends, users} = this.props;
+    const {messages, showLoadEarlier, spinner, text} = this.state;
+
     return (
-      <View style={{ flex: 1, backgroundColor: '#9993' }}>
-        <Header
-          hasBack
-          title={friendUsername || (session && session.title) || (gym && gym.name)}
-          right={this.getRightHandIcon()}
-        />
+      <Layout style={{flex: 1}}>
         <GiftedChat
           text={text}
-          onInputTextChanged={input => this.setState({ text: input })}
-          messages={sortMessagesByCreatedAt(messages)}
-          onSend={msgs => {
+          onInputTextChanged={(input) => this.setState({text: input})}
+          messages={messages}
+          inverted={false}
+          onSend={(msgs) => {
             if (profile.username) {
               this.onSend(msgs);
             } else {
-              Alert.alert('Username not set', 'You need a username before sending messages, go to your profile now?', [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'OK', onPress: () => navigation.navigate('Profile') },
-              ]);
+              Alert.alert(
+                'Username not set',
+                'You need a username before sending messages, go to your profile now?',
+                [
+                  {text: 'Cancel', style: 'cancel'},
+                  {text: 'OK', onPress: () => navigation.navigate('Profile')},
+                ],
+              );
             }
           }}
-          onPressAvatar={user => navigation.navigate('ProfileView', { uid: user._id })}
+          onPressAvatar={(user) =>
+            navigation.navigate('ProfileView', {uid: user._id})
+          }
           onLoadEarlier={() => {
             const sorted = sortMessagesByCreatedAt(messages);
             const endAt = sorted[sorted.length - 1].key;
-            this.setState({ spinner: true }, () => this.loadMessages(endAt));
+            this.setState({spinner: true}, () => this.loadMessages(endAt));
           }}
           loadEarlier={messages && messages.length > 14 && showLoadEarlier}
           user={{
@@ -389,33 +424,26 @@ class Messaging extends Component<MessagingProps, State> {
             name: profile.username,
             avatar: profile.avatar,
           }}
-          renderBubble={props => {
-            return (
-              <Bubble
-                {...props}
-                // @ts-ignore
-                wrapperStyle={{
-                  right: {
-                    backgroundColor: colors.secondary,
-                    ...globalStyles.bubbleShadow,
-                  },
-                  left: {
-                    ...globalStyles.bubbleShadow,
-                  },
-                }}
-              />
-            );
+          renderBubble={(props) => {
+            return <Bubble {...props} />;
           }}
-          renderMessageText={props => {
+          renderMessageText={(props) => {
             // @ts-ignore
-            const { previousMessage, currentMessage, position } = props;
+            const {previousMessage, currentMessage, position} = props;
             return (
               <View>
                 {((previousMessage.user &&
                   position === 'left' &&
                   previousMessage.user._id !== currentMessage.user._id) ||
-                  (!previousMessage.user && currentMessage.user && position === 'left')) && (
-                  <Text style={{ color: colors.secondary, fontSize: 12, padding: 10, paddingBottom: 0 }}>
+                  (!previousMessage.user &&
+                    currentMessage.user &&
+                    position === 'left')) && (
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      padding: 10,
+                      paddingBottom: 0,
+                    }}>
                     {props.currentMessage.user.name}
                   </Text>
                 )}
@@ -425,47 +453,40 @@ class Messaging extends Component<MessagingProps, State> {
           }}
           renderActions={() => {
             return (
-              <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity
-                  onPress={() => this.showPicker()}
-                  style={{ marginLeft: isIphoneX() ? 10 : 0, padding: 5, paddingLeft: 15, paddingRight: 10 }}
-                >
-                  <Icon size={25} name="ios-attach" style={{ color: colors.secondary }} />
-                </TouchableOpacity>
-                {/* <TouchableOpacity 
-                style={{padding: 5}}
-                onPress={() => {
-                  this.setState({showEmojiKeyboard: !this.state.showEmojiKeyboard})
-                  Keyboard.dismiss()
-                  }}>
-                  <Icon name="md-happy" style={{color: colors.secondary, marginTop: Platform.OS == 'ios' ? 0 : -1}}/>
-                </TouchableOpacity> */}
-              </View>
+              <TouchableOpacity onPress={() => this.showPicker()}>
+                <ThemedIcon size={25} name="attach-2" />
+              </TouchableOpacity>
             );
           }}
           // @ts-ignore
-          parsePatterns={linkStyle => [
+          parsePatterns={(linkStyle) => [
             {
               pattern: str.mentionRegex,
               style: linkStyle,
-              onPress: async mention => {
+              onPress: async (mention) => {
                 const name = mention.substring(1);
-                const combined = [...Object.values(friends), ...Object.values(users)];
+                const combined = [
+                  ...Object.values(friends),
+                  ...Object.values(users),
+                ];
                 if (name === profile.username) {
                   navigation.navigate('Profile');
                 } else {
-                  const found = combined.find(friend => friend.username === name);
+                  const found = combined.find(
+                    (friend) => friend.username === name,
+                  );
                   if (found) {
-                    navigation.navigate('ProfileView', { uid: found.uid });
+                    navigation.navigate('ProfileView', {uid: found.uid});
                   } else {
                     try {
-                      const snapshot = await firebase
-                        .database()
+                      const snapshot = await database()
                         .ref('usernames')
                         .child(name)
                         .once('value');
                       if (snapshot.val()) {
-                        navigation.navigate('ProfileView', { uid: snapshot.val() });
+                        navigation.navigate('ProfileView', {
+                          uid: snapshot.val(),
+                        });
                       }
                     } catch (e) {
                       console.warn(e.message);
@@ -476,25 +497,19 @@ class Messaging extends Component<MessagingProps, State> {
             },
           ]}
         />
-        {/* this.state.showEmojiKeyboard &&  <EmojiInput
-          enableSearch={Platform.OS == 'android'}
-              onEmojiSelected={(emoji) => {
-                  this.setState({text: this.state.text += emoji.char})
-                }}
-            /> */}
         {spinner && (
-          <View style={globalStyles.indicator}>
-            <PulseIndicator color={colors.secondary} />
-          </View>
+          <Layout style={globalStyles.indicator}>
+            <Spinner />
+          </Layout>
         )}
-      </View>
+      </Layout>
     );
   }
 }
 
-const fetchId = params => {
-  if (params.session) {
-    return params.session.key;
+const fetchId = (params) => {
+  if (params.sessionId) {
+    return params.sessionId;
   }
   if (params.gymId) {
     return params.gymId;
@@ -502,7 +517,10 @@ const fetchId = params => {
   return params.chatId;
 };
 
-const mapStateToProps = ({ friends, profile, chats, sharedInfo }, ownProps) => ({
+const mapStateToProps = (
+  {friends, profile, chats, sharedInfo, sessions}: MyRootState,
+  ownProps,
+) => ({
   friends: friends.friends,
   users: sharedInfo.users,
   profile: profile.profile,
@@ -511,21 +529,31 @@ const mapStateToProps = ({ friends, profile, chats, sharedInfo }, ownProps) => (
   chats: chats.chats,
   message: chats.message,
   gymChat: chats.gymChat,
-  messageSession: chats.messageSessions[fetchId(ownProps.navigation.state.params)],
+  messageSession: chats.messageSessions[fetchId(ownProps.route.params)],
   notif: chats.notif,
   unreadCount: chats.unreadCount,
+  sessions: {...sessions.sessions, ...sessions.privateSessions},
 });
 
-const mapDispatchToProps = dispatch => ({
-  onUpdateLastMessage: message => dispatch(updateLastMessage(message)),
-  onRequest: friendUid => dispatch(sendRequest(friendUid)),
-  onAccept: (uid, friendUid) => dispatch(acceptRequest(uid, friendUid)),
-  getMessages: (id, amount, uid, endAt) => dispatch(fetchMessages(id, amount, uid, endAt)),
-  getSessionMessages: (id, amount, isPrivate, endAt) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
-  getGymMessages: (id, amount, endAt) => dispatch(fetchGymMessages(id, amount, endAt)),
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
+  onUpdateLastMessage: (message: PushNotificationData) =>
+    dispatch(updateLastMessage(message)),
+  onRequest: (friendUid: string) => dispatch(sendRequest(friendUid)),
+  onAccept: (uid: string, friendUid: string) =>
+    dispatch(acceptRequest(uid, friendUid)),
+  getMessages: (id: string, amount: number, uid: string, endAt: string) =>
+    dispatch(fetchMessages(id, amount, uid, endAt)),
+  getSessionMessages: (
+    id: string,
+    amount: number,
+    isPrivate: boolean,
+    endAt: string,
+  ) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
+  getGymMessages: (id: string, amount: number, endAt: string) =>
+    dispatch(fetchGymMessages(id, amount, endAt)),
   resetNotif: () => dispatch(resetNotification()),
   onResetMessage: () => dispatch(resetMessage()),
-  onResetUnreadCount: id => dispatch(resetUnreadCount(id)),
+  onResetUnreadCount: (id: string) => dispatch(resetUnreadCount(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Messaging);

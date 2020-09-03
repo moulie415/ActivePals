@@ -1,39 +1,49 @@
-import firebase from 'react-native-firebase';
-import { upUnreadCount, fetchUsers } from './home';
-import Profile, { UserState } from '../types/Profile';
-import { fetchOther } from './profile';
+import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
+import {upUnreadCount, fetchUsers} from './home';
+import Profile, {UserState} from '../types/Profile';
+import {fetchOther} from './profile';
+import {MyThunkDispatch, MyThunkResult} from '../types/Shared';
 
 export const SET_FRIENDS = 'SET_FRIENDS';
 export const SET_FRIEND = 'SET_FRIEND';
 export const ADD_FRIEND = 'ADD_FRIEND';
 export const UPDATE_FRIEND_STATE = 'UPDATE_FRIEND_STATE';
+export const SET_MODAL = 'SET_MODAL';
 
-const setFriends = friends => ({
+const setFriends = (friends) => ({
   type: SET_FRIENDS,
   friends,
 });
 
-const setFriend = friend => ({
+const setFriend = (friend) => ({
   type: SET_FRIEND,
   friend,
 });
 
-const addToFriends = (uid, friend) => ({
+const addToFriends = (uid: string, friend) => ({
   type: ADD_FRIEND,
   uid,
   friend,
 });
 
-export const updateFriendState = (uid, state) => ({
+export const updateFriendState = (uid: string, state: UserState) => ({
   type: UPDATE_FRIEND_STATE,
   uid,
   state,
 });
 
-export const removeFriend = (uid: string) => {
-  return (dispatch, getState) => {
-    const { friends }: { [key: string]: Profile } = getState().friends;
-    const friendArr = Object.values(friends).filter(friend => friend.uid !== uid);
+export const SetModal = (open: boolean) => ({
+  type: SET_MODAL,
+  open,
+});
+
+export const removeFriend = (uid: string): MyThunkResult<void> => {
+  return (dispatch: MyThunkDispatch, getState) => {
+    const {friends}: {[key: string]: Profile} = getState().friends;
+    const friendArr = Object.values(friends).filter(
+      (friend) => friend.uid !== uid,
+    );
     const obj = friendArr.reduce((acc, cur, i) => {
       acc[cur.uid] = cur;
       return acc;
@@ -42,7 +52,7 @@ export const removeFriend = (uid: string) => {
   };
 };
 
-const getStateString = state => {
+const getStateString = (state: UserState) => {
   if (state && state !== UserState.AWAY) {
     return UserState.ONLINE;
   }
@@ -52,49 +62,41 @@ const getStateString = state => {
   return UserState.AWAY;
 };
 
-export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
-  return async (dispatch, getState) => {
-    const ref = firebase
-      .database()
-      .ref('userFriends')
-      .child(uid)
-      .limitToLast(limit);
-    await ref.on('value', async snapshot => {
+export const fetchFriends = (
+  uid: string,
+  limit = 10,
+  startAt?: string,
+): MyThunkResult<Promise<void>> => {
+  return async (dispatch: MyThunkDispatch, getState) => {
+    const ref = database().ref('userFriends').child(uid).limitToLast(limit);
+    await ref.on('value', async (snapshot) => {
       if (snapshot.val()) {
-        const { friends } = getState().friends;
-        Object.keys(friends).forEach(friend => {
+        const {friends} = getState().friends;
+        Object.keys(friends).forEach((friend) => {
           if (!snapshot.val()[friend]) {
             dispatch(removeFriend(friend));
           }
         });
         const uids = Object.keys(snapshot.val());
         await Promise.all(
-          uids.map(friendUid => {
-            return new Promise(resolve => {
+          uids.map((friendUid) => {
+            return new Promise((resolve) => {
               const status = snapshot.val()[friendUid];
-              firebase
-                .database()
+              database()
                 .ref('users')
                 .child(friendUid)
-                .on('value', async profile => {
+                .on('value', async (profile) => {
                   if (profile.val()) {
-                    const { state } = profile.val();
+                    const {state} = profile.val();
                     const userState = getStateString(state);
-                    try {
-                      const avatar = await firebase
-                        .storage()
-                        .ref(`images/${friendUid}`)
-                        .child('avatar')
-                        .getDownloadURL();
-                      dispatch(setFriend({ ...profile.val(), state: userState, avatar, status }));
-                    } catch (e) {
-                      dispatch(setFriend({ ...profile.val(), state: userState, status }));
-                    }
+                    dispatch(
+                      setFriend({...profile.val(), state: userState, status}),
+                    );
                     resolve();
                   }
                 });
             });
-          })
+          }),
         );
         dispatch(fetchOther(uid));
       } else {
@@ -105,45 +107,36 @@ export const fetchFriends = (uid: string, limit = 10, startAt?: string) => {
   };
 };
 
-export const sendRequest = friendUid => {
-  return async (dispatch, getState) => {
-    const { uid } = getState().profile.profile;
-    const promise1 = firebase
-      .database()
+export const sendRequest = (
+  friendUid: string,
+): MyThunkResult<Promise<void>> => {
+  return async (dispatch: MyThunkDispatch, getState) => {
+    const {uid} = getState().profile.profile;
+    const promise1 = database()
       .ref(`userFriends/${uid}`)
       .child(friendUid)
       .set('outgoing');
-    const promise2 = firebase
-      .database()
+    const promise2 = database()
       .ref(`userFriends/${friendUid}`)
       .child(uid)
       .set('incoming');
     await Promise.all([promise1, promise2]);
     const date = new Date().toString();
-    const ref = firebase
-      .database()
-      .ref('notifications')
-      .push();
-    const { key } = ref;
-    await ref.set({ date, uid, type: 'friendRequest' });
-    firebase
-      .database()
-      .ref(`userNotifications/${friendUid}`)
-      .child(key)
-      .set(true);
+    const ref = database().ref('notifications').push();
+    const {key} = ref;
+    await ref.set({date, uid, type: 'friendRequest'});
+    database().ref(`userNotifications/${friendUid}`).child(key).set(true);
     upUnreadCount(friendUid);
   };
 };
 
-export const acceptRequest = (uid, friendUid) => {
-  return dispatch => {
-    const promise1 = firebase
-      .database()
+export const acceptRequest = (uid: string, friendUid: string) => {
+  return () => {
+    const promise1 = database()
       .ref(`userFriends/${uid}`)
       .child(friendUid)
       .set('connected');
-    const promise2 = firebase
-      .database()
+    const promise2 = database()
       .ref(`userFriends/${friendUid}`)
       .child(uid)
       .set('connected');
@@ -151,34 +144,31 @@ export const acceptRequest = (uid, friendUid) => {
   };
 };
 
-export const deleteFriend = uid => {
-  return (dispatch, getState) => {
+export const deleteFriend = (uid: string): MyThunkResult<Promise<void>> => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const you = getState().profile.profile.uid;
     dispatch(removeFriend(uid));
-    return firebase
-      .database()
-      .ref(`userFriends/${you}`)
-      .child(uid)
-      .remove();
+    return database().ref(`userFriends/${you}`).child(uid).remove();
   };
 };
 
 export const fetchFbFriends = (token: string) => {
-  return async dispatch => {
-    const response = await fetch(`https://graph.facebook.com/v5.0/me?fields=friends&access_token=${token}`);
+  return async (dispatch: MyThunkDispatch) => {
+    const response = await fetch(
+      `https://graph.facebook.com/v5.0/me?fields=friends&access_token=${token}`,
+    );
     const json = await response.json();
     if (json.friends && json.friends.data) {
       const uids: string[] = await Promise.all(
-        json.friends.data.map(async friend => {
-          const snapshot = await firebase
-            .database()
+        json.friends.data.map(async (friend) => {
+          const snapshot = await database()
             .ref('fbusers')
             .child(friend.id)
             .once('value');
           return snapshot.val();
-        })
+        }),
       );
-      const validUids = uids.filter(uid => uid != null);
+      const validUids = uids.filter((uid) => uid !== null);
       return dispatch(fetchUsers(validUids)) || {};
     }
     return {};

@@ -1,33 +1,37 @@
-import React, { Component, createRef, RefObject } from 'react';
+import React, {Component, createRef, RefObject} from 'react';
 import {
   View,
   TouchableWithoutFeedback,
   Platform,
-  TextInput,
   KeyboardAvoidingView,
   Keyboard,
   Alert,
-  FlatList,
   TouchableOpacity,
   SafeAreaView,
   Image as SlowImage,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import firebase, { RNFirebase } from 'react-native-firebase';
+import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 import Video from 'react-native-video';
 import Image from 'react-native-fast-image';
-import { PulseIndicator } from 'react-native-indicators';
-import { connect } from 'react-redux';
-import Text from '../components/Text';
-import colors from '../constants/colors';
-import { getMentionsList, guid } from '../constants/utils';
+import {connect} from 'react-redux';
+
+import {getMentionsList, guid} from '../constants/utils';
 import sStyles from '../styles/settingsStyles';
 import styles from '../styles/homeStyles';
-import { addPost } from '../actions/home';
-import { setMessage } from '../actions/chats';
+import {addPost} from '../actions/home';
+import {setMessage} from '../actions/chats';
 import FilePreviewProps from '../types/views/FilePreview';
-import { TaskEvent, TaskState } from '../types/Shared';
+import {
+  TaskEvent,
+  TaskState,
+  MyRootState,
+  MyThunkDispatch,
+} from '../types/Shared';
 import Profile from '../types/Profile';
+import {Text, List, Divider, Spinner, Input} from '@ui-kitten/components';
+import Post, {PostType} from '../types/Post';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 
 interface State {
   paused: boolean;
@@ -42,33 +46,26 @@ class FilePreview extends Component<FilePreviewProps, State> {
 
   constructor(props) {
     super(props);
-    const { navigation } = this.props;
-    const { params } = navigation.state;
+    const {text} = this.props.route.params;
     this.player = createRef<Video>();
     this.state = {
       paused: true,
-      text: params.text,
+      text: text || '',
       spinner: false,
       mentionList: [],
     };
   }
 
   componentDidMount() {
-    const { navigation } = this.props;
-    const { type } = navigation.state.params;
+    const {type} = this.props.route.params;
     if (type === 'video' && this.player.current) {
       this.player.current.presentFullscreenPlayer();
       this.player.current.seek(0);
     }
   }
 
-  static navigationOptions = {
-    headerShown: false,
-  };
-
   previewView() {
-    const { navigation } = this.props;
-    const { type } = navigation.state.params;
+    const {type} = this.props.route.params;
     if (type === 'video') {
       return this.renderVideo();
     }
@@ -78,28 +75,29 @@ class FilePreview extends Component<FilePreviewProps, State> {
     return null;
   }
 
-  uploadImage(uri, mime = 'application/octet-stream'): Promise<{ url: string; id: string }> {
+  uploadImage(
+    uri: string,
+    mime = 'application/octet-stream',
+  ): Promise<{url: string; id: string}> {
     const {
-      navigation,
-      profile: { uid },
+      profile: {uid},
     } = this.props;
-    const { type, message } = navigation.state.params;
+    const {type, message} = this.props.route.params;
     const mimeType = type === 'video' ? 'video/mp4' : mime;
     const imagePath = message ? '/messages' : '/photos';
-    const ref = type === 'image' ? `images/${uid}${imagePath}` : `videos/${uid}`;
+    const ref =
+      type === 'image' ? `images/${uid}${imagePath}` : `videos/${uid}`;
     return new Promise((resolve, reject) => {
       // const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       const id = guid();
-      const imageRef = firebase
-        .storage()
-        .ref(ref)
-        .child(id);
+      const imageRef = storage().ref(ref).child(id);
 
-      imageRef.putFile(uri, { contentType: mimeType }).on(
+      imageRef.putFile(uri, {contentType: mimeType}).on(
         TaskEvent.STATE_CHANGED,
-        snapshot => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          this.setState({ progress });
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          this.setState({progress});
           switch (snapshot.state) {
             case TaskState.SUCCESS: // or 'success'
               console.log('Upload is complete');
@@ -111,26 +109,27 @@ class FilePreview extends Component<FilePreviewProps, State> {
               console.log(snapshot.state);
           }
         },
-        e => {
+        (e) => {
           Alert.alert('Error', e.message);
           reject();
         },
-        result => {
+        (result) => {
           if (result && result.downloadURL) {
-            resolve({ url: result.downloadURL, id });
-          } else reject();
-        }
+            resolve({url: result.downloadURL, id});
+          } else {
+            reject();
+          }
+        },
       );
     });
   }
 
   async acceptPressed() {
-    this.setState({ spinner: true });
-    const { navigation, profile, postStatus, setPostMessage } = this.props;
-    const { text } = this.state;
-    const { uri, message } = navigation.state.params;
-    const { type: paramType } = navigation.state.params;
-    const type = paramType === 'image' ? 'photo' : 'video';
+    this.setState({spinner: true});
+    const {navigation, profile, postStatus, setPostMessage, route} = this.props;
+    const {text} = this.state;
+    const {type: paramType, uri, message} = route.params;
+    const type = paramType === 'image' ? PostType.PHOTO : PostType.VIDEO;
     const ref = paramType === 'image' ? 'userPhotos/' : 'userVideos/';
     try {
       const image = await this.uploadImage(uri);
@@ -139,11 +138,10 @@ class FilePreview extends Component<FilePreviewProps, State> {
         navigation.goBack();
         setPostMessage(image.url, text);
       } else {
-        firebase
-          .database()
+        database()
           .ref(ref + profile.uid)
           .child(image.id)
-          .set({ createdAt: date, url: image.url });
+          .set({createdAt: date, url: image.url});
         await postStatus({
           type,
           url: image.url,
@@ -153,67 +151,67 @@ class FilePreview extends Component<FilePreviewProps, State> {
         });
         navigation.goBack();
         Alert.alert('Success', 'Post submitted');
-        this.setState({ spinner: false });
+        this.setState({spinner: false});
       }
     } catch (e) {
       Alert.alert('Error', e.message);
-      this.setState({ spinner: false });
+      this.setState({spinner: false});
     }
   }
 
   renderImage() {
-    const { navigation, friends } = this.props;
-    const { uri, message } = navigation.state.params;
-    const { mentionList, text, spinner } = this.state;
+    const {navigation, friends, route} = this.props;
+    const {uri, message} = route.params;
+    const {mentionList, text, spinner} = this.state;
     return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-          <View style={{ flex: 1 }}>
-            <SlowImage style={{ flex: 1, resizeMode: 'contain' }} source={{ uri }} />
-            <View style={{ position: 'absolute', margin: 20, marginTop: 30 }}>
+      <SafeAreaView style={{flex: 1}}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{flex: 1}}>
+          <View style={{flex: 1}}>
+            <SlowImage
+              style={{flex: 1, resizeMode: 'contain'}}
+              source={{uri}}
+            />
+            <View style={{position: 'absolute', margin: 20, marginTop: 30}}>
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
                 style={{
-                  backgroundColor: colors.secondary,
                   opacity: 0.8,
                   padding: 10,
                   paddingHorizontal: 15,
                   borderRadius: 5,
-                }}
-              >
-                <Icon size={30} name="md-close" style={{ color: '#fff' }} />
+                }}>
+                <ThemedIcon size={30} name="close" status="danger" />
               </TouchableOpacity>
             </View>
-            <View style={{ position: 'absolute', margin: 20, marginTop: 30, right: 0 }}>
+            <View
+              style={{
+                position: 'absolute',
+                margin: 20,
+                marginTop: 30,
+                right: 0,
+              }}>
               <TouchableOpacity
                 onPress={() => this.acceptPressed()}
                 style={{
-                  backgroundColor: colors.secondary,
                   opacity: 0.8,
                   padding: 10,
                   paddingHorizontal: 15,
                   borderRadius: 5,
-                }}
-              >
-                <Icon size={30} name="md-checkmark" style={{ color: '#fff' }} />
+                }}>
+                <ThemedIcon size={30} name="checkmark" status="success" />
               </TouchableOpacity>
             </View>
             {mentionList && !message && this.renderMentionList()}
-            <TextInput
-              style={{
-                height: 50,
-                paddingLeft: 10,
-                width: '100%',
-                fontSize: 18,
-                backgroundColor: '#fff',
-              }}
+            <Input
               maxLength={280}
               underlineColorAndroid="transparent"
-              onChangeText={input => {
-                this.setState({ text: input });
+              onChangeText={(input) => {
+                this.setState({text: input});
                 const mentionFriends = Object.values(friends);
                 const list = getMentionsList(input, mentionFriends);
-                list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
+                list
+                  ? this.setState({mentionList: list})
+                  : this.setState({mentionList: null});
               }}
               value={text}
               multiline={false}
@@ -222,7 +220,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
             />
             {spinner && (
               <View style={sStyles.spinner}>
-                <PulseIndicator color={colors.secondary} />
+                <Spinner />
               </View>
             )}
           </View>
@@ -232,69 +230,79 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   renderVideo() {
-    const { navigation, friends } = this.props;
-    const { paused, mentionList, text, spinner, progress } = this.state;
-    const { uri, message } = navigation.state.params;
+    const {navigation, friends, route} = this.props;
+    const {paused, mentionList, text, spinner, progress} = this.state;
+    const {uri, message} = route.params;
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{flex: 1}}>
         <TouchableWithoutFeedback
           onPress={() => {
-            this.setState({ paused: true });
+            this.setState({paused: true});
             Keyboard.dismiss();
-          }}
-        >
-          <View style={{ flex: 1 }}>
+          }}>
+          <View style={{flex: 1}}>
             <Video
               ref={this.player}
-              source={{ uri }}
-              style={{ flex: 1 }}
+              source={{uri}}
+              style={{flex: 1}}
               paused={paused}
               ignoreSilentSwitch="ignore"
               repeat
               resizeMode="cover"
             />
             <View style={styles.playButtonContainer}>
-              <TouchableOpacity onPress={() => this.setState({ paused: false })}>
+              <TouchableOpacity onPress={() => this.setState({paused: false})}>
                 {paused && (
-                  <Icon
+                  <ThemedIcon
                     name="md-play"
                     size={75}
-                    style={{ color: '#fff', backgroundColor: 'transparent', opacity: 0.8 }}
+                    style={{
+                      color: '#fff',
+                      backgroundColor: 'transparent',
+                      opacity: 0.8,
+                    }}
                   />
                 )}
               </TouchableOpacity>
             </View>
-            <View style={{ position: 'absolute', margin: 20 }}>
+            <View style={{position: 'absolute', margin: 20}}>
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
-                style={{ backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5 }}
-              >
-                <Icon size={30} name="md-close" style={{ color: '#fff' }} />
+                style={{
+                  opacity: 0.8,
+                  padding: 10,
+                  borderRadius: 5,
+                }}>
+                <ThemedIcon size={30} name="close" />
               </TouchableOpacity>
             </View>
-            <View style={{ position: 'absolute', margin: 20, right: 0 }}>
+            <View style={{position: 'absolute', margin: 20, right: 0}}>
               <TouchableOpacity
                 onPress={() => this.acceptPressed()}
-                style={{ backgroundColor: colors.secondary, opacity: 0.8, padding: 10, borderRadius: 5 }}
-              >
-                <Icon size={30} name="md-checkmark" style={{ color: '#fff' }} />
+                style={{
+                  opacity: 0.8,
+                  padding: 10,
+                  borderRadius: 5,
+                }}>
+                <ThemedIcon size={30} name="checkmark" />
               </TouchableOpacity>
             </View>
             {mentionList && !message && this.renderMentionList()}
-            <TextInput
+            <Input
               style={{
                 height: 50,
                 paddingLeft: 10,
                 width: '100%',
                 fontSize: 18,
-                backgroundColor: '#fff',
               }}
               underlineColorAndroid="transparent"
-              onChangeText={newText => {
-                this.setState({ text: newText });
+              onChangeText={(newText) => {
+                this.setState({text: newText});
                 const newFriends = Object.values(friends);
                 const list = getMentionsList(newText, newFriends);
-                list ? this.setState({ mentionList: list }) : this.setState({ mentionList: null });
+                list
+                  ? this.setState({mentionList: list})
+                  : this.setState({mentionList: null});
               }}
               value={text}
               multiline={false}
@@ -303,8 +311,10 @@ class FilePreview extends Component<FilePreviewProps, State> {
             />
             {spinner && (
               <View style={sStyles.spinner}>
-                <PulseIndicator color={colors.secondary} />
-                {!!progress && <Text style={{ color: '#fff' }}>{`${progress}%`}</Text>}
+                <Spinner />
+                {!!progress && (
+                  <Text style={{color: '#fff'}}>{`${progress}%`}</Text>
+                )}
               </View>
             )}
           </View>
@@ -314,31 +324,38 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 
   renderMentionList() {
-    const { mentionList, text } = this.state;
+    const {mentionList, text} = this.state;
     return (
-      <View style={[styles.mentionList, { bottom: 0, marginBottom: 50 }]}>
-        <FlatList
+      <View style={[styles.mentionList, {bottom: 0, marginBottom: 50}]}>
+        <List
+          ItemSeparatorComponent={Divider}
           keyboardShouldPersistTaps="handled"
           data={mentionList}
-          style={{ backgroundColor: '#fff' }}
-          keyExtractor={item => item.uid}
-          renderItem={({ item, index }) => {
+          style={{}}
+          keyExtractor={(item) => item.uid}
+          renderItem={({item, index}) => {
             if (index < 10) {
               return (
                 <TouchableOpacity
                   onPress={() => {
                     const split = text.split(' ');
                     split[split.length - 1] = `@${item.username} `;
-                    this.setState({ text: split.join(' '), mentionList: null });
+                    this.setState({text: split.join(' '), mentionList: null});
                   }}
-                  style={{ backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', padding: 5 }}
-                >
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: 5,
+                  }}>
                   {item.avatar ? (
-                    <Image source={{ uri: item.avatar }} style={{ height: 30, width: 30, borderRadius: 15 }} />
+                    <Image
+                      source={{uri: item.avatar}}
+                      style={{height: 30, width: 30, borderRadius: 15}}
+                    />
                   ) : (
-                    <Icon name="md-contact" size={35} style={{ color: colors.primary }} />
+                    <ThemedIcon name="person" size={35} />
                   )}
-                  <Text style={{ marginLeft: 10 }}>{item.username}</Text>
+                  <Text style={{marginLeft: 10}}>{item.username}</Text>
                 </TouchableOpacity>
               );
             }
@@ -352,7 +369,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
   render() {
     return Platform.select({
       ios: (
-        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+        <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
           {this.previewView()}
         </KeyboardAvoidingView>
       ),
@@ -361,14 +378,15 @@ class FilePreview extends Component<FilePreviewProps, State> {
   }
 }
 
-const mapStateToProps = ({ profile, friends }) => ({
+const mapStateToProps = ({profile, friends}: MyRootState) => ({
   profile: profile.profile,
   friends: friends.friends,
 });
 
-const mapDispatchToProps = dispatch => ({
-  postStatus: status => dispatch(addPost(status)),
-  setPostMessage: (url, text) => dispatch(setMessage(url, text)),
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
+  postStatus: (status: Post) => dispatch(addPost(status)),
+  setPostMessage: (url: string, text: string) =>
+    dispatch(setMessage(url, text)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FilePreview);

@@ -1,39 +1,23 @@
 import React from 'react';
-import { Linking, Alert, View } from 'react-native';
-import { pipe } from 'ramda';
-import firebase from 'react-native-firebase';
-import moment, { Moment } from 'moment';
+import {Linking, Alert, View} from 'react-native';
+import {pipe} from 'ramda';
+import crashlytics from '@react-native-firebase/crashlytics';
+import moment, {Moment} from 'moment';
 import Image from 'react-native-fast-image';
 import RNCalendarEvents from 'react-native-calendar-events';
-import Instabug from 'instabug-reactnative';
 import str from './strings';
-import Session, { SessionType } from '../types/Session';
-import Profile, { UserState } from '../types/Profile';
+import Session, {SessionType} from '../types/Session';
+import Profile, {UserState} from '../types/Profile';
 import Comment from '../types/Comment';
 import Post from '../types/Post';
 import Message from '../types/Message';
 import Notification from '../types/Notification';
 import Chat from '../types/Chat';
-import colors from './colors';
+import {Source} from 'react-native-fast-image';
+import ThemedImage from '../components/ThemedImage/ThemedImage';
 
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
-// @ts-ignore
-const advert = firebase.admob().interstitial(str.admobInterstitial);
-
-export const showAdmobInterstitial = () => {
-  // @ts-ignore
-  const { AdRequest } = firebase.admob;
-  const request = new AdRequest();
-  advert.loadAd(request.build());
-  advert.on('onAdLoaded', () => {
-    advert.show();
-  });
-  advert.on('onAdFailedToLoad', e => {
-    Instabug.logError(e.message);
-    firebase.crashlytics().recordError(0, e.message);
-  });
-};
 const s4 = () => {
   return Math.floor((1 + Math.random()) * 0x10000)
     .toString(16)
@@ -52,7 +36,7 @@ export const types = [
   SessionType.SWIMMING,
 ];
 
-export const getResource = (type: SessionType) => {
+export const getResource = (type: SessionType): Source => {
   if (type === SessionType.CYCLING) {
     return require('../../assets/images/bicycle.png');
   }
@@ -70,13 +54,13 @@ export const getResource = (type: SessionType) => {
 
 export const renderImages = () => {
   return (
-    <View style={{ flexDirection: 'row' }}>
-      {types.map((type, index) => {
+    <View style={{flexDirection: 'row'}}>
+      {types.map((type) => {
         return (
-          <Image
+          <ThemedImage
+            style={{marginRight: 10}}
             key={guid()}
-            tintColor="#fff"
-            style={{ height: 50, width: 50, margin: 10 }}
+            size={50}
             source={getResource(type)}
           />
         );
@@ -89,41 +73,41 @@ export function getType(type: SessionType, size: number, tintColor?: string) {
   switch (type) {
     case SessionType.CYCLING:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{ width: size, height: size }}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/bicycle.png')}
         />
       );
     case SessionType.GYM:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{ width: size, height: size }}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/dumbbell.png')}
         />
       );
     case SessionType.RUNNING:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{ width: size, height: size }}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/running.png')}
         />
       );
     case SessionType.SWIMMING:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{ width: size, height: size }}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/swim.png')}
         />
       );
     default:
       return (
-        <Image
-          tintColor={tintColor}
-          style={{ width: size, height: size }}
+        <ThemedImage
+          fill={tintColor}
+          size={size}
           source={require('../../assets/images/custom.png')}
         />
       );
@@ -136,8 +120,11 @@ export const getMentionsList = (status, friends) => {
     const last = split[split.length - 1];
     const reduced = last.substring(1);
     if (status && last && str.mentionRegex.test(last)) {
-      const filtered = friends.filter(friend => {
-        return friend.username && friend.username.toLowerCase().includes(reduced.toLowerCase());
+      const filtered = friends.filter((friend) => {
+        return (
+          friend.username &&
+          friend.username.toLowerCase().includes(reduced.toLowerCase())
+        );
       });
       if (filtered.length > 0) {
         return filtered;
@@ -157,13 +144,13 @@ export function calculateAge(birthday) {
 
 export function likesExtractor(item, uid, viewProfile, goToProfile) {
   if (item.likes) {
-    return item.likes.map(like => {
+    return item.likes.map((like) => {
       return {
         image: like.image,
         name: like.username,
         user_id: like.user_id,
         like_id: like.user_id,
-        tap: username => {
+        tap: (username) => {
           uid === like.user_id ? goToProfile() : viewProfile(like.user_id);
         },
       };
@@ -173,7 +160,9 @@ export function likesExtractor(item, uid, viewProfile, goToProfile) {
 }
 
 export const nth = (d: number) => {
-  if (d > 3 && d < 21) return 'th';
+  if (d > 3 && d < 21) {
+    return 'th';
+  }
   switch (d % 10) {
     case 1:
       return 'st';
@@ -197,9 +186,9 @@ export const formatDateTime = (dt: string) => {
   const minutes = mins < 10 ? `0${mins}` : mins;
   const strTime = `${hours}:${minutes}${ampm}`;
   const day = date.getDate();
-  return `${str.days[date.getDay()].toString()} ${day.toString() + nth(day)} ${str.months[
-    date.getMonth()
-  ].toString()} ${strTime}`;
+  return `${str.days[date.getDay()].toString()} ${
+    day.toString() + nth(day)
+  } ${str.months[date.getMonth()].toString()} ${strTime}`;
 };
 
 export const dayDiff = (first, second, round = true) => {
@@ -212,7 +201,7 @@ export const dayDiff = (first, second, round = true) => {
   return timeDiff / (1000 * 3600 * 24);
 };
 
-export const getSimplifiedTime = createdAt => {
+export const getSimplifiedTime = (createdAt) => {
   const timeStamp = new Date(createdAt);
   let dateString;
   const now = new Date();
@@ -220,15 +209,23 @@ export const getSimplifiedTime = createdAt => {
   const yesterday0 = new Date(today0.setHours(0, 0, 0, 0));
   yesterday0.setDate(today0.getDate() - 1);
 
-  if (timeStamp < yesterday0) dateString = timeStamp.toDateString();
-  else if (timeStamp < today0) dateString = 'Yesterday';
-  else {
-    const minsBeforeNow = Math.floor((now.getTime() - timeStamp.getTime()) / (1000 * 60));
+  if (timeStamp < yesterday0) {
+    dateString = timeStamp.toDateString();
+  } else if (timeStamp < today0) {
+    dateString = 'Yesterday';
+  } else {
+    const minsBeforeNow = Math.floor(
+      (now.getTime() - timeStamp.getTime()) / (1000 * 60),
+    );
     const hoursBeforeNow = Math.floor(minsBeforeNow / 60);
     if (hoursBeforeNow > 0) {
-      dateString = `${hoursBeforeNow} ${hoursBeforeNow === 1 ? 'hour' : 'hours'} ago`;
+      dateString = `${hoursBeforeNow} ${
+        hoursBeforeNow === 1 ? 'hour' : 'hours'
+      } ago`;
     } else if (minsBeforeNow > 0) {
-      dateString = `${minsBeforeNow} ${minsBeforeNow === 1 ? 'min' : 'mins'} ago`;
+      dateString = `${minsBeforeNow} ${
+        minsBeforeNow === 1 ? 'min' : 'mins'
+      } ago`;
     } else {
       dateString = 'Just Now';
     }
@@ -243,11 +240,11 @@ export const getStateColor = (state: UserState) => {
     case UserState.AWAY:
       return '#F9BD49';
     default:
-      return colors.appRed;
+      return 'red';
   }
 };
 
-const getStateVal = state => {
+const getStateVal = (state: UserState) => {
   switch (state) {
     case UserState.ONLINE:
       return 3;
@@ -266,7 +263,12 @@ export const sortByState = (friends: Profile[]) => {
   });
 };
 
-export const getDirections = (gym, yourLocation, selectedLocation, selectedSession) => {
+export const getDirections = (
+  gym,
+  yourLocation,
+  selectedLocation,
+  selectedSession,
+) => {
   if (yourLocation) {
     let lat2;
     let lng2;
@@ -280,9 +282,14 @@ export const getDirections = (gym, yourLocation, selectedLocation, selectedSessi
       lng2 = selectedSession.location.position.lng;
     }
     const url = `https://www.google.com/maps/dir/?api=1&origin=${lat1},${lng1}&destination=${lat2},${lng2}`;
-    Linking.openURL(url).catch(err => console.error('An error occurred', err));
+    Linking.openURL(url).catch((err) =>
+      console.error('An error occurred', err),
+    );
   } else {
-    Alert.alert('No location found', 'You may need to change your settings to allow Fit Link to access your location');
+    Alert.alert(
+      'No location found',
+      'You may need to change your settings to allow Fit Link to access your location',
+    );
   }
 };
 
@@ -299,7 +306,9 @@ export const getDistance = (item, lat1, lon1, gym = false): number => {
       if (item.geometry) {
         lat2 = item.geometry.location.lat;
         lon2 = item.geometry.location.lng;
-      } else return DEFAULT_DISTANCE;
+      } else {
+        return DEFAULT_DISTANCE;
+      }
     } else {
       lat2 = item.location.position.lat;
       lon2 = item.location.position.lng;
@@ -309,7 +318,10 @@ export const getDistance = (item, lat1, lon1, gym = false): number => {
     const dLon = deg2rad(lon2 - lon1);
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
@@ -325,7 +337,7 @@ export const addSessionToCalendar = (calendarId: string, session: Session) => {
     date.getUTCDate(),
     date.getUTCHours(),
     date.getUTCMinutes(),
-    date.getUTCSeconds()
+    date.getUTCSeconds(),
   );
   const endDate = new Date(startDate);
   const duration = session.duration + session.durationMinutes / 60;
@@ -340,17 +352,7 @@ export const addSessionToCalendar = (calendarId: string, session: Session) => {
   });
 };
 
-export const getBirthdayDate = (birthday: string): Moment => {
-  if (!birthday) return null;
-  for (let i = 0; i < formats.length; i++) {
-    if (moment(birthday, formats[i]).isValid()) {
-      return moment(birthday, formats[i]);
-    }
-  }
-  return moment(birthday);
-};
-
-export const calculateDuration = data => {
+export const calculateDuration = (data) => {
   const minutes = data.durationMinutes / 60 || 0;
   const hours = data.duration;
   return (minutes + hours) * 60 * 60 * 1000;
@@ -371,9 +373,9 @@ export const durationString = (session: Session) => {
 export const dedupeComments = (comments: Comment[]) => {
   return comments.filter(
     (elem, index, self) =>
-      self.findIndex(t => {
+      self.findIndex((t) => {
         return t.created_at === elem.created_at && t.key === elem.key;
-      }) === index
+      }) === index,
   );
 };
 
@@ -385,11 +387,11 @@ export const sortComments = (comments: Comment[]) => {
 
 export const addCommentIds = (comments: Comment[]) => {
   return comments.map((comment, index) => {
-    return { ...comment, comment_id: index + 1 };
+    return {...comment, comment_id: index + 1};
   });
 };
 
-export const getNameString = friend => {
+export const getNameString = (friend) => {
   let string = '';
   if (friend.username) {
     string += friend.username;
@@ -397,7 +399,9 @@ export const getNameString = friend => {
       string += ` (${friend.first_name}`;
       if (friend.last_name) {
         string += ` ${friend.last_name})`;
-      } else string += ')';
+      } else {
+        string += ')';
+      }
     }
   } else {
     string += 'No username set ';
@@ -408,7 +412,7 @@ export const getNameString = friend => {
   return string;
 };
 
-export const getFormattedBirthday = date => {
+export const getFormattedBirthday = (date) => {
   if (date) {
     const d = new Date(date);
     return `${str.months[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}`;
@@ -416,7 +420,7 @@ export const getFormattedBirthday = date => {
   return null;
 };
 
-export const validatePostcode = code => {
+export const validatePostcode = (code) => {
   const postcode = code.replace(/\s/g, '');
   const regex = /^[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}$/i;
   return regex.test(postcode);
@@ -424,7 +428,10 @@ export const validatePostcode = code => {
 
 export const sortChatsByDate = (array: Chat[]): Chat[] => {
   return array.sort((a, b) => {
-    return new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime();
+    return (
+      new Date(b.lastMessage.createdAt).getTime() -
+      new Date(a.lastMessage.createdAt).getTime()
+    );
   });
 };
 
@@ -463,11 +470,15 @@ export const sortNotificationsByDate = (array: Notification[]) => {
   });
 };
 
-export const pickerItems = array => {
-  return array.map(item => {
-    return { label: item, value: item };
+export const pickerItems = (array) => {
+  return array.map((item) => {
+    return {label: item, value: item};
   });
 };
 
-export const dedupeSortAndAddCommentIds = pipe(dedupeComments, sortComments, addCommentIds);
+export const dedupeSortAndAddCommentIds = pipe(
+  dedupeComments,
+  sortComments,
+  addCommentIds,
+);
 export const sortAndAddCommentIds = pipe(sortComments, addCommentIds);

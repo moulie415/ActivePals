@@ -1,140 +1,200 @@
-import React, { Component } from 'react';
-import { View, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import firebase from 'react-native-firebase';
+import React, {FunctionComponent, useState, useContext} from 'react';
+import {View, Alert, ScrollView} from 'react-native';
+import crashlytics from '@react-native-firebase/crashlytics';
 import VersionNumber from 'react-native-version-number';
-import DialogInput from 'react-native-dialog-input';
-import { PulseIndicator } from 'react-native-indicators';
 import Instabug from 'instabug-reactnative';
-import { connect } from 'react-redux';
-import colors from '../constants/colors';
+import {connect} from 'react-redux';
 import styles from '../styles/settingsStyles';
-import Text from '../components/Text';
-import Header from '../components/Header/header';
 import FbFriendsModal from '../components/FbFriendsModal';
-import { removeUser } from '../actions/profile';
+import {removeUser} from '../actions/profile';
 import SettingsProps from '../types/views/Settings';
-import { AccountType } from '../types/Profile';
+import {AccountType} from '../types/Profile';
+import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
+import {
+  Layout,
+  Toggle,
+  ListItem,
+  Divider,
+  Modal,
+  Card,
+  Text,
+  Button,
+  Input,
+  Spinner,
+} from '@ui-kitten/components';
+import {MyRootState, MyThunkDispatch} from '../types/Shared';
+import {ThemeContext} from '../context/themeContext';
+import globalStyles from '../styles/globalStyles';
 
-interface State {
-  spinner: boolean;
-  showDialog: boolean;
-  fbModalOpen?: boolean;
-}
-class Settings extends Component<SettingsProps, State> {
-  constructor(props) {
-    super(props);
+const Settings: FunctionComponent<SettingsProps> = ({
+  profile,
+  onRemoveUser,
+  navigation,
+}) => {
+  const [spinner, setSpinner] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [fbModalOpen, setFbModalOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const {theme, toggleTheme} = useContext(ThemeContext);
 
-    this.state = {
-      spinner: false,
-      showDialog: false,
-    };
-  }
-
-  static navigationOptions = {
-    headerShown: false,
-  };
-
-  render() {
-    const { profile, onRemoveUser, navigation } = this.props;
-    const { spinner, fbModalOpen, showDialog } = this.state;
-    return (
-      <View style={styles.container}>
-        <Header hasBack title="Settings" />
-        <ScrollView>
-          <TouchableOpacity
-            onPress={() => {
-              Alert.alert('coming soon');
-              // Linking.openURL('mailto:fitlink-support@gmail.com')
-            }}
-            style={styles.contact}
-          >
-            <Text>Contact Support</Text>
-            <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Welcome', { goBack: true })} style={styles.contact}>
-            <Text>View Welcome Swiper</Text>
-            <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Credits')} style={styles.contact}>
-            <Text>Credits</Text>
-            <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
-          </TouchableOpacity>
-          {profile.fb_login && (
-            <TouchableOpacity
+  return (
+    <Layout style={styles.container}>
+      <ScrollView>
+        <ListItem
+          title="Contact Support"
+          onPress={() => {
+            Alert.alert('coming soon');
+            // Linking.openURL('mailto:fitlink-support@gmail.com')
+          }}
+          accessoryRight={() => (
+            <ThemedIcon name="arrow-ios-forward" size={25} />
+          )}
+        />
+        <Divider />
+        <ListItem
+          title="View Welcome Swiper"
+          onPress={() => navigation.navigate('Welcome', {goBack: true})}
+          accessoryRight={() => (
+            <ThemedIcon name="arrow-ios-forward" size={25} />
+          )}
+        />
+        <Divider />
+        <ListItem
+          title="Credits"
+          onPress={() => navigation.navigate('Credits')}
+          accessoryRight={() => (
+            <ThemedIcon name="arrow-ios-forward" size={25} />
+          )}
+        />
+        <Divider />
+        {profile.fb_login && (
+          <>
+            <ListItem
+              title="Import Facebook Friends"
               onPress={() => {
                 profile.username
-                  ? this.setState({ fbModalOpen: true })
-                  : Alert.alert('Please set a username before trying to add a pal');
+                  ? setFbModalOpen(true)
+                  : Alert.alert(
+                      'Please set a username before trying to add a pal',
+                    );
               }}
-              style={styles.contact}
-            >
-              <Text>Import Facebook friends</Text>
-              <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
-            </TouchableOpacity>
-          )}
-          {profile.accountType === AccountType.ADMIN && (
-            <TouchableOpacity onPress={() => firebase.crashlytics().crash()} style={styles.contact}>
-              <Text>Force crash</Text>
-              <Icon name="ios-arrow-forward" size={25} style={{ color: colors.primary }} />
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity onPress={Instabug.show} style={styles.contact}>
-            <Text>Report a problem</Text>
-            <Icon name="ios-bug" size={25} style={{ color: colors.primary }} />
-          </TouchableOpacity>
-          <View style={styles.contact}>
-            <Text>Version no: </Text>
-            <Text
-              style={{ color: colors.primary, fontWeight: 'bold' }}
-            >{`${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}</Text>
-          </View>
-          <TouchableOpacity
-            style={{ padding: 15, backgroundColor: '#fff' }}
-            onPress={() => this.setState({ showDialog: true })}
-          >
-            <Text style={{ color: colors.appRed }}>Delete account</Text>
-          </TouchableOpacity>
-        </ScrollView>
-        {spinner && (
-          <View style={styles.spinner}>
-            <PulseIndicator color={colors.secondary} />
-          </View>
+              accessoryRight={() => <ThemedIcon name="facebook" size={25} />}
+            />
+            <Divider />
+          </>
         )}
-        <FbFriendsModal isOpen={fbModalOpen} onClosed={() => this.setState({ fbModalOpen: false })} />
-        <DialogInput
-          isDialogVisible={showDialog}
-          title="Enter email to confirm"
-          message="All your data will be deleted."
-          hintInput="Enter email"
-          submitInput={async inputText => {
-            if (inputText === profile.email) {
-              this.setState({ spinner: true });
-              try {
-                await onRemoveUser();
-                navigation.navigate('Login');
-                Alert.alert('Success', 'Account deleted');
-                this.setState({ spinner: false });
-              } catch (e) {
-                Alert.alert('Error', e.message);
-                this.setState({ spinner: false });
-              }
-            } else {
-              Alert.alert('Incorrect email');
-            }
-          }}
-          closeDialog={() => this.setState({ showDialog: false })}
+        {profile.accountType === AccountType.ADMIN && (
+          <>
+            <ListItem
+              title="Force crash"
+              onPress={() => crashlytics().crash()}
+              accessoryRight={() => (
+                <ThemedIcon name="arrow-ios-forward" size={25} />
+              )}
+            />
+            <Divider />
+          </>
+        )}
+        <ListItem
+          onPress={Instabug.show}
+          title="Report a problem"
+          accessoryRight={() => <ThemedIcon name="alert-triangle" size={25} />}
         />
-      </View>
-    );
-  }
-}
+        <Divider />
+        <ListItem
+          onPress={toggleTheme}
+          title={`Theme: ${theme}`}
+          accessoryRight={() => (
+            <Toggle checked={theme === 'dark'} onChange={toggleTheme} />
+          )}
+        />
+        <Divider />
+        <ListItem
+          title="Version"
+          description={`${VersionNumber.appVersion} (${VersionNumber.buildVersion})`}
+        />
+        <Divider />
+        <ListItem
+          title="Delete account"
+          onPress={() => setShowDialog(true)}
+          accessoryRight={() => (
+            <ThemedIcon name="arrow-ios-forward" size={25} />
+          )}
+        />
+        <Divider />
+      </ScrollView>
+      {spinner && (
+        <View style={styles.spinner}>
+          <Spinner />
+        </View>
+      )}
+      <FbFriendsModal
+        isOpen={fbModalOpen}
+        onClosed={() => setFbModalOpen(false)}
+      />
 
-const mapStateToProps = ({ profile }) => ({
+      <Modal
+        visible={showDialog}
+        backdropStyle={globalStyles.backdrop}
+        style={{width: '90%'}}
+        onBackdropPress={() => setShowDialog(false)}>
+        <Card disabled>
+          <Text style={{textAlign: 'center'}} category="h6">
+            Enter email to confirm
+          </Text>
+          <Text
+            style={{textAlign: 'center', margin: 5}}
+            status="danger"
+            category="label">
+            All your data will be deleted.
+          </Text>
+          <Input
+            placeholder="Enter email"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              marginTop: 10,
+            }}>
+            <Button style={{margin: 5}} onPress={() => setShowDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              style={{margin: 5}}
+              status="danger"
+              onPress={async () => {
+                if (email === profile.email) {
+                  setSpinner(true);
+                  try {
+                    await onRemoveUser();
+                    navigation.navigate('Login');
+                    Alert.alert('Success', 'Account deleted');
+                    setSpinner(false);
+                  } catch (e) {
+                    Alert.alert('Error', e.message);
+                    setSpinner(false);
+                  }
+                } else {
+                  Alert.alert('Incorrect email');
+                }
+              }}>
+              Submit
+            </Button>
+          </View>
+        </Card>
+      </Modal>
+    </Layout>
+  );
+};
+
+const mapStateToProps = ({profile}: MyRootState) => ({
   profile: profile.profile,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onRemoveUser: () => dispatch(removeUser()),
 });
 

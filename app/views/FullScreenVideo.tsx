@@ -1,23 +1,26 @@
-import React, { FunctionComponent } from 'react';
+import React, {FunctionComponent} from 'react';
 import VideoPlayer from 'react-native-video-controls';
-import { connect } from 'react-redux';
-import { StatusBar, View } from 'react-native';
+import {connect} from 'react-redux';
+import {StatusBar} from 'react-native';
 import FullScreenVideoProps from '../types/views/FullScreenVideo';
+import {Layout} from '@ui-kitten/components';
 
-const FullScreenVideo: FunctionComponent<FullScreenVideoProps> = ({ navigation }) => {
-  const { params } = navigation.state;
-  const { uri } = params;
+const FullScreenVideo: FunctionComponent<FullScreenVideoProps> = ({
+  navigation,
+  route,
+}) => {
+  const {uri} = route.params;
   return (
-    <View style={{ flex: 1 }}>
+    <Layout style={{flex: 1}}>
       <StatusBar hidden />
       <VideoPlayer
-        source={{ uri }}
+        source={{uri}}
         disableVolume
         disableFullscreen
-        style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+        style={{position: 'absolute', top: 0, bottom: 0, left: 0, right: 0}}
         onBack={() => navigation.goBack()}
       />
-    </View>
+    </Layout>
   );
 };
 

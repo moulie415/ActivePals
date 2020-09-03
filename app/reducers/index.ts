@@ -1,29 +1,23 @@
-import { persistCombineReducers } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import { createFilter } from 'redux-persist-transform-filter';
-import friends from './friends';
+import {persistCombineReducers} from 'redux-persist';
+import AsyncStorage from '@react-native-community/async-storage';
 import profile from './profile';
-import chats from './chats';
+import friends from './friends';
 import home from './home';
-import sessions from './sessions';
 import sharedInfo from './sharedInfo';
+import chats from './chats';
+import sessions from './sessions';
 
 const config = {
   key: 'root',
-  storage,
-  // whitelist: ['profile'],
-  // transforms: [
-  //     createFilter('login', ['hasViewedWelcomeWizard']),
-  //     createFilter('settings', ['unreadCount', 'profile', 'loggedOut']),
-  // ],
+  storage: AsyncStorage,
 };
 
 // Combine all the reducers
 export default persistCombineReducers(config, {
   profile,
   friends,
-  chats,
   home,
-  sessions,
   sharedInfo,
+  chats,
+  sessions,
 });

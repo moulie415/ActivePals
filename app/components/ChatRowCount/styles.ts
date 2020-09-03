@@ -1,8 +1,4 @@
-import {
-  StyleSheet,
-} from 'react-native'
-import colors from '../../constants/colors'
-
+import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
   countContainer: {
@@ -10,15 +6,14 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: colors.appRed,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   count: {
-    color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
-  }
-})
+    color: '#fff'
+  },
+});
 
-export default styles
+export default styles;

@@ -1,5 +1,4 @@
-import { StyleSheet } from 'react-native';
-import colors from '../constants/colors';
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   spinner: {
@@ -19,7 +18,8 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    backgroundColor: colors.appRed,
+    top: -2,
+    right: 0,
   },
   mentionList: {
     position: 'absolute',
@@ -27,7 +27,7 @@ export default StyleSheet.create({
     right: 10,
     zIndex: 999,
     elevation: 4,
-    shadowOffset: { width: 5, height: 5 },
+    shadowOffset: {width: 5, height: 5},
     shadowColor: 'grey',
     shadowOpacity: 0.5,
     shadowRadius: 10,

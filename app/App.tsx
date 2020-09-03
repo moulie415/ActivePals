@@ -1,370 +1,335 @@
-import React, { Component, FunctionComponent } from 'react';
-import { Platform, AppState, SafeAreaView } from 'react-native';
-import { createAppContainer } from 'react-navigation';
-import { createBottomTabNavigator, createMaterialTopTabNavigator, MaterialTopTabBar } from 'react-navigation-tabs';
-import { createStackNavigator } from 'react-navigation-stack';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/lib/integration/react';
-import { persistStore } from 'redux-persist';
-import { createStore, applyMiddleware, compose } from 'redux';
-import firebase from 'react-native-firebase';
-import Sound from 'react-native-sound';
-import GeoFire from 'geofire';
+import React, {useState, useEffect} from 'react';
+import {
+  ApplicationProvider,
+  IconRegistry,
+  BottomNavigation,
+  BottomNavigationTab,
+  Icon,
+  TabBar,
+  Tab,
+} from '@ui-kitten/components';
+import {EvaIconsPack} from '@ui-kitten/eva-icons';
+import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
+import * as eva from '@eva-design/eva';
+import {ThemeContext} from './context/themeContext';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import Login from './views/Login';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/lib/integration/react';
+import {persistStore} from 'redux-persist';
+import {createStore, applyMiddleware, compose} from 'redux';
 import thunk from 'redux-thunk';
-import { MaterialTabBarProps } from 'react-navigation-tabs/lib/typescript/src/types';
-import color from 'color';
-import Instabug from 'instabug-reactnative';
 import reducer from './reducers';
-import str from './constants/strings';
-import Login from './views/login';
 import SignUp from './views/SignUp';
+import {Theme} from './types/Shared';
+import AsyncStorage from '@react-native-community/async-storage';
+import Welcome from './views/Welcome';
+import {GeoFire} from 'geofire';
 import Home from './views/Home';
 import Sessions from './views/sessions/Sessions';
-import SessionInfo from './views/sessions/SessionInfo';
 import Friends from './views/Friends';
-import Profile from './views/Profile';
-import ProfileView from './views/ProfileView';
-import PostView from './views/PostView';
-import Settings from './views/Settings';
-import Messaging from './views/chat/Messaging';
-import DirectMessages from './views/chat/DirectMessages';
 import SessionChats from './views/chat/SessionChats';
+import DirectMessages from './views/chat/DirectMessages';
 import GymChat from './views/chat/GymChat';
-import TestScreen from './views/TestScreen';
-import SessionDetail from './views/sessions/SessionDetail';
-import FilePreview from './views/FilePreview';
-import Notifications from './views/notifications';
+import Profile from './views/Profile';
+import ThemedImage from './components/ThemedImage/ThemedImage';
+import Settings from './views/Settings';
+import NotificationsButton from './components/NotificationsButton/NotificationsButton';
+import notifications from './views/notifications';
+import SessionInfo from './views/sessions/SessionInfo';
 import Gym from './views/Gym';
-import Credits from './views/Credits';
-import colors from './constants/colors';
-import FullScreenVideo from './views/FullScreenVideo';
-import Welcome from './views/Welcome';
-import Form from './views/Form';
-import { UserState } from './types/Profile';
-import NavigationService from './actions/navigation';
+import Messaging from './views/chat/Messaging';
+import Session from './types/Session';
+import ProfileView from './views/ProfileView';
+import SessionDetail from './views/sessions/SessionDetail';
+import Location from './types/Location';
+import PostView from './views/PostView';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
-import ChatTabLabel from './components/ChatTabLabel';
-import { MessageType } from './types/Message';
-import { NotificationType } from './types/Notification';
-import { setNotificationCount } from './actions/home';
-import { newNotification, updateLastMessage, resetUnreadCount } from './actions/chats';
-import { createChannels } from './helpers/notifications';
-import { shouldNavigate, navigateFromNotif } from './helpers/navigation';
+import {ImageProps, AppState, AppStateStatus} from 'react-native';
+import FullScreenVideo from './views/FullScreenVideo';
+import Credits from './views/Credits';
+import Instabug from 'instabug-reactnative';
+import AddFriendButton from './components/AddFriendButton/AddFriendButton';
+import FilePreview from './views/FilePreview';
+import MapToggle from './components/MapToggle/MapToggle';
+import FilterModalButton from './components/FilterModalButton/FilterModalButton';
+import {UserState} from './types/Profile';
+import {navigationRef} from './RootNavigation';
+import MessagingInfoButton from './components/MessagingInfoButton/MessagingInfoButton';
 
-const notifSound = new Sound(str.notifSound, Sound.MAIN_BUNDLE, error => {
-  if (error) {
-    console.warn('failed to load the sound', error);
-  }
-});
-
-const firebaseRef = firebase.database().ref('locations');
+const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
 
-const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers =
+  // @ts-ignore
+  (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-export const store = createStore(reducer, composeEnhancers(applyMiddleware(thunk)));
-
-export const showLocalNotification = notif => {
-  const user = firebase.auth().currentUser;
-  if (notif.uid !== user.uid) {
-    if (shouldNavigate(notif)) {
-      const notification = new firebase.notifications.Notification()
-        .setTitle(notif.title)
-        .setBody(notif.body)
-        .setData(notif)
-        .setSound(str.notifSound)
-        .android.setSmallIcon('ic_notification')
-        // .android.setLargeIcon('ic_notification_large')
-        .android.setAutoCancel(true)
-        .android.setGroupSummary(true)
-        .android.setGroup(notif.group)
-        .android.setPriority(firebase.notifications.Android.Priority.Max)
-        .android.setChannelId(notif.channel)
-        // .android.setGroupAlertBehaviour(firebase.notifications.Android.GroupAlert.Children)
-        .setNotificationId(notif.group);
-
-      firebase
-        .notifications()
-        .displayNotification(notification)
-        .catch(err => console.error(err));
-    } else {
-      notifSound.play();
-      const { type, gymId, sessionId, uid } = notif;
-      if (type === MessageType.GYM_MESSAGE || type === MessageType.SESSION_MESSAGE || type === MessageType.MESSAGE) {
-        const id = gymId || sessionId || uid;
-        // @ts-ignore
-        store.dispatch(resetUnreadCount(id));
-      }
-    }
-  }
-};
+export const store = createStore(
+  reducer,
+  composeEnhancers(applyMiddleware(thunk)),
+);
 
 export const persistor = persistStore(store);
 
-export const handleNotification = (notification, showLocal = true) => {
-  const { dispatch, getState } = store;
-  const { type } = notification;
-  const localTypes = [
-    MessageType.MESSAGE,
-    MessageType.SESSION_MESSAGE,
-    MessageType.GYM_MESSAGE,
-    NotificationType.FRIEND_REQUEST,
-    NotificationType.ADDED_TO_SESSION,
-    NotificationType.FRIEND_REQUEST,
-  ];
-  if (localTypes.includes(type)) {
-    dispatch(newNotification(notification));
-    if (type === MessageType.GYM_MESSAGE || type === MessageType.SESSION_MESSAGE || type === MessageType.MESSAGE) {
-      // @ts-ignore
-      dispatch(updateLastMessage(notification));
-    }
-    showLocal && showLocalNotification(notification);
-  }
-  if (
-    type === NotificationType.POST_REP ||
-    type === NotificationType.COMMENT ||
-    type === NotificationType.FRIEND_REQUEST ||
-    type === NotificationType.COMMENT_MENTION ||
-    type === NotificationType.POST_MENTION
-  ) {
-    const count = getState().profile.profile.unreadCount || 0;
-    dispatch(setNotificationCount(count + 1));
-  }
+export type StackParamList = {
+  Login: undefined;
+  SignUp: undefined;
+  Welcome: {goBack?: boolean};
+  Home: undefined;
+  Tabs: undefined;
+  Sessions: undefined;
+  Friends: undefined;
+  Chats: undefined;
+  DirectMessages: undefined;
+  SessionChats: undefined;
+  GymChat: undefined;
+  Profile: undefined;
+  ProfileView: {uid: string};
+  Settings: undefined;
+  Notifications: undefined;
+  SessionInfo: {sessionId: string; isPrivate: boolean};
+  Gym: {id: string};
+  Messaging: {
+    sessionId?: string;
+    gymId?: string;
+    chatId?: string;
+    friendUsername?: string;
+    friendUid?: string;
+  };
+  SessionDetail: {location?: Location; friends?: string[]};
+  PostView: {postId: string};
+  FullScreenVideo: {uri: string};
+  Credits: undefined;
+  FilePreview: {
+    type: 'video' | 'image';
+    uri: string;
+    message: boolean;
+    text?: string;
+  };
 };
 
-const SafeAreaMaterialTopTabBar: FunctionComponent<MaterialTabBarProps> = ({ ...props }) => (
-  <SafeAreaView style={{ backgroundColor: colors.primary }}>
-    <MaterialTopTabBar {...props} />
-  </SafeAreaView>
+const Stack = createStackNavigator<StackParamList>();
+const TabNav = createBottomTabNavigator<StackParamList>();
+const TopTab = createMaterialTopTabNavigator<StackParamList>();
+
+const TopTabBar = ({navigation, state}) => (
+  <TabBar
+    selectedIndex={state.index}
+    onSelect={(index) => navigation.navigate(state.routeNames[index])}>
+    <Tab title="Sessions" />
+    <Tab title="Pals" />
+    <Tab title="Gym" />
+  </TabBar>
 );
 
-const chats = createMaterialTopTabNavigator(
-  {
-    SessionChats: {
-      screen: SessionChats,
-      navigationOptions: { tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Sessions" color={tintColor} /> },
-    },
-    DirectMessages: {
-      screen: DirectMessages,
-      navigationOptions: { tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Pals" color={tintColor} /> },
-    },
-    GymChat: {
-      screen: GymChat,
-      navigationOptions: {
-        tabBarLabel: ({ tintColor }) => <ChatTabLabel type="Gym" color={tintColor} />,
-      },
-    },
-  },
-  {
-    tabBarComponent: props => <SafeAreaMaterialTopTabBar {...props} />,
-    tabBarPosition: 'top',
-    tabBarOptions: {
-      showLabel: true,
-      labelStyle: {
-        fontSize: 15,
-        fontFamily: 'Montserrat',
-      },
-      activeTintColor: '#fff',
-      inactiveTintColor: colors.secondary,
-      style: {
-        backgroundColor: colors.primary,
-      },
-      indicatorStyle: {
-        backgroundColor: '#fff',
-      },
-    },
-  }
+const Chats = () => (
+  <TopTab.Navigator tabBar={(props) => <TopTabBar {...props} />}>
+    <TopTab.Screen name="SessionChats" component={SessionChats} />
+    <TopTab.Screen name="DirectMessages" component={DirectMessages} />
+    <TopTab.Screen name="GymChat" component={GymChat} />
+  </TopTab.Navigator>
 );
 
-const tabs = createBottomTabNavigator(
-  {
-    Home: { screen: Home },
-    Sessions: { screen: Sessions },
-    // PersonalTraining: { screen: PersonalTraining },
-    Friends: { screen: Friends },
-    Chat: { screen: chats, navigationOptions: { tabBarIcon: ({ tintColor }) => <ChatTabBarIcon color={tintColor} /> } },
-    Profile: { screen: Profile },
-  },
-  {
-    tabBarOptions: {
-      activeTintColor: colors.primary,
-      inactiveTintColor: color(colors.secondary)
-        .lighten(0.3)
-        .hex(),
-      style: { backgroundColor: '#fff' },
-      showIcon: true,
-      labelStyle: {
-        fontSize: 10,
-        margin: 0,
-        marginTop: Platform.OS === 'android' ? 5 : 0,
-        padding: 0,
-      },
-      // showLabel: false,
-    },
-  }
+const HomeIcon = (props: Partial<ImageProps> | undefined) => (
+  <Icon {...props} name="home" />
+);
+const SessionsIcon = ({style}: Partial<ImageProps> | undefined) => {
+  return (
+    <ThemedImage
+      size={24}
+      fill={style?.tintColor}
+      style={{marginVertical: style?.marginVertical}}
+      source={require('../assets/images/dumbbell.png')}
+    />
+  );
+};
+const FriendsIcon = (props: Partial<ImageProps> | undefined) => (
+  <Icon {...props} name="people" />
+);
+const ChatsIcon = (props: Partial<ImageProps> | undefined) => (
+  <ChatTabBarIcon color={props?.style?.tintColor} />
+);
+const ProfileIcon = (props: Partial<ImageProps> | undefined) => (
+  <Icon {...props} name="person" />
 );
 
-export const Stack = createStackNavigator(
-  {
-    Login: { screen: Login },
-    SessionDetail: { screen: SessionDetail },
-    SessionInfo: { screen: SessionInfo },
-    SignUp: { screen: SignUp },
-    MainNav: { screen: tabs },
-    Messaging: { screen: Messaging },
-    Settings: { screen: Settings },
-    TestScreen: { screen: TestScreen },
-    FilePreview: { screen: FilePreview },
-    ProfileView: { screen: ProfileView },
-    PostView: { screen: PostView },
-    Notifications: { screen: Notifications },
-    Gym: { screen: Gym },
-    Welcome: { screen: Welcome },
-    Credits: { screen: Credits },
-    FullScreenVideo: { screen: FullScreenVideo },
-    Form: { screen: Form },
-  },
-  {
-    headerMode: 'none',
-  }
+const BottomTabBar = ({navigation, state}) => (
+  <BottomNavigation
+    style={{paddingVertical: 8}}
+    selectedIndex={state.index}
+    onSelect={(index) => navigation.navigate(state.routeNames[index])}>
+    <BottomNavigationTab title="Home" icon={HomeIcon} />
+    <BottomNavigationTab title="Sessions" icon={SessionsIcon} />
+    <BottomNavigationTab title="Pals" icon={FriendsIcon} />
+    <BottomNavigationTab title="Chats" icon={ChatsIcon} />
+    <BottomNavigationTab title="Profile" icon={ProfileIcon} />
+  </BottomNavigation>
 );
 
-const Navigation = createAppContainer(Stack);
+const Tabs = () => {
+  return (
+    <TabNav.Navigator tabBar={(props) => <BottomTabBar {...props} />}>
+      <TabNav.Screen name="Home" component={Home} />
+      <TabNav.Screen name="Sessions" component={Sessions} />
+      <TabNav.Screen name="Friends" component={Friends} />
+      <TabNav.Screen name="Chats" component={Chats} />
+      <TabNav.Screen name="Profile" component={Profile} />
+    </TabNav.Navigator>
+  );
+};
 
-class App extends Component {
-  messageListener: () => void;
+const key = '@theme';
 
-  notificationDisplayedListener: () => void;
+const App = () => {
+  const [theme, setTheme] = useState<Theme>('light');
 
-  notificationListener: () => void;
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+  };
 
-  notificationOpenedListener: () => void;
+  useEffect(() => {
+    const getTheme = async () => {
+      const currentTheme = await AsyncStorage.getItem(key);
+      if (currentTheme) {
+        //@ts-ignore
+        setTheme(currentTheme);
+      }
+    };
+    getTheme();
+  }, []);
 
-  onTokenRefreshListener: () => void;
+  useEffect(() => {
+    AsyncStorage.setItem(key, theme);
+  }, [theme]);
 
-  unsubscriber: () => void;
-
-  constructor(props) {
-    super(props);
+  useEffect(() => {
     Instabug.setWelcomeMessageMode(Instabug.welcomeMessageMode.disabled);
-    Instabug.startWithToken('804c8f8e35fa17bdafb82e6778629dd4', [Instabug.invocationEvent.shake]);
-  }
+    Instabug.startWithToken('804c8f8e35fa17bdafb82e6778629dd4', [
+      Instabug.invocationEvent.none,
+    ]);
+  }, []);
 
-  async componentDidMount() {
-    AppState.addEventListener('change', this.handleAppStateChange);
+  useEffect(() => {
+    AppState.addEventListener('change', _handleAppStateChange);
 
-    createChannels();
+    return () => {
+      AppState.removeEventListener('change', _handleAppStateChange);
+    };
+  }, []);
 
-    this.messageListener = firebase.messaging().onMessage(notification => {
-      handleNotification(notification.data);
-    });
-
-    this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed(notification => {
-      // Process your notification as required
-      // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
-      console.log(notification);
-    });
-
-    this.notificationListener = firebase.notifications().onNotification(notification => {
-      // Process your notification as required
-      handleNotification(notification.data);
-    });
-
-    this.notificationOpenedListener = firebase.notifications().onNotificationOpened(notificationOpen => {
-      // Get the action triggered by the notification being opened
-      // Get information about the notification that was opened
-      const { action, notification } = notificationOpen;
-
-      const state = AppState.currentState;
-      if (state !== 'active') {
-        handleNotification(notification.data, false);
-      }
-      navigateFromNotif(notification.data);
-    });
-
-    firebase
-      .notifications()
-      .getInitialNotification()
-      .then(notificationOpen => {
-        if (notificationOpen) {
-          // App was opened by a notification
-          // Get the action triggered by the notification being opened
-          // Get information about the notification that was opened
-          const { action, notification } = notificationOpen;
-        }
-      });
-
-    this.unsubscriber = firebase.auth().onAuthStateChanged(async user => {
-      if (user) {
-        const fcmToken = await firebase.messaging().getToken();
-        if (fcmToken) {
-          firebase
-            .database()
-            .ref(`users/${user.uid}`)
-            .child('FCMToken')
-            .set(fcmToken);
-          console.log(`fcm token: ${fcmToken}`);
-        } else {
-          console.log('no token');
-        }
-      }
-    });
-
-    this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(fcmToken => {
-      // Process your token as required
-      const user = firebase.auth().currentUser;
-      if (user) {
-        firebase
-          .database()
-          .ref(`users/${user.uid}`)
-          .child('FCMToken')
-          .set(fcmToken);
-      } else console.log('no user to set token on');
-    });
-  }
-
-  componentWillUnmount() {
-    AppState.removeEventListener('change', this.handleAppStateChange);
-    this.notificationDisplayedListener();
-    this.notificationListener();
-    this.notificationOpenedListener();
-    this.onTokenRefreshListener();
-    this.messageListener();
-    this.unsubscriber();
-  }
-
-  handleAppStateChange = nextAppState => {
-    const user = firebase.auth().currentUser;
+  const _handleAppStateChange = (nextAppState: AppStateStatus) => {
+    const user = auth().currentUser;
     if (user) {
       if (nextAppState === 'active') {
-        firebase
-          .database()
+        database()
           .ref(`users/${user.uid}`)
           .child('state')
           .set(UserState.ONLINE);
       } else {
-        firebase
-          .database()
-          .ref(`users/${user.uid}`)
-          .child('state')
-          .set(UserState.AWAY);
+        database().ref(`users/${user.uid}`).child('state').set(UserState.AWAY);
       }
     }
   };
 
-  render() {
-    return (
-      <PersistGate persistor={persistor}>
-        <Provider store={store}>
-          <Navigation
-            ref={navigatorRef => {
-              NavigationService.setTopLevelNavigator(navigatorRef);
-            }}
-          />
-        </Provider>
-      </PersistGate>
-    );
-  }
-}
+  return (
+    <PersistGate persistor={persistor}>
+      <Provider store={store}>
+        <IconRegistry icons={EvaIconsPack} />
+        <ThemeContext.Provider value={{theme, toggleTheme}}>
+          {/* @ts-ignore */}
+          <ApplicationProvider {...eva} theme={eva[theme]}>
+            <NavigationContainer ref={navigationRef}>
+              <Stack.Navigator
+                screenOptions={({navigation, route}) => ({
+                  headerStyle: {
+                    backgroundColor: theme === 'light' ? '#fff' : '#222B45',
+                  },
+                  headerTitleStyle: {
+                    color: theme === 'light' ? '#222B45' : '#fff',
+                  },
+                  headerBackTitleStyle: {
+                    color: theme === 'light' ? '#222B45' : '#fff',
+                  },
+                  headerTintColor: theme === 'light' ? '#222B45' : '#fff',
+                  headerTitle: route.name === 'Tabs' ? '' : undefined,
+
+                  headerRight: () => {
+                    const index = route?.state?.index;
+                    if (route.name === 'Tabs') {
+                      if (!route.state || index === 0) {
+                        return <NotificationsButton navigation={navigation} />;
+                      }
+                      if (index === 1) {
+                        return <MapToggle />;
+                      }
+                      if (index === 2) {
+                        return <AddFriendButton />;
+                      }
+                    }
+                  },
+                  headerLeft: (props) => {
+                    const index = route?.state?.index;
+                    if (route.name === 'Tabs') {
+                      if (index === 1) {
+                        return <FilterModalButton />;
+                      }
+                    }
+                    if (props.canGoBack) {
+                      return <HeaderBackButton {...props} />;
+                    }
+                  },
+                })}>
+                <Stack.Screen
+                  options={() => ({headerShown: false})}
+                  name="Login"
+                  component={Login}
+                />
+                <Stack.Screen name="SignUp" component={SignUp} />
+                <Stack.Screen
+                  name="Welcome"
+                  component={Welcome}
+                  options={() => ({headerShown: false})}
+                />
+                <Stack.Screen name="Tabs" component={Tabs} />
+                <Stack.Screen name="Settings" component={Settings} />
+                <Stack.Screen name="Notifications" component={notifications} />
+                <Stack.Screen name="SessionInfo" component={SessionInfo} />
+                <Stack.Screen name="Gym" component={Gym} />
+                <Stack.Screen
+                  name="Messaging"
+                  component={Messaging}
+                  options={({navigation, route}) => ({
+                    headerRight: ({tintColor}) => (
+                      <MessagingInfoButton
+                        tintColor={tintColor}
+                        navigation={navigation}
+                        route={route}
+                      />
+                    ),
+                  })}
+                />
+                <Stack.Screen name="ProfileView" component={ProfileView} />
+                <Stack.Screen name="SessionDetail" component={SessionDetail} />
+                <Stack.Screen name="PostView" component={PostView} />
+                <Stack.Screen
+                  name="FullScreenVideo"
+                  component={FullScreenVideo}
+                  options={() => ({headerShown: false})}
+                />
+                <Stack.Screen name="Credits" component={Credits} />
+                <Stack.Screen name="FilePreview" component={FilePreview} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </ApplicationProvider>
+        </ThemeContext.Provider>
+      </Provider>
+    </PersistGate>
+  );
+};
 
 export default App;

@@ -1,14 +1,31 @@
-import React, { Component } from 'react';
-import Modal from 'react-native-modalbox';
-import { connect } from 'react-redux';
-import { View, Platform, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {
+  View,
+  Platform,
+  Alert,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import Image from 'react-native-fast-image';
-import Icon from 'react-native-vector-icons/Ionicons';
-import colors from '../../constants/colors';
 import styles from './styles';
-import Text from '../Text';
-import Button from '../Button';
+
 import FriendsModalProps from '../../types/components/FriendsModal';
+import {
+  Button,
+  Icon,
+  Text,
+  List,
+  ListItem,
+  Layout,
+  Modal,
+  Card,
+  Divider,
+  Avatar,
+} from '@ui-kitten/components';
+import {MyRootState} from '../../types/Shared';
+import ThemedIcon from '../ThemedIcon/ThemedIcon';
+import globalStyles from '../../styles/globalStyles';
 
 interface State {
   selectedFriends: string[];
@@ -21,101 +38,109 @@ class FriendsModal extends Component<FriendsModalProps, State> {
     };
   }
 
-  onFriendPress(uid) {
-    const { selectedFriends } = this.state;
-    if (selectedFriends.some(friend => friend === uid)) {
-      const friends = selectedFriends.filter(friend => friend !== uid);
-      this.setState({ selectedFriends: friends });
+  onFriendPress(uid: string) {
+    const {selectedFriends} = this.state;
+    if (selectedFriends.some((friend) => friend === uid)) {
+      const friends = selectedFriends.filter((friend) => friend !== uid);
+      this.setState({selectedFriends: friends});
     } else {
-      this.setState({ selectedFriends: [...selectedFriends, uid] });
+      this.setState({selectedFriends: [...selectedFriends, uid]});
     }
   }
 
   renderFriendsSelection() {
-    const { friends } = this.props;
-    const { selectedFriends } = this.state;
-    const connectedFriends = [];
-    Object.values(friends).forEach((friend, index) => {
-      const selected = selectedFriends.some(uid => uid === friend.uid);
-      if (friend.status === 'connected') {
-        connectedFriends.push(
-          <TouchableOpacity key={friend.uid} onPress={() => this.onFriendPress(friend.uid)}>
-            <View
-              style={{
-                backgroundColor: '#fff',
-                paddingVertical: 15,
-                paddingHorizontal: 10,
-                marginBottom: 0.5,
-                marginTop: index === 0 ? 0.5 : 0,
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', height: 30, justifyContent: 'space-between' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {friend.avatar ? (
-                    <Image source={{ uri: friend.avatar }} style={{ height: 30, width: 30, borderRadius: 15 }} />
+    const {friends} = this.props;
+    const {selectedFriends} = this.state;
+    return (
+      <List
+        ItemSeparatorComponent={Divider}
+        data={Object.values(friends)}
+        renderItem={({item}) => {
+          const selected = selectedFriends.some((uid) => uid === item.uid);
+          if (item.status === 'connected') {
+            return (
+              <ListItem
+                onPress={() => this.onFriendPress(item.uid)}
+                title={item.username}
+                accessoryLeft={() =>
+                  item.avatar ? (
+                    <Avatar uri={item.avatar} size={35} />
                   ) : (
-                    <Icon
-                      name="md-contact"
-                      size={35}
-                      style={{
-                        color: colors.primary,
-                        marginTop: Platform.OS === 'ios' ? -2 : 0,
-                      }}
-                    />
-                  )}
-                  <Text style={{ marginHorizontal: 10 }}>{friend.username}</Text>
-                  {selected && (
-                    <Icon
-                      size={25}
-                      name="ios-checkmark-circle"
-                      style={{ color: colors.primary, textAlign: 'right', flex: 1 }}
-                    />
-                  )}
-                </View>
-              </View>
-            </View>
-          </TouchableOpacity>
-        );
-      }
-    });
-    return connectedFriends.length > 0 ? (
-      <ScrollView style={{ backgroundColor: '#d6d6d6' }}>{connectedFriends}</ScrollView>
-    ) : (
-      <View style={{ backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ padding: 15, textAlign: 'center' }}>
-          Sorry, you must have at least one Pal to create a Private Session
-        </Text>
-      </View>
+                    <ThemedIcon name="person" size={35} />
+                  )
+                }
+                accessoryRight={() =>
+                  selected ? (
+                    <ThemedIcon size={25} name="checkmark-circle-2" />
+                  ) : (
+                    <View />
+                  )
+                }
+              />
+            );
+          }
+          return null;
+        }}
+        ListEmptyComponent={
+          <Layout
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text style={{padding: 15, textAlign: 'center'}}>
+              Sorry, you must have at least one Pal to create a Private Session
+            </Text>
+          </Layout>
+        }
+      />
     );
   }
 
   render() {
-    const { onClosed, isOpen, title, onContinue } = this.props;
-    const { selectedFriends } = this.state;
+    const {onClosed, isOpen, title, onContinue} = this.props;
+    const {selectedFriends} = this.state;
     return (
-      <Modal onClosed={onClosed} isOpen={isOpen} style={styles.modal} position="center" key={isOpen ? 1 : 2}>
-        <Text style={{ fontSize: 20, textAlign: 'center', padding: 10 }}>{title || 'Select Pals'}</Text>
-        {this.renderFriendsSelection()}
-        <View style={{ marginVertical: 10, flexDirection: 'row', justifyContent: 'space-evenly' }}>
-          <Button onPress={onClosed} color={colors.appRed} text="Cancel" />
-          <Button
-            onPress={() => {
-              const { length } = selectedFriends;
-              if (length > 0) {
-                onContinue(selectedFriends);
-              } else {
-                Alert.alert('Sorry', 'Please select at least one friend');
-              }
-            }}
-            text="Continue"
-          />
-        </View>
+      <Modal
+        visible={isOpen}
+        backdropStyle={globalStyles.backdrop}
+        onBackdropPress={onClosed}
+        style={styles.modal}>
+        <Card disabled>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
+            {title || 'Select Pals'}
+          </Text>
+          <Divider />
+          {this.renderFriendsSelection()}
+          <Divider />
+          <Layout
+            style={{
+              marginVertical: 10,
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+            }}>
+            <Button onPress={onClosed} status="danger">
+              Cancel
+            </Button>
+            <Button
+              onPress={() => {
+                const {length} = selectedFriends;
+                if (length > 0) {
+                  onContinue(selectedFriends);
+                } else {
+                  Alert.alert('Sorry', 'Please select at least one friend');
+                }
+              }}>
+              Continue
+            </Button>
+          </Layout>
+        </Card>
       </Modal>
     );
   }
 }
 
-const mapStateToProps = ({ friends, profile }) => ({
+const mapStateToProps = ({friends, profile}: MyRootState) => ({
   friends: friends.friends,
   profile: profile.profile,
 });

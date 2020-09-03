@@ -1,4 +1,4 @@
-import { StyleSheet, Platform } from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
 
 // const deviceHeight = Dimensions.get('window').height;
 
@@ -15,12 +15,11 @@ export default StyleSheet.create({
     position: 'absolute',
   },
   inboxItem: {
-    backgroundColor: '#fff',
     borderBottomColor: '#999',
     borderBottomWidth: 0.5,
     padding: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 70
+    minHeight: 70,
   },
-})
+});

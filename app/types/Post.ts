@@ -7,7 +7,7 @@ export default interface Post {
   repCount?: number;
   commentCount?: number;
   uid: string;
-  username: string;
+  username?: string;
   comments?: Comment[];
   repUsers?: string[];
   key?: string;

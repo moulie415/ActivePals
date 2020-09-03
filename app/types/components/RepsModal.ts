@@ -1,7 +1,7 @@
-import Profile from "../Profile";
-import Comment from "../../components/comments/Comment";
-import Rep from "../Rep";
-import { NavigationStackProp } from "react-navigation-stack";
+import Profile from '../Profile';
+import Comment from '../../components/comments/Comment';
+import Rep from '../Rep';
+import {NavigationStackProp} from 'react-navigation-stack';
 
 export default interface RepsModalProps {
   id: string;
@@ -15,5 +15,5 @@ export default interface RepsModalProps {
   getCommentRepsUsers: (comment: Comment, limit?: number) => void;
   getRepUsers: (postId: string, limit?: number, endAt?: string) => void;
   isComment: boolean;
-  repsUsers: { [key: string]: Rep };
-}
+  repsUsers: {[key: string]: Rep};
+};

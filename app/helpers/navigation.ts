@@ -1,43 +1,59 @@
-import NavigationService from '../actions/navigation';
+import {navigate, navigationRef} from '../RootNavigation';
+import {PushNotificationData} from '../types/Shared';
+import {store} from '../App';
+import {resetUnreadCount} from '../actions/chats';
 
-export const shouldNavigate = notification => {
-  const { nav } = NavigationService.getNavigator().state;
-  if (nav.routes.length > 0) {
-    const route = nav.routes[nav.index];
-    if (route.params) {
-      const { chatId, session, gymId } = route.params;
-      return (
-        !(chatId && notification.chatId === chatId) &&
-        !(session && session.key === notification.sessionId) &&
-        !(gymId && gymId === notification.gymId)
-      );
-    }
+export const shouldNavigate = (notification: PushNotificationData) => {
+  const route = navigationRef.current?.getCurrentRoute();
+  if (route && route.params) {
+    const {chatId, sessionId, gymId} = route.params;
+    return (
+      !(chatId && notification.chatId === chatId) &&
+      !(sessionId === notification.sessionId) &&
+      !(gymId && gymId === notification.gymId)
+    );
   }
   return true;
 };
 
-export const navigateFromNotif = notif => {
-  const { type, sessionId, sessionTitle, chatId, uid, username, postId, gymId, isPrivate } = notif;
-  if (type === 'sessionMessage') {
-    const session = { key: sessionId, title: sessionTitle, private: notif.private === 'privateSessions' };
-    NavigationService.navigate('Messaging', { session });
-  }
+export const navigateFromNotif = (notif: PushNotificationData) => {
+  const {
+    type,
+    sessionId,
+    chatId,
+    uid,
+    username,
+    postId,
+    gymId,
+    isPrivate,
+  } = notif;
   switch (type) {
     case 'message':
-      NavigationService.navigate('Messaging', { chatId, friendUsername: username, friendUid: uid });
+      navigate('Messaging', {
+        chatId,
+        friendUsername: username,
+        friendUid: uid,
+      });
+      store.dispatch(resetUnreadCount(uid));
+      break;
+    case 'sessionMessage':
+      navigate('Messaging', {sessionId});
+      store.dispatch(resetUnreadCount(sessionId));
       break;
     case 'gymMessage':
-      NavigationService.navigate('Messaging', { gymId });
+      navigate('Messaging', {gymId});
+      store.dispatch(resetUnreadCount(gymId));
       break;
     case 'friendRequest':
-      NavigationService.navigate('Friends');
+      navigate('Friends');
       break;
     case 'comment':
-    case 'rep':
-      NavigationService.navigate('PostView', { postId });
+    case 'commentRep':
+    case 'postRep':
+      navigate('PostView', {postId});
       break;
     case 'addedToSession':
-      NavigationService.navigate('SessionInfo', { sessionId, isPrivate });
+      navigate('SessionInfo', {sessionId, isPrivate});
       break;
     default:
       console.log('invalid notif type');

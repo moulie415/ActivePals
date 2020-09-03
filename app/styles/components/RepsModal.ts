@@ -1,5 +1,4 @@
-import { StyleSheet } from 'react-native';
-import colors from '../../constants/colors';
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   container: {
@@ -25,12 +24,11 @@ export default StyleSheet.create({
     flexDirection: 'row',
   },
   likeHeader: {
-    textAlign: "center",
+    textAlign: 'center',
     padding: 10,
     marginTop: 10,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   defaultIcon: {
-    color: colors.primary,
   },
 });

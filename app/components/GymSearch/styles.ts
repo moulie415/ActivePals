@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   textInputContainer: {
@@ -9,17 +9,15 @@ export default StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: '#999',
     borderTopColor: '#999',
-    borderBottomColor: '#999'
+    borderBottomColor: '#999',
   },
   container: {
     position: 'absolute',
     width: '100%',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   description: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
-  predefinedPlacesDescription: {
-    color: '#1faadb'
-  }
-})
+  predefinedPlacesDescription: {},
+});

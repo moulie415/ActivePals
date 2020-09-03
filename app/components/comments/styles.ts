@@ -1,5 +1,4 @@
-import { StyleSheet, PixelRatio, Platform } from 'react-native';
-import colors from '../../constants/colors';
+import {StyleSheet, PixelRatio, Platform} from 'react-native';
 
 export default StyleSheet.create({
   commentContainer: {
@@ -21,7 +20,6 @@ export default StyleSheet.create({
   rightContent: {
     borderRadius: 10,
     padding: 5,
-    backgroundColor: '#f1f3f6',
   },
   rightContentTop: {
     flexDirection: 'row',
@@ -38,7 +36,6 @@ export default StyleSheet.create({
   },
   body: {
     paddingBottom: 10,
-    color: colors.textGrey,
   },
   rightActionBar: {
     flexDirection: 'row',
@@ -80,19 +77,14 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
   },
   submit: {
     padding: 10,
-    color: colors.secondary,
   },
   input: {
     flex: 1,
-    padding: Platform.OS == 'ios' ? 10 : 0,
-    marginBottom: Platform.OS == 'ios' ? 0 : 10,
-    backgroundColor: '#fff',
-    color: '#424242',
-    borderColor: '#999',
+    padding: Platform.OS === 'ios' ? 10 : 0,
+    marginBottom: Platform.OS === 'ios' ? 0 : 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginLeft: 5,
   },
@@ -133,7 +125,6 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   editModal: {
-    backgroundColor: 'white',
     width: 400,
     height: 300,
     borderWidth: 2,
@@ -153,11 +144,10 @@ export default StyleSheet.create({
   menu: {
     zIndex: 999,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#999',
     width: 200,
     right: 0,
     top: 0,
-    backgroundColor: 'white',
+
     position: 'absolute',
   },
   menuItem: {
@@ -166,7 +156,6 @@ export default StyleSheet.create({
     borderWidth: 0,
     justifyContent: 'center',
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderColor: '#999',
   },
   menuText: {
     textAlign: 'center',

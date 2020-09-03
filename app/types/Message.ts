@@ -1,4 +1,4 @@
-import { IMessage } from 'react-native-gifted-chat';
+import {IMessage} from 'react-native-gifted-chat';
 
 export default interface Message extends IMessage {
   FCMToken?: string;
@@ -13,7 +13,7 @@ export default interface Message extends IMessage {
   image?: string;
   user: MessageUser;
   key?: string;
-}
+};
 
 export interface MessageUser {
   _id: string;

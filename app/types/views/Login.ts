@@ -1,9 +1,16 @@
-import { NavigationStackProp } from 'react-navigation-stack';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {StackParamList} from '../../App';
+import Profile from '../Profile';
+import {RouteProp} from '@react-navigation/native';
+
+type LoginNavigationProp = StackNavigationProp<StackParamList, 'Login'>;
+type LoginRouteProp = RouteProp<StackParamList, 'Login'>;
 
 export default interface LoginProps {
-  loggedIn: boolean;
-  navigation: NavigationStackProp;
+  navigation: LoginNavigationProp;
+  route: LoginRouteProp;
+  setProfile: (user: Profile) => void;
+  setup: () => void;
   hasViewedWelcome: boolean;
-  onLogin: () => void;
-  loggedOut: () => void;
+  getProfile: () => void;
 }

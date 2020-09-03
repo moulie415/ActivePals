@@ -2,14 +2,14 @@ import Profile from '../Profile';
 import Post from '../Post';
 import Comment from '../Comment';
 import Rep from '../Rep';
-import { NavigationStackProp } from 'react-navigation-stack';
+import {NavigationStackProp} from 'react-navigation-stack';
 
 export default interface HomeProps {
   profile: Profile;
-  feed: { [key: string]: Post };
-  friends: { [key: string]: Profile };
-  users: { [key: string]: Profile };
-  repsUsers: { [key: string]: Rep };
+  feed: {[key: string]: Post};
+  friends: {[key: string]: Profile};
+  users: {[key: string]: Profile};
+  repsUsers: {[key: string]: Rep};
   postStatus: (status: Post) => void;
   onRepPost: (item: Post) => void;
   comment: (uid, postId, text, created_at, parentCommentId) => void;
@@ -20,4 +20,4 @@ export default interface HomeProps {
   getRepsUsers: (postId: string, limit?: number) => void;
   getReplies: (parentComment: Comment, amount: number, key: string) => void;
   navigation: NavigationStackProp;
-}
+};

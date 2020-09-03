@@ -4,7 +4,7 @@ export default interface Notification {
   uid: string;
   key: string;
   postId?: string;
-}
+};
 
 export enum NotificationType {
   POST_REP = 'postRep',
@@ -13,5 +13,5 @@ export enum NotificationType {
   FRIEND_REQUEST = 'friendRequest',
   COMMENT_MENTION = 'commentMention',
   POST_MENTION = 'postMention',
-  ADDED_TO_SESSION = 'addedToSession'
+  ADDED_TO_SESSION = 'addedToSession',
 }

@@ -1,15 +1,24 @@
-import React, { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { View } from 'react-native';
-import Text from '../Text';
+import React, {FunctionComponent} from 'react';
+import {connect} from 'react-redux';
+import {View} from 'react-native';
 import styles from './styles';
 import ChatRowCountProps from '../../types/components/ChatRowCount';
+import {Text, withStyles} from '@ui-kitten/components';
+import {MyRootState} from '../../types/Shared';
 
-const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({ unreadCount, id }) => {
+const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({
+  unreadCount,
+  id,
+  eva,
+}) => {
   const count = unreadCount[id];
   if (count && count > 0) {
     return (
-      <View style={styles.countContainer}>
+      <View
+        style={[
+          styles.countContainer,
+          {backgroundColor: eva.theme['color-primary-active']},
+        ]}>
         <Text style={styles.count}>{count > 9 ? '9+' : count}</Text>
       </View>
     );
@@ -17,8 +26,8 @@ const ChatRowCount: FunctionComponent<ChatRowCountProps> = ({ unreadCount, id })
   return null;
 };
 
-const mapStateToProps = ({ chats }) => ({
+const mapStateToProps = ({chats}: MyRootState) => ({
   unreadCount: chats.unreadCount,
 });
 
-export default connect(mapStateToProps)(ChatRowCount);
+export default connect(mapStateToProps)(withStyles(ChatRowCount));

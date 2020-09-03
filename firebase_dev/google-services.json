@@ -8,34 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:680139677816:android:a708ba4f85c12f60424d8d",
+        "mobilesdk_app_id": "1:680139677816:android:2621d7716c5bb2fe424d8d",
         "android_client_info": {
           "package_name": "com.activepals"
         }
       },
       "oauth_client": [
         {
-          "client_id": "680139677816-ivlilmhkjdi22c794733mmr8t14ihs42.apps.googleusercontent.com",
+          "client_id": "680139677816-tjr8u5ll8nrgk4u52sl9rv0u80ni8kim.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.activepals",
-            "certificate_hash": "e3183a757d4f185b2d093c1b4134b035d4722760"
-          }
-        },
-        {
-          "client_id": "680139677816-6327vpi3tjfjlssttka4bgkabciqe2c5.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.activepals",
-            "certificate_hash": "5265b2e99e4569abd819796fc9a608c02713a70f"
-          }
-        },
-        {
-          "client_id": "680139677816-1f390a1vvuger33oecri7ddrlrjcd4j8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.activepals",
-            "certificate_hash": "900b5959df75284ff6388bbe23d6daae7dc16fb3"
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {
@@ -45,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDn9qBJnxvUZN6M_6AbhrHB9p6sLSIN5GY"
+          "current_key": "AIzaSyBhj9jukN2YitXhooZD2JK7ouDEtMxtoTI"
         }
       ],
       "services": {
