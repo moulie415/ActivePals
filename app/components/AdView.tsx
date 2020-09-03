@@ -72,7 +72,7 @@ const AdComponent: FunctionComponent<{
           requestOptions={{
             requestNonPersonalizedAdsOnly: true,
             keywords: str.keywords,
-            location: [location.lat, location.lon],
+            location: location ? [location.lat, location.lon] : undefined,
           }}
           unitId={adUnitId}
         />
