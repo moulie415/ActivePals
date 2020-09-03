@@ -52,6 +52,18 @@ export const getResource = (type: SessionType): Source => {
   return require('../../assets/images/custom.png');
 };
 
+export const getBirthdayDate = (birthday: string): Moment | null => {
+  if (!birthday) {
+    return null;
+  }
+  for (let i = 0; i < formats.length; i++) {
+    if (moment(birthday, formats[i]).isValid()) {
+      return moment(birthday, formats[i]);
+    }
+  }
+  return moment(birthday);
+};
+
 export const renderImages = () => {
   return (
     <View style={{flexDirection: 'row'}}>

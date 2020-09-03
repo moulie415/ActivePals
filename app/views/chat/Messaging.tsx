@@ -394,7 +394,7 @@ class Messaging extends Component<MessagingProps, State> {
         <GiftedChat
           text={text}
           onInputTextChanged={(input) => this.setState({text: input})}
-          messages={messages}
+          messages={sortMessagesByCreatedAt(messages).reverse()}
           inverted={false}
           onSend={(msgs) => {
             if (profile.username) {

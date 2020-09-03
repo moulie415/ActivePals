@@ -31,6 +31,7 @@ import {
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
+import {getBirthdayDate} from '../constants/utils';
 
 const activities = [
   'Bodybuilding',
@@ -237,7 +238,6 @@ class ProfileView extends Component<ProfileProps, State> {
     } else {
       this.setState({spinner: true});
       await this.checkImages();
-      delete newProfile.avatar;
       try {
         await database()
           .ref(`users/${newProfile.uid}`)
@@ -317,6 +317,33 @@ class ProfileView extends Component<ProfileProps, State> {
           </Layout>
 
           <Layout style={{flex: 1}}>
+            {this.hasChanged() && (
+              <>
+                <Divider />
+                <Layout
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-evenly',
+                    padding: 10,
+                  }}>
+                  <Button
+                    onPress={() => {
+                      this.setState({
+                        profile: initialProfile,
+                      });
+                    }}>
+                    Undo
+                  </Button>
+
+                  <Button
+                    onPress={() => {
+                      this.updateUser(initialProfile, profile);
+                    }}>
+                    Save
+                  </Button>
+                </Layout>
+              </>
+            )}
             <Divider />
             <ListItem title="Email" description={email} disabled />
             <Divider />
@@ -359,15 +386,6 @@ class ProfileView extends Component<ProfileProps, State> {
                 placeholder="Username"
                 autoCapitalize="none"
                 autoCorrect={false}
-                accessoryRight={() =>
-                  initialProfile.username !== profile.username ? (
-                    <TouchableOpacity>
-                      <ThemedIcon size={25} name="save" />
-                    </TouchableOpacity>
-                  ) : (
-                    <Layout />
-                  )
-                }
               />
 
               <Input
@@ -380,15 +398,6 @@ class ProfileView extends Component<ProfileProps, State> {
                 placeholder="First name"
                 autoCapitalize="none"
                 autoCorrect={false}
-                accessoryRight={() =>
-                  initialProfile.first_name !== profile.first_name ? (
-                    <TouchableOpacity>
-                      <ThemedIcon size={25} name="save" />
-                    </TouchableOpacity>
-                  ) : (
-                    <Layout />
-                  )
-                }
               />
 
               <Input
@@ -401,15 +410,6 @@ class ProfileView extends Component<ProfileProps, State> {
                 placeholder="Last name"
                 autoCapitalize="none"
                 autoCorrect={false}
-                accessoryRight={() =>
-                  initialProfile.last_name !== profile.last_name ? (
-                    <TouchableOpacity>
-                      <ThemedIcon size={25} name="save" />
-                    </TouchableOpacity>
-                  ) : (
-                    <Layout />
-                  )
-                }
               />
               <Select
                 style={{marginBottom: 10}}
@@ -439,20 +439,14 @@ class ProfileView extends Component<ProfileProps, State> {
               <Datepicker
                 style={{marginBottom: 10}}
                 accessoryLeft={() => <Text category="label">Birthday</Text>}
-                date={profile.birthday && new Date(profile.birthday)}
+                date={
+                  profile.birthday &&
+                  getBirthdayDate(profile.birthday)?.toDate()
+                }
                 min={new Date('01/01/1900')}
                 max={new Date()}
                 onSelect={(nextDate) =>
                   this.setState({profile: {...profile, birthday: nextDate}})
-                }
-                accessoryRight={() =>
-                  initialProfile.birthday !== profile.birthday ? (
-                    <TouchableOpacity>
-                      <ThemedIcon size={25} name="save" />
-                    </TouchableOpacity>
-                  ) : (
-                    <Layout />
-                  )
                 }
               />
             </Layout>
