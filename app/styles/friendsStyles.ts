@@ -2,7 +2,6 @@ import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   modal: {
-    height: 200,
     width: '90%',
   },
   modalText: {

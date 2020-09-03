@@ -136,6 +136,7 @@ const Settings: FunctionComponent<SettingsProps> = ({
       <Modal
         visible={showDialog}
         backdropStyle={globalStyles.backdrop}
+        style={{width: '90%'}}
         onBackdropPress={() => setShowDialog(false)}>
         <Card disabled>
           <Text style={{textAlign: 'center'}} category="h6">
@@ -152,7 +153,12 @@ const Settings: FunctionComponent<SettingsProps> = ({
             value={email}
             onChangeText={setEmail}
           />
-          <View style={{flexDirection: 'row'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              marginTop: 10,
+            }}>
             <Button style={{margin: 5}} onPress={() => setShowDialog(false)}>
               Cancel
             </Button>

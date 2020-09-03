@@ -16,7 +16,6 @@ import {
   Image as SlowImage,
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import Modal from 'react-native-modalbox';
 import {Popup, Options} from 'react-native-map-link';
 import Permissions, {PERMISSIONS, RESULTS} from 'react-native-permissions';
 import MapView, {Marker, MapEvent} from 'react-native-maps';
@@ -60,6 +59,8 @@ import {
   Divider,
   Avatar,
   Spinner,
+  Modal,
+  Card,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
@@ -562,8 +563,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
             isOpen={friendsModalOpen}
           />
           <Modal
-            useNativeDriver
-            onClosed={async () => {
+            onBackdropPress={async () => {
               setShowFilterModal(false);
               if (radius !== currentRadius) {
                 setRefreshing(true);
@@ -573,66 +573,68 @@ const Sessions: FunctionComponent<SessionsProps> = ({
               }
             }}
             style={styles.modal}
-            position="center"
-            isOpen={showFilterModal}
-            key={showFilterModal ? 1 : 2}>
-            <View style={{flex: 1, borderRadius: 5}}>
-              <Text style={styles.sessionFilterTitle}>Sessions</Text>
-              <View style={styles.sessionFilterContainer}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text
-                    style={{
-                      marginRight: 5,
-                      fontSize: 12,
-                    }}>{`Search radius* ${radius} km`}</Text>
-                  <Slider
-                    maximumValue={50}
-                    minimumValue={5}
-                    step={5}
-                    style={{flex: 1}}
-                    value={radius}
-                    onValueChange={setStateRadius}
-                  />
-                </View>
-                <View style={{flex: 1, justifyContent: 'flex-end'}}>
-                  <Text style={{fontSize: 12, textAlign: 'right', margin: 10}}>
-                    *Public only (private sessions should always be visible)
-                  </Text>
+            backdropStyle={globalStyles.backdrop}
+            visible={showFilterModal}>
+            <Card disabled>
+              <View style={{flex: 1, borderRadius: 5}}>
+                <Text style={styles.sessionFilterTitle}>Sessions</Text>
+                <View style={styles.sessionFilterContainer}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text>{`Search radius* ${radius} km`}</Text>
+                    <Slider
+                      maximumValue={50}
+                      minimumValue={5}
+                      step={5}
+                      style={{flex: 1}}
+                      value={radius}
+                      onValueChange={setStateRadius}
+                    />
+                  </View>
+                  <View style={{flex: 1, justifyContent: 'flex-end'}}>
+                    <Text
+                      appearance="hint"
+                      style={{textAlign: 'right', margin: 10}}>
+                      *Public only (private sessions should always be visible)
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-            <View style={{flex: 1}}>
-              <Text
-                style={{
-                  fontSize: 20,
-                  textAlign: 'center',
-                  padding: 10,
-                  color: '#000',
-                  fontWeight: 'bold',
-                }}>
-                Gyms
-              </Text>
-              <TouchableOpacity
-                onPress={() => setYoga(!yoga)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  borderTopWidth: 0.5,
-                  borderTopColor: '#999',
-                }}>
-                <CheckBox checked={yoga} onPress={() => setYoga(!yoga)} />
-                <Text>Show Yoga</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setPilates(!pilates)}
-                style={{flexDirection: 'row', alignItems: 'center'}}>
-                <CheckBox
-                  checked={pilates}
+              <Divider />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    textAlign: 'center',
+                    padding: 10,
+                    fontWeight: 'bold',
+                  }}>
+                  Gyms
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setYoga(!yoga)}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <CheckBox
+                    checked={yoga}
+                    onPress={() => setYoga(!yoga)}
+                    style={{marginRight: 20, marginVertical: 10}}
+                  />
+                  <Text>Show Yoga</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   onPress={() => setPilates(!pilates)}
-                />
-                <Text>Show Pilates</Text>
-              </TouchableOpacity>
-            </View>
+                  style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <CheckBox
+                    checked={pilates}
+                    onPress={() => setPilates(!pilates)}
+                    style={{marginRight: 20, marginVertical: 10}}
+                  />
+                  <Text>Show Pilates</Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
           </Modal>
           <Popup
             isVisible={popUpVisible}

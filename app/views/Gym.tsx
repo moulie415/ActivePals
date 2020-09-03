@@ -34,6 +34,7 @@ import {
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
+import ThemedImage from '../components/ThemedImage/ThemedImage';
 
 interface State {
   profile?: Profile;
@@ -145,16 +146,17 @@ class Gym extends Component<GymProps, State> {
                   />
                 )}
                 <View>
-                  <SlowImage
-                    style={{
-                      width: 80,
-                      padding: 10,
-                      height: 80,
-                      marginTop: -40,
-                      borderWidth: 1,
-                    }}
-                    source={require('../../assets/images/dumbbell.png')}
-                  />
+                  <Layout>
+                    <ThemedImage
+                      style={{
+                        padding: 10,
+                        marginTop: -40,
+                        borderWidth: 1,
+                      }}
+                      size={80}
+                      source={require('../../assets/images/dumbbell.png')}
+                    />
+                  </Layout>
                 </View>
               </View>
               <Divider />

@@ -243,19 +243,14 @@ class Friends extends Component<FriendsProps, State> {
           </Layout>
         )}
         <Modal
-          // backButtonClose
-          //backdropPressToClose={false}
+          style={styles.modal}
           backdropStyle={globalStyles.backdrop}
           onBackdropPress={() => setModal(false)}
-          //position="center"
-          visible={modalOpen}
-          //key={modalOpen ? 1 : 2}
-        >
+          visible={modalOpen}>
           <Card disabled>
             <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
               Send pal request
             </Text>
-
             <Input
               underlineColorAndroid="transparent"
               autoCapitalize="none"
@@ -263,7 +258,12 @@ class Friends extends Component<FriendsProps, State> {
               value={username}
               onChangeText={(u) => this.setState({username: u})}
             />
-            <Layout style={{flexDirection: 'row', marginTop: 10}}>
+            <Layout
+              style={{
+                flexDirection: 'row',
+                marginTop: 10,
+                justifyContent: 'space-evenly',
+              }}>
               <Button
                 style={{margin: 5}}
                 onPress={() => setModal(false)}
