@@ -3,6 +3,7 @@ import Post from '../Post';
 import Comment from '../Comment';
 import Rep from '../Rep';
 import {NavigationStackProp} from 'react-navigation-stack';
+import {YourLocation} from '../Location';
 
 export default interface HomeProps {
   profile: Profile;
@@ -20,4 +21,5 @@ export default interface HomeProps {
   getRepsUsers: (postId: string, limit?: number) => void;
   getReplies: (parentComment: Comment, amount: number, key: string) => void;
   navigation: NavigationStackProp;
-};
+  location: YourLocation;
+}

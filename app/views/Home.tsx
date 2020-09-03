@@ -609,7 +609,7 @@ class Home extends Component<HomeProps, State> {
           renderItem={({item, index}) => {
             return (
               <>
-                <AdView index={index} />
+                <AdView index={index} location={this.props.location} />
                 <Card style={{marginBottom: 10}}>
                   {this.renderFeedItem(item)}
                 </Card>
@@ -1015,6 +1015,7 @@ const mapStateToProps = ({
   feed: home.feed,
   friends: friends.friends,
   users: sharedInfo.users,
+  location: profile.location,
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({

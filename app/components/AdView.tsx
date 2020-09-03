@@ -15,6 +15,7 @@ import {BannerAd, BannerAdSize, TestIds} from '@react-native-firebase/admob';
 import crashlytics from '@react-native-firebase/crashlytics';
 import str from '../constants/strings';
 import {Text, Card, Layout} from '@ui-kitten/components';
+import {YourLocation} from '../types/Location';
 
 const adUnitId = __DEV__ ? TestIds.BANNER : str.admobBanner;
 
@@ -59,7 +60,10 @@ const fbAd: FunctionComponent<{nativeAd: NativeAd}> = ({nativeAd}) => {
 // TODO: add fb ads back in
 // const FbAd = withNativeAd(fbAd);
 
-const AdComponent: FunctionComponent<{index: number}> = ({index}) => {
+const AdComponent: FunctionComponent<{
+  index: number;
+  location: YourLocation;
+}> = ({index, location}) => {
   if (index > 0 && index % 4 === 0) {
     return (
       <Layout style={{marginBottom: 10}}>
@@ -68,6 +72,7 @@ const AdComponent: FunctionComponent<{index: number}> = ({index}) => {
           requestOptions={{
             requestNonPersonalizedAdsOnly: true,
             keywords: str.keywords,
+            location: [location.lat, location.lon],
           }}
           unitId={adUnitId}
         />
