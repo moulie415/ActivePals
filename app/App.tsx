@@ -13,7 +13,7 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, RouteProp} from '@react-navigation/native';
 import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -256,8 +256,6 @@ const App = () => {
                     color: theme === 'light' ? '#222B45' : '#fff',
                   },
                   headerTintColor: theme === 'light' ? '#222B45' : '#fff',
-                  headerTitle: route.name === 'Tabs' ? '' : undefined,
-
                   headerRight: () => {
                     const index = route?.state?.index;
                     if (route.name === 'Tabs') {
@@ -289,16 +287,34 @@ const App = () => {
                   name="Login"
                   component={Login}
                 />
-                <Stack.Screen name="SignUp" component={SignUp} />
+                <Stack.Screen
+                  name="SignUp"
+                  component={SignUp}
+                  options={{title: 'Sign Up'}}
+                />
                 <Stack.Screen
                   name="Welcome"
                   component={Welcome}
                   options={() => ({headerShown: false})}
                 />
-                <Stack.Screen name="Tabs" component={Tabs} />
+                <Stack.Screen
+                  name="Tabs"
+                  component={Tabs}
+                  options={({route}) => ({
+                    title: '',
+                    headerShown: !(
+                      route.state &&
+                      (route.state.index === 3 || route.state.index === 4)
+                    ),
+                  })}
+                />
                 <Stack.Screen name="Settings" component={Settings} />
                 <Stack.Screen name="Notifications" component={notifications} />
-                <Stack.Screen name="SessionInfo" component={SessionInfo} />
+                <Stack.Screen
+                  name="SessionInfo"
+                  component={SessionInfo}
+                  options={{title: 'Session Info'}}
+                />
                 <Stack.Screen name="Gym" component={Gym} />
                 <Stack.Screen
                   name="Messaging"
@@ -313,9 +329,21 @@ const App = () => {
                     ),
                   })}
                 />
-                <Stack.Screen name="ProfileView" component={ProfileView} />
-                <Stack.Screen name="SessionDetail" component={SessionDetail} />
-                <Stack.Screen name="PostView" component={PostView} />
+                <Stack.Screen
+                  name="ProfileView"
+                  component={ProfileView}
+                  options={{title: 'Profile View'}}
+                />
+                <Stack.Screen
+                  name="SessionDetail"
+                  component={SessionDetail}
+                  options={{title: 'Session Detail'}}
+                />
+                <Stack.Screen
+                  name="PostView"
+                  component={PostView}
+                  options={{title: 'Post'}}
+                />
                 <Stack.Screen
                   name="FullScreenVideo"
                   component={FullScreenVideo}

@@ -3,9 +3,6 @@ import {StyleSheet} from 'react-native';
 export default StyleSheet.create({
   container: {
     width: 300,
-    height: 500,
-    borderRadius: 5,
-    padding: 5,
   },
   likeImage: {
     width: 30,
@@ -29,6 +26,5 @@ export default StyleSheet.create({
     marginTop: 10,
     fontWeight: 'bold',
   },
-  defaultIcon: {
-  },
+
 });
