@@ -16,10 +16,6 @@ jobs:
         run: |
           yarn
       - name: Set environment variables from project settings
-        env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GOOGLE_IOS_ID: ${{ secrets.GOOGLE_IOS_ID }}
-          GOOGLE_WEB_ID: ${{ secrets.GOOGLE_WEB_ID }}
         run: |
           exec .github/scripts/set-env-from-xcodeproj.sh
       - name: Import signing certificate
@@ -33,6 +29,13 @@ jobs:
           PROVISIONING_PROFILE_DATA: ${{ secrets.PROVISIONING_PROFILE_DATA }}
         run: |
           exec .github/scripts/import-profile.sh
+      - name: Set up prod environment
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_IOS_ID: ${{ secrets.GOOGLE_IOS_ID }}
+          GOOGLE_WEB_ID: ${{ secrets.GOOGLE_WEB_ID }}
+        run: |
+          exec .github/scripts/setup-env.sh
       - name: Build app
         run: |
           cd ios
