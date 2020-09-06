@@ -16,13 +16,12 @@ jobs:
         #   npm test
       - name: Build android apk
         run: |
-          touch .env
-          touch .env.prod
-          echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env.prod
-          echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env.prod
-          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env.prod
-          cd scripts && ENV=production ./envscript.sh
-          cd .. && cd android
+          echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env
+          echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env
+          cd android/app
+          echo ${{ secrets.GOOGLE_SERVICES_JSON }} >> google-services.json
+          cd ..
           echo "MYAPP_RELEASE_KEY_ALIAS=${{ secrets.MYAPP_RELEASE_KEY_ALIAS }}" >> gradle.properties
           echo "MYAPP_RELEASE_STORE_FILE=${{ secrets.MYAPP_RELEASE_STORE_FILE }}" >> gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }}" >> gradle.properties
