@@ -31,12 +31,7 @@ jobs:
           exec .github/scripts/import-profile.sh
       - name: Build app
         run: |
-          touch .env
-          touch .env.prod
-          echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env.prod
-          echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env.prod
-          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env.prod
-          cd scripts && ENV=production ./envscript.sh && cd ../ios
+          cd ios
           pod install
           fastlane gym --workspace "ActivePals.xcworkspace" --scheme "ActivePals"
       - name: Upload build artifacts
