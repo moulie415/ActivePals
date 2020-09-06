@@ -16,6 +16,10 @@ jobs:
         run: |
           yarn
       - name: Set environment variables from project settings
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_IOS_ID: ${{ secrets.GOOGLE_IOS_ID }}
+          GOOGLE_WEB_ID: ${{ secrets.GOOGLE_WEB_ID }}
         run: |
           exec .github/scripts/set-env-from-xcodeproj.sh
       - name: Import signing certificate

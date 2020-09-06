@@ -10,7 +10,7 @@ echo "::set-env name=PRODUCT_NAME::$PRODUCT_NAME"
 cd ..
 touch .env
 touch .env.prod
-echo "GOOGLE_IOS_ID=${{ secrets.GOOGLE_IOS_ID }}" >> .env.prod
-echo "GOOGLE_WEB_ID=${{ secrets.GOOGLE_WEB_ID }}" >> .env.prod
-echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> .env.prod
+echo "GOOGLE_IOS_ID=$GOOGLE_IOS_ID" >> .env.prod
+echo "GOOGLE_WEB_ID=$GOOGLE_WEB_ID" >> .env.prod
+echo "GOOGLE_API_KEY=$GOOGLE_API_KEY" >> .env.prod
 cd scripts && ENV=production ./envscript.sh
