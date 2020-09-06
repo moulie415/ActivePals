@@ -1,8 +1,8 @@
-name: test-flight
+name: appstore connect
 
 on:
   push:
-    branches: [ test-flight ]
+    branches: [ test-flight, master ]
     tags: [ v* ]
 
 jobs:
