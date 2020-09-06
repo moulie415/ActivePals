@@ -34,6 +34,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           GOOGLE_IOS_ID: ${{ secrets.GOOGLE_IOS_ID }}
           GOOGLE_WEB_ID: ${{ secrets.GOOGLE_WEB_ID }}
+          GOOGLE_SERVICE_INFO: ${{ secrets.GOOGLE_SERVICE_INFO }}
         run: |
           exec .github/scripts/setup-env.sh
       - name: Build app
