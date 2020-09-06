@@ -31,7 +31,7 @@ jobs:
           exec .github/scripts/import-profile.sh
       - name: Build app
         run: |
-          ls
+          cd ios
           fastlane gym --workspace "ActivePals.xcworkspace" --scheme "ActivePals"
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
