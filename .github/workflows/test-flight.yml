@@ -42,7 +42,6 @@ jobs:
           cd ios
           pod install
           fastlane gym --workspace "ActivePals.xcworkspace" --scheme "ActivePals"
-          ls
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -54,8 +53,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ${{ env.PRODUCT_NAME }}.ipa
-            ${{ env.PRODUCT_NAME }}.app.dSYM.zip
+            ios/${{ env.PRODUCT_NAME }}.ipa
+            ios/${{ env.PRODUCT_NAME }}.app.dSYM.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -66,5 +65,5 @@ jobs:
           APP_STORE_CONNECT_PASSWORD: ${{ secrets.APP_STORE_CONNECT_PASSWORD }}
         run: |
           ls
-          xcrun altool --upload-app -t ios -f "$PRODUCT_NAME.ipa" -u "$APP_STORE_CONNECT_USERNAME" -p "$APP_STORE_CONNECT_PASSWORD"
+          xcrun altool --upload-app -t ios -f "ios/$PRODUCT_NAME.ipa" -u "$APP_STORE_CONNECT_USERNAME" -p "$APP_STORE_CONNECT_PASSWORD"
 
