@@ -32,6 +32,7 @@ jobs:
       - name: Build app
         run: |
           cd ios
+          pod install
           fastlane gym --workspace "ActivePals.xcworkspace" --scheme "ActivePals"
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
