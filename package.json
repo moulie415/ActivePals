@@ -82,6 +82,7 @@
     "react-native-video": "^5.1.0-alpha8",
     "react-native-video-compressor": "^0.0.3",
     "react-native-video-controls": "^2.6.0",
+    "react-native-webview": "^10.8.3",
     "react-redux": "^7.2.1",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
