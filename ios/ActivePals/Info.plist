@@ -70,7 +70,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
 	<string>1959322104333437</string>
 	<key>FacebookDisplayName</key>
@@ -110,10 +110,16 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>ActivePals would like to access your calendar to add sessions to your calendar</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>ActivePals requires you location to find nearby sessions</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>ActivePals requires you location to find nearby sessions</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ActivePals would like to access your microphone if you wish to upload videos with audio</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ActivePals would like to access your photo library if you wish to upload photos</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
