@@ -282,7 +282,7 @@ class Home extends Component<HomeProps, State> {
     });
   }
 
-  async processVideo(uri) {
+  async processVideo(uri: string) {
     const {navigation} = this.props;
     const {status} = this.state;
     // @TODO compress android

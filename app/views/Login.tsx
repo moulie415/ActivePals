@@ -125,13 +125,14 @@ const Login: FunctionComponent<LoginProps> = ({
     try {
       return await auth().signInWithEmailAndPassword(email, password);
     } catch (e) {
-      setSpinner(false)
+      setSpinner(false);
       Alert.alert('Error', e.message);
     }
   };
 
   const appleSignIn = async () => {
     try {
+      setSpinner(true);
       const appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: AppleAuthRequestOperation.LOGIN,
         requestedScopes: [
@@ -153,9 +154,11 @@ const Login: FunctionComponent<LoginProps> = ({
       );
 
       // Sign the user in with the credential
-      return await auth().signInWithCredential(appleCredential);
+      await auth().signInWithCredential(appleCredential);
+      setSpinner(false);
     } catch (e) {
       Alert.alert('Error', e.message);
+      setSpinner(false);
     }
   };
 
@@ -305,7 +308,7 @@ const Login: FunctionComponent<LoginProps> = ({
         <Button onPress={() => navigation.navigate('SignUp')}>Sign Up</Button>
       </View>
       <View style={{alignItems: 'center'}}>
-        {Platform.OS === 'ios' && (
+        {Platform.OS === 'ios' && appleAuth.isSupported && (
           <AppleButton
             buttonStyle={AppleButton.Style.WHITE}
             buttonType={AppleButton.Type.SIGN_IN}

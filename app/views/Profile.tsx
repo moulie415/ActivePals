@@ -28,6 +28,7 @@ import {
   ListItem,
   Divider,
   Datepicker,
+  withStyles,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
@@ -265,7 +266,12 @@ class ProfileView extends Component<ProfileProps, State> {
     const {initialProfile, email, profile, spinner, showPicker} = this.state;
 
     return (
-      <ScrollView>
+      <ScrollView
+        style={{
+          backgroundColor: this.props.eva.theme[
+            'background-basic-color-1'
+          ],
+        }}>
         <Layout style={{flex: 1}}>
           <Layout style={{alignItems: 'center', marginBottom: 10}}>
             <TouchableOpacity
@@ -483,4 +489,7 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onSave: () => dispatch(fetchProfile()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProfileView);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withStyles(ProfileView));

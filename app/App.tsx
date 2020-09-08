@@ -49,7 +49,13 @@ import SessionDetail from './views/sessions/SessionDetail';
 import Location from './types/Location';
 import PostView from './views/PostView';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
-import {ImageProps, AppState, AppStateStatus} from 'react-native';
+import {
+  ImageProps,
+  AppState,
+  AppStateStatus,
+  SafeAreaView,
+  Platform,
+} from 'react-native';
 import FullScreenVideo from './views/FullScreenVideo';
 import Credits from './views/Credits';
 import Instabug from 'instabug-reactnative';
@@ -117,13 +123,15 @@ const TabNav = createBottomTabNavigator<StackParamList>();
 const TopTab = createMaterialTopTabNavigator<StackParamList>();
 
 const TopTabBar = ({navigation, state}) => (
-  <TabBar
-    selectedIndex={state.index}
-    onSelect={(index) => navigation.navigate(state.routeNames[index])}>
-    <Tab title="Sessions" />
-    <Tab title="Pals" />
-    <Tab title="Gym" />
-  </TabBar>
+  <SafeAreaView>
+    <TabBar
+      selectedIndex={state.index}
+      onSelect={(index) => navigation.navigate(state.routeNames[index])}>
+      <Tab title="Sessions" />
+      <Tab title="Pals" />
+      <Tab title="Gym" />
+    </TabBar>
+  </SafeAreaView>
 );
 
 const Chats = () => (
