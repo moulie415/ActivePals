@@ -7,6 +7,7 @@ import {
   Icon,
   TabBar,
   Tab,
+  withStyles,
 } from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import database from '@react-native-firebase/database';
@@ -122,8 +123,17 @@ const Stack = createStackNavigator<StackParamList>();
 const TabNav = createBottomTabNavigator<StackParamList>();
 const TopTab = createMaterialTopTabNavigator<StackParamList>();
 
+const ThemedSafeArea = withStyles(({children, eva}) => {
+  return (
+    <SafeAreaView
+      style={{backgroundColor: eva.theme['background-basic-color-1']}}>
+      {children}
+    </SafeAreaView>
+  );
+});
+
 const TopTabBar = ({navigation, state}) => (
-  <SafeAreaView>
+  <ThemedSafeArea>
     <TabBar
       selectedIndex={state.index}
       onSelect={(index) => navigation.navigate(state.routeNames[index])}>
@@ -131,7 +141,7 @@ const TopTabBar = ({navigation, state}) => (
       <Tab title="Pals" />
       <Tab title="Gym" />
     </TabBar>
-  </SafeAreaView>
+  </ThemedSafeArea>
 );
 
 const Chats = () => (

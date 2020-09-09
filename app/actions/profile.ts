@@ -102,6 +102,7 @@ export const doSetup = (): MyThunkResult<Promise<void>> => {
     await messaging().requestPermission();
     const token = await messaging().getToken();
     if (token) {
+      debugger;
       await database().ref('users').child(uid).update({FCMToken: token});
     }
     createChannels();

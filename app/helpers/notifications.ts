@@ -61,7 +61,8 @@ export const createChannels = () => {
     ),
   );
 };
-export const handleNotfication = (notification: PushNotificationData) => {
+export const handleNotification = (notification: PushNotificationData) => {
+  debugger;
   const {type} = notification;
   const localTypes = [
     MessageType.MESSAGE,
@@ -101,12 +102,11 @@ export const setupNotifications = (uid: string) => {
     // (optional) Called when Token is generated (iOS and Android)
     onRegister: ({token}) => {
       console.log('TOKEN:', token);
-      db().collection('users').doc(uid).update({FCMToken: token});
-      database().ref('users').child(uid).update({FCMToken: token});
     },
 
     // (required) Called when a remote or local notification is opened or received
     onNotification: (notification) => {
+      debugger;
       console.log('NOTIFICATION:', notification);
       if (notification.userInteraction) {
         if (shouldNavigate(notification.data as PushNotificationData)) {

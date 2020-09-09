@@ -408,19 +408,19 @@ const Sessions: FunctionComponent<SessionsProps> = ({
             data={sortPlacesByDistance(Object.values(places))}
             refreshing={refreshing}
             ItemSeparatorComponent={Divider}
-            onEndReached={async () => {
-              if (!spinner && loadMoreGyms) {
-                setRefreshing(true);
-                const {token: newToken, loadMore} = await getPlaces(
-                  yourLat,
-                  yourLon,
-                  stateToken,
-                );
-                setRefreshing(false);
-                setStateToken(newToken);
-                setLoadMoreGyms(loadMore);
-              }
-            }}
+            // onEndReached={async () => {
+            //   if (!spinner && loadMoreGyms) {
+            //     setRefreshing(true);
+            //     const {token: newToken, loadMore} = await getPlaces(
+            //       yourLat,
+            //       yourLon,
+            //       stateToken,
+            //     );
+            //     setRefreshing(false);
+            //     setStateToken(newToken);
+            //     setLoadMoreGyms(loadMore);
+            //   }
+            // }}
             onEndReachedThreshold={0.1}
             onRefresh={handleRefresh}
             keyExtractor={(item) => item.place_id}
