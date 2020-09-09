@@ -636,7 +636,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
               </View>
             </Card>
           </Modal>
-          <Popup
+          {/* <Popup
             isVisible={popUpVisible}
             onCancelPressed={() => setPopUpVisible(false)}
             onAppPressed={() => setPopUpVisible(false)}
@@ -644,7 +644,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
             modalProps={{animationIn: 'slideInUp'}}
             //options={options}
             appsWhiteList={[]}
-          />
+          /> */}
         </Layout>
       )}
       <ActionSheet

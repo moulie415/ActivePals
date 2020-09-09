@@ -328,20 +328,20 @@ export const fetchPrivateSessions = () => {
   };
 };
 
-export const fetchPhotoPath = async (result) => {
-  if (result.photos && result.photos[0].photo_reference) {
-    const url =
-      'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
-    const fullUrl = `${url}${result.photos[0].photo_reference}&key=${GOOGLE_API_KEY}`;
-    try {
-      const response = await fetch(fullUrl);
-      return {...result, photo: response.url};
-    } catch (e) {
-      return result;
-    }
-  }
-  return result;
-};
+// export const fetchPhotoPath = async (result) => {
+//   if (result.photos && result.photos[0].photo_reference) {
+//     const url =
+//       'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
+//     const fullUrl = `${url}${result.photos[0].photo_reference}&key=${GOOGLE_API_KEY}`;
+//     try {
+//       const response = await fetch(fullUrl);
+//       return {...result, photo: response.url};
+//     } catch (e) {
+//       return result;
+//     }
+//   }
+//   return result;
+// };
 
 export const fetchGym = (id: string) => {
   return async (dispatch: MyThunkDispatch, getState) => {
@@ -445,18 +445,18 @@ export const addUser = (key, isPrivate, uid) => {
   };
 };
 
-export const fetchPhotoPaths = () => {
-  return async (dispatch: MyThunkDispatch, getState) => {
-    const obj = getState().sessions.places;
-    const places = await Promise.all(
-      Object.values(obj).map((place) => fetchPhotoPath(place)),
-    );
-    places.forEach((place) => {
-      obj[place.place_id] = place;
-    });
-    dispatch(setPlaces(obj));
-  };
-};
+// export const fetchPhotoPaths = () => {
+//   return async (dispatch: MyThunkDispatch, getState) => {
+//     const obj = getState().sessions.places;
+//     const places = await Promise.all(
+//       Object.values(obj).map((place) => fetchPhotoPath(place)),
+//     );
+//     places.forEach((place) => {
+//       obj[place.place_id] = place;
+//     });
+//     dispatch(setPlaces(obj));
+//   };
+// };
 
 const mapIdsToPlaces = (places) => {
   const obj = {};
@@ -477,7 +477,7 @@ export const fetchPlaces = (lat: number, lon: number, token?: string) => {
         throw json.error_message;
       } else {
         dispatch(setPlaces(mapIdsToPlaces(json.results)));
-        dispatch(fetchPhotoPaths());
+        //dispatch(fetchPhotoPaths());
         return {
           token: json.next_page_token,
           loadMore: json.next_page_token !== undefined,
@@ -490,7 +490,7 @@ export const fetchPlaces = (lat: number, lon: number, token?: string) => {
         throw json.error_message;
       } else {
         dispatch(setPlaces(mapIdsToPlaces(json.results)));
-        dispatch(fetchPhotoPaths());
+        //Paths());
         return {token: json.next_page_token, loadMore: true};
       }
     }
