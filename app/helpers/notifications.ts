@@ -62,7 +62,6 @@ export const createChannels = () => {
   );
 };
 export const handleNotification = (notification: PushNotificationData) => {
-  debugger;
   const {type} = notification;
   const localTypes = [
     MessageType.MESSAGE,
@@ -106,7 +105,6 @@ export const setupNotifications = (uid: string) => {
 
     // (required) Called when a remote or local notification is opened or received
     onNotification: (notification) => {
-      debugger;
       console.log('NOTIFICATION:', notification);
       if (notification.userInteraction) {
         if (shouldNavigate(notification.data as PushNotificationData)) {

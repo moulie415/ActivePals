@@ -137,7 +137,7 @@ android {
         versionCode 1
         versionName "1.0.0"
         multiDexEnabled true
-        manifestPlaceholders = [GOOGLE_API_KEY: "$process.env.GOOGLE_API_KEY_ANDROID"]
+        manifestPlaceholders = [GOOGLE_API_KEY: "$System.env.GOOGLE_API_KEY_ANDROID"]
     }
     splits {
         abi {
