@@ -1,24 +1,19 @@
-import {StyleSheet, Platform} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Platform.select({android: 10}),
-  },
-  countContainer: {
-    marginLeft: 5,
-    width: 18,
-    height: 18,
+  active: {
+    width: 17,
+    height: 17,
     borderRadius: 9,
+    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
+    right: 20,
   },
-  count: {
-    color: '#fff',
+  unreadCount: {
     fontSize: 10,
     fontWeight: 'bold',
+    color: '#fff',
   },
 });
 

@@ -44,19 +44,12 @@ import notifications from './views/notifications';
 import SessionInfo from './views/sessions/SessionInfo';
 import Gym from './views/Gym';
 import Messaging from './views/chat/Messaging';
-import Session from './types/Session';
 import ProfileView from './views/ProfileView';
 import SessionDetail from './views/sessions/SessionDetail';
 import Location from './types/Location';
 import PostView from './views/PostView';
 import ChatTabBarIcon from './components/ChatTabBarIcon';
-import {
-  ImageProps,
-  AppState,
-  AppStateStatus,
-  SafeAreaView,
-  Platform,
-} from 'react-native';
+import {ImageProps, AppState, AppStateStatus, SafeAreaView} from 'react-native';
 import FullScreenVideo from './views/FullScreenVideo';
 import Credits from './views/Credits';
 import Instabug from 'instabug-reactnative';
@@ -67,6 +60,7 @@ import FilterModalButton from './components/FilterModalButton/FilterModalButton'
 import {UserState} from './types/Profile';
 import {navigationRef} from './RootNavigation';
 import MessagingInfoButton from './components/MessagingInfoButton/MessagingInfoButton';
+import ChatTabLabel from './components/ChatTabLabel';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -137,9 +131,9 @@ const TopTabBar = ({navigation, state}) => (
     <TabBar
       selectedIndex={state.index}
       onSelect={(index) => navigation.navigate(state.routeNames[index])}>
-      <Tab title="Sessions" />
-      <Tab title="Pals" />
-      <Tab title="Gym" />
+      <Tab title="Sessions" icon={() => <ChatTabLabel type="sessions" />} />
+      <Tab title="Pals" icon={() => <ChatTabLabel type="pals" />} />
+      <Tab title="Gym" icon={() => <ChatTabLabel type="gym" />} />
     </TabBar>
   </ThemedSafeArea>
 );

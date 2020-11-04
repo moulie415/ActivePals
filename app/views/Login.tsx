@@ -38,14 +38,10 @@ import {
   Spinner,
 } from '@ui-kitten/components';
 import globalStyles from '../styles/globalStyles';
-import {GOOGLE_WEB_ID, GOOGLE_IOS_ID} from 'react-native-dotenv';
 import {ThemeContext} from '../context/themeContext';
 import Logo from '../components/Logo/Logo';
 
-GoogleSignin.configure({
-  webClientId: Platform.OS === 'ios' ? GOOGLE_IOS_ID : GOOGLE_WEB_ID, // From Firebase Console Settings
-  iosClientId: GOOGLE_IOS_ID,
-});
+GoogleSignin.configure();
 
 const Login: FunctionComponent<LoginProps> = ({
   navigation,

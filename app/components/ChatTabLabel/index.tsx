@@ -1,18 +1,17 @@
 import React, {FunctionComponent} from 'react';
-import {View, Platform} from 'react-native';
 import {connect} from 'react-redux';
 import styles from './styles';
 import ChatTabLabelProps from '../../types/components/ChatTabLabel';
 import {MyRootState} from '../../types/Shared';
-import {Text} from '@ui-kitten/components';
+import {Text, Layout, withStyles} from '@ui-kitten/components';
 
 const ChatTabLabel: FunctionComponent<ChatTabLabelProps> = ({
   unreadCount,
-  color,
   type,
   chats,
   sessionChats,
   gymChat,
+  eva,
 }) => {
   let count = 0;
   const chatType = type.toLowerCase();
@@ -34,18 +33,18 @@ const ChatTabLabel: FunctionComponent<ChatTabLabelProps> = ({
         }
     }
   });
-
   return (
-    <View style={styles.container}>
-      <Text style={{color}}>
-        {Platform.select({ios: type, android: type.toUpperCase()})}
-      </Text>
+    <>
       {count > 0 && (
-        <View style={styles.countContainer}>
-          <Text style={styles.count}>{count > 9 ? '9+' : count}</Text>
-        </View>
+        <Layout
+          style={[
+            styles.active,
+            {backgroundColor: eva.theme['color-primary-active']},
+          ]}>
+          <Text style={styles.unreadCount}>{count > 9 ? '9+' : count}</Text>
+        </Layout>
       )}
-    </View>
+    </>
   );
 };
 
@@ -56,4 +55,4 @@ const mapStateToProps = ({chats}: MyRootState) => ({
   gymChat: chats.gymChat,
 });
 
-export default connect(mapStateToProps)(ChatTabLabel);
+export default connect(mapStateToProps)(withStyles(ChatTabLabel));
