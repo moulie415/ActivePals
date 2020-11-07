@@ -17,8 +17,6 @@ import {CommonActions} from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import appleAuth, {
   AppleButton,
-  AppleAuthRequestOperation,
-  AppleAuthRequestScope,
 } from '@invertase/react-native-apple-authentication';
 import db from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
@@ -123,11 +121,8 @@ const Login: FunctionComponent<LoginProps> = ({
     try {
       setSpinner(true);
       const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: AppleAuthRequestOperation.LOGIN,
-        requestedScopes: [
-          AppleAuthRequestScope.EMAIL,
-          AppleAuthRequestScope.FULL_NAME,
-        ],
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
       });
 
       // Ensure Apple returned a user identityToken
