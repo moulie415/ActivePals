@@ -145,6 +145,14 @@ class Messaging extends Component<MessagingProps, State> {
                 : [message],
             }));
           }
+          const id = friendUid || sessionId || gymId;
+          if (id) {
+            const {unreadCount, onResetUnreadCount} = this.props;
+            const count = unreadCount[id];
+            if (count && count > 0) {
+              onResetUnreadCount(id);
+            }
+          }
         }
       }
     }

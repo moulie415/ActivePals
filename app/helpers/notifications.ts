@@ -1,6 +1,5 @@
 import PushNotification from 'react-native-push-notification';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import db from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import messaging from '@react-native-firebase/messaging';
 import {navigateFromNotif, shouldNavigate} from './navigation';
@@ -9,7 +8,9 @@ import {MessageType} from '../types/Message';
 import {NotificationType} from '../types/Notification';
 import {store} from '../App';
 import {newNotification, updateLastMessage} from '../actions/chats';
-import { setNotificationCount } from '../actions/home';
+import {setNotificationCount} from '../actions/home';
+import {Platform} from 'react-native';
+import {Message} from 'react-native-gifted-chat';
 
 export const createChannels = () => {
   const channelData = [
@@ -105,11 +106,43 @@ export const setupNotifications = (uid: string) => {
 
     // (required) Called when a remote or local notification is opened or received
     onNotification: (notification) => {
-      console.log('NOTIFICATION:', notification);
+      const data = notification.data;
+      handleNotification(data as PushNotificationData);
       if (notification.userInteraction) {
-        if (shouldNavigate(notification.data as PushNotificationData)) {
-          navigateFromNotif(notification.data as PushNotificationData);
+        if (shouldNavigate(data as PushNotificationData)) {
+          navigateFromNotif(data as PushNotificationData);
         }
+      }
+      if (
+        !notification.userInteraction &&
+        notification.foreground &&
+        Platform.OS === 'ios'
+      ) {
+        const {
+          type,
+          sessionId,
+          chatId,
+          uid,
+          username,
+          postId,
+          gymId,
+          isPrivate,
+        } = notification.data;
+        PushNotification.localNotification({
+          title: notification.title,
+          message: notification.message,
+          soundName: notification.soundName,
+          userInfo: {
+            type,
+            sessionId,
+            chatId,
+            uid,
+            username,
+            postId,
+            gymId,
+            isPrivate,
+          },
+        });
       }
 
       // process the notification

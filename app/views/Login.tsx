@@ -87,14 +87,6 @@ const Login: FunctionComponent<LoginProps> = ({
               ? AccountType.ADMIN
               : AccountType.STANDARD,
           });
-        // const userRef = db().collection('users').doc(user.uid);
-        // const doc = await userRef.get();
-        // if (doc.exists) {
-        // setProfile(doc.data());
-        // } else {
-        //   userRef.set({uid: user.uid, email: user.email});
-        // setProfile({uid: user.uid, email: user.email});
-        //  }
 
         await getProfile();
         await setup();
