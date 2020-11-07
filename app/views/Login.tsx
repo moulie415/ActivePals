@@ -103,6 +103,7 @@ const Login: FunctionComponent<LoginProps> = ({
         }
         setupNotifications(user.uid);
       }
+
       authRef.current = true;
     });
     // unsubscribe to the listener when unmounting

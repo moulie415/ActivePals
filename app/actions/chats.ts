@@ -49,7 +49,7 @@ const updateSessionChat = (key: string, lastMessage) => ({
   lastMessage,
 });
 
-const setMute = (id: string, mute) => ({
+const setMute = (id: string, mute: boolean) => ({
   type: MUTE_CHAT,
   id,
   mute,
