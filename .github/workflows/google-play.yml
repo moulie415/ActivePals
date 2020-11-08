@@ -16,9 +16,6 @@ jobs:
       #   run: |
       #     npm test
       - name: Setup env
-        run: |
-          ./scripts/setupEnv.sh
-      - name: Runing build command
         env:
           GOOGLE_IOS_ID: ${{ secrets.GOOGLE_IOS_ID }}
           GOOGLE_WEB_ID: ${{ secrets.GOOGLE_IOS_ID }}
@@ -28,7 +25,9 @@ jobs:
           MYAPP_RELEASE_KEY_ALIAS: ${{ secrets.MYAPP_RELEASE_KEY_ALIAS }}
           MYAPP_RELEASE_STORE_PASSWORD: ${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }}
           MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.MYAPP_RELEASE_KEY_PASSWORD }}
-        # Run your own gradle command to generate build.
+        run: |
+          ./scripts/setupEnv.sh
+      - name: Running build command
         run: |
           cd android
           ./gradlew bundleRelease
