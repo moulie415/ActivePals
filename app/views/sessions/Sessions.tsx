@@ -1,5 +1,4 @@
 import React, {
-  Component,
   FunctionComponent,
   useRef,
   useState,
@@ -72,6 +71,7 @@ import {
 } from '@react-native-firebase/admob';
 import str from '../../constants/strings';
 import Avatar from '../../components/Avatar/Avatar';
+import useThrottle from '../../hooks/UseThrottle';
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
 
@@ -157,19 +157,21 @@ const Sessions: FunctionComponent<SessionsProps> = ({
   const [loaded, setLoaded] = useState(false);
   const [radius, setStateRadius] = useState<number>(currentRadius);
 
-  const getPosition = useCallback(async () => {
+  const getPosition = useThrottle(async () => {
     setSpinner(true);
     const response = await Permissions.request(LOCATION_PERMISSION);
     // to watch position:
     // this.watchID = navigator.geolocation.watchPosition((position) => {
     if (response === RESULTS.GRANTED) {
-      return Geolocation.getCurrentPosition(
+      Geolocation.getCurrentPosition(
         async (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
           setYourLocation({lat, lon});
           setLatitude(lat);
           setLongitude(lon);
+          const {token} = await getPlaces(lat, lon, stateToken);
+          //setStateToken(token);
           setSpinner(false);
         },
         (error) => {
@@ -191,23 +193,13 @@ const Sessions: FunctionComponent<SessionsProps> = ({
           response === RESULTS.BLOCKED
             ? {
                 text: 'OK',
-                onPress: () => Permissions.request(LOCATION_PERMISSION),
+                onPress: () => getPosition(),
               }
             : {text: 'Open Settings', onPress: Permissions.openSettings},
         ],
       );
     }
-  }, [setYourLocation]);
-
-  useEffect(() => {
-    const getNewPlaces = async () => {
-      if (latitude && longitude) {
-        const {token} = await getPlaces(latitude, longitude, stateToken);
-        setStateToken(token);
-      }
-    };
-    getNewPlaces();
-  }, [latitude, longitude, getPlaces, stateToken]);
+  }, 30000);
 
   useEffect(() => {
     const eventListener = interstitial.onAdEvent((type) => {
@@ -218,6 +210,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
     // Start loading the interstitial straight away
     interstitial.load();
     getPosition();
+
     // Unsubscribe from events on unmount
     return () => {
       eventListener();

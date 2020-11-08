@@ -95,7 +95,7 @@ export const removeSession = (
   key: string,
   isPrivate: boolean,
   force = false,
-) => {
+): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
     const {uid} = getState().profile.profile;
     const sessions: {[key: string]: Session} = isPrivate
@@ -275,7 +275,7 @@ export const fetchSessions = (): MyThunkResult<Promise<void>> => {
   };
 };
 
-export const fetchPrivateSessions = () => {
+export const fetchPrivateSessions = (): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const {uid} = getState().profile.profile;
     const userFetches = [];
@@ -328,22 +328,22 @@ export const fetchPrivateSessions = () => {
   };
 };
 
-// export const fetchPhotoPath = async (result) => {
-//   if (result.photos && result.photos[0].photo_reference) {
-//     const url =
-//       'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
-//     const fullUrl = `${url}${result.photos[0].photo_reference}&key=${GOOGLE_API_KEY}`;
-//     try {
-//       const response = await fetch(fullUrl);
-//       return {...result, photo: response.url};
-//     } catch (e) {
-//       return result;
-//     }
-//   }
-//   return result;
-// };
+export const fetchPhotoPath = async (result) => {
+  if (result.photos && result.photos[0].photo_reference) {
+    const url =
+      'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=';
+    const fullUrl = `${url}${result.photos[0].photo_reference}&key=${GOOGLE_API_KEY}`;
+    try {
+      const response = await fetch(fullUrl);
+      return {...result, photo: response.url};
+    } catch (e) {
+      return result;
+    }
+  }
+  return result;
+};
 
-export const fetchGym = (id: string) => {
+export const fetchGym = (id: string): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${GOOGLE_API_KEY}`;
     const response = await fetch(url);
@@ -368,7 +368,7 @@ export const fetchGym = (id: string) => {
   };
 };
 
-export const fetchSession = (id: string) => {
+export const fetchSession = (id: string): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     let distance;
     // check if session exists and use existing distance value
@@ -399,7 +399,7 @@ export const fetchSession = (id: string) => {
   };
 };
 
-export const fetchPrivateSession = (id) => {
+export const fetchPrivateSession = (id: string): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const session = await database()
       .ref('privateSessions')
@@ -426,7 +426,11 @@ export const fetchPrivateSession = (id) => {
   };
 };
 
-export const addUser = (key, isPrivate, uid) => {
+export const addUser = (
+  key: string,
+  isPrivate: boolean,
+  uid: string,
+): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const type = isPrivate ? 'privateSessions/' : 'sessions/';
     await database()
@@ -445,18 +449,18 @@ export const addUser = (key, isPrivate, uid) => {
   };
 };
 
-// export const fetchPhotoPaths = () => {
-//   return async (dispatch: MyThunkDispatch, getState) => {
-//     const obj = getState().sessions.places;
-//     const places = await Promise.all(
-//       Object.values(obj).map((place) => fetchPhotoPath(place)),
-//     );
-//     places.forEach((place) => {
-//       obj[place.place_id] = place;
-//     });
-//     dispatch(setPlaces(obj));
-//   };
-// };
+export const fetchPhotoPaths = (): MyThunkResult<void> => {
+  return async (dispatch: MyThunkDispatch, getState) => {
+    const obj = getState().sessions.places;
+    const places = await Promise.all(
+      Object.values(obj).map((place) => fetchPhotoPath(place)),
+    );
+    places.forEach((place) => {
+      obj[place.place_id] = place;
+    });
+    dispatch(setPlaces(obj));
+  };
+};
 
 const mapIdsToPlaces = (places) => {
   const obj = {};
@@ -477,7 +481,7 @@ export const fetchPlaces = (lat: number, lon: number, token?: string) => {
         throw json.error_message;
       } else {
         dispatch(setPlaces(mapIdsToPlaces(json.results)));
-        //dispatch(fetchPhotoPaths());
+        dispatch(fetchPhotoPaths());
         return {
           token: json.next_page_token,
           loadMore: json.next_page_token !== undefined,
@@ -490,7 +494,8 @@ export const fetchPlaces = (lat: number, lon: number, token?: string) => {
         throw json.error_message;
       } else {
         dispatch(setPlaces(mapIdsToPlaces(json.results)));
-        //Paths());
+        dispatch(fetchPhotoPaths());
+
         return {token: json.next_page_token, loadMore: true};
       }
     }
