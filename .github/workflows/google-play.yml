@@ -20,7 +20,10 @@ jobs:
           ./scripts/setupEnv.sh
       - name: Runing build command
         # Run your own gradle command to generate build.
-        run: ./gradlew bundleRelease
+        run: |
+          ls
+          cd android
+          ./gradlew bundleRelease
       - name: Upload release assets
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
