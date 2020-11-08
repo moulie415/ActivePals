@@ -10,7 +10,8 @@
 		00E356F31AD99517003FC87E /* ActivePalsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ActivePalsTests.m */; };
 		0A6229FA2556F76B00C3C8F4 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A6229F92556F76B00C3C8F4 /* Launch Screen.storyboard */; };
 		0A622A00255715D900C3C8F4 /* notif.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0A6229FF255715D900C3C8F4 /* notif.wav */; };
-		0AA1BF9325586ED300165F73 /* splashscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AA1BF9225586ED300165F73 /* splashscreen.png */; };
+		0AA1BF96255884FF00165F73 /* splashscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AA1BF95255884FE00165F73 /* splashscreen.png */; };
+		0AA1BF97255884FF00165F73 /* splashscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AA1BF95255884FE00165F73 /* splashscreen.png */; };
 		0AA86ECF24F2D141008068B6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0AA86ECE24F2D141008068B6 /* GoogleService-Info.plist */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -52,7 +53,7 @@
 		0A6229F92556F76B00C3C8F4 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		0A6229FF255715D900C3C8F4 /* notif.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = notif.wav; sourceTree = SOURCE_ROOT; };
 		0A8C7E4024F688360049A0F8 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
-		0AA1BF9225586ED300165F73 /* splashscreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splashscreen.png; sourceTree = "<group>"; };
+		0AA1BF95255884FE00165F73 /* splashscreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splashscreen.png; sourceTree = SOURCE_ROOT; };
 		0AA86ECE24F2D141008068B6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0C4321C54EFD9BE7F60EF189 /* Pods-ActivePals-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ActivePals-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-ActivePals-tvOSTests/Pods-ActivePals-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		127CA97413EEF991A73FA3F5 /* Instabug.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Instabug.framework; path = "../node_modules/instabug-reactnative/ios/Instabug.framework"; sourceTree = "<group>"; };
@@ -144,7 +145,7 @@
 		0A6229FC255713E200C3C8F4 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				0AA1BF9225586ED300165F73 /* splashscreen.png */,
+				0AA1BF95255884FE00165F73 /* splashscreen.png */,
 				0A6229FF255715D900C3C8F4 /* notif.wav */,
 			);
 			name = Resources;
@@ -379,6 +380,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AA1BF97255884FF00165F73 /* splashscreen.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -387,7 +389,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				0AA1BF9325586ED300165F73 /* splashscreen.png in Resources */,
+				0AA1BF96255884FF00165F73 /* splashscreen.png in Resources */,
 				0A622A00255715D900C3C8F4 /* notif.wav in Resources */,
 				0A6229FA2556F76B00C3C8F4 /* Launch Screen.storyboard in Resources */,
 				0AA86ECF24F2D141008068B6 /* GoogleService-Info.plist in Resources */,
