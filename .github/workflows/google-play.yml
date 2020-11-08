@@ -21,7 +21,6 @@ jobs:
       - name: Runing build command
         # Run your own gradle command to generate build.
         run: |
-          ls
           cd android
           ./gradlew bundleRelease
       - name: Upload release assets
