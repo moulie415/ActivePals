@@ -38,8 +38,11 @@ import {
 import globalStyles from '../styles/globalStyles';
 import {ThemeContext} from '../context/themeContext';
 import Logo from '../components/Logo/Logo';
+import {GOOGLE_WEB_ID} from 'react-native-dotenv';
 
-GoogleSignin.configure();
+GoogleSignin.configure({
+  webClientId: GOOGLE_WEB_ID,
+});
 
 const Login: FunctionComponent<LoginProps> = ({
   navigation,
