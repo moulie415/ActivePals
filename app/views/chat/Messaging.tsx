@@ -461,8 +461,10 @@ class Messaging extends Component<MessagingProps, State> {
           }}
           renderActions={() => {
             return (
-              <TouchableOpacity onPress={() => this.showPicker()}>
-                <ThemedIcon size={25} name="attach-2" />
+              <TouchableOpacity
+                style={{paddingBottom: 10, paddingLeft: 10}}
+                onPress={() => this.showPicker()}>
+                <ThemedIcon size={30} name="attach-2" />
               </TouchableOpacity>
             );
           }}
