@@ -147,11 +147,11 @@ export const getMentionsList = (status, friends) => {
   }
 };
 
-export function calculateAge(birthday) {
+export function calculateAge(birthday: Moment | null) {
   // birthday is a date
-  const ageDifMs = Date.now() - birthday.getTime();
-  const ageDate = new Date(ageDifMs); // miliseconds from epoch
-  return Math.abs(ageDate.getUTCFullYear() - 1970);
+  if (birthday) {
+    return moment().diff(birthday, 'years');
+  }
 }
 
 export function likesExtractor(item, uid, viewProfile, goToProfile) {

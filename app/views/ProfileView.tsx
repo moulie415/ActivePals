@@ -13,14 +13,26 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import Image from 'react-native-fast-image';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
+import moment from 'moment';
 import hStyles from '../styles/homeStyles';
-import {calculateAge, getFormattedBirthday} from '../constants/utils';
+import {
+  calculateAge,
+  getBirthdayDate,
+  getFormattedBirthday,
+} from '../constants/utils';
 import globalStyles from '../styles/globalStyles';
 import {deleteFriend, sendRequest} from '../actions/friends';
 import ProfileViewProps from '../types/views/ProfileView';
 import Profile from '../types/Profile';
 import Place from '../types/Place';
-import {Button, Text, Spinner} from '@ui-kitten/components';
+import {
+  Button,
+  Text,
+  Spinner,
+  Layout,
+  ListItem,
+  Divider,
+} from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
@@ -97,9 +109,9 @@ class ProfileView extends Component<ProfileViewProps, State> {
     return (
       <>
         {loaded ? (
-          <View style={{flex: 1, justifyContent: 'space-between'}}>
-            <View>
-              <View style={{alignItems: 'center', marginBottom: 10}}>
+          <Layout style={{flex: 1, justifyContent: 'space-between'}}>
+            <Layout>
+              <Layout style={{alignItems: 'center', marginBottom: 10}}>
                 {backdrop ? (
                   <TouchableOpacity
                     style={{height: 150, width: '100%'}}
@@ -159,7 +171,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
                     }}
                   />
                 )}
-              </View>
+              </Layout>
 
               <Text
                 style={{
@@ -167,6 +179,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
                   fontSize: 15,
                   textAlign: 'center',
                   fontWeight: 'bold',
+                  marginBottom: 10,
                 }}>
                 <Text>{`${username} `}</Text>
                 {(first_name || last_name) && (
@@ -204,51 +217,58 @@ class ProfileView extends Component<ProfileViewProps, State> {
               )}
 
               {accountType && isFriend && (
-                <Text style={{marginLeft: 10, marginVertical: 5}}>
-                  Account type:
-                  <Text>{` ${accountType}`}</Text>
-                </Text>
+                <>
+                  <Divider />
+                  <ListItem title="Account type" description={accountType} />
+                  <Divider />
+                </>
               )}
 
               {gym && gym.name && isFriend && (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Gym', {id: gym.place_id})
-                  }>
-                  <Text style={{marginLeft: 10, marginVertical: 5}}>
-                    Gym:
-                    <Text>{` ${gym.name}`}</Text>
-                  </Text>
-                </TouchableOpacity>
+                <>
+                  <ListItem
+                    onPress={() =>
+                      navigation.navigate('Gym', {id: gym.place_id})
+                    }
+                    title="Gym"
+                    description={gym.name}
+                  />
+                  <Divider />
+                </>
               )}
 
               {birthday && isFriend && (
-                <Text style={{marginLeft: 10, marginVertical: 5}}>
-                  <Text style={{marginLeft: 10, marginVertical: 5}}>
-                    Birthday:{' '}
-                  </Text>
-                  <Text>
-                    {`${getFormattedBirthday(birthday)} (${calculateAge(
-                      new Date(birthday),
+                <>
+                  <ListItem
+                    title="Birthday"
+                    description={`${birthday} (${calculateAge(
+                      getBirthdayDate(birthday),
                     )})`}
-                  </Text>
-                </Text>
+                  />
+                  <Divider />
+                </>
               )}
 
               {isFriend && (
-                <Text style={{marginLeft: 10, marginVertical: 5}}>
-                  {'Preferred activity: '}
-                  <Text>{activity || 'Unspecified'}</Text>
-                </Text>
+                <>
+                  <ListItem
+                    title="Preferred activity"
+                    description={activity || 'Unspecified'}
+                  />
+                  <Divider />
+                </>
               )}
 
               {activity && isFriend && (
-                <Text style={{marginLeft: 10, marginVertical: 5}}>
-                  {'Level: '}
-                  <Text>{level || 'Unspecified'}</Text>
-                </Text>
+                <>
+                  <ListItem
+                    title="Level"
+                    description={level || 'Unspecified'}
+                  />
+                  <Divider />
+                </>
               )}
-            </View>
+            </Layout>
 
             {isFriend && (
               <Button
@@ -270,7 +290,7 @@ class ProfileView extends Component<ProfileViewProps, State> {
                 Remove pal
               </Button>
             )}
-          </View>
+          </Layout>
         ) : (
           <View style={hStyles.spinner}>
             <Spinner />

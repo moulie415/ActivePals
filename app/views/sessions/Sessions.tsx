@@ -159,45 +159,50 @@ const Sessions: FunctionComponent<SessionsProps> = ({
 
   const getPosition = useThrottle(async () => {
     setSpinner(true);
-    const response = await Permissions.request(LOCATION_PERMISSION);
-    // to watch position:
-    // this.watchID = navigator.geolocation.watchPosition((position) => {
-    if (response === RESULTS.GRANTED) {
-      Geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          setYourLocation({lat, lon});
-          setLatitude(lat);
-          setLongitude(lon);
-          const {token} = await getPlaces(lat, lon, stateToken);
-          //setStateToken(token);
-          setSpinner(false);
-        },
-        (error) => {
-          setSpinner(false);
-          Alert.alert('Error', error.message);
-        },
-        {enableHighAccuracy: true, timeout: 20000 /* , maximumAge: 1000 */},
-      );
-    } else {
-      Alert.alert(
-        'Can we access your location?',
-        'We need access to help find sessions near you',
-        [
-          {
-            text: 'No way',
-            onPress: () => console.log('Permission denied'),
-            style: 'cancel',
+    try {
+      const response = await Permissions.request(LOCATION_PERMISSION);
+      // to watch position:
+      // this.watchID = navigator.geolocation.watchPosition((position) => {
+      if (response === RESULTS.GRANTED) {
+        Geolocation.getCurrentPosition(
+          async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            setYourLocation({lat, lon});
+            setLatitude(lat);
+            setLongitude(lon);
+            const {token} = await getPlaces(lat, lon, stateToken);
+            //setStateToken(token);
+            setSpinner(false);
           },
-          response === RESULTS.BLOCKED
-            ? {
-                text: 'OK',
-                onPress: () => getPosition(),
-              }
-            : {text: 'Open Settings', onPress: Permissions.openSettings},
-        ],
-      );
+          (error) => {
+            setSpinner(false);
+            Alert.alert('Error', error.message);
+          },
+          {enableHighAccuracy: true, timeout: 20000 /* , maximumAge: 1000 */},
+        );
+      } else {
+        setSpinner(false);
+        Alert.alert(
+          'Can we access your location?',
+          'We need access to help find sessions near you',
+          [
+            {
+              text: 'No way',
+              onPress: () => console.log('Permission denied'),
+              style: 'cancel',
+            },
+            response === RESULTS.BLOCKED
+              ? {
+                  text: 'OK',
+                  onPress: () => getPosition(),
+                }
+              : {text: 'Open Settings', onPress: Permissions.openSettings},
+          ],
+        );
+      }
+    } catch (e) {
+      setSpinner(false)
     }
   }, 30000);
 
@@ -508,8 +513,9 @@ const Sessions: FunctionComponent<SessionsProps> = ({
             setSpinner={setSpinner}
             onOpen={(id) => navigation.navigate('Gym', {id})}
           />
-          <View
+          <Layout
             style={{
+
               flexDirection: 'row',
               height: 60,
               justifyContent: 'space-evenly',
@@ -541,7 +547,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
               }}>
               Create Private Session
             </Button>
-          </View>
+          </Layout>
           <FriendsModal
             onClosed={() => setFriendsModalOpen(false)}
             onContinue={(f) => {

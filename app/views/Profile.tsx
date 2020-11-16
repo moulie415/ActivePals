@@ -293,7 +293,6 @@ class ProfileView extends Component<ProfileProps, State> {
                   </View>
                 )}
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={[{marginTop: -45}]}
                 onPress={() => this.selectAvatar()}>
