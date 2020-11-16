@@ -22,6 +22,7 @@ import SegmentedControlTab from 'react-native-segmented-control-tab';
 import {connect} from 'react-redux';
 import Slider from '@react-native-community/slider';
 import Image from 'react-native-fast-image';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import styles from '../../styles/sessionStyles';
 import {
   getType,
@@ -42,6 +43,7 @@ import {
   setRadius,
   SetShowMap,
   SetShowFilterModal,
+  fetchPhotoPath,
 } from '../../actions/sessions';
 import {removeGym, joinGym, setLocation} from '../../actions/profile';
 import SessionsProps from '../../types/views/sessions/Sessions';
@@ -72,20 +74,12 @@ import {
 import str from '../../constants/strings';
 import Avatar from '../../components/Avatar/Avatar';
 import useThrottle from '../../hooks/UseThrottle';
+import {GOOGLE_API_KEY} from '../../constants/strings';
+import GooglePlacesAutocompleteStyles from '../../components/GymSearch/styles';
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
 
-const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  requestNonPersonalizedAdsOnly: true,
-  keywords: str.keywords,
-});
-
-const LOCATION_PERMISSION =
-  Platform.OS === 'ios'
-    ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-    : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
-
-const Sessions: FunctionComponent<SessionsProps> = ({
+const Gyms: FunctionComponent<SessionsProps> = ({
   sessions: propsSessions,
   privateSessions,
   radius: currentRadius,
@@ -157,77 +151,23 @@ const Sessions: FunctionComponent<SessionsProps> = ({
   const [loaded, setLoaded] = useState(false);
   const [radius, setStateRadius] = useState<number>(currentRadius);
 
-  const getPosition = useThrottle(async () => {
-    setSpinner(true);
-    try {
-      const response = await Permissions.request(LOCATION_PERMISSION);
-      // to watch position:
-      // this.watchID = navigator.geolocation.watchPosition((position) => {
-      if (response === RESULTS.GRANTED) {
-        Geolocation.getCurrentPosition(
-          async (position) => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            setYourLocation({lat, lon});
-            setLatitude(lat);
-            setLongitude(lon);
-            const {token} = await getPlaces(lat, lon, stateToken);
-            //setStateToken(token);
-            setSpinner(false);
-          },
-          (error) => {
-            setSpinner(false);
-            Alert.alert('Error', error.message);
-          },
-          {enableHighAccuracy: true, timeout: 20000 /* , maximumAge: 1000 */},
-        );
-      } else {
-        setSpinner(false);
-        Alert.alert(
-          'Can we access your location?',
-          'We need access to help find sessions near you',
-          [
-            {
-              text: 'No way',
-              onPress: () => console.log('Permission denied'),
-              style: 'cancel',
-            },
-            response === RESULTS.BLOCKED
-              ? {
-                  text: 'OK',
-                  onPress: () => getPosition(),
-                }
-              : {text: 'Open Settings', onPress: Permissions.openSettings},
-          ],
-        );
-      }
-    } catch (e) {
-      setSpinner(false);
-    }
-  }, 30000);
-
-  useEffect(() => {
-    const eventListener = interstitial.onAdEvent((type) => {
-      if (type === AdEventType.LOADED) {
-        setLoaded(true);
-      }
-    });
-    // Start loading the interstitial straight away
-    interstitial.load();
-    getPosition();
-
-    // Unsubscribe from events on unmount
-    return () => {
-      eventListener();
-    };
-  }, [getPosition]);
-
   const handleRefresh = async () => {
     setRefreshing(true);
     setMarkers([]);
     await fetch(radius);
-    await getPosition();
     setRefreshing(false);
+  };
+
+  const sortPlacesByDistance = (places: Place[]): Place[] => {
+    if (location) {
+      const {lat, lon} = location;
+      return places.sort((a, b) => {
+        const distance1 = getDistance(a, lat, lon, true);
+        const distance2 = getDistance(b, lat, lon, true);
+        return distance1 - distance2;
+      });
+    }
+    return places;
   };
 
   const handlePress = (event: MapEvent) => {
@@ -282,68 +222,183 @@ const Sessions: FunctionComponent<SessionsProps> = ({
   };
 
   const renderLists = () => {
-    const emptyComponent = (
-      <Text
-        style={{
-          textAlign: 'center',
-          marginHorizontal: 20,
-        }}>
-        No sessions near you have been created yet, also please make sure you
-        are connected to the internet
-      </Text>
-    );
     const yourLat = pathOr(null, ['lat'], location);
     const yourLon = pathOr(null, ['lon'], location);
     return (
-      <Layout style={{flex: 1}}>
-        <List
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          contentContainerStyle={[
-            {flexGrow: 1},
-            sessions.length > 0 ? null : {justifyContent: 'center'},
-          ]}
-          ItemSeparatorComponent={Divider}
-          ListEmptyComponent={emptyComponent}
-          data={sessions}
-          keyExtractor={(item) => item.key}
-          renderItem={({item}) => (
-            <ListItem
-              onPress={() =>
-                navigation.navigate('SessionInfo', {
-                  sessionId: item.key,
-                  isPrivate: item.private,
-                })
-              }
-              title={`${item.title} (${
-                item.distance
-                  ? item.distance.toFixed(2)
-                  : getDistance(item, yourLat, yourLon).toFixed(2)
-              } km away)`}
-              description={item.details}
-              accessoryLeft={() => getType(item.type, 40)}
-              accessoryRight={() => {
-                return (
-                  <>
-                    {item.private && <PrivateIcon size={25} />}
-                    <TouchableOpacity
-                      onPress={() => {
-                        setLongitude(item.location.position.lng);
-                        setLatitude(item.location.position.lat);
-                        setShowMap(true);
-                      }}>
-                      <ThemedIcon name="pin" size={40} />
-                    </TouchableOpacity>
-                  </>
-                );
-              }}
-            />
-          )}
+      <>
+        <GooglePlacesAutocomplete
+          onPress={async (data, details) => {
+            setSpinner(true);
+            const {lat, lng} = details.geometry.location;
+            if (details && details.types && details.types.includes('gym')) {
+              const gym = await fetchPhotoPath(details);
+              const marker = (
+                <Marker
+                  key={gym.place_id}
+                  coordinate={{
+                    latitude: lat,
+                    longitude: lng,
+                  }}
+                  onPress={(event) => {
+                    event.stopPropagation();
+                    setSelectedLocation(gym);
+                    setLatitude(lat);
+                    setLongitude(lng);
+                    navigation.navigate('Gym', {id: gym.place_id})
+                  }}
+                />
+              );
+              setSelectedLocation(gym);
+              setLatitude(lat);
+              setLongitude(lng);
+              setMarkers([...markers, marker]);
+              setSpinner(false);
+              navigation.navigate('Gym', {id: gym.place_id})
+            } else {
+              Alert.alert(
+                'Location selected not recognised as a gym, please contact support if you think this is incorrect',
+              );
+            }
+          }}
+          styles={{
+            container: {
+              flex: 0,
+              position: 'absolute',
+              width: '100%',
+              zIndex: 9,
+            },
+          }}
+          query={{
+            // available options: https://developers.google.com/places/web-service/autocomplete
+            key: GOOGLE_API_KEY,
+            language: 'en', // language of the results
+            types: 'establishment', // default: 'geocode'
+          }}
+          GooglePlacesSearchQuery={{
+            // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
+            rankby: 'distance',
+            types: 'gym',
+          }}
+          nearbyPlacesAPI="GooglePlacesSearch"
+          placeholder="Search for your gym..."
+          debounce={500}
+          minLength={2} // minimum length of text to search
+          listViewDisplayed="auto" // true/false/undefined
+          fetchDetails
         />
-      </Layout>
+        <Layout style={{flex: 1, marginTop: 45}}>
+          <ListItem
+            title="Your gym"
+            description={gym.name}
+            onPress={() =>
+              navigation.navigate('Messaging', {gymId: gym.place_id})
+            }
+            accessoryLeft={() =>
+              gym.photo ? (
+                <Image
+                  source={{uri: gym.photo}}
+                  style={{
+                    height: 40,
+                    width: 40,
+                    borderRadius: 20,
+                  }}
+                />
+              ) : (
+                <ThemedImage
+                  source={require('../../../assets/images/dumbbell.png')}
+                  size={40}
+                />
+              )
+            }
+            accessoryRight={() => (
+              <>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Messaging', {gymId: gym.place_id})
+                  }>
+                  <ThemedIcon name="message-square" size={25} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Gym', {id: gym.place_id})
+                  }>
+                  <ThemedIcon name="info" size={25} />
+                </TouchableOpacity>
+              </>
+            )}
+          />
+
+          <List
+            data={sortPlacesByDistance(Object.values(places))}
+            refreshing={refreshing}
+            ItemSeparatorComponent={Divider}
+            // onEndReached={async () => {
+            //   if (!spinner && loadMoreGyms) {
+            //     setRefreshing(true);
+            //     const {token: newToken, loadMore} = await getPlaces(
+            //       yourLat,
+            //       yourLon,
+            //       stateToken,
+            //     );
+            //     setRefreshing(false);
+            //     setStateToken(newToken);
+            //     setLoadMoreGyms(loadMore);
+            //   }
+            // }}
+            onEndReachedThreshold={0.1}
+            onRefresh={handleRefresh}
+            keyExtractor={(item) => item.place_id}
+            renderItem={({item}) => {
+              const {lat, lng} = item.geometry.location;
+              if (gymFilter(item)) {
+                return (
+                  <ListItem
+                    onPress={() => {
+                      setSelectedLocation(item);
+                      setLatitude(lat);
+                      setLongitude(lng);
+                      navigation.navigate('Gym', {id: item.place_id});
+                    }}
+                    title={`${item.name}  (${getDistance(
+                      item,
+                      yourLat,
+                      yourLon,
+                      true,
+                    ).toFixed(2)} km away)`}
+                    description={item.vicinity}
+                    accessoryLeft={() => {
+                      return item.photo ? (
+                        <Avatar uri={item.photo} size={40} />
+                      ) : (
+                        <ThemedImage
+                          source={require('../../../assets/images/dumbbell.png')}
+                          size={40}
+                        />
+                      );
+                    }}
+                    accessoryRight={() => {
+                      return (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setLongitude(lng);
+                            setLatitude(lat);
+                            setShowMap(true);
+                          }}>
+                          <ThemedIcon size={40} name="pin" />
+                        </TouchableOpacity>
+                      );
+                    }}
+                  />
+                );
+              }
+              return null;
+            }}
+          />
+        </Layout>
+      </>
     );
   };
-  console.log({latitude, longitude});
+
   return (
     <Layout style={{flex: 1}}>
       {spinner ? (
@@ -353,7 +408,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
       ) : (
         <Layout style={{flex: 1}}>
           {!showMap && renderLists()}
-          {/* {showMap && latitude && longitude && (
+          {showMap && longitude && latitude && (
             <MapView
               style={styles.map}
               onPress={handlePress}
@@ -374,54 +429,8 @@ const Sessions: FunctionComponent<SessionsProps> = ({
               {markers}
               {gymMarkers(Object.values(places))}
             </MapView>
-          )} */}
-          <Layout
-            style={{
-              flexDirection: 'row',
-              height: 60,
-              justifyContent: 'space-evenly',
-            }}>
-            <Button
-              style={styles.button}
-              onPress={() => {
-                setSelectedLocation({});
-                if (loaded) {
-                  interstitial.show();
-                }
-                navigation.navigate('SessionDetail', {});
-              }}>
-              Create Session
-            </Button>
-            {/* <View style={{borderRightWidth: 1}} /> */}
-            <Button
-              style={styles.button}
-              onPress={() => {
-                if (Object.keys(friends).length > 0) {
-                  setSelectedLocation({});
-                  setFriendsModalOpen(true);
-                } else {
-                  Alert.alert(
-                    'Sorry',
-                    'You must have at least one pal to create a private session',
-                  );
-                }
-              }}>
-              Create Private Session
-            </Button>
-          </Layout>
-          <FriendsModal
-            onClosed={() => setFriendsModalOpen(false)}
-            onContinue={(f) => {
-              if (loaded) {
-                interstitial.show();
-              }
-              navigation.navigate('SessionDetail', {
-                friends: f,
-                location: selectedLocation,
-              });
-            }}
-            isOpen={friendsModalOpen}
-          />
+          )}
+
           <Modal
             onBackdropPress={async () => {
               setShowFilterModal(false);
@@ -572,4 +581,4 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   setShowFilterModal: (show: boolean) => dispatch(SetShowFilterModal(show)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Sessions);
+export default connect(mapStateToProps, mapDispatchToProps)(Gyms);

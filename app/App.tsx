@@ -61,6 +61,7 @@ import {UserState} from './types/Profile';
 import {navigationRef} from './RootNavigation';
 import MessagingInfoButton from './components/MessagingInfoButton/MessagingInfoButton';
 import ChatTabLabel from './components/ChatTabLabel';
+import Gyms from './views/sessions/Gyms';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -83,6 +84,7 @@ export type StackParamList = {
   Home: undefined;
   Tabs: undefined;
   Sessions: undefined;
+  Gyms: undefined;
   Friends: undefined;
   Chats: undefined;
   DirectMessages: undefined;
@@ -146,6 +148,24 @@ const Chats = () => (
   </TopTab.Navigator>
 );
 
+const SessionsTopTabBar = ({navigation, state}) => (
+  <ThemedSafeArea>
+    <TabBar
+      selectedIndex={state.index}
+      onSelect={(index) => navigation.navigate(state.routeNames[index])}>
+      <Tab title="Sessions" />
+      <Tab title="Gyms near you" />
+    </TabBar>
+  </ThemedSafeArea>
+);
+
+const SessionsComponent = () => (
+  <TopTab.Navigator tabBar={(props) => <SessionsTopTabBar {...props} />}>
+    <TopTab.Screen name="Sessions" component={Sessions} />
+    <TopTab.Screen name="Gyms" component={Gyms} />
+  </TopTab.Navigator>
+);
+
 const HomeIcon = (props: Partial<ImageProps> | undefined) => (
   <Icon {...props} name="home" />
 );
@@ -186,7 +206,7 @@ const Tabs = () => {
   return (
     <TabNav.Navigator tabBar={(props) => <BottomTabBar {...props} />}>
       <TabNav.Screen name="Home" component={Home} />
-      <TabNav.Screen name="Sessions" component={Sessions} />
+      <TabNav.Screen name="Sessions" component={SessionsComponent} />
       <TabNav.Screen name="Friends" component={Friends} />
       <TabNav.Screen name="Chats" component={Chats} />
       <TabNav.Screen name="Profile" component={Profile} />
