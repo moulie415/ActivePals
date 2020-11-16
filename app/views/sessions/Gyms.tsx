@@ -244,7 +244,7 @@ const Gyms: FunctionComponent<SessionsProps> = ({
                     setSelectedLocation(gym);
                     setLatitude(lat);
                     setLongitude(lng);
-                    navigation.navigate('Gym', {id: gym.place_id})
+                    navigation.navigate('Gym', {id: gym.place_id});
                   }}
                 />
               );
@@ -253,7 +253,7 @@ const Gyms: FunctionComponent<SessionsProps> = ({
               setLongitude(lng);
               setMarkers([...markers, marker]);
               setSpinner(false);
-              navigation.navigate('Gym', {id: gym.place_id})
+              navigation.navigate('Gym', {id: gym.place_id});
             } else {
               Alert.alert(
                 'Location selected not recognised as a gym, please contact support if you think this is incorrect',
@@ -287,46 +287,48 @@ const Gyms: FunctionComponent<SessionsProps> = ({
           fetchDetails
         />
         <Layout style={{flex: 1, marginTop: 45}}>
-          <ListItem
-            title="Your gym"
-            description={gym.name}
-            onPress={() =>
-              navigation.navigate('Messaging', {gymId: gym.place_id})
-            }
-            accessoryLeft={() =>
-              gym.photo ? (
-                <Image
-                  source={{uri: gym.photo}}
-                  style={{
-                    height: 40,
-                    width: 40,
-                    borderRadius: 20,
-                  }}
-                />
-              ) : (
-                <ThemedImage
-                  source={require('../../../assets/images/dumbbell.png')}
-                  size={40}
-                />
-              )
-            }
-            accessoryRight={() => (
-              <>
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Messaging', {gymId: gym.place_id})
-                  }>
-                  <ThemedIcon name="message-square" size={25} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Gym', {id: gym.place_id})
-                  }>
-                  <ThemedIcon name="info" size={25} />
-                </TouchableOpacity>
-              </>
-            )}
-          />
+          {gym && (
+            <ListItem
+              title="Your gym"
+              description={gym.name}
+              onPress={() =>
+                navigation.navigate('Messaging', {gymId: gym.place_id})
+              }
+              accessoryLeft={() =>
+                gym.photo ? (
+                  <Image
+                    source={{uri: gym.photo}}
+                    style={{
+                      height: 40,
+                      width: 40,
+                      borderRadius: 20,
+                    }}
+                  />
+                ) : (
+                  <ThemedImage
+                    source={require('../../../assets/images/dumbbell.png')}
+                    size={40}
+                  />
+                )
+              }
+              accessoryRight={() => (
+                <>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('Messaging', {gymId: gym.place_id})
+                    }>
+                    <ThemedIcon name="message-square" size={25} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('Gym', {id: gym.place_id})
+                    }>
+                    <ThemedIcon name="info" size={25} />
+                  </TouchableOpacity>
+                </>
+              )}
+            />
+          )}
 
           <List
             data={sortPlacesByDistance(Object.values(places))}
