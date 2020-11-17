@@ -1,8 +1,11 @@
 import Session from '../../Session';
 import Place from '../../Place';
 import Profile from '../../Profile';
-import {NavigationStackProp} from 'react-navigation-stack';
 import {YourLocation} from '../../Location';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {StackParamList} from '../../../App';
+
+type SessionsNavigationProp = StackNavigationProp<StackParamList, 'Sessions'>;
 
 export default interface SessionsProps {
   sessions: {[key: string]: Session};
@@ -20,9 +23,7 @@ export default interface SessionsProps {
   places: {[key: string]: Place};
   gym: Place;
   friends: {[key: string]: Profile};
-  navigation: NavigationStackProp;
-  showMap: boolean;
-  setShowMap: (show: boolean) => void;
+  navigation: SessionsNavigationProp;
   showFilterModal: boolean;
   setShowFilterModal: (show: boolean) => void;
 }

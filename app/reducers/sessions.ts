@@ -22,7 +22,6 @@ export interface SessionsState {
   places: {[key: string]: Place};
   radius: number;
   ignored: {[key: string]: boolean};
-  showMap: boolean;
   showFilterModal: boolean;
 }
 
@@ -32,7 +31,6 @@ const initialState: SessionsState = {
   places: {},
   radius: 10,
   ignored: {},
-  showMap: false,
   showFilterModal: false,
 };
 
@@ -99,12 +97,6 @@ export default function (state = initialState, action) {
       return {
         ...state,
         ignored: {...state.ignored, [action.session]: true},
-      };
-    }
-    case SET_SHOW_MAP: {
-      return {
-        ...state,
-        showMap: action.show,
       };
     }
     case SET_SHOW_FILTER_MODAL: {

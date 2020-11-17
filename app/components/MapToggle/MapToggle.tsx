@@ -1,29 +1,17 @@
 import React, {FunctionComponent} from 'react';
-import {View} from 'react-native';
-import {Toggle, Text} from '@ui-kitten/components';
-import {MyRootState, MyThunkDispatch} from '../../types/Shared';
-import {SetShowMap} from '../../actions/sessions';
-import {connect} from 'react-redux';
-import MapToggleProps from '../../types/components/MapToggle';
+import {TouchableOpacity} from 'react-native';
 
-const MapToggle: FunctionComponent<MapToggleProps> = ({
-  showMap,
-  setShowMap,
-}) => {
+import MapToggleProps from '../../types/components/MapToggle';
+import ThemedIcon from '../ThemedIcon/ThemedIcon';
+
+const MapToggle: FunctionComponent<MapToggleProps> = ({navigation}) => {
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}>
-      <Text>Map: </Text>
-      <Toggle checked={showMap} onChange={setShowMap} />
-    </View>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('Map')}
+      style={{padding: 10}}>
+      <ThemedIcon name="map" size={30} />
+    </TouchableOpacity>
   );
 };
 
-const mapStateToProps = ({sessions}: MyRootState) => ({
-  showMap: sessions.showMap,
-});
-
-const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  setShowMap: (show: boolean) => dispatch(SetShowMap(show)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(MapToggle);
+export default MapToggle;

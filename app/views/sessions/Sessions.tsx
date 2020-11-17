@@ -1,10 +1,4 @@
-import React, {
-  FunctionComponent,
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, {FunctionComponent, useRef, useState, useEffect} from 'react';
 import {pathOr} from 'ramda';
 import Geolocation from '@react-native-community/geolocation';
 import {
@@ -14,24 +8,16 @@ import {
   Platform,
   Image as SlowImage,
 } from 'react-native';
-import ActionSheet from 'react-native-actionsheet';
-import {Popup, Options} from 'react-native-map-link';
 import Permissions, {PERMISSIONS, RESULTS} from 'react-native-permissions';
-import MapView, {Marker, MapEvent} from 'react-native-maps';
-import SegmentedControlTab from 'react-native-segmented-control-tab';
 import {connect} from 'react-redux';
 import Slider from '@react-native-community/slider';
-import Image from 'react-native-fast-image';
 import styles from '../../styles/sessionStyles';
 import {
   getType,
-  formatDateTime,
   getDistance,
   sortSessionsByDistance,
 } from '../../constants/utils';
 import FriendsModal from '../../components/friendsModal';
-import GymSearch from '../../components/GymSearch';
-import PrivateIcon from '../../components/PrivateIcon';
 import {fetchSessionChats} from '../../actions/chats';
 import {
   fetchSessions,
@@ -40,7 +26,6 @@ import {
   setPlaces,
   fetchPlaces,
   setRadius,
-  SetShowMap,
   SetShowFilterModal,
 } from '../../actions/sessions';
 import {removeGym, joinGym, setLocation} from '../../actions/profile';
@@ -62,7 +47,6 @@ import {
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
-import ThemedImage from '../../components/ThemedImage/ThemedImage';
 import {YourLocation} from '../../types/Location';
 import {
   InterstitialAd,
@@ -70,8 +54,8 @@ import {
   AdEventType,
 } from '@react-native-firebase/admob';
 import str from '../../constants/strings';
-import Avatar from '../../components/Avatar/Avatar';
 import useThrottle from '../../hooks/UseThrottle';
+import PrivateIcon from '../../components/PrivateIcon';
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
 
@@ -92,67 +76,27 @@ const Sessions: FunctionComponent<SessionsProps> = ({
   saveRadius,
   setYourLocation,
   getPlaces,
-  places,
   fetch,
   location,
   navigation,
   setShowFilterModal,
-  setShowMap,
   showFilterModal,
-  showMap,
-  gym,
   friends,
 }) => {
-  const getMarkers = (sessions: Session[]) => {
-    return sessions.map((session) => {
-      const {lng} = session.location.position;
-      const {lat} = session.location.position;
-      return (
-        <Marker
-          key={session.key}
-          coordinate={{
-            latitude: lat,
-            longitude: lng,
-          }}
-          onPress={(event) => {
-            event.stopPropagation();
-            setLatitude(lat);
-            setLongitude(lng);
-            Alert.alert(`View session ${session.title}?`, '', [
-              {text: 'Cancel', style: 'cancel'},
-              {
-                text: 'OK',
-                onPress: () =>
-                  navigation.navigate('SessionInfo', {
-                    sessionId: session.key,
-                    isPrivate: session.private,
-                  }),
-              },
-            ]);
-          }}>
-          {getType(session.type, 40)}
-        </Marker>
-      );
-    });
-  };
   const sessions = sortSessionsByDistance([
     ...Object.values(propsSessions),
     ...Object.values(privateSessions),
   ]);
 
-  const ActionSheetRef = useRef<ActionSheet>(null);
   const [spinner, setSpinner] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [markers, setMarkers] = useState<Element[]>(getMarkers(sessions));
-  const [selectedIndex, setSelectedIndex] = useState(0);
+
   const [popUpVisible, setPopUpVisible] = useState(false);
   const [pilates, setPilates] = useState(true);
   const [yoga, setYoga] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState({});
   const [loadMoreGyms, setLoadMoreGyms] = useState(true);
   const [stateToken, setStateToken] = useState<string>();
-  const [latitude, setLatitude] = useState<number>();
-  const [longitude, setLongitude] = useState<number>();
   const [friendsModalOpen, setFriendsModalOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [radius, setStateRadius] = useState<number>(currentRadius);
@@ -169,8 +113,6 @@ const Sessions: FunctionComponent<SessionsProps> = ({
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             setYourLocation({lat, lon});
-            setLatitude(lat);
-            setLongitude(lon);
             const {token} = await getPlaces(lat, lon, stateToken);
             //setStateToken(token);
             setSpinner(false);
@@ -224,61 +166,9 @@ const Sessions: FunctionComponent<SessionsProps> = ({
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    setMarkers([]);
     await fetch(radius);
     await getPosition();
     setRefreshing(false);
-  };
-
-  const handlePress = (event: MapEvent) => {
-    const lat = event.nativeEvent.coordinate.latitude;
-    const lng = event.nativeEvent.coordinate.longitude;
-    const loc = {geometry: {location: {lat, lng}}};
-    setSelectedLocation(loc);
-    setLatitude(lat);
-    setLongitude(lng);
-    ActionSheetRef.current?.show();
-  };
-
-  const gymMarkers = (results: Place[]) => {
-    return results.map((result) => {
-      if (result.geometry) {
-        const {lat} = result.geometry.location;
-        const {lng} = result.geometry.location;
-        return (
-          <Marker
-            key={result.place_id}
-            coordinate={{
-              latitude: lat,
-              longitude: lng,
-            }}
-            onPress={(event) => {
-              event.stopPropagation();
-              setSelectedLocation(result);
-              setLatitude(lat);
-              setLongitude(lng);
-              Alert.alert(`View gym ${result.name}?`, '', [
-                {text: 'Cancel', style: 'cancel'},
-                {
-                  text: 'OK',
-                  onPress: () =>
-                    navigation.navigate('Gym', {id: result.place_id}),
-                },
-              ]);
-            }}
-          />
-        );
-      }
-    });
-  };
-
-  const gymFilter = (gym: Place) => {
-    return (
-      pilates &&
-      !gym.name.toLowerCase().includes('pilates') &&
-      yoga &&
-      !gym.name.toLowerCase().includes('yoga')
-    );
   };
 
   const renderLists = () => {
@@ -328,9 +218,10 @@ const Sessions: FunctionComponent<SessionsProps> = ({
                     {item.private && <PrivateIcon size={25} />}
                     <TouchableOpacity
                       onPress={() => {
-                        setLongitude(item.location.position.lng);
-                        setLatitude(item.location.position.lat);
-                        setShowMap(true);
+                        navigation.navigate('Map', {
+                          lat: item.location.position.lat,
+                          lng: item.location.position.lng,
+                        });
                       }}>
                       <ThemedIcon name="pin" size={40} />
                     </TouchableOpacity>
@@ -343,7 +234,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
       </Layout>
     );
   };
-  console.log({latitude, longitude});
+
   return (
     <Layout style={{flex: 1}}>
       {spinner ? (
@@ -352,29 +243,8 @@ const Sessions: FunctionComponent<SessionsProps> = ({
         </View>
       ) : (
         <Layout style={{flex: 1}}>
-          {!showMap && renderLists()}
-          {/* {showMap && latitude && longitude && (
-            <MapView
-              style={styles.map}
-              onPress={handlePress}
-              // onLongPress={event => this.handlePress(event)}
-              showsUserLocation
-              initialRegion={{
-                latitude,
-                longitude,
-                latitudeDelta: 0.015,
-                longitudeDelta: 0.0121,
-              }}
-              region={{
-                latitude,
-                longitude,
-                latitudeDelta: 0.015,
-                longitudeDelta: 0.0121,
-              }}>
-              {markers}
-              {gymMarkers(Object.values(places))}
-            </MapView>
-          )} */}
+          {renderLists()}
+
           <Layout
             style={{
               flexDirection: 'row',
@@ -507,29 +377,6 @@ const Sessions: FunctionComponent<SessionsProps> = ({
           /> */}
         </Layout>
       )}
-      <ActionSheet
-        ref={ActionSheetRef}
-        title="Create session at location?"
-        options={['Create session', 'Create private session', 'Cancel']}
-        cancelButtonIndex={2}
-        onPress={(index) => {
-          if (index === 0) {
-            //showAdmobInterstitial();
-            navigation.navigate('SessionDetail', {
-              location: selectedLocation,
-            });
-          } else if (index === 1) {
-            if (Object.values(friends).length > 0) {
-              setFriendsModalOpen(true);
-            } else {
-              Alert.alert(
-                'Sorry',
-                'You must have at least one pal to create a private session',
-              );
-            }
-          }
-        }}
-      />
     </Layout>
   );
 };
@@ -551,16 +398,10 @@ const mapStateToProps = ({
   places: sessions.places,
   radius: sessions.radius,
   location: profile.location,
-  showMap: sessions.showMap,
   showFilterModal: sessions.showFilterModal,
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  join: (location) => dispatch(joinGym(location)),
-  removeGym: () => dispatch(removeGym()),
-  getChats: (sessions, uid: string) =>
-    dispatch(fetchSessionChats(sessions, uid)),
-  remove: (key: string, type) => dispatch(removeSession(key, type)),
   fetch: () =>
     Promise.all([dispatch(fetchSessions()), dispatch(fetchPrivateSessions())]),
   setYourLocation: (location: YourLocation) => dispatch(setLocation(location)),
@@ -568,7 +409,6 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   getPlaces: (lat: number, lon: number, token?: string) =>
     dispatch(fetchPlaces(lat, lon, token)),
   saveRadius: (radius: number) => dispatch(setRadius(radius)),
-  setShowMap: (show: boolean) => dispatch(SetShowMap(show)),
   setShowFilterModal: (show: boolean) => dispatch(SetShowFilterModal(show)),
 });
 

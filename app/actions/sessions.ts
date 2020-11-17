@@ -68,10 +68,6 @@ export const setIgnored = (session) => ({
   session,
 });
 
-export const SetShowMap = (show: boolean) => ({
-  type: SET_SHOW_MAP,
-  show,
-});
 
 export const SetShowFilterModal = (show: boolean) => ({
   type: SET_SHOW_FILTER_MODAL,

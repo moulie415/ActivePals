@@ -8,4 +8,5 @@ export default interface ThemeImageProps {
   style?: ViewStyle;
   fill?: string;
   status?: 'success' | 'danger';
+  dark?: boolean;
 }

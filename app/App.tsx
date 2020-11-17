@@ -62,6 +62,7 @@ import {navigationRef} from './RootNavigation';
 import MessagingInfoButton from './components/MessagingInfoButton/MessagingInfoButton';
 import ChatTabLabel from './components/ChatTabLabel';
 import Gyms from './views/sessions/Gyms';
+import Map from './views/sessions/Map';
 
 const firebaseRef = database().ref('locations');
 export const geofire = new GeoFire(firebaseRef);
@@ -85,6 +86,7 @@ export type StackParamList = {
   Tabs: undefined;
   Sessions: undefined;
   Gyms: undefined;
+  Map: {lat?: number; lng?: number};
   Friends: undefined;
   Chats: undefined;
   DirectMessages: undefined;
@@ -295,7 +297,7 @@ const App = () => {
                         return <NotificationsButton navigation={navigation} />;
                       }
                       if (index === 1) {
-                        return <MapToggle />;
+                        return <MapToggle navigation={navigation} />;
                       }
                       if (index === 2) {
                         return <AddFriendButton />;
@@ -383,6 +385,7 @@ const App = () => {
                 />
                 <Stack.Screen name="Credits" component={Credits} />
                 <Stack.Screen name="FilePreview" component={FilePreview} />
+                <Stack.Screen name="Map" component={Map} />
               </Stack.Navigator>
             </NavigationContainer>
           </ApplicationProvider>
