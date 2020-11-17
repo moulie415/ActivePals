@@ -19,6 +19,8 @@ jobs:
         run: |
           yarn
       - name: Set environment variables from project settings
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
           exec .github/scripts/set-env-from-xcodeproj.sh
       - name: Import signing certificate

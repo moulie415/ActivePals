@@ -15,13 +15,13 @@ export default interface SessionsProps {
     lat: number,
     lon: number,
     token?: string,
-  ) => {token: string; loadMore: boolean};
+  ) => Promise<{token: string; loadMore: boolean}>;
   fetch: (radius: number) => void;
   radius: number;
   saveRadius: (radius: number) => void;
-  location: {lat: number; lon: number};
+  location?: {lat: number; lon: number};
   places: {[key: string]: Place};
-  gym: Place;
+  gym?: Place;
   friends: {[key: string]: Profile};
   navigation: SessionsNavigationProp;
   showFilterModal: boolean;

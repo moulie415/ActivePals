@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useRef, useState, useEffect} from 'react';
+import React, {FunctionComponent, useState, useEffect} from 'react';
 import {pathOr} from 'ramda';
 import Geolocation from '@react-native-community/geolocation';
 import {
@@ -18,7 +18,6 @@ import {
   sortSessionsByDistance,
 } from '../../constants/utils';
 import FriendsModal from '../../components/friendsModal';
-import {fetchSessionChats} from '../../actions/chats';
 import {
   fetchSessions,
   fetchPrivateSessions,
