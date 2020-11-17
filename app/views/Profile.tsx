@@ -283,15 +283,16 @@ class ProfileView extends Component<ProfileProps, State> {
                     source={{uri: profile.backdrop}}
                   />
                 ) : (
-                  <View
+                  <Layout
                     style={{
                       height: 150,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
                     <ThemedIcon name="plus" size={25} />
-                  </View>
+                  </Layout>
                 )}
+                <Divider />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[{marginTop: -45}]}

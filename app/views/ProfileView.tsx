@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, FunctionComponent, useEffect, useState} from 'react';
 import {pathOr} from 'ramda';
 import {
   Alert,
@@ -35,6 +35,8 @@ import {
 } from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
+import {fetchUser, fetchUsers} from '../actions/home';
+import Avatar from '../components/Avatar/Avatar';
 
 interface State {
   profile?: Profile;
@@ -46,295 +48,247 @@ interface State {
   avatar?: string;
   selectedImage?: {url: string}[];
 }
-class ProfileView extends Component<ProfileViewProps, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isFriend: false,
-      showImage: false,
-      loaded: false,
-    };
-  }
+const ProfileView: FunctionComponent<ProfileViewProps> = ({
+  route,
+  navigation,
+  remove,
+  request,
+  friends,
+  users,
+}) => {
+  const [showImage, setShowImage] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{url: string}[]>();
+  const [isFriend, setIsFriend] = useState(false);
+  const {uid} = route.params;
+  useEffect(() => {
+    if (friends[uid]) {
+      setIsFriend(true);
+    } else {
+      fetchUser(uid);
+    }
+  }, [uid, friends]);
 
-  componentDidMount() {
-    // TODO update friend in redux
-    const {
-      friends,
-      route: {
-        params: {uid},
-      },
-    } = this.props;
+  const user = friends[uid] || users[uid];
 
-    database()
-      .ref(`users/${uid}`)
-      .once('value', (user) => {
-        this.setState({profile: user.val()});
-        if (user.val().gym) {
-          database()
-            .ref(`gyms/${user.val().gym}`)
-            .once('value', (gym) => {
-              this.setState({gym: gym.val(), loaded: true});
-            });
-        } else {
-          this.setState({loaded: true});
-        }
-        if (friends[user.val().uid]) {
-          this.setState({isFriend: true});
-        }
-      });
-  }
-
-  render() {
-    const {remove, request, navigation} = this.props;
-    const {
-      loaded,
-      backdrop,
-      avatar,
-      isFriend,
-      gym,
-      showImage,
-      selectedImage,
-    } = this.state;
-    const profile = pathOr({}, ['profile'], this.state);
-    const {
-      username,
-      first_name,
-      last_name,
-      birthday,
-      uid,
-      accountType,
-      activity,
-      level,
-    } = profile;
-    return (
-      <>
-        {loaded ? (
-          <Layout style={{flex: 1, justifyContent: 'space-between'}}>
-            <Layout>
-              <Layout style={{alignItems: 'center', marginBottom: 10}}>
-                {backdrop ? (
-                  <TouchableOpacity
-                    style={{height: 150, width: '100%'}}
-                    onPress={() => {
-                      this.setState({
-                        selectedImage: [{url: backdrop}],
-                        showImage: true,
-                      });
-                    }}>
-                    <Image
-                      style={{height: 150, width: '100%'}}
-                      resizeMode="cover"
-                      source={{uri: backdrop}}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <View
-                    style={{
-                      height: 150,
-                      width: '100%',
-                      justifyContent: 'center',
-                    }}
-                  />
-                )}
-                {avatar ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.setState({
-                        selectedImage: [{url: avatar}],
-                        showImage: true,
-                      });
-                    }}
-                    style={[
-                      {
-                        marginTop: -45,
-                        marginHorizontal: 20,
-                        borderWidth: 0.5,
-                      },
-                      globalStyles.shadow,
-                    ]}>
-                    <Image
-                      style={{height: 90, width: 90}}
-                      source={{uri: avatar}}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <ThemedIcon
-                    name="person"
-                    size={80}
-                    style={{
-                      marginTop: -45,
-                      textAlign: 'center',
-                      marginBottom: 10,
-                      paddingHorizontal: 10,
-                      paddingTop: Platform.OS === 'ios' ? 5 : 0,
-                      borderWidth: 1,
-                    }}
-                  />
-                )}
-              </Layout>
-
-              <Text
-                style={{
-                  alignSelf: 'center',
-                  fontSize: 15,
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  marginBottom: 10,
-                }}>
-                <Text>{`${username} `}</Text>
-                {(first_name || last_name) && (
-                  <Text style={{marginLeft: 10, marginVertical: 5}}>
-                    {first_name && (
-                      <Text>{`${first_name}${last_name ? ' ' : ''}`}</Text>
-                    )}
-                    {last_name && <Text>{last_name}</Text>}
-                  </Text>
-                )}
-              </Text>
-              {!isFriend && (
-                <Button
+  return (
+    <>
+      {user ? (
+        <Layout style={{flex: 1, justifyContent: 'space-between'}}>
+          <Layout>
+            <Layout style={{alignItems: 'center', marginBottom: 10}}>
+              {user.backdrop ? (
+                <TouchableOpacity
+                  style={{height: 150, width: '100%'}}
                   onPress={() => {
-                    Alert.alert('Send pal request', 'Are you sure?', [
-                      {text: 'Cancel', style: 'cancel'},
-                      {
-                        text: 'Yes',
-                        onPress: async () => {
-                          try {
-                            await request(uid);
-                            navigation.goBack();
-                            Alert.alert('Success', 'Request sent');
-                          } catch (e) {
-                            Alert.alert('Error', e.message);
-                          }
-                        },
-                        style: 'destructive',
-                      },
-                    ]);
+                    setSelectedImage([{url: user.backdrop}]);
+                    setShowImage(true);
+                  }}>
+                  <Image
+                    style={{height: 150, width: '100%'}}
+                    resizeMode="cover"
+                    source={{uri: user.backdrop}}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={{
+                    height: 150,
+                    width: '100%',
+                    justifyContent: 'center',
                   }}
-                  style={{margin: 10, alignSelf: 'center'}}>
-                  Send pal request
-                </Button>
+                />
               )}
-
-              {accountType && isFriend && (
-                <>
-                  <Divider />
-                  <ListItem title="Account type" description={accountType} />
-                  <Divider />
-                </>
-              )}
-
-              {gym && gym.name && isFriend && (
-                <>
-                  <ListItem
-                    onPress={() =>
-                      navigation.navigate('Gym', {id: gym.place_id})
-                    }
-                    title="Gym"
-                    description={gym.name}
-                  />
-                  <Divider />
-                </>
-              )}
-
-              {birthday && isFriend && (
-                <>
-                  <ListItem
-                    title="Birthday"
-                    description={`${birthday} (${calculateAge(
-                      getBirthdayDate(birthday),
-                    )})`}
-                  />
-                  <Divider />
-                </>
-              )}
-
-              {isFriend && (
-                <>
-                  <ListItem
-                    title="Preferred activity"
-                    description={activity || 'Unspecified'}
-                  />
-                  <Divider />
-                </>
-              )}
-
-              {activity && isFriend && (
-                <>
-                  <ListItem
-                    title="Level"
-                    description={level || 'Unspecified'}
-                  />
-                  <Divider />
-                </>
+              {user.avatar ? (
+                <TouchableOpacity
+                  style={{
+                    marginTop: -45,
+                    marginHorizontal: 20,
+                  }}
+                  onPress={() => {
+                    setSelectedImage([{url: user.avatar}]);
+                    setShowImage(true);
+                  }}>
+                  <Avatar uri={user.avatar} size={90} />
+                </TouchableOpacity>
+              ) : (
+                <ThemedIcon
+                  name="person"
+                  size={80}
+                  style={{
+                    marginTop: -45,
+                    textAlign: 'center',
+                    marginBottom: 10,
+                    paddingHorizontal: 10,
+                    paddingTop: Platform.OS === 'ios' ? 5 : 0,
+                  }}
+                />
               )}
             </Layout>
 
-            {isFriend && (
+            <Text
+              style={{
+                alignSelf: 'center',
+                fontSize: 15,
+                textAlign: 'center',
+                fontWeight: 'bold',
+                marginBottom: 10,
+              }}>
+              <Text>{`${user.username} `}</Text>
+              {(user.first_name || user.last_name) && (
+                <Text style={{marginLeft: 10, marginVertical: 5}}>
+                  {user.first_name && (
+                    <Text>{`${user.first_name}${
+                      user.last_name ? ' ' : ''
+                    }`}</Text>
+                  )}
+                  {user.last_name && <Text>{user.last_name}</Text>}
+                </Text>
+              )}
+            </Text>
+            {!isFriend && (
               <Button
-                status="danger"
-                style={{alignSelf: 'center', margin: 10}}
                 onPress={() => {
-                  Alert.alert('Remove pal', 'Are you sure?', [
+                  Alert.alert('Send pal request', 'Are you sure?', [
                     {text: 'Cancel', style: 'cancel'},
                     {
                       text: 'Yes',
                       onPress: async () => {
-                        await remove(uid);
-                        navigation.goBack();
+                        try {
+                          await request(uid);
+                          navigation.goBack();
+                          Alert.alert('Success', 'Request sent');
+                        } catch (e) {
+                          Alert.alert('Error', e.message);
+                        }
                       },
                       style: 'destructive',
                     },
                   ]);
-                }}>
-                Remove pal
+                }}
+                style={{margin: 10, alignSelf: 'center'}}>
+                Send pal request
               </Button>
             )}
-          </Layout>
-        ) : (
-          <View style={hStyles.spinner}>
-            <Spinner />
-          </View>
-        )}
-        <Modal onRequestClose={() => null} visible={showImage} transparent>
-          <ImageViewer
-            renderIndicator={(currentIndex, allSize) => null}
-            loadingRender={() => (
-              <SafeAreaView>
-                <Text style={{color: '#fff', fontSize: 20}}>Loading...</Text>
-              </SafeAreaView>
+
+            {user.accountType && isFriend && (
+              <>
+                <Divider />
+                <ListItem title="Account type" description={user.accountType} />
+                <Divider />
+              </>
             )}
-            renderHeader={() => {
-              return (
-                <TouchableOpacity
-                  style={{
-                    position: 'absolute',
-                    top: 20,
-                    left: 10,
-                    padding: 10,
-                    zIndex: 9999,
-                  }}
+
+            {user.gym && user.gym.name && isFriend && (
+              <>
+                <ListItem
                   onPress={() =>
-                    this.setState({selectedImage: null, showImage: false})
-                  }>
-                  <View
-                    style={{
-                      paddingHorizontal: 15,
-                      paddingVertical: 2,
-                      borderRadius: 10,
-                    }}>
-                    <ThemedIcon name="arrow-ios-back" size={40} />
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-            imageUrls={selectedImage}
-          />
-        </Modal>
-      </>
-    );
-  }
-}
+                    navigation.navigate('Gym', {id: user.gym.place_id})
+                  }
+                  title="Gym"
+                  description={user.gym.name}
+                />
+                <Divider />
+              </>
+            )}
+
+            {user.birthday && isFriend && (
+              <>
+                <ListItem
+                  title="Birthday"
+                  description={`${user.birthday} (${calculateAge(
+                    getBirthdayDate(user.birthday),
+                  )})`}
+                />
+                <Divider />
+              </>
+            )}
+
+            {isFriend && (
+              <>
+                <ListItem
+                  title="Preferred activity"
+                  description={user.activity || 'Unspecified'}
+                />
+                <Divider />
+              </>
+            )}
+
+            {user.activity && isFriend && (
+              <>
+                <ListItem
+                  title="Level"
+                  description={user.level || 'Unspecified'}
+                />
+                <Divider />
+              </>
+            )}
+          </Layout>
+
+          {isFriend && (
+            <Button
+              status="danger"
+              style={{alignSelf: 'center', margin: 10}}
+              onPress={() => {
+                Alert.alert('Remove pal', 'Are you sure?', [
+                  {text: 'Cancel', style: 'cancel'},
+                  {
+                    text: 'Yes',
+                    onPress: async () => {
+                      await remove(uid);
+                      navigation.goBack();
+                    },
+                    style: 'destructive',
+                  },
+                ]);
+              }}>
+              Remove pal
+            </Button>
+          )}
+        </Layout>
+      ) : (
+        <View style={hStyles.spinner}>
+          <Spinner />
+        </View>
+      )}
+      <Modal onRequestClose={() => null} visible={showImage} transparent>
+        <ImageViewer
+          renderIndicator={(currentIndex, allSize) => null}
+          loadingRender={() => (
+            <SafeAreaView>
+              <Text style={{color: '#fff', fontSize: 20}}>Loading...</Text>
+            </SafeAreaView>
+          )}
+          renderHeader={() => {
+            return (
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  top: 20,
+                  left: 10,
+                  padding: 10,
+                  zIndex: 9999,
+                }}
+                onPress={() => {
+                  setSelectedImage([]);
+                  setShowImage(false);
+                }}>
+                <View
+                  style={{
+                    paddingHorizontal: 15,
+                    paddingVertical: 2,
+                    borderRadius: 10,
+                  }}>
+                  <ThemedIcon name="arrow-ios-back" size={40} />
+                </View>
+              </TouchableOpacity>
+            );
+          }}
+          imageUrls={selectedImage}
+        />
+      </Modal>
+    </>
+  );
+};
 
 const mapStateToProps = ({friends, sharedInfo, profile}: MyRootState) => ({
   friends: friends.friends,
@@ -345,6 +299,7 @@ const mapStateToProps = ({friends, sharedInfo, profile}: MyRootState) => ({
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   remove: (uid: string) => dispatch(deleteFriend(uid)),
   request: (friendUid: string) => dispatch(sendRequest(friendUid)),
+  fetchUser: (uid: string) => dispatch(fetchUsers([uid])),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileView);

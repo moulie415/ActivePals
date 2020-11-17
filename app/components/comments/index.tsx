@@ -2,13 +2,7 @@
  * Created by tino on 6/6/17.
  */
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Modal,
-  Dimensions,
-  Keyboard,
-  TouchableOpacity,
-} from 'react-native';
+import {Modal, Dimensions, Keyboard, TouchableOpacity} from 'react-native';
 import Image from 'react-native-fast-image';
 import Collapsible from 'react-native-collapsible';
 import styles from './styles';
@@ -17,7 +11,15 @@ import CommentsProps from '../../types/components/Comments';
 import Profile from '../../types/Profile';
 import CommentType from '../../types/Comment';
 import Comment from './Comment';
-import {Icon, Text, List, Divider, Spinner, Input} from '@ui-kitten/components';
+import {
+  Icon,
+  Text,
+  List,
+  Divider,
+  Spinner,
+  Input,
+  Layout,
+} from '@ui-kitten/components';
 import ThemedIcon from '../ThemedIcon/ThemedIcon';
 
 const screen = Dimensions.get('screen');
@@ -146,7 +148,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
       const {replyAction} = this.props;
       console.log(pageY);
       input.focus();
-      replyAction(pageY);
+      replyAction && replyAction(pageY);
     });
   }
 
@@ -299,9 +301,9 @@ export default class Comments extends PureComponent<CommentsProps, State> {
     }
     return items.map((c) => {
       return (
-        <View key={keyExtractor(c) + Math.random()}>
+        <Layout key={keyExtractor(c) + Math.random()}>
           {this.generateComment(c)}
-        </View>
+        </Layout>
       );
     });
   }
@@ -315,14 +317,14 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         }}
         style={styles.likeButton}
         key={like.user_id}>
-        <View style={[styles.likeContainer]}>
+        <Layout style={[styles.likeContainer]}>
           {like.image ? (
             <Image style={[styles.likeImage]} source={{uri: like.image}} />
           ) : (
             <ThemedIcon name="person" size={40} />
           )}
           <Text>{like.name || like.username}</Text>
-        </View>
+        </Layout>
       </TouchableOpacity>
     );
   }
@@ -343,14 +345,14 @@ export default class Comments extends PureComponent<CommentsProps, State> {
       parentIdExtractor,
     } = this.props;
     return (
-      <View>
+      <Layout>
         {this.generateComment(item)}
-        <View style={{marginLeft: 40}}>
+        <Layout style={{marginLeft: 40}}>
           {item.childrenCount &&
           item[childPropName] &&
           item[childPropName][0] ? (
             <TouchableOpacity onPress={() => this.toggleExpand(item)}>
-              <View style={styles.repliedSection}>
+              <Layout style={styles.repliedSection}>
                 <Image
                   style={styles.repliedImg}
                   source={{
@@ -367,7 +369,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                   * {childrenCountExtractor(item)}
                   {childrenCountExtractor(item) > 1 ? ' replies' : ' reply'}
                 </Text>
-              </View>
+              </Layout>
             </TouchableOpacity>
           ) : null}
           <Collapsible
@@ -375,7 +377,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
             duration={400}
             collapsed={!this.isExpanded(keyExtractor(item))}>
             {childrenCountExtractor(item) && paginateAction ? (
-              <View>
+              <Layout>
                 {/* {this.props.childPropName &&
                 this.props.childrenCountExtractor(item) >
                   item[this.props.childPropName].length ? (
@@ -410,9 +412,9 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                     </Text>
                   </TouchableOpacity>
                 ) : null}
-              </View>
+              </Layout>
             ) : null}
-            <View style={styles.inputSection}>
+            <Layout style={styles.inputSection}>
               <Input
                 ref={(input) => {
                   this.textInputs[`input${keyExtractor(item)}`] = input;
@@ -435,13 +437,12 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                   style={styles.submit}
                   name="corner-down-right"
                   size={40}
-                  fill="#000"
                 />
               </TouchableOpacity>
-            </View>
+            </Layout>
           </Collapsible>
-        </View>
-      </View>
+        </Layout>
+      </Layout>
     );
   }
 
@@ -464,8 +465,8 @@ export default class Comments extends PureComponent<CommentsProps, State> {
       editModalVisible,
     } = this.state;
     return (
-      <View style={{flex: 1}}>
-        <View style={styles.inputSection}>
+      <Layout style={{flex: 1}}>
+        <Layout style={styles.inputSection}>
           <Input
             style={styles.input}
             ref={(input) => {
@@ -477,7 +478,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
             onChangeText={(input) => {
               this.newCommentText = input;
               this.setState({text: input});
-              this.inputMain.setNativeProps({text: input});
+              // this.inputMain.setNativeProps({text: input});
               const list = getMentionsList(text, users);
               list
                 ? this.setState({mentionList: list})
@@ -499,9 +500,9 @@ export default class Comments extends PureComponent<CommentsProps, State> {
               size={30}
             />
           </TouchableOpacity>
-        </View>
+        </Layout>
         {mentionList && (
-          <View style={styles.mentionsList}>
+          <Layout style={styles.mentionsList}>
             <List
               ItemSeparatorComponent={Divider}
               keyboardShouldPersistTaps="handled"
@@ -542,7 +543,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                 return null;
               }}
             />
-          </View>
+          </Layout>
         )}
         {!loadingComments && !data ? (
           <Text style={{textAlign: 'center'}}>No comments yet</Text>
@@ -579,7 +580,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
         ) : null}
 
         {loadingComments ? (
-          <View
+          <Layout
             style={{
               position: 'absolute',
               zIndex: 10,
@@ -587,7 +588,7 @@ export default class Comments extends PureComponent<CommentsProps, State> {
               height: 60,
             }}>
             <Spinner size="small" />
-          </View>
+          </Layout>
         ) : null}
 
         {!loadingComments &&
@@ -610,8 +611,8 @@ export default class Comments extends PureComponent<CommentsProps, State> {
           transparent
           visible={editModalVisible}
           onRequestClose={() => this.setEditModalVisible(false)}>
-          <View style={styles.editModalContainer}>
-            <View style={styles.editModal}>
+          <Layout style={styles.editModalContainer}>
+            <Layout style={styles.editModal}>
               <Input
                 ref={(input) => {
                   this.textInputs.editCommentInput = input;
@@ -624,30 +625,30 @@ export default class Comments extends PureComponent<CommentsProps, State> {
                 }}
                 placeholder="Edit comment"
               />
-              <View
+              <Layout
                 style={{flexDirection: 'row', justifyContent: 'space-around'}}>
                 <TouchableOpacity
                   onPress={() => this.setEditModalVisible(false)}>
-                  <View style={styles.editButtons}>
+                  <Layout style={styles.editButtons}>
                     <Text>Cancel</Text>
                     <Icon name="times" size={20} />
-                  </View>
+                  </Layout>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
                     editAction(this.editCommentText, this.editingComment);
                     this.setEditModalVisible(!editModalVisible);
                   }}>
-                  <View style={styles.editButtons}>
+                  <Layout style={styles.editButtons}>
                     <Text>Save</Text>
                     <Icon name="send" size={20} />
-                  </View>
+                  </Layout>
                 </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+              </Layout>
+            </Layout>
+          </Layout>
         </Modal>
-      </View>
+      </Layout>
     );
   }
 }

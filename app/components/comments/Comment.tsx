@@ -2,15 +2,14 @@
  * Created by tino on 6/6/17.
  */
 import React, {PureComponent} from 'react';
-import {View, Alert, TouchableOpacity, Image as SlowImage} from 'react-native';
+import {Alert, TouchableOpacity, Image as SlowImage} from 'react-native';
 import Image from 'react-native-fast-image';
 import database from '@react-native-firebase/database';
-import ParsedText from 'react-native-parsed-text';
 import TimeAgo from 'react-native-timeago';
 import styles from './styles';
 import str from '../../constants/strings';
 import CommentProps from '../../types/components/CommentProps';
-import {Text} from '@ui-kitten/components';
+import {Layout, Text} from '@ui-kitten/components';
 import RepIcon from '../RepIcon/RepIcon';
 
 interface State {
@@ -64,7 +63,7 @@ export default class Comment extends PureComponent<CommentProps, State> {
 
   handleReply() {
     const {data, replyAction} = this.props;
-    replyAction(data);
+    replyAction && replyAction(data);
   }
 
   handleLike() {
@@ -134,10 +133,10 @@ export default class Comment extends PureComponent<CommentProps, State> {
       reported,
     } = this.props;
     return (
-      <View style={styles.commentContainer}>
-        <View style={styles.left}>
+      <Layout style={styles.commentContainer}>
+        <Layout style={styles.left}>
           <TouchableOpacity onPress={this.handleUsernameTap}>
-            <View style={{alignItems: 'center'}}>
+            <Layout style={{alignItems: 'center'}}>
               <Image
                 style={[
                   styles.image,
@@ -149,37 +148,37 @@ export default class Comment extends PureComponent<CommentProps, State> {
                 <TouchableOpacity
                   style={{paddingTop: 5}}
                   onPress={this.handleLikesTap}>
-                  <View style={{flexDirection: 'row'}}>
+                  <Layout style={{flexDirection: 'row'}}>
                     <RepIcon disabled active size={15} />
                     <Text style={styles.likeNr}> {likesNr}</Text>
-                  </View>
+                  </Layout>
                 </TouchableOpacity>
               ) : null}
-            </View>
+            </Layout>
           </TouchableOpacity>
-        </View>
+        </Layout>
         <TouchableOpacity
           onPress={() => this.setState({menuVisible: false})}
           onLongPress={() => this.setModalVisible()}
           style={styles.right}>
-          <View style={styles.rightContent}>
-            <View style={styles.rightContentTop}>
+          <Layout style={styles.rightContent}>
+            <Layout style={styles.rightContentTop}>
               <TouchableOpacity onPress={this.handleUsernameTap}>
                 <Text style={styles.name}>{username}</Text>
               </TouchableOpacity>
-            </View>
-            <ParsedText
-              parse={[
-                {
-                  pattern: str.mentionRegex,
-                  onPress: this.handleUsernamePress.bind(this),
-                },
-              ]}
+            </Layout>
+            <Text
+              // parse={[
+              //   {
+              //     pattern: str.mentionRegex,
+              //     onPress: this.handleUsernamePress.bind(this),
+              //   },
+              // ]}
               style={styles.body}>
               {body}
-            </ParsedText>
-          </View>
-          <View style={styles.rightActionBar}>
+            </Text>
+          </Layout>
+          <Layout style={styles.rightActionBar}>
             <TimeAgo style={styles.time} time={updatedAt} />
             {likeAction ? (
               <RepIcon
@@ -193,10 +192,10 @@ export default class Comment extends PureComponent<CommentProps, State> {
                 <Text style={styles.actionText}>Reply</Text>
               </TouchableOpacity>
             ) : null}
-          </View>
+          </Layout>
         </TouchableOpacity>
         {menuVisible ? (
-          <View style={styles.menu}>
+          <Layout style={styles.menu}>
             {canEdit ? (
               <TouchableOpacity
                 style={styles.menuItem}
@@ -228,9 +227,9 @@ export default class Comment extends PureComponent<CommentProps, State> {
                 <Text style={styles.menuText}>Delete</Text>
               </TouchableOpacity>
             ) : null}
-          </View>
+          </Layout>
         ) : null}
-      </View>
+      </Layout>
     );
   }
 }

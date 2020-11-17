@@ -169,7 +169,7 @@ class PostView extends Component<PostViewProps, State> {
             </TouchableOpacity>
           )}
           <View style={{flex: 1}}>
-            <Text style={{ textAlign: 'center'}}>
+            <Text style={{textAlign: 'center'}}>
               {`${item.commentCount || 0} ${
                 item.commentCount === 1 ? ' comment' : ' comments'
               }`}
@@ -277,7 +277,7 @@ class PostView extends Component<PostViewProps, State> {
                   {this.getUsernameFormatted(item.uid)}
                   <Text>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                <ParsedText text={item.text} />
+                <Text>{item.text}</Text>
               </View>
             </View>
           </View>
@@ -302,7 +302,7 @@ class PostView extends Component<PostViewProps, State> {
                   {this.getUsernameFormatted(item.uid)}
                   <Text>{getSimplifiedTime(item.createdAt)}</Text>
                 </View>
-                <ParsedText text={item.text} />
+                <Text>{item.text}</Text>
               </View>
             </View>
             <TouchableOpacity
@@ -345,7 +345,7 @@ class PostView extends Component<PostViewProps, State> {
                     {this.getUsernameFormatted(item.uid)}
                     <Text>{getSimplifiedTime(item.createdAt)}</Text>
                   </View>
-                  <ParsedText text={item.text} />
+                  <Text>{item.text}</Text>
                 </View>
               </View>
               <Video

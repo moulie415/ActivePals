@@ -28,7 +28,7 @@ export default StyleSheet.create({
   name: {
     fontWeight: 'bold',
     paddingBottom: 5,
-    color: '#000',
+
   },
   editIcon: {
     flex: 1,
@@ -44,11 +44,11 @@ export default StyleSheet.create({
   time: {
     fontSize: 12,
     paddingLeft: 5,
-    color: '#9B9B9B',
+
     fontStyle: 'italic',
   },
   actionText: {
-    color: '#9B9B9B',
+
     fontWeight: 'bold',
   },
   repliedSection: {
@@ -64,13 +64,13 @@ export default StyleSheet.create({
     borderRadius: 10,
   },
   repliedUsername: {
-    color: '#9B9B9B',
+
   },
   repliedText: {
-    color: '#9B9B9B',
+
   },
   repliedCount: {
-    color: '#9B9B9B',
+
     fontSize: 11,
   },
   inputSection: {

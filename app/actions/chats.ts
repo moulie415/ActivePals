@@ -1,5 +1,6 @@
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
+import {getAvatar} from '../helpers/images';
 import Message, {MessageType} from '../types/Message';
 import {
   MyThunkDispatch,
@@ -85,8 +86,8 @@ export const setUnreadCount = ({id, count}: {id: string; count: number}) => ({
   count,
 });
 
-export const fetchGymChat = (gym: string) => {
-  return (dispatch: MyThunkDispatch) => {
+export const fetchGymChat = (gym: string): MyThunkResult<void> => {
+  return (dispatch: MyThunkDispatch, getState) => {
     return database()
       .ref('gymChats')
       .child(gym)
@@ -96,7 +97,12 @@ export const fetchGymChat = (gym: string) => {
         if (lastMessage.val()) {
           const key = Object.keys(lastMessage.val())[0];
           const message = lastMessage.val()[key];
-          const chat = {lastMessage: {...message, key}, key: gym};
+          const avatar = getAvatar(message, getState());
+          
+          const chat = {
+            lastMessage: {...message, user: {...message.user, avatar}, key},
+            key: gym,
+          };
           dispatch(setGymChat(chat));
         } else {
           dispatch(setGymChat(null));
@@ -105,8 +111,10 @@ export const fetchGymChat = (gym: string) => {
   };
 };
 
-export const updateLastMessage = (notif: PushNotificationData) => {
-  return (dispatch: MyThunkDispatch) => {
+export const updateLastMessage = (
+  notif: PushNotificationData,
+): MyThunkResult<void> => {
+  return (dispatch: MyThunkDispatch, getState) => {
     if (notif.type === MessageType.MESSAGE && notif.chatId) {
       return database()
         .ref('chats')
@@ -117,8 +125,13 @@ export const updateLastMessage = (notif: PushNotificationData) => {
           if (lastMessage.val()) {
             const key = Object.keys(lastMessage.val())[0];
             const message = lastMessage.val()[key];
+            const avatar = getAvatar(message, getState());
             dispatch(
-              updateChat(notif.uid || notif.friendUid, {...message, key}),
+              updateChat(notif.uid || notif.friendUid, {
+                ...message,
+                user: {...message.user, avatar},
+                key,
+              }),
             );
           }
         });
@@ -133,8 +146,15 @@ export const updateLastMessage = (notif: PushNotificationData) => {
           if (lastMessage.val()) {
             const key = Object.keys(lastMessage.val())[0];
             const message = lastMessage.val()[key];
+            const avatar = getAvatar(message, getState());
 
-            dispatch(updateSessionChat(notif.sessionId, {...message, key}));
+            dispatch(
+              updateSessionChat(notif.sessionId, {
+                ...message,
+                user: {...message.user, avatar},
+                key,
+              }),
+            );
           }
         });
     }
@@ -173,8 +193,8 @@ export const getUnreadCount = (uid: string) => {
   };
 };
 
-export const fetchChats = (uid: string, limit = 10) => {
-  return async (dispatch: MyThunkDispatch) => {
+export const fetchChats = (uid: string, limit = 10): MyThunkResult<void> => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     return database()
       .ref('userChats')
       .child(uid)
@@ -193,7 +213,12 @@ export const fetchChats = (uid: string, limit = 10) => {
               let message = {text: 'Beginning of chat'};
               if (lastMessage.val()) {
                 const key = Object.keys(lastMessage.val())[0];
-                message = {...lastMessage.val()[key], key};
+                const avatar = getAvatar(lastMessage.val(), getState());
+                message = {
+                  ...lastMessage.val()[key],
+                  user: {...lastMessage.val(), avatar},
+                  key,
+                };
               }
               return {uid: chat, chatId, lastMessage: message, key: chatId};
             }),
@@ -210,8 +235,11 @@ export const fetchChats = (uid: string, limit = 10) => {
   };
 };
 
-export const fetchSessionChats = (uid: string, limit = 10) => {
-  return async (dispatch: MyThunkDispatch) => {
+export const fetchSessionChats = (
+  uid: string,
+  limit = 10,
+): MyThunkResult<void> => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     return database()
       .ref('userSessions')
       .child(uid)
@@ -236,7 +264,12 @@ export const fetchSessionChats = (uid: string, limit = 10) => {
               let message = {text: 'Beginning of chat'};
               if (lastMessage.val()) {
                 const key = Object.keys(lastMessage.val())[0];
-                message = {...lastMessage.val()[key], key};
+                const avatar = getAvatar(lastMessage.val(), getState());
+                message = {
+                  ...lastMessage.val()[key],
+                  user: {...lastMessage.val(), avatar},
+                  key,
+                };
               }
               return {...snapshot.val(), key: session, lastMessage: message};
             }),
@@ -258,8 +291,8 @@ export const fetchMessages = (
   amount: number,
   uid: string,
   endAt: string,
-) => {
-  return async (dispatch: MyThunkDispatch) => {
+): MyThunkResult<void> => {
+  return async (dispatch: MyThunkDispatch, getState) => {
     const ref = endAt
       ? database()
           .ref(`chats/${id}`)
@@ -269,36 +302,16 @@ export const fetchMessages = (
       : database().ref(`chats/${id}`).orderByKey().limitToLast(amount);
     const snapshot = await ref.once('value');
     const messages = {};
-    try {
-      snapshot.forEach((child) => {
-        if (child.val().user && child.val().user._id === uid) {
-          messages[child.key] = {
-            ...child.val(),
-            key: child.key,
-            createdAt: new Date(child.val().createdAt),
-            user: {...child.val().user},
-          };
-        } else {
-          messages[child.key] = {
-            ...child.val(),
-            key: child.key,
-            createdAt: new Date(child.val().createdAt),
-          };
-        }
-        return false;
-      });
-      dispatch(setMessageSession(id, messages));
-    } catch (e) {
-      snapshot.forEach((child) => {
-        messages[child.key] = {
-          ...child.val(),
-          key: child.key,
-          createdAt: new Date(child.val().createdAt),
-        };
-        return false;
-      });
-      dispatch(setMessageSession(id, messages));
-    }
+    snapshot.forEach((child) => {
+      const avatar = getAvatar(child.val(), getState());
+      messages[child.key] = {
+        ...child.val(),
+        key: child.key,
+        createdAt: new Date(child.val().createdAt),
+        user: {...child.val().user, avatar},
+      };
+    });
+    dispatch(setMessageSession(id, messages));
   };
 };
 
@@ -307,8 +320,8 @@ export const fetchSessionMessages = (
   amount: number,
   isPrivate = false,
   endAt: string,
-) => {
-  return (dispatch: MyThunkDispatch) => {
+): MyThunkResult<void> => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const type = isPrivate ? 'privateSessions' : 'sessions';
     const ref = endAt
       ? database()
@@ -321,10 +334,12 @@ export const fetchSessionMessages = (
     return ref.once('value', (snapshot) => {
       const messages = {};
       snapshot.forEach((child) => {
+        const avatar = getAvatar(child.val(), getState());
         messages[child.key] = {
           ...child.val(),
           key: child.key,
           createdAt: new Date(child.val().createdAt),
+          user: {...child.val().user, avatar},
         };
 
         return false;
@@ -335,17 +350,19 @@ export const fetchSessionMessages = (
 };
 
 export const fetchGymMessages = (id: string, amount: number, endAt: string) => {
-  return (dispatch: MyThunkDispatch) => {
+  return (dispatch: MyThunkDispatch, getState) => {
     const ref = endAt
       ? database().ref(`gymChats/${id}`).endAt(endAt).limitToLast(amount)
       : database().ref(`gymChats/${id}`).limitToLast(amount);
     return ref.once('value', (snapshot) => {
       const messages = {};
       snapshot.forEach((child) => {
+        const avatar = getAvatar(child.val(), getState());
         messages[child.key] = {
           ...child.val(),
           key: child.key,
           createdAt: new Date(child.val().createdAt),
+          user: {...child.val().user, avatar},
         };
 
         return false;

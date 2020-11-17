@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, FunctionComponent, useEffect} from 'react';
 import {View} from 'react-native';
 import {connect} from 'react-redux';
 import {getType, getSimplifiedTime} from '../../constants/utils';
@@ -9,68 +9,68 @@ import {GymChatProps} from '../../types/views/chat/GymChat';
 import {Text, Layout, ListItem} from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import Avatar from '../../components/Avatar/Avatar';
+import {fetchGym} from '../../actions/sessions';
 
-class GymChat extends Component<GymChatProps, {refreshing: boolean}> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      refreshing: false,
-    };
-  }
+const GymChat: FunctionComponent<GymChatProps> = ({
+  gymChat,
+  navigation,
+  places,
+  profile,
+  getGym,
+}) => {
 
-  render() {
-    const {gymChat, getChat, navigation, places, profile} = this.props;
-    const {refreshing} = this.state;
-    const gym = places[profile.gym];
-    return (
-      <Layout style={{flex: 1}} level="2">
-        {gym && gymChat ? (
-          <ListItem
-            onPress={() =>
-              navigation.navigate('Messaging', {gymId: gym.place_id})
-            }
-            title={gym.name}
-            description={gymChat.lastMessage.text}
-            accessoryLeft={() =>
-              gym && gym.photo ? (
-                <Avatar uri={gym.photo} size={50} />
-              ) : (
-                getType(SessionType.GYM, 50)
-              )
-            }
-            accessoryRight={() => (
-              <View style={{flexDirection: 'row'}}>
-                {gymChat?.lastMessage?.createdAt && (
-                  <Text>
-                    {getSimplifiedTime(gymChat.lastMessage.createdAt)}
-                  </Text>
-                )}
-                <ChatRowCount id={gym.place_id} />
-              </View>
-            )}
-          />
-        ) : (
-          <Layout
+  const gym = places[profile.gym];
+  useEffect(() => {
+    if (!places[profile.gym]) {
+      getGym(profile.gym);
+    }
+  }, [getGym, profile.gym, places]);
+  return (
+    <Layout style={{flex: 1}} level="2">
+      {gym && gymChat ? (
+        <ListItem
+          onPress={() =>
+            navigation.navigate('Messaging', {gymId: gym.place_id})
+          }
+          title={gym.name}
+          description={gymChat.lastMessage.text}
+          accessoryLeft={() =>
+            gym && gym.photo ? (
+              <Avatar uri={gym.photo} size={50} />
+            ) : (
+              getType(SessionType.GYM, 50)
+            )
+          }
+          accessoryRight={() => (
+            <View style={{flexDirection: 'row'}}>
+              {gymChat?.lastMessage?.createdAt && (
+                <Text>{getSimplifiedTime(gymChat.lastMessage.createdAt)}</Text>
+              )}
+              <ChatRowCount id={gym.place_id} />
+            </View>
+          )}
+        />
+      ) : (
+        <Layout
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text
             style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
+              textAlign: 'center',
+              marginHorizontal: 20,
             }}>
-            <Text
-              style={{
-                textAlign: 'center',
-                marginHorizontal: 20,
-              }}>
-              {
-                "You haven't joined a Gym, please join a Gym if you want to participate in Gym chat"
-              }
-            </Text>
-          </Layout>
-        )}
-      </Layout>
-    );
-  }
-}
+            {
+              "You haven't joined a Gym, please join a Gym if you want to participate in Gym chat"
+            }
+          </Text>
+        </Layout>
+      )}
+    </Layout>
+  );
+};
 
 const mapStateToProps = ({friends, profile, chats, sessions}: MyRootState) => ({
   friends: friends.friends,
@@ -81,6 +81,7 @@ const mapStateToProps = ({friends, profile, chats, sessions}: MyRootState) => ({
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   getChat: (gym: string) => dispatch(fetchGymChat(gym)),
+  getGym: (id: string) => dispatch(fetchGym(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GymChat);

@@ -75,10 +75,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
     return null;
   }
 
-  uploadImage(
-    uri: string,
-    mime = 'application/octet-stream',
-  ): Promise<{url: string; id: string}> {
+  async uploadImage(uri: string, mime = 'application/octet-stream') {
     const {
       profile: {uid},
     } = this.props;
@@ -87,12 +84,13 @@ class FilePreview extends Component<FilePreviewProps, State> {
     const imagePath = message ? '/messages' : '/photos';
     const ref =
       type === 'image' ? `images/${uid}${imagePath}` : `videos/${uid}`;
-    return new Promise((resolve, reject) => {
+    try {
       // const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       const id = guid();
       const imageRef = storage().ref(ref).child(id);
 
-      imageRef.putFile(uri, {contentType: mimeType}).on(
+      const task = imageRef.putFile(uri, {contentType: mimeType});
+      task.on(
         TaskEvent.STATE_CHANGED,
         (snapshot) => {
           const progress =
@@ -111,17 +109,14 @@ class FilePreview extends Component<FilePreviewProps, State> {
         },
         (e) => {
           Alert.alert('Error', e.message);
-          reject();
-        },
-        (result) => {
-          if (result && result.downloadURL) {
-            resolve({url: result.downloadURL, id});
-          } else {
-            reject();
-          }
         },
       );
-    });
+
+      await task;
+      return {id, url: await imageRef.getDownloadURL()};
+    } catch (e) {
+      Alert.alert('Error', e.message);
+    }
   }
 
   async acceptPressed() {
@@ -133,25 +128,27 @@ class FilePreview extends Component<FilePreviewProps, State> {
     const ref = paramType === 'image' ? 'userPhotos/' : 'userVideos/';
     try {
       const image = await this.uploadImage(uri);
-      const date = new Date().toString();
-      if (message) {
-        navigation.goBack();
-        setPostMessage(image.url, text);
-      } else {
-        database()
-          .ref(ref + profile.uid)
-          .child(image.id)
-          .set({createdAt: date, url: image.url});
-        await postStatus({
-          type,
-          url: image.url,
-          text,
-          uid: profile.uid,
-          createdAt: date,
-        });
-        navigation.goBack();
-        Alert.alert('Success', 'Post submitted');
-        this.setState({spinner: false});
+      if (image) {
+        const date = new Date().toString();
+        if (message) {
+          navigation.goBack();
+          setPostMessage(image.url, text);
+        } else {
+          database()
+            .ref(ref + profile.uid)
+            .child(image.id)
+            .set({createdAt: date, url: image.url});
+          await postStatus({
+            type,
+            url: image.url,
+            text,
+            uid: profile.uid,
+            createdAt: date,
+          });
+          navigation.goBack();
+          Alert.alert('Success', 'Post submitted');
+          this.setState({spinner: false});
+        }
       }
     } catch (e) {
       Alert.alert('Error', e.message);
@@ -211,7 +208,7 @@ class FilePreview extends Component<FilePreviewProps, State> {
                 const list = getMentionsList(input, mentionFriends);
                 list
                   ? this.setState({mentionList: list})
-                  : this.setState({mentionList: null});
+                  : this.setState({mentionList: []});
               }}
               value={text}
               multiline={false}

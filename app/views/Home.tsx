@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {
   View,
   Alert,
-  Modal,
   SafeAreaView,
   Dimensions,
   TouchableWithoutFeedback,
@@ -15,7 +14,6 @@ import {connect} from 'react-redux';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import ModalBox from 'react-native-modalbox';
 import database from '@react-native-firebase/database';
 import Video from 'react-native-video';
 import Share, {Options} from 'react-native-share';
@@ -58,11 +56,13 @@ import {
   List,
   Divider,
   Spinner,
+  Modal,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import RepIcon from '../components/RepIcon/RepIcon';
 import Avatar from '../components/Avatar/Avatar';
+import globalStyles from '../styles/globalStyles';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -414,7 +414,7 @@ class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{marginBottom: 5}}>
-              <ParsedText text={item.text} />
+              <Text>{item.text}</Text>
             </View>
             {this.repCommentCount(item)}
             {this.repsAndComments(item)}
@@ -443,7 +443,7 @@ class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{margin: 5, marginHorizontal: 10}}>
-              <ParsedText text={item.text} />
+              <Text>{item.text}</Text>
             </View>
             <TouchableOpacity
               activeOpacity={1}
@@ -488,7 +488,7 @@ class Home extends Component<HomeProps, State> {
               </TouchableOpacity>
             </View>
             <View style={{margin: 10}}>
-              <ParsedText text={item.text} />
+              <Text>{item.text}</Text>
             </View>
             <TouchableWithoutFeedback
               onPress={() => {
@@ -682,7 +682,7 @@ class Home extends Component<HomeProps, State> {
             )}
           </TouchableOpacity>
           <Input
-            style={{flex: 1, marginHorizontal: 10}}
+            style={{flex: 1, marginHorizontal: 10, fontSize: 12}}
             value={status}
             maxLength={280}
             autoCorrect={false}
@@ -692,7 +692,7 @@ class Home extends Component<HomeProps, State> {
               const list = getMentionsList(input, mentionFriends);
               list
                 ? this.setState({mentionList: list})
-                : this.setState({mentionList: null});
+                : this.setState({mentionList: []});
             }}
             placeholder="Post a status for your pals..."
           />
@@ -824,7 +824,10 @@ class Home extends Component<HomeProps, State> {
             <Spinner />
           </View>
         )}
-        <Modal onRequestClose={() => null} visible={showImage} transparent>
+        <Modal
+          style={{width: SCREEN_WIDTH, height: SCREEN_HEIGHT}}
+          visible={showImage}
+          backdropStyle={globalStyles.backdrop}>
           <ImageViewer
             renderIndicator={(currentIndex, allSize) => null}
             loadingRender={() => (
@@ -843,7 +846,7 @@ class Home extends Component<HomeProps, State> {
                     zIndex: 9999,
                   }}
                   onPress={() =>
-                    this.setState({selectedImage: null, showImage: false})
+                    this.setState({selectedImage: [], showImage: false})
                   }>
                   <View
                     style={{
@@ -859,127 +862,130 @@ class Home extends Component<HomeProps, State> {
             imageUrls={selectedImage}
           />
         </Modal>
-        <ModalBox
-          useNativeDriver
+        <Modal
           style={{
             width: SCREEN_WIDTH - 20,
-            height: SCREEN_HEIGHT - 150,
-            marginTop: Platform.select({ios: 10}),
+            height: SCREEN_HEIGHT - 30,
             borderRadius: 5,
             padding: 5,
           }}
-          swipeToClose={false}
-          isOpen={showCommentModal}
-          onClosed={() =>
+          backdropStyle={globalStyles.backdrop}
+          visible={showCommentModal}
+          onBackdropPress={() =>
             this.setState({focusCommentInput: false, showCommentModal: false})
-          }
-          backButtonClose
-          position="center"
-          key={showCommentModal ? 1 : 2}>
-          <TouchableOpacity
-            onPress={() => this.setState({showCommentModal: false})}>
-            <ThemedIcon name="arrow-ios-back" size={30} style={{padding: 10}} />
-          </TouchableOpacity>
-          <Comments
-            data={feed[postId] ? feed[postId].comments : []}
-            viewingUserName={profile.username}
-            deleteAction={(c) => console.log('delete comment')}
-            initialDisplayCount={10}
-            editMinuteLimit={900}
-            focusCommentInput={focusCommentInput}
-            childrenPerPage={5}
-            // clastCommentUpdate={this.state.lastCommentUpdate}
-            users={Object.values(combined)}
-            usernameTapAction={(username, uid) => {
-              if (uid === profile.uid) {
-                navigation.navigate('Profile');
-              } else {
-                navigation.navigate('ProfileView', {uid});
+          }>
+          <Layout style={{flex: 1}}>
+            <TouchableOpacity
+              onPress={() => this.setState({showCommentModal: false})}>
+              <ThemedIcon
+                name="arrow-back"
+                size={30}
+                style={{padding: 10, margin: 10}}
+              />
+            </TouchableOpacity>
+            <Comments
+              data={feed[postId] ? feed[postId].comments : []}
+              viewingUserName={profile.username}
+              deleteAction={(c) => console.log('delete comment')}
+              initialDisplayCount={10}
+              editMinuteLimit={900}
+              focusCommentInput={focusCommentInput}
+              childrenPerPage={5}
+              // clastCommentUpdate={this.state.lastCommentUpdate}
+              users={Object.values(combined)}
+              usernameTapAction={(username, uid) => {
+                if (uid === profile.uid) {
+                  navigation.navigate('Profile');
+                } else {
+                  navigation.navigate('ProfileView', {uid});
+                }
+              }}
+              childPropName="children"
+              isChild={(c) => c.parentCommentId}
+              parentIdExtractor={(c) => c.key}
+              keyExtractor={(item) => item.comment_id}
+              usernameExtractor={(item) => {
+                if (item.uid === profile.uid) {
+                  return 'You';
+                }
+                return friends[item.uid].username || users[item.uid].username;
+              }}
+              uidExtractor={(item) => item.uid}
+              editTimeExtractor={(item) =>
+                item.updated_at || new Date(item.created_at).toISOString()
               }
-            }}
-            childPropName="children"
-            isChild={(c) => c.parentCommentId}
-            parentIdExtractor={(c) => c.key}
-            keyExtractor={(item) => item.comment_id}
-            usernameExtractor={(item) => {
-              if (item.uid === profile.uid) {
-                return 'You';
+              createdTimeExtractor={(item) =>
+                new Date(item.created_at).toISOString()
               }
-              return friends[item.uid].username || users[item.uid].username;
-            }}
-            uidExtractor={(item) => item.uid}
-            editTimeExtractor={(item) =>
-              item.updated_at || new Date(item.created_at).toISOString()
-            }
-            createdTimeExtractor={(item) =>
-              new Date(item.created_at).toISOString()
-            }
-            bodyExtractor={(item) => item.text}
-            imageExtractor={(item) => {
-              if (item.uid === profile.uid) {
-                return profile.avatar;
-              }
-              return friends[item.uid].avatar || users[item.uid].avatar;
-            }}
-            likeExtractor={(item) => item.rep}
-            reportedExtractor={(item) => item.reported}
-            likesExtractor={(item) =>
-              likesExtractor(
-                item,
-                profile.uid,
-                (id: string) => navigation.navigate('ProfileView', {uid: id}),
-                () => navigation.navigate('Profile'),
-              )
-            }
-            likeCountExtractor={(item) => item.repCount}
-            commentCount={feed[postId] ? feed[postId].commentCount : 0}
-            childrenCountExtractor={(c) => c.childrenCount}
-            timestampExtractor={(item) =>
-              new Date(item.created_at).toISOString()
-            }
-            replyAction={(offset) => {
-              scrollRef.current.scrollTo({
-                x: null,
-                y: this.scrollIndex + offset - 300,
-                animated: true,
-              });
-            }}
-            saveAction={async (text, parentCommentId) => {
-              if (text) {
-                await comment(
+              bodyExtractor={(item) => item.text}
+              imageExtractor={(item) => {
+                if (item.uid === profile.uid) {
+                  return profile.avatar;
+                }
+                return friends[item.uid].avatar || users[item.uid].avatar;
+              }}
+              likeExtractor={(item) => item.rep}
+              reportedExtractor={(item) => item.reported}
+              likesExtractor={(item) =>
+                likesExtractor(
+                  item,
                   profile.uid,
-                  postId,
-                  text,
-                  new Date().toString(),
-                  parentCommentId,
-                );
+                  (id: string) => navigation.navigate('ProfileView', {uid: id}),
+                  () => navigation.navigate('Profile'),
+                )
               }
-            }}
-            editAction={(text, c) => console.log(text)}
-            reportAction={(c) => console.log(c)}
-            likeAction={(c) => onRepComment(c)}
-            likesTapAction={(c: Comment) => {
-              this.setState({
-                likesModalVisible: true,
-                repsId: c.key,
-                repCount: c.repCount,
-              });
-              getRepsUsers(c.key);
-            }}
-            paginateAction={(
-              fromComment: Comment,
-              direction: string,
-              parentComment?: Comment,
-            ) => {
-              if (parentComment) {
-                getReplies(parentComment, 10, fromComment.key);
-              } else {
-                getComments(postId, 10, fromComment.key);
+              likeCountExtractor={(item) => item.repCount}
+              commentCount={feed[postId] ? feed[postId].commentCount : 0}
+              childrenCountExtractor={(c) => c.childrenCount}
+              timestampExtractor={(item) =>
+                new Date(item.created_at).toISOString()
               }
-            }}
-            getCommentRepsUsers={(c, amount) => getCommentRepsUsers(c, amount)}
-          />
-        </ModalBox>
+              replyAction={(offset) => {
+                scrollRef.current.scrollTo({
+                  x: null,
+                  y: this.scrollIndex + offset - 300,
+                  animated: true,
+                });
+              }}
+              saveAction={async (text, parentCommentId) => {
+                if (text) {
+                  await comment(
+                    profile.uid,
+                    postId,
+                    text,
+                    new Date().toString(),
+                    parentCommentId,
+                  );
+                }
+              }}
+              editAction={(text, c) => console.log(text)}
+              reportAction={(c) => console.log(c)}
+              likeAction={(c) => onRepComment(c)}
+              likesTapAction={(c: Comment) => {
+                this.setState({
+                  likesModalVisible: true,
+                  repsId: c.key,
+                  repCount: c.repCount,
+                });
+                getRepsUsers(c.key);
+              }}
+              paginateAction={(
+                fromComment: Comment,
+                direction: string,
+                parentComment?: Comment,
+              ) => {
+                if (parentComment) {
+                  getReplies(parentComment, 10, fromComment.key);
+                } else {
+                  getComments(postId, 10, fromComment.key);
+                }
+              }}
+              getCommentRepsUsers={(c, amount) =>
+                getCommentRepsUsers(c, amount)
+              }
+            />
+          </Layout>
+        </Modal>
         <RepsModal
           onClosed={() => this.setState({likesModalVisible: false})}
           isOpen={likesModalVisible}

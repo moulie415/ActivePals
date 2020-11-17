@@ -151,7 +151,6 @@ class Gym extends Component<GymProps, State> {
                       style={{
                         padding: 10,
                         marginTop: -40,
-                        borderWidth: 1,
                       }}
                       size={80}
                       source={require('../../assets/images/dumbbell.png')}

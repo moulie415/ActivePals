@@ -9,4 +9,5 @@ export interface GymChatProps {
   navigation: NavigationStackProp;
   places: {[key: string]: Place};
   profile: Profile;
+  getGym: (id: string) => void;
 }

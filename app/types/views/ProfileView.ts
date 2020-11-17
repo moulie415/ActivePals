@@ -18,4 +18,5 @@ export default interface ProfileViewProps {
   users: {[key: string]: Profile};
   remove: (uid: string) => void;
   request: (friendUid: string) => void;
+  fetchUser: (uid: string) => void;
 }
