@@ -33,7 +33,7 @@ const GymChat: FunctionComponent<GymChatProps> = ({
             navigation.navigate('Messaging', {gymId: gym.place_id})
           }
           title={gym.name}
-          description={gymChat.lastMessage.text}
+          description={gymChat.lastMessage && gymChat.lastMessage.text}
           accessoryLeft={() =>
             gym && gym.photo ? (
               <Avatar uri={gym.photo} size={50} />
