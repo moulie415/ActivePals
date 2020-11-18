@@ -67,7 +67,6 @@ const Messaging: FunctionComponent<MessagingProps> = ({
 
   const loadMessages = useCallback(
     (endAt?: string) => {
-      setSpinner(true);
       if (sessionId) {
         const session = sessions[sessionId];
         const {key, private: isPrivate} = session;
