@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import {equals, findIndex} from 'ramda';
+import {equals} from 'ramda';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
@@ -64,7 +64,6 @@ const ProfileView: FunctionComponent<ProfileProps> = ({
   const [selectedLevelIndex, setSelectedLevelIndex] = useState(
     new IndexPath(0),
   );
-  console.log(profile.level);
 
   useEffect(() => {
     database()

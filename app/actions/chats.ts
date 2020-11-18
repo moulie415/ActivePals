@@ -290,7 +290,7 @@ export const fetchMessages = (
   id: string,
   amount: number,
   uid: string,
-  endAt: string,
+  endAt?: string,
 ): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const ref = endAt
@@ -319,7 +319,7 @@ export const fetchSessionMessages = (
   id: string,
   amount: number,
   isPrivate = false,
-  endAt: string,
+  endAt?: string,
 ): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
     const type = isPrivate ? 'privateSessions' : 'sessions';
@@ -349,7 +349,7 @@ export const fetchSessionMessages = (
   };
 };
 
-export const fetchGymMessages = (id: string, amount: number, endAt: string) => {
+export const fetchGymMessages = (id: string, amount: number, endAt?: string) => {
   return (dispatch: MyThunkDispatch, getState) => {
     const ref = endAt
       ? database().ref(`gymChats/${id}`).endAt(endAt).limitToLast(amount)

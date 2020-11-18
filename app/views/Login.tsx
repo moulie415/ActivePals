@@ -154,6 +154,7 @@ const Login: FunctionComponent<LoginProps> = ({
       const result = await LoginManager.logInWithPermissions([
         'public_profile',
         'email',
+        'user_friends',
       ]);
 
       if (result.isCancelled) {

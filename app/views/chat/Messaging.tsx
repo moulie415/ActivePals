@@ -1,4 +1,9 @@
-import React, {Component} from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import {Alert, TouchableOpacity, View, BackHandler} from 'react-native';
 import database from '@react-native-firebase/database';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
@@ -18,7 +23,7 @@ import {
   resetUnreadCount,
   updateLastMessage,
 } from '../../actions/chats';
-import MessagingProps from '../../types/views/Messaging';
+import MessagingProps, {MessagingRouteProp} from '../../types/views/Messaging';
 import Message, {MessageType, SessionType} from '../../types/Message';
 import {Text, Spinner, Layout} from '@ui-kitten/components';
 import {
@@ -28,34 +33,40 @@ import {
 } from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 import moment from 'moment';
-import Profile from '../../types/Profile';
 
-interface State {
-  spinner: boolean;
-  showLoadEarlier: boolean;
-  messages: Message[];
-  amount: number;
-  text?: string;
-}
+const Messaging: FunctionComponent<MessagingProps> = ({
+  navigation,
+  route,
+  unreadCount,
+  onResetUnreadCount,
+  profile,
+  onResetMessage,
+  resetNotif,
+  gym,
+  messageSession,
+  friends,
+  users,
+  getMessages,
+  getSessionMessages,
+  getGymMessages,
+  onUpdateLastMessage,
+  sessions,
+  message,
+  notif,
+}) => {
+  const [messages, setMessages] = useState<Message[]>(
+    messageSession ? Object.values(messageSession) : [],
+  );
+  const [spinner, setSpinner] = useState(false);
+  const [showLoadEarlier, setShowLoadEarlier] = useState(true);
+  const [text, setText] = useState('');
 
-class Messaging extends Component<MessagingProps, State> {
-  constructor(props) {
-    super(props);
-    const {messageSession} = this.props;
-    this.state = {
-      messages: messageSession ? Object.values(messageSession) : [],
-      spinner: false,
-      amount: 15,
-      showLoadEarlier: true,
-    };
-  }
+  const amount = 15;
 
-  componentDidMount() {
-    const {unreadCount, onResetUnreadCount, route} = this.props;
-
+  const onBackPress = useCallback(() => {
     const {gymId, friendUid, sessionId} = route.params;
-    BackHandler.addEventListener('hardwareBackPress', () => this.onBackPress());
-    this.loadMessages();
+
+    navigation.goBack();
     const id = friendUid || sessionId || gymId;
     if (id) {
       const count = unreadCount[id];
@@ -63,43 +74,182 @@ class Messaging extends Component<MessagingProps, State> {
         onResetUnreadCount(id);
       }
     }
-  }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const {profile, onResetMessage, resetNotif, route} = this.props;
+    return true;
+  }, [navigation, onResetUnreadCount, route.params, unreadCount]);
 
-    const {friendUid, gymId, sessionId} = route.params;
-    const {messages} = this.state;
-    // message it populated when an attachment is sent
-    if (nextProps.message) {
-      const message = {
+  const loadMessages = useCallback(
+    (endAt?: string) => {
+      const {friendUid, gymId, sessionId, chatId} = route.params;
+      setSpinner(true);
+      if (sessionId) {
+        const session = sessions[sessionId];
+        const {key, private: isPrivate} = session;
+        if (key) {
+          getSessionMessages(key, amount, isPrivate, endAt);
+        }
+      } else if (gymId) {
+        getGymMessages(gymId, amount, endAt);
+      } else if (chatId && friendUid) {
+        getMessages(chatId, amount, friendUid, endAt);
+      }
+    },
+    [
+      amount,
+      getSessionMessages,
+      getGymMessages,
+      getMessages,
+      route.params,
+      sessions,
+    ],
+  );
+
+  useEffect(() => {
+    const {gymId, friendUid, sessionId} = route.params;
+    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    loadMessages();
+    const id = friendUid || sessionId || gymId;
+    if (id) {
+      const count = unreadCount[id];
+      if (count && count > 0) {
+        onResetUnreadCount(id);
+      }
+    }
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    };
+  }, [
+    loadMessages,
+    onBackPress,
+    onResetUnreadCount,
+    route.params,
+    unreadCount,
+  ]);
+
+  const getType = useCallback(() => {
+    const {gymId, sessionId} = route.params;
+    if (sessionId) {
+      return MessageType.SESSION_MESSAGE;
+    }
+    if (gymId) {
+      return MessageType.GYM_MESSAGE;
+    }
+    return MessageType.MESSAGE;
+  }, [route.params]);
+
+  const getDbRef = useCallback(() => {
+    const {gymId, sessionId, chatId} = route.params;
+    if (sessionId) {
+      return database().ref('sessionChats').child(sessionId);
+    }
+    if (gymId) {
+      return database().ref('gymChats').child(gymId);
+    }
+    if (chatId) {
+      return database().ref('chats').child(chatId);
+    }
+  }, [route.params]);
+
+  const onSend = useCallback(
+    async (newMessages: Message[] = []) => {
+      const {friendUid, gymId, sessionId, chatId} = route.params;
+
+      // make messages database friendly
+      const converted = newMessages.map((message) => {
+        const type = getType();
+        const createdAt = moment().utc().valueOf();
+
+        if (sessionId) {
+          const session = sessions[sessionId];
+          const {title: sessionTitle} = session;
+          const sessionType: SessionType = session.private
+            ? 'privateSessions'
+            : 'sessions';
+          return {
+            ...message,
+            createdAt,
+            sessionTitle,
+            sessionId,
+            sessionType,
+            type,
+          };
+        }
+        if (gymId && gym) {
+          const {name} = gym;
+          return {...message, createdAt, gymId, gymName: name, type};
+        }
+        return {...message, createdAt, chatId, friendUid, type};
+      });
+
+      const ref = getDbRef();
+      if (ref) {
+        try {
+          const dbFriendly = converted.map((msg) => {
+            return {...msg, createdAt: moment(msg.createdAt).utc().format()};
+          });
+          await ref.push(...dbFriendly);
+          setMessages([...messages, ...newMessages]);
+
+          if (sessionId) {
+            onUpdateLastMessage({...converted[0]});
+          } else if (gymId) {
+            onUpdateLastMessage({...converted[0]});
+          } else {
+            onUpdateLastMessage({...converted[0]});
+          }
+        } catch (e) {
+          Alert.alert('Error sending message', e.message);
+        }
+      }
+    },
+    [
+      getDbRef,
+      getType,
+      gym,
+      messages,
+      onUpdateLastMessage,
+      route.params,
+      sessions,
+    ],
+  );
+
+  useEffect(() => {
+    if (message) {
+      const messageObj = {
         _id: guid(),
         createdAt: new Date(),
-        text: nextProps.message.text,
-        image: nextProps.message.url,
+        text: message.text,
+        image: message.url,
         user: {
           _id: profile.uid,
           name: profile.username,
           avatar: profile.avatar,
         },
-        type: this.getType(),
+        type: getType(),
       };
-      this.onSend([message]);
+      onSend([messageObj]);
       onResetMessage();
     }
-    if (nextProps.messageSession) {
-      const {messageSession}: {[key: string]: Message} = nextProps;
-      this.setState({messages: Object.values(messageSession), spinner: false});
+  }, [getType, message, onResetMessage, onSend, profile]);
+
+  useEffect(() => {
+    if (messageSession) {
+      setMessages(Object.values(messageSession));
+      setSpinner(false);
       if (
         messageSession &&
-        Object.values(messageSession).some((message) => message._id === 1)
+        Object.values(messageSession).some((msg) => msg._id === 1)
       ) {
-        this.setState({showLoadEarlier: false});
+        setShowLoadEarlier(false);
       }
     }
-    if (nextProps.notif) {
+  }, [messageSession]);
+
+  useEffect(() => {
+    if (notif) {
+      const {friendUid, sessionId, gymId} = route.params;
       resetNotif();
-      // ignore inital fetch when component mounts
+      // ignore initial fetch when component mounts
       const {
         type,
         uid,
@@ -112,14 +262,14 @@ class Messaging extends Component<MessagingProps, State> {
         gymId: messageGymId,
         image,
         sessionType,
-      } = nextProps.notif;
+      } = notif;
       if (
         type === MessageType.MESSAGE ||
         type === MessageType.SESSION_MESSAGE ||
         type === MessageType.GYM_MESSAGE
       ) {
         const date = new Date(createdAt);
-        const message = {
+        const messageObj = {
           createdAt: date,
           _id,
           text: body,
@@ -138,16 +288,14 @@ class Messaging extends Component<MessagingProps, State> {
             profile.uid !== uid)
         ) {
           // check if its a dupe
-          if (!messages.some((msg) => msg._id === message._id)) {
-            this.setState((previousState) => ({
-              messages: previousState.messages
-                ? [...previousState.messages, message]
-                : [message],
-            }));
+          if (!messages.some((msg) => msg._id === messageObj._id)) {
+            if (messages) {
+              setMessages([...messages, messageObj]);
+            }
+            setMessages([messageObj]);
           }
           const id = friendUid || sessionId || gymId;
           if (id) {
-            const {unreadCount, onResetUnreadCount} = this.props;
             const count = unreadCount[id];
             if (count && count > 0) {
               onResetUnreadCount(id);
@@ -156,162 +304,17 @@ class Messaging extends Component<MessagingProps, State> {
         }
       }
     }
-  }
+  }, [
+    messages,
+    notif,
+    onResetUnreadCount,
+    profile.uid,
+    resetNotif,
+    route.params,
+    unreadCount,
+  ]);
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', () =>
-      this.onBackPress(),
-    );
-  }
-
-  onBackPress() {
-    const {navigation, onResetUnreadCount, unreadCount, route} = this.props;
-    const {gymId, friendUid, sessionId} = route.params;
-
-    navigation.goBack();
-    const id = friendUid || sessionId || gymId;
-    if (id) {
-      const count = unreadCount[id];
-      if (count && count > 0) {
-        onResetUnreadCount(id);
-      }
-    }
-
-    return true;
-  }
-
-  async onSend(messages: Message[] = []) {
-    const {gym, onUpdateLastMessage, route, sessions} = this.props;
-    const {friendUid, gymId, sessionId, chatId} = route.params;
-    const session = sessions[sessionId];
-    // make messages database friendly
-    const converted = messages.map((message) => {
-      const type = this.getType();
-      const createdAt = moment().utc().valueOf();
-
-      if (session) {
-        const {title: sessionTitle} = session;
-        const sessionType: SessionType = session.private
-          ? 'privateSessions'
-          : 'sessions';
-        return {
-          ...message,
-          createdAt,
-          sessionTitle,
-          sessionId,
-          sessionType,
-          type,
-        };
-      }
-      if (gymId) {
-        const {name} = gym;
-        return {...message, createdAt, gymId, gymName: name, type};
-      }
-      return {...message, createdAt, chatId, friendUid, type};
-    });
-
-    const ref = this.getDbRef();
-
-    try {
-      const dbFriendly = converted.map((msg) => {
-        return {...msg, createdAt: moment(msg.createdAt).utc().format()};
-      });
-      await ref.push(...dbFriendly);
-      this.setState((previousState) => ({
-        messages: [...previousState.messages, ...messages],
-      }));
-
-      if (session) {
-        onUpdateLastMessage({...converted[0]});
-      } else if (gymId) {
-        onUpdateLastMessage({...converted[0]});
-      } else {
-        onUpdateLastMessage({...converted[0]});
-      }
-    } catch (e) {
-      Alert.alert('Error sending message', e.message);
-    }
-  }
-
-  getType() {
-    const {route} = this.props;
-    const {gymId, sessionId} = route.params;
-    if (sessionId) {
-      return MessageType.SESSION_MESSAGE;
-    }
-    if (gymId) {
-      return MessageType.GYM_MESSAGE;
-    }
-    return MessageType.MESSAGE;
-  }
-
-  getDbRef() {
-    const {route} = this.props;
-    const {gymId, sessionId, chatId} = route.params;
-    if (sessionId) {
-      return database().ref('sessionChats').child(sessionId);
-    }
-    if (gymId) {
-      return database().ref('gymChats').child(gymId);
-    }
-    if (chatId) {
-      return database().ref('chats').child(chatId);
-    }
-  }
-
-  getRightHandIcon() {
-    const {navigation, route, sessions} = this.props;
-    const {gymId, sessionId} = route.params;
-    if (gymId) {
-      return (
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Gym', {id: gymId})}>
-          <ThemedIcon size={25} name="info" />
-        </TouchableOpacity>
-      );
-    }
-    if (sessionId) {
-      const session = sessions[sessionId];
-      if (session) {
-        const {key, private: isPrivate} = session;
-        return (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('SessionInfo', {sessionId: key, isPrivate})
-            }>
-            <ThemedIcon size={25} name="info" />
-          </TouchableOpacity>
-        );
-      }
-    }
-    return null;
-  }
-
-  loadMessages(endAt?: string) {
-    const {
-      getSessionMessages,
-      getGymMessages,
-      getMessages,
-      route,
-      sessions,
-    } = this.props;
-    const {amount} = this.state;
-    const {friendUid, gymId, sessionId, chatId} = route.params;
-    const session = sessions[sessionId];
-    this.setState({spinner: true});
-    if (session) {
-      const {key, private: isPrivate} = session;
-      getSessionMessages(key, amount, isPrivate, endAt);
-    } else if (gymId) {
-      getGymMessages(gymId, amount, endAt);
-    } else {
-      getMessages(chatId, amount, friendUid, endAt);
-    }
-  }
-
-  showPicker() {
-    const {navigation} = this.props;
-    const {text} = this.state;
+  const showPicker = () => {
     const videoOptions: ImagePickerOptions = {
       mediaType: 'video',
       durationLimit: 30,
@@ -329,27 +332,27 @@ class Messaging extends Component<MessagingProps, State> {
       },
     };
     ImagePicker.showImagePicker(options, async (response) => {
-      this.setState({spinner: true});
+      setSpinner(true);
       console.log('Response = ', response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
-        this.setState({spinner: false});
+        setSpinner(false);
       } else if (response.error) {
         Alert.alert('Error', response.error);
-        this.setState({spinner: false});
+        setSpinner(false);
       } else if (response.customButton) {
         if (response.customButton === 'uploadVideo') {
           ImagePicker.launchImageLibrary(videoOptions, (imageResponse) => {
             if (imageResponse.error) {
               Alert.alert('Error', imageResponse.error);
-              this.setState({spinner: false});
+              setSpinner(false);
             }
           });
         } else if (response.customButton === 'video') {
           ImagePicker.launchCamera(videoOptions, (videoResponse) => {
             if (videoResponse.error) {
               Alert.alert('Error', videoResponse.error);
-              this.setState({spinner: false});
+              setSpinner(false);
             }
           });
         }
@@ -363,7 +366,7 @@ class Messaging extends Component<MessagingProps, State> {
             'JPEG',
             100,
           );
-          this.setState({spinner: false});
+          setSpinner(false);
           navigation.navigate('FilePreview', {
             type: 'image',
             uri: resized.uri,
@@ -372,164 +375,146 @@ class Messaging extends Component<MessagingProps, State> {
           });
         } catch (e) {
           Alert.alert('Error', e.message);
-          this.setState({spinner: false});
+          setSpinner(false);
         }
       }
     });
-  }
+  };
 
-  async openChat(user: Profile) {
-    const {profile, navigation} = this.props;
-    const snapshot = await database()
-      .ref(`userChats/${profile.uid}`)
-      .child(user.uid)
-      .once('value');
-    if (snapshot.val()) {
-      navigation.navigate('Messaging', {
-        chatId: snapshot.val(),
-        friendUsername: user.username,
-        friendUid: user.uid,
-      });
-    }
-  }
-
-  render() {
-    const {navigation, profile, friends, users} = this.props;
-    const {messages, showLoadEarlier, spinner, text} = this.state;
-
-    return (
-      <Layout style={{flex: 1}}>
-        <GiftedChat
-          text={text}
-          onInputTextChanged={(input) => this.setState({text: input})}
-          messages={sortMessagesByCreatedAt(messages).reverse()}
-          inverted={false}
-          onSend={(msgs) => {
-            if (profile.username) {
-              this.onSend(msgs);
-            } else {
-              Alert.alert(
-                'Username not set',
-                'You need a username before sending messages, go to your profile now?',
-                [
-                  {text: 'Cancel', style: 'cancel'},
-                  {text: 'OK', onPress: () => navigation.navigate('Profile')},
-                ],
-              );
-            }
-          }}
-          onPressAvatar={(user) =>
-            navigation.navigate('ProfileView', {uid: user._id})
+  return (
+    <Layout style={{flex: 1}}>
+      <GiftedChat
+        text={text}
+        onInputTextChanged={(input) => setText(input)}
+        messages={sortMessagesByCreatedAt(messages).reverse()}
+        inverted={false}
+        onSend={(msgs) => {
+          if (profile.username) {
+            onSend(msgs);
+          } else {
+            Alert.alert(
+              'Username not set',
+              'You need a username before sending messages, go to your profile now?',
+              [
+                {text: 'Cancel', style: 'cancel'},
+                {text: 'OK', onPress: () => navigation.navigate('Profile')},
+              ],
+            );
           }
-          onLoadEarlier={() => {
-            const sorted = sortMessagesByCreatedAt(messages);
-            const endAt = sorted[sorted.length - 1].key;
-            this.setState({spinner: true}, () => this.loadMessages(endAt));
-          }}
-          loadEarlier={messages && messages.length > 14 && showLoadEarlier}
-          user={{
-            _id: profile.uid,
-            name: profile.username,
-            avatar: profile.avatar,
-          }}
-          renderBubble={(props) => {
-            return <Bubble {...props} />;
-          }}
-          renderMessageText={(props) => {
-            // @ts-ignore
-            const {previousMessage, currentMessage, position} = props;
-            return (
-              <View>
-                {((previousMessage.user &&
-                  position === 'left' &&
-                  previousMessage.user._id !== currentMessage.user._id) ||
-                  (!previousMessage.user &&
-                    currentMessage.user &&
-                    position === 'left')) && (
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      padding: 10,
-                      paddingBottom: 0,
-                    }}>
-                    {props.currentMessage.user.name}
-                  </Text>
-                )}
-                <MessageText {...props} />
-              </View>
-            );
-          }}
-          renderActions={() => {
-            return (
-              <TouchableOpacity
-                style={{paddingBottom: 10, paddingLeft: 10}}
-                onPress={() => this.showPicker()}>
-                <ThemedIcon size={30} name="attach-2" />
-              </TouchableOpacity>
-            );
-          }}
+        }}
+        onPressAvatar={(user) =>
+          navigation.navigate('ProfileView', {uid: user._id})
+        }
+        onLoadEarlier={() => {
+          const sorted = sortMessagesByCreatedAt(messages);
+          const endAt = sorted[sorted.length - 1].key;
+          setSpinner(true);
+          loadMessages(endAt);
+        }}
+        loadEarlier={messages && messages.length > 14 && showLoadEarlier}
+        user={{
+          _id: profile.uid,
+          name: profile.username,
+          avatar: profile.avatar,
+        }}
+        renderBubble={(props) => {
+          return <Bubble {...props} />;
+        }}
+        renderMessageText={(props) => {
           // @ts-ignore
-          parsePatterns={(linkStyle) => [
-            {
-              pattern: str.mentionRegex,
-              style: linkStyle,
-              onPress: async (mention) => {
-                const name = mention.substring(1);
-                const combined = [
-                  ...Object.values(friends),
-                  ...Object.values(users),
-                ];
-                if (name === profile.username) {
-                  navigation.navigate('Profile');
+          const {previousMessage, currentMessage, position} = props;
+          return (
+            <View>
+              {((previousMessage.user &&
+                position === 'left' &&
+                previousMessage.user._id !== currentMessage.user._id) ||
+                (!previousMessage.user &&
+                  currentMessage.user &&
+                  position === 'left')) && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    padding: 10,
+                    paddingBottom: 0,
+                  }}>
+                  {props.currentMessage.user.name}
+                </Text>
+              )}
+              <MessageText {...props} />
+            </View>
+          );
+        }}
+        renderActions={() => {
+          return (
+            <TouchableOpacity
+              style={{paddingBottom: 10, paddingLeft: 10}}
+              onPress={showPicker}>
+              <ThemedIcon size={30} name="attach-2" />
+            </TouchableOpacity>
+          );
+        }}
+        // @ts-ignore
+        parsePatterns={(linkStyle) => [
+          {
+            pattern: str.mentionRegex,
+            style: linkStyle,
+            onPress: async (mention) => {
+              const name = mention.substring(1);
+              const combined = [
+                ...Object.values(friends),
+                ...Object.values(users),
+              ];
+              if (name === profile.username) {
+                navigation.navigate('Profile');
+              } else {
+                const found = combined.find(
+                  (friend) => friend.username === name,
+                );
+                if (found) {
+                  navigation.navigate('ProfileView', {uid: found.uid});
                 } else {
-                  const found = combined.find(
-                    (friend) => friend.username === name,
-                  );
-                  if (found) {
-                    navigation.navigate('ProfileView', {uid: found.uid});
-                  } else {
-                    try {
-                      const snapshot = await database()
-                        .ref('usernames')
-                        .child(name)
-                        .once('value');
-                      if (snapshot.val()) {
-                        navigation.navigate('ProfileView', {
-                          uid: snapshot.val(),
-                        });
-                      }
-                    } catch (e) {
-                      console.warn(e.message);
+                  try {
+                    const snapshot = await database()
+                      .ref('usernames')
+                      .child(name)
+                      .once('value');
+                    if (snapshot.val()) {
+                      navigation.navigate('ProfileView', {
+                        uid: snapshot.val(),
+                      });
                     }
+                  } catch (e) {
+                    console.warn(e.message);
                   }
                 }
-              },
+              }
             },
-          ]}
-        />
-        {spinner && (
-          <Layout style={globalStyles.indicator}>
-            <Spinner />
-          </Layout>
-        )}
-      </Layout>
-    );
-  }
-}
+          },
+        ]}
+      />
+      {spinner && (
+        <Layout style={globalStyles.indicator}>
+          <Spinner />
+        </Layout>
+      )}
+    </Layout>
+  );
+};
 
-const fetchId = (params) => {
-  if (params.sessionId) {
-    return params.sessionId;
+const fetchId = (route: MessagingRouteProp) => {
+  const {sessionId, gymId, chatId} = route.params;
+  if (sessionId) {
+    return sessionId;
   }
-  if (params.gymId) {
-    return params.gymId;
+  if (gymId) {
+    return gymId;
   }
-  return params.chatId;
+  return chatId;
 };
 
 const mapStateToProps = (
   {friends, profile, chats, sharedInfo, sessions}: MyRootState,
-  ownProps,
+  ownProps: MessagingProps,
 ) => ({
   friends: friends.friends,
   users: sharedInfo.users,
@@ -539,7 +524,7 @@ const mapStateToProps = (
   chats: chats.chats,
   message: chats.message,
   gymChat: chats.gymChat,
-  messageSession: chats.messageSessions[fetchId(ownProps.route.params)],
+  messageSession: chats.messageSessions[fetchId(ownProps.route) || ''],
   notif: chats.notif,
   unreadCount: chats.unreadCount,
   sessions: {...sessions.sessions, ...sessions.privateSessions},
@@ -551,15 +536,15 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onRequest: (friendUid: string) => dispatch(sendRequest(friendUid)),
   onAccept: (uid: string, friendUid: string) =>
     dispatch(acceptRequest(uid, friendUid)),
-  getMessages: (id: string, amount: number, uid: string, endAt: string) =>
+  getMessages: (id: string, amount: number, uid: string, endAt?: string) =>
     dispatch(fetchMessages(id, amount, uid, endAt)),
   getSessionMessages: (
     id: string,
     amount: number,
     isPrivate: boolean,
-    endAt: string,
+    endAt?: string,
   ) => dispatch(fetchSessionMessages(id, amount, isPrivate, endAt)),
-  getGymMessages: (id: string, amount: number, endAt: string) =>
+  getGymMessages: (id: string, amount: number, endAt?: string) =>
     dispatch(fetchGymMessages(id, amount, endAt)),
   resetNotif: () => dispatch(resetNotification()),
   onResetMessage: () => dispatch(resetMessage()),

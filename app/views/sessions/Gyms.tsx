@@ -1,12 +1,6 @@
-import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import {pathOr} from 'ramda';
-import {
-  Alert,
-  View,
-  TouchableOpacity,
-  Platform,
-  Image as SlowImage,
-} from 'react-native';
+import {Alert, View, TouchableOpacity, Image as SlowImage} from 'react-native';
 import MapView, {Marker, MapEvent} from 'react-native-maps';
 import {connect} from 'react-redux';
 import Slider from '@react-native-community/slider';
@@ -25,7 +19,6 @@ import Place from '../../types/Place';
 import globalStyles from '../../styles/globalStyles';
 import {
   CheckBox,
-  Button,
   Text,
   Layout,
   List,
@@ -44,7 +37,6 @@ import str from '../../constants/strings';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
 import ThemedImage from '../../components/ThemedImage/ThemedImage';
-import {YourLocation} from '../../types/Location';
 import Avatar from '../../components/Avatar/Avatar';
 import {GOOGLE_API_KEY} from '../../constants/strings';
 import FriendsModal from '../../components/friendsModal';

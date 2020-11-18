@@ -64,7 +64,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
     if (session.users[you]) {
       if (host.uid === you) {
         return (
-          <View style={styles.infoRowSpaceEvenly}>
+          <Layout style={styles.infoRowSpaceEvenly}>
             <Button
               onPress={() => {
                 Alert.alert('Delete session', 'Are you sure?', [
@@ -85,7 +85,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
             </Button>
             {this.chatButton(session)}
             {/* {this.muteButton()} */}
-          </View>
+          </Layout>
         );
       }
       return (
@@ -224,11 +224,11 @@ class SessionInfo extends Component<SessionInfoProps, State> {
     }
 
     return (
-      <>
+      <Layout>
         <ScrollView>
           {session ? (
             <Layout>
-              <View style={{marginBottom: 20}}>
+              <Layout style={{marginBottom: 20}}>
                 {gym && gym.photo ? (
                   <Image
                     style={{height: 150, width: '100%'}}
@@ -236,22 +236,22 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                     source={{uri: gym.photo}}
                   />
                 ) : (
-                  <View
+                  <Layout
                     style={{
                       height: 150,
                     }}
                   />
                 )}
-                <View
+                <Layout
                   style={{
                     alignSelf: 'center',
                     marginTop: -40,
                     padding: 5,
                   }}>
                   {getType(session.type, 80)}
-                </View>
-              </View>
-              <View>
+                </Layout>
+              </Layout>
+              <Layout>
                 <Divider />
                 {session && host && this.getButtons(host, session)}
                 <Divider />
@@ -396,10 +396,10 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                     description={host.username}
                   />
                 )}
-              </View>
-              <View>
+              </Layout>
+              <Layout>
                 <Divider />
-                <View
+                <Layout
                   style={[
                     styles.rowSpaceBetween,
                     {padding: 5, paddingHorizontal: 10},
@@ -416,10 +416,10 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                       />
                     </TouchableOpacity>
                   )}
-                </View>
+                </Layout>
                 <Divider />
                 {session && this.renderUsers(session.users)}
-              </View>
+              </Layout>
             </Layout>
           ) : (
             <Spinner />
@@ -455,7 +455,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
           }}
           isOpen={friendsModalOpen}
         />
-      </>
+      </Layout>
     );
   }
 }

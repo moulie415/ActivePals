@@ -5,10 +5,11 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {StackParamList} from '../../App';
 import {RouteProp} from '@react-navigation/native';
 import Session from '../Session';
+import {PushNotificationData} from '../Shared';
 
 type MessagingNavigationProp = StackNavigationProp<StackParamList, 'Messaging'>;
 
-type MessagingRouteProp = RouteProp<StackParamList, 'Messaging'>;
+export type MessagingRouteProp = RouteProp<StackParamList, 'Messaging'>;
 
 export default interface MessagingProps {
   navigation: MessagingNavigationProp;
@@ -18,18 +19,25 @@ export default interface MessagingProps {
   onResetUnreadCount: (id: string) => void;
   onResetMessage: () => void;
   resetNotif: () => void;
-  gym: Place;
+  gym?: Place;
   messageSession: {[key: string]: Message};
   friends: {[key: string]: Profile};
   users: {[key: string]: Profile};
-  getMessages: (id: string, amount: number, uid: string, endAt: string) => void;
+  getMessages: (
+    id: string,
+    amount: number,
+    uid: string,
+    endAt?: string,
+  ) => void;
   getSessionMessages: (
     id: string,
     amount: number,
     isPrivate: boolean,
-    endAt: string,
+    endAt?: string,
   ) => void;
-  getGymMessages: (id: string, amount: number, endAt: string) => void;
-  onUpdateLastMessage: (message: Message) => void;
+  getGymMessages: (id: string, amount: number, endAt?: string) => void;
+  onUpdateLastMessage: (message: PushNotificationData) => void;
   sessions: {[key: string]: Session};
+  message?: Message;
+  notif?: PushNotificationData;
 };
