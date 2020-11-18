@@ -18,7 +18,7 @@ jobs:
       - name: Setup env
         env:
           GOOGLE_IOS_ID: ${{ secrets.GOOGLE_IOS_ID }}
-          GOOGLE_WEB_ID: ${{ secrets.GOOGLE_IOS_ID }}
+          GOOGLE_WEB_ID: ${{ secrets.GOOGLE_WEB_ID }}
           GOOGLE_API_KEY_ANDROID: ${{ secrets.GOOGLE_API_KEY_ANDROID }}
           GOOGLE_API_KEY_IOS: ${{ secrets.GOOGLE_API_KEY_IOS }}
           MYAPP_RELEASE_STORE_FILE: ${{ secrets.MYAPP_RELEASE_STORE_FILE }}

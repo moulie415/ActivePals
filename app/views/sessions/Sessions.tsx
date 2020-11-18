@@ -347,7 +347,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
                   }}>
                   <CheckBox
                     checked={yoga}
-                    onPress={() => setYoga(!yoga)}
+                    onChange={(val) => setYoga(val)}
                     style={{marginRight: 20, marginVertical: 10}}
                   />
                   <Text>Show Yoga</Text>
@@ -357,7 +357,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
                   style={{flexDirection: 'row', alignItems: 'center'}}>
                   <CheckBox
                     checked={pilates}
-                    onPress={() => setPilates(!pilates)}
+                    onChange={(val) => setPilates(val)}
                     style={{marginRight: 20, marginVertical: 10}}
                   />
                   <Text>Show Pilates</Text>
