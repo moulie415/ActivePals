@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import {
   Alert,
   View,
@@ -6,8 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import moment from 'moment';
-import {equals} from 'ramda';
+import {equals, findIndex} from 'ramda';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
@@ -50,50 +49,34 @@ const activities = [
 ];
 const levels = ['Beginner', 'Intermediate', 'Advanced'];
 
-interface State {
-  spinner: boolean;
-  email: string;
-  profile: Profile;
-  initialProfile: Profile;
-  showPicker?: boolean;
-}
-class ProfileView extends Component<ProfileProps, State> {
-  constructor(props) {
-    super(props);
-    const {profile} = this.props;
-    this.state = {
-      email: profile.email,
-      profile,
-      initialProfile: profile,
-      spinner: false,
-    };
-  }
+const ProfileView: FunctionComponent<ProfileProps> = ({
+  profile: propsProfile,
+  onLogoutPress,
+  navigation,
+  onSave,
+  eva,
+  gym,
+}) => {
+  const [profile, setProfile] = useState(propsProfile);
+  const [initialProfile, setInitialProfile] = useState(propsProfile);
+  const [spinner, setSpinner] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(new IndexPath(0));
+  const [selectedLevelIndex, setSelectedLevelIndex] = useState(
+    new IndexPath(0),
+  );
+  console.log(profile.level);
 
-  async componentDidMount() {
-    const {profile} = this.props;
-    this.listenForUserChanges(database().ref(`users/${profile.uid}`));
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.profile) {
-      const {profile} = nextProps;
-      this.setState({
-        profile,
-        initialProfile: profile,
+  useEffect(() => {
+    database()
+      .ref(`users/${profile.uid}`)
+      .on('value', (snapshot) => {
+        const p = snapshot.val();
+        setInitialProfile(p);
+        setProfile(p);
       });
-    }
-  }
+  }, [profile.uid]);
 
-  listenForUserChanges(ref) {
-    ref.on('value', (snapshot) => {
-      const profile = snapshot.val();
-      this.setState({initialProfile: profile});
-      this.setState({profile});
-    });
-  }
-
-  logout() {
-    const {profile, onLogoutPress, navigation} = this.props;
+  const logout = async () => {
     Alert.alert('Log out', 'Are you sure?', [
       {
         text: 'Cancel',
@@ -106,23 +89,23 @@ class ProfileView extends Component<ProfileProps, State> {
           navigation.navigate('Login');
           onLogoutPress();
           try {
-            this.setState({spinner: true});
+            setSpinner(true);
             await database()
               .ref(`users/${profile.uid}`)
               .child('state')
               .remove();
             // await firebase.messaging().deleteToken();
             await auth().signOut();
-            this.setState({spinner: false});
+            setSpinner(false);
           } catch (e) {
             Alert.alert('Error', e.message);
           }
         },
       },
     ]);
-  }
+  };
 
-  async selectAvatar(backdrop = false) {
+  const selectAvatar = async (backdrop = false) => {
     const options: ImagePickerOptions = {
       title: backdrop ? 'Select Backdrop' : 'Select Avatar',
       mediaType: 'photo',
@@ -132,19 +115,19 @@ class ProfileView extends Component<ProfileProps, State> {
         path: 'images',
       },
     };
-    this.setState({spinner: true});
+    setSpinner(true);
     ImagePicker.showImagePicker(options, async (response) => {
       console.log('Response = ', response);
 
       if (response.didCancel) {
         console.log('User cancelled image picker');
-        this.setState({spinner: false});
+        setSpinner(false);
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
-        this.setState({spinner: false});
+        setSpinner(false);
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
-        this.setState({spinner: false});
+        setSpinner(false);
       } else {
         const size = 640;
         // You can also display the image using data:
@@ -160,55 +143,46 @@ class ProfileView extends Component<ProfileProps, State> {
         // response.path is the path of the new image
         // response.name is the name of the new image with the extension
         // response.size is the size of the new image
-        const {profile} = this.state;
         if (backdrop) {
-          this.setState({profile: {...profile, backdrop: resized.uri}});
+          setProfile({...profile, backdrop: resized.uri});
         } else {
-          this.setState({profile: {...profile, avatar: resized.uri}});
+          setProfile({...profile, avatar: resized.uri});
         }
-        this.setState({spinner: false});
+        setSpinner(false);
       }
     });
-  }
+  };
 
-  async uploadImage(
+  const uploadImage = async (
     uri: string,
     backdrop = false,
     mime = 'application/octet-stream',
-  ): Promise<string> {
-    const {profile} = this.props;
+  ): Promise<string> => {
     const imageRef = storage()
       .ref(`images/${profile.uid}`)
       .child(backdrop ? 'backdrop' : 'avatar');
     await imageRef.putFile(uri, {contentType: mime});
     return imageRef.getDownloadURL();
-  }
+  };
 
-  async checkImages() {
-    const {avatar, backdrop, uid} = this.state.profile;
-    const {
-      avatar: initialAvatar,
-      backdrop: initialBackdrop,
-    } = this.state.initialProfile;
+  const checkImages = async () => {
+    const {avatar, backdrop, uid} = profile;
+    const {avatar: initialAvatar, backdrop: initialBackdrop} = initialProfile;
     let newAvatar = initialAvatar;
     let newBackDrop = initialBackdrop;
     try {
       if (initialAvatar !== avatar) {
-        const url = await this.uploadImage(avatar);
+        const url = await uploadImage(avatar);
         await database().ref('users').child(uid).update({avatar: url});
-        this.setState({
-          profile: {...this.state.profile, avatar: url},
-          initialProfile: {...this.state.initialProfile, avatar: url},
-        });
+        setProfile({...profile, avatar: url});
+        setInitialProfile({...initialProfile, avatar: url});
         newAvatar = url;
       }
       if (initialBackdrop !== backdrop) {
-        const url = await this.uploadImage(backdrop, true);
+        const url = await uploadImage(backdrop, true);
         await database().ref('users').child(uid).update({backdrop: url});
-        this.setState({
-          profile: {...this.state.profile, backdrop: url},
-          initialProfile: {...this.state.initialProfile, backdrop: url},
-        });
+        setProfile({...profile, backdrop: url});
+        setInitialProfile({...initialProfile, backdrop: url});
         newBackDrop = url;
       }
       return {avatar: newAvatar, backdrop: newBackDrop};
@@ -216,16 +190,14 @@ class ProfileView extends Component<ProfileProps, State> {
       Alert.alert('Error', e.message);
       return {avatar: newAvatar, backdrop: newBackDrop};
     }
-  }
+  };
 
-  hasChanged() {
-    const {initialProfile, profile} = this.state;
+  const hasChanged = () => {
     return !equals(initialProfile, profile);
-  }
+  };
 
-  async updateUser(initial: Profile, newProfile: Profile) {
-    const {onSave} = this.props;
-    if (!this.hasChanged()) {
+  const updateUser = async (initial: Profile, newProfile: Profile) => {
+    if (!hasChanged()) {
       Alert.alert('No changes');
     } else if (
       !newProfile.username ||
@@ -237,8 +209,8 @@ class ProfileView extends Component<ProfileProps, State> {
         'Username must be at least 5 characters long and cannot contain any spaces',
       );
     } else {
-      this.setState({spinner: true});
-      const {avatar, backdrop} = await this.checkImages();
+      setSpinner(true);
+      const {avatar, backdrop} = await checkImages();
       try {
         await database()
           .ref(`users/${newProfile.uid}`)
@@ -253,233 +225,231 @@ class ProfileView extends Component<ProfileProps, State> {
         /* we need to make sure the username is saved locally
         which is why this calls fetchProfile which saves the username */
         onSave();
-        this.setState({spinner: false});
+        setSpinner(false);
       } catch (e) {
         Alert.alert('Error', 'That username may have already been taken');
-        this.setState({spinner: false});
+        setSpinner(false);
       }
     }
-  }
+  };
 
-  render() {
-    const {gym, navigation} = this.props;
-    const {initialProfile, email, profile, spinner, showPicker} = this.state;
+  return (
+    <ScrollView
+      style={{
+        backgroundColor: eva.theme['background-basic-color-1'],
+      }}>
+      <SafeAreaView>
+        <Layout style={{flex: 1}}>
+          <Layout style={{alignItems: 'center', marginBottom: 10}}>
+            <TouchableOpacity
+              style={{width: '100%'}}
+              onPress={() => selectAvatar(true)}>
+              {profile.backdrop ? (
+                <Image
+                  style={{height: 150}}
+                  resizeMode="cover"
+                  source={{uri: profile.backdrop}}
+                />
+              ) : (
+                <Layout
+                  style={{
+                    height: 150,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <ThemedIcon name="plus" size={25} />
+                </Layout>
+              )}
+              <Divider />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[{marginTop: -45}]}
+              onPress={() => selectAvatar()}>
+              {profile.avatar ? (
+                <Image
+                  source={{uri: profile.avatar}}
+                  style={{
+                    width: 90,
+                    height: 90,
+                    alignSelf: 'center',
+                  }}
+                />
+              ) : (
+                <View
+                  style={{
+                    width: 80,
+                    height: 80,
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <ThemedIcon name="plus" size={25} />
+                </View>
+              )}
+            </TouchableOpacity>
+          </Layout>
 
-    return (
-      <ScrollView
-        style={{
-          backgroundColor: this.props.eva.theme['background-basic-color-1'],
-        }}>
-        <SafeAreaView>
           <Layout style={{flex: 1}}>
-            <Layout style={{alignItems: 'center', marginBottom: 10}}>
-              <TouchableOpacity
-                style={{width: '100%'}}
-                onPress={() => this.selectAvatar(true)}>
-                {profile.backdrop ? (
-                  <Image
-                    style={{height: 150}}
-                    resizeMode="cover"
-                    source={{uri: profile.backdrop}}
-                  />
-                ) : (
-                  <Layout
-                    style={{
-                      height: 150,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <ThemedIcon name="plus" size={25} />
-                  </Layout>
-                )}
+            {hasChanged() && (
+              <>
                 <Divider />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[{marginTop: -45}]}
-                onPress={() => this.selectAvatar()}>
-                {profile.avatar ? (
-                  <Image
-                    source={{uri: profile.avatar}}
-                    style={{
-                      width: 90,
-                      height: 90,
-                      alignSelf: 'center',
-                    }}
-                  />
-                ) : (
-                  <View
-                    style={{
-                      width: 80,
-                      height: 80,
-                      alignSelf: 'center',
-                      justifyContent: 'center',
-                      alignItems: 'center',
+                <Layout
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-evenly',
+                    padding: 10,
+                  }}>
+                  <Button
+                    onPress={() => {
+                      setProfile(initialProfile);
                     }}>
-                    <ThemedIcon name="plus" size={25} />
-                  </View>
-                )}
-              </TouchableOpacity>
-            </Layout>
+                    Undo
+                  </Button>
 
-            <Layout style={{flex: 1}}>
-              {this.hasChanged() && (
-                <>
-                  <Divider />
-                  <Layout
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-evenly',
-                      padding: 10,
+                  <Button
+                    onPress={() => {
+                      updateUser(initialProfile, profile);
                     }}>
-                    <Button
-                      onPress={() => {
-                        this.setState({
-                          profile: initialProfile,
-                        });
-                      }}>
-                      Undo
-                    </Button>
-
-                    <Button
-                      onPress={() => {
-                        this.updateUser(initialProfile, profile);
-                      }}>
-                      Save
-                    </Button>
-                  </Layout>
-                </>
+                    Save
+                  </Button>
+                </Layout>
+              </>
+            )}
+            <Divider />
+            <ListItem title="Email" description={profile.email} disabled />
+            <Divider />
+            <ListItem
+              title="Account type"
+              description={profile.accountType}
+              disabled
+            />
+            <Divider />
+            {gym && (
+              <>
+                <ListItem
+                  onPress={() => navigation.navigate('Gym', {id: gym.place_id})}
+                  title="Gym"
+                  description={gym.name}
+                  accessoryRight={() => (
+                    <ThemedIcon size={25} name="arrow-ios-forward" />
+                  )}
+                />
+                <Divider />
+              </>
+            )}
+            <ListItem
+              onPress={() => navigation.navigate('Settings')}
+              title="Settings"
+              accessoryLeft={() => <ThemedIcon size={25} name="settings" />}
+              accessoryRight={() => (
+                <ThemedIcon size={25} name="arrow-ios-forward" />
               )}
-              <Divider />
-              <ListItem title="Email" description={email} disabled />
-              <Divider />
-              <ListItem
-                title="Account type"
-                description={profile.accountType}
-                disabled
+            />
+            <Divider />
+            <Layout style={{margin: 10}}>
+              <Input
+                style={{marginBottom: 10}}
+                accessoryLeft={() => <Text category="label">Username</Text>}
+                value={profile && profile.username}
+                onChangeText={(username) => setProfile({...profile, username})}
+                placeholder="Username"
+                autoCapitalize="none"
+                autoCorrect={false}
               />
-              <Divider />
-              {gym && (
-                <>
-                  <ListItem
-                    onPress={() =>
-                      navigation.navigate('Gym', {id: gym.place_id})
-                    }
-                    title="Gym"
-                    description={gym.name}
-                    accessoryRight={() => (
-                      <ThemedIcon size={25} name="arrow-ios-forward" />
-                    )}
-                  />
-                  <Divider />
-                </>
-              )}
-              <ListItem
-                onPress={() => navigation.navigate('Settings')}
-                title="Settings"
-                accessoryLeft={() => <ThemedIcon size={25} name="settings" />}
-                accessoryRight={() => (
-                  <ThemedIcon size={25} name="arrow-ios-forward" />
+
+              <Input
+                style={{marginBottom: 10}}
+                accessoryLeft={() => <Text category="label">First name</Text>}
+                value={profile && profile.first_name}
+                onChangeText={(name) =>
+                  setProfile({...profile, first_name: name})
+                }
+                placeholder="First name"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+
+              <Input
+                style={{marginBottom: 10}}
+                accessoryLeft={() => <Text category="label">Last name</Text>}
+                value={profile && profile.last_name}
+                onChangeText={(name) =>
+                  setProfile({...profile, last_name: name})
+                }
+                placeholder="Last name"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <Select
+                style={{marginBottom: 10}}
+                accessoryLeft={() => (
+                  <Text category="label">Preferred activity</Text>
                 )}
-              />
-              <Divider />
-              <Layout style={{margin: 10}}>
-                <Input
-                  style={{marginBottom: 10}}
-                  accessoryLeft={() => <Text category="label">Username</Text>}
-                  value={profile && profile.username}
-                  onChangeText={(username) =>
-                    this.setState({profile: {...profile, username}})
-                  }
-                  placeholder="Username"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
+                value={profile.activity || 'Select preferred activity'}
+                onSelect={(index) => {
+                  setSelectedIndex(index as IndexPath);
+                  setProfile({
+                    ...profile,
+                    activity: activities[Number(index) - 1],
+                  });
+                }}
+                selectedIndex={selectedIndex}>
+                {activities.map((activity) => (
+                  <SelectItem key={activity} title={activity} />
+                ))}
+              </Select>
 
-                <Input
-                  style={{marginBottom: 10}}
-                  accessoryLeft={() => <Text category="label">First name</Text>}
-                  value={profile && profile.first_name}
-                  onChangeText={(name) =>
-                    this.setState({profile: {...profile, first_name: name}})
-                  }
-                  placeholder="First name"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-
-                <Input
-                  style={{marginBottom: 10}}
-                  accessoryLeft={() => <Text category="label">Last name</Text>}
-                  value={profile && profile.last_name}
-                  onChangeText={(name) =>
-                    this.setState({profile: {...profile, last_name: name}})
-                  }
-                  placeholder="Last name"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
+              {profile && profile.activity && (
                 <Select
                   style={{marginBottom: 10}}
-                  accessoryLeft={() => (
-                    <Text category="label">Preferred activity</Text>
-                  )}
-                  selectedIndex={
-                    new IndexPath(
-                      activities.findIndex((a) => a === profile.activity),
-                    )
-                  }>
-                  {activities.map((activity) => (
-                    <SelectItem key={activity} title={activity} />
+                  value={profile.level || 'Select level'}
+                  accessoryLeft={() => <Text category="label">Level</Text>}
+                  onSelect={(index) => {
+                    setSelectedLevelIndex(index as IndexPath);
+                    setProfile({...profile, level: levels[Number(index) - 1]});
+                  }}
+                  selectedIndex={selectedLevelIndex}>
+                  {levels.map((level) => (
+                    <SelectItem key={level} title={level} />
                   ))}
                 </Select>
-
-                {profile && profile.activity && (
-                  <Select
-                    style={{marginBottom: 10}}
-                    accessoryLeft={() => <Text category="label">Level</Text>}
-                    selectedIndex={new IndexPath(0)}>
-                    {levels.map((level) => (
-                      <SelectItem key={level} title={level} />
-                    ))}
-                  </Select>
-                )}
-                <Datepicker
-                  style={{marginBottom: 10}}
-                  accessoryLeft={() => <Text category="label">Birthday</Text>}
-                  date={
-                    profile.birthday &&
-                    getBirthdayDate(profile.birthday)?.toDate()
-                  }
-                  min={new Date('01/01/1900')}
-                  max={new Date()}
-                  onSelect={(nextDate) =>
-                    this.setState({profile: {...profile, birthday: nextDate}})
-                  }
-                />
-              </Layout>
-
-              <Layout
-                style={{flex: 1, justifyContent: 'flex-end', marginBottom: 10}}>
-                <Button
-                  style={{alignSelf: 'center'}}
-                  status="danger"
-                  onPress={() => this.logout()}>
-                  Log out
-                </Button>
-              </Layout>
+              )}
+              <Datepicker
+                style={{marginBottom: 10}}
+                accessoryLeft={() => <Text category="label">Birthday</Text>}
+                date={
+                  profile.birthday &&
+                  getBirthdayDate(profile.birthday)?.toDate()
+                }
+                min={new Date('01/01/1900')}
+                max={new Date()}
+                onSelect={(nextDate) =>
+                  setProfile({...profile, birthday: nextDate})
+                }
+              />
             </Layout>
 
-            {spinner && (
-              <View style={hStyles.spinner}>
-                <Spinner />
-              </View>
-            )}
+            <Layout
+              style={{flex: 1, justifyContent: 'flex-end', marginBottom: 10}}>
+              <Button
+                style={{alignSelf: 'center'}}
+                status="danger"
+                onPress={() => logout()}>
+                Log out
+              </Button>
+            </Layout>
           </Layout>
-        </SafeAreaView>
-      </ScrollView>
-    );
-  }
-}
+
+          {spinner && (
+            <View style={hStyles.spinner}>
+              <Spinner />
+            </View>
+          )}
+        </Layout>
+      </SafeAreaView>
+    </ScrollView>
+  );
+};
 
 const mapStateToProps = ({profile}: MyRootState) => ({
   profile: profile.profile,

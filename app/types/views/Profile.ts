@@ -1,13 +1,16 @@
 import Profile from '../Profile';
 import Place from '../Place';
-import {NavigationStackProp} from 'react-navigation-stack';
 import {ThemeType} from '@ui-kitten/components';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {StackParamList} from '../../App';
+
+type ProfileNavigationProp = StackNavigationProp<StackParamList, 'Profile'>;
 
 export default interface ProfileProps {
   profile: Profile;
-  gym: Place;
+  gym?: Place;
   onLogoutPress: () => void;
   onSave: () => void;
-  navigation: NavigationStackProp;
+  navigation: ProfileNavigationProp;
   eva?: ThemeType;
 }
