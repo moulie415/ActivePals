@@ -14,7 +14,11 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import * as eva from '@eva-design/eva';
 import {ThemeContext} from './context/themeContext';
-import {NavigationContainer, RouteProp} from '@react-navigation/native';
+import {
+  getFocusedRouteNameFromRoute,
+  NavigationContainer,
+  RouteProp,
+} from '@react-navigation/native';
 import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -291,25 +295,22 @@ const App = () => {
                   },
                   headerTintColor: theme === 'light' ? '#222B45' : '#fff',
                   headerRight: () => {
-                    const index = route?.state?.index;
+                    const name = getFocusedRouteNameFromRoute(route);
                     if (route.name === 'Tabs') {
-                      if (!route.state || index === 0) {
+                      if (name === 'Home') {
                         return <NotificationsButton navigation={navigation} />;
                       }
-                      if (index === 1) {
+                      if (name === 'Sessions') {
                         return <MapToggle navigation={navigation} />;
                       }
-                      if (index === 2) {
+                      if (name === 'Friends') {
                         return <AddFriendButton />;
                       }
                     }
                   },
                   headerLeft: (props) => {
-                    const index = route?.state?.index;
-                    if (route.name === 'Tabs') {
-                      if (index === 1) {
-                        return <FilterModalButton />;
-                      }
+                    if (getFocusedRouteNameFromRoute(route) === 'Sessions') {
+                      return <FilterModalButton />;
                     }
                     if (props.canGoBack) {
                       return <HeaderBackButton {...props} />;
@@ -337,8 +338,8 @@ const App = () => {
                   options={({route}) => ({
                     title: '',
                     headerShown: !(
-                      route.state &&
-                      (route.state.index === 3 || route.state.index === 4)
+                      getFocusedRouteNameFromRoute(route) === 'Chats' ||
+                      getFocusedRouteNameFromRoute(route) === 'Profile'
                     ),
                   })}
                 />

@@ -18,7 +18,6 @@ import SplashScreen from 'react-native-splash-screen';
 import appleAuth, {
   AppleButton,
 } from '@invertase/react-native-apple-authentication';
-import db from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
 import {GoogleSignin} from '@react-native-community/google-signin';
