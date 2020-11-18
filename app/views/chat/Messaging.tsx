@@ -54,33 +54,19 @@ const Messaging: FunctionComponent<MessagingProps> = ({
   message,
   notif,
 }) => {
+  const {gymId, friendUid, sessionId, chatId} = route.params;
   const [messages, setMessages] = useState<Message[]>(
     messageSession ? Object.values(messageSession) : [],
   );
   const [spinner, setSpinner] = useState(false);
   const [showLoadEarlier, setShowLoadEarlier] = useState(true);
   const [text, setText] = useState('');
+  const [loaded, setLoaded] = useState(false);
 
   const amount = 15;
 
-  const onBackPress = useCallback(() => {
-    const {gymId, friendUid, sessionId} = route.params;
-
-    navigation.goBack();
-    const id = friendUid || sessionId || gymId;
-    if (id) {
-      const count = unreadCount[id];
-      if (count && count > 0) {
-        onResetUnreadCount(id);
-      }
-    }
-
-    return true;
-  }, [navigation, onResetUnreadCount, route.params, unreadCount]);
-
   const loadMessages = useCallback(
     (endAt?: string) => {
-      const {friendUid, gymId, sessionId, chatId} = route.params;
       setSpinner(true);
       if (sessionId) {
         const session = sessions[sessionId];
@@ -95,39 +81,18 @@ const Messaging: FunctionComponent<MessagingProps> = ({
       }
     },
     [
-      amount,
       getSessionMessages,
       getGymMessages,
       getMessages,
-      route.params,
       sessions,
+      chatId,
+      friendUid,
+      gymId,
+      sessionId,
     ],
   );
 
-  useEffect(() => {
-    const {gymId, friendUid, sessionId} = route.params;
-    BackHandler.addEventListener('hardwareBackPress', onBackPress);
-    loadMessages();
-    const id = friendUid || sessionId || gymId;
-    if (id) {
-      const count = unreadCount[id];
-      if (count && count > 0) {
-        onResetUnreadCount(id);
-      }
-    }
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    };
-  }, [
-    loadMessages,
-    onBackPress,
-    onResetUnreadCount,
-    route.params,
-    unreadCount,
-  ]);
-
   const getType = useCallback(() => {
-    const {gymId, sessionId} = route.params;
     if (sessionId) {
       return MessageType.SESSION_MESSAGE;
     }
@@ -135,10 +100,9 @@ const Messaging: FunctionComponent<MessagingProps> = ({
       return MessageType.GYM_MESSAGE;
     }
     return MessageType.MESSAGE;
-  }, [route.params]);
+  }, [gymId, sessionId]);
 
   const getDbRef = useCallback(() => {
-    const {gymId, sessionId, chatId} = route.params;
     if (sessionId) {
       return database().ref('sessionChats').child(sessionId);
     }
@@ -148,12 +112,10 @@ const Messaging: FunctionComponent<MessagingProps> = ({
     if (chatId) {
       return database().ref('chats').child(chatId);
     }
-  }, [route.params]);
+  }, [chatId, sessionId, gymId]);
 
   const onSend = useCallback(
     async (newMessages: Message[] = []) => {
-      const {friendUid, gymId, sessionId, chatId} = route.params;
-
       // make messages database friendly
       const converted = newMessages.map((message) => {
         const type = getType();
@@ -208,10 +170,30 @@ const Messaging: FunctionComponent<MessagingProps> = ({
       gym,
       messages,
       onUpdateLastMessage,
-      route.params,
       sessions,
+      chatId,
+      sessionId,
+      gymId,
+      friendUid,
     ],
   );
+
+  useEffect(() => {
+    if (!loaded) {
+      loadMessages();
+      setLoaded(true);
+    }
+  }, [loadMessages, loaded]);
+
+  useEffect(() => {
+    const id = friendUid || sessionId || gymId;
+    if (id) {
+      const count = unreadCount[id];
+      if (count && count > 0) {
+        onResetUnreadCount(id);
+      }
+    }
+  }, [friendUid, gymId, sessionId, onResetUnreadCount, unreadCount]);
 
   useEffect(() => {
     if (message) {
@@ -230,24 +212,18 @@ const Messaging: FunctionComponent<MessagingProps> = ({
       onSend([messageObj]);
       onResetMessage();
     }
-  }, [getType, message, onResetMessage, onSend, profile]);
-
-  useEffect(() => {
-    if (messageSession) {
-      setMessages(Object.values(messageSession));
-      setSpinner(false);
-      if (
-        messageSession &&
-        Object.values(messageSession).some((msg) => msg._id === 1)
-      ) {
-        setShowLoadEarlier(false);
-      }
-    }
-  }, [messageSession]);
+  }, [
+    getType,
+    message,
+    onResetMessage,
+    onSend,
+    profile.uid,
+    profile.avatar,
+    profile.username,
+  ]);
 
   useEffect(() => {
     if (notif) {
-      const {friendUid, sessionId, gymId} = route.params;
       resetNotif();
       // ignore initial fetch when component mounts
       const {
@@ -294,25 +270,23 @@ const Messaging: FunctionComponent<MessagingProps> = ({
             }
             setMessages([messageObj]);
           }
-          const id = friendUid || sessionId || gymId;
-          if (id) {
-            const count = unreadCount[id];
-            if (count && count > 0) {
-              onResetUnreadCount(id);
-            }
-          }
         }
       }
     }
-  }, [
-    messages,
-    notif,
-    onResetUnreadCount,
-    profile.uid,
-    resetNotif,
-    route.params,
-    unreadCount,
-  ]);
+  }, [friendUid, gymId, sessionId, messages, notif, profile.uid, resetNotif]);
+
+  useEffect(() => {
+    if (messageSession) {
+      setMessages(Object.values(messageSession));
+      setSpinner(false);
+      if (
+        messageSession &&
+        Object.values(messageSession).some((msg) => msg._id === 1)
+      ) {
+        setShowLoadEarlier(false);
+      }
+    }
+  }, [messageSession]);
 
   const showPicker = () => {
     const videoOptions: ImagePickerOptions = {
