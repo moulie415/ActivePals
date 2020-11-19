@@ -130,7 +130,7 @@ const Friends: FunctionComponent<FriendsProps> = ({
                     onPress={() => {
                       Alert.alert('Cancel Pal request', 'Are you sure?', [
                         {text: 'Cancel', style: 'cancel'},
-                        {text: 'OK', onPress: () => this.remove(item.uid)},
+                        {text: 'OK', onPress: () => remove(item.uid)},
                       ]);
                     }}>
                     <ThemedIcon name="close" size={40} status="danger" />
