@@ -17,7 +17,6 @@ import {ThemeContext} from './context/themeContext';
 import {
   getFocusedRouteNameFromRoute,
   NavigationContainer,
-  RouteProp,
 } from '@react-navigation/native';
 import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';

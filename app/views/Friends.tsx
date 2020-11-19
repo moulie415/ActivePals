@@ -1,7 +1,6 @@
-import React, {Component} from 'react';
+import React, {FunctionComponent, useState} from 'react';
 import {Alert, View, Platform, TouchableOpacity} from 'react-native';
 import database from '@react-native-firebase/database';
-import Image from 'react-native-fast-image';
 import {connect} from 'react-redux';
 import styles from '../styles/friendsStyles';
 import {getStateColor, sortByState} from '../constants/utils';
@@ -14,7 +13,6 @@ import {
 } from '../actions/friends';
 import FriendsProps from '../types/views/Friends';
 import {
-  Icon,
   Button,
   Text,
   Layout,
@@ -30,39 +28,38 @@ import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import globalStyles from '../styles/globalStyles';
 import Avatar from '../components/Avatar/Avatar';
 
-interface State {
-  refreshing: boolean;
-  username?: string;
-}
-class Friends extends Component<FriendsProps, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      refreshing: false,
-    };
-  }
+const Friends: FunctionComponent<FriendsProps> = ({
+  profile,
+  getFriends,
+  setModal,
+  onRemove,
+  onRequest,
+  navigation,
+  friends,
+  onAccept,
+  modalOpen,
+}) => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [username, setUsername] = useState('');
 
-  async refresh() {
-    const {profile, getFriends} = this.props;
+  const refresh = async () => {
     if (profile.friends) {
-      this.setState({refreshing: true});
+      setRefreshing(true);
       await getFriends(profile.uid);
-      this.setState({refreshing: false});
+      setRefreshing(false);
     }
-  }
+  };
 
-  async remove(friend) {
-    const {onRemove, setModal} = this.props;
+  const remove = async (friend: string) => {
     try {
       await onRemove(friend);
       setModal(false);
     } catch (e) {
       Alert.alert('Error', e.message);
     }
-  }
+  };
 
-  async sendRequest(username: string) {
-    const {profile, onRequest, setModal} = this.props;
+  const request = async (username: string) => {
     if (username !== profile.username) {
       try {
         const snapshot = await database()
@@ -89,10 +86,9 @@ class Friends extends Component<FriendsProps, State> {
     } else {
       Alert.alert('Error', 'You cannot add yourself as a pal');
     }
-  }
+  };
 
-  async openChat(uid, username) {
-    const {profile, navigation} = this.props;
+  const openChat = async (uid: string, username: string) => {
     try {
       const snapshot = await database()
         .ref(`userChats/${profile.uid}`)
@@ -113,17 +109,15 @@ class Friends extends Component<FriendsProps, State> {
     } catch (e) {
       Alert.alert('Error', e.message);
     }
-  }
+  };
 
-  renderFriends() {
-    const {friends, profile, onAccept, navigation} = this.props;
-    const {refreshing} = this.state;
+  const renderFriends = () => {
     return (
       <List
         data={sortByState(Object.values(friends))}
         ItemSeparatorComponent={Divider}
         keyExtractor={(friend) => friend.uid}
-        onRefresh={() => this.refresh()}
+        onRefresh={refresh}
         refreshing={refreshing}
         renderItem={({item}) => {
           if (item.status === 'outgoing') {
@@ -155,7 +149,7 @@ class Friends extends Component<FriendsProps, State> {
                       onPress={() => onAccept(profile.uid, item.uid)}>
                       <ThemedIcon size={40} name="checkmark" status="success" />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.remove(item.uid)}>
+                    <TouchableOpacity onPress={() => remove(item.uid)}>
                       <ThemedIcon size={40} name="close" status="danger" />
                     </TouchableOpacity>
                   </>
@@ -198,7 +192,7 @@ class Friends extends Component<FriendsProps, State> {
                       />
                     )}
                     <TouchableOpacity
-                      onPress={() => this.openChat(item.uid, item.username)}
+                      onPress={() => openChat(item.uid, item.username)}
                       style={{padding: 5, marginLeft: 10}}>
                       <ThemedIcon size={30} name="message-square" />
                     </TouchableOpacity>
@@ -218,70 +212,66 @@ class Friends extends Component<FriendsProps, State> {
         }}
       />
     );
-  }
+  };
 
-  render() {
-    const {profile, friends, modalOpen, setModal} = this.props;
-    const {username} = this.state;
-
-    return (
-      <Layout style={{flex: 1}}>
-        {Object.values(friends).length > 0 ? (
-          this.renderFriends()
-        ) : (
+  return (
+    <Layout style={{flex: 1}}>
+      {Object.values(friends).length > 0 ? (
+        renderFriends()
+      ) : (
+        <Layout
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginHorizontal: 20,
+          }}>
+          <Text style={{textAlign: 'center'}}>
+            You don't have any pals yet, also please make sure you are connected
+            to the internet
+          </Text>
+        </Layout>
+      )}
+      <Modal
+        style={styles.modal}
+        backdropStyle={globalStyles.backdrop}
+        onBackdropPress={() => setModal(false)}
+        visible={modalOpen}>
+        <Card disabled>
+          <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
+            Send pal request
+          </Text>
+          <Input
+            underlineColorAndroid="transparent"
+            autoCapitalize="none"
+            placeholder="Enter username"
+            value={username}
+            onChangeText={(u) => setUsername(u)}
+          />
           <Layout
             style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginHorizontal: 20,
+              flexDirection: 'row',
+              marginTop: 10,
+              justifyContent: 'space-evenly',
             }}>
-            <Text style={{textAlign: 'center'}}>
-              You don't have any pals yet, also please make sure you are
-              connected to the internet
-            </Text>
+            <Button
+              style={{margin: 5}}
+              onPress={() => setModal(false)}
+              status="danger">
+              Cancel
+            </Button>
+            <Button
+              disabled={!username}
+              style={{margin: 5}}
+              onPress={() => request(username)}>
+              Submit
+            </Button>
           </Layout>
-        )}
-        <Modal
-          style={styles.modal}
-          backdropStyle={globalStyles.backdrop}
-          onBackdropPress={() => setModal(false)}
-          visible={modalOpen}>
-          <Card disabled>
-            <Text style={{fontSize: 20, textAlign: 'center', padding: 10}}>
-              Send pal request
-            </Text>
-            <Input
-              underlineColorAndroid="transparent"
-              autoCapitalize="none"
-              placeholder="Enter username"
-              value={username}
-              onChangeText={(u) => this.setState({username: u})}
-            />
-            <Layout
-              style={{
-                flexDirection: 'row',
-                marginTop: 10,
-                justifyContent: 'space-evenly',
-              }}>
-              <Button
-                style={{margin: 5}}
-                onPress={() => setModal(false)}
-                status="danger">
-                Cancel
-              </Button>
-              <Button
-                style={{margin: 5}}
-                onPress={() => this.sendRequest(username)}>
-                Submit
-              </Button>
-            </Layout>
-          </Card>
-        </Modal>
-      </Layout>
-    );
-  }
-}
+        </Card>
+      </Modal>
+    </Layout>
+  );
+};
 
 const mapStateToProps = ({friends, profile}: MyRootState) => ({
   friends: friends.friends,

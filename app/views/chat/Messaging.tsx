@@ -4,11 +4,17 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import {Alert, TouchableOpacity, View, BackHandler} from 'react-native';
+import {Alert, TouchableOpacity, View} from 'react-native';
 import database from '@react-native-firebase/database';
 import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
-import {GiftedChat, Bubble, MessageText} from 'react-native-gifted-chat';
+import {
+  GiftedChat,
+  Bubble,
+  MessageText,
+  InputToolbar,
+  Composer,
+} from 'react-native-gifted-chat';
 import {connect} from 'react-redux';
 import globalStyles from '../../styles/globalStyles';
 import {guid, sortMessagesByCreatedAt} from '../../constants/utils';
@@ -25,7 +31,7 @@ import {
 } from '../../actions/chats';
 import MessagingProps, {MessagingRouteProp} from '../../types/views/Messaging';
 import Message, {MessageType, SessionType} from '../../types/Message';
-import {Text, Spinner, Layout} from '@ui-kitten/components';
+import {Text, Spinner, Layout, withStyles} from '@ui-kitten/components';
 import {
   MyRootState,
   MyThunkDispatch,
@@ -53,6 +59,7 @@ const Messaging: FunctionComponent<MessagingProps> = ({
   sessions,
   message,
   notif,
+  eva,
 }) => {
   const {gymId, friendUid, sessionId, chatId} = route.params;
   const [messages, setMessages] = useState<Message[]>(
@@ -355,8 +362,22 @@ const Messaging: FunctionComponent<MessagingProps> = ({
   };
 
   return (
-    <Layout style={{flex: 1}}>
+    <Layout style={{flex: 1}} level="1">
       <GiftedChat
+        renderInputToolbar={(props) => (
+          <InputToolbar
+            {...props}
+            containerStyle={{
+              backgroundColor: eva?.theme['background-basic-color-1'],
+            }}
+            renderComposer={(props) => (
+              <Composer
+                {...props}
+                textInputStyle={{color: eva?.theme['text-basic-color']}}
+              />
+            )}
+          />
+        )}
         text={text}
         onInputTextChanged={(input) => setText(input)}
         messages={sortMessagesByCreatedAt(messages).reverse()}
@@ -391,30 +412,23 @@ const Messaging: FunctionComponent<MessagingProps> = ({
           avatar: profile.avatar,
         }}
         renderBubble={(props) => {
-          return <Bubble {...props} />;
-        }}
-        renderMessageText={(props) => {
-          // @ts-ignore
-          const {previousMessage, currentMessage, position} = props;
           return (
-            <View>
-              {((previousMessage.user &&
-                position === 'left' &&
-                previousMessage.user._id !== currentMessage.user._id) ||
-                (!previousMessage.user &&
-                  currentMessage.user &&
-                  position === 'left')) && (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    padding: 10,
-                    paddingBottom: 0,
-                  }}>
-                  {props.currentMessage.user.name}
-                </Text>
-              )}
-              <MessageText {...props} />
-            </View>
+            <Bubble
+              {...props}
+              wrapperStyle={{
+                right: {
+                  backgroundColor: eva?.theme['color-primary-active'],
+                },
+                left: {
+                  backgroundColor: eva?.theme['background-basic-color-4'],
+                },
+              }}
+              textStyle={{
+                left: {
+                  color: eva?.theme['text-basic-color'],
+                }
+              }}
+            />
           );
         }}
         renderActions={() => {
@@ -524,4 +538,7 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onResetUnreadCount: (id: string) => dispatch(resetUnreadCount(id)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Messaging);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withStyles(Messaging));

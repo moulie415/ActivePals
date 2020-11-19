@@ -6,6 +6,7 @@ import {StackParamList} from '../../App';
 import {RouteProp} from '@react-navigation/native';
 import Session from '../Session';
 import {PushNotificationData} from '../Shared';
+import {ThemeType} from '@ui-kitten/components';
 
 type MessagingNavigationProp = StackNavigationProp<StackParamList, 'Messaging'>;
 
@@ -40,4 +41,5 @@ export default interface MessagingProps {
   sessions: {[key: string]: Session};
   message?: Message;
   notif?: PushNotificationData;
-};
+  eva?: ThemeType;
+}

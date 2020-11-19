@@ -224,7 +224,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
     }
 
     return (
-      <Layout>
+      <Layout style={{flex: 1}}>
         <ScrollView>
           {session ? (
             <Layout>
@@ -405,7 +405,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
                     {padding: 5, paddingHorizontal: 10},
                   ]}>
                   <Text style={{fontSize: 18}}>Users</Text>
-                
+
                   {(!isPrivate || (host && profile.uid === host.uid)) && (
                     <TouchableOpacity
                       onPress={() => this.setState({friendsModalOpen: true})}>
