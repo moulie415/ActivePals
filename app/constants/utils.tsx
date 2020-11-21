@@ -364,10 +364,11 @@ export const addSessionToCalendar = (calendarId: string, session: Session) => {
   });
 };
 
-export const calculateDuration = (data) => {
-  const minutes = data.durationMinutes / 60 || 0;
-  const hours = data.duration;
-  return (minutes + hours) * 60 * 60 * 1000;
+export const calculateDuration = (data: Session) => {
+  if (!data) return 0;
+  const minutes = data.durationMinutes * 60 || 0;
+  const hours = data.duration * 3600 || 0;
+  return minutes + hours;
 };
 
 export const durationString = (session: Session) => {

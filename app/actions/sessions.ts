@@ -1,7 +1,7 @@
 import database from '@react-native-firebase/database';
 import {Alert} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-
+import moment from 'moment';
 import {geofire} from '../App';
 import {fetchUsers, updateUsers} from './home';
 import {setGym} from './profile';
@@ -181,16 +181,14 @@ export const fetchSessions = (): MyThunkResult<Promise<void>> => {
           );
           const obj = {};
           sessions.forEach((session) => {
-            if (session) {
+            if (session && session.val()) {
               const {host} = session.val();
               if (!checkHost(host, getState())) {
                 userFetches.push(host);
               }
               const duration = calculateDuration(session.val());
-              const time = new Date(
-                session.val().dateTime.replace(/-/g, '/'),
-              ).getTime();
-              const current = new Date().getTime();
+              const time = moment(session.val().dateTime).unix();
+              const current = moment().unix();
               if (time + duration < current) {
                 dispatch(expirationAlert(session, false));
               }
@@ -291,12 +289,10 @@ export const fetchPrivateSessions = (): MyThunkResult<void> => {
             }),
           );
           const privateSessions = sessions.map((session) => {
-            if (session) {
+            if (session && session.val()) {
               const duration = calculateDuration(session.val());
-              const time = new Date(
-                session.val().dateTime.replace(/-/g, '/'),
-              ).getTime();
-              const current = new Date().getTime();
+              const time = moment(session.val()).unix();
+              const current = moment().unix();
               if (time + duration < current) {
                 dispatch(expirationAlert(session, true));
               }
@@ -401,6 +397,7 @@ export const fetchPrivateSession = (id: string): MyThunkResult<void> => {
       .ref('privateSessions')
       .child(id)
       .once('value');
+    debugger;
     if (session.val().gym) {
       dispatch(fetchGym(session.val().gym));
     }

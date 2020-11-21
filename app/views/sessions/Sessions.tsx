@@ -55,6 +55,8 @@ import {
 import str from '../../constants/strings';
 import useThrottle from '../../hooks/UseThrottle';
 import PrivateIcon from '../../components/PrivateIcon';
+import {logEvent} from '../../helpers/logging';
+import { logError } from 'instabug-reactnative';
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
 
@@ -188,10 +190,6 @@ const Sessions: FunctionComponent<SessionsProps> = ({
         <List
           refreshing={refreshing}
           onRefresh={handleRefresh}
-          contentContainerStyle={[
-            {flexGrow: 1},
-            sessions.length > 0 ? null : {justifyContent: 'center'},
-          ]}
           ItemSeparatorComponent={Divider}
           ListEmptyComponent={emptyComponent}
           data={sessions}
@@ -255,7 +253,12 @@ const Sessions: FunctionComponent<SessionsProps> = ({
               onPress={() => {
                 setSelectedLocation({});
                 if (loaded) {
-                  interstitial.show();
+                  try {
+                    interstitial.show();
+                  } catch (e) {
+                    logError(e.message);
+                    logEvent('ad_failed_to_load', {error: e.message});
+                  }
                 }
                 navigation.navigate('SessionDetail', {});
               }}>
@@ -282,8 +285,14 @@ const Sessions: FunctionComponent<SessionsProps> = ({
             onClosed={() => setFriendsModalOpen(false)}
             onContinue={(f) => {
               if (loaded) {
-                interstitial.show();
+                try {
+                  interstitial.show();
+                } catch (e) {
+                  logError(e.message);
+                  logEvent('ad_failed_to_load', {error: e.message});
+                }
               }
+              setFriendsModalOpen(false);
               navigation.navigate('SessionDetail', {
                 friends: f,
                 location: selectedLocation,

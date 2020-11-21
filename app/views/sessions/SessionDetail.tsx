@@ -34,6 +34,7 @@ import {
   Input,
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
+import {isEmpty} from 'ramda';
 
 const genders = [Gender.UNSPECIFIED, Gender.MALE, Gender.FEMALE];
 
@@ -430,7 +431,7 @@ class SessionDetail extends Component<SessionDetailProps, State> {
             </RadioGroup>
           </View>
           <Button
-            disabled={!(location && title && details && date)}
+            disabled={!(!isEmpty(location) && title && details && date)}
             style={{alignSelf: 'center', marginVertical: 20}}
             onPress={() => this.createSession()}>
             Create Session

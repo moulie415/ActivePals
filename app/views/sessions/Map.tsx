@@ -168,6 +168,7 @@ const Map: FunctionComponent<MapProps> = ({
             if (loaded) {
               interstitial.show();
             }
+            setFriendsModalOpen(false)
             navigation.navigate('SessionDetail', {
               friends: f,
               location: selectedLocation,
