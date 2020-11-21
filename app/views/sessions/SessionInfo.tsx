@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import {View, TouchableOpacity, Alert, ScrollView} from 'react-native';
 import RNCalendarEvents from 'react-native-calendar-events';
 import Image from 'react-native-fast-image';
@@ -10,22 +10,18 @@ import {
   addSessionToCalendar,
   durationString,
 } from '../../constants/utils';
-import globalStyles from '../../styles/globalStyles';
 import styles from '../../styles/sessionStyles';
-import PrivateIcon from '../../components/PrivateIcon';
 import FriendsModal from '../../components/friendsModal';
 import {
   removeSession,
   addUser,
   fetchSession,
   fetchPrivateSession,
-  fetchGym,
 } from '../../actions/sessions';
 import {muteChat} from '../../actions/chats';
 import SessionInfoProps from '../../types/views/sessions/SessionInfo';
 import {SessionType} from '../../types/Session';
 import {
-  Icon,
   Text,
   Button,
   Layout,
@@ -37,29 +33,40 @@ import {
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../../types/Shared';
 import ThemedIcon from '../../components/ThemedIcon/ThemedIcon';
+import hStyles from '../../styles/homeStyles';
 
-interface State {
-  popUpVisible: boolean;
-  friendsModalOpen?: boolean;
-  options?: Options;
-}
-class SessionInfo extends Component<SessionInfoProps, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      popUpVisible: false,
-    };
-  }
+const SessionInfo: FunctionComponent<SessionInfoProps> = ({
+  route,
+  getPrivateSession,
+  getSession,
+  profile,
+  remove,
+  onAddUser,
+  navigation,
+  muted,
+  onMuteChat,
+  users: propsUsers,
+  sessions,
+  privateSessions,
+  friends,
+  users,
+  places,
+  location,
+}) => {
+  const [popUpVisible, setPopUpVisible] = useState(false);
+  const [friendsModalOpen, setFriendsModalOpen] = useState(false);
+  const [options, setOptions] = useState<Options>();
+  const {isPrivate, sessionId} = route.params;
 
-  componentDidMount() {
-    const {navigation, route, getPrivateSession, getSession} = this.props;
-    const {isPrivate, sessionId} = route.params;
-    isPrivate ? getPrivateSession(sessionId) : getSession(sessionId);
-  }
+  useEffect(() => {
+    if (isPrivate) {
+      getPrivateSession(sessionId);
+    } else {
+      getSession(sessionId);
+    }
+  }, [getPrivateSession, getSession, isPrivate, sessionId]);
 
-  getButtons(host, session) {
-    const {profile, navigation, remove, onAddUser, route} = this.props;
-    const {sessionId} = route.params;
+  const getButtons = (host, session) => {
     const you = profile.uid;
     if (session.users[you]) {
       if (host.uid === you) {
@@ -83,7 +90,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
               status="danger">
               Delete
             </Button>
-            {this.chatButton(session)}
+            {chatButton(session)}
             {/* {this.muteButton()} */}
           </Layout>
         );
@@ -99,7 +106,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
             }}>
             Leave
           </Button>
-          {this.chatButton(session)}
+          {chatButton(session)}
           {/* {this.muteButton()} */}
         </View>
       );
@@ -123,19 +130,17 @@ class SessionInfo extends Component<SessionInfoProps, State> {
         </Button>
       </View>
     );
-  }
+  };
 
-  handleUserPress(uid: string) {
-    const {navigation, profile} = this.props;
+  const handleUserPress = (uid: string) => {
     if (uid === profile.uid) {
       navigation.navigate('Profile');
     } else {
       navigation.navigate('ProfileView', {uid});
     }
-  }
+  };
 
-  chatButton(session) {
-    const {navigation} = this.props;
+  const chatButton = (session) => {
     return (
       <Button
         onPress={() =>
@@ -144,11 +149,9 @@ class SessionInfo extends Component<SessionInfoProps, State> {
         Chat
       </Button>
     );
-  }
+  };
 
-  muteButton() {
-    const {muted, onMuteChat, navigation, route} = this.props;
-    const {sessionId} = route.params;
+  const muteButton = () => {
     return (
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Text>Mute </Text>
@@ -158,10 +161,9 @@ class SessionInfo extends Component<SessionInfoProps, State> {
         />
       </View>
     );
-  }
+  };
 
-  renderUsers(users) {
-    const {profile, friends, users: propsUsers} = this.props;
+  const renderUsers = (users) => {
     return (
       <List
         ItemSeparatorComponent={Divider}
@@ -175,7 +177,7 @@ class SessionInfo extends Component<SessionInfoProps, State> {
           if (userItem) {
             return (
               <ListItem
-                onPress={() => this.handleUserPress(item)}
+                onPress={() => handleUserPress(item)}
                 title={userItem.username}
                 accessoryLeft={() =>
                   userItem.avatar ? (
@@ -194,271 +196,240 @@ class SessionInfo extends Component<SessionInfoProps, State> {
         }}
       />
     );
+  };
+
+  console.log({sessionId});
+  const session = sessions[sessionId] || privateSessions[sessionId];
+  console.log({session});
+  let host;
+  if (session && session.host === profile.uid) {
+    host = profile;
+  } else if (session && session.host) {
+    host = friends[session.host] || users[session.host];
+  }
+  let gym;
+  if (session && session.gym) {
+    gym = places[session.gym];
   }
 
-  render() {
-    const {
-      navigation,
-      sessions,
-      privateSessions,
-      profile,
-      friends,
-      users,
-      places,
-      location,
-      route,
-    } = this.props;
-    const {friendsModalOpen, options, popUpVisible} = this.state;
-    const {sessionId, isPrivate} = route.params;
-    const session = sessions[sessionId] || privateSessions[sessionId];
-
-    let host;
-    if (session && session.host === profile.uid) {
-      host = profile;
-    } else if (session && session.host) {
-      host = friends[session.host] || users[session.host];
-    }
-    let gym;
-    if (session && session.gym) {
-      gym = places[session.gym];
-    }
-
-    return (
-      <Layout style={{flex: 1}}>
-        <ScrollView>
-          {session ? (
-            <Layout>
-              <Layout style={{marginBottom: 20}}>
-                {gym && gym.photo ? (
-                  <Image
-                    style={{height: 150, width: '100%'}}
-                    resizeMode="cover"
-                    source={{uri: gym.photo}}
-                  />
-                ) : (
-                  <Layout
-                    style={{
-                      height: 150,
-                    }}
-                  />
-                )}
+  return (
+    <>
+      {session ? (
+        <Layout style={{flex: 1}}>
+          <ScrollView>
+            <Layout style={{marginBottom: 20}}>
+              {gym && gym.photo ? (
+                <Image
+                  style={{height: 150, width: '100%'}}
+                  resizeMode="cover"
+                  source={{uri: gym.photo}}
+                />
+              ) : (
                 <Layout
                   style={{
-                    alignSelf: 'center',
-                    marginTop: -40,
-                    padding: 5,
-                  }}>
-                  {getType(session.type, 80)}
-                </Layout>
-              </Layout>
-              <Layout>
-                <Divider />
-                {session && host && this.getButtons(host, session)}
-                <Divider />
-                <ListItem
-                  onPress={() => Alert.alert('Details', session.details)}
-                  title="Details"
-                  description={session.details}
-                  accessoryRight={() => {
-                    return (
-                      <>
-                        {isPrivate && <PrivateIcon />}
-                        {/* <View>
-                          <Text>Gender</Text>
-                          <Text style={{color: '#999'}}>{session.gender}</Text>
-                        </View> */}
-                      </>
-                    );
+                    height: 150,
                   }}
                 />
-                <Divider />
-                <ListItem
-                  onPress={() => {
-                    Alert.alert(
-                      'Date and duration',
-                      formatDateTime(session.dateTime) +
-                        durationString(session),
-                    );
-                  }}
-                  title="Date"
-                  description={
-                    formatDateTime(session.dateTime) + durationString(session)
-                  }
-                  accessoryRight={() => (
-                    <Button
-                      onPress={() => {
-                        Alert.alert(`Add ${session.title} to calendar?`, '', [
-                          {text: 'Cancel', style: 'cancel'},
-                          {
-                            text: 'Yes',
-                            onPress: async () => {
-                              try {
-                                const result = await RNCalendarEvents.requestPermissions();
-                                if (result === 'authorized') {
-                                  const calendars = await RNCalendarEvents.findCalendars();
-                                  const validList = calendars.filter(
-                                    (calendar) => calendar.allowsModifications,
-                                  );
-                                  if (validList && validList.length > 0) {
-                                    const calendarId = validList[0].id;
-                                    await addSessionToCalendar(
-                                      calendarId,
-                                      session,
-                                    );
-                                    Alert.alert(
-                                      'Success',
-                                      `${session.title} saved to calendar`,
-                                    );
-                                  } else {
-                                    Alert.alert(
-                                      'Sorry',
-                                      "You don't have any calendars that allow modification",
-                                    );
-                                  }
-                                }
-                              } catch (e) {
-                                Alert.alert('Error', e.message);
-                              }
-                            },
-                          },
-                        ]);
-                      }}>
-                      Add to calendar
-                    </Button>
-                  )}
-                />
-                <Divider />
-                <ListItem
-                  onPress={() =>
-                    Alert.alert('Location', session.location.formattedAddress)
-                  }
-                  title="Location"
-                  description={session.location.formattedAddress}
-                  accessoryRight={() =>
-                    location ? (
-                      <Button
-                        onPress={() => {
-                          const {lat, lng} = session.location.position;
-                          const newOptions: Options = {
-                            latitude: lat,
-                            longitude: lng,
-                            cancelText: 'Cancel',
-                            sourceLatitude: location.lat,
-                            sourceLongitude: location.lon,
-                          };
-                          this.setState({
-                            popUpVisible: true,
-                            options: newOptions,
-                          });
-                        }}>
-                        Directions
-                      </Button>
-                    ) : (
-                      <Layout />
-                    )
-                  }
-                />
-                <Divider />
-                {gym && (
-                  <ListItem
-                    onPress={() =>
-                      navigation.navigate('Gym', {id: gym.place_id})
-                    }
-                    accessoryLeft={() =>
-                      gym.photo ? (
-                        <Image
-                          source={{uri: gym.photo}}
-                          style={{height: 40, width: 40, borderRadius: 25}}
-                        />
-                      ) : (
-                        getType(SessionType.GYM, 40)
-                      )
-                    }
-                    title="Gym"
-                    description={gym.name}
-                  />
-                )}
-                <Divider />
-                {host && (
-                  <ListItem
-                    onPress={() => this.handleUserPress(host.uid)}
-                    accessoryLeft={() =>
-                      host.avatar ? (
-                        <Image
-                          source={{uri: host.avatar}}
-                          style={{height: 40, width: 40, borderRadius: 25}}
-                        />
-                      ) : (
-                        <ThemedIcon size={50} name="person" />
-                      )
-                    }
-                    title="Host"
-                    description={host.username}
-                  />
-                )}
+              )}
+              <Layout
+                style={{
+                  alignSelf: 'center',
+                  marginTop: -40,
+                  padding: 5,
+                }}>
+                {getType(session.type, 80)}
               </Layout>
-              <Layout>
-                <Divider />
-                <Layout
-                  style={[
-                    styles.rowSpaceBetween,
-                    {padding: 5, paddingHorizontal: 10},
-                  ]}>
-                  <Text style={{fontSize: 18}}>Users</Text>
-
-                  {(!isPrivate || (host && profile.uid === host.uid)) && (
-                    <TouchableOpacity
-                      onPress={() => this.setState({friendsModalOpen: true})}>
-                      <ThemedIcon
-                        size={40}
-                        style={{marginRight: 10}}
-                        name="plus"
-                      />
-                    </TouchableOpacity>
-                  )}
-                </Layout>
-                <Divider />
-                {session && this.renderUsers(session.users)}
-              </Layout>
+              <Text style={{textAlign: 'center'}} category="h4">
+                {session.title}
+              </Text>
             </Layout>
-          ) : (
-            <Spinner />
-          )}
-          <Popup
-            isVisible={popUpVisible}
-            onCancelPressed={() => this.setState({popUpVisible: false})}
-            onAppPressed={() => this.setState({popUpVisible: false})}
-            onBackButtonPressed={() => this.setState({popUpVisible: false})}
-            modalProps={{animationIn: 'slideInUp'}}
-            options={options}
-            appsWhiteList={[]}
-          />
-        </ScrollView>
-        <FriendsModal
-          title="Add Pals to Session"
-          onClosed={() => this.setState({friendsModalOpen: false})}
-          onContinue={async (friends) => {
-            const invites = [];
-            friends.forEach((friend) => {
-              if (
-                !Object.values(session.users).some((user) => friend === user)
-              ) {
-                invites.push(addUser(session.key, session.private, friend));
+
+            <Divider />
+            {session && host && getButtons(host, session)}
+            <Divider />
+
+            <ListItem
+              onPress={() => Alert.alert('Details', session.details)}
+              title="Details"
+              description={session.details}
+            />
+            <Divider />
+            <ListItem
+              onPress={() => {
+                Alert.alert(
+                  'Date and duration',
+                  formatDateTime(session.dateTime) + durationString(session),
+                );
+              }}
+              title="Date"
+              description={
+                formatDateTime(session.dateTime) + durationString(session)
               }
-            });
-            await Promise.all(invites);
-            Alert.alert(
-              'Success',
-              `${friends.length > 1 ? 'Pals' : 'Pal'} added`,
-            );
-            this.setState({friendsModalOpen: false});
-          }}
-          isOpen={friendsModalOpen}
-        />
-      </Layout>
-    );
-  }
-}
+              accessoryRight={() => (
+                <Button
+                  onPress={() => {
+                    Alert.alert(`Add ${session.title} to calendar?`, '', [
+                      {text: 'Cancel', style: 'cancel'},
+                      {
+                        text: 'Yes',
+                        onPress: async () => {
+                          try {
+                            const result = await RNCalendarEvents.requestPermissions();
+                            if (result === 'authorized') {
+                              const calendars = await RNCalendarEvents.findCalendars();
+                              const validList = calendars.filter(
+                                (calendar) => calendar.allowsModifications,
+                              );
+                              if (validList && validList.length > 0) {
+                                const calendarId = validList[0].id;
+                                await addSessionToCalendar(calendarId, session);
+                                Alert.alert(
+                                  'Success',
+                                  `${session.title} saved to calendar`,
+                                );
+                              } else {
+                                Alert.alert(
+                                  'Sorry',
+                                  "You don't have any calendars that allow modification",
+                                );
+                              }
+                            }
+                          } catch (e) {
+                            Alert.alert('Error', e.message);
+                          }
+                        },
+                      },
+                    ]);
+                  }}>
+                  Add to calendar
+                </Button>
+              )}
+            />
+            <Divider />
+            <ListItem
+              onPress={() =>
+                Alert.alert('Location', session.location.formattedAddress)
+              }
+              title="Location"
+              description={session.location.formattedAddress}
+              accessoryRight={() =>
+                location ? (
+                  <Button
+                    onPress={() => {
+                      const {lat, lng} = session.location.position;
+                      const newOptions: Options = {
+                        latitude: lat,
+                        longitude: lng,
+                        cancelText: 'Cancel',
+                        sourceLatitude: location.lat,
+                        sourceLongitude: location.lon,
+                      };
+                      setPopUpVisible(true);
+                      setOptions(newOptions);
+                    }}>
+                    Directions
+                  </Button>
+                ) : (
+                  <Layout />
+                )
+              }
+            />
+            <Divider />
+            {gym && (
+              <ListItem
+                onPress={() => navigation.navigate('Gym', {id: gym.place_id})}
+                accessoryLeft={() =>
+                  gym.photo ? (
+                    <Image
+                      source={{uri: gym.photo}}
+                      style={{height: 40, width: 40, borderRadius: 25}}
+                    />
+                  ) : (
+                    getType(SessionType.GYM, 40)
+                  )
+                }
+                title="Gym"
+                description={gym.name}
+              />
+            )}
+            <Divider />
+            {host && (
+              <ListItem
+                onPress={() => handleUserPress(host.uid)}
+                accessoryLeft={() =>
+                  host.avatar ? (
+                    <Image
+                      source={{uri: host.avatar}}
+                      style={{height: 40, width: 40, borderRadius: 25}}
+                    />
+                  ) : (
+                    <ThemedIcon size={50} name="person" />
+                  )
+                }
+                title="Host"
+                description={host.username}
+              />
+            )}
+            <Layout>
+              <Divider />
+              <Layout
+                style={[
+                  styles.rowSpaceBetween,
+                  {padding: 5, paddingHorizontal: 10},
+                ]}>
+                <Text style={{fontSize: 18}}>Users</Text>
+
+                {(!isPrivate || (host && profile.uid === host.uid)) && (
+                  <TouchableOpacity onPress={() => setFriendsModalOpen(true)}>
+                    <ThemedIcon
+                      size={40}
+                      style={{marginRight: 10}}
+                      name="plus"
+                    />
+                  </TouchableOpacity>
+                )}
+              </Layout>
+              <Divider />
+              {session && renderUsers(session.users)}
+            </Layout>
+          </ScrollView>
+        </Layout>
+      ) : (
+        <Layout style={hStyles.spinner}>
+          <Spinner />
+        </Layout>
+      )}
+      <Popup
+        isVisible={popUpVisible}
+        onCancelPressed={() => setPopUpVisible(false)}
+        onAppPressed={() => setPopUpVisible(false)}
+        onBackButtonPressed={() => setPopUpVisible(false)}
+        modalProps={{animationIn: 'slideInUp'}}
+        options={options}
+        appsWhiteList={[]}
+      />
+      <FriendsModal
+        title="Add Pals to Session"
+        onClosed={() => setFriendsModalOpen(false)}
+        onContinue={async (friends) => {
+          const invites = [];
+          friends.forEach((friend) => {
+            if (!Object.values(session.users).some((user) => friend === user)) {
+              invites.push(addUser(session.key, session.private, friend));
+            }
+          });
+          await Promise.all(invites);
+          Alert.alert(
+            'Success',
+            `${friends.length > 1 ? 'Pals' : 'Pal'} added`,
+          );
+          setFriendsModalOpen(false);
+        }}
+        isOpen={friendsModalOpen}
+      />
+    </>
+  );
+};
 
 const mapStateToProps = ({
   profile,
@@ -478,12 +449,13 @@ const mapStateToProps = ({
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  remove: (key, type) => dispatch(removeSession(key, type)),
-  onAddUser: (session, isPrivate, uid) =>
+  remove: (key: string, isPrivate: boolean) =>
+    dispatch(removeSession(key, isPrivate)),
+  onAddUser: (session: string, isPrivate: boolean, uid: string) =>
     dispatch(addUser(session, isPrivate, uid)),
-  getSession: (id) => dispatch(fetchSession(id)),
-  getPrivateSession: (id) => dispatch(fetchPrivateSession(id)),
-  onMuteChat: (id, mute) => dispatch(muteChat(id, mute)),
+  getSession: (id: string) => dispatch(fetchSession(id)),
+  getPrivateSession: (id: string) => dispatch(fetchPrivateSession(id)),
+  onMuteChat: (id: string, mute: boolean) => dispatch(muteChat(id, mute)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SessionInfo);

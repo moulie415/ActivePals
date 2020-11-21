@@ -157,6 +157,9 @@ class Gym extends Component<GymProps, State> {
                     />
                   </Layout>
                 </View>
+                <Text style={{textAlign: 'center'}} category="h4">
+                  {gym.name}
+                </Text>
               </View>
               <Divider />
               <View>
@@ -398,7 +401,7 @@ class Gym extends Component<GymProps, State> {
         <FriendsModal
           onClosed={() => this.setState({friendsModalOpen: false})}
           onContinue={(friends) => {
-            this.setState({friendsModalOpen: false})
+            this.setState({friendsModalOpen: false});
             navigation.navigate('SessionDetail', {friends, location: gym});
           }}
           isOpen={friendsModalOpen}

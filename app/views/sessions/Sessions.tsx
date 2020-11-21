@@ -56,7 +56,6 @@ import str from '../../constants/strings';
 import useThrottle from '../../hooks/UseThrottle';
 import PrivateIcon from '../../components/PrivateIcon';
 import {logEvent} from '../../helpers/logging';
-import { logError } from 'instabug-reactnative';
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
 
@@ -256,7 +255,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
                   try {
                     interstitial.show();
                   } catch (e) {
-                    logError(e.message);
+                    
                     logEvent('ad_failed_to_load', {error: e.message});
                   }
                 }
@@ -288,7 +287,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
                 try {
                   interstitial.show();
                 } catch (e) {
-                  logError(e.message);
+                  
                   logEvent('ad_failed_to_load', {error: e.message});
                 }
               }

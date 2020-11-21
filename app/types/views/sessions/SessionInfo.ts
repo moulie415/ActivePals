@@ -23,8 +23,8 @@ export default interface SessionInfoProps {
   sessions: {[key: string]: Session};
   privateSessions: {[key: string]: Session};
   places: {[key: string]: Place};
-  location: {lat: number; lon: number};
-  remove: (key: string, type: string) => void;
+  location?: {lat: number; lon: number};
+  remove: (key: string, isPrivate: boolean) => void;
   onAddUser: (session: string, isPrivate: boolean, uid: string) => void;
   muted: {[key: string]: boolean};
   onMuteChat: (id: string, mute: boolean) => void;

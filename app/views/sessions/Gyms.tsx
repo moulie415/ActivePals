@@ -41,7 +41,6 @@ import Avatar from '../../components/Avatar/Avatar';
 import {GOOGLE_API_KEY} from '../../constants/strings';
 import FriendsModal from '../../components/friendsModal';
 import GymsProps from '../../types/views/sessions/Gyms';
-import {logError} from 'instabug-reactnative';
 import {logEvent} from '../../helpers/logging';
 
 const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : str.admobInterstitial;
@@ -141,7 +140,7 @@ const Gyms: FunctionComponent<GymsProps> = ({
                       try {
                         interstitial.show();
                       } catch (e) {
-                        logError(e.message);
+                        
                         logEvent('ad_failed_to_load', {error: e.message});
                       }
                     }
@@ -156,7 +155,7 @@ const Gyms: FunctionComponent<GymsProps> = ({
                 try {
                   interstitial.show();
                 } catch (e) {
-                  logError(e.message);
+                  
                   logEvent('ad_failed_to_load', {error: e.message});
                 }
               }
@@ -234,7 +233,7 @@ const Gyms: FunctionComponent<GymsProps> = ({
                         try {
                           interstitial.show();
                         } catch (e) {
-                          logError(e.message);
+                          
                           logEvent('ad_failed_to_load', {error: e.message});
                         }
                       }
@@ -278,7 +277,7 @@ const Gyms: FunctionComponent<GymsProps> = ({
                         try {
                           interstitial.show();
                         } catch (e) {
-                          logError(e.message);
+                          
                           logEvent('ad_failed_to_load', {error: e.message});
                         }
                       }
