@@ -12,10 +12,10 @@ export default interface GymProps {
   navigation: GymNavigationProp;
   route: GymRouteProp;
   friends: {[key: string]: Profile};
-  location: {lat: number; lon: number};
+  location?: {lat: number; lon: number};
   users: {[key: string]: Profile};
   profile: Profile;
-  gym: Place;
+  gym?: Place;
   places: {[key: string]: Place};
   getGym: (id: string) => void;
   join: (gym: Place) => void;
