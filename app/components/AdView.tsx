@@ -16,6 +16,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import str from '../constants/strings';
 import {Text, Card, Layout} from '@ui-kitten/components';
 import {YourLocation} from '../types/Location';
+import { logEvent } from '../helpers/logging';
 
 const adUnitId = __DEV__ ? TestIds.BANNER : str.admobBanner;
 
@@ -68,13 +69,18 @@ const AdComponent: FunctionComponent<{
     return (
       <Layout style={{marginBottom: 10}}>
         <BannerAd
-          size={BannerAdSize.FULL_BANNER}
+          size={BannerAdSize.SMART_BANNER}
           requestOptions={{
             requestNonPersonalizedAdsOnly: true,
             keywords: str.keywords,
             location: location ? [location.lat, location.lon] : undefined,
           }}
           unitId={adUnitId}
+          onAdLoaded={() => console.log('banner ad loaded')}
+          onAdFailedToLoad={() => logEvent('banner_ad_failed')}
+          onAdOpened={() => logEvent('banner_ad_opened')}
+          onAdClosed={() => console.log('ad closed')}
+          onAdLeftApplication={() => console.log('ad left application')}
         />
       </Layout>
     );

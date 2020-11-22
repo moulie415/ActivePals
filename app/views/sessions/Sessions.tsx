@@ -176,7 +176,7 @@ const Sessions: FunctionComponent<SessionsProps> = ({
       <Text
         style={{
           textAlign: 'center',
-          marginHorizontal: 20,
+          margin: 20,
         }}>
         No sessions near you have been created yet, also please make sure you
         are connected to the internet

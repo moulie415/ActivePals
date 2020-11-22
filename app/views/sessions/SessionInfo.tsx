@@ -198,9 +198,7 @@ const SessionInfo: FunctionComponent<SessionInfoProps> = ({
     );
   };
 
-  console.log({sessionId});
   const session = sessions[sessionId] || privateSessions[sessionId];
-  console.log({session});
   let host;
   if (session && session.host === profile.uid) {
     host = profile;
@@ -241,6 +239,9 @@ const SessionInfo: FunctionComponent<SessionInfoProps> = ({
               </Layout>
               <Text style={{textAlign: 'center'}} category="h4">
                 {session.title}
+              </Text>
+              <Text style={{textAlign: 'center'}} category="h6">
+                {session.private ? '(private)' : ''}
               </Text>
             </Layout>
 

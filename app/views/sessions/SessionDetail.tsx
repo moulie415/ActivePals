@@ -291,7 +291,6 @@ class SessionDetail extends Component<SessionDetailProps, State> {
                             'Sorry',
                             "You don't have any calendars that allow modification",
                           );
-                          console.log('test');
                           this.setState({addToCalendar: false});
                         }
                       } else {
@@ -299,11 +298,9 @@ class SessionDetail extends Component<SessionDetailProps, State> {
                           'Sorry',
                           'ActivePals does not have permissions to add to your calendar',
                         );
-                        console.log('test1');
                         this.setState({addToCalendar: false});
                       }
                     } else {
-                      console.log('test2');
                       this.setState({addToCalendar: false});
                     }
                   } catch (e) {
