@@ -80,7 +80,7 @@ export const setNotificationCount = (
   count,
 });
 
-export const addPost = (item: Post) => {
+export const addPost = (item: Post): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
     const uid = getState().profile.profile.uid;
     const uids = Object.keys(getState().friends.friends);
@@ -186,7 +186,11 @@ export const fetchPost = (key: string): MyThunkResult<Promise<void>> => {
   };
 };
 
-export const fetchPosts = (uid: string, amount = 30, endAt?: string) => {
+export const fetchPosts = (
+  uid: string,
+  amount = 30,
+  endAt?: string,
+): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
     const promises = [];
     const ref = endAt

@@ -2,8 +2,11 @@ import Profile from '../Profile';
 import Post from '../Post';
 import Comment from '../Comment';
 import Rep from '../Rep';
-import {NavigationStackProp} from 'react-navigation-stack';
 import {YourLocation} from '../Location';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {StackParamList} from '../../App';
+
+type HomeNavigationProp = StackNavigationProp<StackParamList, 'Home'>;
 
 export default interface HomeProps {
   profile: Profile;
@@ -20,6 +23,6 @@ export default interface HomeProps {
   getCommentRepsUsers: (comment: Comment, limit?: number) => void;
   getRepsUsers: (postId: string, limit?: number) => void;
   getReplies: (parentComment: Comment, amount: number, key: string) => void;
-  navigation: NavigationStackProp;
-  location: YourLocation;
+  navigation: HomeNavigationProp;
+  location?: YourLocation;
 }

@@ -63,7 +63,7 @@ const fbAd: FunctionComponent<{nativeAd: NativeAd}> = ({nativeAd}) => {
 
 const AdComponent: FunctionComponent<{
   index: number;
-  location: YourLocation;
+  location?: YourLocation;
 }> = ({index, location}) => {
   if (index > 0 && index % 4 === 0) {
     return (

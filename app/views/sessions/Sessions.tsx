@@ -21,15 +21,13 @@ import FriendsModal from '../../components/friendsModal';
 import {
   fetchSessions,
   fetchPrivateSessions,
-  removeSession,
   setPlaces,
   fetchPlaces,
   setRadius,
   SetShowFilterModal,
 } from '../../actions/sessions';
-import {removeGym, joinGym, setLocation} from '../../actions/profile';
+import {setLocation} from '../../actions/profile';
 import SessionsProps from '../../types/views/sessions/Sessions';
-import Session from '../../types/Session';
 import Place from '../../types/Place';
 import globalStyles from '../../styles/globalStyles';
 import {
@@ -255,7 +253,6 @@ const Sessions: FunctionComponent<SessionsProps> = ({
                   try {
                     interstitial.show();
                   } catch (e) {
-                    
                     logEvent('ad_failed_to_load', {error: e.message});
                   }
                 }
@@ -287,7 +284,6 @@ const Sessions: FunctionComponent<SessionsProps> = ({
                 try {
                   interstitial.show();
                 } catch (e) {
-                  
                   logEvent('ad_failed_to_load', {error: e.message});
                 }
               }

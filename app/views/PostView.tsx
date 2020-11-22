@@ -40,6 +40,7 @@ import Comment from '../types/Comment';
 import {Text, Spinner, Icon, Layout, Divider} from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import RepIcon from '../components/RepIcon/RepIcon';
+import {MyRootState, MyThunkDispatch} from '../types/Shared';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -626,7 +627,12 @@ class PostView extends Component<PostViewProps, State> {
   }
 }
 
-const mapStateToProps = ({profile, home, friends, sharedInfo}) => ({
+const mapStateToProps = ({
+  profile,
+  home,
+  friends,
+  sharedInfo,
+}: MyRootState) => ({
   profile: profile.profile,
   feed: home.feed,
   friends: friends.friends,
