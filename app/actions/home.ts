@@ -1,5 +1,4 @@
 import database from '@react-native-firebase/database';
-import storage from '@react-native-firebase/storage';
 import Sound from 'react-native-sound';
 import str from '../constants/strings';
 import Profile from '../types/Profile';
@@ -511,7 +510,11 @@ export const postComment = (uid, postId, text, created_at, parentCommentId) => {
   };
 };
 
-export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
+export const fetchReplies = (
+  comment: Comment,
+  limit = 5,
+  endAt?: string,
+): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const key = comment.key;
     const {uid} = getState().profile.profile;
@@ -567,7 +570,11 @@ export const fetchReplies = (comment: Comment, limit = 5, endAt?: string) => {
   };
 };
 
-export const fetchComments = (key: string, limit = 10, endAt?: string) => {
+export const fetchComments = (
+  key: string,
+  limit = 10,
+  endAt?: string,
+): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
     const userFetches = [];
     const {uid} = getState().profile.profile;

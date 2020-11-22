@@ -4,7 +4,6 @@ import {
   Alert,
   SafeAreaView,
   Dimensions,
-  TouchableWithoutFeedback,
   Platform,
   ScrollView,
   TouchableOpacity,
@@ -15,7 +14,6 @@ import ImagePicker, {ImagePickerOptions} from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Video from 'react-native-video';
-import Share, {Options} from 'react-native-share';
 import RNFetchBlob from 'rn-fetch-blob';
 import Image from 'react-native-fast-image';
 import VideoCompress from 'react-native-video-compressor';
@@ -25,13 +23,12 @@ import sStyles from '../styles/settingsStyles';
 import Comments from '../components/comments';
 import {
   likesExtractor,
-  getSimplifiedTime,
   getMentionsList,
   sortPostsByDate,
 } from '../constants/utils';
 import AdView from '../components/AdView';
 import PostItem from '../components/Post/Post';
-import {PostType} from '../types/Post';
+import Post, {PostType} from '../types/Post';
 import HomeProps from '../types/views/Home';
 import RepsModal from '../components/RepsModal';
 import {
@@ -59,10 +56,8 @@ import {
 } from '@ui-kitten/components';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
-import RepIcon from '../components/RepIcon/RepIcon';
 import Avatar from '../components/Avatar/Avatar';
 import globalStyles from '../styles/globalStyles';
-import Post from '../components/Post/Post';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -196,7 +191,7 @@ const Home: FunctionComponent<HomeProps> = ({
             const initial = Object.values(feed).length;
             if (initial > 29 && loadMore) {
               return (
-                <Card>
+                <Card disabled>
                   <TouchableOpacity
                     style={{alignItems: 'center', paddingVertical: 10}}
                     onPress={async () => {
@@ -221,7 +216,7 @@ const Home: FunctionComponent<HomeProps> = ({
             return (
               <>
                 <AdView index={index} location={location} />
-                <Card style={{marginBottom: 10}}>
+                <Card disabled style={{marginBottom: 10}}>
                   <PostItem
                     item={item}
                     profile={profile}
@@ -618,15 +613,21 @@ const mapStateToProps = ({
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
-  postStatus: (status) => dispatch(addPost(status)),
-  onRepPost: (item) => dispatch(repPost(item)),
-  comment: (uid, postId, text, created_at, parentCommentId) =>
-    dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
+  postStatus: (status: Post) => dispatch(addPost(status)),
+  onRepPost: (item: Post) => dispatch(repPost(item)),
+  comment: (
+    uid: string,
+    postId: string,
+    text: string,
+    created_at: string,
+    parentCommentId: string,
+  ) => dispatch(postComment(uid, postId, text, created_at, parentCommentId)),
   getComments: (key: string, amount?: number, endAt?: string) =>
     dispatch(fetchComments(key, amount, endAt)),
-  onRepComment: (comment) => dispatch(repComment(comment)),
-  getPosts: (uid, amount, endAt) => dispatch(fetchPosts(uid, amount, endAt)),
-  getCommentRepsUsers: (comment, limit) =>
+  onRepComment: (comment: Comment) => dispatch(repComment(comment)),
+  getPosts: (uid: string, amount?: number, endAt?: string) =>
+    dispatch(fetchPosts(uid, amount, endAt)),
+  getCommentRepsUsers: (comment: Comment, limit?: number) =>
     dispatch(fetchCommentRepsUsers(comment, limit)),
   getRepsUsers: (postId: string, limit?: number) =>
     dispatch(fetchRepsUsers(postId, limit)),

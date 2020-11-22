@@ -1,13 +1,20 @@
 import Profile from '../Profile';
 import Post from '../Post';
 import Comment from '../Comment';
-import {NavigationStackProp} from 'react-navigation-stack';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {StackParamList} from '../../App';
+import {RouteProp} from '@react-navigation/native';
+
+type PostViewNavigationProp = StackNavigationProp<StackParamList, 'PostView'>;
+
+type PostViewRouteProp = RouteProp<StackParamList, 'PostView'>;
 
 export default interface PostViewProps {
   friends: {[key: string]: Profile};
   users: {[key: string]: Profile};
   profile: Profile;
-  navigation: NavigationStackProp;
+  navigation: PostViewNavigationProp;
+  route: PostViewRouteProp;
   feed: {[key: string]: Post};
   onRepPost: (item: Post) => void;
   getRepsUsers: (postId: string, limit?: number) => void;
@@ -23,4 +30,4 @@ export default interface PostViewProps {
   ) => void;
   onRepComment: (comment: Comment) => void;
   getCommentRepsUsers: (comment: Comment, limit?: number) => void;
-};
+}
