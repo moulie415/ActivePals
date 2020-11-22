@@ -83,7 +83,7 @@ const Messaging: FunctionComponent<MessagingProps> = ({
       } else if (gymId) {
         getGymMessages(gymId, amount, endAt);
       } else if (chatId && friendUid) {
-        getMessages(chatId, amount, friendUid, endAt);
+        getMessages(chatId, amount, endAt);
       }
     },
     [
@@ -152,11 +152,22 @@ const Messaging: FunctionComponent<MessagingProps> = ({
       const ref = getDbRef();
       if (ref) {
         try {
+          const pending = newMessages.map((msg) => {
+            return {...msg, pending: true};
+          });
+          setMessages([...messages, ...pending]);
           const dbFriendly = converted.map((msg) => {
-            return {...msg, createdAt: moment(msg.createdAt).utc().format()};
+            return {
+              ...msg,
+              sent: true,
+              createdAt: moment(msg.createdAt).utc().format(),
+            };
           });
           await ref.push(...dbFriendly);
-          setMessages([...messages, ...newMessages]);
+          const sent = newMessages.map((msg) => {
+            return {...msg, sent: true};
+          });
+          setMessages([...messages, ...sent]);
 
           if (sessionId) {
             onUpdateLastMessage({...converted[0]});
@@ -426,7 +437,7 @@ const Messaging: FunctionComponent<MessagingProps> = ({
               textStyle={{
                 left: {
                   color: eva?.theme['text-basic-color'],
-                }
+                },
               }}
             />
           );
@@ -523,8 +534,8 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   onRequest: (friendUid: string) => dispatch(sendRequest(friendUid)),
   onAccept: (uid: string, friendUid: string) =>
     dispatch(acceptRequest(uid, friendUid)),
-  getMessages: (id: string, amount: number, uid: string, endAt?: string) =>
-    dispatch(fetchMessages(id, amount, uid, endAt)),
+  getMessages: (id: string, amount: number, endAt?: string) =>
+    dispatch(fetchMessages(id, amount, endAt)),
   getSessionMessages: (
     id: string,
     amount: number,

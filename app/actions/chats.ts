@@ -98,7 +98,7 @@ export const fetchGymChat = (gym: string): MyThunkResult<void> => {
           const key = Object.keys(lastMessage.val())[0];
           const message = lastMessage.val()[key];
           const avatar = getAvatar(message, getState());
-          
+
           const chat = {
             lastMessage: {...message, user: {...message.user, avatar}, key},
             key: gym,
@@ -289,10 +289,10 @@ export const fetchSessionChats = (
 export const fetchMessages = (
   id: string,
   amount: number,
-  uid: string,
   endAt?: string,
 ): MyThunkResult<void> => {
   return async (dispatch: MyThunkDispatch, getState) => {
+    const uid = getState().profile.profile.uid;
     const ref = endAt
       ? database()
           .ref(`chats/${id}`)
@@ -301,12 +301,20 @@ export const fetchMessages = (
           .limitToLast(amount)
       : database().ref(`chats/${id}`).orderByKey().limitToLast(amount);
     const snapshot = await ref.once('value');
-    const messages = {};
+    const messages: {[key: string]: Message} = {};
     snapshot.forEach((child) => {
+      if (
+        child.val().user &&
+        child.val().user._id !== uid &&
+        !child.val().received
+      ) {
+        database().ref(`chats/${id}`).child(child.key).update({received: true});
+      }
       const avatar = getAvatar(child.val(), getState());
       messages[child.key] = {
         ...child.val(),
         key: child.key,
+        sent: true,
         createdAt: new Date(child.val().createdAt),
         user: {...child.val().user, avatar},
       };
@@ -322,6 +330,7 @@ export const fetchSessionMessages = (
   endAt?: string,
 ): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
+    const uid = getState().profile.profile.uid;
     const type = isPrivate ? 'privateSessions' : 'sessions';
     const ref = endAt
       ? database()
@@ -332,11 +341,22 @@ export const fetchSessionMessages = (
           .ref('sessionChats/' + id)
           .limitToLast(amount);
     return ref.once('value', (snapshot) => {
-      const messages = {};
+      const messages: {[key: string]: Message} = {};
       snapshot.forEach((child) => {
+        if (
+          child.val().user &&
+          child.val().user._id !== uid &&
+          !child.val().received
+        ) {
+          database()
+            .ref(`sessionChats/${id}`)
+            .child(child.key)
+            .update({received: true});
+        }
         const avatar = getAvatar(child.val(), getState());
         messages[child.key] = {
           ...child.val(),
+          sent: true,
           key: child.key,
           createdAt: new Date(child.val().createdAt),
           user: {...child.val().user, avatar},
@@ -349,18 +369,34 @@ export const fetchSessionMessages = (
   };
 };
 
-export const fetchGymMessages = (id: string, amount: number, endAt?: string) => {
+export const fetchGymMessages = (
+  id: string,
+  amount: number,
+  endAt?: string,
+): MyThunkResult<void> => {
   return (dispatch: MyThunkDispatch, getState) => {
+    const uid = getState().profile.profile.uid;
     const ref = endAt
       ? database().ref(`gymChats/${id}`).endAt(endAt).limitToLast(amount)
       : database().ref(`gymChats/${id}`).limitToLast(amount);
     return ref.once('value', (snapshot) => {
-      const messages = {};
+      const messages: {[key: string]: Message} = {};
       snapshot.forEach((child) => {
+        if (
+          child.val().user &&
+          child.val().user._id !== uid &&
+          !child.val().received
+        ) {
+          database()
+            .ref(`gymChats/${id}`)
+            .child(child.key)
+            .update({received: true});
+        }
         const avatar = getAvatar(child.val(), getState());
         messages[child.key] = {
           ...child.val(),
           key: child.key,
+          sent: true,
           createdAt: new Date(child.val().createdAt),
           user: {...child.val().user, avatar},
         };

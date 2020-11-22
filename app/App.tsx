@@ -295,16 +295,14 @@ const App = () => {
                   headerTintColor: theme === 'light' ? '#222B45' : '#fff',
                   headerRight: () => {
                     const name = getFocusedRouteNameFromRoute(route);
-                    if (route.name === 'Tabs') {
-                      if (name === 'Home') {
-                        return <NotificationsButton navigation={navigation} />;
-                      }
-                      if (name === 'Sessions') {
-                        return <MapToggle navigation={navigation} />;
-                      }
-                      if (name === 'Friends') {
-                        return <AddFriendButton />;
-                      }
+                    if (!name || name === 'Home') {
+                      return <NotificationsButton navigation={navigation} />;
+                    }
+                    if (name === 'Sessions') {
+                      return <MapToggle navigation={navigation} />;
+                    }
+                    if (name === 'Friends') {
+                      return <AddFriendButton />;
                     }
                   },
                   headerLeft: (props) => {

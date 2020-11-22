@@ -24,12 +24,7 @@ export default interface MessagingProps {
   messageSession: {[key: string]: Message};
   friends: {[key: string]: Profile};
   users: {[key: string]: Profile};
-  getMessages: (
-    id: string,
-    amount: number,
-    uid: string,
-    endAt?: string,
-  ) => void;
+  getMessages: (id: string, amount: number, endAt?: string) => void;
   getSessionMessages: (
     id: string,
     amount: number,
@@ -42,4 +37,4 @@ export default interface MessagingProps {
   message?: Message;
   notif?: PushNotificationData;
   eva?: ThemeType;
-}
+};
