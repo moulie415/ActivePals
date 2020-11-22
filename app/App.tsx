@@ -295,7 +295,7 @@ const App = () => {
                   headerTintColor: theme === 'light' ? '#222B45' : '#fff',
                   headerRight: () => {
                     const name = getFocusedRouteNameFromRoute(route);
-                    if (!name || name === 'Home') {
+                    if (route.name === 'Tabs' && (name === 'Home' || !name)) {
                       return <NotificationsButton navigation={navigation} />;
                     }
                     if (name === 'Sessions') {
