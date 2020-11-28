@@ -1,7 +1,5 @@
 import PushNotification from 'react-native-push-notification';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import database from '@react-native-firebase/database';
-import messaging from '@react-native-firebase/messaging';
 import {navigateFromNotif, shouldNavigate} from './navigation';
 import {PushNotificationData} from '../types/Shared';
 import {MessageType} from '../types/Message';
@@ -10,7 +8,6 @@ import {store} from '../App';
 import {newNotification, updateLastMessage} from '../actions/chats';
 import {setNotificationCount} from '../actions/home';
 import {Platform} from 'react-native';
-import {Message} from 'react-native-gifted-chat';
 
 export const createChannels = () => {
   const channelData = [
@@ -94,31 +91,41 @@ export const handleNotification = (notification: PushNotificationData) => {
   }
 };
 
-export const setupNotifications = (uid: string) => {
-  messaging().onTokenRefresh((token) => {
-    database().ref(`users/${uid}`).child('FCMToken').set(token);
-  });
-  PushNotification.configure({
-    // (optional) Called when Token is generated (iOS and Android)
-    onRegister: ({token}) => {
-      console.log('TOKEN:', token);
-    },
+PushNotification.configure({
+  // (optional) Called when Token is generated (iOS and Android)
+  onRegister: ({token}) => {
+    console.log('TOKEN:', token);
+  },
 
-    // (required) Called when a remote or local notification is opened or received
-    onNotification: (notification) => {
-      const data = notification.data;
-      handleNotification(data as PushNotificationData);
-      if (notification.userInteraction) {
-        if (shouldNavigate(data as PushNotificationData)) {
-          navigateFromNotif(data as PushNotificationData);
-        }
+  // (required) Called when a remote or local notification is opened or received
+  onNotification: (notification) => {
+    const data = notification.data;
+    handleNotification(data as PushNotificationData);
+    if (notification.userInteraction) {
+      if (shouldNavigate(data as PushNotificationData)) {
+        navigateFromNotif(data as PushNotificationData);
       }
-      if (
-        !notification.userInteraction &&
-        notification.foreground &&
-        Platform.OS === 'ios'
-      ) {
-        const {
+    }
+    if (
+      !notification.userInteraction &&
+      notification.foreground &&
+      Platform.OS === 'ios'
+    ) {
+      const {
+        type,
+        sessionId,
+        chatId,
+        uid,
+        username,
+        postId,
+        gymId,
+        isPrivate,
+      } = notification.data;
+      PushNotification.localNotification({
+        title: notification.title,
+        message: notification.message,
+        soundName: notification.soundName,
+        userInfo: {
           type,
           sessionId,
           chatId,
@@ -127,49 +134,34 @@ export const setupNotifications = (uid: string) => {
           postId,
           gymId,
           isPrivate,
-        } = notification.data;
-        PushNotification.localNotification({
-          title: notification.title,
-          message: notification.message,
-          soundName: notification.soundName,
-          userInfo: {
-            type,
-            sessionId,
-            chatId,
-            uid,
-            username,
-            postId,
-            gymId,
-            isPrivate,
-          },
-        });
-      }
+        },
+      });
+    }
 
-      // process the notification
+    // process the notification
 
-      // required on iOS only (see fetchCompletionHandler docs: https://github.com/react-native-community/react-native-push-notification-ios)
-      notification.finish(PushNotificationIOS.FetchResult.NoData);
-    },
+    // required on iOS only (see fetchCompletionHandler docs: https://github.com/react-native-community/react-native-push-notification-ios)
+    notification.finish(PushNotificationIOS.FetchResult.NoData);
+  },
 
-    // ANDROID ONLY: GCM or FCM Sender ID (product_number) (optional - not required for local notifications, but is need to receive remote push notifications)
-    // senderID: '48631950986',
+  // ANDROID ONLY: GCM or FCM Sender ID (product_number) (optional - not required for local notifications, but is need to receive remote push notifications)
+  // senderID: '48631950986',
 
-    // IOS ONLY (optional): default: all - Permissions to register.
-    permissions: {
-      alert: true,
-      badge: true,
-      sound: true,
-    },
+  // IOS ONLY (optional): default: all - Permissions to register.
+  permissions: {
+    alert: true,
+    badge: true,
+    sound: true,
+  },
 
-    // Should the initial notification be popped automatically
-    // default: true
-    popInitialNotification: true,
+  // Should the initial notification be popped automatically
+  // default: true
+  popInitialNotification: true,
 
-    /**
-     * (optional) default: true
-     * - Specified if permissions (ios) and token (android and ios) will requested or not,
-     * - if not, you must
-     *  */
-    requestPermissions: true,
-  });
-};
+  /**
+   * (optional) default: true
+   * - Specified if permissions (ios) and token (android and ios) will requested or not,
+   * - if not, you must
+   *  */
+  requestPermissions: true,
+});

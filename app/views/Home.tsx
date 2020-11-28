@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useRef, useState} from 'react';
+import React, {FunctionComponent, useEffect, useRef, useState} from 'react';
 import {
   View,
   Alert,
@@ -16,6 +16,8 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import Video from 'react-native-video';
 import RNFetchBlob from 'rn-fetch-blob';
 import Image from 'react-native-fast-image';
+import database from '@react-native-firebase/database';
+import messaging from '@react-native-firebase/messaging';
 import VideoCompress from 'react-native-video-compressor';
 import ActionSheet from 'react-native-actionsheet';
 import styles from '../styles/homeStyles';
@@ -99,6 +101,12 @@ const Home: FunctionComponent<HomeProps> = ({
   const [mentionList, setMentionList] = useState<Profile[]>([]);
   const [selectedPost, setSelectedPost] = useState('');
   const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    messaging().onTokenRefresh((token) => {
+      database().ref(`users/${profile.uid}`).child('FCMToken').set(token);
+    });
+  }, [profile.uid]);
 
   const showPicker = () => {
     const options: ImagePickerOptions = {

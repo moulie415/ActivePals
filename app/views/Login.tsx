@@ -22,7 +22,6 @@ import database from '@react-native-firebase/database';
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
 import {GoogleSignin} from '@react-native-community/google-signin';
 import {getProfileImage} from '../helpers/images';
-import {setupNotifications} from '../helpers/notifications';
 import LoginProps from '../types/views/Login';
 import styles from '../styles/loginStyles';
 import {
@@ -103,7 +102,6 @@ const Login: FunctionComponent<LoginProps> = ({
         } else {
           navigation.navigate('Welcome', {goBack: false});
         }
-        setupNotifications(user.uid);
         loggedInAction();
       } else {
         loggedOutAction();
