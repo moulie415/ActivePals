@@ -1,10 +1,4 @@
-import React, {
-  FunctionComponent,
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-} from 'react';
+import React, {FunctionComponent, useState, useEffect, useContext} from 'react';
 import {Alert, View, TouchableOpacity, Platform} from 'react-native';
 import VersionNumber from 'react-native-version-number';
 import SpinnerButton from 'react-native-spinner-button';
@@ -60,14 +54,10 @@ const Login: FunctionComponent<LoginProps> = ({
 
   const {theme, toggleTheme} = useContext(ThemeContext);
 
-  const authRef = useRef(false);
-
   useEffect(() => {
     // listen for auth state changes
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
-      SplashScreen.hide();
       if (
-        authRef.current &&
         user &&
         ((user && user.emailVerified) ||
           (user.providerData && user.providerData.length > 0))
@@ -103,8 +93,7 @@ const Login: FunctionComponent<LoginProps> = ({
         }
         setupNotifications(user.uid);
       }
-
-      authRef.current = true;
+      SplashScreen.hide();
     });
     // unsubscribe to the listener when unmounting
     return () => unsubscribe();
