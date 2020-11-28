@@ -505,48 +505,48 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.10):
     - React
-  - RNCPushNotificationIOS (1.7.3):
+  - RNCPushNotificationIOS (1.8.0):
     - React-Core
-  - RNDateTimePicker (3.0.5):
+  - RNDateTimePicker (3.0.6):
     - React-Core
   - RNFastImage (8.3.4):
     - React-Core
     - SDWebImage (~> 5.8)
     - SDWebImageWebPCoder (~> 0.6.1)
-  - RNFBAdMob (10.0.0):
+  - RNFBAdMob (10.1.0):
     - Firebase/AdMob (~> 7.1.0)
     - PersonalizedAdConsent (~> 1.0.4)
     - React-Core
     - RNFBApp
-  - RNFBAnalytics (10.0.0):
+  - RNFBAnalytics (10.1.0):
     - Firebase/Analytics (~> 7.1.0)
     - React-Core
     - RNFBApp
-  - RNFBApp (10.0.0):
+  - RNFBApp (10.1.0):
     - Firebase/CoreOnly (~> 7.1.0)
     - React-Core
-  - RNFBAuth (10.0.0):
+  - RNFBAuth (10.1.0):
     - Firebase/Auth (~> 7.1.0)
     - React-Core
     - RNFBApp
-  - RNFBCrashlytics (10.0.0):
+  - RNFBCrashlytics (10.1.0):
     - Firebase/Crashlytics (~> 7.1.0)
     - React-Core
     - RNFBApp
-  - RNFBDatabase (10.0.0):
+  - RNFBDatabase (10.1.0):
     - Firebase/Database (~> 7.1.0)
     - React-Core
     - RNFBApp
-  - RNFBMessaging (10.0.0):
+  - RNFBMessaging (10.1.0):
     - Firebase/Messaging (~> 7.1.0)
     - React-Core
     - RNFBApp
-  - RNFBStorage (10.0.0):
+  - RNFBStorage (10.1.0):
     - Firebase/Storage (~> 7.1.0)
     - React-Core
     - RNFBApp
-  - RNGestureHandler (1.8.0):
-    - React
+  - RNGestureHandler (1.9.0):
+    - React-Core
   - RNGoogleSignin (5.0.0):
     - GoogleSignIn (~> 5.0.0)
     - React-Core
@@ -927,18 +927,18 @@ SPEC CHECKSUMS:
   RNCalendarEvents: 3b71e430212566b814a7bdd5d265ab2851d59ce2
   RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
-  RNCPushNotificationIOS: edeeea93b7210d2f918fc0e46e1a2a189b5fdacc
-  RNDateTimePicker: 3131bc214dd74d75dd7324343adf53ab2ea8ff72
+  RNCPushNotificationIOS: 61a7c72bd1ebad3568025957d001e0f0e7b32191
+  RNDateTimePicker: 120f8d08b19dd50c0308d30a07c1982e4618e9ad
   RNFastImage: d4870d58f5936111c56218dbd7fcfc18e65b58ff
-  RNFBAdMob: ebea7ba1edc8e7992daf7fc149ad3533020e1985
-  RNFBAnalytics: 56ceefdcff33238b7817d164ebabb4863a3fed92
-  RNFBApp: dd793eec42bce8d09391bd95e42f2ed7511e7fef
-  RNFBAuth: 55efed3bceda1d53196bb1671a446ec4f0a7bfd7
-  RNFBCrashlytics: 2ff8548152020b4eeba1963f60bb5e35c3dcfc44
-  RNFBDatabase: bae5c0da6fd97d019cbd02dc51612a23a4b07e12
-  RNFBMessaging: b61a2478fd3fb05bd2f72f18ad194cfb93e682f2
-  RNFBStorage: 4a54067b318427ec4741ebca6d9e88b138149202
-  RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
+  RNFBAdMob: 24817d28f78ae64ba806215564d2097600e280ce
+  RNFBAnalytics: 0a98aff1ad9abee16de201012f03179246c2e5bb
+  RNFBApp: 2b4e07dfca4cf780b9e2d61bcc21e34d890cd654
+  RNFBAuth: 850fe75de0fb59d52867b0c462c7e10f9dfa0b8d
+  RNFBCrashlytics: cf1600bf055aabd1fefb67220f151ea6092e1a2f
+  RNFBDatabase: 3b3fda7bf4a6fb0099e274b7549d084281b74618
+  RNFBMessaging: 483093ab71fb3de1d5b410fbf8ecdd32b84b5f78
+  RNFBStorage: 12a4def10a0e9633d0e58df084b88a2b7dab8b9c
+  RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
   RNGoogleSignin: ad866d4c4af2651e36801dd3b7771d7715353499
   RNPermissions: 5df468064df661a4c8c017e2791ce90d7695eea5
   RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad

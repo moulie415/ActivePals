@@ -13,4 +13,7 @@ export default interface LoginProps {
   setup: () => void;
   hasViewedWelcome: boolean;
   getProfile: () => void;
+  loggedInAction: () => void;
+  loggedOutAction: () => void;
+  loggedIn?: boolean;
 }

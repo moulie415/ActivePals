@@ -62,7 +62,7 @@ const Welcome: FunctionComponent<WelcomeProps> = ({
         <Text category="h1" style={styles.text}>
           {`Welcome \n to \n ${str.appName}`}
         </Text>
-        <Logo size={100} />
+        <Logo height={75} width={90} />
       </Layout>
       <Layout style={styles.slide} level="1">
         <Skip />

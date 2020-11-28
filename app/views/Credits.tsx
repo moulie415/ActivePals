@@ -28,9 +28,9 @@ const Credits: FunctionComponent = () => {
               case 'http://okodesign.ru/':
                 return 'okodesign.ru';
               case 'http://www.freepik.com/':
-                return 'www.freepik.com';
-              case 'https://www.flaticon.com/authors/monkik':
-                return 'www.flaticon.com/authors/monkik';
+                return 'freepik.com';
+              case 'https://www.fiverr.com/haibroartstudio':
+                return 'fiverr.com/haibroartstudio';
               case 'https://www.zapsplat.com':
                 return 'zapsplat.com';
               default: {
@@ -121,7 +121,7 @@ const Credits: FunctionComponent = () => {
                 marginBottom: 10,
               }}>
               {
-                'Icon made by monkik from \nhttps://www.flaticon.com/authors/monkik'
+                'Icon made by haibroartstudio from \nhttps://www.fiverr.com/haibroartstudio'
               }
             </Text>
           </View>

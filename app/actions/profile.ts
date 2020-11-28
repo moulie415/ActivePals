@@ -30,7 +30,7 @@ interface SetProfileAction {
   profile: {[key: string]: any};
 }
 
-interface SetLoggedOutOutAction {
+interface SetLoggedOutAction {
   type: typeof SET_LOGGED_OUT;
 }
 
@@ -51,9 +51,15 @@ interface SetGymAction {
 interface ResetGymAction {
   type: typeof REMOVE_GYM;
 }
+
+interface SetLoggedInAction {
+  type: typeof SET_LOGGED_IN;
+}
+
 export type ProfileActionTypes =
   | SetProfileAction
-  | SetLoggedOutOutAction
+  | SetLoggedOutAction
+  | SetLoggedInAction
   | ViewedWelcomeAction
   | SetGymAction
   | ResetGymAction
@@ -71,8 +77,12 @@ export const ViewedWelcome = (): ViewedWelcomeAction => ({
   type: SET_HAS_VIEWED_WELCOME,
 });
 
-export const setLoggedOut = (): SetLoggedOutOutAction => ({
+export const setLoggedOut = (): SetLoggedOutAction => ({
   type: SET_LOGGED_OUT,
+});
+
+export const setLoggedIn = (): SetLoggedInAction => ({
+  type: SET_LOGGED_IN,
 });
 
 export const setGym = (gym: Place): SetGymAction => ({

@@ -4,7 +4,13 @@ import VersionNumber from 'react-native-version-number';
 import SpinnerButton from 'react-native-spinner-button';
 import auth from '@react-native-firebase/auth';
 import {connect} from 'react-redux';
-import {SetProfile, doSetup, fetchProfile} from '../actions/profile';
+import {
+  SetProfile,
+  doSetup,
+  fetchProfile,
+  setLoggedIn,
+  setLoggedOut,
+} from '../actions/profile';
 import Profile, {AccountType} from '../types/Profile';
 import {MyThunkDispatch, MyRootState} from '../types/Shared';
 import {CommonActions} from '@react-navigation/native';
@@ -44,6 +50,9 @@ const Login: FunctionComponent<LoginProps> = ({
   hasViewedWelcome,
   setup,
   getProfile,
+  loggedIn,
+  loggedInAction,
+  loggedOutAction,
 }) => {
   const [spinner, setSpinner] = useState(false);
   const [facebookLoading, setFacebookLoading] = useState(false);
@@ -55,6 +64,9 @@ const Login: FunctionComponent<LoginProps> = ({
   const {theme, toggleTheme} = useContext(ThemeContext);
 
   useEffect(() => {
+    if (!loggedIn) {
+      SplashScreen.hide();
+    }
     // listen for auth state changes
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
       if (
@@ -92,12 +104,25 @@ const Login: FunctionComponent<LoginProps> = ({
           navigation.navigate('Welcome', {goBack: false});
         }
         setupNotifications(user.uid);
+        loggedInAction();
+      } else {
+        loggedOutAction();
       }
       SplashScreen.hide();
     });
     // unsubscribe to the listener when unmounting
     return () => unsubscribe();
-  }, [setProfile, navigation, hasViewedWelcome, setup, getProfile, route]);
+  }, [
+    setProfile,
+    navigation,
+    hasViewedWelcome,
+    setup,
+    getProfile,
+    route,
+    loggedIn,
+    loggedInAction,
+    loggedOutAction,
+  ]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -227,7 +252,7 @@ const Login: FunctionComponent<LoginProps> = ({
         style={{position: 'absolute', top: 40, right: 20}}
       />
       <View style={{alignItems: 'center', margin: 30}}>
-        <Logo size={100} />
+        <Logo height={75} width={90} />
       </View>
       <Input
         placeholder="Email"
@@ -333,12 +358,15 @@ const Login: FunctionComponent<LoginProps> = ({
 
 const mapStateToProps = ({profile}: MyRootState) => ({
   hasViewedWelcome: profile.hasViewedWelcome,
+  loggedIn: profile.loggedIn,
 });
 
 const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   setProfile: (profile: Profile) => dispatch(SetProfile(profile)),
   setup: () => dispatch(doSetup()),
   getProfile: () => dispatch(fetchProfile()),
+  loggedInAction: () => dispatch(setLoggedIn()),
+  loggedOutAction: () => dispatch(setLoggedOut()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

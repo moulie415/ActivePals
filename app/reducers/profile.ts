@@ -1,5 +1,6 @@
 import {
   SET_PROFILE,
+  SET_LOGGED_IN,
   SET_LOGGED_OUT,
   SET_HAS_VIEWED_WELCOME,
   ProfileActionTypes,
@@ -18,6 +19,7 @@ export interface ProfileState {
   gym?: Place;
   unreadCount: number;
   location?: YourLocation;
+  loggedIn?: boolean;
 }
 
 const initialState: ProfileState = {
@@ -26,7 +28,10 @@ const initialState: ProfileState = {
   unreadCount: 0,
 };
 
-const reducer = (state = initialState, action: ProfileActionTypes) => {
+const reducer = (
+  state = initialState,
+  action: ProfileActionTypes,
+): ProfileState => {
   switch (action.type) {
     case SET_PROFILE:
       return {
@@ -60,8 +65,18 @@ const reducer = (state = initialState, action: ProfileActionTypes) => {
         location: action.location,
       };
     }
+    case SET_LOGGED_IN: {
+      return {
+        ...state,
+        loggedIn: true,
+      };
+    }
     case SET_LOGGED_OUT:
-      return {...initialState, hasViewedWelcome: state.hasViewedWelcome};
+      return {
+        ...initialState,
+        hasViewedWelcome: state.hasViewedWelcome,
+        loggedIn: false,
+      };
     default:
       return state;
   }
