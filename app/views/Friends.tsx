@@ -22,6 +22,7 @@ import {
   Input,
   Modal,
   Card,
+  withStyles,
 } from '@ui-kitten/components';
 import ThemedIcon from '../components/ThemedIcon/ThemedIcon';
 import {MyRootState, MyThunkDispatch} from '../types/Shared';
@@ -38,6 +39,7 @@ const Friends: FunctionComponent<FriendsProps> = ({
   friends,
   onAccept,
   modalOpen,
+  eva,
 }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [username, setUsername] = useState('');
@@ -173,7 +175,7 @@ const Friends: FunctionComponent<FriendsProps> = ({
                     {item.state && (
                       <Text
                         style={{
-                          color: getStateColor(item.state),
+                          color: getStateColor(item.state, eva),
                           alignSelf: 'center',
                           marginRight: 10,
                         }}>
@@ -186,7 +188,7 @@ const Friends: FunctionComponent<FriendsProps> = ({
                           width: 10,
                           height: 10,
                           borderRadius: 5,
-                          backgroundColor: getStateColor(item.state),
+                          backgroundColor: getStateColor(item.state, eva),
                           alignSelf: 'center',
                         }}
                       />
@@ -289,4 +291,7 @@ const mapDispatchToProps = (dispatch: MyThunkDispatch) => ({
   setModal: (show: boolean) => dispatch(SetModal(show)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Friends);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withStyles(Friends));

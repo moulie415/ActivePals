@@ -15,6 +15,7 @@ import Notification from '../types/Notification';
 import Chat from '../types/Chat';
 import {Source} from 'react-native-fast-image';
 import ThemedImage from '../components/ThemedImage/ThemedImage';
+import {ThemeType} from '@ui-kitten/components';
 
 const formats = ['DD/MM/YYYY', 'MM/DD/YYYY'];
 
@@ -245,14 +246,14 @@ export const getSimplifiedTime = (createdAt) => {
   return dateString;
 };
 
-export const getStateColor = (state: UserState) => {
+export const getStateColor = (state: UserState, eva?: ThemeType) => {
   switch (state) {
     case UserState.ONLINE:
-      return 'green';
+      return eva?.theme['color-success-default'];
     case UserState.AWAY:
-      return '#F9BD49';
+      return eva?.theme['color-warning-default'];
     default:
-      return 'red';
+      return eva?.theme['color-danger-default'];
   }
 };
 
@@ -365,7 +366,9 @@ export const addSessionToCalendar = (calendarId: string, session: Session) => {
 };
 
 export const calculateDuration = (data: Session) => {
-  if (!data) return 0;
+  if (!data) {
+    return 0;
+  }
   const minutes = data.durationMinutes * 60 || 0;
   const hours = data.duration * 3600 || 0;
   return minutes + hours;

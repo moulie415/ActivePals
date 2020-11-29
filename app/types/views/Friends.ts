@@ -1,5 +1,6 @@
 import Profile from '../Profile';
 import {NavigationStackProp} from 'react-navigation-stack';
+import {ThemeType} from '@ui-kitten/components';
 
 export default interface FriendsProps {
   profile: Profile;
@@ -11,4 +12,5 @@ export default interface FriendsProps {
   navigation: NavigationStackProp;
   setModal: (show: boolean) => void;
   modalOpen: boolean;
-};
+  eva?: ThemeType;
+}
