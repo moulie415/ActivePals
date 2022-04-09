@@ -41,7 +41,7 @@
     "hermes-engine": "0.5.2-rc1",
     "instabug-reactnative": "^9.1.9",
     "lodash.throttle": "^4.1.1",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "ramda": "^0.27.1",
     "react": "16.13.1",
     "react-native": "0.63.3",
